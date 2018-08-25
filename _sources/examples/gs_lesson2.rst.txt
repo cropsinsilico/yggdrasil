@@ -19,6 +19,24 @@ Model YAML:
 
 
 
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson2/src/gs_lesson2.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson2/gs_lesson2_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
 C Version
 ---------
 
@@ -50,24 +68,6 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../cis_interface/examples/gs_lesson2/gs_lesson2_cpp.yml
-   :language: yaml
-   :linenos:
-
-
-
-Matlab Version
---------------
-
-Model Code:
-
-.. literalinclude:: /../../cis_interface/examples/gs_lesson2/src/gs_lesson2.m
-   :language: matlab
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../cis_interface/examples/gs_lesson2/gs_lesson2_matlab.yml
    :language: yaml
    :linenos:
 

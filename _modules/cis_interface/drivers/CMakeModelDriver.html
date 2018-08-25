@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.CMakeModelDriver &mdash; cis_interface 0.5.3 documentation</title>
+  <title>cis_interface.drivers.CMakeModelDriver &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,18 +25,27 @@
   
 
   
+  
     <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="../../../index.html"/>
+        <link rel="up" title="cis_interface.drivers" href="../drivers.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -58,7 +67,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -112,7 +121,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">cis_interface</a>
@@ -120,10 +129,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -292,7 +300,7 @@
 
 
 <span class="nd">@register_component</span>
-<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Class for running cmake compiled drivers. Before running the</span>
 <span class="sd">    cmake command, the cmake commands for setting the necessary compiler &amp; linker</span>
 <span class="sd">    flags for the interface&#39;s C/C++ library are written to a file called</span>
@@ -372,7 +380,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Making target.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CMakeModelDriver.run_cmake"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.run_cmake">[docs]</a>    <span class="k">def</span> <span class="nf">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver.run_cmake"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.run_cmake">[docs]</a>    <span class="k">def</span> <span class="nf">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Run the cmake command on the source.</span>
 
 <span class="sd">        Args:</span>
@@ -419,7 +427,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Make complete&#39;</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CMakeModelDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver.cleanup"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
         <span class="c1"># self.run_cmake(&#39;clean&#39;)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">preserve_cache</span><span class="p">:</span>
@@ -440,7 +448,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -453,7 +463,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -471,7 +481,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -491,13 +501,14 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

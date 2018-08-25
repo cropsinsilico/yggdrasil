@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.dataio package &mdash; cis_interface 0.5.3 documentation</title>
+  <title>cis_interface.dataio package &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,20 +25,29 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface.dataio.tests package" href="cis_interface.dataio.tests.html" />
-    <link rel="prev" title="cis_interface.serialize.tests package" href="cis_interface.serialize.tests.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="index.html"/>
+        <link rel="up" title="Python Code" href="code_python.html"/>
+        <link rel="next" title="cis_interface.dataio.tests package" href="cis_interface.dataio.tests.html"/>
+        <link rel="prev" title="cis_interface.serialize.tests package" href="cis_interface.serialize.tests.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -60,7 +69,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -143,7 +152,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -151,10 +160,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -223,7 +231,7 @@
 <span id="cis-interface-dataio-asciifile-module"></span><h2>cis_interface.dataio.AsciiFile module<a class="headerlink" href="#module-cis_interface.dataio.AsciiFile" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cis_interface.dataio.AsciiFile.AsciiFile">
-<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiFile.</code><code class="descname">AsciiFile</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>comment=b'# '</em>, <em>newline=b'n'</em>, <em>open_as_binary=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiFile.</code><code class="descname">AsciiFile</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>comment='# '</em>, <em>newline='n'</em>, <em>open_as_binary=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="cis_interface.dataio.AsciiFile.AsciiFile.close">
@@ -333,7 +341,7 @@ nothing happens.</p>
 <span id="cis-interface-dataio-asciitable-module"></span><h2>cis_interface.dataio.AsciiTable module<a class="headerlink" href="#module-cis_interface.dataio.AsciiTable" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable">
-<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">AsciiTable</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>format_str=None</em>, <em>dtype=None</em>, <em>column_names=None</em>, <em>use_astropy=False</em>, <em>column=b't'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">AsciiTable</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>format_str=None</em>, <em>dtype=None</em>, <em>column_names=None</em>, <em>use_astropy=False</em>, <em>column='t'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="cis_interface.dataio.AsciiFile.AsciiFile"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.dataio.AsciiFile.AsciiFile</span></code></a></p>
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable.arr">
@@ -741,7 +749,9 @@ exist. Otherwise, no names are written.</td>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -763,7 +773,7 @@ exist. Otherwise, no names are written.</td>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -781,7 +791,7 @@ exist. Otherwise, no names are written.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -801,13 +811,14 @@ exist. Otherwise, no names are written.</td>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

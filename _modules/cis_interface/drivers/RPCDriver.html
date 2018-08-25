@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.RPCDriver &mdash; cis_interface 0.5.3 documentation</title>
+  <title>cis_interface.drivers.RPCDriver &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,18 +25,27 @@
   
 
   
+  
     <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="../../../index.html"/>
+        <link rel="up" title="cis_interface.drivers" href="../drivers.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -58,7 +67,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -112,7 +121,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">cis_interface</a>
@@ -120,10 +129,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -170,7 +178,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.CommDriver</span> <span class="k">import</span> <span class="n">CommDriver</span>
 
 
-<div class="viewcode-block" id="RPCDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver">[docs]</a><span class="k">class</span> <span class="nc">RPCDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver">[docs]</a><span class="k">class</span> <span class="nc">RPCDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Base class for any driver that requires to access to input &amp; output</span>
 <span class="sd">    queues for RPC type functionality.</span>
 
@@ -220,7 +228,7 @@
         <span class="sd">r&quot;&quot;&quot;int: The number of messages in the output comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">n_msg</span>
 
-<div class="viewcode-block" id="RPCDriver.start"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.start"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Run the input/output comm drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -228,47 +236,47 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RPCDriver.graceful_stop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.graceful_stop"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Allow the IPC comms to terminate gracefully.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RPCDriver.close_comms"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.close_comms">[docs]</a>    <span class="k">def</span> <span class="nf">close_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.close_comms"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.close_comms">[docs]</a>    <span class="k">def</span> <span class="nf">close_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Close the IPC comms.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RPCDriver.do_terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.do_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">do_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.do_terminate"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.do_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">do_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Terminate input/output comm drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">do_terminate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RPCDriver.on_model_exit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.on_model_exit"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Actions to perform when the associated model driver is finished.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
         
-<div class="viewcode-block" id="RPCDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.cleanup"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Perform cleanup for IPC drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="RPCDriver.printStatus"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.printStatus"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Print information on the status of the driver.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;RPC Input Driver:&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;RPC Ouput Driver:&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RPCDriver.send"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.send"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Send message smaller than maxMsgSize to the output comm.</span>
 
 <span class="sd">        Args:</span>
@@ -282,7 +290,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RPCDriver.recv"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.recv"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Receive message smaller than maxMsgSize from the input comm.</span>
 
 <span class="sd">        Args:</span>
@@ -296,7 +304,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
             
-<div class="viewcode-block" id="RPCDriver.send_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.send_nolimit"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Send message larger than maxMsgSize to the input comm.</span>
 
 <span class="sd">        Args:</span>
@@ -311,7 +319,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RPCDriver.recv_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RPCDriver.recv_nolimit"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Receive message larger than maxMsgSize from the output comm.</span>
 
 <span class="sd">        Args:</span>
@@ -328,7 +336,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -341,7 +351,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -359,7 +369,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -379,13 +389,14 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

@@ -106,7 +106,7 @@ create your YAML file by clicking the ``Generate Manifest`` button,
 .. image:: interface_images/network_manifest.png
 
 Copy this information to you clipboard and past it into a new file 
-called ``growth_network.yml`` in the ``hackthon2018`` directory.
+called ``growth_network.yml`` in the ``cis_home`` directory.
 
 
 Running the Model-to-Model Integration
@@ -116,5 +116,5 @@ You can run the integration you just created by executing::
 
   $ cisrun growth_network.yml
 
-from the ``hackathon2018`` directory. This will output information on the 
+from the ``cis_home`` directory. This will output information on the 
 screen from all of the models being run.

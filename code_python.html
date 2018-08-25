@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Code &mdash; cis_interface 0.5.3 documentation</title>
+  <title>Python Code &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,20 +25,29 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface.interface package" href="cis_interface.interface.html" />
-    <link rel="prev" title="Code" href="code.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="index.html"/>
+        <link rel="up" title="Code" href="code.html"/>
+        <link rel="next" title="cis_interface.interface package" href="cis_interface.interface.html"/>
+        <link rel="prev" title="Code" href="code.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -60,7 +69,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -143,7 +152,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -151,10 +160,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -365,8 +373,8 @@ the interface library in a C or C++ program.</p>
 </div>
 <dl class="class">
 <dt id="cis_interface.config.CisConfigParser">
-<em class="property">class </em><code class="descclassname">cis_interface.config.</code><code class="descname">CisConfigParser</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>dict_type=&lt;class 'collections.OrderedDict'&gt;</em>, <em>allow_no_value=False</em>, <em>*</em>, <em>delimiters=('='</em>, <em>':')</em>, <em>comment_prefixes=('#'</em>, <em>';')</em>, <em>inline_comment_prefixes=None</em>, <em>strict=True</em>, <em>empty_lines_in_values=True</em>, <em>default_section='DEFAULT'</em>, <em>interpolation=&lt;object object&gt;</em>, <em>converters=&lt;object object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">configparser.ConfigParser</span></code></a></p>
+<em class="property">class </em><code class="descclassname">cis_interface.config.</code><code class="descname">CisConfigParser</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>dict_type=&lt;class 'collections.OrderedDict'&gt;</em>, <em>allow_no_value=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ConfigParser.ConfigParser</span></code></p>
 <p>Config parser that returns None if option not provided on get.</p>
 <dl class="method">
 <dt id="cis_interface.config.CisConfigParser.get">
@@ -445,7 +453,9 @@ tree starting at a given path.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the file to be found (with the extension).</li>
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Directory where search should start.</li>
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) &#8211; Directory where search should start. If set to
+None on Windows, the current directory and PATH variable are
+searched.</li>
 </ul>
 </td>
 </tr>
@@ -1024,22 +1034,22 @@ or None if the format does not match.</p>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.CisSchemaValidator.normalization_rules">
-<code class="descname">normalization_rules</code><em class="property"> = {'rename_handler': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'default_setter': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}, 'coerce': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'purge_unknown': {'type': 'boolean'}, 'default': {'nullable': True}, 'rename': {'type': 'hashable'}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.normalization_rules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">normalization_rules</code><em class="property"> = {'rename': {'type': 'hashable'}, 'purge_unknown': {'type': 'boolean'}, 'default': {'nullable': True}, 'default_setter': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}, 'coerce': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'rename_handler': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.normalization_rules" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.CisSchemaValidator.rules">
-<code class="descname">rules</code><em class="property"> = {'allow_unknown': {'oneof': [{'type': 'boolean'}, {'type': ['dict', 'string'], 'validator': 'bulk_schema'}]}, 'rename': {'type': 'hashable'}, 'keyschema': {'type': ['dict', 'string'], 'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler']}, 'validator': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}}, {'type': 'string', 'allowed': ()}]}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}, 'empty': {'type': 'boolean'}, 'forbidden': {'type': 'list'}, 'excludes': {'type': ('hashable', 'list'), 'schema': {'type': 'hashable'}}, 'items': {'type': 'list', 'validator': 'items'}, 'max': {'nullable': False}, 'regex': {'type': 'string'}, 'coerce': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'type': {'type': ['string', 'list'], 'validator': 'type'}, 'required': {'type': 'boolean'}, 'minlength': {'type': 'integer'}, 'dependencies': {'type': ('dict', 'hashable', 'list'), 'validator': 'dependencies'}, 'allowed': {'type': 'list'}, 'purge_unknown': {'type': 'boolean'}, 'rename_handler': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'noneof': {'type': 'list', 'logical': 'noneof'}, 'default': {'nullable': True}, 'min': {'nullable': False}, 'maxlength': {'type': 'integer'}, 'nullable': {'type': 'boolean'}, 'allof': {'type': 'list', 'logical': 'allof'}, 'default_setter': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}, 'anyof': {'type': 'list', 'logical': 'anyof'}, 'valueschema': {'type': ['dict', 'string'], 'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler']}, 'readonly': {'type': 'boolean'}, 'oneof': {'type': 'list', 'logical': 'oneof'}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.rules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rules</code><em class="property"> = {'rename': {'type': 'hashable'}, 'oneof': {'type': 'list', 'logical': 'oneof'}, 'required': {'type': 'boolean'}, 'max': {'nullable': False}, 'forbidden': {'type': 'list'}, 'maxlength': {'type': 'integer'}, 'allow_unknown': {'oneof': [{'type': 'boolean'}, {'validator': 'bulk_schema', 'type': ['dict', 'string']}]}, 'default_setter': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}, 'items': {'validator': 'items', 'type': 'list'}, 'coerce': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'dependencies': {'validator': 'dependencies', 'type': ('dict', 'hashable', 'list')}, 'nullable': {'type': 'boolean'}, 'allowed': {'type': 'list'}, 'anyof': {'type': 'list', 'logical': 'anyof'}, 'regex': {'type': 'string'}, 'excludes': {'type': ('hashable', 'list'), 'schema': {'type': 'hashable'}}, 'purge_unknown': {'type': 'boolean'}, 'min': {'nullable': False}, 'default': {'nullable': True}, 'minlength': {'type': 'integer'}, 'allof': {'type': 'list', 'logical': 'allof'}, 'valueschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}, 'readonly': {'type': 'boolean'}, 'validator': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}}, {'type': 'string', 'allowed': ()}]}, 'rename_handler': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'noneof': {'type': 'list', 'logical': 'noneof'}, 'keyschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}, 'type': {'validator': 'type', 'type': ['string', 'list']}, 'empty': {'type': 'boolean'}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.rules" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.CisSchemaValidator.types_mapping">
-<code class="descname">types_mapping</code><em class="property"> = {'integer': TypeDefinition(name='integer', included_types=((&lt;class 'int'&gt;,),), excluded_types=()), 'list': TypeDefinition(name='list', included_types=(&lt;class 'collections.abc.Sequence'&gt;,), excluded_types=(&lt;class 'str'&gt;,)), 'function': TypeDefinition(name='function', included_types=&lt;class 'function'&gt;, excluded_types=()), 'dict': TypeDefinition(name='dict', included_types=(&lt;class 'collections.abc.Mapping'&gt;,), excluded_types=()), 'date': TypeDefinition(name='date', included_types=(&lt;class 'datetime.date'&gt;,), excluded_types=()), 'number': TypeDefinition(name='number', included_types=((&lt;class 'int'&gt;,), &lt;class 'float'&gt;), excluded_types=(&lt;class 'bool'&gt;,)), 'boolean': TypeDefinition(name='boolean', included_types=(&lt;class 'bool'&gt;,), excluded_types=()), 'binary': TypeDefinition(name='binary', included_types=(&lt;class 'bytes'&gt;, &lt;class 'bytearray'&gt;), excluded_types=()), 'datetime': TypeDefinition(name='datetime', included_types=(&lt;class 'datetime.datetime'&gt;,), excluded_types=()), 'float': TypeDefinition(name='float', included_types=(&lt;class 'float'&gt;, (&lt;class 'int'&gt;,)), excluded_types=()), 'string': TypeDefinition(name='string', included_types=&lt;class 'str'&gt;, excluded_types=()), 'set': TypeDefinition(name='set', included_types=(&lt;class 'set'&gt;,), excluded_types=())}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.types_mapping" title="Permalink to this definition">¶</a></dt>
+<code class="descname">types_mapping</code><em class="property"> = {'function': TypeDefinition(name='function', included_types=&lt;type 'function'&gt;, excluded_types=()), 'binary': TypeDefinition(name='binary', included_types=(&lt;type 'str'&gt;, &lt;type 'bytearray'&gt;), excluded_types=()), 'set': TypeDefinition(name='set', included_types=(&lt;type 'set'&gt;,), excluded_types=()), 'string': TypeDefinition(name='string', included_types=&lt;type 'basestring'&gt;, excluded_types=()), 'float': TypeDefinition(name='float', included_types=(&lt;type 'float'&gt;, (&lt;type 'int'&gt;, &lt;type 'long'&gt;)), excluded_types=()), 'list': TypeDefinition(name='list', included_types=(&lt;class '_abcoll.Sequence'&gt;,), excluded_types=(&lt;type 'basestring'&gt;,)), 'number': TypeDefinition(name='number', included_types=((&lt;type 'int'&gt;, &lt;type 'long'&gt;), &lt;type 'float'&gt;), excluded_types=(&lt;type 'bool'&gt;,)), 'datetime': TypeDefinition(name='datetime', included_types=(&lt;type 'datetime.datetime'&gt;,), excluded_types=()), 'boolean': TypeDefinition(name='boolean', included_types=(&lt;type 'bool'&gt;,), excluded_types=()), 'dict': TypeDefinition(name='dict', included_types=(&lt;class '_abcoll.Mapping'&gt;,), excluded_types=()), 'date': TypeDefinition(name='date', included_types=(&lt;type 'datetime.date'&gt;,), excluded_types=()), 'integer': TypeDefinition(name='integer', included_types=((&lt;type 'int'&gt;, &lt;type 'long'&gt;),), excluded_types=())}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.types_mapping" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.CisSchemaValidator.validation_rules">
-<code class="descname">validation_rules</code><em class="property"> = {'allow_unknown': {'oneof': [{'type': 'boolean'}, {'type': ['dict', 'string'], 'validator': 'bulk_schema'}]}, 'keyschema': {'type': ['dict', 'string'], 'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler']}, 'validator': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}}, {'type': 'string', 'allowed': ()}]}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}, 'empty': {'type': 'boolean'}, 'forbidden': {'type': 'list'}, 'minlength': {'type': 'integer'}, 'excludes': {'type': ('hashable', 'list'), 'schema': {'type': 'hashable'}}, 'items': {'type': 'list', 'validator': 'items'}, 'max': {'nullable': False}, 'regex': {'type': 'string'}, 'type': {'type': ['string', 'list'], 'validator': 'type'}, 'required': {'type': 'boolean'}, 'readonly': {'type': 'boolean'}, 'dependencies': {'type': ('dict', 'hashable', 'list'), 'validator': 'dependencies'}, 'noneof': {'type': 'list', 'logical': 'noneof'}, 'min': {'nullable': False}, 'maxlength': {'type': 'integer'}, 'nullable': {'type': 'boolean'}, 'allof': {'type': 'list', 'logical': 'allof'}, 'anyof': {'type': 'list', 'logical': 'anyof'}, 'valueschema': {'type': ['dict', 'string'], 'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler']}, 'allowed': {'type': 'list'}, 'oneof': {'type': 'list', 'logical': 'oneof'}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.validation_rules" title="Permalink to this definition">¶</a></dt>
+<code class="descname">validation_rules</code><em class="property"> = {'forbidden': {'type': 'list'}, 'allowed': {'type': 'list'}, 'regex': {'type': 'string'}, 'excludes': {'type': ('hashable', 'list'), 'schema': {'type': 'hashable'}}, 'min': {'nullable': False}, 'minlength': {'type': 'integer'}, 'allof': {'type': 'list', 'logical': 'allof'}, 'readonly': {'type': 'boolean'}, 'noneof': {'type': 'list', 'logical': 'noneof'}, 'keyschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}, 'type': {'validator': 'type', 'type': ['string', 'list']}, 'empty': {'type': 'boolean'}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}, 'oneof': {'type': 'list', 'logical': 'oneof'}, 'max': {'nullable': False}, 'allow_unknown': {'oneof': [{'type': 'boolean'}, {'validator': 'bulk_schema', 'type': ['dict', 'string']}]}, 'dependencies': {'validator': 'dependencies', 'type': ('dict', 'hashable', 'list')}, 'anyof': {'type': 'list', 'logical': 'anyof'}, 'nullable': {'type': 'boolean'}, 'items': {'validator': 'items', 'type': 'list'}, 'required': {'type': 'boolean'}, 'valueschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}, 'validator': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}}, {'type': 'string', 'allowed': ()}]}, 'maxlength': {'type': 'integer'}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.validation_rules" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -1177,7 +1187,7 @@ __init__ method.</li>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaDumper.yaml_representers">
-<code class="descname">yaml_representers</code><em class="property"> = {&lt;class 'dict'&gt;: &lt;function SafeRepresenter.represent_dict&gt;, &lt;class 'cis_interface.schema.SchemaRegistry'&gt;: &lt;function SchemaDumper.represent_SchemaRegistry&gt;, &lt;class 'int'&gt;: &lt;function SafeRepresenter.represent_int&gt;, &lt;class 'datetime.datetime'&gt;: &lt;function SafeRepresenter.represent_datetime&gt;, &lt;class 'bool'&gt;: &lt;function SafeRepresenter.represent_bool&gt;, &lt;class 'collections.OrderedDict'&gt;: &lt;function Representer.represent_ordered_dict&gt;, &lt;class 'builtin_function_or_method'&gt;: &lt;function Representer.represent_name&gt;, &lt;class 'bytes'&gt;: &lt;function SafeRepresenter.represent_binary&gt;, &lt;class 'str'&gt;: &lt;function SafeRepresenter.represent_str&gt;, &lt;class 'type'&gt;: &lt;function Representer.represent_name&gt;, &lt;class 'cis_interface.schema.ComponentSchema'&gt;: &lt;function SchemaDumper.represent_ComponentSchema&gt;, &lt;class 'NoneType'&gt;: &lt;function SafeRepresenter.represent_none&gt;, &lt;class 'float'&gt;: &lt;function SafeRepresenter.represent_float&gt;, &lt;class 'complex'&gt;: &lt;function Representer.represent_complex&gt;, &lt;class 'module'&gt;: &lt;function Representer.represent_module&gt;, None: &lt;function SafeRepresenter.represent_undefined&gt;, &lt;class 'list'&gt;: &lt;function SafeRepresenter.represent_list&gt;, &lt;class 'tuple'&gt;: &lt;function SchemaDumper.represent_python_tuple&gt;, &lt;class 'set'&gt;: &lt;function SafeRepresenter.represent_set&gt;, &lt;class 'datetime.date'&gt;: &lt;function SafeRepresenter.represent_date&gt;, &lt;class 'function'&gt;: &lt;function Representer.represent_name&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaDumper.yaml_representers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">yaml_representers</code><em class="property"> = {&lt;type 'int'&gt;: &lt;unbound method SafeRepresenter.represent_int&gt;, &lt;type 'list'&gt;: &lt;unbound method SafeRepresenter.represent_list&gt;, &lt;type 'bool'&gt;: &lt;unbound method SafeRepresenter.represent_bool&gt;, &lt;type 'set'&gt;: &lt;unbound method SafeRepresenter.represent_set&gt;, &lt;type 'NoneType'&gt;: &lt;unbound method SafeRepresenter.represent_none&gt;, &lt;type 'float'&gt;: &lt;unbound method SafeRepresenter.represent_float&gt;, &lt;type 'module'&gt;: &lt;unbound method Representer.represent_module&gt;, &lt;type 'function'&gt;: &lt;unbound method Representer.represent_name&gt;, &lt;type 'dict'&gt;: &lt;unbound method SafeRepresenter.represent_dict&gt;, &lt;class 'cis_interface.schema.SchemaRegistry'&gt;: &lt;unbound method SchemaDumper.represent_SchemaRegistry&gt;, &lt;type 'long'&gt;: &lt;unbound method Representer.represent_long&gt;, &lt;type 'datetime.datetime'&gt;: &lt;unbound method SafeRepresenter.represent_datetime&gt;, &lt;type 'str'&gt;: &lt;unbound method Representer.represent_str&gt;, &lt;type 'unicode'&gt;: &lt;unbound method Representer.represent_unicode&gt;, &lt;type 'complex'&gt;: &lt;unbound method Representer.represent_complex&gt;, &lt;type 'type'&gt;: &lt;unbound method Representer.represent_name&gt;, &lt;class 'cis_interface.schema.ComponentSchema'&gt;: &lt;unbound method SchemaDumper.represent_ComponentSchema&gt;, &lt;type 'builtin_function_or_method'&gt;: &lt;unbound method Representer.represent_name&gt;, &lt;type 'tuple'&gt;: &lt;unbound method SchemaDumper.represent_python_tuple&gt;, None: &lt;unbound method SafeRepresenter.represent_undefined&gt;, &lt;type 'datetime.date'&gt;: &lt;unbound method SafeRepresenter.represent_date&gt;, &lt;type 'classobj'&gt;: &lt;unbound method Representer.represent_name&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaDumper.yaml_representers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1194,7 +1204,7 @@ __init__ method.</li>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaLoader.yaml_constructors">
-<code class="descname">yaml_constructors</code><em class="property"> = {'tag:yaml.org,2002:bool': &lt;function SafeConstructor.construct_yaml_bool&gt;, 'tag:yaml.org,2002:seq': &lt;function SafeConstructor.construct_yaml_seq&gt;, 'tag:yaml.org,2002:set': &lt;function SafeConstructor.construct_yaml_set&gt;, None: &lt;function SafeConstructor.construct_undefined&gt;, 'tag:yaml.org,2002:map': &lt;function SafeConstructor.construct_yaml_map&gt;, 'tag:yaml.org,2002:int': &lt;function SafeConstructor.construct_yaml_int&gt;, 'tag:yaml.org,2002:python/tuple': &lt;function SchemaLoader.construct_python_tuple&gt;, 'tag:yaml.org,2002:omap': &lt;function SafeConstructor.construct_yaml_omap&gt;, 'tag:yaml.org,2002:timestamp': &lt;function SafeConstructor.construct_yaml_timestamp&gt;, 'tag:yaml.org,2002:pairs': &lt;function SafeConstructor.construct_yaml_pairs&gt;, 'tag:yaml.org,2002:float': &lt;function SafeConstructor.construct_yaml_float&gt;, 'tag:yaml.org,2002:binary': &lt;function SafeConstructor.construct_yaml_binary&gt;, 'tag:yaml.org,2002:str': &lt;function SafeConstructor.construct_yaml_str&gt;, 'tag:yaml.org,2002:null': &lt;function SafeConstructor.construct_yaml_null&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaLoader.yaml_constructors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">yaml_constructors</code><em class="property"> = {u'tag:yaml.org,2002:omap': &lt;unbound method SafeConstructor.construct_yaml_omap&gt;, u'tag:yaml.org,2002:float': &lt;unbound method SafeConstructor.construct_yaml_float&gt;, u'tag:yaml.org,2002:bool': &lt;unbound method SafeConstructor.construct_yaml_bool&gt;, u'tag:yaml.org,2002:set': &lt;unbound method SafeConstructor.construct_yaml_set&gt;, u'tag:yaml.org,2002:null': &lt;unbound method SafeConstructor.construct_yaml_null&gt;, 'tag:yaml.org,2002:python/tuple': &lt;unbound method SchemaLoader.construct_python_tuple&gt;, u'tag:yaml.org,2002:pairs': &lt;unbound method SafeConstructor.construct_yaml_pairs&gt;, u'tag:yaml.org,2002:seq': &lt;unbound method SafeConstructor.construct_yaml_seq&gt;, u'tag:yaml.org,2002:int': &lt;unbound method SafeConstructor.construct_yaml_int&gt;, u'tag:yaml.org,2002:timestamp': &lt;unbound method SafeConstructor.construct_yaml_timestamp&gt;, None: &lt;unbound method SafeConstructor.construct_undefined&gt;, u'tag:yaml.org,2002:binary': &lt;unbound method SafeConstructor.construct_yaml_binary&gt;, u'tag:yaml.org,2002:map': &lt;unbound method SafeConstructor.construct_yaml_map&gt;, u'tag:yaml.org,2002:str': &lt;unbound method SafeConstructor.construct_yaml_str&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaLoader.yaml_constructors" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2786,7 +2796,9 @@ such that they can be run simultaneously, passing input back and forth.</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -2808,7 +2820,7 @@ such that they can be run simultaneously, passing input back and forth.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -2826,7 +2838,7 @@ such that they can be run simultaneously, passing input back and forth.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -2846,13 +2858,14 @@ such that they can be run simultaneously, passing input back and forth.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

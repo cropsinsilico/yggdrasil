@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.ModelDriver &mdash; cis_interface 0.5.3 documentation</title>
+  <title>cis_interface.drivers.ModelDriver &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,18 +25,27 @@
   
 
   
+  
     <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="../../../index.html"/>
+        <link rel="up" title="cis_interface.drivers" href="../drivers.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -58,7 +67,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -112,7 +121,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">cis_interface</a>
@@ -120,10 +129,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -181,7 +189,7 @@
 
 
 <span class="nd">@register_component</span>
-<div class="viewcode-block" id="ModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver">[docs]</a><span class="k">class</span> <span class="nc">ModelDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver">[docs]</a><span class="k">class</span> <span class="nc">ModelDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Base class for Model drivers and for running executable based models.</span>
 
 <span class="sd">    Args:</span>
@@ -294,7 +302,7 @@
         <span class="n">env</span><span class="p">[</span><span class="s1">&#39;CIS_MODEL_INDEX&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_index</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">env</span></div>
 
-<div class="viewcode-block" id="ModelDriver.before_start"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.before_start"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Actions to perform before the run starts.&quot;&quot;&quot;</span>
         <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_env</span><span class="p">()</span>
         <span class="n">pre_args</span> <span class="o">=</span> <span class="p">[]</span>
@@ -316,7 +324,7 @@
                                                 <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.EnqueueLoop&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ModelDriver.enqueue_output_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.enqueue_output_loop">[docs]</a>    <span class="k">def</span> <span class="nf">enqueue_output_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.enqueue_output_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.enqueue_output_loop">[docs]</a>    <span class="k">def</span> <span class="nf">enqueue_output_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Keep passing lines to queue.&quot;&quot;&quot;</span>
         <span class="c1"># if self.model_process_complete:</span>
         <span class="c1">#     self.debug(&quot;Process complete&quot;)</span>
@@ -340,12 +348,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ModelDriver.before_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.before_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Actions before loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Running </span><span class="si">%s</span><span class="s1"> from </span><span class="si">%s</span><span class="s1"> with cwd </span><span class="si">%s</span><span class="s1"> and env </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ModelDriver.run_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.run_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
         <span class="c1"># Continue reading until there is not any output</span>
         <span class="k">try</span><span class="p">:</span>
@@ -365,7 +373,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ModelDriver.after_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.after_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
 <span class="sd">        if there was an error and then handling it.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -392,7 +400,7 @@
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ModelDriver.wait_process"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.wait_process">[docs]</a>    <span class="k">def</span> <span class="nf">wait_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.wait_process"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.wait_process">[docs]</a>    <span class="k">def</span> <span class="nf">wait_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Wait for some amount of time for the process to finish.</span>
 
 <span class="sd">        Args:</span>
@@ -413,7 +421,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="n">key_suffix</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process_complete</span></div>
 
-<div class="viewcode-block" id="ModelDriver.kill_process"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.kill_process">[docs]</a>    <span class="k">def</span> <span class="nf">kill_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.kill_process"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.kill_process">[docs]</a>    <span class="k">def</span> <span class="nf">kill_process</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Kill the process running the model, checking return code.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_started</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Process was never started.&#39;</span><span class="p">)</span>
@@ -455,7 +463,7 @@
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Queue thread was not terminated.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ModelDriver.graceful_stop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.graceful_stop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Gracefully stop the driver.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wait_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="s1">&#39;.graceful_stop&#39;</span><span class="p">)</span>
@@ -469,7 +477,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -482,7 +492,7 @@
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -500,7 +510,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -520,13 +530,14 @@
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

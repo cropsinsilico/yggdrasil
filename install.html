@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; cis_interface 0.5.3 documentation</title>
+  <title>Installation &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,20 +25,28 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Getting started" href="getting_started.html" />
-    <link rel="prev" title="Overview" href="includeme.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="index.html"/>
+        <link rel="next" title="Getting started" href="getting_started.html"/>
+        <link rel="prev" title="Overview" href="includeme.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -60,7 +68,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -121,7 +129,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -129,10 +137,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -280,6 +287,37 @@ install, but should it fail or if you want to use a non-default version of Matla
 you can also do it manually.</p>
 <p>Instructions for installing the Matlab engine as a python package can be found on the
 <a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html">Mathworks website</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The version of Matlab that you are using will determine the versions of
+Python that you can use with cis_interface. The chart below shows the
+versions of Python that are compatible with several versions of Matlab.
+If you are using an incompatible version, the instructions above for manually
+installing the Matlab engine as a Python package will fail with an error
+message indicating which versions of Python you can use.</p>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="38%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Matlab Version</th>
+<th class="head">Max Python Version</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>R2015b</td>
+<td>2.7, 3.3, 3.4</td>
+</tr>
+<tr class="row-odd"><td>R2017a</td>
+<td>2.7, 3.3, 3.4, 3.5</td>
+</tr>
+<tr class="row-even"><td>R2017b</td>
+<td>2.7, 3.3, 3.4, 3.5, 3.6</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="additional-steps-for-rabbitmq-message-passing">
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
@@ -303,7 +341,9 @@ for starting a RabbitMQ server.</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -325,7 +365,7 @@ for starting a RabbitMQ server.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -343,7 +383,7 @@ for starting a RabbitMQ server.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -363,13 +403,14 @@ for starting a RabbitMQ server.</p>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

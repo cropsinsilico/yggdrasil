@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; cis_interface 0.5.3 documentation</title>
+  <title>Installation &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,20 +25,29 @@
   
 
   
+  
     <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Introduction" href="intro.html" />
-    <link rel="prev" title="Welcome to the 2018 Crops in Silico Hackathon!" href="index.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="../index.html"/>
+        <link rel="up" title="Welcome to the 2018 Crops in Silico Hackathon!" href="index.html"/>
+        <link rel="next" title="Introduction" href="intro.html"/>
+        <link rel="prev" title="Welcome to the 2018 Crops in Silico Hackathon!" href="index.html"/> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -60,7 +69,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -104,9 +113,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Welcome to the 2018 Crops in Silico Hackathon!</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#first-steps-with-windows">First Steps with Windows</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#setting-up-your-conda-environment">Setting up your Conda environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#installing-cis-interface">Installing cis_interface</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#checkout-hackathon-example">Checkout Hackathon Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-hackathon-materials">Get Hackathon Materials</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#using-git">Using Git</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#via-download">Via Download</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html">Introduction</a></li>
@@ -125,7 +140,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">cis_interface</a>
@@ -133,10 +148,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -182,6 +196,15 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="first-steps-with-windows">
+<h2>First Steps with Windows<a class="headerlink" href="#first-steps-with-windows" title="Permalink to this headline">¶</a></h2>
+<p>If you are running Windows, you will first need to install Microsoft
+Visual Studio. If you do not already have a copy, the free community
+edition will work and can be downloaded
+<a class="reference external" href="https://visualstudio.microsoft.com/vs/express/">here</a>. Visual Studio (VS)
+can be installed in parallel with conda, just be sure to finish installing
+VS before moving on to installing cis_interface.</p>
+</div>
 <div class="section" id="setting-up-your-conda-environment">
 <h2>Setting up your Conda environment<a class="headerlink" href="#setting-up-your-conda-environment" title="Permalink to this headline">¶</a></h2>
 <p>For the purpose of the hackathon, we recommend using a conda environment
@@ -195,11 +218,16 @@ install Anaconda from <a class="reference external" href="https://www.anaconda.c
 <p>Once Anaconda (or Miniconda) is installed you can create a new Python 3.6
 environment for the hackathon by entering the following at your terminal
 prompt (or Anaconda prompt for Windows):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ conda create -n cis python=3.6 anaconda
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ conda create -n cis python=3.6
 </pre></div>
 </div>
-<p>Then activate the environment by calling:</p>
+<p>On Linux/OSX, the created environment can be activated by calling:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ source activate cis
+</pre></div>
+</div>
+<p>On Windows, this can be done by calling the following from the Anaconda
+prompt:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ activate cis
 </pre></div>
 </div>
 <p>Verify that the correct version of Python is now being used.:</p>
@@ -213,21 +241,46 @@ prompt (or Anaconda prompt for Windows):</p>
 can be found <a class="reference internal" href="../install.html#install-rst"><span class="std std-ref">here</span></a>. We recommend installing via
 conda and pip for the purpose of the hackathon.</p>
 </div>
-<div class="section" id="checkout-hackathon-example">
-<h2>Checkout Hackathon Example<a class="headerlink" href="#checkout-hackathon-example" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="get-hackathon-materials">
+<h2>Get Hackathon Materials<a class="headerlink" href="#get-hackathon-materials" title="Permalink to this headline">¶</a></h2>
 <p>To get started, we will walk through transforming an example model and
-connecting it to other models. To get the necessary materials, fork
-the <a class="reference external" href="https://github.com/cropsinsilico/hackathon2018">hackathon2018 repository</a>
-on GitHub (Fork button in the upper right), create a <code class="docutils literal"><span class="pre">cis_home</span></code> directory for the
-hackathon:</p>
+connecting it to other models. To make sure we are all on the same page,
+create a <code class="docutils literal"><span class="pre">cis_home</span></code> directory somewhere that you will remember and can
+access from the command line and then move into that directory:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ mkdir cis_home
 $ cd cis_home
 </pre></div>
 </div>
+<p>The tutorial will use this directory as a reference for naming files and
+running the examples.</p>
+<p>The materials for the hackathon tutorials are
+in a git repository on GitHub called
+<a class="reference external" href="https://github.com/cropsinsilico/hackathon2018">hackathon2018</a>.</p>
+<img alt="../_images/setup_github.png" src="../_images/setup_github.png" />
+<div class="section" id="using-git">
+<h3>Using Git<a class="headerlink" href="#using-git" title="Permalink to this headline">¶</a></h3>
+<p>If you have a GitHub account, are familiar with git, and would like to
+save changes you make to the hackathon materials for future reference,
+you can fork the hackathon2018 repository (Fork button in the upper right)</p>
+<img alt="../_images/setup_fork.png" src="../_images/setup_fork.png" />
 <p>and clone your fork on your machine into the <code class="docutils literal"><span class="pre">cis_home</span></code> directory.:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/[your username]/hackathon2018.git
 </pre></div>
 </div>
+</div>
+<div class="section" id="via-download">
+<h3>Via Download<a class="headerlink" href="#via-download" title="Permalink to this headline">¶</a></h3>
+<p>If you don&#8217;t have a GitHub account or don&#8217;t know git, you can download the
+repository as a .zip or .tar.gz archive from the GitHub page by clicking
+<cite>Download ZIP</cite> in the box that drops down when you click the green
+<cite>Clone or Download</cite> button.</p>
+<img alt="../_images/setup_download.png" src="../_images/setup_download.png" />
+<p>You can also download a tagged version of the materials from
+<a class="reference external" href="https://github.com/cropsinsilico/hackathon2018/releases/tag/1.0">here</a>.</p>
+<p>Once downloaded, extract the repository into the <code class="docutils literal"><span class="pre">cis_home</span></code> directory.</p>
+</div>
+<div class="section" id="running-tests">
+<h3>Running Tests<a class="headerlink" href="#running-tests" title="Permalink to this headline">¶</a></h3>
 <p>From the <code class="docutils literal"><span class="pre">hackathon2018</span></code> directory, run the tests to ensure that everything
 is working:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ cd hackathon2018
@@ -239,10 +292,13 @@ If you have any errors, please let us know so we can track down any issues you
 might be having. Warnings are OK.</p>
 </div>
 </div>
+</div>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -264,7 +320,7 @@ might be having. Warnings are OK.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -282,7 +338,7 @@ might be having. Warnings are OK.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -302,13 +358,14 @@ might be having. Warnings are OK.</p>
     <script type="text/javascript" src="../_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

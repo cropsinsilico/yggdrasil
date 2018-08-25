@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers package &mdash; cis_interface 0.5.3 documentation</title>
+  <title>cis_interface.drivers package &mdash; cis_interface 0.6 documentation</title>
   
 
   
@@ -25,20 +25,29 @@
   
 
   
+  
     <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface.drivers.tests package" href="cis_interface.drivers.tests.html" />
-    <link rel="prev" title="cis_interface.dataio.tests package" href="cis_interface.dataio.tests.html" /> 
+  
+
+  
+    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.6 documentation" href="index.html"/>
+        <link rel="up" title="Python Code" href="code_python.html"/>
+        <link rel="next" title="cis_interface.drivers.tests package" href="cis_interface.drivers.tests.html"/>
+        <link rel="prev" title="cis_interface.dataio.tests package" href="cis_interface.dataio.tests.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -60,7 +69,7 @@
             
             
               <div class="version">
-                0.5.3
+                0.6
               </div>
             
           
@@ -143,7 +152,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -151,10 +160,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -270,7 +278,7 @@
 <dl class="class">
 <dt id="cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiFileInputDriver.</code><code class="descname">AsciiFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiFileInputDriver.html#AsciiFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
 <p>Class that sends lines from an ASCII file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -299,7 +307,7 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <dl class="class">
 <dt id="cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiFileOutputDriver.</code><code class="descname">AsciiFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>path</em>, <em>in_temp=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiFileOutputDriver.html#AsciiFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
 <p>Class to handle output line by line to an ASCII file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -328,7 +336,7 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <dl class="class">
 <dt id="cis_interface.drivers.AsciiMapInputDriver.AsciiMapInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiMapInputDriver.</code><code class="descname">AsciiMapInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiMapInputDriver.html#AsciiMapInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiMapInputDriver.AsciiMapInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
 <p>Class that sends messages read from a ASCII map file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -351,7 +359,7 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <dl class="class">
 <dt id="cis_interface.drivers.AsciiMapOutputDriver.AsciiMapOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiMapOutputDriver.</code><code class="descname">AsciiMapOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiMapOutputDriver.html#AsciiMapOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiMapOutputDriver.AsciiMapOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
 <p>Class that writes received messages to a ASCII map file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -374,7 +382,7 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <dl class="class">
 <dt id="cis_interface.drivers.AsciiTableInputDriver.AsciiTableInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiTableInputDriver.</code><code class="descname">AsciiTableInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiTableInputDriver.html#AsciiTableInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiTableInputDriver.AsciiTableInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver" title="cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver" title="cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver</span></code></a></p>
 <p>Class to handle input from an ASCII table.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -421,7 +429,7 @@ once as an array. Defaults to False.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.AsciiTableOutputDriver.AsciiTableOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiTableOutputDriver.</code><code class="descname">AsciiTableOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiTableOutputDriver.html#AsciiTableOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiTableOutputDriver.AsciiTableOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver" title="cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver" title="cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver</span></code></a></p>
 <p>Class to handle output of received messages to an ASCII table.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -468,7 +476,7 @@ once as an array. Defaults to False.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.CMakeModelDriver.</code><code class="descname">CMakeModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>sourcedir=None</em>, <em>builddir=None</em>, <em>cmakeargs=None</em>, <em>preserve_cache=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/CMakeModelDriver.html#CMakeModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
 <p>Class for running cmake compiled drivers. Before running the
 cmake command, the cmake commands for setting the necessary compiler &amp; linker
 flags for the interface&#8217;s C/C++ library are written to a file called
@@ -1611,7 +1619,7 @@ considered relative to the temporary directory. Defaults to False.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.GCCModelDriver.GCCModelDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.GCCModelDriver.</code><code class="descname">GCCModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>cc=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/GCCModelDriver.html#GCCModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.GCCModelDriver.GCCModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
 <p>Class for running gcc compiled drivers.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1891,7 +1899,7 @@ connect to.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.LPyModelDriver.LPyModelDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.LPyModelDriver.</code><code class="descname">LPyModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/LPyModelDriver.html#LPyModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.LPyModelDriver.LPyModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
 <p>Class for running LPy models.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1915,7 +1923,7 @@ __init__ method.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.MakeModelDriver.</code><code class="descname">MakeModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>make_command=None</em>, <em>makedir=None</em>, <em>makefile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MakeModelDriver.html#MakeModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
 <p>Class for running make file compiled drivers. Before running the
 make command, the necessary compiler &amp; linker flags for the interface&#8217;s
 C/C++ library are stored the environment variables CISCCFLAGS and CISLDFLAGS
@@ -2031,7 +2039,7 @@ should be set. Defaults to [].</li>
 <dl class="class">
 <dt id="cis_interface.drivers.MatInputDriver.MatInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.MatInputDriver.</code><code class="descname">MatInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatInputDriver.html#MatInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatInputDriver.MatInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
 <p>Class that sends pickled dictionaries of matricies read from a .mat
 file.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -2055,7 +2063,7 @@ file.</p>
 <dl class="class">
 <dt id="cis_interface.drivers.MatOutputDriver.MatOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.MatOutputDriver.</code><code class="descname">MatOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatOutputDriver.html#MatOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatOutputDriver.MatOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
 <p>Class to handle output to .mat Matlab files.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2078,7 +2086,7 @@ file.</p>
 <dl class="class">
 <dt id="cis_interface.drivers.MatlabModelDriver.MatlabModelDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.MatlabModelDriver.</code><code class="descname">MatlabModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
 <p>Base class for running Matlab models.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2163,7 +2171,7 @@ if there was an error and then handling it.</p>
 
 <dl class="class">
 <dt id="cis_interface.drivers.MatlabModelDriver.MatlabProcess">
-<em class="property">class </em><code class="descclassname">cis_interface.drivers.MatlabModelDriver.</code><code class="descname">MatlabProcess</code><span class="sig-paren">(</span><em>target</em>, <em>args</em>, <em>kwargs=None</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabProcess" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.MatlabModelDriver.</code><code class="descname">MatlabProcess</code><span class="sig-paren">(</span><em>target</em>, <em>args</em>, <em>kwargs=None</em>, <em>name=None</em>, <em>matlab_engine=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabProcess" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="code_python.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
 <p>Add features to mimic subprocess.Popen while running Matlab function
 asynchronously.</p>
@@ -2176,6 +2184,10 @@ asynchronously.</p>
 <li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a>) &#8211; Arguments that should be passed to target.</li>
 <li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Keyword arguments that should be passed to
 target. Defaults to empty dict.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; A name for the process. Generated if not provided.</li>
+<li><strong>matlab_engine</strong> (<em>MatlabEngine</em><em>, </em><em>optional</em>) &#8211; MatlabEngine that should be used
+to get errors. Defaults to None and errors will not be recovered
+unless passed through stdout and stderr before shutdown.</li>
 </ul>
 </td>
 </tr>
@@ -2220,6 +2232,13 @@ be written to.</p>
 will be None until start is called.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabProcess.matlab_engine">
+<code class="descname">matlab_engine</code><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabProcess.matlab_engine" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>MatlabEngine</em> &#8211; MatlabEngine that should be used to get
+errors.</p>
+</dd></dl>
+
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2256,6 +2275,12 @@ will be None until start is called.</p>
 <dt id="cis_interface.drivers.MatlabModelDriver.MatlabProcess.kill">
 <code class="descname">kill</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabProcess.kill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabProcess.kill" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cancel the async call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabProcess.on_matlab_error">
+<code class="descname">on_matlab_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabProcess.on_matlab_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabProcess.on_matlab_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions performed on error in Matlab engine.</p>
 </dd></dl>
 
 <dl class="method">
@@ -2554,7 +2579,7 @@ Defaults to None and set based on the stack trace.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.ObjFileInputDriver.ObjFileInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.ObjFileInputDriver.</code><code class="descname">ObjFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ObjFileInputDriver.html#ObjFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ObjFileInputDriver.ObjFileInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
 <p>Class that sends messages read from a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2577,7 +2602,7 @@ Defaults to None and set based on the stack trace.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.ObjFileOutputDriver.ObjFileOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.ObjFileOutputDriver.</code><code class="descname">ObjFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ObjFileOutputDriver.html#ObjFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ObjFileOutputDriver.ObjFileOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
 <p>Class that writes received messages to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2648,7 +2673,7 @@ connect to.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.PandasFileInputDriver.PandasFileInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PandasFileInputDriver.</code><code class="descname">PandasFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PandasFileInputDriver.html#PandasFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PandasFileInputDriver.PandasFileInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
 <p>Class to handle input from a Pandas csv file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2679,7 +2704,7 @@ columns. Defaults to &#8216;t&#8217;.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PandasFileOutputDriver.</code><code class="descname">PandasFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PandasFileOutputDriver.html#PandasFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
 <p>Class to handle output of received messages to a Pandas csv file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2710,7 +2735,7 @@ columns. Defaults to &#8216;t&#8217;.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.PickleFileInputDriver.PickleFileInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PickleFileInputDriver.</code><code class="descname">PickleFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PickleFileInputDriver.html#PickleFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PickleFileInputDriver.PickleFileInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
 <p>Class that sends messages read from a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2733,7 +2758,7 @@ columns. Defaults to &#8216;t&#8217;.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.PickleFileOutputDriver.PickleFileOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PickleFileOutputDriver.</code><code class="descname">PickleFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PickleFileOutputDriver.html#PickleFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PickleFileOutputDriver.PickleFileOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
 <p>Class that writes received messages to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2756,7 +2781,7 @@ columns. Defaults to &#8216;t&#8217;.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.PlyFileInputDriver.PlyFileInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PlyFileInputDriver.</code><code class="descname">PlyFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PlyFileInputDriver.html#PlyFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PlyFileInputDriver.PlyFileInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver" title="cis_interface.drivers.FileInputDriver.FileInputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileInputDriver.FileInputDriver</span></code></a></p>
 <p>Class that sends messages read from a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2779,7 +2804,7 @@ columns. Defaults to &#8216;t&#8217;.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.PlyFileOutputDriver.PlyFileOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PlyFileOutputDriver.</code><code class="descname">PlyFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PlyFileOutputDriver.html#PlyFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PlyFileOutputDriver.PlyFileOutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="cis_interface.drivers.FileOutputDriver.FileOutputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.FileOutputDriver.FileOutputDriver</span></code></a></p>
 <p>Class that writes received messages to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2802,7 +2827,7 @@ columns. Defaults to &#8216;t&#8217;.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.PythonModelDriver.PythonModelDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PythonModelDriver.</code><code class="descname">PythonModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PythonModelDriver.html#PythonModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PythonModelDriver.PythonModelDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="model_drivers.html#cis_interface.drivers.ModelDriver.ModelDriver" title="cis_interface.drivers.ModelDriver.ModelDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ModelDriver.ModelDriver</span></code></a></p>
 <p>Class for running Python models.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2827,7 +2852,7 @@ __init__ method.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.RMQAsyncClientDriver.RMQAsyncClientDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQAsyncClientDriver.</code><code class="descname">RMQAsyncClientDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQAsyncClientDriver.html#RMQAsyncClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQAsyncClientDriver.RMQAsyncClientDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ClientDriver.ClientDriver" title="cis_interface.drivers.ClientDriver.ClientDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ClientDriver.ClientDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.ClientDriver.ClientDriver" title="cis_interface.drivers.ClientDriver.ClientDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ClientDriver.ClientDriver</span></code></a></p>
 <p>Class for handling an RMQAsync client.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2872,7 +2897,7 @@ connect to.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.RMQAsyncServerDriver.RMQAsyncServerDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQAsyncServerDriver.</code><code class="descname">RMQAsyncServerDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQAsyncServerDriver.html#RMQAsyncServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQAsyncServerDriver.RMQAsyncServerDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ServerDriver.ServerDriver" title="cis_interface.drivers.ServerDriver.ServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ServerDriver.ServerDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.ServerDriver.ServerDriver" title="cis_interface.drivers.ServerDriver.ServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ServerDriver.ServerDriver</span></code></a></p>
 <p>Class for handling an RMQAsync server.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2894,7 +2919,7 @@ connect to.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.RMQClientDriver.RMQClientDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQClientDriver.</code><code class="descname">RMQClientDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQClientDriver.html#RMQClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQClientDriver.RMQClientDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ClientDriver.ClientDriver" title="cis_interface.drivers.ClientDriver.ClientDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ClientDriver.ClientDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.ClientDriver.ClientDriver" title="cis_interface.drivers.ClientDriver.ClientDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ClientDriver.ClientDriver</span></code></a></p>
 <p>Class for handling an RMQ client.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2945,7 +2970,7 @@ connect to.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.RMQInputDriver.RMQInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQInputDriver.</code><code class="descname">RMQInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQInputDriver.html#RMQInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQInputDriver.RMQInputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.InputDriver.InputDriver" title="cis_interface.drivers.InputDriver.InputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.InputDriver.InputDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.InputDriver.InputDriver" title="cis_interface.drivers.InputDriver.InputDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.InputDriver.InputDriver</span></code></a></p>
 <p>Driver for receiving input from a RabbitMQ server via a local comm.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2996,7 +3021,7 @@ connect to.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.RMQServerDriver.RMQServerDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQServerDriver.</code><code class="descname">RMQServerDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQServerDriver.html#RMQServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQServerDriver.RMQServerDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.ServerDriver.ServerDriver" title="cis_interface.drivers.ServerDriver.ServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ServerDriver.ServerDriver</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="io_drivers.html#cis_interface.drivers.ServerDriver.ServerDriver" title="cis_interface.drivers.ServerDriver.ServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ServerDriver.ServerDriver</span></code></a></p>
 <p>Class for handling an RMQ server.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -3562,7 +3587,9 @@ class.</li>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -3584,7 +3611,7 @@ class.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -3602,7 +3629,7 @@ class.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.5.3',
+            VERSION:'0.6',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -3622,13 +3649,14 @@ class.</li>
     <script type="text/javascript" src="_static/js/theme.js"></script>
   
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          
-          SphinxRtdTheme.Navigation.enableSticky();
-          
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>
