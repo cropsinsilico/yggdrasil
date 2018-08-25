@@ -58,7 +58,9 @@ def find_all(name, path):
 
     Args:
         name (str): Name of the file to be found (with the extension).
-        path (str): Directory where search should start.
+        path (str, None): Directory where search should start. If set to
+            None on Windows, the current directory and PATH variable are
+            searched.
 
     Returns:
         list: All instances of the specified file.
@@ -67,23 +69,31 @@ def find_all(name, path):
     result = []
     try:
         if platform._is_win:  # pragma: windows
-            out = subprocess.check_output(["where", "/r", path, name],
-                                          stderr=subprocess.STDOUT)
-        else:
-            try:
-                out = subprocess.check_output(["find", path, "-type", "f",
-                                               "-name", name],
+            if path is None:
+                out = subprocess.check_output(["where", name],
+                                              env=os.environ,
                                               stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError as e:
-                if backwards.unicode2bytes('Permission denied') in e.output:
-                    out = ''
-                else:
-                    raise e
+            else:
+                out = subprocess.check_output(["where", "/r", path, name],
+                                              env=os.environ,
+                                              stderr=subprocess.STDOUT)
+        else:
+            args = ["find", path, "-type", "f", "-name", name]
+            pfind = subprocess.Popen(args, env=os.environ,
+                                     stderr=subprocess.PIPE,
+                                     stdout=subprocess.PIPE)
+            (stdoutdata, stderrdata) = pfind.communicate()
+            out = stdoutdata
+            for l in stderrdata.splitlines():
+                if backwards.unicode2bytes('Permission denied') not in l:
+                    raise subprocess.CalledProcessError(pfind.returncode,
+                                                        ' '.join(args),
+                                                        output=stderrdata)
     except subprocess.CalledProcessError:
         out = ''
     if not out.isspace():
-        result = out.splitlines()
-    result = [m.decode('utf-8') for m in result]
+        result = sorted(out.splitlines())
+    result = [os.path.normcase(os.path.normpath(m.decode('utf-8'))) for m in result]
     return result
 
 
@@ -99,10 +109,12 @@ def locate_file(fname):
 
     """
     out = []
-    for path in os.environ.get('PATH').split(os.pathsep):
-        if path:
-            # print('searching %s for %s' % (path, fname))
-            out += find_all(fname, path)
+    if platform._is_win:  # pragma: windows
+        out += find_all(fname, None)
+    else:
+        for path in os.environ.get('PATH').split(os.pathsep):
+            if path:
+                out += find_all(fname, path)
     if not out:
         return False
     first = out[0]

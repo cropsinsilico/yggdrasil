@@ -122,6 +122,22 @@ you can also do it manually.
 Instructions for installing the Matlab engine as a python package can be found on the 
 `Mathworks website <https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html>`_.
 
+.. note::
+   The version of Matlab that you are using will determine the versions of 
+   Python that you can use with |cis_interface|. The chart below shows the 
+   versions of Python that are compatible with several versions of Matlab. 
+   If you are using an incompatible version, the instructions above for manually 
+   installing the Matlab engine as a Python package will fail with an error 
+   message indicating which versions of Python you can use.
+
+==============    =======================
+Matlab Version    Max Python Version
+==============    =======================
+R2015b            2.7, 3.3, 3.4
+R2017a            2.7, 3.3, 3.4, 3.5
+R2017b            2.7, 3.3, 3.4, 3.5, 3.6
+==============    =======================
+
 
 Additional Steps for RabbitMQ Message Passing
 ---------------------------------------------

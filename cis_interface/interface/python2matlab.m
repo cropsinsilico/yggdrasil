@@ -1,4 +1,5 @@
 function x_ml = python2matlab(x_py)
+  [version, executable, isloaded] = pyversion;
   if isa(x_py, 'py.float')
     x_ml = float(x_py);
   elseif isa(x_py, 'py.double')
@@ -7,10 +8,16 @@ function x_ml = python2matlab(x_py)
     x_ml = int64(x_py);
   elseif isa(x_py, 'py.bytes')
     x_ml = char(x_py.decode('utf-8'));
+  elseif isa(x_py, 'py.unicode')
+    x_ml = char(x_py);
   elseif isa(x_py, 'py.string')
     x_ml = char(x_py);
   elseif isa(x_py, 'py.str')
-    x_ml = char(x_py);
+    if version == '2.7';
+      x_ml = char(x_py.decode('utf-8'));
+    else;
+      x_ml = char(x_py);
+    end;
   elseif isa(x_py, 'py.bool')
     x_ml = logical(x_py);
   elseif isa(x_py, 'py.dict')
