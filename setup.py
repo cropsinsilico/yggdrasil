@@ -52,7 +52,7 @@ else:
 
 # Create requirements list based on platform
 requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
-                "pystache", "nose", "zmq", "psutil",
+                "pystache", "nose", "pyzmq", "psutil",
                 "matplotlib", "cerberus", "jsonschema",
                 'pandas<0.21; python_version == "3.4"',
                 'pandas; python_version != "3.4"',
