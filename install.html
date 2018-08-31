@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; cis_interface 0.6 documentation</title>
+  <title>Installation &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="cis_interface 0.6 documentation" href="index.html"/>
+    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="index.html"/>
         <link rel="next" title="Getting started" href="getting_started.html"/>
         <link rel="prev" title="Overview" href="includeme.html"/> 
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.6
+                0.6.1
               </div>
             
           
@@ -96,7 +96,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#conda-installation-pip-recommended">Conda Installation + pip (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conda-installation-recommended">Conda Installation (recommended)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#manual-installation">Manual Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-on-windows">Additional Steps on Windows</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-matlab-models">Additional Steps for Matlab Models</a></li>
@@ -183,24 +183,17 @@
             
   <div class="section" id="installation">
 <span id="install-rst"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="conda-installation-pip-recommended">
-<h2>Conda Installation + pip (recommended)<a class="headerlink" href="#conda-installation-pip-recommended" title="Permalink to this headline">¶</a></h2>
-<p>We are still working to create conda wheels for cis_interface on
-<cite>conda-forge</cite>, but you can install some of the more difficult dependencies
-using conda, particularly the ZeroMQ C and C++ libraries. To do so call:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ conda install -c conda-forge zeromq czmq
-</pre></div>
-</div>
-<p>You can then install cis_interface from
-<a class="reference external" href="https://pypi.org/project/cis_interface/">PyPI</a> using <code class="docutils literal"><span class="pre">pip</span></code>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install cis_interface
-</pre></div>
-</div>
-<p>In the future when the conda wheels are available, you will only need to
-run:</p>
+<div class="section" id="conda-installation-recommended">
+<h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this headline">¶</a></h2>
+<p>There are conda distributions available for cis_interface from
+<a class="reference external" href="https://github.com/conda-forge/cis_interface-feedstock">conda-forge</a>.
+You can install cis_interface from conda-forge by calling:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ conda install -c conda-forge cis_interface
 </pre></div>
 </div>
+<p>from your terminal prompt (or Anaconda prompt on Windows). This will
+install cis_interface and all of its dependencies in your active
+conda environment from the <code class="docutils literal"><span class="pre">conda-forge</span></code> channel.</p>
 </div>
 <div class="section" id="manual-installation">
 <h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
@@ -383,7 +376,7 @@ for starting a RabbitMQ server.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.6',
+            VERSION:'0.6.1+1.g81b8e90',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

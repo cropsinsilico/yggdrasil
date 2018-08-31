@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>gs_lesson3 Example &mdash; cis_interface 0.6 documentation</title>
+  <title>gs_lesson3 Example &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
   
 
   
@@ -37,7 +37,7 @@
         <link rel="index" title="Index"
               href="../genindex.html"/>
         <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="cis_interface 0.6 documentation" href="../index.html"/>
+    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="../index.html"/>
         <link rel="up" title="Examples" href="examples_toc.html"/>
         <link rel="next" title="gs_lesson4 Example" href="gs_lesson4.html"/>
         <link rel="prev" title="gs_lesson2 Example" href="gs_lesson2.html"/> 
@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                0.6
+                0.6.1
               </div>
             
           
@@ -113,9 +113,9 @@
 <li class="toctree-l2"><a class="reference internal" href="gs_lesson2.html">gs_lesson2 Example</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">gs_lesson3 Example</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#python-version">Python Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#c-version">C++ Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">C Version</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#matlab-version">Matlab Version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#c-version">C Version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">C++ Version</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="gs_lesson4.html">gs_lesson4 Example</a></li>
@@ -286,10 +286,10 @@
 </pre></div>
 </td></tr></table></div>
 </div>
-<div class="section" id="matlab-version">
-<h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="c-version">
+<h2>C++ Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-matlab"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-c++"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -319,37 +319,59 @@
 28
 29
 30
-31</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span> <span class="s">&#39;input&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;output&#39;</span><span class="p">);</span>
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="c1">// Include methods for input/output channels</span>
+<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
 
-<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
+<span class="cp">#define MYBUFSIZ 1000</span>
 
-<span class="c">% Loop until there is no longer input or the queues are closed</span>
-<span class="k">while</span> <span class="n">flag</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="c1">// Initialize input/output channels</span>
+  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;input&quot;</span><span class="p">);</span>
+  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">);</span>
 
-  <span class="c">% Receive input from input channel </span>
-  <span class="c">% If there is an error, the flag will be False.</span>
-  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;No more input.&#39;</span><span class="p">);</span>
-    <span class="k">break</span>
-  <span class="k">end</span>
+  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
 
-  <span class="c">% Print received message</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;%s\n&#39;</span><span class="p">,</span> <span class="n">char</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span>
-
-  <span class="c">% Send output to output channel</span>
-  <span class="c">% If there is an error, the flag will be False</span>
-  <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Error sending output.&#39;</span><span class="p">);</span>
-    <span class="k">break</span>
-  <span class="k">end</span>
+  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   
-<span class="k">end</span>
+    <span class="c1">// Receive input from input channel</span>
+    <span class="c1">// If there is an error or the queue is closed, the flag will be negative</span>
+    <span class="c1">// Otherwise, it is the size of the received message</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="c1">// Print received message</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
 
-<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="c1">// Send output to output channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+
+  <span class="p">}</span>
+  
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -367,9 +389,9 @@
 12
 13
 14</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_model</span>
-    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>  <span class="c1"># Runs the script using a Matlab engine</span>
-    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.m</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_model</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>  <span class="c1"># Compiles the C code with necessary cis_interface libraries</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.cpp</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -383,8 +405,8 @@
 </pre></div>
 </td></tr></table></div>
 </div>
-<div class="section" id="c-version">
-<h2>C Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>C Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
 <div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -504,10 +526,10 @@
 </pre></div>
 </td></tr></table></div>
 </div>
-<div class="section" id="id1">
-<h2>C++ Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="matlab-version">
+<h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-c++"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-matlab"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -537,59 +559,37 @@
 28
 29
 30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
-<span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+31</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span> <span class="s">&#39;input&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;output&#39;</span><span class="p">);</span>
 
-<span class="cp">#define MYBUFSIZ 1000</span>
+<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;input&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;output&quot;</span><span class="p">);</span>
+<span class="c">% Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="n">flag</span>
 
-  <span class="c1">// Declare resulting variables and create buffer for received message</span>
-  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="n">MYBUFSIZ</span><span class="p">];</span>
+  <span class="c">% Receive input from input channel </span>
+  <span class="c">% If there is an error, the flag will be False.</span>
+  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">msg</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;No more input.&#39;</span><span class="p">);</span>
+    <span class="k">break</span>
+  <span class="k">end</span>
 
-  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
-  <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c">% Print received message</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;%s\n&#39;</span><span class="p">,</span> <span class="n">char</span><span class="p">(</span><span class="n">msg</span><span class="p">));</span>
+
+  <span class="c">% Send output to output channel</span>
+  <span class="c">% If there is an error, the flag will be False</span>
+  <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Error sending output.&#39;</span><span class="p">);</span>
+    <span class="k">break</span>
+  <span class="k">end</span>
   
-    <span class="c1">// Receive input from input channel</span>
-    <span class="c1">// If there is an error or the queue is closed, the flag will be negative</span>
-    <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">MYBUFSIZ</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="c1">// Print received message</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">buf</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+<span class="k">end</span>
 
-    <span class="c1">// Send output to output channel</span>
-    <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="n">flag</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-
-  <span class="p">}</span>
-  
-  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -607,9 +607,9 @@
 12
 13
 14</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_model</span>
-    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>  <span class="c1"># Compiles the C code with necessary cis_interface libraries</span>
-    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.cpp</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_model</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>  <span class="c1"># Runs the script using a Matlab engine</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/gs_lesson3.m</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -669,7 +669,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.6',
+            VERSION:'0.6.1+1.g81b8e90',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

@@ -27,8 +27,8 @@ Model YAML:
 
 
 
-Matlab Version
---------------
+C++ Version
+-----------
 
 Model Code:
 
@@ -36,8 +36,8 @@ Model Code:
    :language: python
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.m
-   :language: matlab
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.cpp
+   :language: c++
    :linenos:
 
 
@@ -47,7 +47,7 @@ Model YAML:
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_matlab.yml
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_cpp.yml
    :language: yaml
    :linenos:
 
@@ -79,8 +79,8 @@ Model YAML:
 
 
 
-C++ Version
------------
+Matlab Version
+--------------
 
 Model Code:
 
@@ -88,8 +88,8 @@ Model Code:
    :language: python
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.cpp
-   :language: c++
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.m
+   :language: matlab
    :linenos:
 
 
@@ -99,7 +99,7 @@ Model YAML:
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_cpp.yml
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_matlab.yml
    :language: yaml
    :linenos:
 

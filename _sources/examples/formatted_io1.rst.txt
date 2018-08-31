@@ -23,23 +23,23 @@ Model YAML:
 
 
 
-Matlab Version
---------------
+C++ Version
+-----------
 
 Model Code:
 
-.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelA.m
-   :language: matlab
+.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelA.cpp
+   :language: c++
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelB.m
-   :language: matlab
+.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelB.cpp
+   :language: c++
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../cis_interface/examples/formatted_io1/formatted_io1_matlab.yml
+.. literalinclude:: /../../cis_interface/examples/formatted_io1/formatted_io1_cpp.yml
    :language: yaml
    :linenos:
 
@@ -67,23 +67,23 @@ Model YAML:
 
 
 
-C++ Version
------------
+Matlab Version
+--------------
 
 Model Code:
 
-.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelA.cpp
-   :language: c++
+.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelA.m
+   :language: matlab
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelB.cpp
-   :language: c++
+.. literalinclude:: /../../cis_interface/examples/formatted_io1/src/formatted_io1_modelB.m
+   :language: matlab
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../cis_interface/examples/formatted_io1/formatted_io1_cpp.yml
+.. literalinclude:: /../../cis_interface/examples/formatted_io1/formatted_io1_matlab.yml
    :language: yaml
    :linenos:
 

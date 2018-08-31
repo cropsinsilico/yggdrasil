@@ -52,7 +52,7 @@ Installing |cis_interface|
 
 Directions for installing the |cis_interface| package and its dependencies 
 can be found :ref:`here <install_rst>`. We recommend installing via 
-conda and pip for the purpose of the hackathon.
+conda and/or pip for the purpose of the hackathon.
 
 
 Get Hackathon Materials
