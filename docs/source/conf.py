@@ -101,10 +101,10 @@ author = u'Meagan Lang, David Raila'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-# The short X.Y version.
-version = cis_interface.__version__
 # The full version, including alpha/beta/rc tags.
 release = cis_interface.__version__
+# The short X.Y version.
+version = release.split('+')[0]
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/
