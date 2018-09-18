@@ -4,6 +4,11 @@ import jsonschema
 from cis_interface import backwards
 
 
+class CisTypeError(TypeError):
+    r"""Error that should be raised when a class encounters a type it cannot handle."""
+    pass
+
+
 class CisBaseType(object):
     r"""Base type that should be subclassed by user defined types. Attributes
     should be overwritten to match the type.
@@ -45,26 +50,14 @@ class CisBaseType(object):
 
     # Methods to be overridden by subclasses
     @classmethod
-    def check_data(cls, data, typedef):
-        r"""Checks if data matches the provided type definition.
-
-        Args:
-            obj (object): Object to be tested.
-            typedef (dict): Type properties that object should be tested
-                against.
-
-        Returns:
-            bool: Truth of if the input object is of this type.
-
-        """
-        raise NotImplementedError("Method must be overridden by the subclass.")
-
-    @classmethod
     def encode_type(cls, obj):
         r"""Encode an object's type definition.
 
         Args:
             obj (object): Object to encode.
+
+        Raises:
+            CisTypeError: If the object is not the correct type.
 
         Returns:
             dict: Encoded type definition.
@@ -199,15 +192,20 @@ class CisBaseType(object):
         """
         try:
             cls.validate_metadata(metadata)
-        except jsonschema.exceptions.ValidationError:
+        except jsonschema.exceptions.ValidationError as e:
+            print("Validation of metadata error")
+            print(e)
             return False
         if typedef is not None:
             try:
                 cls.validate_definition(typedef)
-            except jsonschema.exceptions.ValidationError:
+            except jsonschema.exceptions.ValidationError as e:
+                print("Validation of typedef error")
+                print(e)
                 return False
             for k, v in typedef.items():
                 if not cls.check_meta_compat(k, metadata.get(k, None), v):
+                    print("Incompatible elements: ", k, metadata.get(k, None), v)
                     return False
         return True
 
@@ -224,16 +222,13 @@ class CisBaseType(object):
             bool: Truth of if the input object is of this type.
 
         """
-        if typedef is None:
-            return True
         try:
-            cls.validate_definition(typedef)
-        except jsonschema.exceptions.ValidationError:
-            print("invalid definition")
-            import pprint
-            pprint.pprint(typedef)
+            datadef = cls.encode_type(obj)
+            datadef['typename'] = cls.name
+        except CisTypeError:
+            print('CisTypeError in check_decoded', type(obj), obj)
             return False
-        return cls.check_data(obj, typedef)
+        return cls.check_encoded(datadef, typedef)
 
     @classmethod
     def encode(cls, obj, typedef=None):
@@ -251,6 +246,7 @@ class CisBaseType(object):
                 serialized to bytes.
 
         """
+        # This is slightly redundent, maybe pass None
         if not cls.check_decoded(obj, typedef):
             raise ValueError("Object is not correct type for encoding.")
         obj_t = cls.transform_type(obj, typedef)
@@ -273,7 +269,7 @@ class CisBaseType(object):
             data (bytes): Encoded data.
             typedef (dict, optional): Type properties that decoded object should
                 be tested against. Defaults to None and object may have any
-                values for the type properties (so long as they match the schema.
+                values for the type properties (so long as they match the schema).
 
         Returns:
             object: Decoded object.

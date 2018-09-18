@@ -86,10 +86,6 @@ class TestCisBaseType(CisTestClassInfo):
 
     def test_check_decoded(self):
         r"""Test check_decoded."""
-        # Test always valid without typedef
-        nt.assert_equal(self.import_cls.check_decoded(None), True)
-        # Test always invalid with incorrect typedef
-        nt.assert_equal(self.import_cls.check_decoded(None, {}), False)
         # Not implemented for base class
         if self._cls == 'CisBaseType':
             for x in self._valid_decoded:
@@ -99,6 +95,9 @@ class TestCisBaseType(CisTestClassInfo):
             # Test valid
             for x in self._valid_decoded:
                 nt.assert_equal(self.import_cls.check_decoded(x, self.typedef), True)
+            # Test invalid with incorrect typedef
+            for x in self._valid_decoded:
+                nt.assert_equal(self.import_cls.check_decoded(x, {}), False)
             # Test invalid
             for x in self._invalid_decoded:
                 nt.assert_equal(self.import_cls.check_decoded(x, self.typedef), False)

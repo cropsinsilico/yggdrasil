@@ -1,6 +1,8 @@
 import os
 import glob
+import json
 import importlib
+from cis_interface import backwards
 
 
 _type_registry = {}
@@ -51,3 +53,50 @@ def get_type_class(type_name):
     if type_name not in _type_registry:
         raise ValueError("Class for type %s could not be found." % type_name)
     return _type_registry[type_name]
+
+
+def guess_type_from_msg(msg):
+    r"""Guess the type class from a message.
+
+    Args:
+        msg (str, bytes): Message containing metadata.
+
+    Raises:
+        ValueError: If a type class cannot be determined.
+
+    Returns:
+        CisBaseType: Instance of the appropriate type class.
+
+    """
+    from cis_interface.datatypes.CisBaseType import CisBaseType
+    try:
+        metadata = msg.split(CisBaseType.sep)[0]
+        metadata = json.loads(backwards.bytes2unicode(metadata))
+        return _type_registry[metadata['typename']]()
+    except BaseException as e:
+        print(e)
+        raise ValueError("Could not guess type.")
+
+
+def guess_type_from_obj(obj):
+    r"""Guess the type class for a given Python object.
+
+    Args:
+        obj (object): Python object.
+
+    Returns:
+        CisBaseType: Instance of the appropriate type class.
+
+    Raises:
+        ValueError: If a type class cannot be determined.
+
+    """
+    # Handle string explicitly to avoid confusion?
+    for cls in _type_registry.values():
+        try:
+            cls.encode_type(obj)
+            print(obj, cls)
+            return cls()
+        except BaseException as e:
+            print('guess_type_from_obj', e)
+    raise ValueError("Could not guess type.")

@@ -1,0 +1,136 @@
+import copy
+import numpy as np
+import nose.tools as nt
+from cis_interface import units
+from cis_interface.datatypes.tests import test_CisBaseType as parent
+from cis_interface.datatypes.CisScalarType import _valid_types, definition2dtype
+
+
+def test_definition2dtype_errors():
+    r"""Check that error raised if type not specified."""
+    nt.assert_raises(KeyError, definition2dtype, {})
+
+
+class TestCisScalarType(parent.TestCisBaseType):
+    r"""Test class for CisScalarType class with float."""
+    _mod = 'CisScalarType'
+    _cls = 'CisScalarType'
+    _prec = 32
+    _type = 'float'
+    _shape = 1
+    _array_contents = None
+    _explicit = False
+
+    def __init__(self, *args, **kwargs):
+        super(TestCisScalarType, self).__init__(*args, **kwargs)
+        if not self._explicit:
+            self._typedef['type'] = self._type
+        if self._type == 'string':
+            dtype = 'S%d' % (self._prec / 8)
+        else:
+            dtype = '%s%d' % (self._type, self._prec)
+        if self._array_contents is None:
+            self._array = np.ones(self._shape, dtype)
+        else:
+            self._array = np.array(self._array_contents, dtype)
+        if 'Array' not in self._cls:
+            self._value = self._array[0]
+        else:
+            self._value = self._array
+        self._valid_encoded = [{'typename': self.import_cls.name,
+                                'precision': self._prec,
+                                'units': '',
+                                'data': self._value.tobytes()}]
+        if not self._explicit:
+            self._valid_encoded[0]['type'] = self._type
+        self._valid_decoded = [self._value]
+        if self._type == 'string':
+            new_dtype = 'S%d' % (self._prec * 2 / 8)
+        else:
+            new_dtype = '%s%d' % (self._type, self._prec * 2)
+        prec_array = self._array.astype(new_dtype)
+        if 'Array' not in self._cls:
+            self._prec_value = prec_array[0]
+        else:
+            self._prec_value = prec_array
+        self._compatible_objects = [
+            (self._value, self._value, None)]
+        if not self._explicit:
+            self._compatible_objects.append(
+                (self._value, self._prec_value, {'type': self._type,
+                                                 'precision': self._prec * 2}))
+        else:
+            self._compatible_objects.append(
+                (self._value, self._prec_value, {'precision': self._prec * 2}))
+
+
+# Dynamically create tests for dynamic and explicitly typed scalars
+for t in _valid_types.keys():
+    iattr_imp = {'_type': t}
+    if t == 'complex':
+        iattr_imp['_prec'] = 64
+    elif t == 'string':
+        iattr_imp['_array_contents'] = ['one', 'two', 'three']
+    iattr_exp = copy.deepcopy(iattr_imp)
+    iattr_exp['_cls'] = 'Cis%sType' % t.title()
+    iattr_exp['_explicit'] = True
+    cls_imp = type('TestCisScalarType_%s' % t, (TestCisScalarType, ), iattr_imp)
+    cls_exp = type('Test%s' % iattr_exp['_cls'], (TestCisScalarType, ), iattr_exp)
+    globals()[cls_imp.__name__] = cls_imp
+    globals()[cls_exp.__name__] = cls_exp
+    del cls_imp, cls_exp
+
+
+if False:
+    class TestCisScalarType_int(TestCisScalarType):
+        r"""Test class for CisScalarType class with int."""
+        _type = 'int'
+
+
+    class TestCisScalarType_uint(TestCisScalarType):
+        r"""Test class for CisScalarType class with uint."""
+        _type = 'uint'
+
+
+    class TestCisScalarType_complex(TestCisScalarType):
+        r"""Test class for CisScalarType class with complex."""
+        _type = 'complex'
+        _prec = 64
+
+
+    class TestCisScalarType_string(TestCisScalarType):
+        r"""Test class for CisScalarType class with string."""
+        _type = 'string'
+        _array_contents = ['one', 'two', 'three']
+
+
+class TestCisScalarType_prec(TestCisScalarType):
+    r"""Test class for CisScalarType class with precision."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestCisScalarType_prec, self).__init__(*args, **kwargs)
+        self._typedef['precision'] = self._prec
+        self._valid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
+        self._invalid_encoded[-1]['precision'] = self._prec / 2
+        # Version with incorrect precision
+        self._invalid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
+        self._invalid_encoded[-1]['precision'] = self._prec * 2
+        self._invalid_decoded.append(self._prec_value)
+
+
+class TestCisScalarType_units(TestCisScalarType):
+    r"""Test class for CisScalarType class with units."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestCisScalarType_units, self).__init__(*args, **kwargs)
+        self._typedef['units'] = 'cm'
+        # self._valid_encoded[-1]['units'] = 'cm'
+        self._valid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
+        self._valid_encoded[-1]['units'] = 'cm'
+        self._valid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
+        self._valid_encoded[-1]['units'] = 'm'
+        self._valid_decoded.append(copy.deepcopy(self._valid_decoded[0]))
+        self._valid_decoded[-1] = units.add_units(self._valid_decoded[-1], 'm')
+        # Version with incorrect units
+        self._invalid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
+        self._invalid_encoded[-1]['units'] = 's'
