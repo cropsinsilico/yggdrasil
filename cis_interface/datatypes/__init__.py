@@ -73,8 +73,7 @@ def guess_type_from_msg(msg):
         metadata = msg.split(CisBaseType.sep)[0]
         metadata = json.loads(backwards.bytes2unicode(metadata))
         return _type_registry[metadata['typename']]()
-    except BaseException as e:
-        print(e)
+    except BaseException:
         raise ValueError("Could not guess type.")
 
 
@@ -91,12 +90,13 @@ def guess_type_from_obj(obj):
         ValueError: If a type class cannot be determined.
 
     """
+    if isinstance(obj, (list, tuple, dict)):
+        raise ValueError("Cannot handle lists, tuples, or dictionaries yet.")
     # Handle string explicitly to avoid confusion?
     for cls in _type_registry.values():
         try:
             cls.encode_type(obj)
-            print(obj, cls)
             return cls()
-        except BaseException as e:
-            print('guess_type_from_obj', e)
+        except BaseException:
+            pass
     raise ValueError("Could not guess type.")

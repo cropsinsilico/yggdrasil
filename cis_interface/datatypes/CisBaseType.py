@@ -133,8 +133,6 @@ class CisBaseType(object):
         out = cls.definition_schema()
         out['required'] = copy.deepcopy(cls.metadata_properties)
         out['required'] += ['typename']
-        # out['required'] += ['data']
-        # out['properties']['data'] = copy.deepcopy(cls.data_schema)
         return out
 
     @classmethod
@@ -192,20 +190,16 @@ class CisBaseType(object):
         """
         try:
             cls.validate_metadata(metadata)
-        except jsonschema.exceptions.ValidationError as e:
-            print("Validation of metadata error")
-            print(e)
+        except jsonschema.exceptions.ValidationError:
             return False
         if typedef is not None:
             try:
                 cls.validate_definition(typedef)
-            except jsonschema.exceptions.ValidationError as e:
-                print("Validation of typedef error")
-                print(e)
+            except jsonschema.exceptions.ValidationError:
                 return False
             for k, v in typedef.items():
                 if not cls.check_meta_compat(k, metadata.get(k, None), v):
-                    print("Incompatible elements: ", k, metadata.get(k, None), v)
+                    # print("Incompatible elements: ", k, metadata.get(k, None), v)
                     return False
         return True
 
@@ -226,7 +220,7 @@ class CisBaseType(object):
             datadef = cls.encode_type(obj)
             datadef['typename'] = cls.name
         except CisTypeError:
-            print('CisTypeError in check_decoded', type(obj), obj)
+            # print('CisTypeError in check_decoded', type(obj), obj)
             return False
         return cls.check_encoded(datadef, typedef)
 

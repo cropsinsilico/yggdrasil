@@ -26,7 +26,9 @@ class TestCisScalarType(parent.TestCisBaseType):
         if not self._explicit:
             self._typedef['type'] = self._type
         if self._type == 'string':
-            dtype = 'S%d' % (self._prec / 8)
+            dtype = 'S%d' % (self._prec // 8)
+        elif self._type == 'unicode':
+            dtype = 'U%d' % (self._prec // 32)
         else:
             dtype = '%s%d' % (self._type, self._prec)
         if self._array_contents is None:
@@ -45,7 +47,9 @@ class TestCisScalarType(parent.TestCisBaseType):
             self._valid_encoded[0]['type'] = self._type
         self._valid_decoded = [self._value]
         if self._type == 'string':
-            new_dtype = 'S%d' % (self._prec * 2 / 8)
+            new_dtype = 'S%d' % (self._prec * 2 // 8)
+        elif self._type == 'unicode':
+            new_dtype = 'U%d' % (self._prec * 2 // 32)
         else:
             new_dtype = '%s%d' % (self._type, self._prec * 2)
         prec_array = self._array.astype(new_dtype)
@@ -69,8 +73,13 @@ for t in _valid_types.keys():
     iattr_imp = {'_type': t}
     if t == 'complex':
         iattr_imp['_prec'] = 64
-    elif t == 'string':
+    elif t in ('string', 'unicode'):
         iattr_imp['_array_contents'] = ['one', 'two', 'three']
+        max_len = len(max(iattr_imp['_array_contents'], key=len))
+        if t == 'unicode':
+            iattr_imp['_prec'] = max_len * 32
+        else:
+            iattr_imp['_prec'] = max_len * 8
     iattr_exp = copy.deepcopy(iattr_imp)
     iattr_exp['_cls'] = 'Cis%sType' % t.title()
     iattr_exp['_explicit'] = True
@@ -79,29 +88,6 @@ for t in _valid_types.keys():
     globals()[cls_imp.__name__] = cls_imp
     globals()[cls_exp.__name__] = cls_exp
     del cls_imp, cls_exp
-
-
-if False:
-    class TestCisScalarType_int(TestCisScalarType):
-        r"""Test class for CisScalarType class with int."""
-        _type = 'int'
-
-
-    class TestCisScalarType_uint(TestCisScalarType):
-        r"""Test class for CisScalarType class with uint."""
-        _type = 'uint'
-
-
-    class TestCisScalarType_complex(TestCisScalarType):
-        r"""Test class for CisScalarType class with complex."""
-        _type = 'complex'
-        _prec = 64
-
-
-    class TestCisScalarType_string(TestCisScalarType):
-        r"""Test class for CisScalarType class with string."""
-        _type = 'string'
-        _array_contents = ['one', 'two', 'three']
 
 
 class TestCisScalarType_prec(TestCisScalarType):
@@ -124,7 +110,6 @@ class TestCisScalarType_units(TestCisScalarType):
     def __init__(self, *args, **kwargs):
         super(TestCisScalarType_units, self).__init__(*args, **kwargs)
         self._typedef['units'] = 'cm'
-        # self._valid_encoded[-1]['units'] = 'cm'
         self._valid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
         self._valid_encoded[-1]['units'] = 'cm'
         self._valid_encoded.append(copy.deepcopy(self._valid_encoded[0]))

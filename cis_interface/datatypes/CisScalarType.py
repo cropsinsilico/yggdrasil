@@ -8,12 +8,13 @@ _valid_numpy_types = ['int', 'uint', 'float', 'complex']
 _valid_types = {k: k for k in _valid_numpy_types}
 _flexible_types = ['string', 'bytes', 'unicode']
 if backwards.PY2:  # pragma: Python 2
-    _valid_numpy_types.append('string')
+    _valid_numpy_types += ['string', 'unicode']
     _valid_types['string'] = 'string'
+    _valid_types['unicode'] = 'unicode'
 else:  # pragma: Python 3
-    _valid_numpy_types.append('bytes')
-    _valid_types['unicode'] = 'str'
+    _valid_numpy_types += ['bytes', 'unicode']
     _valid_types['string'] = 'bytes'
+    _valid_types['unicode'] = 'str'
 
 
 def data2dtype(data):
@@ -27,9 +28,10 @@ def data2dtype(data):
 
     """
     data_nounits = units.get_data(data)
-    print(data_nounits, type(data_nounits))
     if isinstance(data_nounits, np.ndarray):
         dtype = data_nounits.dtype
+    elif isinstance(data_nounits, (list, dict, tuple)):
+        raise TypeError
     else:
         dtype = np.array([data_nounits]).dtype
     return dtype
@@ -50,7 +52,6 @@ def dtype2definition(dtype):
         if dtype.name.startswith(v):
             out['type'] = k
     if 'type' not in out:
-        print("CisTypeError", dtype, dtype.name)
         raise CisTypeError('Cannot find type string for dtype %s' % dtype)
     out['precision'] = dtype.itemsize * 8  # in bits
     return out
@@ -71,7 +72,9 @@ def definition2dtype(props):
         typename = props.get('typename', None)
         if typename is None:
             raise KeyError('Could not find type in dictionary')
-    if typename in _flexible_types:
+    if typename == 'unicode':
+        out = np.dtype((_valid_types[typename], props['precision'] // 32))
+    elif typename in _flexible_types:
         out = np.dtype((_valid_types[typename], props['precision'] // 8))
     else:
         out = np.dtype('%s%d' % (_valid_types[typename], props['precision']))
@@ -133,8 +136,6 @@ class CisScalarType(CisBaseType):
         """
         out = dtype2definition(data2dtype(obj))
         out['units'] = units.get_units(obj)
-        # if 'type' not in cls.properties:
-        #     del out['type']
         return out
 
     @classmethod
@@ -238,21 +239,5 @@ class CisScalarType(CisBaseType):
 
 # Dynamically create explicity scalar classes for shorthand
 for t in _valid_types.keys():
-    iattr = {'name': t,
-             'description': 'A %s value with or without units.' % t}
-    if False:
-        for k in ['properties', 'definition_properties', 'metadata_properties']:
-            iattr[k] = copy.deepcopy(getattr(CisScalarType, k))
-            if isinstance(iattr[k], list):
-                iattr[k].remove('type')
-            elif isinstance(iattr[k], dict):
-                del iattr[k]['type']
-    else:
-        iattr['fixed_properties'] = {'type': t}
     create_fixed_type_class(t, 'A %s value with or without units.' % t,
                             CisScalarType, {'type': t}, globals())
-    if False:
-        new_cls = register_type(type('Cis%sType' % t.title(),
-                                     (CisScalarType, CisFixedType, ), iattr))
-        globals()[new_cls.__name__] = new_cls
-        del new_cls
