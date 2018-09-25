@@ -398,7 +398,8 @@ class TimedRun(CisTestBase, tools.CisClass):
         print(out.get_runs()[0].values)
         print(out.get_values())
         print(out.get_nvalue(), out.get_loops())
-        return (out.min(), out.mean(), out.stdev())
+        print(min(out.get_values()), out.mean(), out.stdev())
+        return (min(out.get_values()), out.mean(), out.stdev())
 
     def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
         r"""Time sending a set of messages between the designated models.
@@ -528,7 +529,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
             min0, avg0, std0 = self.time_run(0, 0)
-        min = []
+        mbo = []
         avg = []
         std = []
         for c in counts:
@@ -536,10 +537,10 @@ class TimedRun(CisTestBase, tools.CisClass):
             if per_message:
                 imin = (imin - min0) / c
                 iavg = (iavg - avg0) / c
-            min.append(imin)
+            mbo.append(imin)
             avg.append(iavg)
             std.append(istd)
-        return (counts, min, avg, std)
+        return (counts, mbo, avg, std)
 
     def scaling_size(self, nmsg, sizes=None, min_size=1, max_size=1e7,
                      nsamples=10, scaling='log', per_message=False):
@@ -578,7 +579,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
             min0, avg0, std0 = self.time_run(0, 0)
-        min = []
+        mbo = []
         avg = []
         std = []
         for s in sizes:
@@ -586,10 +587,10 @@ class TimedRun(CisTestBase, tools.CisClass):
             if per_message:
                 imin = (imin - min0) / nmsg
                 iavg = (iavg - avg0) / nmsg
-            min.append(imin)
+            mbo.append(imin)
             avg.append(iavg)
             std.append(istd)
-        return (sizes, avg, std)
+        return (sizes, mbo, avg, std)
 
     def load_perf(self):
         r"""Load perf BenchmarkSuite from file.
