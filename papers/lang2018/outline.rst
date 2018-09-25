@@ -10,17 +10,16 @@ Outline
 #. Methods
   #. YAML Specification
   #. Communication
+    #. Asynchrounous Message Passing
     #. Sys V IPC
     #. ZeroMQ
     #. RabbitMQ
-  #. Asynchrounous Message Passing
-  #. Model Drivers
-    #. Python
-    #. Matlab
-    #. C/C++, Make, CMake
-    #. LPy
+  #. Language Support
+    #. Drivers
+    #. Interface
 #. Results
   #. Communication Performance
   #. Model Performance (startup/runtime/shutdown)
+#. Future Directions
 #. Conclusion
 #. References
