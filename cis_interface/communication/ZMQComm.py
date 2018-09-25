@@ -23,6 +23,7 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = backwards.unicode2bytes('CIS_REPLY')
 _purge_msg = backwards.unicode2bytes('CIS_PURGE')
 _global_context = zmq.Context.instance()
+_zmq_installed = tools._zmq_installed
 
 
 def get_ipc_host():

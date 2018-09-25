@@ -8,9 +8,12 @@ import subprocess
 import warnings
 import tempfile
 import numpy as np
-from cis_interface import tools, runner, drivers, examples, backwards, platform
+from cis_interface import tools, runner, examples, backwards, platform
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 from cis_interface.tests import CisTestBase
+from cis_interface.communication.IPCComm import _ipc_installed
+from cis_interface.communication.ZMQComm import _zmq_installed
+from cis_interface.communication.RMQComm import _rmq_installed
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 _linewidth = 4
@@ -38,8 +41,7 @@ def write_perf_script(script_file, nmsg, msg_size,
         'runner = perf.Runner(values=nrep)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.perf_func,',
-        '                             timer, nmsg, msg_size)',
-        ]
+        '                             timer, nmsg, msg_size)']
     if os.path.isfile(script_file):
         os.remove(script_file)
     with open(script_file, 'w') as fd:
@@ -272,7 +274,7 @@ class TimedRun(CisTestBase, tools.CisClass):
 
         """
         out = {'name': 'timed_pipe_src',
-               'driver': drivers.get_model_driver(lang),
+               'language': lang,
                'args': [os.path.join('.', self.source_src),
                         "{{PIPE_MSG_COUNT}}", "{{PIPE_MSG_SIZE}}"],
                'outputs': {'name': 'output_pipe',
@@ -288,7 +290,7 @@ class TimedRun(CisTestBase, tools.CisClass):
 
         """
         out = {'name': 'timed_pipe_dst',
-               'driver': drivers.get_model_driver(lang),
+               'language': lang,
                'args': os.path.join('.', self.source_dst),
                'inputs': {'name': 'input_pipe',
                           'driver': 'InputDriver',
@@ -376,7 +378,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 run will be overwritten. Defaults to False.
 
         Returns:
-            tuple: Average and standard deviation in the time (in seconds)
+            tuple: Best of, average and standard deviation in the time (in seconds)
                 required to execute the program.
 
         """
@@ -390,12 +392,13 @@ class TimedRun(CisTestBase, tools.CisClass):
             cmd = [sys.executable, self.perfscript, '--append=' + self.perf_file]
             subprocess.call(cmd)
             assert(os.path.isfile(self.perf_file))
+            os.remove(self.perfscript)
             self.perf = self.load_perf()
         out = self.perf.get_benchmark(entry_name)
         print(out.get_runs()[0].values)
         print(out.get_values())
         print(out.get_nvalue(), out.get_loops())
-        return (out.mean(), out.stdev())
+        return (out.min(), out.mean(), out.stdev())
 
     def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
         r"""Time sending a set of messages between the designated models.
@@ -410,7 +413,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 run will be overwritten. Defaults to False.
 
         Returns:
-            tuple: Average and standard deviation in the time (in seconds)
+            tuple: Best of, average and standard deviation in the time (in seconds)
                 required to execute the program.
 
         """
@@ -423,7 +426,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                 t1 = time.time()
                 out[i] = t1 - t0
                 self.after_run(run_uuid, np.mean(out))
-            self.data[self.name][(nmsg, msg_size)] = (np.mean(out), np.std(out))
+            self.data[self.name][(nmsg, msg_size)] = (
+                np.min(out), np.mean(out), np.std(out))
             self.save_scalings()
         return self.data[self.name][(nmsg, msg_size)]
 
@@ -509,8 +513,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                 returned rather than the total time. Defaults to False.
 
         Returns:
-            tuple: Lists of counts timed, average execution times, and standard
-                deviations.
+            tuple: Lists of counts timed, minimum execution time, average
+                execution times, and standard deviations.
 
         """
         if counts is None:
@@ -523,16 +527,19 @@ class TimedRun(CisTestBase, tools.CisClass):
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
-            avg0, std0 = self.time_run(0, 0)
+            min0, avg0, std0 = self.time_run(0, 0)
+        min = []
         avg = []
         std = []
         for c in counts:
-            iavg, istd = self.time_run(c, msg_size)
+            imin, iavg, istd = self.time_run(c, msg_size)
             if per_message:
+                imin = (imin - min0) / c
                 iavg = (iavg - avg0) / c
+            min.append(imin)
             avg.append(iavg)
             std.append(istd)
-        return (counts, avg, std)
+        return (counts, min, avg, std)
 
     def scaling_size(self, nmsg, sizes=None, min_size=1, max_size=1e7,
                      nsamples=10, scaling='log', per_message=False):
@@ -556,8 +563,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                 returned rather than the total time. Defaults to False.
 
         Returns:
-            tuple: Lists of sizes timed, average execution times, and standard
-                deviations.
+            tuple: Lists of sizes timed, minimum execution times, average
+                execution times, and standard deviations.
 
         """
         if sizes is None:
@@ -570,13 +577,16 @@ class TimedRun(CisTestBase, tools.CisClass):
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
-            avg0, std0 = self.time_run(0, 0)
+            min0, avg0, std0 = self.time_run(0, 0)
+        min = []
         avg = []
         std = []
         for s in sizes:
-            iavg, istd = self.time_run(nmsg, s)
+            imin, iavg, istd = self.time_run(nmsg, s)
             if per_message:
+                imin = (imin - min0) / nmsg
                 iavg = (iavg - avg0) / nmsg
+            min.append(imin)
             avg.append(iavg)
             std.append(istd)
         return (sizes, avg, std)
@@ -617,20 +627,27 @@ class TimedRun(CisTestBase, tools.CisClass):
             backwards.pickle.dump(self.data, fd)
 
 
-def plot_scalings(nmsg=1, msg_size=1000, counts=None, sizes=None,
-                  plotfile=None, show_plot=False,
+def plot_scalings(nmsg=5, msg_size=1000, counts=None, sizes=None,
+                  plotfile=None, show_plot=False, compare='language',
                   scalings_file=None, test_name='timed_pipe',
-                  per_message=False, comm_type=None):  # pragma: debug
-    r"""Plot the scalings for the full matrix of language combinations. This
-    can be time consuming.
+                  per_message=False, comm_type=None, language='python',
+                  time_method='bestof'):  # pragma: debug
+    r"""Plot the scalings comparing different communication mechanisms and
+    languages. This can be time consuming.
 
     Args:
         nmsg (int, optional): Number of messages for scaling of message size.
-            Defaults to 1.
+            Defaults to 5.
         msg_size (int, optional): Size of messages for scaling of message count.
             Defaults to 1000.
+        counts (list, optional): List of counts to test. Defaults to
+            [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] if not provided.
+        sizes (list, optional): List of sizes to test. Defaults to
+            [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7] if not provided.
         plotfile (str, optional): Path to file where the figure should be saved.
             If None, one will be created.
+        compare (str, optional): Variable that should be compared. Valid values
+            include 'language' and 'commtype'. Defaults to 'language'.
         show_plot (bool, optional): If True, the plot will be displayed before
             it is saved. Defaults to False.
         scalings_file (str, optional): Path to the file containing scalings
@@ -639,27 +656,35 @@ def plot_scalings(nmsg=1, msg_size=1000, counts=None, sizes=None,
         per_message (bool, optional): If True, the time per message is
             returned rather than the total time. Defaults to False.
         comm_type (str, optional): Name of communication class that should be
-            used for tests. Defaults to the current default comm class.
+            used for tests comparing communication between models in different
+            languages. Defaults to the current default comm class.
+        language (str, optional): Language of model that should be used for
+            a comparison of different comm types. Defaults to 'python'.
+        time_method (str, optional): Timing method that should be used. Valid
+            values include 'bestof' and 'average'. Defaults to 'bestof'.
 
     Returns:
         str: Path where the figure was saved.
 
     """
+    if counts is None:
+        counts = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    if sizes is None:
+        sizes = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7]
     if comm_type is None:
         comm_type = tools.get_default_comm()
+    if compare not in ['commtype', 'language']:
+        raise ValueError("Invalid compare: '%s'" % compare)
+    if time_method not in ['bestof', 'average']:
+        raise ValueError("Invalid time_method: '%s'" % time_method)
     if plotfile is None:
-        plotfile = os.path.join(os.getcwd(), 'scaling_%s_%s.png' % (
-            test_name, comm_type))
+        if compare == 'commtype':
+            plotfile = os.path.join(os.getcwd(), 'scaling_commtype_%s_%s_%s.png' % (
+                test_name, language, time_method))
+        elif compare == 'language':
+            plotfile = os.path.join(os.getcwd(), 'scaling_language_%s_%s_%s.png' % (
+                test_name, comm_type, time_method))
     fig, axs = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
-    lang_list = ['python']
-    if tools._c_library_avail:
-        lang_list += ['c', 'cpp']
-    if _matlab_installed:
-        lang_list.append('matlab')
-    colors = {'python': 'b', 'matlab': 'm',
-              'c': 'g', 'cpp': 'r'}
-    styles = {'python': '-', 'matlab': ';',
-              'c': '--', 'cpp': ':'}
     # Labels
     axs[0].set_xlabel('Message Count (size = %d)' % msg_size)
     if per_message:
@@ -676,26 +701,70 @@ def plot_scalings(nmsg=1, msg_size=1000, counts=None, sizes=None,
     pos2 = [box2.x0, box2.y0, axs_width * box2.width, axs_height * box2.height]
     axs[1].set_position(pos2)
     box_leg = (1.0 + (pos2[0] - (pos1[0] + pos1[2])) / (2.0 * pos1[2]), 1.25)
-    for l1 in lang_list:
-        clr = colors[l1]
-        for l2 in lang_list:
-            sty = styles[l2]
-            plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
-            x = TimedRun(l1, l2, scalings_file=scalings_file, name=test_name,
-                         comm_type=comm_type)
-            label = '%s to %s' % (l1, l2)
-            x1, y1, z1 = x.scaling_count(msg_size, counts=counts,
-                                         per_message=per_message)
-            x2, y2, z2 = x.scaling_size(nmsg, sizes=sizes,
-                                        per_message=per_message)
-            x.plot_scaling(x1, y1, 'count', yerr=z1, axs=axs[0],
-                           yscale='log',
+
+    def single_plot(l1, l2, c0, clr, sty, label, yscale):
+        plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
+        x = TimedRun(l1, l2, scalings_file=scalings_file, name=test_name,
+                     comm_type=c0)
+        x1, min1, avg1, std1 = x.scaling_count(msg_size, counts=counts,
+                                               per_message=per_message)
+        x2, min2, avg2, std2 = x.scaling_size(nmsg, sizes=sizes,
+                                              per_message=per_message)
+        if time_method == 'bestof':
+            x.plot_scaling(x1, min1, 'count', axs=axs[0],
+                           yscale=yscale,
                            label=label, plot_kws=plot_kws,
                            per_message=per_message)
-            x.plot_scaling(x2, y2, 'size', yerr=z2, axs=axs[1],
-                           yscale='log', xscale='log',
+            x.plot_scaling(x2, min2, 'size', axs=axs[1],
+                           yscale=yscale, xscale='log',
                            label=label, plot_kws=plot_kws,
                            per_message=per_message)
+        elif time_method == 'average':
+            x.plot_scaling(x1, avg1, 'count', yerr=std1, axs=axs[0],
+                           yscale=yscale,
+                           label=label, plot_kws=plot_kws,
+                           per_message=per_message)
+            x.plot_scaling(x2, avg2, 'size', yerr=std2, axs=axs[1],
+                           yscale=yscale, xscale='log',
+                           label=label, plot_kws=plot_kws,
+                           per_message=per_message)
+
+    if compare == 'commtype':
+        colors = {'ZMQ': 'b', 'IPC': 'r', 'RMQ': 'g'}
+        styles = {}
+        comm_list = []
+        if _ipc_installed:
+            comm_list.append('IPCComm')
+        if _zmq_installed:
+            comm_list.append('ZMQComm')
+        if _rmq_installed:
+            comm_list.append('RMQComm')
+        print('comm_list', comm_list)
+        for comm_type in comm_list:
+            l1 = language
+            l2 = language
+            label = comm_type.split('Comm')[0]
+            clr = colors[label]
+            sty = '-'
+            yscale = 'linear'
+            single_plot(l1, l2, comm_type, clr, sty, label, yscale)
+    elif compare == 'language':
+        colors = {'python': 'b', 'matlab': 'm',
+                  'c': 'g', 'cpp': 'r'}
+        styles = {'python': '-', 'matlab': ';',
+                  'c': '--', 'cpp': ':'}
+        lang_list = ['python']
+        if tools._c_library_avail:
+            lang_list += ['c', 'cpp']
+        if _matlab_installed:
+            lang_list.append('matlab')
+        for l1 in lang_list:
+            clr = colors[l1]
+            for l2 in lang_list:
+                sty = styles[l2]
+                label = '%s to %s' % (l1, l2)
+                yscale = 'log'
+                single_plot(l1, l2, comm_type, clr, sty, label, yscale)
     legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
     legend.get_frame().set_linewidth(_linewidth)
     if show_plot:

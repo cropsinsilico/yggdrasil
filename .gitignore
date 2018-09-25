@@ -5,6 +5,7 @@ cis_interface/tests/scripts/Makefile
 
 # Intermediate docs
 docs/build
+docs/source/cis_interface.inc
 docs/source/cis_interface*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst

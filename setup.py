@@ -108,7 +108,9 @@ setup(
                             'cisldflags=cis_interface.command_line:ld_flags',
                             'cistest=cis_interface:run_nose',
                             'cisschema=cis_interface.command_line:regen_schema',
-                            'cisconfig=cis_interface.command_line:update_config'],
+                            'cisconfig=cis_interface.command_line:update_config',
+                            'cistime_comm=cis_interface.command_line:cistime_comm',
+                            'cistime_lang=cis_interface.command_line:cistime_lang'],
     },
     license="BSD",
 )
