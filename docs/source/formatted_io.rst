@@ -22,8 +22,8 @@ for initializing channels and sending/receiving to/from them.
 
 The same YAML can be used as was used for the example from 
 :ref:`Getting started <getting_started_rst>` with the modification that 
-the files are now read/written line-by-line (``read_meth: line`` and 
-``write_meth: line``) rather than all at once:
+the files are now read/written line-by-line (``filetype: ascii``) 
+rather than all at once:
 
 .. include:: examples/formatted_io1_yml.rst
 
@@ -39,7 +39,7 @@ versus standard channels in each language. (e.g. ``CisInput`` vs.
 
 .. include:: examples/formatted_io2_src.rst
 
-The ``read_meth: table`` and ``write_meth: table`` options in the YAML, tell the 
+The ``filetype: table`` options in the YAML tell the 
 |cis_interface| framework that the file should be read/written as a table 
 row-by-row including verification that each row conforms with the table.
 
@@ -55,9 +55,51 @@ arguments of the table API classes/functions.
 
 .. include:: examples/formatted_io3_src.rst
 
-The YAML only differs in that ``read_meth: table_array`` and 
-``write_meth: table_array`` for the connections to files to indicate that the files 
-should be interpreted as tables and that the tables should be read/written in their 
-entirety as arrays.
+The YAML only differs in that ``as_array: True`` for the connections to the files 
+to indicate that the files should be interpreted as tables and that the tables 
+should be read/written in their entirety as arrays.
 
 .. include:: examples/formatted_io3_yml.rst
+
+
+Tables as Pandas Data Frames
+----------------------------
+
+In Python, tables can also be passed as `Pandas <https://pandas.pydata.org/>`_ 
+data frames.
+
+.. include:: examples/formatted_io4_src.rst
+
+The YAML specifies ``filetype: pandas`` for the 
+connections to files to indicate that the files should be interpreted as CSV 
+tables using Pandas.
+
+.. include:: examples/formatted_io4_yml.rst
+
+As Pandas data frames are a Python specific construction, they cannot be 
+used within models written in other languages. However, the files can 
+still be read using Pandas. The data format returned to models on the 
+receiving end of sent Pandas data frames will receive arrays in the 
+proper native data type. In addition, a model written in Python can 
+receive any array sent by another model (whether or not it is Python) 
+as a Pandas data frame.
+
+
+3D Structures as Ply/Obj
+------------------------
+
+3D structures can be passed around in `Ply <http://paulbourke.net/dataformats/ply/>`_ 
+or `Obj <http://paulbourke.net/dataformats/obj/>`_ formats.
+
+.. include:: examples/formatted_io5_src.rst
+
+The YAML specifies ``filetype: ply`` (``filetype: obj`` for Obj) for the 
+connections to files to indicate that the files should be interpreted as 
+Ply/Obj file formats.
+
+.. include:: examples/formatted_io5_yml.rst
+
+In Python the data is returned as a dictionary subclass
+(:class:`cis_interface.serialize.PlySerialize.PlyDict` or 
+:class:`cis_interface.serialize.ObjSerialize.ObjDict`) while in 
+C/C++ it is returned as a structure (:c:type:`ply_t` or :c:type:`obj_t`).

@@ -1,10 +1,13 @@
+#ifndef CISFORMATSERIALIZE_H_
+#define CISFORMATSERIALIZE_H_
+
 #include <../tools.h>
 #include <SerializeBase.h>
 #include <../dataio/AsciiTable.h>
 
-#ifndef CISFORMATSERIALIZE_H_
-#define CISFORMATSERIALIZE_H_
-
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*!
   @brief Serialize arguments to create a message.
@@ -78,5 +81,9 @@ int deserialize_format(const seri_t s, const char *buf, const size_t buf_siz,
   return sret;
 };
 
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISFORMATSERIALIZE_H_*/

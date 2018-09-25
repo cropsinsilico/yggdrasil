@@ -1,6 +1,8 @@
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class FileOutputDriver(ConnectionDriver):
     r"""Class to handle output of received messages to a file.
 
@@ -12,12 +14,14 @@ class FileOutputDriver(ConnectionDriver):
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     """
+
+    _ocomm_type = 'FileComm'
+    _is_output = True
+
     def __init__(self, name, path, in_temp=False, **kwargs):
         if isinstance(in_temp, str):
             in_temp = eval(in_temp)
-        # icomm_kws = kwargs.get('icomm_kws', {})
         ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws.setdefault('comm', 'FileComm')
         ocomm_kws['address'] = path
         ocomm_kws['in_temp'] = in_temp
         kwargs['ocomm_kws'] = ocomm_kws

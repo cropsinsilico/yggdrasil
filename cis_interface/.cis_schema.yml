@@ -1,0 +1,383 @@
+comm:
+  as_array: &id001
+    required: false
+    type: boolean
+  dtype: &id002
+    required: false
+    type: string
+  field_names: &id003
+    required: false
+    schema:
+      type: string
+    type: list
+  field_units: &id004
+    required: false
+    schema:
+      type: string
+    type: list
+  format_str: &id005
+    required: false
+    type: string
+  name: &id006
+    required: true
+    type: string
+  stype: &id007
+    required: false
+    type: integer
+  units: &id008
+    required: false
+    type: string
+comm_schema_subtypes:
+  CommBase:
+  - default
+  RMQComm:
+  - rmq
+comm_subtype_attr: _commtype
+connection:
+  input:
+    excludes: input_file
+    required: true
+    schema:
+      type: string
+    type:
+    - string
+    - list
+  input_file:
+    excludes: input
+    required: true
+    schema: file
+    type: dict
+  onexit:
+    required: false
+    type: string
+  output:
+    excludes: output_file
+    required: true
+    schema:
+      type: string
+    type:
+    - string
+    - list
+  output_file:
+    excludes: output
+    required: true
+    schema: file
+    type: dict
+  translator:
+    required: false
+    schema:
+      type: function
+    type:
+    - function
+    - list
+connection_schema_subtypes:
+  AsciiFileInputDriver:
+  - !!python/tuple
+    - AsciiFileComm
+    - DefaultComm
+    - input
+  AsciiFileOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - AsciiFileComm
+    - output
+  AsciiMapInputDriver:
+  - !!python/tuple
+    - AsciiMapComm
+    - DefaultComm
+    - input
+  AsciiMapOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - AsciiMapComm
+    - output
+  AsciiTableInputDriver:
+  - !!python/tuple
+    - AsciiTableComm
+    - DefaultComm
+    - input
+  AsciiTableOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - AsciiTableComm
+    - output
+  ConnectionDriver:
+  - !!python/tuple
+    - DefaultComm
+    - DefaultComm
+    - null
+  FileInputDriver:
+  - !!python/tuple
+    - FileComm
+    - DefaultComm
+    - input
+  FileOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - FileComm
+    - output
+  InputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - DefaultComm
+    - input
+  ObjFileInputDriver:
+  - !!python/tuple
+    - ObjFileComm
+    - DefaultComm
+    - input
+  ObjFileOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - ObjFileComm
+    - output
+  OutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - DefaultComm
+    - output
+  PandasFileInputDriver:
+  - !!python/tuple
+    - PandasFileComm
+    - DefaultComm
+    - input
+  PandasFileOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - PandasFileComm
+    - output
+  PickleFileInputDriver:
+  - !!python/tuple
+    - PickleFileComm
+    - DefaultComm
+    - input
+  PickleFileOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - PickleFileComm
+    - output
+  PlyFileInputDriver:
+  - !!python/tuple
+    - PlyFileComm
+    - DefaultComm
+    - input
+  PlyFileOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - PlyFileComm
+    - output
+  RMQInputDriver:
+  - !!python/tuple
+    - RMQComm
+    - DefaultComm
+    - input
+  RMQOutputDriver:
+  - !!python/tuple
+    - DefaultComm
+    - RMQComm
+    - output
+file:
+  append:
+    required: false
+    type: boolean
+  as_array: *id001
+  comment:
+    dependencies:
+      filetype:
+      - ascii
+      - table
+    required: false
+    type: string
+  delimiter:
+    dependencies:
+      filetype:
+      - pandas
+      - table
+    required: false
+    type: string
+  dtype: *id002
+  field_names: *id003
+  field_units: *id004
+  filetype:
+    allowed:
+    - ascii
+    - binary
+    - map
+    - obj
+    - pandas
+    - pickle
+    - ply
+    - table
+    default: binary
+    required: false
+    type: string
+  format_str: *id005
+  in_temp:
+    required: false
+    type: boolean
+  is_series:
+    required: false
+    type: boolean
+  name: *id006
+  newline:
+    default: '
+
+      '
+    required: false
+    type: string
+  stype: *id007
+  units: *id008
+  use_astropy:
+    dependencies:
+      filetype:
+      - table
+    required: false
+    type: boolean
+  working_dir:
+    required: true
+    type: string
+file_schema_subtypes:
+  AsciiFileComm:
+  - ascii
+  AsciiMapComm:
+  - map
+  AsciiTableComm:
+  - table
+  FileComm:
+  - binary
+  ObjFileComm:
+  - obj
+  PandasFileComm:
+  - pandas
+  PickleFileComm:
+  - pickle
+  PlyFileComm:
+  - ply
+file_subtype_attr: _filetype
+model:
+  args:
+    required: true
+    schema:
+      type: string
+    type:
+    - list
+    - string
+  builddir:
+    dependencies:
+      language:
+      - cmake
+    required: false
+    type: string
+  cc:
+    dependencies:
+      language:
+      - c
+      - c++
+      - cpp
+    required: false
+    type: string
+  client_of:
+    required: false
+    schema:
+      type: string
+    type: list
+  cmakeargs:
+    dependencies:
+      language:
+      - cmake
+    required: false
+    schema:
+      type: string
+    type: list
+  inputs:
+    required: false
+    schema:
+      schema: comm
+      type: dict
+    type: list
+  is_server:
+    required: false
+    type: boolean
+  language:
+    allowed:
+    - c
+    - c++
+    - cmake
+    - cpp
+    - executable
+    - lpy
+    - make
+    - matlab
+    - python
+    required: true
+    type: string
+  make_command:
+    dependencies:
+      language:
+      - make
+    required: false
+    type: string
+  makedir:
+    dependencies:
+      language:
+      - make
+    required: false
+    type: string
+  makefile:
+    dependencies:
+      language:
+      - make
+    required: false
+    type: string
+  name:
+    required: true
+    type: string
+  outputs:
+    required: false
+    schema:
+      schema: comm
+      type: dict
+    type: list
+  sourcedir:
+    dependencies:
+      language:
+      - cmake
+    required: false
+    type: string
+  strace_flags:
+    required: false
+    schema:
+      type: string
+    type: list
+  valgrind_flags:
+    required: false
+    schema:
+      type: string
+    type: list
+  with_strace:
+    required: false
+    type: boolean
+  with_valgrind:
+    required: false
+    type: boolean
+  working_dir:
+    required: true
+    type: string
+model_schema_subtypes:
+  CMakeModelDriver:
+  - cmake
+  GCCModelDriver:
+  - c
+  - c++
+  - cpp
+  LPyModelDriver:
+  - lpy
+  MakeModelDriver:
+  - make
+  MatlabModelDriver:
+  - matlab
+  ModelDriver:
+  - executable
+  PythonModelDriver:
+  - python
+model_subtype_attr: _language

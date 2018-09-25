@@ -1,10 +1,14 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISRPCCOMM_H_
+#define CISRPCCOMM_H_
+
 #include <CommBase.h>
 #include <DefaultComm.h>
 #include <comm_header.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISRPCCOMM_H_
-#define CISRPCCOMM_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 // Handle is output comm
 // Info is input comm
@@ -30,7 +34,7 @@ int init_rpc_comm(comm_t *comm) {
   int ret;
   // Input comm
   comm_t *info = init_comm_base(comm->name, "recv", _default_comm,
-				comm->serializer.info);
+				comm->serializer->info);
   ret = init_default_comm(info);
   if (ret < 0) {
     cislog_error("init_rpc_comm(%s): Failed to initialize input comm", comm->name);
@@ -132,5 +136,9 @@ int rpc_comm_recv(const comm_t x, char **data, const size_t len,
   comm_t *req_comm = (comm_t*)(x.info);
   return default_comm_recv(*req_comm, data, len, allow_realloc);
 };
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISRPCCOMM_H_*/

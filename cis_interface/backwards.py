@@ -11,20 +11,26 @@ if PY2:  # pragma: Python 2
     from __builtin__ import unicode
     import types
     BytesIO = sio.StringIO
+    StringIO = sio.StringIO
     file_type = types.FileType
     bytes_type = str
     unicode_type = str
+    string_type = str
     np_dtype_str = 'S'
+    string_types = (str, unicode)
 else:  # pragma: Python 3
     import pickle
     import configparser
     import io as sio
     BytesIO = sio.BytesIO
+    StringIO = sio.StringIO
     file_type = sio.IOBase
     bytes_type = bytes
     unicode_type = str
+    string_type = str
     unicode = None
     np_dtype_str = 'S'
+    string_types = (bytes, str)
 if sys.version_info >= (3, 3):
     clock_time = time.perf_counter
 else:
@@ -37,16 +43,19 @@ def scanf_bytes(fmt, bytes_line):
         out_byt = scanf(fmt, bytes_line)
     else:  # pragma: Python 3
         out_uni = scanf(bytes2unicode(fmt), bytes2unicode(bytes_line))
-        out_byt = out_uni
-        # if out_uni is None:
-        #     out_byt = None
-        # else:
-        #     out_byt = []
-        #     for a in out_uni:
-        #         if isinstance(a, unicode_type):
-        #             out_byt.append(unicode2bytes(a))
-        #         else:
-        #             out_byt.append(a)
+        if isinstance(bytes_line, unicode_type):
+            out_byt = out_uni
+        else:
+            if out_uni is None:
+                out_byt = None
+            else:
+                out_byt = []
+                for a in out_uni:
+                    if isinstance(a, unicode_type):
+                        out_byt.append(unicode2bytes(a))
+                    else:
+                        out_byt.append(a)
+                out_byt = tuple(out_byt)
     return out_byt
 
 
@@ -212,7 +221,7 @@ def format_bytes(s, args):
             else:
                 new_args.append(a)
         out = converter(s) % tuple(new_args)
-        if PY34 and is_bytes:
+        if is_bytes:
             out = unicode2bytes(out)
     return out
 

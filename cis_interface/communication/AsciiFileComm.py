@@ -1,40 +1,34 @@
+from cis_interface import serialize, backwards
 from cis_interface.communication.FileComm import FileComm
-from cis_interface.dataio.AsciiFile import AsciiFile
+from cis_interface.schema import register_component, inherit_schema
 
 
+@register_component
 class AsciiFileComm(FileComm):
     r"""Class for handling I/O from/to a file on disk.
 
     Args:
         name (str): The environment variable where communication address is
             stored.
+        comment (str, optional): String indicating a comment. If 'read_meth'
+            is 'readline' and this is provided, lines starting with a comment
+            will be skipped.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
-        file_kwargs (dict): Keyword arguments for the AsciiFile instance.
-        file (AsciiFile): Instance for read/writing to/from file.
+        comment (str): String indicating a comment.
 
     """
-    def _init_before_open(self, skip_AsciiFile=False, **kwargs):
-        r"""Set up dataio and attributes."""
+
+    _filetype = 'ascii'
+    _schema = inherit_schema(FileComm._schema, 'filetype', _filetype,
+                             comment={'type': 'string', 'required': False})
+
+    def _init_before_open(self, comment=serialize._default_comment, **kwargs):
+        r"""Get absolute path and set attributes."""
+        self.comment = backwards.unicode2bytes(comment)
+        kwargs.setdefault('read_meth', 'readline')
         super(AsciiFileComm, self)._init_before_open(**kwargs)
-        file_keys = ['comment', 'newline']
-        file_kwargs = {}
-        for k in file_keys:
-            if k in kwargs:
-                file_kwargs[k] = kwargs.pop(k)
-        self.file_kwargs = file_kwargs
-        self.file = None
-        if not skip_AsciiFile:
-            if self.direction == 'recv':
-                self.file = AsciiFile(self.address, 'r', **self.file_kwargs)
-            else:
-                if self.append:
-                    self.file = AsciiFile(self.address, 'a', **self.file_kwargs)
-                else:
-                    self.file = AsciiFile(self.address, 'w', **self.file_kwargs)
-        else:
-            self.file = None
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
@@ -45,45 +39,10 @@ class AsciiFileComm(FileComm):
 
         """
         kwargs = super(AsciiFileComm, self).opp_comm_kwargs()
-        kwargs['comment'] = self.file.comment
-        kwargs['newline'] = self.file.newline
-        kwargs['open_as_binary'] = self.file.open_as_binary
+        kwargs['comment'] = self.comment
         return kwargs
 
-    def _open(self):
-        r"""Open the file."""
-        self.file.open()
-
-    def _file_close(self):
-        r"""Close the file."""
-        self.file.close()
-
-    @property
-    def is_open(self):
-        r"""bool: True if the connection is open."""
-        return self.file.is_open
-
-    @property
-    def fd(self):
-        r"""Associated file identifier."""
-        return self.file.fd
-
-    def _send(self, msg):
-        r"""Write message to a file.
-
-        Args:
-            msg (bytes, str): Data to write to the file.
-
-        Returns:
-            bool: Success or failure of writing to the file.
-
-        """
-        if msg != self.eof_msg:
-            self.file.writeline_full(msg)
-        self.file.fd.flush()
-        return True
-
-    def _recv(self, timeout=0, **kwargs):
+    def _recv(self, timeout=0):
         r"""Reads message from a file.
 
         Args:
@@ -91,10 +50,12 @@ class AsciiFileComm(FileComm):
                 Defaults to self.recv_timeout. Unused.
 
         Returns:
-            tuple(bool, str): Success or failure of reading from the file.
+            tuple (bool, str): Success or failure of reading from the file and
+                the read messages as bytes.
 
         """
-        eof, data = self.file.readline(**kwargs)
-        if eof:
-            data = self.eof_msg
-        return (True, data)
+        flag, msg = super(AsciiFileComm, self)._recv()
+        if self.read_meth == 'readline':
+            while flag and msg.startswith(self.comment):
+                flag, msg = super(AsciiFileComm, self)._recv()
+        return flag, msg

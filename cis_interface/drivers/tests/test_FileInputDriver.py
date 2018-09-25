@@ -27,10 +27,15 @@ class TestFileInputParam(parent.TestConnectionParam):
         out['append'] = True
         return out
 
+    @property
+    def contents_to_write(self):
+        r"""str: Contents that should be written to the file."""
+        return self.file_contents
+
     def setup(self):
         r"""Create a driver instance and start the driver."""
         with open(self.filepath, 'wb') as fd:
-            fd.write(self.file_contents)
+            fd.write(self.contents_to_write)
         super(TestFileInputParam, self).setup()
 
     def teardown(self):

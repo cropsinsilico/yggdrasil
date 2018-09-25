@@ -11,9 +11,6 @@ branches:
   except:
     - gh-pages
 
-# Do not build on tags (GitHub and BitBucket)
-skip_tags: true
-
 os: Visual Studio 2015
 
 #---------------------------------#
@@ -21,6 +18,9 @@ os: Visual Studio 2015
 #---------------------------------#
 
 environment:
+
+  PYPI_PASSWORD:
+    secure: vixzjLjh1xT6my9x65rOcw==
 
   global:
     PYTHON: "C:\\Miniconda3-x64"
@@ -117,9 +117,28 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
-  - "nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface"
-
+  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx"
 
 after_test:
   - "codecov"
+
+# Deploy to PyPI
+# on_success:
+#   - echo "Starting Artifact Deployment"
+#   - "pip install twine"
+#   - "python setup.py bdist_wheel"
+
+#   # Specify account details for PyPI
+#   - echo [distutils]                                  > %USERPROFILE%\\.pypirc
+#   - echo index-servers =                             >> %USERPROFILE%\\.pypirc
+#   - echo     pypi                                    >> %USERPROFILE%\\.pypirc
+#   - echo [pypi]                                      >> %USERPROFILE%\\.pypirc
+#   - echo username=langmm                             >> %USERPROFILE%\\.pypirc
+#   - echo password=%PYPI_PASSWORD%                    >> %USERPROFILE%\\.pypirc
+
+#   # Workaround required to ensure setup.py finds the .pypirc under Windows
+#   - set HOME=%USERPROFILE%
+
+#   # Deploy wheel on tags
+#   - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -And $env:APPVEYOR_REPO_BRANCH -eq "master") { Invoke-Expression "twine upload --skip-existing dist/*" 2>$null } Else { write-output "Not on a tag on master, won't deploy to pypi"}
+#   # - if "%APPVEYOR_REPO_TAG%"=="true" ( python setup.py bdist_wheel upload ) else ( echo "Not deploying because not a tagged commit." )

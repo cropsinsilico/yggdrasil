@@ -4,8 +4,8 @@
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  CisAsciiTableInput in_channel("inputA", 1);
-  CisAsciiTableOutput out_channel("outputA", "%6s\t%d\t%f\n", 1);
+  CisAsciiArrayInput in_channel("inputA");
+  CisAsciiArrayOutput out_channel("outputA", "%6s\t%d\t%f\n");
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;

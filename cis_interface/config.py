@@ -6,8 +6,17 @@ This module imports the configuration for cis_interface.
 
 """
 import os
+import shutil
+import warnings
 import logging
+# import pprint
+import subprocess
 from cis_interface.backwards import configparser
+from cis_interface import platform, backwards
+config_file = '.cis_interface.cfg'
+def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
+usr_config_file = os.path.expanduser(os.path.join('~', config_file))
+loc_config_file = os.path.join(os.getcwd(), config_file)
 
 
 class CisConfigParser(configparser.ConfigParser):
@@ -41,16 +50,148 @@ class CisConfigParser(configparser.ConfigParser):
                 return out
         else:
             return default
-        
+
+
+def find_all(name, path):
+    r"""Find all instances of a file with a given name within the directory
+    tree starting at a given path.
+
+    Args:
+        name (str): Name of the file to be found (with the extension).
+        path (str, None): Directory where search should start. If set to
+            None on Windows, the current directory and PATH variable are
+            searched.
+
+    Returns:
+        list: All instances of the specified file.
+
+    """
+    result = []
+    try:
+        if platform._is_win:  # pragma: windows
+            if path is None:
+                out = subprocess.check_output(["where", name],
+                                              env=os.environ,
+                                              stderr=subprocess.STDOUT)
+            else:
+                out = subprocess.check_output(["where", "/r", path, name],
+                                              env=os.environ,
+                                              stderr=subprocess.STDOUT)
+        else:
+            args = ["find", path, "-type", "f", "-name", name]
+            pfind = subprocess.Popen(args, env=os.environ,
+                                     stderr=subprocess.PIPE,
+                                     stdout=subprocess.PIPE)
+            (stdoutdata, stderrdata) = pfind.communicate()
+            out = stdoutdata
+            for l in stderrdata.splitlines():
+                if backwards.unicode2bytes('Permission denied') not in l:
+                    raise subprocess.CalledProcessError(pfind.returncode,
+                                                        ' '.join(args),
+                                                        output=stderrdata)
+    except subprocess.CalledProcessError:
+        out = ''
+    if not out.isspace():
+        result = sorted(out.splitlines())
+    result = [os.path.normcase(os.path.normpath(m.decode('utf-8'))) for m in result]
+    return result
+
+
+def locate_file(fname):
+    r"""Locate a file on PATH.
+
+    Args:
+        fname (str): Name of the file that should be located.
+
+    Returns:
+        bool, str: Full path to the located file if it was located, False
+            otherwise.
+
+    """
+    out = []
+    if platform._is_win:  # pragma: windows
+        out += find_all(fname, None)
+    else:
+        for path in os.environ.get('PATH').split(os.pathsep):
+            if path:
+                out += find_all(fname, path)
+    if not out:
+        return False
+    first = out[0]
+    if len(out) > 1:
+        # pprint.pprint(out)
+        warnings.warn("More than one (%d) match to %s. Using first match (%s)" % (
+            len(out), fname, first))
+    return first
+
+
+def update_config_windows(config):  # pragma: windows
+    r"""Update config options specific to windows.
+
+    Args:
+        config (CisConfigParser): Config class that options should be set for.
+
+    Returns:
+        list: Section, option, description tuples for options that could not be
+            set.
+
+    """
+    out = []
+    if not config.has_section('windows'):
+        config.add_section('windows')
+    # Find paths
+    clibs = [('libzmq_include', 'zmq.h', 'The full path to the zmq.h header file.'),
+             ('libzmq_static', 'zmq.lib', 'The full path to the zmq.lib static library.'),
+             ('czmq_include', 'czmq.h', 'The full path to the czmq.h header file.'),
+             ('czmq_static', 'czmq.lib', 'The full path to the czmq.lib static library.')]
+    for opt, fname, desc in clibs:
+        if not config.has_option('windows', opt):
+            fpath = locate_file(fname)
+            if fpath:
+                print('located %s: %s' % (fname, fpath))
+                config.set('windows', opt, fpath)
+            else:
+                out.append(('windows', opt, desc))
+    return out
+
+
+def update_config(config_file, config_base=None):
+    r"""Update config options for the current platform.
+
+    Args:
+        config_file (str): Full path to the config file that should be created
+            and/or updated.
+        config_base (str, optional): Full path to existing config file that should
+            be used as a base for building the new one if it dosn't already exist.
+            Defaults to 'defaults.cfg' if not provided.
+
+    """
+    if config_base is None:
+        config_base = def_config_file
+    assert(os.path.isfile(config_base))
+    if not os.path.isfile(config_file):
+        shutil.copy(config_base, config_file)
+    cp = CisConfigParser()
+    cp.read(config_file)
+    miss = []
+    if platform._is_win:  # pragma: windows
+        miss += update_config_windows(cp)
+    with open(config_file, 'w') as fd:
+        cp.write(fd)
+    for sect, opt, desc in miss:
+        warnings.warn(("Could not locate option %s in section %s." +
+                       "Please set this in %s to: %s")
+                      % (opt, sect, config_file, desc))
+
         
 # In order read: defaults, user, local files
-cis_cfg = CisConfigParser()
-config_file = '.cis_interface.cfg'
-def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
-usr_config_file = os.path.expanduser(os.path.join('~', config_file))
-loc_config_file = os.path.join(os.getcwd(), config_file)
+if not os.path.isfile(usr_config_file):
+    print('Creating user config file: "%s".' % usr_config_file)
+    update_config(usr_config_file)
+assert(os.path.isfile(usr_config_file))
 assert(os.path.isfile(def_config_file))
 files = [def_config_file, usr_config_file, loc_config_file]
+cis_cfg = CisConfigParser()
 cis_cfg.read(files)
 
 

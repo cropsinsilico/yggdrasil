@@ -1,6 +1,8 @@
 from cis_interface.drivers.FileInputDriver import FileInputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class AsciiFileInputDriver(FileInputDriver):
     r"""Class that sends lines from an ASCII file.
 
@@ -16,15 +18,5 @@ class AsciiFileInputDriver(FileInputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
-    
-    def __init__(self, name, args, **kwargs):
-        file_keys = ['comment', 'newline']
-        icomm_kws = kwargs.get('icomm_kws', {})
-        # ocomm_kws = kwargs.get('ocomm_kws', {})
-        icomm_kws.setdefault('comm', 'AsciiFileComm')
-        for k in file_keys:
-            if k in kwargs:
-                icomm_kws[k] = kwargs.pop(k)
-        kwargs['icomm_kws'] = icomm_kws
-        super(AsciiFileInputDriver, self).__init__(name, args, **kwargs)
-        self.debug('(%s)', args)
+
+    _icomm_type = 'AsciiFileComm'

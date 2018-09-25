@@ -1,7 +1,6 @@
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ServerResponseDriver import ServerResponseDriver
-from cis_interface.drivers.ClientRequestDriver import (
-    CIS_CLIENT_INI, CIS_CLIENT_EOF)
+from cis_interface.drivers.ClientRequestDriver import CIS_CLIENT_INI
 
 
 class ServerRequestDriver(ConnectionDriver):
@@ -28,6 +27,8 @@ class ServerRequestDriver(ConnectionDriver):
         nclients (int): Number of clients signed on.
 
     """
+
+    _is_input = True
 
     def __init__(self, model_request_name, request_name=None,
                  comm=None, comm_address=None, **kwargs):
@@ -56,7 +57,6 @@ class ServerRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.icomm.address  # opp_address
         self._block_response = False
-        self._is_input = True
 
     @property
     def last_header(self):
@@ -109,7 +109,12 @@ class ServerRequestDriver(ConnectionDriver):
     def on_client_exit(self):
         r"""Close input comm to stop the loop."""
         self.debug('')
-        # self.stop()
+        self.wait_close_state('client exit')
+        with self.lock:
+            self.icomm.close()
+        self.wait()
+        self.confirm_output()
+        self.debug('Finished')
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
@@ -118,10 +123,9 @@ class ServerRequestDriver(ConnectionDriver):
             self.nclients -= 1
             self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
-                self.set_close_state('clients signed off')
                 self.debug("All clients have signed off.")
                 return super(ServerRequestDriver, self).on_eof()
-        return ''
+        return self.icomm.serializer.empty_msg
 
     def on_message(self, msg):
         r"""Process a message checking to see if it is a client signing on.
@@ -137,23 +141,10 @@ class ServerRequestDriver(ConnectionDriver):
             if msg == CIS_CLIENT_INI:
                 self.debug("New client signed on.")
                 self.nclients += 1
-                msg = ''
+                msg = self.icomm.serializer.empty_msg
                 return msg
         return super(ServerRequestDriver, self).on_message(msg)
     
-    def send_eof(self):
-        r"""Send EOF message.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        with self.lock:
-            if self.icomm._last_header is None:  # pragma: debug
-                self.icomm._last_header = dict()
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-        return super(ServerRequestDriver, self).send_eof()
-
     def send_message(self, *args, **kwargs):
         r"""Send a single message.
 
@@ -168,7 +159,8 @@ class ServerRequestDriver(ConnectionDriver):
         if self.ocomm.is_closed:
             return False
         # Start response driver
-        if self.response_address != CIS_CLIENT_EOF:
+        is_eof = kwargs.get('is_eof', False)
+        if not is_eof:
             self.debug("Starting new ServerResponseDriver at: %s" %
                        self.response_address)
             with self.lock:
@@ -187,7 +179,6 @@ class ServerRequestDriver(ConnectionDriver):
                     self.exception("Could not create/start response driver.")
                     return False
             # Send response address in header
-            kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.model_response_address)

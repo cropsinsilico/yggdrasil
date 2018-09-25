@@ -51,8 +51,8 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
     
     def __init__(self, *args, **kwargs):
         super(TestMakeModelDriverNoStart, self).__init__(*args, **kwargs)
-        # Version specifying makedir via workingDir
-        self._inst_kwargs['yml']['workingDir'] = self.makedir
+        # Version specifying makedir via working_dir
+        self._inst_kwargs['yml']['working_dir'] = self.makedir
         self._inst_kwargs['makedir'] = None
         self._inst_kwargs['makefile'] = None
 

@@ -8,6 +8,7 @@
 
 int main(int argc,char *argv[]){
   int ret;
+  int error_code = 0;
 
   // Input & output to an ASCII file line by line
   CisAsciiFileInput FileInput("inputCPP_file");
@@ -17,9 +18,9 @@ int main(int argc,char *argv[]){
   CisAsciiTableOutput TableOutput("outputCPP_table",
                                   "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
-  CisAsciiTableInput ArrayInput("inputCPP_array", 1);
-  CisAsciiTableOutput ArrayOutput("outputCPP_array",
-				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n", 1);
+  CisAsciiArrayInput ArrayInput("inputCPP_array");
+  CisAsciiArrayOutput ArrayOutput("outputCPP_array",
+				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
 
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
@@ -36,6 +37,7 @@ int main(int argc,char *argv[]){
       ret = FileOutput.send_line(line);
       if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING LINE\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -66,6 +68,7 @@ int main(int argc,char *argv[]){
       ret = TableOutput.send(5, name, number, value, comp_real, comp_imag);
       if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING ROW\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -85,22 +88,28 @@ int main(int argc,char *argv[]){
   double *value_arr = NULL;
   double *comp_real_arr = NULL;
   double *comp_imag_arr = NULL;
-  ret = ArrayInput.recv(5, &name_arr, &number_arr, &value_arr,
-			&comp_real_arr, &comp_imag_arr);
-  if (ret < 0) {
-    printf("ascii_io(CPP): ERROR RECVING ARRAY\n");
-  } else {
-    printf("Array: (%d rows)\n", ret);
-    // Print each line in the array
-    for (int i = 0; i < ret; i++)
-      printf("%.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
-	     value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
-    // Send the columns in the array to output. Formatting is handled on the
-    // output driver side.
-    ret = ArrayOutput.send(5, ret, name_arr, number_arr, value_arr,
-			   comp_real_arr, comp_imag_arr);
-    if (ret < 0)
-      printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
+  ret = 0;
+  while (ret >= 0) {
+    ret = ArrayInput.recv(5, &name_arr, &number_arr, &value_arr,
+			  &comp_real_arr, &comp_imag_arr);
+    if (ret >= 0) {
+      printf("Array: (%d rows)\n", ret);
+      // Print each line in the array
+      for (int i = 0; i < ret; i++)
+	printf("%.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
+	       value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
+      // Send the columns in the array to output. Formatting is handled on the
+      // output driver side.
+      ret = ArrayOutput.send(5, ret, name_arr, number_arr, value_arr,
+			     comp_real_arr, comp_imag_arr);
+      if (ret < 0) {
+	printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
+	error_code = -1;
+	break;
+      }
+    } else {
+      printf("End of array input (C++)\n"); 
+    }
   }
   
   // Free dynamically allocated columns
@@ -110,5 +119,5 @@ int main(int argc,char *argv[]){
   if (comp_real_arr) free(comp_real_arr);
   if (comp_imag_arr) free(comp_imag_arr);
 
-  return 0;
+  return error_code;
 }

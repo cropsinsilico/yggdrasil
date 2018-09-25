@@ -350,4 +350,4 @@ class IPCComm(AsyncComm.AsyncComm):
         r"""Purge all messages from the comm."""
         super(IPCComm, self).purge()
         while self.n_msg_direct > 0:  # pragma: debug
-            _, _ = self.q.receive()
+            self.q.receive()

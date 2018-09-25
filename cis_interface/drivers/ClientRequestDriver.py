@@ -53,6 +53,8 @@ class ClientRequestDriver(ConnectionDriver):
 
     """
 
+    _is_output = True
+
     def __init__(self, model_request_name, request_name=None,
                  comm=None, comm_address=None, **kwargs):
         if request_name is None:
@@ -79,7 +81,6 @@ class ClientRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.ocomm.opp_address
         self._block_response = False
-        self._is_output = True
 
     @property
     def last_header(self):
@@ -143,20 +144,8 @@ class ClientRequestDriver(ConnectionDriver):
         # self.sleep()  # Help ensure that the server is connected
         self.debug("Sending client sign on")
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
+        self.ocomm._send_serializer = True
         # self.info("%s: before loop complete", self.name)
-
-    def send_eof(self):
-        r"""Send EOF message.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        with self.lock:
-            if self.icomm._last_header is None:  # pragma: debug
-                self.icomm._last_header = dict()
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-        return super(ClientRequestDriver, self).send_eof()
 
     def send_message(self, *args, **kwargs):
         r"""Start a response driver for a request message and send message with
@@ -173,7 +162,8 @@ class ClientRequestDriver(ConnectionDriver):
         if self.ocomm.is_closed:
             return False
         # Start response driver
-        if self.model_response_address != CIS_CLIENT_EOF:
+        is_eof = kwargs.get('is_eof', False)
+        if not is_eof:
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     return False
@@ -192,7 +182,6 @@ class ClientRequestDriver(ConnectionDriver):
                     self.exception("Could not create/start response driver.")
                     return False
             # Send response address in header
-            kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.response_address)

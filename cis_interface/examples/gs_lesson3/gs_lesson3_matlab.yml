@@ -1,14 +1,14 @@
 models:
   - name: matlab_model
-    driver: MatlabModelDriver  # Runs the script using a Matlab engine
+    language: matlab  # Runs the script using a Matlab engine
     args: ./src/gs_lesson3.m
-
     inputs:
-      - name: input
-        driver: FileInputDriver
-        args: ./Input/input.txt
-
+      - input
     outputs:
-      - name: output
-        driver: FileOutputDriver
-        args: ./output.txt
+      - output
+
+connections:
+  - input_file: ./Input/input.txt
+    output: input
+  - input: output
+    output: ./output.txt

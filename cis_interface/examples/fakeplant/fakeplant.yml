@@ -1,0 +1,35 @@
+connections:
+  - input: growth_rate
+    output: growth_rate
+    field_names: growth_rate
+  - input: photosynthesis_rate
+    output: photosynthesis_rate
+    field_names: photosynthesis_rate
+  - input: canopy_structure
+    output: canopy_structure
+    field_names: x1,y1,z1,x2,y2,z2,x3,y3,z3
+  - input: light_intensity
+    output: light_intensity
+    field_names: light_intensity
+  # Canopy file input
+  - input: ./Input/plant_layout.txt
+    output: plant_layout
+    filetype: table
+  - input: ./Input/canopy_structure.txt
+    output: init_canopy_structure
+    filetype: table
+    as_array: True
+  - input: ./Input/time.txt
+    output: time
+    filetype: table
+  # Light file input
+  - input: ./Input/ambient_light.txt
+    output: ambient_light
+    filetype: table
+  # Photosynthesis file input
+  - input: ./Input/temperature.txt
+    output: temperature
+    filetype: table
+  - input: ./Input/co2.txt
+    output: co2
+    filetype: table

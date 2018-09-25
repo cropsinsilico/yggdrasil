@@ -55,7 +55,11 @@ class TestExample(CisTestBase, tools.CisClass):
         r"""str: Full path to the directory containing the yaml file."""
         if self.yaml is None:  # pragma: no cover
             return None
-        return os.path.dirname(self.yaml)
+        if isinstance(self.yaml, list):
+            out = os.path.dirname(self.yaml[0])
+        else:
+            out = os.path.dirname(self.yaml)
+        return out
 
     # @property
     # def yaml_contents(self):

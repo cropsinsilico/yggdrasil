@@ -9,8 +9,10 @@ try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
+from cis_interface.schema import register_component
 
 
+@register_component
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -54,6 +56,29 @@ class ModelDriver(Driver):
         RuntimeError: If both with_strace and with_valgrind are True.
 
     """
+
+    _language = 'executable'
+    _schema_type = 'model'
+    _schema = {'name': {'type': 'string', 'required': True},
+               'language': {'type': 'string', 'required': True},
+               'args': {'type': ['list', 'string'], 'required': True,
+                        'schema': {'type': 'string'}},
+               'inputs': {'type': 'list', 'required': False,
+                          'schema': {'type': 'dict',
+                                     'schema': 'comm'}},
+               'outputs': {'type': 'list', 'required': False,
+                           'schema': {'type': 'dict',
+                                      'schema': 'comm'}},
+               'working_dir': {'type': 'string', 'required': True},
+               'is_server': {'type': 'boolean', 'required': False},
+               'client_of': {'type': 'list', 'required': False,
+                             'schema': {'type': 'string'}},
+               'with_strace': {'type': 'boolean', 'required': False},
+               'strace_flags': {'type': 'list', 'required': False,
+                                'schema': {'type': 'string'}},
+               'with_valgrind': {'type': 'boolean', 'required': False},
+               'valgrind_flags': {'type': 'list', 'required': False,
+                                  'schema': {'type': 'string'}}}
 
     def __init__(self, name, args, is_server=False, client_of=[],
                  with_strace=False, strace_flags=None,
@@ -115,7 +140,7 @@ class ModelDriver(Driver):
             pre_args += ['valgrind'] + self.valgrind_flags
         # print(pre_args + self.args)
         self.model_process = tools.CisPopen(pre_args + self.args, env=env,
-                                            cwd=self.workingDir,
+                                            cwd=self.working_dir,
                                             forward_signals=False,
                                             shell=platform._is_win)
         # Start thread to queue output
@@ -150,7 +175,7 @@ class ModelDriver(Driver):
     def before_loop(self):
         r"""Actions before loop."""
         self.debug('Running %s from %s with cwd %s and env %s',
-                   self.args, os.getcwd(), self.workingDir, pformat(self.env))
+                   self.args, os.getcwd(), self.working_dir, pformat(self.env))
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""

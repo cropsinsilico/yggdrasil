@@ -2,24 +2,27 @@ include *.md
 include *.png
 include *.svg
 include *.txt
-include cis_interface/drivers/matlab_screenrc
 recursive-include cis_interface *.cfg
 recursive-include cis_interface *.yml
 recursive-include cis_interface *.sh
 recursive-include cis_interface *.m
+recursive-include cis_interface *.c
 recursive-include cis_interface *.h
+recursive-include cis_interface *.cpp
 recursive-include cis_interface *.hpp
-include cis_interface/tests/data/*.txt
-include cis_interface/tests/yaml/*.yml
-include cis_interface/tests/scripts/*.m
-include cis_interface/tests/scripts/*.c
-include cis_interface/tests/scripts/*.cpp
-include cis_interface/tests/scripts/*.py
-include cis_interface/examples/*.sh
-include cis_interface/examples/*.yml
-include cis_interface/examples/*/src/*.m
-include cis_interface/examples/*/src/*.c
-include cis_interface/examples/*/src/*.cpp
-include cis_interface/examples/*/src/*.py
-include cis_interface/examples/*/Input/*.txt
+recursive-include cis_interface *.lpy
+recursive-include cis_interface *.ply
+recursive-include cis_interface *.obj
+recursive-include cis_interface *.txt
+recursive-include cis_interface/examples *.py
+recursive-include cis_interface/tests/scripts *.py
+include cis_interface/drivers/matlab_screenrc
+include cis_interface/regex/CMakeLists.txt
+include cis_interface/tests/scripts/CMakeLists.txt
+include cis_interface/tests/scripts/Makefile_linux
+include cis_interface/tests/scripts/Makefile_windows
 graft docs
+include versioneer.py
+include cis_interface/_version.py
+include install_matlab_engine.py
+include create_coveragerc.py

@@ -19,13 +19,14 @@ help:
 .PHONY: ghpages
 ghpages: autodoc
 
-	cp -a $(BUILDDIR)/html/. $(REPODIR)/html/
-	cd $(REPODIR)/html ; git add . ; git commit -m "rebuilt docs" ; git push origin gh-pages
+	cp -a $(BUILDDIR)/html/. $(REPODIR)/
+	cd $(REPODIR) ; git pull ; git add . ; git commit -m "rebuilt docs" ; git push origin gh-pages
 
 .PHONY: autodoc
 autodoc: doxy
 	python $(SOURCEDIR)/examples/make_example_rst.py
-	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../cis_interface ../cis_interface/tests/* ../cis_interface/*/tests/*
+	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../cis_interface # ../cis_interface/tests/* ../cis_interface/*/tests/*
+	mv $(SOURCEDIR)/cis_interface.rst $(SOURCEDIR)/cis_interface.inc
 	make html
 
 .PHONY: doxy

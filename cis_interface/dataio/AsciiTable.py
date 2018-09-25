@@ -1,225 +1,24 @@
 import numpy as np
-import copy
 # from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
-from cis_interface import backwards, platform
-from numpy.compat import asbytes
+from cis_interface import backwards, serialize
+from cis_interface.serialize import AsciiTableSerialize
 try:
-    if backwards.PY2:  # pragma: Python 2
+    if not backwards.PY2:  # pragma: Python 3
         from astropy.io import ascii as apy_ascii
         from astropy.table import Table as apy_Table
         _use_astropy = True
-        from astropy.io.ascii import TableOutputter, convert_numpy
-        apy_tableout = TableOutputter()
-        apy_tableout.default_converters = [convert_numpy(np.int),
-                                           convert_numpy(np.float),
-                                           convert_numpy(np.str),
-                                           convert_numpy(np.complex)]
-    else:  # pragma: Python 3
+    else:  # pragma: Python 2
         apy_ascii, apy_Table = None, None
         _use_astropy = False
-except ImportError:  # pragma: no cover
+except ImportError:
     apy_ascii, apy_Table = None, None
     # print("astropy is not installed, reading/writing as an array will be " +
     #       "disabled. astropy can be installed using 'pip install astropy'.")
     _use_astropy = False
 
 
-_default_args = {'column': '\t'}
-_fmt_char = backwards.unicode2bytes('%')
-
-
-def nptype2cformat(nptype):
-    r"""Convert a numpy data type to a c format string.
-
-    Args:
-        nptype (str or numpy.dtype): Numpy data type that should be converted.
-
-    Returns:
-        str: Corresponding c format specification string.
-
-    Raises:
-        TypeError: If nptype is not a string or numpy.dtype.
-        ValueError: If a matching format string cannot be determined.
-
-    """
-    if isinstance(nptype, np.dtype):
-        t = nptype
-    elif isinstance(nptype, str):
-        t = np.dtype(nptype)
-    else:
-        raise TypeError("Input must be a string or a numpy.dtype")
-    if t in [np.dtype(x) for x in ["float_", "float16", "float32", "float64"]]:
-        cfmt = "%g"  # Ensures readability
-    elif t in [np.dtype(x) for x in ["complex_", "complex64", "complex128"]]:
-        cfmt = "%g%+gj"
-    elif t == np.dtype("int8"):
-        cfmt = "%hhd"
-    elif t == np.dtype("short"):
-        cfmt = "%hd"
-    elif t == np.dtype("intc"):
-        cfmt = "%d"
-    elif t == np.dtype("int_"):
-        cfmt = "%ld"
-    # elif t == np.dtype("int64"):
-    #     if platform._is_win:
-    #         cfmt = "%l64d"
-    #     else:  # pragma: no cover
-    #         cfmt = "%ld"
-    elif t == np.dtype("longlong"):
-        # On windows C long is 32bit and long long is 64bit
-        if platform._is_win:  # pragma: windows
-            cfmt = "%l64d"
-        else:  # pragma: no cover
-            cfmt = "%lld"
-    elif t == np.dtype("uint8"):
-        cfmt = "%hhu"
-    elif t == np.dtype("ushort"):
-        cfmt = "%hu"
-    elif t == np.dtype("uintc"):
-        cfmt = "%u"
-    elif t == np.dtype("uint64"):  # Platform dependent
-        if platform._is_win:  # pragma: windows
-            cfmt = "%l64u"
-        else:
-            cfmt = "%lu"
-    elif t == np.dtype("ulonglong"):  # pragma: no cover
-        # On windows C unsigned long is 32bit and unsigned long long is 64bit
-        if platform._is_win:  # pragma: windows
-            cfmt = "%l64u"
-        else:
-            cfmt = "%llu"
-    elif np.issubdtype(t, np.dtype("S")):
-        if t.itemsize is 0:
-            cfmt = '%s'
-        else:
-            cfmt = "%" + str(t.itemsize) + "s"
-    elif np.issubdtype(t, np.dtype("U")):
-        if t.itemsize is 0:
-            cfmt = '%s'
-        else:
-            cfmt = "%" + str(t.itemsize) + "s"
-    else:
-        raise ValueError("No format specification string for dtype %s" % t)
-    # Short and long specifiers not supported by python scanf
-    # cfmt = cfmt.replace("h", "")
-    # cfmt = cfmt.replace("l", "")
-    return cfmt
-
-
-def cformat2nptype(cfmt):
-    r"""Convert a c format string to a numpy data type.
-
-    Args:
-        cfmt (str): c format that should be translated.
-
-    Returns:
-        str: Corresponding numpy data type.
-
-    Raises:
-        TypeError: if cfmt is not a string.
-        ValueError: If the c format does not begin with '%'.
-        ValueError: If the c format does not contain type info.
-        ValueError: If the c format cannot be translated to a numpy datatype.
-
-    """
-    # TODO: this may fail on 32bit systems where C long types are 32 bit
-    if not isinstance(cfmt, backwards.bytes_type):
-        raise TypeError("Input must be of type %s, not %s" %
-                        (backwards.bytes_type, type(cfmt)))
-    elif not cfmt.startswith(_fmt_char):
-        raise ValueError("Provided C format string (%s) " % cfmt +
-                         "does not start with '%%'")
-    elif len(cfmt) == 1:
-        raise ValueError("Provided C format string (%s) " % cfmt +
-                         "does not contain type info")
-    out = None
-    cfmt_str = backwards.bytes2unicode(cfmt)
-    if cfmt_str[-1] in ['j']:
-        out = 'complex128'
-    elif cfmt_str[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
-        # if 'hh' in cfmt_str:
-        #     out = 'float8'
-        # elif cfmt_str[-2] == 'h':
-        #     out = 'float16'
-        # elif 'll' in cfmt_str:
-        #     out = 'longfloat'
-        # elif cfmt_str[-2] == 'l':
-        #     out = 'double'
-        # else:
-        #     out = 'single'
-        out = 'float64'
-    elif cfmt_str[-1] in ['d', 'i']:
-        if 'hh' in cfmt_str:  # short short, single char
-            out = 'int8'
-        elif cfmt_str[-2] == 'h':  # short
-            out = 'short'
-        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
-            out = 'longlong'  # long long
-        elif cfmt_str[-2] == 'l':
-            out = 'int_'  # long (broken in python)
-        else:
-            out = 'intc'  # int, platform dependent
-    elif cfmt_str[-1] in ['u', 'o', 'x', 'X']:
-        if 'hh' in cfmt_str:  # short short, single char
-            out = 'uint8'
-        elif cfmt_str[-2] == 'h':  # short
-            out = 'ushort'
-        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
-            out = 'ulonglong'  # long long
-        elif cfmt_str[-2] == 'l':
-            out = 'uint64'  # long (broken in python)
-        else:
-            out = 'uintc'  # int, platform dependent
-    elif cfmt_str[-1] in ['c', 's']:
-        lstr = cfmt_str[1:-1]
-        if lstr:
-            lint = int(lstr)
-        else:
-            lint = 0
-        lsiz = lint * np.dtype(backwards.np_dtype_str + '1').itemsize
-        out = '%s%d' % (backwards.np_dtype_str, lsiz)
-    else:
-        raise ValueError("Could not find match for format str %s" % cfmt)
-    return np.dtype(out).str
-
-
-def cformat2pyscanf(cfmt):
-    r"""Convert a c format specification string to a version that the
-    python scanf module can use.
-
-    Args:
-        cfmt (str): C format specification string.
-
-    Returns:
-        str: Version of cfmt that can be parsed by scanf.
-
-    Raises:
-        TypeError: if cfmt is not a bytes/str.
-        ValueError: If the c format does not begin with '%'.
-        ValueError: If the c format does not contain type info.
-
-    """
-    if not isinstance(cfmt, backwards.bytes_type):
-        raise TypeError("Input must be of type %s." % backwards.bytes_type)
-    elif not cfmt.startswith(_fmt_char):
-        raise ValueError("Provided C format string (%s) " % cfmt +
-                         "does not start with '%'")
-    elif len(cfmt) == 1:
-        raise ValueError("Provided C format string (%s) " % cfmt +
-                         "does not contain type info")
-    # Hacky, but necessary to handle concatenation of a single byte
-    cfmt_str = backwards.bytes2unicode(cfmt)
-    if cfmt_str[-1] == 'j':
-        # Handle complex format specifier
-        out = '%g%+gj'
-    else:
-        out = backwards.bytes2unicode(_fmt_char)
-        out += cfmt_str[-1]
-        out = out.replace('h', '')
-        out = out.replace('l', '')
-        out = out.replace('64', '')
-    return backwards.unicode2bytes(out)
+_default_args = {'column': serialize._default_delimiter}
 
 
 class AsciiTable(AsciiFile):
@@ -258,8 +57,8 @@ class AsciiTable(AsciiFile):
             self.use_astropy = _use_astropy
         else:
             self.use_astropy = False
-        if self.use_astropy:
-            kwargs['open_as_binary'] = False
+        # if self.use_astropy:
+        #     kwargs['open_as_binary'] = False
         super(AsciiTable, self).__init__(filepath, io_mode, **kwargs)
         self.column_names = None
         # Add default args specific to ascii table
@@ -274,17 +73,17 @@ class AsciiTable(AsciiFile):
                     self.discover_format_str()
                 else:
                     raise RuntimeError("'format_str' must be provided for output")
-        if isinstance(column_names, list) and (len(column_names) == self.ncols):
-            self.column_names = column_names
+        if ((isinstance(column_names, (list, tuple)) and
+             (len(column_names) == self.ncols))):
+            self.column_names = tuple([c for c in column_names])
 
     @property
     def format_str(self):
+        r"""str: Format string describing the table column types."""
         if not hasattr(self, '_format_str'):
             if hasattr(self, '_dtype'):
-                fmts = [backwards.unicode2bytes(nptype2cformat(self.dtype[i]))
-                        for i in range(len(self.dtype))]
-                self._format_str = backwards.unicode2bytes(
-                    self.column.join(fmts) + self.newline)
+                fmts = serialize.nptype2cformat(self.dtype, asbytes=True)
+                self._format_str = self.column.join(fmts) + self.newline
             else:  # pragma: debug
                 raise RuntimeError("Format string not set " +
                                    "and cannot be determined.")
@@ -292,24 +91,21 @@ class AsciiTable(AsciiFile):
 
     @property
     def dtype(self):
+        r"""np.dtype: Data type of the table."""
         if not hasattr(self, '_dtype'):
-            # typs = [(f[-1] + str(i), np.dtype(cformat2nptype(f)))
-            #         for i, f in enumerate(self.fmts)]
-            typs = [('f' + str(i), np.dtype(cformat2nptype(f)))
-                    for i, f in enumerate(self.fmts)]
-            self._dtype = np.dtype(typs)
+            self._dtype = serialize.cformat2nptype(
+                self.format_str, names=self.column_names)
         return self._dtype
 
     @property
     def fmts(self):
-        r"""List of formats in format string."""
-        out = self.format_str.split(self.newline)[0].split(self.column)
-        return [f for f in out if f]
+        r"""list: Formats in format string."""
+        return serialize.extract_formats(self.format_str)
 
     @property
     def ncols(self):
+        r"""int: The number of columns in the table."""
         return len(self.fmts)
-        # return self.format_str.count(_fmt_char)
 
     def update_format_str(self, new_format_str):
         r"""Change the format string and update the data type.
@@ -368,22 +164,17 @@ class AsciiTable(AsciiFile):
         if len(names) != self.ncols:
             raise IndexError("The number of names must match the number of columns.")
         names = [backwards.unicode2bytes(n) for n in names]
-        line = (self.comment + backwards.unicode2bytes(' ') +
-                self.column.join(names) + self.newline)
+        line = (self.comment + self.column.join(names) + self.newline)
         self.writeline_full(line)
             
     def writeformat(self):
         r"""Write the format string to the file."""
-        line = self.comment + backwards.unicode2bytes(' ') + self.format_str
+        line = self.comment + self.format_str
         self.writeline_full(line)
 
-    def readline(self, dont_parse=False):
+    def readline(self):
         r"""Continue reading lines until a valid line (uncommented) is
         encountered and return the arguments found there.
-
-        Args:
-            dont_parse (bool, optional): If True, the raw line is returned.
-                Defaults to False.
 
         Returns:
             tuple (bool, tuple): End of file flag and the arguments that
@@ -395,8 +186,6 @@ class AsciiTable(AsciiFile):
         eof, line = False, None
         while (not eof) and (line is None):
             eof, line = self.readline_full(validate=True)
-        if dont_parse:
-            return eof, line
         if (not line) or eof:
             args = None
         else:
@@ -456,21 +245,8 @@ class AsciiTable(AsciiFile):
         Returns:
             str: The line created from the arguments.
 
-        Raises:
-            RuntimeError: If the incorrect number of arguments are passed.
-
         """
-        if len(args) < self.ncols:
-            raise RuntimeError("Incorrect number of arguments.")
-        # Handle complex
-        args_ = []
-        for a in args:
-            if np.iscomplexobj(a):
-                args_ += [a.real, a.imag]
-            else:
-                args_.append(a)
-        out = backwards.format_bytes(self.format_str, tuple(args_))
-        return backwards.unicode2bytes(out)
+        return serialize.format_message(args, self.format_str)
 
     def process_line(self, line):
         r"""Extract values from the columns in the line using the table format.
@@ -482,27 +258,12 @@ class AsciiTable(AsciiFile):
             tuple: The arguments extracted from line.
 
         """
-        new_fmt = (self.column.join(
-            [backwards.unicode2bytes(cformat2pyscanf(f)) for f in self.fmts]) +
-            self.newline)
-        out = backwards.scanf_bytes(new_fmt, line)
-        return out
+        return serialize.process_message(line, self.format_str)
         
     def validate_line(self, line):
         r"""Assert that the line matches the format string and produces the
-        expected number of values.
-
-        Raises:
-            TypeError: If the line is not a bytes/str.
-            AssertionError: If the line does not match the format string.
-
-        """
-        if not isinstance(line, backwards.bytes_type):
-            raise TypeError("Line must be of type %s, not %s."
-                            % (backwards.bytes_type, type(line)))
-        args = self.process_line(line)
-        if args is None or (len(args) != self.ncols):
-            raise AssertionError("The line does not match the format string.")
+        expected number of values."""
+        self.process_line(line)
 
     def discover_format_str(self):
         r"""Determine the format string by reading it from the file. The format
@@ -513,63 +274,15 @@ class AsciiTable(AsciiFile):
             RuntimeError: If a format string cannot be located within the file.
 
         """
-        if self.use_astropy:
-            arr = self.read_array()
-            self._arr = arr
-            self._dtype = self._arr.dtype
-            if getattr(self, 'column_names', None) is None:
-                self.column_names = [c for c in arr.dtype.names]
-        else:
-            comment_list = []
-            out = None
-            with open(self.filepath, self.open_mode) as fd:
-                for line in fd:
-                    line = backwards.unicode2bytes(line)
-                    if line.startswith(self.comment):
-                        sline = line.lstrip(self.comment)
-                        sline = sline.lstrip(backwards.unicode2bytes(' '))
-                        sline = sline.replace(backwards.unicode2bytes(platform._newline),
-                                              backwards.unicode2bytes(self.newline))
-                        fmts = sline.split(self.column)
-                        fmts = [f for f in fmts if f]
-                        is_fmt = [f.startswith(_fmt_char) for f in fmts]
-                        if sum(is_fmt) == len(fmts):
-                            out = sline
-                            break
-                        comment_list.append(sline)
-            if out is None:  # pragma: debug
-                raise Exception("Could not locate a line containing format descriptors.")
-            self._format_str = backwards.unicode2bytes(out)
-            # Do column names
-            if getattr(self, 'column_names', None) is None:
-                self.column_names = None
-                for sline in comment_list:
-                    names = sline.split(self.newline)[0].split(self.column)
-                    if len(names) == self.ncols:
-                        self.column_names = [
-                            backwards.bytes2unicode(n) for n in names]
-                        break
-            # Do string lengths
-            str_fmt = backwards.unicode2bytes('%s')
-            if str_fmt in self._format_str:
-                fmts = self.fmts
-                idx_str = []
-                for i, ifmt in enumerate(fmts):
-                    if ifmt == str_fmt:
-                        idx_str.append(i)
-                max_len = {i: 0 for i in idx_str}
-                with open(self.filepath, self.open_mode) as fd:
-                    for line in fd:
-                        line = backwards.unicode2bytes(line)
-                        if line.startswith(self.comment):
-                            continue
-                        cols = line.split(self.newline)[0].split(self.column)
-                        for i in idx_str:
-                            max_len[i] = max(max_len[i], len(cols[i]))
-                for i in idx_str:
-                    fmts[i] = backwards.unicode2bytes('%' + str(max_len[i]) + 's')
-                new_format_str = self.column.join(fmts) + self.newline
-                self.update_format_str(new_format_str)
+        serializer = AsciiTableSerialize.AsciiTableSerialize()
+        serializer.field_names = getattr(self, 'column_names', None)
+        with open(self.filepath, self.open_mode) as fd:
+            serialize.discover_header(fd, serializer, newline=self.newline,
+                                      comment=self.comment, delimiter=self.column,
+                                      use_astropy=self.use_astropy)
+        self.column_names = serializer.field_names
+        self._format_str = serializer.format_str
+        self.column = serializer.table_info['delimiter']
 
     @property
     def arr(self):
@@ -606,32 +319,16 @@ class AsciiTable(AsciiFile):
         if not self.is_open:
             self.open()
             openned = True
-        if self.use_astropy:
-            tab = apy_ascii.read(self.fd, names=names,
-                                 **getattr(self, 'astropy_kwargs', {}))
-            arr = tab.as_array()
-            typs = [arr.dtype[i].str for i in range(len(arr.dtype))]
-            cols = tab.columns
-            for i in range(len(arr.dtype)):
-                if np.issubdtype(arr.dtype[i], np.dtype('S')):
-                    new_typs = copy.copy(typs)
-                    new_typs[i] = 'complex'
-                    new_dtyp = np.dtype([(c, t) for c, t in zip(cols, new_typs)])
-                    try:
-                        arr = arr.astype(new_dtyp)
-                    except ValueError:
-                        pass
-        else:
-            arr = np.genfromtxt(self.fd,
-                                comments=backwards.bytes2unicode(self.comment),
-                                delimiter=backwards.bytes2unicode(self.column),
-                                dtype=self.dtype,
-                                autostrip=True, names=names)
+        msg = self.fd.read()
+        arr = serialize.table_to_array(msg, fmt_str=self.format_str,
+                                       use_astropy=self.use_astropy,
+                                       delimiter=self.column, comment=self.comment,
+                                       names=names)
         if openned:
             self.close()
         return arr
 
-    def write_array(self, array, names=None, skip_header=False, append=False):
+    def write_array(self, array, names=None, skip_header=False):
         r"""Write a numpy array to the table.
 
         Args:
@@ -642,71 +339,30 @@ class AsciiTable(AsciiFile):
             skip_header (bool, optional): If True, no header information is
                 written (it is assumed it was already written. Defaults to
                 False.
-            append (bool, optional): If True, array is appended to existing
-                table. This sets skip_header to True. Defaults to False.
 
         Raises:
             ValueError: If names are provided, but not the same number as
                 there are columns.
 
         """
-        fmt = backwards.bytes2unicode(self.format_str.split(self.newline)[0])
-        column = backwards.bytes2unicode(self.column)
-        comment = backwards.bytes2unicode(self.comment) + ' '
-        newline = backwards.bytes2unicode(self.newline)
-        open_mode = self.open_mode
         openned = False
         fd = self.fd
-        if append:
-            skip_header = True
-            open_mode = 'a'
-            if self.open_as_binary:
-                open_mode += 'b'
         if not self.is_open:
-            fd = open(self.filepath, open_mode)
+            fd = open(self.filepath, self.open_mode)
             openned = True
-        if skip_header:
-            names = None
-        else:
+        # Write header
+        if not skip_header:
             if names is None:
                 names = self.column_names
-            if (names is not None) and (len(names) != self.ncols):
-                raise ValueError("The number of names does not match " +
-                                 "the number of columns")
-        if self.use_astropy:
-            table = apy_Table(array)
-            if skip_header:
-                table_format = 'no_header'
-            else:
-                table_format = 'commented_header'
-                table.meta["comments"] = [fmt]
-            apy_ascii.write(table, fd,
-                            delimiter=column, comment=comment,
-                            format=table_format, names=names)
-        else:
-            if skip_header:
-                head = ''
-            else:
-                head = fmt
-                if names is not None:
-                    head = column.join(names) + newline + " " + head
-            # Write directly to file, savetxt writes bytes as "b'body'"
-            if len(head) > 0:
-                head = head.replace(newline, newline + comment)
-                fd.write(asbytes(comment + head + newline))
-            for row in array:
-                row2 = []
-                for x in row:
-                    if np.iscomplexobj(x):
-                        row2.append(x.real)
-                        row2.append(x.imag)
-                    else:
-                        row2.append(x)
-                line = backwards.format_bytes(asbytes(fmt), tuple(row2))
-                fd.write(line + asbytes(newline))
-            # np.savetxt(fd, array,
-            #            fmt=fmt, delimiter=column, comments=comment,
-            #            newline=newline, header=head)
+            header = serialize.format_header(format_str=self.format_str,
+                                             comment=self.comment,
+                                             delimiter=self.column,
+                                             newline=self.newline,
+                                             field_names=names)
+            fd.write(header)
+        # Write array
+        fd.write(serialize.array_to_table(array, self.format_str,
+                                          use_astropy=self.use_astropy))
         if openned:
             fd.close()
             fd = None
@@ -733,51 +389,9 @@ class AsciiTable(AsciiFile):
             ValueError: If any of the listed arrays doesn't have enough elements.
 
         """
-        ntyp = len(self.dtype.names)
         if arr is None:
             arr = self.arr
-        if isinstance(arr, (list, tuple)):
-            if len(arr) == ntyp and isinstance(arr[0], np.ndarray):
-                nele = len(arr[0])
-                arr1 = np.empty(nele, dtype=self.dtype)
-                for i, n in enumerate(self.dtype.names):
-                    if len(arr[i]) != nele:
-                        raise ValueError("Field %s does not have enough elements." % n)
-                    arr1[n] = arr[i]
-            elif len(arr[0]) == ntyp:
-                nele = len(arr)
-                arr1 = np.empty(nele, dtype=self.dtype)
-                for i in range(nele):
-                    if len(arr[i]) != ntyp:
-                        raise ValueError("Element %d does not have enough fields." % i)
-                    # arr1[i] = np.asarray(arr[i], self.dtype)
-                    for j in range(ntyp):
-                        arr1[i][j] = arr[i][j]
-            else:
-                raise ValueError("Not enough arrays for fields")
-        elif isinstance(arr, np.ndarray):
-            if (arr.dtype != self.dtype):
-                if (arr.ndim != 2) or (arr.shape[1] != ntyp):
-                    raise ValueError("Data types do not match.")
-                arr1 = np.empty(arr.shape[0], dtype=self.dtype)
-                for i, n in enumerate(self.dtype.names):
-                    arr1[n] = arr[:, i]
-            else:
-                arr1 = arr
-        else:
-            raise TypeError("Provided array must be an array, list, or tuple.")
-        if order == 'F':
-            out = backwards.unicode2bytes('')
-            for i in range(ntyp):
-                n = arr1.dtype.names[i]
-                if np.issubdtype(arr1.dtype[i], np.dtype('complex')):
-                    out = out + arr1[n].real.tobytes()
-                    out = out + arr1[n].imag.tobytes()
-                else:
-                    out = out + arr1[n].tobytes()
-        else:
-            out = arr1.tobytes(order='C')
-        return out
+        return serialize.array_to_bytes(arr, dtype=self.dtype, order=order)
 
     def bytes_to_array(self, data, order='C'):
         r"""Process bytes according to the table format and return it as an
@@ -792,34 +406,7 @@ class AsciiTable(AsciiFile):
             np.ndarray: Numpy array containing data from bytes.
 
         """
-        if (len(data) % self.dtype.itemsize) != 0:
-            raise RuntimeError("Data length (%d) must a multiple of the itemsize (%d)."
-                               % (len(data), self.dtype.itemsize))
-        nrows = len(data) // self.dtype.itemsize
-        if order == 'F':
-            arr = np.empty((nrows,), dtype=self.dtype)
-            prev = 0
-            j = 0
-            for i in range(len(self.dtype)):
-                idata = data[prev:(prev + (nrows * self.dtype[i].itemsize))]
-                if np.issubdtype(self.dtype[i], np.dtype('complex')):
-                    idata_real = idata[:(nrows * self.dtype[i].itemsize // 2)]
-                    idata_imag = idata[(nrows * self.dtype[i].itemsize // 2):]
-                    arr_real = np.fromstring(idata_real, dtype='float64')
-                    arr_imag = np.fromstring(idata_imag, dtype='float64')
-                    arr[self.dtype.names[i]] = np.zeros(nrows, dtype=self.dtype[i])
-                    arr[self.dtype.names[i]] += arr_real
-                    arr[self.dtype.names[i]] += arr_imag * 1j
-                else:
-                    arr[self.dtype.names[i]] = np.fromstring(idata, dtype=self.dtype[i])
-                prev += len(idata)
-                j += 1
-        else:
-            arr = np.fromstring(data, dtype=self.dtype)
-            if (len(arr) % self.ncols) != 0:
-                raise ValueError("Returned data does not match")
-            nrows = len(arr) // self.ncols
-            arr.reshape((nrows, self.ncols), order=order)
+        arr = serialize.bytes_to_array(data, self.dtype, order=order)
         return arr
 
     def read_bytes(self, order='C', **kwargs):

@@ -1,4 +1,6 @@
 r"""IO and Model drivers."""
+import os
+import glob
 import importlib
 
 
@@ -41,39 +43,17 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
     return instance
 
 
-def get_model_driver(lang=None):
-    r"""Get the name of the model driver that should be used for a model
-    written in the specified programming language. If there is not a
-    corresponding driver, 'ModelDriver' will be returned.
-
-    Args:
-        lang (str, optional): Language that the model is written in. Defaults
-            to None.
-
-    Returns:
-        str: The name of the model driver that should be used to run a model
-            in the specified language.
-
-    """
-    if isinstance(lang, str):
-        lang = lang.lower()
-    if lang == 'python':
-        out = 'PythonModelDriver'
-    elif lang == 'matlab':
-        out = 'MatlabModelDriver'
-    elif lang in ['c', 'c++', 'cpp']:
-        out = 'GCCModelDriver'
-    elif lang == 'make':
-        out = 'MakeModelDriver'
-    else:
-        out = 'ModelDriver'
-    return out
+def import_all_drivers():
+    r"""Import all drivers to ensure they are registered."""
+    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
+        xbase = os.path.basename(x)
+        if (not xbase.startswith('__')) and (xbase != 'lpy_model.py'):
+            import_driver(xbase[:-3])
 
 
-__all__ = ['import_driver', 'create_driver', 'get_model_driver', 'Driver',
+__all__ = ['import_driver', 'create_driver', 'Driver',
            'ModelDriver', 'PythonModelDriver', 'GCCModelDriver',
-           'MakeModelDriver', 'MatlabModelDriver',
-           'InputDriver', 'OutputDriver',
+           'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',
            'IODriver', 'FileInputDriver', 'FileOutputDriver',
            'AsciiFileInputDriver', 'AsciiFileOutputDriver',
            'AsciiTableInputDriver', 'AsciiTableOutputDriver',

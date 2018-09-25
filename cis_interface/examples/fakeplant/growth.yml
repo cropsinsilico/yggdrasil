@@ -1,0 +1,8 @@
+model:
+  name: GrowthModel
+  language: matlab
+  args: ./src/growth.m
+  inputs:
+    - photosynthesis_rate
+  outputs:
+    - growth_rate

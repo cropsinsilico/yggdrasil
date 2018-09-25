@@ -4,7 +4,7 @@ import tempfile
 from nose.tools import assert_raises, assert_equal
 from cis_interface.dataio import AsciiTable
 from cis_interface.tests import data
-from cis_interface import backwards, platform
+from cis_interface import backwards
 
 
 input_file = data['table']
@@ -18,7 +18,7 @@ input_nlines = nrows
 output_ncomments = 2  # Just formats
 output_nlines = nrows
 format_str = "%5s\t%ld\t%lf\t%g%+gj\n"
-column_names = ["name", "number", "value", "complex"]
+column_names = ("name", "number", "value", "complex")
 
 
 mode_list = ['r', 'w', None]
@@ -28,111 +28,6 @@ mode2file = {'r': input_file,
 mode2kws = {'r': {},
             'w': {'format_str': format_str, 'column_names': column_names},
             None: {'format_str': format_str, 'column_names': column_names}}
-
-unsupported_nptype = ['bool_']
-map_nptype2cformat = [
-    (['float_', 'float16', 'float32', 'float64'], '%g'),
-    (['complex_', 'complex64', 'complex128'], '%g%+gj'),
-    # (['int8', 'short', 'intc', 'int_', 'longlong'], '%d'),
-    # (['uint8', 'ushort', 'uintc', 'uint64', 'ulonglong'], '%u'),
-    ('int8', '%hhd'), ('short', '%hd'), ('intc', '%d'),
-    ('uint8', '%hhu'), ('ushort', '%hu'), ('uintc', '%u'),
-    ('S', '%s'), ('S5', '%5s'), ('U', '%s'), ('U5', '%20s')]
-if platform._is_win:  # pragma: windows
-    map_nptype2cformat.append(('int64', '%l64d'))
-    map_nptype2cformat.append(('uint64', '%l64u'))
-else:
-    map_nptype2cformat.append(('int64', '%ld'))
-    map_nptype2cformat.append(('uint64', '%lu'))
-# Conditional on if default int 32bit or 64bit
-# This is for when default int is 32bit
-if np.dtype('int_') != np.dtype('intc'):
-    map_nptype2cformat.append(('int_', '%ld'))
-else:
-    map_nptype2cformat.append(('int_', '%d'))  # pragma: windows
-if np.dtype('int_') != np.dtype('longlong'):
-    if platform._is_win:  # pragma: windows
-        map_nptype2cformat.append(('longlong', '%l64d'))
-        map_nptype2cformat.append(('ulonglong', '%l64u'))
-    else:  # pragma: debug
-        map_nptype2cformat.append(('longlong', '%lld'))
-        map_nptype2cformat.append(('ulonglong', '%llu'))
-map_cformat2pyscanf = [(['%hhd', '%hd', '%d', '%ld', '%lld', '%l64d'], '%d'),
-                       (['%hhu', '%hu', '%u', '%lu', '%llu', '%l64u'], '%u'),
-                       (['%5s', '%s'], '%s'),
-                       ('%s', '%s'),
-                       ('%g%+gj', '%g%+gj')]
-
-unsupported_cfmt = ['a', 'A', 'p', 'n', '']
-map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
-                      # (['f', 'F', 'e', 'E', 'g', 'G'], 'float32'),
-                      # (['lf', 'lF', 'le', 'lE', 'lg', 'lG'], 'float64'),
-                      (['hhd', 'hhi'], 'int8'),
-                      (['hd', 'hi'], 'short'),
-                      (['d', 'i'], 'intc'),
-                      (['ld', 'li'], 'int_'),
-                      (['lld', 'lli', 'l64d'], 'longlong'),
-                      (['hhu', 'hho', 'hhx', 'hhX'], 'uint8'),
-                      (['hu', 'ho', 'hx', 'hX'], 'ushort'),
-                      (['u', 'o', 'x', 'X'], 'uintc'),
-                      (['lu', 'lo', 'lx', 'lX'], 'uint64'),
-                      (['llu', 'llo', 'llx', 'llX', 'l64u'], 'ulonglong'),
-                      (['c', 's'], backwards.np_dtype_str),
-                      ('s', backwards.np_dtype_str)]
-# if np.dtype('int_') != np.dtype('intc'):
-#     map_cformat2nptype.append((['ld', 'li'], 'int_'))
-map_cformat2nptype.append(
-    (['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
-     'complex128'))
-
-
-def test_nptype2cformat():
-    r"""Test conversion from numpy dtype to C format string."""
-    for a, b in map_nptype2cformat:
-        if isinstance(a, str):
-            a = [a]
-        for ia in a:
-            assert_equal(AsciiTable.nptype2cformat(ia), b)
-    assert_raises(TypeError, AsciiTable.nptype2cformat, 0)
-    for a in unsupported_nptype:
-        assert_raises(ValueError, AsciiTable.nptype2cformat, a)
-
-
-def test_cformat2nptype():
-    r"""Test conversion from C format string to numpy dtype."""
-    for a, b in map_cformat2nptype:
-        if isinstance(a, str):
-            a = [a]
-        for _ia in a:
-            if _ia.startswith(backwards.bytes2unicode(AsciiTable._fmt_char)):
-                ia = backwards.unicode2bytes(_ia)
-            else:
-                ia = AsciiTable._fmt_char + backwards.unicode2bytes(_ia)
-            assert_equal(AsciiTable.cformat2nptype(ia), np.dtype(b).str)
-    assert_raises(TypeError, AsciiTable.cformat2nptype, 0)
-    assert_raises(ValueError, AsciiTable.cformat2nptype,
-                  backwards.unicode2bytes('s'))
-    assert_raises(ValueError, AsciiTable.cformat2nptype,
-                  backwards.unicode2bytes('%'))
-    for a in unsupported_nptype:
-        assert_raises(ValueError, AsciiTable.cformat2nptype,
-                      backwards.unicode2bytes('%' + a))
-
-
-def test_cformat2pyscanf():
-    r"""Test conversion of C format string to version for python scanf."""
-    for a, b in map_cformat2pyscanf:
-        if isinstance(a, str):
-            a = [a]
-        for _ia in a:
-            ia = backwards.unicode2bytes(_ia)
-            ib = backwards.unicode2bytes(b)
-            assert_equal(AsciiTable.cformat2pyscanf(ia), ib)
-    assert_raises(TypeError, AsciiTable.cformat2pyscanf, 0)
-    assert_raises(ValueError, AsciiTable.cformat2pyscanf,
-                  backwards.unicode2bytes('s'))
-    assert_raises(ValueError, AsciiTable.cformat2pyscanf,
-                  backwards.unicode2bytes('%'))
 
 
 def test_AsciiTable():
@@ -359,7 +254,7 @@ def test_AsciiTable_array_bytes():
             in_arr = AF_in.read_array()
             # Errors
             assert_raises(TypeError, AF_in.array_to_bytes, 0)
-            assert_raises(ValueError, AF_in.array_to_bytes, np.zeros(nrows))
+            # assert_raises(ValueError, AF_in.array_to_bytes, np.zeros(nrows))
             assert_raises(ValueError, AF_in.array_to_bytes,
                           np.zeros((nrows, ncols - 1)))
             list_of_arr = [in_arr[n] for n in in_arr.dtype.names]
@@ -370,13 +265,6 @@ def test_AsciiTable_array_bytes():
             assert_raises(ValueError, AF_in.array_to_bytes, list_of_ele)
             assert_raises(ValueError, AF_in.array_to_bytes, [np.zeros(0)])
             # Check direct conversion of bytes
-            if order == 'C':
-                AF_out_err = AsciiTable.AsciiTable(
-                    output_file, 'w', dtype='float',
-                    format_str='\t'.join(5 * ['%f']) + '\n')
-                err_byt = np.zeros(12, dtype=AF_out_err.dtype).tobytes(order=order)
-                assert_raises(ValueError, AF_out_err.bytes_to_array, err_byt,
-                              order=order)
             in_bts = AF_in.array_to_bytes(order=order)
             out_arr = AF_in.bytes_to_array(in_bts, order=order)
             np.testing.assert_equal(out_arr, in_arr)
@@ -394,8 +282,8 @@ def test_AsciiTable_array_bytes():
             assert_raises(RuntimeError, AF_out.bytes_to_array, in_bts[:-1],
                           order=order)
             out_arr = AF_out.bytes_to_array(in_bts, order=order)
-            assert_raises(ValueError, AF_out.write_array, out_arr,
-                          names=['wrong'])
+            # assert_raises(ValueError, AF_out.write_array, out_arr,
+            #               names=['wrong'])
             AF_out.write_array(out_arr)
             # Read output matrix
             AF_out = AsciiTable.AsciiTable(output_file, 'r',
@@ -478,6 +366,6 @@ def test_AsciiTable_writenames():
 def test_AsciiTable_validate_line():
     r"""Test errors raised in line validation."""
     AF0 = AsciiTable.AsciiTable(mode2file['w'], 'w', **mode2kws['w'])
-    assert_raises(AssertionError, AF0.validate_line,
+    assert_raises(ValueError, AF0.validate_line,
                   backwards.unicode2bytes('wrong format'))
     assert_raises(TypeError, AF0.validate_line, 5)

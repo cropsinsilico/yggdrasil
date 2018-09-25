@@ -1,0 +1,8 @@
+connections:
+  - input: ./Input/photosynthesis_rate.txt
+    output: photosynthesis_rate
+    filetype: table
+  - input: growth_rate
+    output: ./Output/growth_rate.txt
+    filetype: table
+    field_names: growth_rate

@@ -17,11 +17,14 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import glob
 import sys
 import sphinx_rtd_theme
+import cis_interface
 # sys.path.insert(0, os.path.abspath('.'))
 doxydir = os.path.join(os.path.abspath('../'), "doxy", "xml")
-srcdir = os.path.join(os.path.abspath('../../'), "cis_interface")
+rootdir = os.path.abspath('../../')
+srcdir = os.path.join(rootdir, "cis_interface")
 sys.path.append(doxydir)
 
 
@@ -52,13 +55,16 @@ finterface = ['CisInterface.h', 'CisInterface.hpp', 'CisInterface.m']
 fasciiio = ['AsciiTable.h', # 'AsciiTable.hpp', 'AsciiTable.m',
             'AsciiFile.h', # 'AsciiFile.hpp', 'AsciiFile.m',
 ]
+fserialize = [os.path.basename(f) for f in glob.glob(
+    os.path.join(srcdir, 'serialize', '*.h'))]
 
 breathe_projects = {"cis_interface": doxydir}
 breathe_default_project = "cis_interface"
 breathe_projects_source = {"cis_interface": (
     srcdir,
     ([os.path.join('interface', f) for f in finterface] +
-     [os.path.join('dataio', f) for f in fasciiio]))
+     [os.path.join('dataio', f) for f in fasciiio] +
+     [os.path.join('serialize', f) for f in fserialize]))
     }
 
 # Napoleon settings
@@ -95,10 +101,10 @@ author = u'Meagan Lang, David Raila'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-# The short X.Y version.
-version = u'0.1'
 # The full version, including alpha/beta/rc tags.
-release = u'0.1.3'
+release = cis_interface.__version__
+# The short X.Y version.
+version = release.split('+')[0]
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/

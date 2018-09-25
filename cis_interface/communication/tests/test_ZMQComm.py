@@ -246,6 +246,12 @@ class TestZMQCommROUTER(TestZMQComm):
         super(TestZMQCommROUTER, self).__init__(*args, **kwargs)
         self.socket_type = 'ROUTER'
 
+    def setup(self, *args, **kwargs):
+        r"""Initialize comm object pair with sleep after setup to ensure
+        dealer has connected."""
+        kwargs['sleep_after_connect'] = True
+        super(TestZMQCommROUTER, self).setup(*args, **kwargs)
+
     def test_router_recv(self):
         r"""Test router receipt of message from the dealer with an identity."""
         self.do_send_recv(reverse_comms=True, send_kwargs=dict(

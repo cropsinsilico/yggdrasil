@@ -55,11 +55,11 @@ class Driver(tools.CisThreadLoop):
         if namespace is None:
             namespace = cis_cfg.get('rmq', 'namespace')
             self.debug("Setting namespace to %s", namespace)
-        if kwargs.get('workingDir', None) is None:
-            if isinstance(yml, dict) and ('workingDir' in yml):
-                self.workingDir = yml['workingDir']
+        if kwargs.get('working_dir', None) is None:
+            if isinstance(yml, dict) and ('working_dir' in yml):
+                self.working_dir = yml['working_dir']
             else:
-                self.workingDir = os.getcwd()
+                self.working_dir = os.getcwd()
         # Assign things
         self.yml = yml
         self.env = env

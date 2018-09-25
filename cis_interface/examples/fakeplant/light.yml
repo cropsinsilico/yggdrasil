@@ -1,0 +1,11 @@
+model:
+  name: LightModel
+  language: c
+  args:
+    - ./src/light.c
+    - -lm
+  inputs:
+    - ambient_light
+    - canopy_structure
+  outputs:
+    - light_intensity

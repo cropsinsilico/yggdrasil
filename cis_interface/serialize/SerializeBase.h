@@ -1,12 +1,16 @@
-#include <../tools.h>
-
 #ifndef CISSERIALIZEBASE_H_
 #define CISSERIALIZEBASE_H_
 
+#include <../tools.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Serializer types. */
-enum seri_enum { DIRECT_SERI, FORMAT_SERI,
-		 ASCII_TABLE_SERI, ASCII_TABLE_ARRAY_SERI };
+enum seri_enum { DIRECT_SERI, FORMAT_SERI, ARRAY_SERI,
+		 ASCII_TABLE_SERI, ASCII_TABLE_ARRAY_SERI,
+		 PLY_SERI, OBJ_SERI};
 typedef enum seri_enum seri_type;
 
 /*!
@@ -14,7 +18,8 @@ typedef enum seri_enum seri_type;
 */
 typedef struct seri_t {
   seri_type type; //!< Serializer type.
-  const void *info; //!< Pointer to any extra info serializer requires.
+  void *info; //!< Pointer to any extra info serializer requires.
+  size_t size_info; //!< Size of allocate space for info.
 } seri_t;
 
 
@@ -30,7 +35,7 @@ typedef struct seri_t {
  */
 static inline
 int serialize_direct(const seri_t s, char *buf, const size_t buf_siz,
-        int *args_used, va_list ap) {
+		     int *args_used, va_list ap) {
   args_used[0] = 0;
   if (s.type != DIRECT_SERI)
     return -1;
@@ -47,7 +52,7 @@ int serialize_direct(const seri_t s, char *buf, const size_t buf_siz,
   @param[in] s seri_t Structure sepcifying how to deserialize message.
   @param[in] buf character pointer to serialized message.
   @param[in] buf_siz size_t Size of buf.
-  @param[in] ap va_list Arguments to be parsed from message.
+  @param[out] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
  */
 static inline
@@ -62,5 +67,8 @@ int deserialize_direct(const seri_t s, const char *buf, const size_t buf_siz,
   return 1;
 };
   
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISSERIALIZEBASE_H_*/

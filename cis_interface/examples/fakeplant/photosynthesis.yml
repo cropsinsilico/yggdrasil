@@ -1,0 +1,10 @@
+model:
+  name: PhotosynthesisModel
+  language: python
+  args: ./src/photosynthesis.py
+  inputs:
+    - light_intensity
+    - temperature
+    - co2
+  outputs:
+    - photosynthesis_rate

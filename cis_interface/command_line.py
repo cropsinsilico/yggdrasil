@@ -2,13 +2,17 @@
 import os
 import sys
 import traceback
-from cis_interface import runner
+from cis_interface import runner, schema, config
 from cis_interface.drivers import GCCModelDriver
 
 
 def cisrun():
     r"""Start a run."""
     prog = sys.argv[0].split(os.path.sep)[-1]
+    # Print help
+    if '-h' in sys.argv:
+        print('Usage: cisrun [YAMLFILE1] [YAMLFILE2]...')
+        return
     models = sys.argv[1:]
     cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
     try:
@@ -48,6 +52,19 @@ def ld_flags():
 
     """
     return ' '.join(GCCModelDriver.get_flags()[1])
+
+
+def regen_schema():
+    r"""Regenerate the cis_interface schema."""
+    if os.path.isfile(schema._schema_fname):
+        os.remove(schema._schema_fname)
+    schema.clear_schema()
+    schema.init_schema()
+
+
+def update_config():
+    r"""Update the user config file for cis_interface."""
+    config.update_config(config.usr_config_file, config.def_config_file)
 
 
 if __name__ == '__main__':

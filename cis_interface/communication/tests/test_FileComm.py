@@ -1,3 +1,4 @@
+import os
 import nose.tools as nt
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
@@ -8,15 +9,9 @@ class TestFileComm(parent.TestCommBase):
     def __init__(self, *args, **kwargs):
         super(TestFileComm, self).__init__(*args, **kwargs)
         self.comm = 'FileComm'
-        self.attr_list += ['fd', 'read_meth', 'append']
-        self.read_meth = 'read'
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
-        out = super(TestFileComm, self).inst_kwargs
-        out['read_meth'] = self.read_meth
-        return out
+        self.attr_list += ['fd', 'read_meth', 'append', 'in_temp',
+                           'open_as_binary', 'newline', 'is_series',
+                           'platform_newline']
 
     def teardown(self):
         r"""Remove the file."""
@@ -30,9 +25,34 @@ class TestFileComm(parent.TestCommBase):
         nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
     @property
+    def send_inst_kwargs(self):
+        r"""dict: Keyword arguments for send instance."""
+        out = super(TestFileComm, self).send_inst_kwargs
+        out['in_temp'] = True
+        return out
+
+    @property
+    def append_msg(self):
+        r"""str: Message that should be sent by second comm."""
+        return self.test_msg
+    
+    @property
     def double_msg(self):
         r"""str: Message that should result from writing two test messages."""
-        return 2 * self.test_msg
+        out = self.merge_messages([self.test_msg, self.append_msg])
+        return out
+
+    def merge_messages(self, msg_list):
+        r"""Merge multiple messages to produce the expected total message.
+
+        Args:
+            msg_list (list): Messages to be merged.
+
+        Returns:
+            obj: Merged message.
+
+        """
+        return self.recv_instance.empty_msg.join(msg_list)
 
     def test_append(self):
         r"""Test open of file comm with append."""
@@ -43,23 +63,40 @@ class TestFileComm(parent.TestCommBase):
         kwargs = self.send_inst_kwargs
         kwargs['append'] = True
         new_inst = new_comm('append%s' % self.uuid, **kwargs)
-        flag = new_inst.send(self.test_msg)
+        flag = new_inst.send(self.append_msg)
         assert(flag)
         self.remove_instance(new_inst)
         # Read entire contents
-        msg_tot = self.recv_instance.empty_msg
         flag = True
+        msg_list = []
         while flag:
             flag, msg_recv = self.recv_instance.recv()
             if flag:
-                msg_tot += msg_recv
+                msg_list.append(msg_recv)
             else:
                 nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
-        nt.assert_equal(msg_tot, self.double_msg)
+        self.assert_msg_equal(self.merge_messages(msg_list), self.double_msg)
 
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
         pass
+
+    def test_series(self):
+        r"""Test sending/receiving to/from a series of files."""
+        # Set up series
+        fname = '%d'.join(os.path.splitext(self.send_instance.address))
+        self.send_instance.close()
+        self.recv_instance.close()
+        self.send_instance.is_series = True
+        self.recv_instance.is_series = True
+        self.send_instance.address = fname
+        self.recv_instance.address = fname
+        self.send_instance.open()
+        self.recv_instance.open()
+        # Send/receive multiple messages
+        nmsg = 2
+        for i in range(nmsg):
+            self.do_send_recv()
         
     def test_remaining_bytes(self):
         r"""Test remaining_bytes."""
@@ -77,6 +114,21 @@ class TestFileComm(parent.TestCommBase):
 
 class TestFileComm_readline(TestFileComm):
     r"""Test for FileComm communication class with read_meth = 'readline'."""
-    def __init__(self, *args, **kwargs):
-        super(TestFileComm_readline, self).__init__(*args, **kwargs)
-        self.read_meth = 'readline'
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestFileComm, self).inst_kwargs
+        out['read_meth'] = 'readline'
+        return out
+
+
+class TestFileComm_ascii(TestFileComm):
+    r"""Test for FileComm communication class with open_as_binary = False."""
+
+    @property
+    def send_inst_kwargs(self):
+        r"""dict: Keyword arguments for send instance."""
+        out = super(TestFileComm_ascii, self).send_inst_kwargs
+        out['open_as_binary'] = False
+        return out

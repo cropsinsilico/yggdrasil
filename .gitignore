@@ -4,13 +4,13 @@ cis_interface/tests/scripts/gcc_model.out
 cis_interface/tests/scripts/Makefile
 
 # Intermediate docs
-README.rst
 docs/build
 docs/source/cis_interface*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
 
 # Coverage
+.coveragerc
 .coverage
 htmlcov
 

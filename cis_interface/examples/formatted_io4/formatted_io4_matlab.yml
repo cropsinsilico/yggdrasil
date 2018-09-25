@@ -1,0 +1,26 @@
+models:
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/formatted_io4_modelA.m
+    inputs: inputA
+    outputs:
+      name: outputA
+      field_names: name,count,size
+
+  - name: matlab_modelB
+    language: matlab
+    args: ./src/formatted_io4_modelB.m
+    inputs: inputB
+    outputs:
+      name: outputB
+      field_names: name,count,size
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+    filetype: pandas
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
+    filetype: pandas

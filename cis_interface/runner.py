@@ -196,8 +196,8 @@ class CisRunner(CisClass):
             out = chain(self.inputdrivers.values(), self.outputdrivers.values())
         else:
             driver = self.modeldrivers[model]
-            out = chain(driver.get('inputs', dict()),
-                        driver.get('outputs', dict()))
+            out = chain(driver.get('input_drivers', dict()),
+                        driver.get('output_drivers', dict()))
         return out
 
     def createDriver(self, yml):
@@ -214,7 +214,8 @@ class CisRunner(CisClass):
         curpath = os.getcwd()
         if 'ClientDriver' in yml['driver']:
             yml.setdefault('comm_address', self.serverdrivers[yml['args']])
-        os.chdir(yml['workingDir'])
+        if 'working_dir' in yml:
+            os.chdir(yml['working_dir'])
         instance = create_driver(yml=yml, namespace=self.namespace,
                                  rank=self.rank, **yml)
         yml['instance'] = instance
@@ -236,6 +237,7 @@ class CisRunner(CisClass):
         yml['env'] = {}
         for iod in self.io_drivers(yml['name']):
             yml['env'].update(iod['instance'].env)
+            iod['models'].append(yml['name'])
         drv = self.createDriver(yml)
         if 'client_of' in yml:
             for srv in yml['client_of']:
@@ -254,12 +256,9 @@ class CisRunner(CisClass):
             object: An instance of the specified driver.
 
         """
+        yml['models'] = []
         if yml['args'] not in self._outputchannels:
-            try:
-                norm_path = os.path.normpath(os.path.join(
-                    yml['workingDir'], yml['args']))
-                assert(os.path.isfile(norm_path))
-            except AssertionError:
+            if not os.path.isfile(yml['args']):
                 raise Exception(("Input driver %s could not locate a " +
                                  "corresponding file or output channel %s") % (
                                      yml["name"], yml["args"]))
@@ -277,6 +276,7 @@ class CisRunner(CisClass):
 
         """
         from cis_interface.drivers import FileOutputDriver
+        yml['models'] = []
         if yml['args'] in self._inputchannels:
             yml.setdefault('comm_env', {})
             yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
@@ -330,11 +330,20 @@ class CisRunner(CisClass):
                       self.host, self.namespace, self.rank))
         driver = dict(name='name')
         try:
+            # Start connections
             for driver in self.io_drivers():
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
                 if not d.was_started:
                     d.start()
+            # Ensure connections in loop
+            for driver in self.io_drivers():
+                self.debug("Checking driver %s", driver['name'])
+                d = driver['instance']
+                d.wait_for_loop()
+                assert(d.was_loop)
+                assert(not d.errors)
+            # Start models
             # self.sleep(1)  # on windows comms can take a while start
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])
@@ -368,9 +377,13 @@ class CisRunner(CisClass):
                 d.join(1)
                 if not d.is_alive():
                     if not d.errors:
+                        self.info("%s finished running.", drv['name'])
                         self.do_model_exits(drv)
+                        self.debug("%s completed model exits.", drv['name'])
                         self.do_client_exits(drv)
+                        self.debug("%s completed client exits.", drv['name'])
                         running.remove(drv)
+                        self.info("%s finished exiting.", drv['name'])
                 else:
                     self.info('%s still running', drv['name'])
             dead = []
@@ -389,6 +402,22 @@ class CisRunner(CisClass):
             self.terminate()
         self.debug('Returning')
 
+    def do_model_exits(self, model):
+        r"""Perform exits for IO drivers associated with a model.
+
+        Args:
+            model (dict): Dictionary of model parameters including any
+                associated IO drivers.
+
+        """
+        for drv in self.io_drivers(model['name']):
+            drv['models'].remove(model['name'])
+            if not drv['instance'].is_alive():
+                continue
+            if (len(drv['models']) == 0):
+                self.debug('on_model_exit %s', drv['name'])
+                drv['instance'].on_model_exit()
+    
     def do_client_exits(self, model):
         r"""Perform exits for IO drivers associated with a client model.
 
@@ -407,26 +436,6 @@ class CisRunner(CisClass):
                 iod['instance'].on_client_exit()
                 srv['instance'].stop()
 
-    def do_model_exits(self, model):
-        r"""Perform exits for IO drivers associated with a model.
-
-        Args:
-            model (dict): Dictionary of model parameters including any
-                associated IO drivers.
-
-        """
-        for drv in self.io_drivers(model['name']):
-            if not drv['instance'].is_alive():
-                continue
-            self.debug('on_model_exit %s', drv['name'])
-            if 'onexit' in drv:
-                self.debug(drv['onexit'])
-                if drv['onexit'] != 'pass':
-                    exit_method = getattr(drv['instance'], drv['onexit'])
-                    exit_method()
-            else:
-                drv['instance'].on_model_exit()
-    
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         self.debug('')

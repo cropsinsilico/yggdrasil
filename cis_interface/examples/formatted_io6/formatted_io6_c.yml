@@ -1,0 +1,22 @@
+models:
+  - name: c_modelA
+    language: c
+    args: ./src/formatted_io6_modelA.c
+    inputs: inputA
+    outputs: outputA
+
+  - name: c_modelB
+    language: c
+    args: ./src/formatted_io6_modelB.c
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.obj  # Connection between file and model A input
+    output: inputA
+    filetype: obj
+  - input: outputB  # Connection between model B output and file
+    output: ./output.obj
+    filetype: obj

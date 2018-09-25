@@ -1,0 +1,5 @@
+# photosynthesis_rate
+# %f
+5.0
+7.0
+20.0

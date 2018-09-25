@@ -39,13 +39,27 @@
 #define psiRpcServer cisRpcServer
 #define psi_free_rpc cis_free_rpc
 #define psiAsciiFileInput_t cisAsciiFileInput_t
-#define psiAsciiFileInput cisAsciiFileInput
 #define psiAsciiFileOutput_t cisAsciiFileOutput_t
+#define psiAsciiFileInput cisAsciiFileInput
 #define psiAsciiFileOutput cisAsciiFileOutput
 #define psiAsciiTableInput_t cisAsciiTableInput_t
-#define psiAsciiTableInput cisAsciiTableInput
 #define psiAsciiTableOutput_t cisAsciiTableOutput_t
+#define psiAsciiTableInput cisAsciiTableInput
 #define psiAsciiTableOutput cisAsciiTableOutput
+#define psiAsciiTableInput_local cisAsciiTableInput_local
+#define psiAsciiTableOutput_local cisAsciiTableOutput_local
+#define psiAsciiArrayInput cisAsciiArrayInput
+#define psiAsciiArrayOutput cisAsciiArrayOutput
+#define psiAsciiArrayInput_local cisAsciiArrayInput_local
+#define psiAsciiArrayOutput_local cisAsciiArrayOutput_local
+#define psiPlyInput_t cisPlyInput_t
+#define psiPlyOutput_t cisPlyOutput_t
+#define psiPlyInput cisPlyInput
+#define psiPlyOutput cisPlyOutput
+#define psiObjInput_t cisObjInput_t
+#define psiObjOutput_t cisObjOutput_t
+#define psiObjInput cisObjInput
+#define psiObjOutput cisObjOutput
 
 
 #endif /*PSIINTERFACE_H_*/

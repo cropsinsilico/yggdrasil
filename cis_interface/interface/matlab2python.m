@@ -33,7 +33,12 @@ function x_py = matlab2python(x_ml)
     if isa(x_ml, 'string');
       x_py = py.str(x_ml);
     elseif isa(x_ml, 'char');
-      x_py = py.str(x_ml);
+      try
+        x_py = py.str(x_ml);
+      catch
+        x_py = py.unicode(x_ml);
+      end;
+      x_py = x_py.encode('utf-8');
     elseif isa(x_ml, 'cell');
       for i = 1:length(x_ml)
 	x_ml{i} = matlab2python(x_ml{i});
@@ -57,15 +62,15 @@ function x_py = matlab2python(x_ml)
 	all_match = false;
       end;
       if all_match
-	x_py = cell2mat(x_ml);
+        x_py = cell2mat(x_ml).tolist();
       else
 	x_py = matlab2python(reduce_dim(x_ml));
       end;
     else
-      data_size = size(x_ml);
+      data_size = int16(size(x_ml));
       transpose = x_ml';
-      x_py = py.numpy.reshape(transpose(:)', data_size);
-    end
+      x_py = py.numpy.reshape(transpose(:)', data_size).tolist();
+    end;
   else;
     disp('Could not convert matlab type to python type');
     disp(x_ml);

@@ -13,22 +13,25 @@ env:
     INSTALLZMQ=1
     INSTALLRMQ=0
     INSTALLAPY=0
-
-# services:
-#   - rabbitmq
+    INSTALLLPY=0
+    DEPLOYPYPI=0
 
 matrix:
   include:
     - python: 2.7
-      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - python: 2.7
-      env: INSTALLRMQ=1 INSTALLAPY=1
+      env: INSTALLRMQ=1 INSTALLLPY=1
     - python: 3.4
     - python: 3.5
+      env: INSTALLAPY=1
     - python: 3.6
       env: INSTALLZMQ=0 INSTALLRMQ=0
     - python: 3.6
       env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1
+    - python: 3.7
+      dist: xenial
+      sudo: true
     - os: osx
       env: INSTALLRMQ=0 INSTALLZMQ=0
       osx_image: xcode7.3
@@ -40,7 +43,7 @@ matrix:
           # `cache` does not support `env`-like `global` so copy-paste from top
           # - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
     - os: osx
-      env: INSTALLRMQ=0
+      env: INSTALLRMQ=0 DEPLOYPYPI=1
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -52,6 +55,30 @@ matrix:
 
 before_install:
   - |
+    sudo apt-get update
+    # We do this conditionally because it saves us some downloading if the
+    # version is the same.
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      fi
+    else
+      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      fi
+    fi
+    bash miniconda.sh -b -p $HOME/miniconda
+    export PATH="$HOME/miniconda/bin:$PATH"
+    hash -r
+    conda config --set always_yes yes --set changeps1 no
+    conda update -q conda
+    # Useful for debugging any issues with conda
+    conda info -a
+
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
        brew update
        # brew install ccache
@@ -69,6 +96,17 @@ before_install:
     if [[ $INSTALLAPY == '1' ]]; then
        echo Installing AstroPy...;
        pip install astropy
+    fi
+
+    # Install LPy
+    if [[ $INSTALLLPY == '1' ]]; then
+       echo Installing LPy...;
+       sh ci/install-lpy-linux.sh
+       # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+       #    sh ci/install-lpy-osx.sh
+       # else
+       #    sh ci/install-lpy-linux.sh
+       # fi
     fi
 
     # Install ZeroMQ
@@ -98,7 +136,7 @@ before_install:
        else
           sh ci/start-rmqserver-linux.sh
        fi
-       
+
     fi
 
 install:
@@ -111,11 +149,11 @@ install:
     pip install --upgrade setuptools
     # Install dependencies
     pip install $NUMPY
-    # pip install $MATPLOTLIB
+    pip install $MATPLOTLIB
     pip install nose coverage coveralls codecov flake8
     # Install cis_interface
     pip install -e .
-    
+
 before_script:
   - |
     flake8 cis_interface
@@ -127,3 +165,15 @@ script:
 after_success:
   - coveralls
   - codecov
+
+deploy:
+  provider: pypi
+  edge: true
+  skip_existing: true
+  distributions: sdist bdist_wheel --universal
+  user: langmm
+  password:
+    secure: cYP65ktykU8vzNpjDxVJ7hb5VIA8pcG0+LfaboyJ/7jJ85OFFMb7k12cuzmcFgyCMzxaMaR74ZwSL1Zs3jwfpsfKt22rdXV3YtAlrbLfHDd1ReoPeg6ZHSHYlZq/pkGowB7OHZMPaF7Pwjl2igWE1ZrJ8q/K2vVCt/cv9JhZXZS3nnC3iTY9jbvq/sWp6QChy61s5ekxf9m3PJBcS3s/n34ZyuQt8eF73YSMlztWNLTBWKIfK2LOpDXXKDWhFRDhlmt3mA88I2HI1ZxFyANIrrMwGEBIJOVWlAfnPOdoI36JW9wqv3DXj9RGVDNcVwfW5/juxMF+DSHORwQDuTn3E6Z0Q/ic6rLndI+vzHjYdjPeLXutggOEGTjq32LP6FkJ+3LyrFoQXwZIZ+FqLRni/HyppoyIQ+S5NneLB7Wj5Hyja7ycmwLZnlnixUz3qHOvIv6Hpv/koDltqyB5gzf0xvbNUMkRCHuuovtbqtmRtxA1BL8VKoGVzZ7zHrWG+iTGZXSFhgrcO1k8OYzxaWR2O/NeeURuy3ViD+xzPSvMASRX0sCULOf3o2rgDdJyTBjW5KZcLqVcOiGZoHgwOjZY0NQ50R7mE7T+CQmoYtil1Ovmm8b6NUhoE0z6jEgDVfEhKo9/WACHamzIQ4afrYsEWlQhDSg+dvrzS7OciILOK+Q=
+  on:
+    tags: true
+    condition: $DEPLOYPYPI = 1

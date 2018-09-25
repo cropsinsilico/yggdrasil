@@ -11,6 +11,8 @@ def rand_str(length):
     while (len(out) < (length - 1)):
         index = int(random.random() * len(charset))
         out += charset[index]
+    if sys.version_info[0] == 3:
+        out = out.encode("utf-8")
     return out
 
 

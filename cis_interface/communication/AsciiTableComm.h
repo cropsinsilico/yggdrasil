@@ -1,10 +1,14 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISASCIITABLECOMM_H_
+#define CISASCIITABLECOMM_H_
+
 #include <../tools.h>
 #include <CommBase.h>
 #include <../dataio/AsciiTable.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISASCIITABLECOMM_H_
-#define CISASCIITABLECOMM_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Number of tables creates. */
 static unsigned _cisAsciiTablesCreated;
@@ -16,26 +20,37 @@ static unsigned _cisAsciiTablesCreated;
  */
 static inline
 int init_ascii_table_comm(comm_t *comm) {
+  int flag = 0;
   // Don't check base validity since address is name
+  comm->is_file = 1;
   comm->type = ASCII_TABLE_COMM;
   strcpy(comm->address, comm->name);
   // Initialize table as handle
-  char *fmt = (char*)(comm->serializer.info);
-  asciiTable_t *handle = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-  if (handle == NULL) {
-    cislog_error("init_ascii_table_comm: Failed to malloc asciiTable handle.");
-    comm->valid = 0;
+  flag = update_serializer(comm->serializer, ASCII_TABLE_SERI, NULL);
+  if (flag != 0) {
+    cislog_error("init_ascii_table_comm: Could not update serializer.");
     return -1;
   }
+  asciiTable_t *handle = (asciiTable_t*)(comm->serializer->info);
   if (strcmp(comm->direction, "send") == 0)
-    handle[0] = asciiTable(comm->address, "w", fmt,
-			   NULL, NULL, NULL);
+    flag = at_update(handle, comm->address, "w");
   else
-    handle[0] = asciiTable(comm->address, "r", NULL,
-			   NULL, NULL, NULL);
+    flag = at_update(handle, comm->address, "r");
+  if (flag != 0) {
+    cislog_error("init_ascii_table_comm: Could not set asciiTable address.");
+    return -1;
+  }
   comm->handle = (void*)handle;
+  // Simplify received formats
+  if (strcmp(comm->direction, "recv") == 0) {
+    flag = simplify_formats(handle->format_str, CIS_MSG_MAX);
+    if (flag < 0) {
+      cislog_error("init_ascii_table_comm: Failed to simplify recvd format.");
+      return -1;
+    }
+  }
   // Open the table
-  int flag = at_open(handle);
+  flag = at_open(handle);
   if (flag != 0) {
     cislog_error("init_ascii_table_comm: Could not open %s", comm->name);
     comm->valid = 0;
@@ -45,8 +60,8 @@ int init_ascii_table_comm(comm_t *comm) {
   if (strcmp(comm->direction, "send") == 0)
     at_writeformat(handle[0]);
   // Set AsciiTable serializer
-  comm->serializer.type = ASCII_TABLE_SERI;
-  comm->serializer.info = (void*)handle;
+  /* comm->serializer.type = ASCII_TABLE_SERI; */
+  /* comm->serializer.info = (void*)handle; */
   return 0;
 };
 
@@ -72,7 +87,7 @@ int new_ascii_table_address(comm_t *comm) {
 static inline
 int init_ascii_table_array_comm(comm_t *comm) {
   int ret = init_ascii_table_comm(comm);
-  comm->serializer.type = ASCII_TABLE_ARRAY_SERI;
+  comm->serializer->type = ASCII_TABLE_ARRAY_SERI;
   return ret;
 };
 
@@ -100,6 +115,7 @@ int free_ascii_table_comm(comm_t *x) {
     asciiTable_t *table = (asciiTable_t*)x->handle;
     at_close(table);
     at_cleanup(table);
+    x->serializer->info = NULL; // Duplicate pointer to handle
     free(x->handle);
     x->handle = NULL;
   }
@@ -173,5 +189,9 @@ int ascii_table_comm_recv(const comm_t x, char **data, const size_t len,
  */
 #define ascii_table_comm_recv_nolimit ascii_table_comm_recv
 
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISASCIITABLECOMM_H_*/

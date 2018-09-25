@@ -1,0 +1,11 @@
+model:
+  name: CanopyModel
+  language: c++
+  args: ./src/canopy.cpp
+  inputs:
+    - plant_layout
+    - init_canopy_structure
+    - growth_rate
+    - time
+  outputs:
+    - canopy_structure

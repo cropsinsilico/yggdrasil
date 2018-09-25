@@ -115,8 +115,13 @@ def write_lang(fd, k, l):
     fd.write('\n')
 
     
-def write_code_line(fd, s, upone=False, language='python'):
+def write_code_line(fd, s, upone=False, language=None):
     p = os.path.sep + get_rel_path(s, upone=True)
+    ext2lang = {'.yml': 'yaml', '.py': 'python',
+                '.c': 'c', '.cpp': 'c++', '.m': 'matlab'}
+    if language is None:
+        ext = os.path.splitext(p)[-1]
+        language = ext2lang.get(ext, 'python')
     fd.write(".. literalinclude:: %s\n" % p)
     fd.write("   :language: %s\n" % language)
     fd.write("   :linenos:\n")
@@ -145,8 +150,9 @@ def write_yml(fd, k, l, upone=False):
 
         
 # rst_examples = source.keys()  # all examples
-rst_examples = ['gs_lesson%d' % x for x in range(1, 6)]
-rst_examples += ['formatted_io%d' % x for x in range(1, 4)]
+rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
+rst_examples.append('gs_lesson4b')  # Special case
+rst_examples += ['formatted_io%d' % x for x in range(1, 6)]
 rst_examples += ['rpc_lesson%d' % x for x in range(1, 3)]
 make_toc_file(rst_examples)
 for k in rst_examples:

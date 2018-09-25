@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import copy
 import shutil
 import uuid
 import importlib
@@ -7,14 +8,16 @@ import unittest
 import numpy as np
 import threading
 import psutil
+import pandas
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
-from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, serialize
 from cis_interface.communication import cleanup_comms, get_comm_class
+from cis_interface.serialize.PlySerialize import PlyDict
+from cis_interface.serialize.ObjSerialize import ObjDict
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -29,9 +32,11 @@ script_list = [
     ('c', ['gcc_model.c', 'hellofunc.c']),
     ('cpp', ['gcc_model.cpp', 'hellofunc.c']),
     ('make', 'gcc_model'),
+    ('cmake', 'gcc_model'),
     ('matlab', 'matlab_model.m'),
     ('python', 'python_model.py'),
-    ('error', 'error_model.py')]
+    ('error', 'error_model.py'),
+    ('lpy', 'lpy_model.lpy')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):
@@ -46,9 +51,11 @@ yaml_list = [
     ('c', 'gcc_model.yml'),
     ('cpp', 'gpp_model.yml'),
     ('make', 'make_model.yml'),
+    ('cmake', 'cmake_model.yml'),
     ('matlab', 'matlab_model.yml'),
     ('python', 'python_model.yml'),
-    ('error', 'error_model.yml')]
+    ('error', 'error_model.yml'),
+    ('lpy', 'lpy_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
 # Makefile
@@ -109,7 +116,7 @@ class CisTestBase(unittest.TestCase):
     def fd_count(self):
         r"""int: The number of open file descriptors."""
         proc = psutil.Process()
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
             out = proc.num_fds()
@@ -274,11 +281,6 @@ class CisTestBase(unittest.TestCase):
             out = '%s: %s' % (self.description_prefix, out)
         return out
 
-    # @property
-    # def workingDir(self):
-    #     r"""str: Working directory."""
-    #     return os.path.dirname(__file__)
-
     def check_file_exists(self, fname):
         r"""Check that a file exists.
 
@@ -286,7 +288,7 @@ class CisTestBase(unittest.TestCase):
             fname (str): Full path to the file that should be checked.
 
         """
-        Tout = self.start_timeout()
+        Tout = self.start_timeout(2)
         while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
@@ -300,7 +302,9 @@ class CisTestBase(unittest.TestCase):
             fsize (int): Size that the file should be in bytes.
 
         """
-        Tout = self.start_timeout()
+        Tout = self.start_timeout(2)
+        if (os.stat(fname).st_size != fsize):  # pragma: debug
+            print('file sizes not equal', os.stat(fname).st_size, fsize)
         while ((not Tout.is_out) and
                (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()
@@ -336,9 +340,10 @@ class CisTestBase(unittest.TestCase):
 class CisTestClass(CisTestBase):
     r"""Test class for a CisClass."""
 
+    _mod = None
+    _cls = None
+
     def __init__(self, *args, **kwargs):
-        self._mod = None
-        self._cls = None
         self._inst_args = list()
         self._inst_kwargs = dict()
         super(CisTestClass, self).__init__(*args, **kwargs)
@@ -428,30 +433,99 @@ class IOInfo(object):
     """
 
     def __init__(self):
-        self.comment = backwards.unicode2bytes('#')
+        self.field_names = ['name', 'count', 'size']
+        self.field_units = ['n/a', 'g', 'cm']
+        self.nfields = len(self.field_names)
+        self.comment = backwards.unicode2bytes('# ')
+        self.delimiter = backwards.unicode2bytes('\t')
+        self.newline = backwards.unicode2bytes('\n')
         self.fmt_str = backwards.unicode2bytes('%5s\t%d\t%f\n')
         self.fmt_str_matlab = backwards.unicode2bytes('%5s\\t%d\\t%f\\n')
+        self.field_formats = self.fmt_str.split(self.newline)[0].split(self.delimiter)
         self.fmt_str_line = backwards.unicode2bytes('# ') + self.fmt_str
-        self.file_dtype = '%s5, i4, f8' % backwards.np_dtype_str
-        self.file_rows = [('one', int(1), 1.0),
-                          ('two', int(2), 2.0),
-                          ('three', int(3), 3.0)]
+        # self.file_cols = ['name', 'count', 'size']
+        self.file_dtype = np.dtype(
+            {'names': self.field_names,
+             'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+        self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
+        self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
+        self.field_names_line = (self.comment +
+                                 self.delimiter.join(self.field_names) +
+                                 self.newline)
+        self.field_units_line = (self.comment +
+                                 self.delimiter.join(self.field_units) +
+                                 self.newline)
+        self.file_elements = [('one', int(1), 1.0),
+                              ('two', int(2), 2.0),
+                              ('three', int(3), 3.0)]
+        self.map_dict = dict(args1=1, args2='2')
+        self.ply_dict = dict(vertices=[[0.0, 0.0, 0.0],
+                                       [0.0, 1.0, 0.0],
+                                       [1.0, 0.0, 0.0],
+                                       [1.0, 1.0, 0.0]],
+                             faces=[[0, 1, 2], [1, 2, 3]])
+        self.obj_dict = copy.deepcopy(self.ply_dict)
+        self.obj_dict.update(normals=copy.deepcopy(self.obj_dict['vertices']),
+                             texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [5.0, 6.0]],
+                             face_normals=[[0, 1, 2], None, None],
+                             face_texcoords=[[0, 1, 2], None, None],
+                             material='material')
+        self.obj_dict['faces'].append([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+        self.ply_dict = PlyDict(**self.ply_dict)
+        self.obj_dict = ObjDict(**self.obj_dict)
+
+    @property
+    def header_lines(self):
+        r"""list: Lines in a mock file header."""
+        out = [self.field_names_line, self.field_units_line, self.fmt_str_line]
+        return out
+
+    @property
+    def file_rows(self):
+        r"""list: File rows."""
+        out = []
+        for x in self.file_elements:
+            out.append((backwards.unicode2bytes(x[0]), x[1], x[2]))
+        return out
         
     @property
     def file_lines(self):
         r"""list: Lines in a mock file."""
         out = []
         for r in self.file_rows:
-            out.append(backwards.unicode2bytes(
-                backwards.bytes2unicode(self.fmt_str) % r))
+            out.append(backwards.format_bytes(self.fmt_str, r))
+        return out
+
+    @property
+    def pandas_file_contents(self):
+        r"""str: Contents of mock Pandas file."""
+        s = serialize.get_serializer(stype=6, delimiter=self.delimiter,
+                                     write_header=True)
+        out = s.serialize(self.pandas_frame)
+        return out
+
+    @property
+    def ply_file_contents(self):
+        r"""The contents of a file containing the ply data."""
+        serializer = serialize.get_serializer(stype=8)
+        out = serializer.serialize(self.ply_dict)
+        return out
+
+    @property
+    def obj_file_contents(self):
+        r"""The contents of a file containing the obj data."""
+        serializer = serialize.get_serializer(stype=9)
+        out = serializer.serialize(self.obj_dict)
         return out
 
     @property
     def file_contents(self):
         r"""str: Complete contents of mock file."""
-        out = self.fmt_str_line
+        out = backwards.unicode2bytes('')
+        for line in self.header_lines:
+            out += line
         for line in self.file_lines:
-            out = out + line
+            out += line
         return out
 
     @property
@@ -462,25 +536,32 @@ class IOInfo(object):
             out[i] = row
         return out
 
-    def to_bytes(self, arr):
-        r"""Turn an array into the bytes that will be written.
+    # def to_bytes(self, arr):
+    #     r"""Turn an array into the bytes that will be written.
 
-        Args:
-            arr (np.ndarray): Array.
+    #     Args:
+    #         arr (np.ndarray): Array.
         
-        Returns:
-            str: Bytes that represent the array.
+    #     Returns:
+    #         str: Bytes that represent the array.
 
-        """
-        out = backwards.unicode2bytes('')
-        for n in arr.dtype.names:
-            out = out + arr[n].tobytes()
-        return out
+    #     """
+    #     out = backwards.unicode2bytes('')
+    #     for n in arr.dtype.names:
+    #         out = out + arr[n].tobytes()
+    #     return out
+
+    # @property
+    # def file_bytes(self):
+    #     r"""str: Raw bytes of array of mock file contents."""
+    #     return self.to_bytes(self.file_array)
 
     @property
-    def file_bytes(self):
-        r"""str: Raw bytes of array of mock file contents."""
-        return self.to_bytes(self.file_array)
+    def pandas_frame(self):
+        r"""pandas.DataFrame: Pandas data frame."""
+        if not hasattr(self, '_pandas_frame'):
+            self._pandas_frame = pandas.DataFrame(self.file_array)
+        return self._pandas_frame
 
     @property
     def data_dict(self):
@@ -510,16 +591,19 @@ class IOInfo(object):
             del x[k]
         return x
 
-    def assert_equal_data_dict(self, x):
+    def assert_equal_data_dict(self, x, y=None):
         r"""Assert that the provided object is equivalent to data_dict.
 
         Args:
             x (obj): Object to check.
+            y (obj, optional): Object to check against. Defaults to self.data_dict.
 
         Raises:
             AssertionError: If the two are not equal.
 
         """
+        if y is None:
+            y = self.data_dict
         if isinstance(x, backwards.file_type):
             if x.name.endswith('.mat'):
                 x = self.load_mat(x)
@@ -531,15 +615,15 @@ class IOInfo(object):
                     x = self.load_mat(fd)
                 else:
                     x = pickle.load(fd)
-        elif isinstance(x, backwards.bytes_type):
-            x = pickle.loads(x)
-        nt.assert_equal(type(x), type(self.data_dict))
-        for k in self.data_dict:
+        # elif isinstance(x, backwards.bytes_type):
+        #     x = pickle.loads(x)
+        nt.assert_equal(type(x), type(y))
+        for k in y:
             if k not in x:  # pragma: debug
                 raise AssertionError("Key %s expected, but not in result." % k)
-            np.testing.assert_array_equal(x[k], self.data_dict[k])
+            np.testing.assert_array_equal(x[k], y[k])
         for k in x:
-            if k not in self.data_dict:  # pragma: debug
+            if k not in y:  # pragma: debug
                 raise AssertionError("Key %s in result not expected." % k)
 
     @property
@@ -579,8 +663,40 @@ class IOInfo(object):
                 written to.
 
         """
-        at = AsciiTable(fname, 'w', format_str=self.fmt_str)
-        at.write_array(self.file_array)
+        header = serialize.format_header(format_str=self.fmt_str,
+                                         comment=self.comment,
+                                         delimiter=self.delimiter,
+                                         newline=self.newline,
+                                         field_names=self.field_names,
+                                         field_units=self.field_units)
+        body = serialize.array_to_table(self.file_array, self.fmt_str)
+        with open(fname, 'wb') as fd:
+            fd.write(header)
+            fd.write(body)
+
+    @property
+    def mapfile_contents(self):
+        r"""bytes: The contents of the test ASCII map file."""
+        out = ''
+        order = sorted([k for k in self.map_dict.keys()])
+        for k in order:
+            v = self.map_dict[k]
+            if isinstance(v, backwards.string_types):
+                out += "%s\t'%s'\n" % (k, v)
+            else:
+                out += "%s\t%s\n" % (k, repr(v))
+        return backwards.unicode2bytes(out)
+
+    def write_map(self, fname):
+        r"""Write the map dictionary out to a file.
+
+        Args:
+            fname (str): Full path to the file that the map should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.mapfile_contents)
 
     def write_pickle(self, fname):
         r"""Write the pickled table out to a file.
@@ -592,6 +708,39 @@ class IOInfo(object):
         """
         with open(fname, 'wb') as fd:
             pickle.dump(self.data_dict, fd)
+
+    def write_pandas(self, fname):
+        r"""Write the pandas data frame out to a file.
+
+        Args:
+            fname (str): Full path to the file that the pickle should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.pandas_file_contents)
+
+    def write_ply(self, fname):
+        r"""Write the ply data out to a file.
+
+        Args:
+            fname (str): Full path to the file that the ply should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.ply_file_contents)
+
+    def write_obj(self, fname):
+        r"""Write the obj data out to a file.
+
+        Args:
+            fname (str): Full path to the file that the obj should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.obj_file_contents)
 
 
 # class CisTestBaseInfo(CisTestBase, IOInfo):
