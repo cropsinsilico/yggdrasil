@@ -405,8 +405,9 @@ class TimedRun(CisTestBase, tools.CisClass):
         """
         entry_name = self.entry_name(nmsg, msg_size)
         nrep_remain = nrep
-        if (entry_name in self.perf.get_benchmark_names()) and (not overwrite):
-            nrep_remain -= self.perf.get_benchmark(entry_name).get_nvalue()
+        if (self.perf is not None):
+            if (entry_name in self.perf.get_benchmark_names()) and (not overwrite):
+                nrep_remain -= self.perf.get_benchmark(entry_name).get_nvalue()
         # TODO: Properly handle partial overwrite
         if (self.perf is None) or overwrite or (nrep_remain > 0):
             write_perf_script(self.perfscript, nmsg, msg_size, nrep=nrep_remain,
