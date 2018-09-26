@@ -212,7 +212,6 @@ def get_installed_comm():
         out.append('ZMQComm')
     if _rmq_installed:
         out.append('RMQComm')
-    print('comm_list', out)
     return out
 
 

@@ -9,11 +9,7 @@ import warnings
 import tempfile
 import numpy as np
 from cis_interface import tools, runner, examples, backwards, platform
-from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 from cis_interface.tests import CisTestBase
-from cis_interface.communication.IPCComm import _ipc_installed
-from cis_interface.communication.ZMQComm import _zmq_installed
-from cis_interface.communication.RMQComm import _rmq_installed
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 _linewidth = 4
@@ -22,23 +18,48 @@ mpl.rcParams['axes.labelweight'] = 'bold'
 mpl.rcParams['font.weight'] = 'bold'
 
 
-def write_perf_script(script_file, nmsg, msg_size,
+_lang_list = tools.get_installed_lang()
+for k in ['lpy', 'make', 'cmake']:
+    if k in _lang_list:
+        _lang_list.remove(k)
+_comm_list = tools.get_installed_comm()
+
+
+def write_perf_script(script_file, nmsg, msg_size, nrep=10,
                       lang_src='python', lang_dst='python',
                       comm_type=None):
-    r"""Write a script to run perf."""
+    r"""Write a script to run perf.
+
+    Args:
+        script_file (str): Full path to the file where the script should be
+            saved.
+        nmsg (int): The number of messages that should be sent during the run.
+        msg_size (int): The size (in bytes) of the test messages that should be
+            sent during the run.
+        nrep (int, optional): The number of times the test run should be
+            repeated. Defaults to 3.
+        lang_src (str, optional): The language that the source program should
+            be in. Defaults to 'python',
+        lang_dst (str, optional): The language that the destination program
+            should be in. Defaults to 'python',
+        comm_type (str, optional): The type of communication channel that should
+            be used for the test. Defaults to the current default if not
+            provided.
+
+    """
     if comm_type is None:
         comm_type = tools.get_default_comm()
     lines = [
         'import perf',
         'from cis_interface import timing',
-        'nrep = 3',
+        'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
         'msg_size = %d' % msg_size,
         'lang_src = "%s"' % lang_src,
         'lang_dst = "%s"' % lang_dst,
         'comm_type = "%s"' % comm_type,
         'timer = timing.TimedRun(lang_src, lang_dst, comm_type=comm_type)',
-        'runner = perf.Runner(values=nrep)',
+        'runner = perf.Runner(values=1, processes=nrep)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.perf_func,',
         '                             timer, nmsg, msg_size)']
@@ -383,9 +404,12 @@ class TimedRun(CisTestBase, tools.CisClass):
 
         """
         entry_name = self.entry_name(nmsg, msg_size)
-        if (((self.perf is None) or overwrite or
-             (entry_name not in self.perf.get_benchmark_names()))):
-            write_perf_script(self.perfscript, nmsg, msg_size,
+        nrep_remain = nrep
+        if (entry_name in self.perf.get_benchmark_names()) and (not overwrite):
+            nrep_remain -= self.perf.get_benchmark(entry_name).get_nvalue()
+        # TODO: Properly handle partial overwrite
+        if (self.perf is None) or overwrite or (nrep_remain > 0):
+            write_perf_script(self.perfscript, nmsg, msg_size, nrep=nrep_remain,
                               lang_src=self.lang_src,
                               lang_dst=self.lang_dst,
                               comm_type=self.comm_type)
@@ -395,11 +419,15 @@ class TimedRun(CisTestBase, tools.CisClass):
             os.remove(self.perfscript)
             self.perf = self.load_perf()
         out = self.perf.get_benchmark(entry_name)
-        print(out.get_runs()[0].values)
-        print(out.get_values())
-        print(out.get_nvalue(), out.get_loops())
-        print(min(out.get_values()), out.mean(), out.stdev())
-        return (min(out.get_values()), out.mean(), out.stdev())
+        if out.get_nvalue() < 2:
+            ret = (min(out.get_values()), out.mean(), 0.0)
+        else:
+            ret = (min(out.get_values()), out.mean(), out.stdev())
+        # self.info(out.get_runs()[0].values)
+        # self.info(out.get_values())
+        self.info((out.get_nvalue(), out.get_loops()))
+        self.info(ret)
+        return ret
 
     def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
         r"""Time sending a set of messages between the designated models.
@@ -493,7 +521,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         return axs
 
     def scaling_count(self, msg_size, counts=None, min_count=1, max_count=100,
-                      nsamples=10, scaling='linear', per_message=False):
+                      nsamples=10, scaling='linear', per_message=False, **kwargs):
         r"""Get scaling of run time with message count.
 
         Args:
@@ -512,6 +540,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 is ignored if 'counts' is provided.
             per_message (bool, optional): If True, the time per message is
                 returned rather than the total time. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to time_run.
 
         Returns:
             tuple: Lists of counts timed, minimum execution time, average
@@ -528,12 +557,12 @@ class TimedRun(CisTestBase, tools.CisClass):
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
-            min0, avg0, std0 = self.time_run(0, 0)
+            min0, avg0, std0 = self.time_run(0, 0, **kwargs)
         mbo = []
         avg = []
         std = []
         for c in counts:
-            imin, iavg, istd = self.time_run(c, msg_size)
+            imin, iavg, istd = self.time_run(c, msg_size, **kwargs)
             if per_message:
                 imin = (imin - min0) / c
                 iavg = (iavg - avg0) / c
@@ -543,7 +572,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         return (counts, mbo, avg, std)
 
     def scaling_size(self, nmsg, sizes=None, min_size=1, max_size=1e7,
-                     nsamples=10, scaling='log', per_message=False):
+                     nsamples=10, scaling='log', per_message=False, **kwargs):
         r"""Get scaling of run time with message size.
 
         Args:
@@ -562,6 +591,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 is ignored if 'sizes' is provided.
             per_message (bool, optional): If True, the time per message is
                 returned rather than the total time. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to time_run.
 
         Returns:
             tuple: Lists of sizes timed, minimum execution times, average
@@ -578,12 +608,12 @@ class TimedRun(CisTestBase, tools.CisClass):
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
-            min0, avg0, std0 = self.time_run(0, 0)
+            min0, avg0, std0 = self.time_run(0, 0, **kwargs)
         mbo = []
         avg = []
         std = []
         for s in sizes:
-            imin, iavg, istd = self.time_run(nmsg, s)
+            imin, iavg, istd = self.time_run(nmsg, s, **kwargs)
             if per_message:
                 imin = (imin - min0) / nmsg
                 iavg = (iavg - avg0) / nmsg
@@ -733,15 +763,7 @@ def plot_scalings(nmsg=5, msg_size=1000, counts=None, sizes=None,
     if compare == 'commtype':
         colors = {'ZMQ': 'b', 'IPC': 'r', 'RMQ': 'g'}
         styles = {}
-        comm_list = []
-        if _ipc_installed:
-            comm_list.append('IPCComm')
-        if _zmq_installed:
-            comm_list.append('ZMQComm')
-        if _rmq_installed:
-            comm_list.append('RMQComm')
-        print('comm_list', comm_list)
-        for comm_type in comm_list:
+        for comm_type in _comm_list:
             l1 = language
             l2 = language
             label = comm_type.split('Comm')[0]
@@ -754,14 +776,9 @@ def plot_scalings(nmsg=5, msg_size=1000, counts=None, sizes=None,
                   'c': 'g', 'cpp': 'r'}
         styles = {'python': '-', 'matlab': ';',
                   'c': '--', 'cpp': ':'}
-        lang_list = ['python']
-        if tools._c_library_avail:
-            lang_list += ['c', 'cpp']
-        if _matlab_installed:
-            lang_list.append('matlab')
-        for l1 in lang_list:
+        for l1 in _lang_list:
             clr = colors[l1]
-            for l2 in lang_list:
+            for l2 in _lang_list:
                 sty = styles[l2]
                 label = '%s to %s' % (l1, l2)
                 yscale = 'log'
