@@ -22,17 +22,4 @@ def test_create_driver():
                           args=scripts['python'])
 
 
-def test_get_model_driver():
-    r"""Test getting model driver for specified language."""
-    drv_map = {'Python': 'PythonModelDriver',
-               'MATLAB': 'MatlabModelDriver',
-               'C': 'GCCModelDriver',
-               'C++': 'GCCModelDriver',
-               'cpp': 'GCCModelDriver',
-               'make': 'MakeModelDriver',
-               'invalid': 'ModelDriver'}
-    for k, v in drv_map.items():
-        nt.assert_equal(drivers.get_model_driver(k), v)
-
-
 __all__ = []

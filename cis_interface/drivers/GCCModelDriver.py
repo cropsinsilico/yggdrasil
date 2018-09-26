@@ -280,6 +280,18 @@ class GCCModelDriver(ModelDriver):
         self.args += self.run_args
         self.debug('Compiled executable with %s', self.cc)
 
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return tools._c_library_avail
+
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax. Arguments ending with '.c' or
         '.cpp' are considered source and the first one will be compiled to an

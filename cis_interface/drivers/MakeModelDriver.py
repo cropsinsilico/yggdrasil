@@ -93,6 +93,18 @@ class MakeModelDriver(ModelDriver):
         self.debug("Making target.")
         self.make_target(self.target)
 
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return tools._c_library_avail
+
     def make_target(self, target):
         r"""Run the make command to make the target.
 

@@ -38,3 +38,15 @@ class LPyModelDriver(ModelDriver):  # pragma: lpy
         super(LPyModelDriver, self).__init__(name, args, **kwargs)
         self.debug(args)
         self.args = [sys.executable, _model_script] + self.args
+
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return _lpy_installed

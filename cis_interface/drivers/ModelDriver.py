@@ -119,6 +119,18 @@ class ModelDriver(Driver):
             if k in os.environ:
                 self.env[k] = os.environ[k]
 
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return False
+
     def set_env(self):
         env = copy.deepcopy(self.env)
         env.update(os.environ)
