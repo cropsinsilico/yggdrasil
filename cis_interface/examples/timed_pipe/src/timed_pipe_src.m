@@ -7,11 +7,11 @@ function timed_pipe_src(msg_count, msg_size)
           msg_count, msg_size);
 
   % Ins/outs matching with the the model yaml
-  outq = CisInterface('CisOnput', 'output_pipe');
+  outq = CisInterface('CisOutput', 'output_pipe');
   disp('pipe_src(M): Created I/O channels');
 
   % Send test message multiple times
-  test_msg = repeat('0', msg_size);
+  test_msg(1:msg_size) = '0';
   count = 0;
   for i = 1:msg_count
       ret = outq.send(test_msg);
