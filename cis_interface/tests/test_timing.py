@@ -1,10 +1,10 @@
 import os
-from cis_interface import timing, tools
+from cis_interface import timing
 
 
 def test_get_source():
     r"""Test getting source file for test."""
-    lang_list = ['python', 'c', 'cpp', 'matlab']
+    lang_list = timing._lang_list
     dir_list = ['src', 'dst']
     for l in lang_list:
         for d in dir_list:
