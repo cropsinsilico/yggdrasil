@@ -1,6 +1,7 @@
 import copy
 import numpy as np
 import matplotlib as mpl
+mpl.use('TkAgg')
 import matplotlib.cm as cm
 from cis_interface import backwards
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize

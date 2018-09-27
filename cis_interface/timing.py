@@ -10,8 +10,9 @@ import tempfile
 import numpy as np
 from cis_interface import tools, runner, examples, backwards, platform
 from cis_interface.tests import CisTestBase
-import matplotlib.pyplot as plt
 import matplotlib as mpl
+mpl.use('TkAgg')
+import matplotlib.pyplot as plt
 _linewidth = 4
 mpl.rcParams['axes.linewidth'] = _linewidth
 mpl.rcParams['axes.labelweight'] = 'bold'
