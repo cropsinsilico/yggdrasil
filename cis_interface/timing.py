@@ -11,8 +11,8 @@ import numpy as np
 from cis_interface import tools, runner, examples, backwards, platform
 from cis_interface.tests import CisTestBase
 import matplotlib as mpl
-mpl.use('TkAgg')
 import matplotlib.pyplot as plt
+mpl.use('TkAgg')
 _linewidth = 4
 mpl.rcParams['axes.linewidth'] = _linewidth
 mpl.rcParams['axes.labelweight'] = 'bold'
@@ -156,7 +156,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             scalings_file = os.path.join(os.getcwd(), 'scaling_%s_%s.dat' % (
                 name, comm_type))
         if perf_file is None:
-            perf_file = os.path.join(os.getcwd(), 'benches.json')
+            perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % name)
         self.scalings_file = scalings_file
         self.perf_file = perf_file
         self.comm_type = comm_type
@@ -462,17 +462,80 @@ class TimedRun(CisTestBase, tools.CisClass):
             self.save_scalings()
         return self.data[self.name][(nmsg, msg_size)]
 
-    def plot_scaling(self, x, y, xname, yerr=None, axs=None, label=None,
-                     xscale='linear', yscale='linear',
-                     plot_kws={}, per_message=False):
+    def plot_scaling_joint(self, msg_size0=1000, msg_count0=5,
+                           msg_size=None, msg_count=None, axs=None, **kwargs):
+        r"""Plot scaling of run time with both count and size, side by side.
+        Anywhere data is exchanged as a tuple for each plot, the plot of
+        scaling with count is first and the scaling with size is second.
+        
+        Args:
+            msg_size0 (int): Size of messages to use for count scaling.
+            msg_count0 (int): Number of messages to use for size scaling.
+            msg_size (list, np.ndarray, optional): List of message sizes to use
+                as x variable on the size scaling plot. Defaults to
+                [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7] if not provided, unless the
+                IPC communication channels are being used. Then
+                [1, 1e2, 1e3, 1e4, 1e5].
+            msg_count (list, np.ndarray, optional)): List of message counts to
+                use as x variable on the count scaling plot. Defaults to
+                [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].
+            axs (tuple, optional): Pair of axes objects that lines should be
+                added to. If not provided, they are created.
+            **kwargs: Additional keyword arguments are passed to plot_scaling.
+
+        Returns:
+            tuple(matplotlib.Axes, matplotlib.Axes): Pair of axes containing the
+                plotted scalings.
+
+        """
+        if msg_size is None:
+            if self.comm_type.startswith('IPC'):
+                msg_size = [1, 1e2, 1e3, 1e4, 1e5]
+            else:
+                msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7]
+        if msg_count is None:
+            msg_count = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        if axs is None:
+            fig, axs = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
+            axs[0].set_xlabel('Message Count (size = %d)' % msg_size0)
+            if kwargs.get('per_message', False):
+                axs[0].set_ylabel('Time per Message (s)')
+            else:
+                axs[0].set_ylabel('Time (s)')
+            axs[1].set_xlabel('Message Size (count = %d)' % msg_count0)
+            axs_width = 1.0  # 0.75
+            axs_height = 0.85
+            box1 = axs[0].get_position()
+            pos1 = [box1.x0, box1.y0, axs_width * box1.width, axs_height * box1.height]
+            axs[0].set_position(pos1)
+            box2 = axs[1].get_position()
+            pos2 = [box2.x0, box2.y0, axs_width * box2.width, axs_height * box2.height]
+            axs[1].set_position(pos2)
+        self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
+        self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
+        # Legend
+        box1 = axs[0].get_position()
+        box2 = axs[1].get_position()
+        # pos1 = [box1.x0, box1.y0, box1.width, box1.height]
+        # pos2 = [box2.x0, box2.y0, box2.width, box2.height]
+        # box_leg = (1.0 + (pos2[0] - (pos1[0] + pos1[2])) / (2.0 * pos1[2]), 1.25)
+        box_leg = (1.0 + (box2.x0 - (box1.x0 + box1.width)) / (2.0 * box1.width), 1.25)
+        legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
+        legend.get_frame().set_linewidth(_linewidth)
+        return axs
+                           
+    def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
+                     xscale=None, yscale='linear', plot_kws={},
+                     time_method='bestof', per_message=False, **kwargs):
         r"""Plot scaling of run time with a variable.
 
         Args:
-            x (list, np.ndarray): Variable that is being scaled.
-            y (list, np.ndarray): Run times in seconds.
-            xname (str): Name of x variable. This is used to label the x axis.
-            yerr (list, np.ndarray, optional): Error bars for the run times.
-                Defaults to None and error bars are not plotted.
+            msg_size (int, list, np.ndarray): List of message sizes to use as
+                x variable, or message size to use when plotting dependent on
+                message count.
+            msg_count (int, list, np.ndarray): List of message counts to use as
+                x variable, or message count to use when plotting dependent on
+                message size.
             axs (matplotlib.Axes, optional): Axes object that line should be
                 added to. If not provided, one is created.
             label (str, optional): Label that should be used for the line.
@@ -483,19 +546,55 @@ class TimedRun(CisTestBase, tools.CisClass):
                 the y axis should use. Defaults to 'linear'.
             plot_kws (dict, optional): Ploting keywords that should be passed.
                 Defaults to {}.
+            time_method (str, optional): Timing method that should be used.
+                Valid values include 'bestof' and 'average'. Defaults to
+                'bestof'.
             per_message (bool, optional): If True, the time per message is
                 returned rather than the total time. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to scaling_size or
+                scaling_count.
 
         Returns:
             matplotlib.Axes: Axes containing the plotted scaling.
 
         """
+        if isinstance(msg_size, list):
+            msg_size = np.array(msg_size)
+        if isinstance(msg_count, list):
+            msg_count = np.array(msg_count)
+        if isinstance(msg_size, np.ndarray) and isinstance(msg_count, np.ndarray):
+            raise RuntimeError("Arrays provided for both msg_size & msg_count.")
+        elif isinstance(msg_size, np.ndarray):
+            xname = 'size'
+            x, mbo, avg, std = self.scaling_size(msg_count, sizes=msg_size,
+                                                 per_message=per_message, **kwargs)
+        elif isinstance(msg_count, np.ndarray):
+            xname = 'count'
+            x, mbo, avg, std = self.scaling_count(msg_size, counts=msg_count,
+                                                  per_message=per_message, **kwargs)
+        else:
+            raise RuntimeError("Array not provided for msg_size or msg_count.")
+        if xscale is None:
+            if xname == 'size':
+                xscale = 'log'
+            else:
+                xscale = 'linear'
+        if time_method == 'bestof':
+            y = mbo
+            yerr = None
+        elif time_method == 'average':
+            y = avg
+            yerr = std
+        else:
+            raise ValueError("Invalid time_method: '%s'" % time_method)
+        # Ensure everything in array format
         if isinstance(x, list):
             x = np.array(x)
         if isinstance(y, list):
             y = np.array(y)
         if isinstance(yerr, list):
             yerr = np.array(yerr)
+        # Create axes if not provded
         if axs is None:
             fig, axs = plt.subplots()
             axs.set_xlabel(xname)
@@ -660,23 +759,13 @@ class TimedRun(CisTestBase, tools.CisClass):
             backwards.pickle.dump(self.data, fd)
 
 
-def plot_scalings(nmsg=5, msg_size=1000, counts=None, sizes=None,
-                  plotfile=None, show_plot=False, compare='language',
+def plot_scalings(plotfile=None, show_plot=False, compare='language',
                   scalings_file=None, test_name='timed_pipe',
-                  per_message=False, comm_type=None, language='python',
-                  time_method='bestof'):  # pragma: debug
+                  comm_type=None, language='python', **kwargs):
     r"""Plot the scalings comparing different communication mechanisms and
     languages. This can be time consuming.
 
     Args:
-        nmsg (int, optional): Number of messages for scaling of message size.
-            Defaults to 5.
-        msg_size (int, optional): Size of messages for scaling of message count.
-            Defaults to 1000.
-        counts (list, optional): List of counts to test. Defaults to
-            [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100] if not provided.
-        sizes (list, optional): List of sizes to test. Defaults to
-            [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7] if not provided.
         plotfile (str, optional): Path to file where the figure should be saved.
             If None, one will be created.
         compare (str, optional): Variable that should be compared. Valid values
@@ -686,30 +775,22 @@ def plot_scalings(nmsg=5, msg_size=1000, counts=None, sizes=None,
         scalings_file (str, optional): Path to the file containing scalings
             data that should be updated and plotted. Defaults to None and is
             created based on 'test_name'.
-        per_message (bool, optional): If True, the time per message is
-            returned rather than the total time. Defaults to False.
         comm_type (str, optional): Name of communication class that should be
             used for tests comparing communication between models in different
             languages. Defaults to the current default comm class.
         language (str, optional): Language of model that should be used for
             a comparison of different comm types. Defaults to 'python'.
-        time_method (str, optional): Timing method that should be used. Valid
-            values include 'bestof' and 'average'. Defaults to 'bestof'.
+        **kwargs: Additional keyword arguments are passed to plot_scaling_joint.
 
     Returns:
         str: Path where the figure was saved.
 
     """
-    if counts is None:
-        counts = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    if sizes is None:
-        sizes = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7]
     if comm_type is None:
         comm_type = tools.get_default_comm()
     if compare not in ['commtype', 'language']:
         raise ValueError("Invalid compare: '%s'" % compare)
-    if time_method not in ['bestof', 'average']:
-        raise ValueError("Invalid time_method: '%s'" % time_method)
+    time_method = kwargs.get('time_method', 'bestof')
     if plotfile is None:
         if compare == 'commtype':
             plotfile = os.path.join(os.getcwd(), 'scaling_commtype_%s_%s_%s.png' % (
@@ -717,62 +798,23 @@ def plot_scalings(nmsg=5, msg_size=1000, counts=None, sizes=None,
         elif compare == 'language':
             plotfile = os.path.join(os.getcwd(), 'scaling_language_%s_%s_%s.png' % (
                 test_name, comm_type, time_method))
-    fig, axs = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
-    # Labels
-    axs[0].set_xlabel('Message Count (size = %d)' % msg_size)
-    if per_message:
-        axs[0].set_ylabel('Time per Message (s)')
-    else:
-        axs[0].set_ylabel('Time (s)')
-    axs[1].set_xlabel('Message Size (count = %d)' % nmsg)
-    axs_width = 1.0  # 0.75
-    axs_height = 0.85
-    box1 = axs[0].get_position()
-    pos1 = [box1.x0, box1.y0, axs_width * box1.width, axs_height * box1.height]
-    axs[0].set_position(pos1)
-    box2 = axs[1].get_position()
-    pos2 = [box2.x0, box2.y0, axs_width * box2.width, axs_height * box2.height]
-    axs[1].set_position(pos2)
-    box_leg = (1.0 + (pos2[0] - (pos1[0] + pos1[2])) / (2.0 * pos1[2]), 1.25)
-
-    def single_plot(l1, l2, c0, clr, sty, label, yscale):
-        plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
-        x = TimedRun(l1, l2, scalings_file=scalings_file, name=test_name,
-                     comm_type=c0)
-        x1, min1, avg1, std1 = x.scaling_count(msg_size, counts=counts,
-                                               per_message=per_message)
-        x2, min2, avg2, std2 = x.scaling_size(nmsg, sizes=sizes,
-                                              per_message=per_message)
-        if time_method == 'bestof':
-            x.plot_scaling(x1, min1, 'count', axs=axs[0],
-                           yscale=yscale,
-                           label=label, plot_kws=plot_kws,
-                           per_message=per_message)
-            x.plot_scaling(x2, min2, 'size', axs=axs[1],
-                           yscale=yscale, xscale='log',
-                           label=label, plot_kws=plot_kws,
-                           per_message=per_message)
-        elif time_method == 'average':
-            x.plot_scaling(x1, avg1, 'count', yerr=std1, axs=axs[0],
-                           yscale=yscale,
-                           label=label, plot_kws=plot_kws,
-                           per_message=per_message)
-            x.plot_scaling(x2, avg2, 'size', yerr=std2, axs=axs[1],
-                           yscale=yscale, xscale='log',
-                           label=label, plot_kws=plot_kws,
-                           per_message=per_message)
-
+    # Iterate over variable
+    axs = None
     if compare == 'commtype':
         colors = {'ZMQ': 'b', 'IPC': 'r', 'RMQ': 'g'}
         styles = {}
-        for comm_type in _comm_list:
+        for c0 in _comm_list:
             l1 = language
             l2 = language
-            label = comm_type.split('Comm')[0]
+            label = c0.split('Comm')[0]
             clr = colors[label]
             sty = '-'
             yscale = 'linear'
-            single_plot(l1, l2, comm_type, clr, sty, label, yscale)
+            plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
+            x = TimedRun(l1, l2, scalings_file=scalings_file,
+                         name=test_name, comm_type=c0)
+            axs = x.plot_scaling_joint(axs=axs, label=label, yscale=yscale,
+                                       plot_kws=plot_kws, **kwargs)
     elif compare == 'language':
         colors = {'python': 'b', 'matlab': 'm',
                   'c': 'g', 'cpp': 'r'}
@@ -784,9 +826,12 @@ def plot_scalings(nmsg=5, msg_size=1000, counts=None, sizes=None,
                 sty = styles[l2]
                 label = '%s to %s' % (l1, l2)
                 yscale = 'log'
-                single_plot(l1, l2, comm_type, clr, sty, label, yscale)
-    legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
-    legend.get_frame().set_linewidth(_linewidth)
+                x = TimedRun(l1, l2, scalings_file=scalings_file,
+                             name=test_name, comm_type=comm_type)
+                axs = x.plot_scaling_joint(axs=axs, label=label, yscale=yscale,
+                                           plot_kws=plot_kws, **kwargs)
+    # legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
+    # legend.get_frame().set_linewidth(_linewidth)
     if show_plot:
         plt.show()
     plt.savefig(plotfile)

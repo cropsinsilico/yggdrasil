@@ -1,4 +1,5 @@
 import os
+import nose.tools as nt
 from cis_interface import timing
 
 
@@ -36,10 +37,15 @@ def test_scaling_size():
 
 def test_plot_scaling():
     x = timing.TimedRun('python', 'python')
-    x1, min1, avg1, std1 = x.scaling_count(1, nrep=2, nsamples=1)
-    axs = x.plot_scaling(x1, min1, 'count')
-    x.plot_scaling(x1, avg1, 'count', axs=axs, yerr=std1)
-    x2, min2, avg2, std2 = x.scaling_size(1, nrep=2, nsamples=1)
-    axs = x.plot_scaling(x2, min2, 'size', yscale='log')
-    x.plot_scaling(x2, avg2, 'size', yscale='log',
-                   axs=axs, yerr=std2)
+    axs = None
+    axs = x.plot_scaling(1, [1], nrep=2, axs=axs,
+                         time_method='average', per_message=True)
+    axs = x.plot_scaling(1, [1], nrep=2, axs=axs,
+                         time_method='bestof', per_message=True)
+    axs = None
+    axs = x.plot_scaling([1], 1, nrep=2, axs=axs,
+                         time_method='average', xscale='log')
+    axs = x.plot_scaling([1], 1, nrep=2, axs=axs,
+                         time_method='bestof', xscale='log')
+    nt.assert_raises(RuntimeError, x.plot_scaling, [1], [1])
+    nt.assert_raises(RuntimeError, x.plot_scaling, 1, 1)
