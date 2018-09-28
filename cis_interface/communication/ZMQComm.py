@@ -23,6 +23,7 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = backwards.unicode2bytes('CIS_REPLY')
 _purge_msg = backwards.unicode2bytes('CIS_PURGE')
 _global_context = zmq.Context.instance()
+_zmq_installed = tools._zmq_installed
 
 
 def get_ipc_host():
@@ -407,6 +408,12 @@ class ZMQComm(AsyncComm.AsyncComm):
         # Based on limit of 32bit int, this could be 2**30, but this is
         # too large for stack allocation in C so 2**20 will be used.
         return 2**20
+
+    @property
+    def msgBufSize(self):
+        r"""int: Size of buffer that should be reservered for info added to
+        messages."""
+        return 100
 
     @classmethod
     def underlying_comm_class(self):
@@ -906,21 +913,22 @@ class ZMQComm(AsyncComm.AsyncComm):
             header_kwargs['zmq_reply'] = self.set_reply_socket_send()
         return super(ZMQComm, self).on_send(msg, header_kwargs=header_kwargs)
         
-    def _send_multipart_worker(self, msg, header, **kwargs):
-        r"""Send multipart message to the worker comm identified.
+    # This is only needed when base is not asynchronous
+    # def _send_multipart_worker(self, msg, header, **kwargs):
+    #     r"""Send multipart message to the worker comm identified.
 
-        Args:
-            msg (str): Message to be sent.
-            header (dict): Message info including work comm address.
+    #     Args:
+    #         msg (str): Message to be sent.
+    #         header (dict): Message info including work comm address.
 
-        Returns:
-            bool: Success or failure of sending the message.
+    #     Returns:
+    #         bool: Success or failure of sending the message.
 
-        """
-        workcomm = self.get_work_comm(header)
-        args = [msg]
-        self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
-        return True
+    #     """
+    #     workcomm = self.get_work_comm(header)
+    #     args = [msg]
+    #     self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
+    #     return True
 
     def _send_direct(self, msg, topic='', identity=None, **kwargs):
         r"""Send a message.

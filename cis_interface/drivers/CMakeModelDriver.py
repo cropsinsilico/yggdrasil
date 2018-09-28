@@ -204,6 +204,18 @@ class CMakeModelDriver(ModelDriver):
         self.debug("Making target.")
         self.run_cmake(self.target)
 
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return tools._c_library_avail
+
     def run_cmake(self, target=None):
         r"""Run the cmake command on the source.
 

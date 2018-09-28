@@ -91,31 +91,6 @@ class TestExample(CisTestBase, tools.CisClass):
             out.append(icont)
         return out
 
-    def check_file_exists(self, fname):
-        r"""Check that a file exists."""
-        Tout = self.start_timeout(2)
-        while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
-        assert(os.path.isfile(fname))
-
-    def check_file_size(self, fname, fsize):
-        r"""Check that file is the correct size."""
-        Tout = self.start_timeout(2)
-        if (os.stat(fname).st_size != fsize):  # pragma: debug
-            print('file sizes not equal', os.stat(fname).st_size, fsize)
-        while ((not Tout.is_out) and
-               (os.stat(fname).st_size != fsize)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
-        nt.assert_equal(os.stat(fname).st_size, fsize)
-
-    def check_file_contents(self, fname, result):
-        r"""Check that the contents of a file are correct."""
-        with open(fname, 'r') as fd:
-            ocont = fd.read()
-        nt.assert_equal(ocont, result)
-
     def check_results(self):
         r"""This should be overridden with checks for the result."""
         if self.output_files is None:

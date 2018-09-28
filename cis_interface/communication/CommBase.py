@@ -426,6 +426,12 @@ class CommBase(tools.CisClass):
         return get_CIS_MSG_MAX()
 
     @property
+    def msgBufSize(self):
+        r"""int: Size of buffer that should be reservered for info added to
+        messages."""
+        return 0
+
+    @property
     def empty_msg(self):
         r"""str: Empty message."""
         return backwards.unicode2bytes('')
@@ -879,7 +885,8 @@ class CommBase(tools.CisClass):
         kws.update(**kwargs)
         if work_comm_name is None:
             cls = kws.get("comm", tools.get_default_comm())
-            work_comm_name = 'temp_%s_%s.%s' % (cls, kws['direction'], kws['uuid'])
+            work_comm_name = '%s_temp_%s_%s.%s' % (
+                self.name, cls, kws['direction'], kws['uuid'])
         c = new_comm(work_comm_name, **kws)
         self.add_work_comm(c)
         return c

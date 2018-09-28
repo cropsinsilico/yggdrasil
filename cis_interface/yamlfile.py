@@ -26,6 +26,8 @@ def load_yaml(fname):
         yamlparsed = pystache.render(
             backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
         yamlparsed = yaml.safe_load(yamlparsed)
+    if not isinstance(yamlparsed, dict):  # pragma: debug
+        raise ValueError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
     return yamlparsed
 

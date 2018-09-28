@@ -4,6 +4,7 @@ import matplotlib as mpl
 import matplotlib.cm as cm
 from cis_interface import backwards
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+mpl.use('TkAgg')
 
 
 class PlyDict(dict):

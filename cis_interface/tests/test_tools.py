@@ -3,6 +3,16 @@ import nose.tools as nt
 from cis_interface import tools, platform  # , backwards
 
 
+def test_get_installed_lang():
+    r"""Test get_installed_lang."""
+    tools.get_installed_lang()
+
+
+def test_get_installed_comm():
+    r"""Test get_installed_comm."""
+    tools.get_installed_comm()
+
+
 def test_locate_path():
     r"""Test file location."""
     # Search for current file

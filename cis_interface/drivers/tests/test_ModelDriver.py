@@ -41,17 +41,19 @@ class TestModelParam(parent.TestParam):
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
     r"""Test runner for basic ModelDriver class."""
-    
-    pass
+
+    def test_is_installed(self):
+        r"""Assert that the tested model driver is installed."""
+        if self.driver == 'ModelDriver':
+            assert(not self.import_cls.is_installed())
+        else:
+            assert(self.import_cls.is_installed())
 
 
 class TestModelDriver(TestModelParam, parent.TestDriver):
     r"""Test runner for basic ModelDriver class."""
 
     pass
-    # def run_before_stop(self):
-    #     r"""Commands to run while the instance is running."""
-    #     self.instance.wait(0.0)
 
 
 @unittest.skipIf(platform._is_win, "Platform is windows")

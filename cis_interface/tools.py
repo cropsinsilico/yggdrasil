@@ -171,6 +171,50 @@ CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
 CIS_MSG_BUF = 1024 * 2
 
 
+def get_installed_lang():
+    r"""Get a list of the languages that are supported by cis_interface on the
+    current machine. This checks for the necessary interpreters, licenses, and/or
+    compilers.
+
+    Returns:
+        list: The name of languages supported on the current machine.
+    
+    """
+    from cis_interface import schema, drivers
+    s = schema.get_schema()
+    out = []
+    for k, v in s.language2class.items():
+        drv = drivers.import_driver(v)
+        if drv.is_installed():
+            if k == 'c++':
+                out.append('cpp')
+            else:
+                out.append(k)
+    return list(set(out))
+
+
+def get_installed_comm():
+    r"""Get a list of the communication channel types that are supported by
+    cis_interface on the current machine. This checks the operating system,
+    supporting libraries, and broker credentials.
+
+    Returns:
+        list: The names of the the communication channel types supported on
+            the current machine.
+
+    """
+    # TODO: Do this using schema as above.
+    from cis_interface.communication.RMQComm import _rmq_installed
+    out = []
+    if _ipc_installed:
+        out.append('IPCComm')
+    if _zmq_installed:
+        out.append('ZMQComm')
+    if _rmq_installed:
+        out.append('RMQComm')
+    return out
+
+
 def get_default_comm():
     r"""Get the default comm that should be used for message passing."""
     if 'CIS_DEFAULT_COMM' in os.environ:

@@ -325,6 +325,18 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.mlsession = None
         self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
 
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return _matlab_installed
+
     def start_matlab(self):
         r"""Start matlab session and connect to it."""
         # Connect to matlab, start if not running
