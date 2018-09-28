@@ -36,6 +36,7 @@ def test_scaling_size():
 
 
 def test_plot_scaling():
+    r"""Test plot_scaling."""
     x = timing.TimedRun('python', 'python')
     axs = None
     axs = x.plot_scaling(1, [1], nrep=2, axs=axs,
@@ -49,3 +50,13 @@ def test_plot_scaling():
                          time_method='bestof', xscale='log')
     nt.assert_raises(RuntimeError, x.plot_scaling, [1], [1])
     nt.assert_raises(RuntimeError, x.plot_scaling, 1, 1)
+
+
+def test_plot_scalings():
+    r"""Test plot_scalings."""
+    # Limit language list for tests
+    timing._lang_list = ['python']
+    nt.assert_raises(ValueError, timing.plot_scalings, compare='invalid')
+    kwargs = dict(msg_size=[1], msg_size0=1, msg_count=[1], msg_count0=1)
+    timing.plot_scalings(compare='commtype', **kwargs)
+    timing.plot_scalings(compare='language', **kwargs)

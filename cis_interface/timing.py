@@ -826,6 +826,8 @@ def plot_scalings(plotfile=None, show_plot=False, compare='language',
                 sty = styles[l2]
                 label = '%s to %s' % (l1, l2)
                 yscale = 'log'
+                plot_kws = {'color': clr, 'linestyle': sty,
+                            'linewidth': _linewidth}
                 x = TimedRun(l1, l2, scalings_file=scalings_file,
                              name=test_name, comm_type=comm_type)
                 axs = x.plot_scaling_joint(axs=axs, label=label, yscale=yscale,
