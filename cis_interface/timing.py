@@ -11,13 +11,13 @@ import numpy as np
 from cis_interface import tools, runner, examples, backwards, platform
 from cis_interface.tests import CisTestBase
 import matplotlib as mpl
-if os.environ.get('DISPLAY','') == '':  # pragma: debug
+import matplotlib.pyplot as plt
+if os.environ.get('DISPLAY', '') == '':  # pragma: debug
     mpl.use('Agg')
+    plt.switch_backend('Agg')
 elif platform._is_osx:
     mpl.use('TkAgg')
-import matplotlib.pyplot as plt
-# plt.switch_backend('agg')
-# mpl.use('TkAgg')
+    plt.switch_backend('TkAgg')
 _linewidth = 4
 mpl.rcParams['axes.linewidth'] = _linewidth
 mpl.rcParams['axes.labelweight'] = 'bold'
