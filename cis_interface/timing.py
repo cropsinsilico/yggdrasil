@@ -170,10 +170,11 @@ class TimedRun(CisTestBase, tools.CisClass):
             platform = cis_platform._platform
         if python_ver is None:
             python_ver = backwards._python_version
+        suffix = '%s_%s_py%s' % (name, platform, python_ver.replace('.', ''))
         if scalings_file is None:
-            scalings_file = os.path.join(os.getcwd(), 'scaling_%s.dat' % name)
+            scalings_file = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
         if perf_file is None:
-            perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % name)
+            perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
         self.scalings_file = scalings_file
         self.perf_file = perf_file
         self.comm_type = comm_type
