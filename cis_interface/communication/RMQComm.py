@@ -36,6 +36,7 @@ def check_rmq_server(url=None, **kwargs):
             otherwise.
 
     """
+    out = True
     if not _rmq_installed:
         return False
     if url is not None:
@@ -51,14 +52,16 @@ def check_rmq_server(url=None, **kwargs):
                                                virtual_host=vhost,
                                                credentials=credentials)
     # Try to establish connection
+    logging.getLogger("pika").propagate = False
     try:
         connection = pika.BlockingConnection(parameters)
         if not connection.is_open:  # pragma: debug
-            return False
+            raise BaseException("Connection was not openned.")
         connection.close()
     except BaseException:  # pragma: debug
-        return False
-    return True
+        out = False
+    logging.getLogger("pika").propagate = True
+    return out
 
 
 _rmq_server_running = check_rmq_server()
