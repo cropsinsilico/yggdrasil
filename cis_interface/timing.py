@@ -586,7 +586,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                            
     def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
                      xscale=None, yscale='linear', plot_kws={},
-                     time_method='bestof', per_message=False, **kwargs):
+                     time_method='average', per_message=False, **kwargs):
         r"""Plot scaling of run time with a variable.
 
         Args:
@@ -608,7 +608,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 Defaults to {}.
             time_method (str, optional): Timing method that should be used.
                 Valid values include 'bestof' and 'average'. Defaults to
-                'bestof'.
+                'average'.
             per_message (bool, optional): If True, the time per message is
                 returned rather than the total time. Defaults to False.
             **kwargs: Additional keyword arguments are passed to scaling_size or
@@ -899,7 +899,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         for k, v in default_vars.items():
             if k not in var_kws[0]:
                 plotbase += '_%s' % v
-        plotbase += '_%s.png' % kwargs.get('time_method', 'bestof')
+        plotbase += '_%s.png' % kwargs.get('time_method', 'average')
         plotfile = os.path.join(os.getcwd(), plotbase)
         print('plotfile', plotfile)
     # Iterate over variables
@@ -955,7 +955,7 @@ def plot_scalings_old(plotfile=None, show_plot=False, compare='language',
         comm_type = tools.get_default_comm()
     if compare not in ['commtype', 'language']:
         raise ValueError("Invalid compare: '%s'" % compare)
-    time_method = kwargs.get('time_method', 'bestof')
+    time_method = kwargs.get('time_method', 'average')
     if plotfile is None:
         if compare == 'commtype':
             plotfile = os.path.join(os.getcwd(), 'scaling_commtype_%s_%s_%s.png' % (
