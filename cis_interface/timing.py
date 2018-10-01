@@ -878,7 +878,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         yscale = 'linear'
     elif compare == 'python':
         color_var = 'python_ver'
-        color_map = {'2.7': 'b', '3.6': 'r'}
+        color_map = {'2.7': 'b', '3.4': 'g', '3.5': 'o', '3.6': 'r', '3.7': 'm'}
         style_var = None
         style_map = None
         var_list = compare_values
