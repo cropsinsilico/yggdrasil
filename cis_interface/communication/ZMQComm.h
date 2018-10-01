@@ -755,11 +755,13 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   zframe_destroy(&out);
   (*data)[len_recv-1] = '\0';
   ret = (int)len_recv - 1;
+  /*
   if (strlen(*data) != ret) {
     cislog_error("zmq_comm_recv(%s): Size of string (%d) doesn't match expected (%d)",
 		 x.name, strlen(*data), ret);
     return -1;
   }
+  */
   // Check reply
   ret = check_reply_recv(&x, *data, ret);
   if (ret < 0) {
