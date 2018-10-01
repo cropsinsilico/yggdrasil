@@ -112,7 +112,9 @@ setup(
                             'cisschema=cis_interface.command_line:regen_schema',
                             'cisconfig=cis_interface.command_line:update_config',
                             'cistime_comm=cis_interface.command_line:cistime_comm',
-                            'cistime_lang=cis_interface.command_line:cistime_lang'],
+                            'cistime_lang=cis_interface.command_line:cistime_lang',
+                            'cistime_os=cis_interface.command_line:cistime_os',
+                            'cistime_py=cis_interface.command_line:cistime_py'],
     },
     license="BSD",
 )
