@@ -733,6 +733,9 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   }
   // Check reply
   char *dummy = (char*)zframe_data(out);
+  if (strlen(dummy) > zframe_size(out)) {
+    dummy[zframe_size(out)] = '\0';
+  }
   ret = check_reply_recv(&x, dummy, zframe_size(out));
   if (ret < 0) {
     cislog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
