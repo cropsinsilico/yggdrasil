@@ -898,7 +898,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         plotbase = 'compare_%s_%s' % (test_name, compare)
         for k, v in default_vars.items():
             if k not in var_kws[0]:
-                plotbase += '_%s' % v
+                plotbase += '_%s' % v.replace('.', '')
         plotbase += '_%s.png' % kwargs.get('time_method', 'average')
         plotfile = os.path.join(os.getcwd(), plotbase)
         print('plotfile', plotfile)
