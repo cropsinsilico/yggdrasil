@@ -9,6 +9,7 @@ import warnings
 import tempfile
 import itertools
 import numpy as np
+import logging
 from cis_interface import tools, runner, examples, backwards
 from cis_interface import platform as cis_platform
 from cis_interface.tests import CisTestBase
@@ -456,8 +457,11 @@ class TimedRun(CisTestBase, tools.CisClass):
             ret = (min(out.get_values()), out.mean(), out.stdev())
         # self.info(out.get_runs()[0].values)
         # self.info(out.get_values())
-        self.info((out.get_nvalue(), out.get_loops()))
-        self.info(ret)
+        # self.info((out.get_nvalue(), out.get_loops()))
+        # self.info(ret)
+        self.info("Result for %s: %f +/- %f (%d runs)",
+                  self.entry_name(nmsg, msg_size), ret[1], ret[2],
+                  out.get_nvalue())
         return ret
 
     def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
@@ -879,7 +883,8 @@ def plot_scalings(compare='commtype', compare_values=None,
         yscale = 'linear'
     elif compare == 'python':
         color_var = 'python_ver'
-        color_map = {'2.7': 'b', '3.4': 'g', '3.5': 'o', '3.6': 'r', '3.7': 'm'}
+        color_map = {'2.7': 'b', '3.4': 'g', '3.5': 'orange', '3.6': 'r',
+                     '3.7': 'm'}
         style_var = None
         style_map = None
         var_list = compare_values
@@ -901,7 +906,6 @@ def plot_scalings(compare='commtype', compare_values=None,
                 plotbase += '_%s' % v.replace('.', '')
         plotbase += '_%s.png' % kwargs.get('time_method', 'average')
         plotfile = os.path.join(os.getcwd(), plotbase)
-        print('plotfile', plotfile)
     # Iterate over variables
     axs = None
     for kws in var_kws:
@@ -921,6 +925,7 @@ def plot_scalings(compare='commtype', compare_values=None,
                                   yscale=yscale, plot_kws=plot_kws, **kws)
     # Save plot
     plt.savefig(plotfile)
+    logging.info('plotfile: %s', plotfile)
     return plotfile
                                   
 

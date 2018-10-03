@@ -686,6 +686,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             return False
         out = self.reply_socket_send.poll(timeout=1, flags=zmq.POLLIN)
         if out == 0:
+            if (self.loop_count % 100) == 0:
+                self.debug('No reply handshake waiting')
             return False
         msg = self.reply_socket_send.recv(flags=zmq.NOBLOCK)
         if msg == self.eof_msg:  # pragma: debug
@@ -705,19 +707,30 @@ class ZMQComm(AsyncComm.AsyncComm):
                 return False
             out = socket.poll(timeout=1, flags=zmq.POLLOUT)
             if out == 0:  # pragma: debug
+                if (self.loop_count % 100) == 0:
+                    self.debug('Cannot initiate reply handshake')
                 return False
             socket.send(msg_send, flags=zmq.NOBLOCK)
             if msg_send == self.eof_msg:  # pragma: debug
                 self.error("REPLY EOF SENT")
                 return True
-            out = socket.poll(timeout=self.zmq_sleeptime, flags=zmq.POLLIN)
+            tries = 10
+            out = 0
+            while (out == 0) and (tries > 0):
+                out = socket.poll(timeout=self.zmq_sleeptime,
+                                  flags=zmq.POLLIN)
+                if out == 0:
+                    self.debug("No response waiting. %d tries left.", tries)
+                    tries -= 1
             if out == 0:
+                self.error('No response received.')
                 return False
             msg_recv = socket.recv(flags=zmq.NOBLOCK)
             assert(msg_recv == msg_send)
             self._n_reply_recv[key] += 1
             return True
-        except zmq.ZMQError:  # pragma: debug
+        except zmq.ZMQError as e:  # pragma: debug
+            self.error("ZMQ Error: %s", e)
             return False
 
     def _close_direct(self, linger=False):
@@ -828,6 +841,10 @@ class ZMQComm(AsyncComm.AsyncComm):
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
+        for v in self._work_comms.values():
+            if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
+                self.debug("Work comm not confirmed")
+                return False
         if self.is_open_backlog:
             return (self._n_zmq_recv == self._n_reply_recv)
         return True  # pragma: debug
