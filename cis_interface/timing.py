@@ -863,7 +863,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         color_var = 'lang_src'
         color_map = {'python': 'b', 'matlab': 'm', 'c': 'g', 'cpp': 'r'}
         style_var = 'lang_dst'
-        style_map = {'python': '-', 'matlab': ';', 'c': '--', 'cpp': ':'}
+        style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = itertools.product(compare_values, repeat=2)
         var_kws = [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
         kws2label = lambda x: '%s to %s' % (x['lang_src'], x['lang_dst'])  # noqa: E731
@@ -983,7 +983,7 @@ def plot_scalings_old(plotfile=None, show_plot=False, compare='language',
     elif compare == 'language':
         colors = {'python': 'b', 'matlab': 'm',
                   'c': 'g', 'cpp': 'r'}
-        styles = {'python': '-', 'matlab': ';',
+        styles = {'python': '-', 'matlab': '-.',
                   'c': '--', 'cpp': ':'}
         for l1 in _lang_list:
             clr = colors[l1]
