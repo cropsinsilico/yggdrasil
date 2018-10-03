@@ -176,7 +176,7 @@ class ModelDriver(Driver):
             # self.info("%s: Empty line from stdout" % self.name)
             self.queue_thread.set_break_flag()
             self.queue.put(self._exit_line)
-            self.info("End of model output")
+            self.debug("End of model output")
             try:
                 self.model_process.stdout.close()
             except BaseException:  # pragma: debug
