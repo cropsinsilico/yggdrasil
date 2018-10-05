@@ -20,9 +20,6 @@ elif cis_platform._is_osx:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 _linewidth = 4
-mpl.rcParams['axes.linewidth'] = _linewidth
-mpl.rcParams['axes.labelweight'] = 'bold'
-mpl.rcParams['font.weight'] = 'bold'
 
 
 _lang_list = tools.get_installed_lang()
@@ -560,32 +557,28 @@ class TimedRun(CisTestBase, tools.CisClass):
         if msg_count is None:
             msg_count = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         if axs is None:
-            fig, axs = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
+            figure_size = (15.0, 6.0)
+            figure_buff = 0.75
+            fig, axs = plt.subplots(1, 2, figsize=figure_size, sharey=True)
             axs[0].set_xlabel('Message Count (size = %d)' % msg_size0)
             if kwargs.get('per_message', False):
                 axs[0].set_ylabel('Time per Message (s)')
             else:
                 axs[0].set_ylabel('Time (s)')
             axs[1].set_xlabel('Message Size (count = %d)' % msg_count0)
-            axs_width = 1.0  # 0.75
-            axs_height = 0.85
-            box1 = axs[0].get_position()
-            pos1 = [box1.x0, box1.y0, axs_width * box1.width, axs_height * box1.height]
+            axs_wbuffer = figure_buff / figure_size[0]
+            axs_hbuffer = figure_buff / figure_size[1]
+            axs_width = (1.0 - (3.0 * axs_wbuffer)) / 2.0
+            axs_height = 1.0 - (2.0 * axs_hbuffer)
+            pos1 = [axs_wbuffer, axs_hbuffer, axs_width, axs_height]
+            pos2 = [2.0 * axs_wbuffer + axs_width, axs_hbuffer,
+                    axs_width, axs_height]
             axs[0].set_position(pos1)
-            box2 = axs[1].get_position()
-            pos2 = [box2.x0, box2.y0, axs_width * box2.width, axs_height * box2.height]
             axs[1].set_position(pos2)
         self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
         self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
         # Legend
-        box1 = axs[0].get_position()
-        box2 = axs[1].get_position()
-        # pos1 = [box1.x0, box1.y0, box1.width, box1.height]
-        # pos2 = [box2.x0, box2.y0, box2.width, box2.height]
-        # box_leg = (1.0 + (pos2[0] - (pos1[0] + pos1[2])) / (2.0 * pos1[2]), 1.25)
-        box_leg = (1.0 + (box2.x0 - (box1.x0 + box1.width)) / (2.0 * box1.width), 1.25)
-        legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
-        legend.get_frame().set_linewidth(_linewidth)
+        axs[1].legend(loc='upper left', ncol=2)
         return axs
                            
     def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
@@ -675,11 +668,15 @@ class TimedRun(CisTestBase, tools.CisClass):
         if yerr is not None:
             # Convert yscale to prevent negative values for log y
             if yscale == 'log':
-                ylower = np.maximum(1e-2, y - yerr)
+                ylower = y - yerr
+                ylower[ylower <= 0] = 1.0e-6
+                # ylower = np.maximum(1e-6, y - yerr)
                 yerr_lower = y - ylower
+                yerr_upper = yerr
             else:
-                yerr_lower = y - yerr
-            axs.errorbar(x, y, yerr=[yerr_lower, 2 * yerr],
+                yerr_lower = yerr
+                yerr_upper = yerr
+            axs.errorbar(x, y, yerr=[yerr_lower, yerr_upper],
                          label=label, **plot_kws)
         else:
             axs.plot(x, y, label=label, **plot_kws)
@@ -901,7 +898,8 @@ def plot_scalings(compare='commtype', compare_values=None,
     # Create plotfile name with information in it
     if plotfile is None:
         plotbase = 'compare_%s_%s' % (test_name, compare)
-        for k, v in default_vars.items():
+        for k in sorted(default_vars.keys()):
+            v = default_vars[k]
             if k not in var_kws[0]:
                 plotbase += '_%s' % v.replace('.', '')
         plotbase += '_%s.png' % kwargs.get('time_method', 'average')
@@ -926,85 +924,4 @@ def plot_scalings(compare='commtype', compare_values=None,
     # Save plot
     plt.savefig(plotfile)
     logging.info('plotfile: %s', plotfile)
-    return plotfile
-                                  
-
-def plot_scalings_old(plotfile=None, show_plot=False, compare='language',
-                      scalings_file=None, test_name='timed_pipe',
-                      comm_type=None, language='python', **kwargs):
-    r"""Plot the scalings comparing different communication mechanisms and
-    languages. This can be time consuming.
-
-    Args:
-        plotfile (str, optional): Path to file where the figure should be saved.
-            If None, one will be created.
-        compare (str, optional): Variable that should be compared. Valid values
-            include 'language' and 'commtype'. Defaults to 'language'.
-        show_plot (bool, optional): If True, the plot will be displayed before
-            it is saved. Defaults to False.
-        scalings_file (str, optional): Path to the file containing scalings
-            data that should be updated and plotted. Defaults to None and is
-            created based on 'test_name'.
-        comm_type (str, optional): Name of communication class that should be
-            used for tests comparing communication between models in different
-            languages. Defaults to the current default comm class.
-        language (str, optional): Language of model that should be used for
-            a comparison of different comm types. Defaults to 'python'.
-        **kwargs: Additional keyword arguments are passed to plot_scaling_joint.
-
-    Returns:
-        str: Path where the figure was saved.
-
-    """
-    if comm_type is None:
-        comm_type = tools.get_default_comm()
-    if compare not in ['commtype', 'language']:
-        raise ValueError("Invalid compare: '%s'" % compare)
-    time_method = kwargs.get('time_method', 'average')
-    if plotfile is None:
-        if compare == 'commtype':
-            plotfile = os.path.join(os.getcwd(), 'scaling_commtype_%s_%s_%s.png' % (
-                test_name, language, time_method))
-        elif compare == 'language':
-            plotfile = os.path.join(os.getcwd(), 'scaling_language_%s_%s_%s.png' % (
-                test_name, comm_type, time_method))
-    # Iterate over variable
-    axs = None
-    if compare == 'commtype':
-        colors = {'ZMQ': 'b', 'IPC': 'r', 'RMQ': 'g'}
-        styles = {}
-        for c0 in _comm_list:
-            l1 = language
-            l2 = language
-            label = c0.split('Comm')[0]
-            clr = colors[label]
-            sty = '-'
-            yscale = 'linear'
-            plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
-            x = TimedRun(l1, l2, scalings_file=scalings_file,
-                         name=test_name, comm_type=c0)
-            axs = x.plot_scaling_joint(axs=axs, label=label, yscale=yscale,
-                                       plot_kws=plot_kws, **kwargs)
-    elif compare == 'language':
-        colors = {'python': 'b', 'matlab': 'm',
-                  'c': 'g', 'cpp': 'r'}
-        styles = {'python': '-', 'matlab': '-.',
-                  'c': '--', 'cpp': ':'}
-        for l1 in _lang_list:
-            clr = colors[l1]
-            for l2 in _lang_list:
-                sty = styles[l2]
-                label = '%s to %s' % (l1, l2)
-                yscale = 'log'
-                plot_kws = {'color': clr, 'linestyle': sty,
-                            'linewidth': _linewidth}
-                x = TimedRun(l1, l2, scalings_file=scalings_file,
-                             name=test_name, comm_type=comm_type)
-                axs = x.plot_scaling_joint(axs=axs, label=label, yscale=yscale,
-                                           plot_kws=plot_kws, **kwargs)
-    # legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
-    # legend.get_frame().set_linewidth(_linewidth)
-    if show_plot:
-        plt.show()
-    plt.savefig(plotfile)
     return plotfile
