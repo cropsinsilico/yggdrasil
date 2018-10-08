@@ -105,7 +105,7 @@ def perf_func(loops, timer, nmsg, msg_size):
         while not flag:
             try:
                 t0 = perf.perf_counter()
-                timer.run(run_uuid)
+                tI = timer.run(run_uuid)
                 t1 = perf.perf_counter()
                 tdif = t1 - t0
                 timer.after_run(run_uuid, tdif)
@@ -168,6 +168,9 @@ class TimedRun(CisTestBase, tools.CisClass):
             tests.
 
     """
+
+    _use_mine = False
+
     def __init__(self, lang_src, lang_dst, name='timed_pipe',
                  scalings_file=None, perf_file=None,
                  comm_type=None, platform=None, python_ver=None, **kwargs):
@@ -229,6 +232,39 @@ class TimedRun(CisTestBase, tools.CisClass):
                                             self.lang_src, self.lang_dst,
                                             nmsg, msg_size)
         return out
+
+    @property
+    def max_msg_size(self):
+        r"""int: Largest size of message that can be sent without being split."""
+        return tools.get_CIS_MSG_MAX(comm_type=self.comm_type)
+
+    @property
+    def default_msg_size(self):
+        r"""list: Default message sizes for scaling tests."""
+        if self.comm_type.startswith('IPC'):
+            msg_size = [1, 1e2, 1e3, 1e4, 1e5]
+        else:
+            msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7]
+        return msg_size
+
+    @property
+    def default_msg_count(self):
+        r"""list: Default message count for scaling tests."""
+        return [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+    @property
+    def time_per_byte(self):
+        return self.fit_scaling_size()[0]
+
+    @property
+    def time_per_message(self):
+        r"""float: Time required to send a single message of 1000 bytes."""
+        return self.fit_scaling_count()[0]
+
+    @property
+    def startup_time(self):
+        r"""float: Time required to set up communications and start models."""
+        return self.fit_scaling_count()[1]
 
     @property
     def description_prefix(self):
@@ -407,21 +443,33 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.reset_default_comm()
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
-    def run(self, run_uuid):
+    def run(self, run_uuid, time_func=None):
         r"""Run test sending a set of messages between the designated models.
 
         Args:
             run_uuid (str): Unique ID for the run.
+            time_func (function, optional): Function that should be called after
+                creating the runner to get the intermediate time. Defaults to
+                time.time if not provided.
+
+        Returns:
+            float: Intermediate time resulting from calling time_func.
 
         """
+        if time_func is None:
+            time_func = time.time
         r = runner.get_runner(self.fyaml[run_uuid],
                               namespace=self.name + run_uuid)
+        t_int = time_func()
         r.run()
         assert(not r.error_flag)
+        return t_int
 
     def time_run(self, *args, **kwargs):
-        # return self.time_run_mine(*args, **kwargs)
-        return self.time_run_perf(*args, **kwargs)
+        if self._use_mine:
+            return self.time_run_mine(*args, **kwargs)
+        else:
+            return self.time_run_perf(*args, **kwargs)
 
     def time_run_perf(self, nmsg, msg_size, nrep=10, overwrite=False):
         r"""Time sending a set of messages between the designated models.
@@ -497,7 +545,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             for i in range(nrep):
                 run_uuid = self.before_run(nmsg, msg_size)
                 t0 = time.time()
-                self.run(run_uuid)
+                tI = self.run(run_uuid)
                 t1 = time.time()
                 out[i] = t1 - t0
                 self.after_run(run_uuid, np.mean(out))
@@ -521,7 +569,7 @@ class TimedRun(CisTestBase, tools.CisClass):
 
         Returns:
             tuple(matplotlib.Axes, matplotlib.Axes): Pair of axes containing the
-                plotted scalings.
+                plotted scalings and the fit.
 
         """
         cls_kwargs_keys = ['name', 'scalings_file',
@@ -531,8 +579,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             if k in kwargs:
                 cls_kwargs[k] = kwargs.pop(k)
         x = TimedRun(lang_src, lang_dst, **cls_kwargs)
-        axs = x.plot_scaling_joint(**kwargs)
-        return axs
+        axs, fit = x.plot_scaling_joint(**kwargs)
+        return axs, fit
 
     def plot_scaling_joint(self, msg_size0=1000, msg_count0=5,
                            msg_size=None, msg_count=None, axs=None, **kwargs):
@@ -557,16 +605,13 @@ class TimedRun(CisTestBase, tools.CisClass):
 
         Returns:
             tuple(matplotlib.Axes, matplotlib.Axes): Pair of axes containing the
-                plotted scalings.
+                plotted scalings and the fit.
 
         """
         if msg_size is None:
-            if self.comm_type.startswith('IPC'):
-                msg_size = [1, 1e2, 1e3, 1e4, 1e5]
-            else:
-                msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7]
+            msg_size = self.default_msg_size
         if msg_count is None:
-            msg_count = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+            msg_count = self.default_msg_count
         if axs is None:
             figure_size = (15.0, 6.0)
             figure_buff = 0.75
@@ -588,10 +633,16 @@ class TimedRun(CisTestBase, tools.CisClass):
             axs[1].set_position(pos2)
         self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
         self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
+        # Get slopes
+        fit = self.fit_scaling_count(msg_size=msg_size0, counts=msg_count)
+        self.info('fit: slope = %f, intercept = %f', fit[0], fit[1])
+        # m, b = self.fit_scaling_size()
+        # xname = 'size'
+        # self.info('%s: slope = %f, intercept = %f', xname, m, b)
         # Legend
         axs[1].legend(loc='upper left', ncol=2)
-        return axs
-                           
+        return axs, fit
+        
     def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
                      xscale=None, yscale='linear', plot_kws={},
                      time_method='average', per_message=False, **kwargs):
@@ -697,6 +748,53 @@ class TimedRun(CisTestBase, tools.CisClass):
         else:
             axs.plot(x, y, label=label, **plot_kws)
         return axs
+
+    def fit_scaling_count(self, msg_size=1000, counts=None, **kwargs):
+        r"""Do a linear fit to the scaling of execution time with message count.
+
+        Args:
+            msg_size (int, optional): Size of each message that should be sent.
+                Defaults to 1000.
+            counts (list, optional): List of counts to test. Defaults to
+                self.default_msg_count if not provided.
+            **kwargs: Additional keyword arguments are passed to scaling_count.
+
+        Returns:
+            tuple: The slope and intercept of the linear fit.
+
+        """
+        if counts is None:
+            counts = self.default_msg_count
+        out = self.scaling_count(msg_size, counts=counts, **kwargs)
+        x = out[0]
+        y = out[2]
+        return np.polyfit(x, y, 1)
+
+    def fit_scaling_size(self, msg_count=5, sizes=None, **kwargs):
+        r"""Do a linear fit to the scaling of execution time with message count.
+
+        Args:
+            msg_count (int, optional): Number of messages that should be sent
+                for each size. Defaults to 5.
+            sizes (list, optional): List of sizes to test. Defaults to
+                self.default_msg_size if not provided.
+            **kwargs: Additional keyword arguments are passed to scaling_size.
+
+        Returns:
+            tuple: The slope and intercept of the linear fit.
+
+        """
+        if sizes is None:
+            sizes = self.default_msg_size[:-2]
+        max_size = self.max_msg_size
+        sizes_limit = []
+        for s in sizes:
+            if s < max_size:
+                sizes_limit.append(s)
+        out = self.scaling_size(msg_count, sizes=sizes_limit, **kwargs)
+        x = out[0]
+        y = out[2]
+        return np.polyfit(x, y, 1)
 
     def scaling_count(self, msg_size, counts=None, min_count=1, max_count=100,
                       nsamples=10, scaling='linear', per_message=False, **kwargs):
@@ -867,6 +965,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         compare_values = default_vals.get(compare, None)
     else:
         assert(isinstance(compare_values, list))
+    per_message = kwargs.get('per_message', False)
     if compare == 'commtype':
         color_var = 'comm_type'
         color_map = {'ZMQComm': 'b', 'IPCComm': 'r', 'RMQComm': 'g'}
@@ -918,10 +1017,13 @@ def plot_scalings(compare='commtype', compare_values=None,
             v = default_vars[k]
             if k not in var_kws[0]:
                 plotbase += '_%s' % v.replace('.', '')
-        plotbase += '_%s.png' % kwargs.get('time_method', 'average')
-        plotfile = os.path.join(os.getcwd(), plotbase)
+        plotbase += '_%s' % kwargs.get('time_method', 'average')
+        if per_message:
+            plotbase += '_per_message'
+        plotfile = os.path.join(os.getcwd(), plotbase + '.png')
     # Iterate over variables
     axs = None
+    fits = {}
     for kws in var_kws:
         for k, v in default_vars.items():
             if k not in kws:
@@ -935,8 +1037,16 @@ def plot_scalings(compare='commtype', compare_values=None,
             sty = style_map[kws[style_var]]
         plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
         kws.update(kwargs)
-        axs = TimedRun.class_plot(name=test_name, axs=axs, label=label,
-                                  yscale=yscale, plot_kws=plot_kws, **kws)
+        axs, fit = TimedRun.class_plot(name=test_name, axs=axs, label=label,
+                                       yscale=yscale, plot_kws=plot_kws, **kws)
+        fits[label] = fit
+    # Print a table
+    print('%-20s\t%-20s\t%-20s' % ('Label', 'Time per Message (s)', 'Overhead (s)'))
+    print('%-20s\t%-20s\t%-20s' % (20 * '=', 20 * '=', 20 * '='))
+    fmt_row = '%-20s\t%-20.5f\t%-20.5f'
+    for k in sorted(fits.keys()):
+        v = fits[k]
+        print(fmt_row % (k, v[0], v[1]))
     # Save plot
     plt.savefig(plotfile)
     logging.info('plotfile: %s', plotfile)
