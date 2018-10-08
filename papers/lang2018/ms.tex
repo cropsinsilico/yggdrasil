@@ -99,7 +99,7 @@ University of Illinois, Urbana-Champaign, IL email: {\tt langmm@illinois.edu}}
 %---------------------------------------------------------------------------------
 % ABSTRACT (145 words)
 \begin{abstract}
-Thousands of computational models have been created within the plant biology community within the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible as isolated models. However, the technological barriers introduced by differences in language and data formats as slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\cis}, a Python package for running integration networks with connections between models across languages and scales. {\cis} coordinates parallel execution of models in Python, C, C++, and Matlab and handles communication in a number of data formats common to computational plant modeling. {\cis} is designed to be user-friendly, including visual tools for composing the integration networks. 
+Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\cis}, a Python package for running integration networks with connections between models across languages and scales. {\cis} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OSX, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\cis} is designed to be user-friendly, with visual tools developed in parallel for composing the integration networks. 
 \end{abstract}
 
 %\begin{IEEEkeywords}
@@ -116,16 +116,16 @@ Thousands of computational models have been created within the plant biology com
 \section{Introduction}\label{S:intro}
 %
 %\IEEEPARstart{C}{omputational} 
-Computational plant biologists have produced a wealth of computational models for different biological processes governing plant growth and development, covering scales from atomic to global. Although usually developed independently to address questions specific to an organ, species, or growth process, computational plant models can also have applications beyond their original scope. For example, a photosynthesis model developed for maize can also be adapted to work for other species like soy \todo{cite Kavya and Yu}. Computational models for different scales, organs, or processes also have the potential for being combined to probe more complex biological mechanisms. With advances in compute power, it should be possible to link biologically related models to create integration networks capable of capturing the response of entire plants, fields, or regions. However, independently developed computational models often have compatibility issues resulting from differences in programming language or data format that make such collaborations difficult. 
+Computational plant biologists have produced a wealth of computational models to describe the biological processes governing plant growth and development, covering scales from atomic to global. Although usually developed independently to address questions specific to an organ, species, or growth process, computational plant models can also have applications beyond their original scope. Many biological processes are the same across different species of plants, allowing models developed for one species to be adapted for another by modifying input parameters. In addition, computational models for different scales, organs, or processes can also be combined, or integrated, to probe more complex biological mechanisms. By integrating a metabolic flux model with a genetic regulatory model for carbon uptake, \citet{integration_prep} was able to identify gene candidates for regulating photosynthesis under elevated CO$_{2}$. With advances in compute power, it should be possible to link biologically related models to create complex integration networks capable of capturing the response of entire plants, fields, or regions. However, independently developed computational models often have compatibility issues resulting from differences in programming language or data format that make such collaborations difficult. 
 
-We present an Open Source Python package, {\cis}, for creating and running integrations networks from existing computational models written in Python, Matlab, C and C++. Although developed for the purpose of integrating plant biology models, {\cis} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\cis} package to integrate models, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} summarizes the features of the {\cis} package, describes a few use cases, and outlines areas for future development.
+We present an Open Source Python package, {\cis}, for creating and running integration networks by connecting existing computational models written in Python, Matlab, C and C++. Although developed for the purpose of integrating plant biology models, {\cis} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\cis} package to integrate models, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} summarizes the features of the {\cis} package, describes a few use cases, and outlines areas for future development.
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
 % BACKGROUND
 \section{Background}\label{S:background}
 %
-Computational plant models are usually written with a very specific research question in mind. The resulting programs are highly tuned for one purpose and written specifically for scientists within an isolated group of collaborators. Scientists will generally write programs in the language they are most familiar with and, given that there is no consensus on one programming language as ideal for all scientific applications, the language of computational models will often vary between research groups, if not between members of the groups themselves. The same can be said of data formats which can be highly tailored to the target question and may or may not include metadata like the data types, fields, or units. To integrate two biological models, the following questions must be addressed:
+Computational plant models are usually written with a very specific research question in mind. The resulting programs are highly tuned for one purpose and written specifically for scientists within an isolated group of collaborators. Scientists will generally write programs in the language they are most familiar with and, given that there is no consensus on one programming language as ideal for all scientific applications, the language of computational models will often vary between research groups, if not between members of the groups themselves. The same can be said of data formats which can be highly tailored to the target question and may or may not include metadata like the data types, field names, or units. To integrate two biological models, the following questions must be addressed:
 %
 \begin{enumerate}
 	\item Orchestration: How will models be executed?
@@ -147,9 +147,9 @@ One solution is to agree upon a language. The questions of orchestration, commun
 % FRAMEWORKS
 \subsection{Workflow/Data Flow/Framework}\label{SS:framework}
 %
-Another approach is a workflow/data flow/framework tools for models that are written in the same programming language or can be wrapped. For example, there are many generic tools in Python for coordinating the execution of tasks in parallel or serial \citep[e.g.][]{babuji18, celery, luigi}. While these tools are powerful for organizing complex work flows, it is the user's onus to make sure that the components they connect are compatible and handle an sort of data transformation that might be necessary (e.g. unit conversion or field selection).
+Another approach is a workflow/data flow/framework tool for models that are written in the same programming language or can be wrapped. For example, there are many generic tools in Python for coordinating the execution of tasks in parallel or serial \citep[e.g.][]{babuji18, celery, luigi}. While these tools are powerful for organizing complex work flows, it is the user's onus to make sure that the components they connect are compatible and handle any data transformation that might be necessary (e.g. unit conversion or field selection).
 
-There are also domain specific frameworks for connecting biological models. For example, OpenAlea \citep{Pradal2015} allows users to compose networks from different components including plant models, analysis tools, and visualizations. Domain specific frameworks are more intuitive and ultimately more flexible than DSLs in the types of operations they allow models to perform since they have access to the full power of a programming language. However, they are stricter in several respects: 1) the model must be written in (or exposable to), the language of the framework and 2) the model must be written in a way that is aware of the framework and/or the format of models with which it will interact. Like DSLs, frameworks also provided limited support for models written without them in mind. 
+There are also domain specific frameworks for connecting biological models. For example, OpenAlea \citep{Pradal2015} allows users to compose networks from different components including plant models, analysis tools, and visualization tools. Domain specific frameworks are more intuitive and ultimately more flexible than DSLs in the types of operations they allow models to perform since they have access to the full power of a programming language. However, they are stricter in several respects: 1) the model must be written in (or exposable to), the language of the framework and 2) the model must be written in a way that is aware of the framework and/or the format of models with which it will interact. Like DSLs, frameworks also provided limited support for models written without them in mind. 
 
 {\cis} interface is an example of a framework that overcomes these issues by exposing light-weight interfaces in the language of the model (See \S\ref{SSS:interface}) that permit messages to be passed between the model processes as they run in parallel (See \S\ref{SS:communication}). As a result, models writers only need knowledge of the language in which their model is written.
 
@@ -168,7 +168,7 @@ There are also domain specific frameworks for connecting biological models. For 
 
 \begin{itemize}
 	\item Easy to use. Require as little modification to the model source code as possible and only in the language of the model itself.
-	\item Efficient. Allow models to run in parallel with asynchronous communication that dosen't block when a message is sent.
+	\item Efficient. Allow models to run in parallel with asynchronous communication that dosn't block when a message is sent.
 	\item Flexible. Provide the same interface to the user, regardless of the communication mechanism being used or the platform the model is being executed on.
 \end{itemize}
 
@@ -179,6 +179,7 @@ additional Domain Specific Language (DSL) support for LPy models \citep{Boudon20
 % ORCHESTRATION
 \subsection{Orchestration}\label{SS:orchestration}
 %
+{\cis} is executed via a command line interface (CLI), {\tt cisrun} with YAML specification files (\S\ref{SSS:yaml}) as input. Based on the information contained in the YAML specification files, {\cis} establishes a network of asynchronous communication channels (\S\ref{SS:communication}), and launches the models on new processes (\S\ref{SS:model_driver}).
 %At execution, {\cis} launches models on new processes based on information contained in a YAML specification file (See \S\ref{SSS:yaml} below) and establishes 
 
 %---------------------------------------------------------------------------------
@@ -187,22 +188,22 @@ additional Domain Specific Language (DSL) support for LPy models \citep{Boudon20
 %
 Users specify information about models and integration networks via declarative 
 YAML files \citep{Ben-Kiki2009}. The YAML file format was selected because it is human readable 
-and there are many existing tools for parsing YAML formats in many different 
+and there are many existing tools for parsing YAML formats in different programming 
 languages. The declarative format allows user to specify exactly what they 
-what to do, without describing how it should be done. While the information 
+want to do, without describing how it should be done. While the information 
 about models and integration networks can be contained in a single YAML 
-file, the information can naturally be split between two files, one containing 
-information about the models and one containing the connections comprising the 
+file, the information can naturally be split between two or more files, one (or more) containing 
+information about the model(s) and one containing the connections comprising the 
 integration network. This separation is advantageous because the model YAML 
 can be re-used, unchanged, in conjunction with other integration networks. 
 
 Model YAMLs include information about the location of the 
 model source code, the language the model is written in, how the model should 
-be run, and any input or output variables including their type and units. 
+be run, and any input or output variables including their data type and units. 
 Integration networks are specified via YAML files declaring the connections 
 between models. Connections are declared by pairing an output variable from 
 one model with the input variable of another model. The {\cis} 
-command line interface (CLI) sets up the necessary communication mechanisms to 
+CLI sets up the necessary communication mechanisms to 
 then direct data from one model to the next in the specified pattern. Models 
 can have as many input and/or output variables as is desired.
 Connections between models are specified by references to the 
@@ -226,7 +227,7 @@ While every model is executed on a new process, how the model is handled depends
 on the language it is written in. Models written in 
 interpreted languages (Python and Matlab) are executed on the command line 
 with the interpreter. In the case of Matlab, where there is significant overhead 
-associated with starting the Matlab interpreter, a Matlab shared engine is used 
+associated with starting the Matlab interpreter (See \S\ref{SS:results_language}), a Matlab shared engine is used 
 to execute the model. To speed up the execution, the shared engine can be started 
 in advance and then reused.
 
@@ -240,7 +241,7 @@ CMake \citep{Martin2006} for
 models that already have a Makefile or CMakeLists.txt. To use these drivers, 
 lines are added to the recipe in order to allow linking against {\cis}.
 
-
+Once model are running, each model driver uses a thread to monitor the progress of the model and report back model output (e.g. log messages printed to stdout) and any status changes to the master process. If a model issues any errors, the master process will shut down any model processes that are still running. If a model completes without any errors, the master process will cleanup any input/output channels that are no longer required. The master process will only complete once an error is encountered or all model processes have completed.
 
 
 %---------------------------------------------------------------------------------
@@ -263,7 +264,7 @@ communication strategy is used. Models do not block on sending messages to
 output channels; the model is free to continue working on its task while 
 a separate thread waits for the message to be routed and received. Similarly, 
 a thread continuously pings input channels, moving received messages into a 
-a buffer queue so that they are ready and waiting for the receiving model 
+buffer queue so that they are ready and waiting for the receiving model 
 when it asks for input. As a result, models in complex integration networks 
 can work in parallel, improving the overall efficiency with which computational 
 resources are used. Figure \ref{fig:async} describes the general flow of messages.
@@ -278,18 +279,19 @@ resources are used. Figure \ref{fig:async} describes the general flow of message
 	\end{figure}
 \fi
 %
-\begin{itemize}
+\begin{enumerate}
 	\item A model sends a message in the form of a native data object via a language 
 specific API to one of the output channels declared in the model YAML. The output channel interface encodes the message and sends it.
-	\item An output connection driver (written in Python) runs in a separate thread, listening to the model output channel. When the model sends a message, the model side connection driver checks that the message is in the expected format and then forwards it to an intermediate channel. The intermediate channel may seem unnecessary, but it is used as a buffer for future support on distributed architectures (e.g. if one model is running on a remote machine). In these cases, the intermediate channel will connect to a RabbitMQ broker using security credentials.
+	\item An output connection driver (written in Python) runs in a separate thread, listening to the model output channel. When the model sends a message, the output connection driver checks that the message is in the expected format and then forwards it to an intermediate channel. The intermediate channel may seem unnecessary, but it is used as a buffer for future support on distributed architectures (e.g. if one model is running on a remote machine). In these cases, the intermediate channel will connect to a RabbitMQ broker using security credentials.
 	\item An input connection driver (also written in Python) runs in a separate thread, listening to the intermediate channel. When a message is received, it is then forwarded to the input channel of the receiving model as specified in the integration network YAML.
-	\item The receiving model receives the message.
-\end{itemize}
+	\item The receiving model receives the message in the form of an analogous native data object.
+\end{enumerate}
 
-In additional to communication between two models, users can also specify that a 
+In addition to communication between two models, users can also specify that a 
 model should receive/send input/output from/to a file. This is specified in 
 the integration network YAML and does not impact the way the model will 
-receive/send messages.
+receive/send messages. In this way, users can test their model integration in 
+isolation with input/output form/to files rather than another model.
 
 %---------------------------------------------------------------------------------
 % SYSTEM V IPC
@@ -299,14 +301,19 @@ The first communication mechanism used by {\cis} was System V interprocess
 communication (IPC) message queues \citep{Rusling1999} on Posix (Linux and Mac OSX) systems. 
 IPC message queues allow messages to be passed between models running on separate 
 processes on the same machine. While IPC message queues are light weight, fast 
-(See \S\ref{S:results}), and are part of Posix operating systems, they do not work in all 
+(See \S\ref{SS:results_commtype}), and are part of Posix operating systems, they do not work in all 
 situations. Sys V IPC queues are not natively supported by Windows operating systems 
 and do not allow communication between remote processes. In addition, IPC queues also 
-have relatively low default message size limits on Mac OSX systems (2048 bytes). 
-While this can be handled by splitting large messages into multiple smaller messages 
-(See \S\ref{SSS:large}), the time required to send a message increases with the number of 
-message it must be broken into (See \S\ref{S:results}). As a result, Sys V IPC queues are considered by 
-{\cis} to be a fallback on Posix systems if the necessary ZeroMQ libraries have 
+have relatively low default message size limits on Mac OSX systems (2048 bytes). Once 
+the queue is full or if the message is larger than the limit, any process attempting to send an additional message will block until a 
+sufficient number of messages has been removed from the queue to accommodate the new message. 
+For messages larger than the limit, the sending process will block indefinitely. 
+This can be handled by splitting large messages into multiple smaller messages 
+(See \S\ref{SSS:large}), however, the time required to send a message increases with the number of 
+message it must be broken into (See \S\ref{SS:results_commtype}). These limits make sending large messages 
+relatively inefficient when compared with other communications mechanisms. 
+As a result, Sys V IPC queues are used by 
+{\cis} as a fallback on Posix systems if the necessary ZeroMQ libraries have 
 not been installed.
 
 %---------------------------------------------------------------------------------
@@ -323,7 +330,7 @@ accomplished using System V IPC queues. In addition, while ZeroMQ allows
 interprocess communication via IPC queues like System V IPC queues, ZeroMQ also 
 supports protocols for distributed communication via an Internet Protocol (IP) 
 network. While {\cis} does not currently support using these protocols 
-for distributed integration networks, this one of the plans for future improvement.
+for distributed integration networks, this is part of the plans for future improvement.
 
 %---------------------------------------------------------------------------------
 % RABBITMQ
@@ -352,9 +359,9 @@ limits. To handle messages that are larger than the limit of the communication
 mechanism being used, {\cis} splits the message up into multiple smaller 
 messages. In addition, for large messages, {\cis} creates new, temporary 
 communication channels that are used exclusively for a single message and 
-then destroyed. The address associated with the temporary channel is send in 
+then destroyed. The address associated with the temporary channel is sent in 
 header information as a message on the main channel along with information about 
-the message that will be sent through the temporary channel like size and type. 
+the message that will be sent through the temporary channel like size and data type. 
 Temporary channels are used for large messages to prevent mistakenly combining 
 the pieces from two different large messages that were received at the same time 
 such as in the case that a model is receiving input from two different models 
@@ -364,9 +371,10 @@ working in parallel.
 % INTERFACE
 \subsubsection{Interface}\label{SSS:interface}
 %
-{\cis} provides functions and classes for communication that are 
-written in each of the supported languages. This allows users to program in the 
-language(s) they are already familiar with. The Python interface provides 
+{\cis} provides interface functions/classes for communication that are 
+written in each of the supported languages. Language specific interfaces 
+allow users to program in the 
+language(s) with which they are already familiar. The Python interface provides 
 communication classes for sending and receiving messages. The Matlab 
 interface provides a simple wrapper class for the Python class, that exposes 
 the appropriate methods and handles conversion between Python and Matlab 
@@ -385,7 +393,7 @@ to more complex data types and communication patterns.
 %
 %\subsubsection{Data Formats}\label{SSS:dataformats}
 %
-Messages are passed as raw bytes. In order to understand the messages begin passed, parallel processes that communicate must agree upon the format used to do so. Without community standards, different models will often use very different data formats for their input and output. Differences between data formats can include, but are not limited to, type, precision, fields, or units. While some data formats are self-descriptive and include these types of information as meta data, this is not true of all data formats. To combat this, {\cis} requires models explicitly specify the format of input and output expected by a model in the model YAML. {\cis} can then handle a number of conversion between models without prompting as well as serialization/deserialization to the correct type in . Data formats currently supported by {\cis} include:
+Messages are passed as raw bytes. In order to understand the messages begin passed, parallel processes that communicate must agree upon the format used to do so. Without community standards, different models will often use very different data formats for their input and output. Differences between data formats can include, but are not limited to, type, precision, fields, or units. While some data formats are self-descriptive and include these types of information as meta data, this is not true of all data formats. To combat this, {\cis} requires models to explicitly specify the format of input and output expected by a model in the model YAML. {\cis} can then handle a number of conversion between models without prompting as well as serialization/deserialization to the correct type in each of the supported languages. Data formats currently supported by {\cis} include:
 %
 \begin{itemize}
 	\item Scalars (e.g. integers, floats)
@@ -405,46 +413,92 @@ In addition, {\cis} offers the option to specify units for scalars, arrays, tabu
 % RESULTS
 \section{Results}\label{S:results}
 %
-In order to evaluate {\cis} performance tests were run on Linux, Mac OSX, and Windows for different communication mechanisms and language combinations. During each run, $N_{msg}$ messages of size $S_{msg}$ were sent from the source model (in one language) to the destination model (in another language) which then output the messages to file for verification. Performance tests were run using the perf package \citep{Stinner2018}. Each run was repeated 20 times to rule out fluctuations due to external loads on the test machines.
+In order to evaluate {\cis}, performance tests were run on machines with Linux, Mac OSX, and Windows operating systems for different communication mechanisms, Python versions, and language combinations. During each run, $N_{msg}$ messages of size $S_{msg}$ were sent from the source model (in one language) to the destination model (in another language) which then output the messages to file for verification. Performance tests were run using the perf package \citep{Stinner2018}. Each run was repeated 10 times to rule out fluctuations due to external loads on the test machines.
 
 % COMMTYPE
-\subsection{Communication Mechanism}
+\subsection{Communication Mechanism}\label{SS:results_commtype}
 %
-Figure \ref{fig:commtype} compares the execution times for the different communication mechanisms discussed in \S\ref{SS:communication} for sending different numbers/sizes of messages from one Python model to another Python model. The tests were run on a \todo{Dell?} tower with 10 quad-core Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz processors running Ubuntu 14.04. The left panel of Figure \ref{fig:commtype} shows the total time required to run both models and send a varying number of 1000 bytes messages from one model to the other. The right panel of Figure \ref{fig:commtype} shows the total time required to run the models and send 5 messages of varying lengths from one to the other.
+Figure \ref{fig:commtype} compares the execution times for the different communication mechanisms discussed in \S\ref{SS:communication} for sending different numbers/sizes of messages from one Python model to another Python model. The tests were run on a \todo{Dell?} tower with 10 quad-core Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz processors running Ubuntu 14.04. The left panel of Figure \ref{fig:commtype} shows the total time required to run both models and send a varying number of 1000 bytes messages from one model to the other. The right panel of Figure \ref{fig:commtype} shows the total time required to run the models and send 5 messages of varying lengths from one to the other. 
 %
 \ifinclfig
  	\begin{figure}[htbp]
 	\begin{center}
 	\includegraphics[width=\columnwidth,keepaspectratio]{./images/scaling_commtype.png}
-	\caption{Comparison of communication time scaling across communication methods on Linux. Left: Scaling of execution time with number of 1000 byte messages sent. Right: Scaling of execution time with the size of the 5 messages sent.}
+	\caption{Comparison of communication time scaling across communication methods on Linux. Lines show the average run time for each test with the standard deviation shown in the shaded region. Left: Scaling of execution time with number of 1000 byte messages sent. Right: Scaling of execution time with the size of the 5 messages sent.}
 	\label{fig:commtype}
 	\end{center}
 	\end{figure}
 \fi
 %
-Although Sys V IPC queues are slightly faster than ZeroMQ TCP sockets (\todo{0.012} s/msg vs. \todo{0.019} s/msg), IPC queues have a much smaller maximum size limit for messages. As discussed in \S\ref{SSS:large}, messages larger than this limit (2048 bytes) must be broken up into multiple messages. This compounds the time required to send these messages making IPC queues a poor choice for sending data over $10^5$ bytes. This limit does not kick in for ZeroMQ sockets until much later ($\sim10^6$ bytes).
+
+Table \ref{tab:commtype} shows how the two communication mechanisms compare as determined by performing a linear fit to the scaling of execution time with message count from Figure \ref{fig:commtype}. Time per message (slope of Figure \ref{fig:commtype}) is the average amount of time required to send a single message containing 1000 bytes and constrains how quickly messages can be passed between the models. Overhead (intercept of Figure \ref{fig:commtype}) is the amount of execution time that would be required if no messages were passed between the models and includes the time required to set up communication mechanisms, start the model drivers, and clean up the integration network.
+%
+\begin{table}[htbp]
+%\caption{The time required per message and overhead for startup/teardown of integration for different communication mechanisms as determined by a linear fit to the scaling of execution time with message count. }
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Mechanism	& Time per Message (s) 	& Overhead (s) 	\\\hline
+IPC			& 0.010				& 1.60			\\
+ZMQ 		& 0.012				& 1.73			\\\hline
+\end{tabular}
+\end{center}
+\caption{Effect of communication mechanism on performance.}
+\label{tab:commtype}
+\end{table}%
+%
+Although Sys V IPC queues are slightly faster than ZeroMQ TCP sockets in both time per message and overhead for messages smaller than the limit, IPC queues have a much smaller maximum size limit for messages. As discussed in \S\ref{SSS:large}, messages larger than this limit (2048 bytes) must be broken up into multiple messages, compounding the time required to send these messages and making IPC queues a poor choice for sending data over $\sim10^5$ bytes. This limit is much larger for ZeroMQ sockets ($\sim10^6$ bytes). However, for messages less than the limit, both ZMQ and IPC communication has no measurable dependence on message size.
 
 % LANGUAGE
-\subsection{Language}
+\subsection{Language}\label{SS:results_language}
 %
-Figure \ref{fig:language} compares the execution times for integrations with communications between models in different combinations of languages. The tests were run on \todo{the Linux machine from above} using ZeroMQ communication.
+Figure \ref{fig:language} compares the execution times for integrations with communications between models in different combinations of languages and Table \ref{tab:language} reports the time per message and overhead. The runs for Figure \ref{fig:language} and Table \ref{tab:language} were run on the Linux machine from above while those for Figure \ref{fig:language_matlab} and Table \ref{tab:language_matlab} were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4 that had Matlab R2017a installed. In both cases, ZeroMQ communication was used. 
 %
 \ifinclfig
  	\begin{figure}[htbp]
 	\begin{center}
 	\includegraphics[width=\columnwidth,keepaspectratio]{./images/scaling_language.png}
-	\caption{Comparison of communication time scaling between languages on Linux.}
+	\caption{Comparison of communication time scaling between languages on Linux. The same fiducial message size (1000 bytes) and count (5) was used as in Figure \ref{fig:commtype}.}
 	\label{fig:language}
 	\end{center}
 	\end{figure}
 \fi
 %
-For the most part, performances are not affected by the language of either model. Each language entails some overhead. For Python and Matlab, the overhead comes from starting the interpreter. For C and C++, the overhead comes from compiling the source code.
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Source 	& Destination 	& Time per Message (s) 	& Overhead (s) 	\\\hline
+C 				& C					& 0.11				& 1.36			\\
+C 				& C++				& 0.12				& 1.42			\\
+C 				& Python				& 0.12				& 1.99			\\
+\hline%
+C++ 				& C					& 0.12				& 1.42			\\
+C++ 				& C++				& 0.11				& 1.49			\\
+C++ 				& Python				& 0.12				& 2.05			\\
+\hline%
+Python			& C					& 0.12				& 2.15			\\
+Python			& C++				& 0.12				& 2.21			\\
+Python			& Python				& 0.12				& 1.73			\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Effect of model language on performance (Linux).}
+\label{tab:language}
+\end{table}%
 %
-\todo{results for Matlab \& discussion}
+For the most part, the time required per message is not affected by the language of either model. There is a very small increase in the time per message when there is a Python model involved, but this is much lower than the standard deviation resulting from background activity on the test machine and so is in conclusive.
+
+The largest difference between the different test cases is in in the overhead. Every model driver entails some overhead. For interpreted languages (e.g. Python and Matlab), the majority of the overhead comes from starting the interpreter. For Matlab, this is particularly time consuming. Although this is only a one-time cost required at the start of an integration, {\cis} does offer ways to alleviate this if multiple runs are necessary by starting a Matlab engine prior to the first integration that can be used by subsequent runs \todo{(results that include existing Matlab engine)}.
+
+For compiled languages (C and C++), the overhead comes from compiling the source code which is done in serial. The time required for compilation will depend on the compiler used and the complexity of the model code. For command line compiled models, {\cis} forces the model to be recompiled every time to ensure any changes to the source code are propagated. However, for models that use Make and CMake, overhead due to compile time can be reduced by using existing builds.
+
+Interestingly, the recorded overheads were not symmetric or additive. For example, the Python-to-C integrations required more overhead than the C-to-Python integrations. This is because the models are started in parallel, but do not require the same amount of time to start. In a Python-to-C integration, the C model must wait for the Python model to finish its much slower startup and begin sending message, while in a C-to-Python integration, the C model can immediately begin sending messages that will be received by the Python model once it finishes starting up. In addition, the Python-to-Python integrations required less time than any of the other integrations because, although Python models take longer to start up, the start up is \todo{explanation?}
+%
+\todo{figure/table for Matlab \& discussion}
 
 % PYTHON VERSION
-\subsection{Python Version}
+\subsection{Python Version}\label{SS:results_python}
 %
 Figure \ref{fig:python} compares the execution times when using different versions of Python. The performance tests for both Python 2.7 and Python 3.5 were performed on the Linux machine from above using ZeroMQ communication.
 %
@@ -461,9 +515,9 @@ Figure \ref{fig:python} compares the execution times when using different versio
 \todo{discussion}
 
 % PLATFORM
-\subsection{Platform}
+\subsection{Operating System}\label{SS:results_platform}
 %
-Figure \ref{fig:platform} compares the execution times on different platforms. The performance tests reported for Linux were run on the machine from above. The tests for Mac OS X were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4. The tests for Windows were run on the same machine from a dual boot of Windows 10. All platform dependent performance tests use ZeroMQ communication.
+Figure \ref{fig:platform} compares the execution times on different operating systems. The performance tests reported for Linux were run on the machine from above. The tests for Mac OS X were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4. The tests for Windows were run on the same machine from a dual boot of Windows 10. All platform dependent performance tests use ZeroMQ communication.
 %
 \ifinclfig
  	\begin{figure}[htbp]
@@ -584,6 +638,22 @@ The {\cis} package is available publicly on \href{https://github.com/cropsinsili
 installed using {\tt pip} or {\tt conda}. To ensure code health, {\cis} boasts 100\% code coverage with automated testing on Linux, Mac OSX, and Windows for Python version 2.7, 3.4, 3.5, 3.6, and 3.7 via continuous integration with TravisCI \citep{travisci} and Appveyor \citep{appveyor}. Full documentation for {\cis} can be found \href{https://cropsinsilico.github.io/cis_interface/}{here} including step-by-step directions from the tutorial conducted during the \href{https://cropsinsilico.github.io/cis_interface/hackathon2018/index.html}{2018 Crops in Silico Hackathon}.
 
 %---------------------------------------------------------------------------------
+% TODO
+\section*{TODO}
+\todo{%
+\begin{itemize}
+	\item Fix code citations to include URLs
+	\item Increase size of font on figures or increase size of figures (depends on iSP format)
+	\item Get real in-prep citation from Kavya
+	\item Confirm sentence about Yu/Kavya integration for accuracy
+	\item Get grant numbers/titles for acknowledgments
+	\item Ask Matt what the hardware is for DXL
+	\item Add plots that include Matlab results when they finish
+	\item Add plots that include Windows results when they finish
+\end{itemize}
+}
+
+%---------------------------------------------------------------------------------
 % ACKNOWLEDGMENTS
 %\section*{Acknowledgment}
 %\acknowledgments
@@ -591,7 +661,6 @@ installed using {\tt pip} or {\tt conda}. To ensure code health, {\cis} boasts 1
 
 %---------------------------------------------------------------------------------
 % REFERENCES
-\todo{Fix code citations}
 \ifdraft
 	\bibliography{CiS}
 \else
