@@ -11,6 +11,11 @@ from cis_interface.examples import yamls as ex_yamls
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 
 
+def test_is_matlab_running():
+    r"""Test if there is Matlab engine running."""
+    MatlabModelDriver.is_matlab_running()
+
+
 @unittest.skipIf(MatlabModelDriver._matlab_installed, "Matlab installed.")
 def test_matlab_not_installed():  # pragma: no matlab
     r"""Assert that errors are raise when Matlab is not installed."""

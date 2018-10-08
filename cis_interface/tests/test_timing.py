@@ -72,7 +72,14 @@ def test_plot_scalings():
     kwargs = dict(msg_size=[1], msg_size0=1, msg_count=[1], msg_count0=1)
     timing.plot_scalings(compare='commtype', **kwargs)
     timing.plot_scalings(compare='language', **kwargs)
-    timing.plot_scalings(compare='platform',
+    timing.plot_scalings(compare='platform', per_message=True,
                          compare_values=[platform._platform], **kwargs)
-    timing.plot_scalings(compare='python',
+    timing.plot_scalings(compare='python', per_message=True,
                          compare_values=[backwards._python_version], **kwargs)
+
+
+def test_perfjson_to_pandas():
+    r"""Test perfjson_to_pandas."""
+    x = timing.TimedRun('python', 'python')
+    fname = x.perf_file
+    timing.perfjson_to_pandas(fname)

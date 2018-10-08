@@ -233,10 +233,21 @@ def get_default_comm():
     return _default_comm
 
 
-def get_CIS_MSG_MAX():
-    r"""Get the maximum message size for the default comm."""
-    _default_comm = get_default_comm()
-    if _default_comm == 'IPCComm':
+def get_CIS_MSG_MAX(comm_type=None):
+    r"""Get the maximum message size for a given comm type.
+
+    Args:
+        comm_type (str, optional): The name of the communication type that the
+            maximum message size should be returned for. Defaults to result of
+            get_default_comm() if not provided.
+
+    Returns:
+        int: Maximum message size (in bytes).
+
+    """
+    if comm_type is None:
+        comm_type = get_default_comm()
+    if comm_type == 'IPCComm':
         # OS X limit is 2kb
         out = 1024 * 2
     else:
