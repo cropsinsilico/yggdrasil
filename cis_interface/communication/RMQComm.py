@@ -321,7 +321,8 @@ class RMQComm(AsyncComm.AsyncComm):
                                                  auto_delete=True,
                                                  passive=True)
             except (pika.exceptions.ChannelClosed,
-                    pika.exceptions.ConnectionClosed):  # pragma: debug
+                    pika.exceptions.ConnectionClosed,
+                    AttributeError):  # pragma: debug
                 self._close_direct()
         return res
         
