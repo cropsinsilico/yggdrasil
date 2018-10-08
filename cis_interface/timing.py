@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import copy
 import yaml
 import uuid
 import perf
@@ -19,7 +20,7 @@ if os.environ.get('DISPLAY', '') == '':  # pragma: debug
 elif cis_platform._is_osx:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
-_linewidth = 4
+_linewidth = 2
 
 
 _lang_list = tools.get_installed_lang()
@@ -200,6 +201,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             bool: True if the test can be run, False otherwise.
 
         """
+        # print(self.platform.lower(), cis_platform._platform.lower())
+        # print(self.python_ver, backwards._python_version)
         out = ((self.platform.lower() == cis_platform._platform.lower()) and
                (self.python_ver == backwards._python_version))
         return out
@@ -676,8 +679,13 @@ class TimedRun(CisTestBase, tools.CisClass):
             else:
                 yerr_lower = yerr
                 yerr_upper = yerr
-            axs.errorbar(x, y, yerr=[yerr_lower, yerr_upper],
-                         label=label, **plot_kws)
+            axs.plot(x, y, label=label, **plot_kws)
+            plot_kws_fill = copy.deepcopy(plot_kws)
+            plot_kws_fill['linewidth'] = 0
+            plot_kws_fill['alpha'] = 0.2
+            axs.fill_between(x, y - yerr_lower, y + yerr_upper, **plot_kws_fill)
+            # axs.errorbar(x, y, yerr=[yerr_lower, yerr_upper],
+            #              label=label, **plot_kws)
         else:
             axs.plot(x, y, label=label, **plot_kws)
         return axs
@@ -868,7 +876,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         var_list = itertools.product(compare_values, repeat=2)
         var_kws = [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
         kws2label = lambda x: '%s to %s' % (x['lang_src'], x['lang_dst'])  # noqa: E731
-        yscale = 'log'
+        yscale = 'linear'  # was log originally
     elif compare == 'platform':
         color_var = 'platform'
         color_map = {'Linux': 'b', 'Windows': 'r', 'OSX': 'g'}
