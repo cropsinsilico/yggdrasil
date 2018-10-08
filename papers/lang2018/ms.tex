@@ -441,21 +441,41 @@ Figure \ref{fig:language} compares the execution times for integrations with com
 %
 For the most part, performances are not affected by the language of either model. Each language entails some overhead. For Python and Matlab, the overhead comes from starting the interpreter. For C and C++, the overhead comes from compiling the source code.
 %
-\todo{results for Matlab}
+\todo{results for Matlab \& discussion}
 
 % PYTHON VERSION
 \subsection{Python Version}
 %
 Figure \ref{fig:python} compares the execution times when using different versions of Python. The performance tests for both Python 2.7 and Python 3.5 were performed on the Linux machine from above using ZeroMQ communication.
 %
-\todo{figure and results}
+\ifinclfig
+ 	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[width=\columnwidth,keepaspectratio]{./images/scaling_python.png}
+	\caption{Comparison of communication time scaling between Python versions on Linux.}
+	\label{fig:python}
+	\end{center}
+	\end{figure}
+\fi
+%
+\todo{discussion}
 
 % PLATFORM
 \subsection{Platform}
 %
 Figure \ref{fig:platform} compares the execution times on different platforms. The performance tests reported for Linux were run on the machine from above. The tests for Mac OS X were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4. The tests for Windows were run on the same machine from a dual boot of Windows 10. All platform dependent performance tests use ZeroMQ communication.
 %
-\todo{figure and results}
+\ifinclfig
+ 	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[width=\columnwidth,keepaspectratio]{./images/scaling_platform.png}
+	\caption{Comparison of communication time scaling between operating systems.}
+	\label{fig:platform}
+	\end{center}
+	\end{figure}
+\fi
+%
+\todo{Windows results \& discussion}
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
