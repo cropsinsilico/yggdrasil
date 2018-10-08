@@ -21,6 +21,20 @@ _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 
 
+def is_matlab_running():
+    r"""Determine if there is a Matlab engine running.
+
+    Returns:
+        bool: True if there is a Matlab engine running, False otherwise.
+
+    """
+    if not _matlab_installed:  # pragma: no matlab
+        out = False
+    else:  # pragma: matlab
+        out = (len(matlab.engine.find_matlab()) != 0)
+    return out
+
+
 def locate_matlabroot():  # pragma: matlab
     r"""Find directory that servers as matlab root.
 
