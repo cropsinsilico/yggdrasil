@@ -10,9 +10,6 @@ docs/source/cis_interface*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
 
-# Plots for timing purposes
-scaling_*.png
-
 # Coverage
 .coveragerc
 .coverage
