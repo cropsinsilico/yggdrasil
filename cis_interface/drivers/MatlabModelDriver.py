@@ -1,5 +1,5 @@
 import subprocess
-from logging import debug, warning
+from logging import debug
 from datetime import datetime
 import os
 import weakref
@@ -7,8 +7,8 @@ try:  # pragma: matlab
     import matlab.engine
     _matlab_installed = True
 except ImportError:  # pragma: no matlab
-    warning("Could not import matlab.engine. " +
-            "Matlab support will be disabled.")
+    debug("Could not import matlab.engine. " +
+          "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface import backwards, tools

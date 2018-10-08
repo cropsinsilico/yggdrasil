@@ -204,13 +204,13 @@ def get_installed_comm():
 
     """
     # TODO: Do this using schema as above.
-    from cis_interface.communication.RMQComm import _rmq_installed
+    from cis_interface.communication.RMQComm import _rmq_server_running
     out = []
     if _ipc_installed:
         out.append('IPCComm')
     if _zmq_installed:
         out.append('ZMQComm')
-    if _rmq_installed:
+    if _rmq_server_running:
         out.append('RMQComm')
     return out
 

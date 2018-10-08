@@ -3,13 +3,13 @@
 #
 import os
 import sys
-from logging import warning
+from logging import debug
 from cis_interface.drivers.ModelDriver import ModelDriver
 try:  # pragma: lpy
     from openalea import lpy
 except ImportError:  # pragma: no lpy
-    warning("Could not import openalea.lpy. " +
-            "LPy support will be disabled.")
+    debug("Could not import openalea.lpy. " +
+          "LPy support will be disabled.")
     lpy = None
 from cis_interface.schema import register_component
 _lpy_installed = (lpy is not None)

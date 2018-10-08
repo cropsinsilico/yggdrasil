@@ -77,6 +77,16 @@ def cistime_lang():
     timing.plot_scalings(compare='language')
 
 
+def cistime_os():
+    r"""Plot timing statistics comparing the different operating systems."""
+    timing.plot_scalings(compare='platform')
+
+
+def cistime_py():
+    r"""Plot timing statistics comparing the different versions of Python."""
+    timing.plot_scalings(compare='python')
+
+
 if __name__ == '__main__':
     cisrun()
     sys.exit(0)

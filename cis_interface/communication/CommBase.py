@@ -551,6 +551,7 @@ class CommBase(tools.CisClass):
                 comm. Defaults to False.
 
         """
+        self.debug("")
         if (not skip_base):
             self.debug('')
             if linger and self.is_open:
@@ -616,7 +617,7 @@ class CommBase(tools.CisClass):
         else:
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain)
-        self.debug("Finished")
+        self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
     def matlab_atexit(self):  # pragma: matlab
         r"""Close operations including draining receive."""
@@ -965,8 +966,8 @@ class CommBase(tools.CisClass):
         kws['address'] = header['address']
         if work_comm_name is None:
             cls = kws.get("comm", tools.get_default_comm())
-            work_comm_name = 'temp_%s_%s.%s' % (
-                cls, kws['direction'], header['id'])
+            work_comm_name = '%s_temp_%s_%s.%s' % (
+                self.name, cls, kws['direction'], header['id'])
         c = get_comm(work_comm_name, **kws)
         return c
 
@@ -1062,6 +1063,7 @@ class CommBase(tools.CisClass):
             bool: True if EOF message should be sent, False otherwise.
 
         """
+        self.debug('')
         msg_s = backwards.unicode2bytes(self.eof_msg)
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
@@ -1357,6 +1359,7 @@ class CommBase(tools.CisClass):
             self.exception('Failed to recv.')
             return (False, None)
         if self.single_use and self._used:
+            self.debug('Linger close on single use')
             self.linger_close()
         return (flag, msg)
 

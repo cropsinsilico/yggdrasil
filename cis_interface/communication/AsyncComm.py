@@ -36,6 +36,7 @@ class AsyncComm(CommBase.CommBase):
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
         self.backlog_open = False
+        self.loop_count = 0
         super(AsyncComm, self).__init__(name, **kwargs)
 
     def printStatus(self, nindent=0):
@@ -289,11 +290,17 @@ class AsyncComm(CommBase.CommBase):
     def run_backlog_send(self):
         r"""Continue trying to send buffered messages."""
         if not self.is_open_backlog:  # pragma: debug
+            self.debug("Backlog closed")
             self._close_backlog()
             return
         if not self.send_backlog():  # pragma: debug
+            self.debug("Stopping because send_backlog failed")
             self._close_backlog()
             return
+        self.loop_count += 1
+        if (self.loop_count % 100) == 0:
+            self.debug("Sleeping (is_confirmed_send=%s)",
+                       str(self.is_confirmed_send))
         self.sleep()
 
     def run_backlog_recv(self):
@@ -311,6 +318,10 @@ class AsyncComm(CommBase.CommBase):
             self.debug("Stopping backlog recv thread")
             self.backlog_thread.set_break_flag()
             return
+        self.loop_count += 1
+        if (self.loop_count % 100) == 0:
+            self.debug("Sleeping (is_confirmed_recv=%s)",
+                       str(self.is_confirmed_recv))
         self.sleep()
 
     def send_backlog(self):

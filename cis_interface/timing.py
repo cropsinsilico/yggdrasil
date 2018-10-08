@@ -1,22 +1,26 @@
 import os
 import sys
 import time
+import copy
 import yaml
 import uuid
 import perf
 import subprocess
 import warnings
 import tempfile
+import itertools
 import numpy as np
-from cis_interface import tools, runner, examples, backwards, platform
+import logging
+from cis_interface import tools, runner, examples, backwards
+from cis_interface import platform as cis_platform
 from cis_interface.tests import CisTestBase
 import matplotlib as mpl
-import matplotlib.pyplot as plt
-mpl.use('TkAgg')
-_linewidth = 4
-mpl.rcParams['axes.linewidth'] = _linewidth
-mpl.rcParams['axes.labelweight'] = 'bold'
-mpl.rcParams['font.weight'] = 'bold'
+if os.environ.get('DISPLAY', '') == '':  # pragma: debug
+    mpl.use('Agg')
+elif cis_platform._is_osx:
+    mpl.use('TkAgg')
+import matplotlib.pyplot as plt  # noqa: E402
+_linewidth = 2
 
 
 _lang_list = tools.get_installed_lang()
@@ -135,11 +139,19 @@ class TimedRun(CisTestBase, tools.CisClass):
             'benches.json'.
         comm_type (str, optional): Name of communication class that should be
             used for tests. Defaults to the current default comm class.
+        platform (str, optional): Platform that the test should be run on. If the
+            data doesn't already exist and this doesn't match the current
+            platform, an error will be raised. Defaults to the current platform.
+        python_ver (str, optional): Version of Python that the test should be run
+            with. If the data doesn't already exist and this doesn't match the
+            current version of python, an error will be raised. Defaults to the
+            current version of python.
 
     Attributes:
         lang_src (str): Language that messages should be sent from.
         lang_dst (str): Language that messages should be sent to.
         platform (str): Platform that the test is being run on.
+        python_ver (str): Version of Python that the test should be run with.
         scalings_file (str): Full path to the file where scalings data will be
             saved.
         perf_file (str): Full path to file containing a perf BenchmarkSuite
@@ -149,24 +161,25 @@ class TimedRun(CisTestBase, tools.CisClass):
 
     """
     def __init__(self, lang_src, lang_dst, name='timed_pipe',
-                 scalings_file=None, perf_file=None, comm_type=None, **kwargs):
+                 scalings_file=None, perf_file=None,
+                 comm_type=None, platform=None, python_ver=None, **kwargs):
         if comm_type is None:
             comm_type = tools.get_default_comm()
+        if platform is None:
+            platform = cis_platform._platform
+        if python_ver is None:
+            python_ver = backwards._python_version
+        suffix = '%s_%s_py%s' % (name, platform, python_ver.replace('.', ''))
         if scalings_file is None:
-            scalings_file = os.path.join(os.getcwd(), 'scaling_%s_%s.dat' % (
-                name, comm_type))
+            scalings_file = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
         if perf_file is None:
-            perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % name)
+            perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
         self.scalings_file = scalings_file
         self.perf_file = perf_file
         self.comm_type = comm_type
+        self.platform = platform
+        self.python_ver = python_ver
         self.program_name = name
-        if platform._is_win:
-            self.platform = 'Windows'
-        elif platform._is_osx:
-            self.platform = 'OSX'
-        else:
-            self.platform = 'Linux'
         name = '%s_%s_%s' % (name, lang_src, lang_dst)
         tools.CisClass.__init__(self, name)
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
@@ -180,6 +193,20 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.foutput = dict()
         self.entries = dict()
 
+    def can_run(self):
+        r"""Determine if the test can be run from the current platform and
+        python version.
+
+        Returns:
+            bool: True if the test can be run, False otherwise.
+
+        """
+        # print(self.platform.lower(), cis_platform._platform.lower())
+        # print(self.python_ver, backwards._python_version)
+        out = ((self.platform.lower() == cis_platform._platform.lower()) and
+               (self.python_ver == backwards._python_version))
+        return out
+
     def entry_name(self, nmsg, msg_size):
         r"""Get a unique identifier for a run.
 
@@ -188,10 +215,11 @@ class TimedRun(CisTestBase, tools.CisClass):
             msg_size (int): Size of each message that should be sent.
 
         """
-        out = '%s(%s,%s,%s,%s,%d,%d)' % (self.program_name,
-                                         self.platform, self.comm_type,
-                                         self.lang_src, self.lang_dst,
-                                         nmsg, msg_size)
+        out = '%s(%s,%s,%s,%s,%s,%d,%d)' % (self.program_name,
+                                            self.platform, self.python_ver,
+                                            self.comm_type,
+                                            self.lang_src, self.lang_dst,
+                                            nmsg, msg_size)
         return out
 
     @property
@@ -411,6 +439,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                 nrep_remain -= self.perf.get_benchmark(entry_name).get_nvalue()
         # TODO: Properly handle partial overwrite
         if (self.perf is None) or overwrite or (nrep_remain > 0):
+            if not self.can_run():
+                raise Exception("Cannot run this test.")
             write_perf_script(self.perfscript, nmsg, msg_size, nrep=nrep_remain,
                               lang_src=self.lang_src,
                               lang_dst=self.lang_dst,
@@ -427,8 +457,11 @@ class TimedRun(CisTestBase, tools.CisClass):
             ret = (min(out.get_values()), out.mean(), out.stdev())
         # self.info(out.get_runs()[0].values)
         # self.info(out.get_values())
-        self.info((out.get_nvalue(), out.get_loops()))
-        self.info(ret)
+        # self.info((out.get_nvalue(), out.get_loops()))
+        # self.info(ret)
+        self.info("Result for %s: %f +/- %f (%d runs)",
+                  self.entry_name(nmsg, msg_size), ret[1], ret[2],
+                  out.get_nvalue())
         return ret
 
     def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
@@ -448,7 +481,10 @@ class TimedRun(CisTestBase, tools.CisClass):
                 required to execute the program.
 
         """
-        if (nmsg, msg_size) not in self.data[self.name] or overwrite:
+        entry_name = self.entry_name(nmsg, msg_size)
+        if entry_name not in self.data[self.name] or overwrite:
+            if not self.can_run():
+                raise Exception("Cannot run this test.")
             out = np.zeros(nrep, 'double')
             for i in range(nrep):
                 run_uuid = self.before_run(nmsg, msg_size)
@@ -457,10 +493,38 @@ class TimedRun(CisTestBase, tools.CisClass):
                 t1 = time.time()
                 out[i] = t1 - t0
                 self.after_run(run_uuid, np.mean(out))
-            self.data[self.name][(nmsg, msg_size)] = (
+            self.data[self.name][entry_name] = (
                 np.min(out), np.mean(out), np.std(out))
             self.save_scalings()
-        return self.data[self.name][(nmsg, msg_size)]
+        return self.data[self.name][entry_name]
+
+    @classmethod
+    def class_plot(cls, lang_src='python', lang_dst='python', **kwargs):
+        """Create the class for a given combo of languages and comm types, then
+        call plot_scaling_join.
+
+        Args:
+            lang_src (str, optional): Language that messages should be sent from.
+                Defaults to 'python'.
+            lang_dst (str, optional): Language that messages should be sent to.
+                Defaults to 'python'.
+            **kwargs: Additional keywords are passed to either the class
+                constructor or plot_scaling_joint as appropriate.
+
+        Returns:
+            tuple(matplotlib.Axes, matplotlib.Axes): Pair of axes containing the
+                plotted scalings.
+
+        """
+        cls_kwargs_keys = ['name', 'scalings_file',
+                           'perf_file', 'comm_type', 'platform', 'python_ver']
+        cls_kwargs = {}
+        for k in cls_kwargs_keys:
+            if k in kwargs:
+                cls_kwargs[k] = kwargs.pop(k)
+        x = TimedRun(lang_src, lang_dst, **cls_kwargs)
+        axs = x.plot_scaling_joint(**kwargs)
+        return axs
 
     def plot_scaling_joint(self, msg_size0=1000, msg_count0=5,
                            msg_size=None, msg_count=None, axs=None, **kwargs):
@@ -496,37 +560,33 @@ class TimedRun(CisTestBase, tools.CisClass):
         if msg_count is None:
             msg_count = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
         if axs is None:
-            fig, axs = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
+            figure_size = (15.0, 6.0)
+            figure_buff = 0.75
+            fig, axs = plt.subplots(1, 2, figsize=figure_size, sharey=True)
             axs[0].set_xlabel('Message Count (size = %d)' % msg_size0)
             if kwargs.get('per_message', False):
                 axs[0].set_ylabel('Time per Message (s)')
             else:
                 axs[0].set_ylabel('Time (s)')
             axs[1].set_xlabel('Message Size (count = %d)' % msg_count0)
-            axs_width = 1.0  # 0.75
-            axs_height = 0.85
-            box1 = axs[0].get_position()
-            pos1 = [box1.x0, box1.y0, axs_width * box1.width, axs_height * box1.height]
+            axs_wbuffer = figure_buff / figure_size[0]
+            axs_hbuffer = figure_buff / figure_size[1]
+            axs_width = (1.0 - (3.0 * axs_wbuffer)) / 2.0
+            axs_height = 1.0 - (2.0 * axs_hbuffer)
+            pos1 = [axs_wbuffer, axs_hbuffer, axs_width, axs_height]
+            pos2 = [2.0 * axs_wbuffer + axs_width, axs_hbuffer,
+                    axs_width, axs_height]
             axs[0].set_position(pos1)
-            box2 = axs[1].get_position()
-            pos2 = [box2.x0, box2.y0, axs_width * box2.width, axs_height * box2.height]
             axs[1].set_position(pos2)
         self.plot_scaling(msg_size0, msg_count, axs=axs[0], **kwargs)
         self.plot_scaling(msg_size, msg_count0, axs=axs[1], **kwargs)
         # Legend
-        box1 = axs[0].get_position()
-        box2 = axs[1].get_position()
-        # pos1 = [box1.x0, box1.y0, box1.width, box1.height]
-        # pos2 = [box2.x0, box2.y0, box2.width, box2.height]
-        # box_leg = (1.0 + (pos2[0] - (pos1[0] + pos1[2])) / (2.0 * pos1[2]), 1.25)
-        box_leg = (1.0 + (box2.x0 - (box1.x0 + box1.width)) / (2.0 * box1.width), 1.25)
-        legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
-        legend.get_frame().set_linewidth(_linewidth)
+        axs[1].legend(loc='upper left', ncol=2)
         return axs
                            
     def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
                      xscale=None, yscale='linear', plot_kws={},
-                     time_method='bestof', per_message=False, **kwargs):
+                     time_method='average', per_message=False, **kwargs):
         r"""Plot scaling of run time with a variable.
 
         Args:
@@ -548,7 +608,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 Defaults to {}.
             time_method (str, optional): Timing method that should be used.
                 Valid values include 'bestof' and 'average'. Defaults to
-                'bestof'.
+                'average'.
             per_message (bool, optional): If True, the time per message is
                 returned rather than the total time. Defaults to False.
             **kwargs: Additional keyword arguments are passed to scaling_size or
@@ -611,12 +671,21 @@ class TimedRun(CisTestBase, tools.CisClass):
         if yerr is not None:
             # Convert yscale to prevent negative values for log y
             if yscale == 'log':
-                ylower = np.maximum(1e-2, y - yerr)
+                ylower = y - yerr
+                ylower[ylower <= 0] = 1.0e-6
+                # ylower = np.maximum(1e-6, y - yerr)
                 yerr_lower = y - ylower
+                yerr_upper = yerr
             else:
-                yerr_lower = y - yerr
-            axs.errorbar(x, y, yerr=[yerr_lower, 2 * yerr],
-                         label=label, **plot_kws)
+                yerr_lower = yerr
+                yerr_upper = yerr
+            axs.plot(x, y, label=label, **plot_kws)
+            plot_kws_fill = copy.deepcopy(plot_kws)
+            plot_kws_fill['linewidth'] = 0
+            plot_kws_fill['alpha'] = 0.2
+            axs.fill_between(x, y - yerr_lower, y + yerr_upper, **plot_kws_fill)
+            # axs.errorbar(x, y, yerr=[yerr_lower, yerr_upper],
+            #              label=label, **plot_kws)
         else:
             axs.plot(x, y, label=label, **plot_kws)
         return axs
@@ -759,82 +828,108 @@ class TimedRun(CisTestBase, tools.CisClass):
             backwards.pickle.dump(self.data, fd)
 
 
-def plot_scalings(plotfile=None, show_plot=False, compare='language',
-                  scalings_file=None, test_name='timed_pipe',
-                  comm_type=None, language='python', **kwargs):
-    r"""Plot the scalings comparing different communication mechanisms and
-    languages. This can be time consuming.
+def plot_scalings(compare='commtype', compare_values=None,
+                  plotfile=None, test_name='timed_pipe',
+                  **kwargs):
+    r"""Plot comparison of scaling for chosen variable.
 
     Args:
-        plotfile (str, optional): Path to file where the figure should be saved.
-            If None, one will be created.
-        compare (str, optional): Variable that should be compared. Valid values
-            include 'language' and 'commtype'. Defaults to 'language'.
-        show_plot (bool, optional): If True, the plot will be displayed before
-            it is saved. Defaults to False.
-        scalings_file (str, optional): Path to the file containing scalings
-            data that should be updated and plotted. Defaults to None and is
-            created based on 'test_name'.
-        comm_type (str, optional): Name of communication class that should be
-            used for tests comparing communication between models in different
-            languages. Defaults to the current default comm class.
-        language (str, optional): Language of model that should be used for
-            a comparison of different comm types. Defaults to 'python'.
+        compare (str, optional): Name of variable that should be compared.
+            Valid values are 'language', 'commtype', 'platform', 'python'.
+            Defaults to 'commtype'.
+        compare_values (list, optional): Values that should be plotted.
+            If not provided, the values will be determined based on the
+            current platform.
         **kwargs: Additional keyword arguments are passed to plot_scaling_joint.
 
     Returns:
         str: Path where the figure was saved.
 
     """
-    if comm_type is None:
-        comm_type = tools.get_default_comm()
-    if compare not in ['commtype', 'language']:
-        raise ValueError("Invalid compare: '%s'" % compare)
-    time_method = kwargs.get('time_method', 'bestof')
-    if plotfile is None:
-        if compare == 'commtype':
-            plotfile = os.path.join(os.getcwd(), 'scaling_commtype_%s_%s_%s.png' % (
-                test_name, language, time_method))
-        elif compare == 'language':
-            plotfile = os.path.join(os.getcwd(), 'scaling_language_%s_%s_%s.png' % (
-                test_name, comm_type, time_method))
-    # Iterate over variable
-    axs = None
+    default_vars = {'comm_type': tools.get_default_comm(),
+                    'lang_src': 'python',
+                    'lang_dst': 'python',
+                    'platform': cis_platform._platform,
+                    'python_ver': backwards._python_version}
+    default_vals = {'commtype': _comm_list,
+                    'language': _lang_list,
+                    'platform': ['Linux', 'OSX', 'Windows'],
+                    'python': ['2.7', '3.5']}
+    if compare_values is None:
+        compare_values = default_vals.get(compare, None)
+    else:
+        assert(isinstance(compare_values, list))
     if compare == 'commtype':
-        colors = {'ZMQ': 'b', 'IPC': 'r', 'RMQ': 'g'}
-        styles = {}
-        for c0 in _comm_list:
-            l1 = language
-            l2 = language
-            label = c0.split('Comm')[0]
-            clr = colors[label]
-            sty = '-'
-            yscale = 'linear'
-            plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
-            x = TimedRun(l1, l2, scalings_file=scalings_file,
-                         name=test_name, comm_type=c0)
-            axs = x.plot_scaling_joint(axs=axs, label=label, yscale=yscale,
-                                       plot_kws=plot_kws, **kwargs)
+        color_var = 'comm_type'
+        color_map = {'ZMQComm': 'b', 'IPCComm': 'r', 'RMQComm': 'g'}
+        style_var = None
+        style_map = None
+        var_list = compare_values
+        var_kws = [{color_var: k} for k in var_list]
+        kws2label = lambda x: x['comm_type'].split('Comm')[0]  # noqa: E731
+        yscale = 'linear'
     elif compare == 'language':
-        colors = {'python': 'b', 'matlab': 'm',
-                  'c': 'g', 'cpp': 'r'}
-        styles = {'python': '-', 'matlab': ';',
-                  'c': '--', 'cpp': ':'}
-        for l1 in _lang_list:
-            clr = colors[l1]
-            for l2 in _lang_list:
-                sty = styles[l2]
-                label = '%s to %s' % (l1, l2)
-                yscale = 'log'
-                plot_kws = {'color': clr, 'linestyle': sty,
-                            'linewidth': _linewidth}
-                x = TimedRun(l1, l2, scalings_file=scalings_file,
-                             name=test_name, comm_type=comm_type)
-                axs = x.plot_scaling_joint(axs=axs, label=label, yscale=yscale,
-                                           plot_kws=plot_kws, **kwargs)
-    # legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
-    # legend.get_frame().set_linewidth(_linewidth)
-    if show_plot:
-        plt.show()
+        color_var = 'lang_src'
+        color_map = {'python': 'b', 'matlab': 'm', 'c': 'g', 'cpp': 'r'}
+        style_var = 'lang_dst'
+        style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
+        var_list = itertools.product(compare_values, repeat=2)
+        var_kws = [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
+        kws2label = lambda x: '%s to %s' % (x['lang_src'], x['lang_dst'])  # noqa: E731
+        yscale = 'linear'  # was log originally
+    elif compare == 'platform':
+        color_var = 'platform'
+        color_map = {'Linux': 'b', 'Windows': 'r', 'OSX': 'g'}
+        style_var = None
+        style_map = None
+        var_list = compare_values
+        var_kws = [{color_var: k} for k in var_list]
+        kws2label = lambda x: x[color_var]  # noqa: E731
+        yscale = 'linear'
+    elif compare == 'python':
+        color_var = 'python_ver'
+        color_map = {'2.7': 'b', '3.4': 'g', '3.5': 'orange', '3.6': 'r',
+                     '3.7': 'm'}
+        style_var = None
+        style_map = None
+        var_list = compare_values
+        var_kws = [{color_var: k} for k in var_list]
+        kws2label = lambda x: x[color_var]  # noqa: E731
+        yscale = 'linear'
+    else:
+        raise ValueError("Invalid compare: '%s'" % compare)
+    # Raise error if any of the varied keys are set in kwargs
+    for k in var_kws[0].keys():
+        if k in kwargs:
+            raise RuntimeError("Cannot set variable '%s' when comparing '%s' " % (
+                k, compare))
+    # Create plotfile name with information in it
+    if plotfile is None:
+        plotbase = 'compare_%s_%s' % (test_name, compare)
+        for k in sorted(default_vars.keys()):
+            v = default_vars[k]
+            if k not in var_kws[0]:
+                plotbase += '_%s' % v.replace('.', '')
+        plotbase += '_%s.png' % kwargs.get('time_method', 'average')
+        plotfile = os.path.join(os.getcwd(), plotbase)
+    # Iterate over variables
+    axs = None
+    for kws in var_kws:
+        for k, v in default_vars.items():
+            if k not in kws:
+                kws[k] = v
+        label = kws2label(kws)
+        clr = 'b'
+        sty = '-'
+        if color_map is not None:
+            clr = color_map[kws[color_var]]
+        if style_map is not None:
+            sty = style_map[kws[style_var]]
+        plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
+        kws.update(kwargs)
+        axs = TimedRun.class_plot(name=test_name, axs=axs, label=label,
+                                  yscale=yscale, plot_kws=plot_kws, **kws)
+    # Save plot
     plt.savefig(plotfile)
+    logging.info('plotfile: %s', plotfile)
     return plotfile

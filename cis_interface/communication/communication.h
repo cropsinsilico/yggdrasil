@@ -609,7 +609,7 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
       sending_eof = 1;
       cislog_debug("comm_send(%s): Sending EOF", x.name);
     } else {
-      cislog_info("comm_send(%s): EOF already sent", x.name);
+      cislog_debug("comm_send(%s): EOF already sent", x.name);
       return ret;
     }
   }
@@ -926,7 +926,7 @@ int comm_send_nolimit_eof(const comm_t x) {
     ret = comm_send_nolimit(x, buf, strlen(buf));
     x.sent_eof[0] = 1;
   } else {
-    cislog_info("comm_send_nolimit_eof(%s): EOF already sent", x.name);
+    cislog_debug("comm_send_nolimit_eof(%s): EOF already sent", x.name);
   }
   return ret;
 };

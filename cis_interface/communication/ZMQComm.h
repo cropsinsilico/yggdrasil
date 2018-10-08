@@ -731,17 +731,9 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
     return ret;
   }
-  // Check reply
-  char *dummy = (char*)zframe_data(out);
-  ret = check_reply_recv(&x, dummy, zframe_size(out));
-  if (ret < 0) {
-    cislog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
-    zframe_destroy(&out);
-    return ret;
-  }
-  // Realloc
-  // size_t len_recv = zframe_size(out) + 1;
-  size_t len_recv = (size_t)ret + 1;
+  // Realloc and copy data
+  size_t len_recv = zframe_size(out) + 1;
+  // size_t len_recv = (size_t)ret + 1;
   if (len_recv > len) {
     if (allow_realloc) {
       cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
@@ -759,11 +751,23 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
       return -((int)(len_recv - 1));
     }
   }
-  memcpy(*data, zframe_data(out), len_recv);
-  (*data)[len_recv-1] = '\0';
+  memcpy(*data, zframe_data(out), len_recv - 1);
   zframe_destroy(&out);
+  (*data)[len_recv-1] = '\0';
   ret = (int)len_recv - 1;
-  // ret = check_reply_recv(&x, *data, (size_t)ret);
+  /*
+  if (strlen(*data) != ret) {
+    cislog_error("zmq_comm_recv(%s): Size of string (%d) doesn't match expected (%d)",
+		 x.name, strlen(*data), ret);
+    return -1;
+  }
+  */
+  // Check reply
+  ret = check_reply_recv(&x, *data, ret);
+  if (ret < 0) {
+    cislog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
+    return ret;
+  }
   cislog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
   return ret;
 };
