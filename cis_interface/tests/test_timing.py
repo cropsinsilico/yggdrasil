@@ -76,3 +76,10 @@ def test_plot_scalings():
                          compare_values=[platform._platform], **kwargs)
     timing.plot_scalings(compare='python',
                          compare_values=[backwards._python_version], **kwargs)
+
+
+def test_perfjson_to_pandas():
+    r"""Test perfjson_to_pandas."""
+    x = timing.TimedRun('python', 'python')
+    fname = x.perf_file
+    timing.perfjson_to_pandas(fname)

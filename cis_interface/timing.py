@@ -10,6 +10,7 @@ import warnings
 import tempfile
 import itertools
 import numpy as np
+import pandas as pd
 import logging
 from cis_interface import tools, runner, examples, backwards
 from cis_interface import platform as cis_platform
@@ -933,3 +934,38 @@ def plot_scalings(compare='commtype', compare_values=None,
     plt.savefig(plotfile)
     logging.info('plotfile: %s', plotfile)
     return plotfile
+
+
+def perfjson_to_pandas(json_file):
+    r"""Convert perf benchmarks json file to a Pandas data frame.
+
+    Args:
+        json_file (str): Full path to the JSON benchmarks file that should be
+            added.
+
+    Returns:
+        pandas.DataFrame: Data frame version of perf benchmarks.
+
+    """
+    # Load benchmarks
+    x_js = perf.BenchmarkSuite.load(json_file)
+    meta = copy.deepcopy(x_js.get_metadata())
+    data = None
+    # Loop over keys
+    for k in x_js.get_benchmark_names():
+        meta['test_name'], rem = k.split('(')
+        test_keys = rem.split(')')[0].split(',')
+        meta['communication_type'] = test_keys[2]
+        meta['language_src'] = test_keys[3]
+        meta['language_dst'] = test_keys[4]
+        meta['message_count'] = int(float(test_keys[5]))
+        meta['message_size'] = int(float(test_keys[6]))
+        for v in x_js.get_benchmark(k).get_values():
+            meta['execution_time'] = v
+            if data is None:
+                data = {mk: [mv] for mk, mv in meta.items()}
+            else:
+                for mk, mv in meta.items():
+                    data[mk].append(mv)
+    x_pd = pd.DataFrame(data)
+    return x_pd
