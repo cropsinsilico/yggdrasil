@@ -31,6 +31,13 @@ for k in ['lpy', 'make', 'cmake']:
 _comm_list = tools.get_installed_comm()
 
 
+# TODO:
+#  - Use pandas with Seaborn for plotting?
+#  - Converting to using sparse benchmark data
+#  - Create separate classes for saving/loading benchmarks and running tests
+#  - Add functions for overwriting specific entries
+
+
 def write_perf_script(script_file, nmsg, msg_size, nrep=10,
                       lang_src='python', lang_dst='python',
                       comm_type=None):
