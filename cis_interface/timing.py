@@ -15,6 +15,7 @@ import logging
 from cis_interface import tools, runner, examples, backwards
 from cis_interface import platform as cis_platform
 from cis_interface.tests import CisTestBase
+from cis_interface.drivers import MatlabModelDriver
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':  # pragma: debug
     mpl.use('Agg')
@@ -105,7 +106,7 @@ def perf_func(loops, timer, nmsg, msg_size):
         while not flag:
             try:
                 t0 = perf.perf_counter()
-                tI = timer.run(run_uuid)
+                timer.run(run_uuid, timer=perf.perf_counter, t0=t0)
                 t1 = perf.perf_counter()
                 tdif = t1 - t0
                 timer.after_run(run_uuid, tdif)
@@ -185,6 +186,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             scalings_file = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
         if perf_file is None:
             perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
+        self.matlab_running = MatlabModelDriver.is_matlab_running()
         self.scalings_file = scalings_file
         self.perf_file = perf_file
         self.comm_type = comm_type
@@ -231,6 +233,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                                             self.comm_type,
                                             self.lang_src, self.lang_dst,
                                             nmsg, msg_size)
+        if self.matlab_running and ('matlab' in [self.lang_src, self.lang_dst]):
+            out += '-MLStarted'
         return out
 
     @property
@@ -441,29 +445,33 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.cleanup_output(fout)
         self.reset_log()
         self.reset_default_comm()
+        assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
-    def run(self, run_uuid, time_func=None):
+    def run(self, run_uuid, timer=None, t0=None):
         r"""Run test sending a set of messages between the designated models.
 
         Args:
             run_uuid (str): Unique ID for the run.
-            time_func (function, optional): Function that should be called after
-                creating the runner to get the intermediate time. Defaults to
-                time.time if not provided.
+            timer (function, optional): Function that should be called to get
+                intermediate timing statistics. Defaults to time.time if not
+                provided.
+            t0 (float, optional): Zero point for timing statistics. Is set
+                using the provided timer if not provided.
 
         Returns:
-            float: Intermediate time resulting from calling time_func.
+            dict: Intermediate times from the run.
 
         """
-        if time_func is None:
-            time_func = time.time
+        if timer is None:
+            timer = time.time
+        if t0 is None:
+            t0 = timer()
         r = runner.get_runner(self.fyaml[run_uuid],
                               namespace=self.name + run_uuid)
-        t_int = time_func()
-        r.run()
+        times = r.run(timer=timer, t0=t0)
         assert(not r.error_flag)
-        return t_int
+        return times
 
     def time_run(self, *args, **kwargs):
         if self._use_mine:
@@ -545,7 +553,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             for i in range(nrep):
                 run_uuid = self.before_run(nmsg, msg_size)
                 t0 = time.time()
-                tI = self.run(run_uuid)
+                self.run(run_uuid, timer=time.time, t0=t0)
                 t1 = time.time()
                 out[i] = t1 - t0
                 self.after_run(run_uuid, np.mean(out))
@@ -982,6 +990,9 @@ def plot_scalings(compare='commtype', compare_values=None,
         style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = itertools.product(compare_values, repeat=2)
         var_kws = [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
+        if 'matlab' in compare_values:
+            var_kws.append({'lang_src': 'matlab', 'lang_dst': 'matlab',
+                            'start_matlab': True})
         kws2label = lambda x: '%s to %s' % (x['lang_src'], x['lang_dst'])  # noqa: E731
         yscale = 'linear'  # was log originally
     elif compare == 'platform':
@@ -997,11 +1008,13 @@ def plot_scalings(compare='commtype', compare_values=None,
         color_var = 'python_ver'
         color_map = {'2.7': 'b', '3.4': 'g', '3.5': 'orange', '3.6': 'r',
                      '3.7': 'm'}
-        style_var = None
-        style_map = None
+        style_var = 'lang_src'
+        style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = compare_values
         var_kws = [{color_var: k} for k in var_list]
-        kws2label = lambda x: x[color_var]  # noqa: E731
+        for k in var_list:
+            var_kws.append({color_var: k, 'lang_src': 'c', 'lang_dst': 'c'})
+        kws2label = lambda x: '%s (%s)' % (x[color_var], x[style_var])  # noqa: E731
         yscale = 'linear'
     else:
         raise ValueError("Invalid compare: '%s'" % compare)
@@ -1037,9 +1050,15 @@ def plot_scalings(compare='commtype', compare_values=None,
             sty = style_map[kws[style_var]]
         plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
         kws.update(kwargs)
+        if 'start_matlab' in kws:
+            ml_screen, ml_engine, ml_session = MatlabModelDriver.start_matlab()
+            label += ' (Existing Session)'
+            plot_kws['alpha'] = 0.5
         axs, fit = TimedRun.class_plot(name=test_name, axs=axs, label=label,
                                        yscale=yscale, plot_kws=plot_kws, **kws)
         fits[label] = fit
+        if 'start_matlab' in kws:
+            MatlabModelDriver.stop_matlab(ml_screen, ml_engine, ml_session)
     # Print a table
     print('%-20s\t%-20s\t%-20s' % ('Label', 'Time per Message (s)', 'Overhead (s)'))
     print('%-20s\t%-20s\t%-20s' % (20 * '=', 20 * '=', 20 * '='))

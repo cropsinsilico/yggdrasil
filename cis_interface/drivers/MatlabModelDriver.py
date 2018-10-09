@@ -83,7 +83,7 @@ def start_matlab():  # pragma: matlab
     if not _matlab_installed:  # pragma: no matlab
         raise RuntimeError("Matlab is not installed.")
     old_matlab = set(matlab.engine.find_matlab())
-    screen_session = str('matlab' + datetime.today().strftime("%Y%j%H%M%S") +
+    screen_session = str('cis_matlab' + datetime.today().strftime("%Y%j%H%M%S") +
                          '_%d' % len(old_matlab))
     try:
         args = ['screen', '-dmS', screen_session, '-c',
@@ -103,7 +103,9 @@ def start_matlab():  # pragma: matlab
     if (len(set(matlab.engine.find_matlab()) - old_matlab) == 0):  # pragma: debug
         raise Exception("start_matlab timed out at %f s" % T.elapsed)
     new_matlab = list(set(matlab.engine.find_matlab()) - old_matlab)[0]
-    return screen_session, new_matlab
+    # Connect to the engine
+    matlab_engine = matlab.engine.connect_matlab(new_matlab)
+    return screen_session, matlab_engine, new_matlab
 
 
 def stop_matlab(screen_session, matlab_engine, matlab_session):  # pragma: matlab
@@ -330,7 +332,6 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
     def __init__(self, name, args, **kwargs):
         if not _matlab_installed:  # pragma: no matlab
-            # self.screen_session, self.mlsession = start_matlab()
             raise RuntimeError("Matlab is not installed.")
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
         self.started_matlab = False
@@ -356,21 +357,16 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         # Connect to matlab, start if not running
         if len(matlab.engine.find_matlab()) == 0:
             self.debug("Starting a matlab shared engine")
-            self.screen_session, self.mlsession = start_matlab()
+            self.screen_session, self.mlengine, self.mlsession = start_matlab()
             self.started_matlab = True
         else:
             self.mlsession = matlab.engine.find_matlab()[0]
-        try:
-            self.mlengine = matlab.engine.connect_matlab(self.mlsession)
-        except matlab.engine.EngineError:
-            self.debug("Starting a matlab shared engine")
-            self.screen_session, self.mlsession = start_matlab()
-            self.started_matlab = True
             try:
                 self.mlengine = matlab.engine.connect_matlab(self.mlsession)
-            except matlab.engine.EngineError as e:  # pragma: debug
-                self.error("Could not connect to matlab engine")
-                self.raise_error(e)
+            except matlab.engine.EngineError:
+                self.debug("Starting a matlab shared engine")
+                self.screen_session, self.mlengine, self.mlsession = start_matlab()
+                self.started_matlab = True
         # Add things to Matlab environment
         self.mlengine.addpath(_top_dir, nargout=0)
         self.mlengine.addpath(_incl_interface, nargout=0)
