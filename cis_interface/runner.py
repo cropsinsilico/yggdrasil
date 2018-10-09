@@ -3,6 +3,7 @@ import sys
 import logging
 # import atexit
 import os
+import time
 import signal
 from pprint import pformat
 from itertools import chain
@@ -165,15 +166,25 @@ class CisRunner(CisClass):
         for k, v in self._old_handlers.items():
             signal.signal(k, v)
 
-    def run(self, signal_handler=None):
+    def run(self, signal_handler=None, timer=None):
         r"""Run all of the models and wait for them to exit."""
+        if timer is None:
+            timer = time.time
+        times = {}
+        times['init'] = timer()
         self.loadDrivers()
+        times['loaded'] = timer()
         self.startDrivers()
+        times['started'] = timer()
         self.set_signal_handler(signal_handler)
         self.waitModels()
+        times['model_exit'] = timer()
         self.reset_signal_handler()
         self.closeChannels()
+        times['closed_channels'] = timer()
         self.cleanup()
+        times['cleaned_up'] = timer()
+        return times
 
     @property
     def all_drivers(self):
