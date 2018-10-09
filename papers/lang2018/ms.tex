@@ -487,37 +487,53 @@ Python			& Python				& 0.12				& 1.73			\\
 \label{tab:language}
 \end{table}%
 %
-For the most part, the time required per message is not affected by the language of either model. There is a very small increase in the time per message when there is a Python model involved, but this is much lower than the standard deviation resulting from background activity on the test machine and so is in conclusive.
+For the most part, the time required per message is not affected by the language of either model for smaller messages. There is a very small increase in the time per message when there is a Python model involved, but this is much lower than the standard deviation resulting from background activity on the test machine and so is in conclusive. Language does play a role for messages larger than the maximum ($2^{20}$ bytes), when messages must be broken into smaller pieces. In particular, integrations that include a C or C++ receiving model scale more strongly than for those that have a Python receiving model because, in addition to the input/output connection drivers, the Python interface itself is asynchronous while the C/C++ interface is not. This means that while Python receiving models have concurrent operations to receive, backlog, and confirm messages, C/C++ models will block on each receive until the input connection driver completes the confirmation handshake. In addition, because C/C++ models are not continuously receiving and backlogging messages, the channel will become saturated. Once it reaches its maximum, the input connection driver can no longer pass along messages and must wait for the model to receive the next message. One remedy that is being explored for future releases, is to make the C/C++ interface asynchronous as well. However, this is a low priority as only models with very rapid and high volume input (such as the test models) are affected.
 
 The largest difference between the different test cases is in in the overhead. Every model driver entails some overhead. For interpreted languages (e.g. Python and Matlab), the majority of the overhead comes from starting the interpreter. For Matlab, this is particularly time consuming. Although this is only a one-time cost required at the start of an integration, {\cis} does offer ways to alleviate this if multiple runs are necessary by starting a Matlab engine prior to the first integration that can be used by subsequent runs \todo{(results that include existing Matlab engine)}.
 
 For compiled languages (C and C++), the overhead comes from compiling the source code which is done in serial. The time required for compilation will depend on the compiler used and the complexity of the model code. For command line compiled models, {\cis} forces the model to be recompiled every time to ensure any changes to the source code are propagated. However, for models that use Make and CMake, overhead due to compile time can be reduced by using existing builds.
 
-Interestingly, the recorded overheads were not symmetric or additive. For example, the Python-to-C integrations required more overhead than the C-to-Python integrations. This is because the models are started in parallel, but do not require the same amount of time to start. In a Python-to-C integration, the C model must wait for the Python model to finish its much slower startup and begin sending message, while in a C-to-Python integration, the C model can immediately begin sending messages that will be received by the Python model once it finishes starting up. In addition, the Python-to-Python integrations required less time than any of the other integrations because, although Python models take longer to start up, the start up is \todo{explanation?}
+Interestingly, the recorded overheads were not symmetric or additive. For example, the Python-to-C integrations required more overhead than the C-to-Python integrations. This is because the models are started in parallel, but do not require the same amount of time to start and being execution. C models, while requiring compilation, start much faster than Python models. In a Python-to-C integration, the C model must wait for the Python model to finish its much slower startup and begin sending message, while in a C-to-Python integration, the C model can immediately begin sending messages that will be received by the Python model once it finishes starting up. In addition, the Python-to-Python integrations required less time than any of the other integrations that included Python because, although Python models take longer to start up, the start up is done in parallel while the compilation for the C and C++ models is done in serial. This source of overhead could be ameliorated by compiling models in parallel or in advanced, but is usually not significant enough to effect overall performance.
 %
 \todo{figure/table for Matlab \& discussion}
 
 % PYTHON VERSION
 \subsection{Python Version}\label{SS:results_python}
 %
-Figure \ref{fig:python} compares the execution times when using different versions of Python. The performance tests for both Python 2.7 and Python 3.5 were performed on the Linux machine from above using ZeroMQ communication.
+Figure \ref{fig:python} and Table \ref{tab:python} compare the execution times when using different versions of Python. The performance tests for both Python 2.7 and Python 3.5 were performed on the Linux machine from above using ZeroMQ communication and two different integration (Python-to-Python and C-to-C).
 %
 \ifinclfig
  	\begin{figure}[htbp]
 	\begin{center}
 	\includegraphics[width=\columnwidth,keepaspectratio]{./images/scaling_python.png}
-	\caption{Comparison of communication time scaling between Python versions on Linux.}
+	\caption{Comparison of communication time scaling between Python versions on Linux. The solid lines are for the Python-to-Python integrations and the dotted lines are for the C-to-C integration.}
 	\label{fig:python}
 	\end{center}
 	\end{figure}
 \fi
 %
-\todo{discussion}
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Python Version	& Language	& Time per Message (s) 	& Overhead (s) 	\\\hline
+2.7			& Python		& 0.012				& 1.73			\\
+2.7			& C			& 0.011				& 1.36			\\
+3.5 			& Python		& 0.013				& 2.62			\\
+3.5			& C			& 0.011				& 1.36			\\\hline
+\end{tabular}
+\end{center}
+\caption{Effect of Python version on performance.}
+\label{tab:python}
+\end{table}          
+%
+There is $\sim1$\,s additional overhead with Python 3.5 compared to Python 2.7 due to the increased startup time for the Python 3.5 interpreter. This overhead is only present for integrations that include Python models. For comparison, there is no difference in the time per message and overhead between the different Python versions for the C-to-C integration (dashed lines in Figure \ref{fig:python}). There is a slight difference in time per message between the two versions for Python models that is especially apparent in the scaling of execution time with message size for large messages ($>10^6$ bytes). 
+\todo{discussion of large message scaling}
 
 % PLATFORM
 \subsection{Operating System}\label{SS:results_platform}
 %
-Figure \ref{fig:platform} compares the execution times on different operating systems. The performance tests reported for Linux were run on the machine from above. The tests for Mac OS X were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4. The tests for Windows were run on the same machine from a dual boot of Windows 10. All platform dependent performance tests use ZeroMQ communication.
+Figure \ref{fig:platform} and Table \ref{tab:platform} compare the execution times on different operating systems. The performance tests reported for Linux were run on the machine from above. The tests for Mac OS X were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4. The tests for Windows were run on the same machine from a dual boot of Windows 10. All platform dependent performance tests use ZeroMQ communication and the Python-to-Python integration.
 %
 \ifinclfig
  	\begin{figure}[htbp]
@@ -528,6 +544,20 @@ Figure \ref{fig:platform} compares the execution times on different operating sy
 	\end{center}
 	\end{figure}
 \fi
+%
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Operating System	& Time per Message (s) 	& Overhead (s) 	\\\hline
+Linux			& \todo{?}				& \todo{?}			\\
+Mac OSX			& \todo{?}				& \todo{?}			\\
+Windows			& \todo{?}				& \todo{?}			\\\hline
+\end{tabular}
+\end{center}
+\caption{Effect of operating system on performance.}
+\label{tab:platform}
+\end{table}%
 %
 \todo{Windows results \& discussion}
 
@@ -540,7 +570,7 @@ Figure \ref{fig:platform} compares the execution times on different operating sy
 % CURRENT STATUS
 \subsection{Current Status}\label{SS:current}
 %
-{\cis} is an open-source Python package for connecting computational models across programming languages in scales to form integration networks. Models are run in parallel with asynchronous message passing handled under-the-hood via threading and one of three communication mechanisms. {\cis} works on Linux, Mac OSX, and Windows operating systems with Python 2.7 and $3.4+$. {\cis} currently supports running models written in Python, C, C++, and Matlab with additional support for compiling models C/C++ using Make \citep{Stallman2004} or CMake \citep{Martin2006} and running models written in the LPy \citep{Boudon2012} DSL.
+{\cis} is an open-source Python package for connecting computational models across programming languages in scales to form integration networks. Models are run in parallel with asynchronous message passing handled under-the-hood via threading and one of three communication mechanisms. {\cis} works on Linux, Mac OSX, and Windows operating systems with Python 2.7, 3.4, 3.5, 3.6 and 3.7. {\cis} currently supports running models written in Python, C, C++, and Matlab with additional support for compiling models C/C++ using Make \citep{Stallman2004} or CMake \citep{Martin2006} and running models written in the LPy \citep{Boudon2012} DSL.
 
 {\cis} has already been used to integrate several plant models within the Crops in Silico organization with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. Each square is a model and lines between the models represent connections where information is exchanged. Solid lines are connections we have already implemented, dashed lines are connections we are currently working on, and dotted lines are connections planned for the future. Results from one integration can be found in \todo{cite Kavya/Yu}.
 %
