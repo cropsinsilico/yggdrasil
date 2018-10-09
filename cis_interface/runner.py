@@ -166,24 +166,47 @@ class CisRunner(CisClass):
         for k, v in self._old_handlers.items():
             signal.signal(k, v)
 
-    def run(self, signal_handler=None, timer=None):
-        r"""Run all of the models and wait for them to exit."""
+    def run(self, signal_handler=None, timer=None, t0=None):
+        r"""Run all of the models and wait for them to exit.
+
+        Args:
+            signal_handler (function, optional): Function that should be used as
+                a signal handler. Defaults to None and is set by
+                set_signal_handler.
+            timer (function, optional): Function that should be called to get
+                intermediate timing statistics. Defaults to time.time if not
+                provided.
+            t0 (float, optional): Zero point for timing statistics. Is set
+                using the provided timer if not provided.
+
+        Returns:
+            dict: Intermediate times from the run.
+
+        """
         if timer is None:
             timer = time.time
+        if t0 is None:
+            t0 = timer()
         times = {}
         times['init'] = timer()
         self.loadDrivers()
-        times['loaded'] = timer()
+        times['load drivers'] = timer()
         self.startDrivers()
-        times['started'] = timer()
+        times['start drivers'] = timer()
         self.set_signal_handler(signal_handler)
         self.waitModels()
-        times['model_exit'] = timer()
+        times['run models'] = timer()
         self.reset_signal_handler()
         self.closeChannels()
-        times['closed_channels'] = timer()
+        times['close channels'] = timer()
         self.cleanup()
-        times['cleaned_up'] = timer()
+        times['clean up'] = timer()
+        tprev = t0
+        key_order = ['init', 'load drivers', 'start drivers', 'run models',
+                     'close channels', 'clean up']
+        for k in key_order:
+            self.info('%20s\t%f', k, times[k] - tprev)
+            tprev = times[k]
         return times
 
     @property
