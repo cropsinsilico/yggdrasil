@@ -105,7 +105,7 @@ def perf_func(loops, timer, nmsg, msg_size):
         while not flag:
             try:
                 t0 = perf.perf_counter()
-                tI = timer.run(run_uuid)
+                timer.run(run_uuid, timer=perf.perf_counter, t0=t0)
                 t1 = perf.perf_counter()
                 tdif = t1 - t0
                 timer.after_run(run_uuid, tdif)
@@ -443,27 +443,30 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.reset_default_comm()
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
-    def run(self, run_uuid, time_func=None):
+    def run(self, run_uuid, timer=None, t0=None):
         r"""Run test sending a set of messages between the designated models.
 
         Args:
             run_uuid (str): Unique ID for the run.
-            time_func (function, optional): Function that should be called after
-                creating the runner to get the intermediate time. Defaults to
-                time.time if not provided.
+            timer (function, optional): Function that should be called to get
+                intermediate timing statistics. Defaults to time.time if not
+                provided.
+            t0 (float, optional): Zero point for timing statistics. Is set
+                using the provided timer if not provided.
 
         Returns:
-            float: Intermediate time resulting from calling time_func.
+            dict: Intermediate times from the run.
 
         """
-        if time_func is None:
-            time_func = time.time
+        if timer is None:
+            timer = time.time
+        if t0 is None:
+            t0 = timer()
         r = runner.get_runner(self.fyaml[run_uuid],
                               namespace=self.name + run_uuid)
-        t_int = time_func()
-        r.run()
+        times = r.run(timer=timer, t0=t0)
         assert(not r.error_flag)
-        return t_int
+        return times
 
     def time_run(self, *args, **kwargs):
         if self._use_mine:
@@ -545,7 +548,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             for i in range(nrep):
                 run_uuid = self.before_run(nmsg, msg_size)
                 t0 = time.time()
-                tI = self.run(run_uuid)
+                self.run(run_uuid, timer=time.time, t0=t0)
                 t1 = time.time()
                 out[i] = t1 - t0
                 self.after_run(run_uuid, np.mean(out))
