@@ -15,6 +15,7 @@ import logging
 from cis_interface import tools, runner, examples, backwards
 from cis_interface import platform as cis_platform
 from cis_interface.tests import CisTestBase
+from cis_interface.drivers import MatlabModelDriver
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':  # pragma: debug
     mpl.use('Agg')
@@ -40,7 +41,7 @@ _comm_list = tools.get_installed_comm()
 
 def write_perf_script(script_file, nmsg, msg_size, nrep=10,
                       lang_src='python', lang_dst='python',
-                      comm_type=None):
+                      comm_type=None, matlab_running=False):
     r"""Write a script to run perf.
 
     Args:
@@ -58,12 +59,17 @@ def write_perf_script(script_file, nmsg, msg_size, nrep=10,
         comm_type (str, optional): The type of communication channel that should
             be used for the test. Defaults to the current default if not
             provided.
+        matlab_running (bool, optional): If True, the test will assert that
+            there is an existing Matlab engine before starting, otherwise the
+            test will assert that there is not an existing Matlab engine.
+            Defaults to False.
 
     """
     if comm_type is None:
         comm_type = tools.get_default_comm()
     lines = [
         'import perf',
+        'import os',
         'from cis_interface import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
@@ -71,7 +77,14 @@ def write_perf_script(script_file, nmsg, msg_size, nrep=10,
         'lang_src = "%s"' % lang_src,
         'lang_dst = "%s"' % lang_dst,
         'comm_type = "%s"' % comm_type,
-        'timer = timing.TimedRun(lang_src, lang_dst, comm_type=comm_type)',
+        'matlab_running = %s' % str(matlab_running)]
+    if os.environ.get('TMPDIR', ''):
+        lines += [
+            'os.environ["TMPDIR"] = "%s"' % os.environ['TMPDIR']]
+    lines += [
+        'timer = timing.TimedRun(lang_src, lang_dst,'
+        '                        comm_type=comm_type,'
+        '                        matlab_running=matlab_running)',
         'runner = perf.Runner(values=1, processes=nrep)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.perf_func,',
@@ -105,7 +118,7 @@ def perf_func(loops, timer, nmsg, msg_size):
         while not flag:
             try:
                 t0 = perf.perf_counter()
-                tI = timer.run(run_uuid)
+                timer.run(run_uuid, timer=perf.perf_counter, t0=t0)
                 t1 = perf.perf_counter()
                 tdif = t1 - t0
                 timer.after_run(run_uuid, tdif)
@@ -154,6 +167,10 @@ class TimedRun(CisTestBase, tools.CisClass):
             with. If the data doesn't already exist and this doesn't match the
             current version of python, an error will be raised. Defaults to the
             current version of python.
+        matlab_running (bool, optional): If True, the test will assert that
+            there is an existing Matlab engine before starting, otherwise the
+            test will assert that there is not an existing Matlab engine.
+            Defaults to False.
 
     Attributes:
         lang_src (str): Language that messages should be sent from.
@@ -166,6 +183,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             that runs will be added to.
         comm_type (str): Name of communication class that should be used for
             tests.
+        matlab_running (bool): True if there was a Matlab engine running when
+            the test was created. False otherwise.
 
     """
 
@@ -173,7 +192,8 @@ class TimedRun(CisTestBase, tools.CisClass):
 
     def __init__(self, lang_src, lang_dst, name='timed_pipe',
                  scalings_file=None, perf_file=None,
-                 comm_type=None, platform=None, python_ver=None, **kwargs):
+                 comm_type=None, platform=None, python_ver=None,
+                 matlab_running=False, **kwargs):
         if comm_type is None:
             comm_type = tools.get_default_comm()
         if platform is None:
@@ -185,6 +205,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             scalings_file = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
         if perf_file is None:
             perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
+        assert(matlab_running == MatlabModelDriver.is_matlab_running())
+        self.matlab_running = matlab_running
         self.scalings_file = scalings_file
         self.perf_file = perf_file
         self.comm_type = comm_type
@@ -231,6 +253,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                                             self.comm_type,
                                             self.lang_src, self.lang_dst,
                                             nmsg, msg_size)
+        if self.matlab_running and ('matlab' in [self.lang_src, self.lang_dst]):
+            out += '-MLStarted'
         return out
 
     @property
@@ -244,7 +268,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         if self.comm_type.startswith('IPC'):
             msg_size = [1, 1e2, 1e3, 1e4, 1e5]
         else:
-            msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7]
+            msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 5e6, 1e7]
         return msg_size
 
     @property
@@ -441,29 +465,33 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.cleanup_output(fout)
         self.reset_log()
         self.reset_default_comm()
+        assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
-    def run(self, run_uuid, time_func=None):
+    def run(self, run_uuid, timer=None, t0=None):
         r"""Run test sending a set of messages between the designated models.
 
         Args:
             run_uuid (str): Unique ID for the run.
-            time_func (function, optional): Function that should be called after
-                creating the runner to get the intermediate time. Defaults to
-                time.time if not provided.
+            timer (function, optional): Function that should be called to get
+                intermediate timing statistics. Defaults to time.time if not
+                provided.
+            t0 (float, optional): Zero point for timing statistics. Is set
+                using the provided timer if not provided.
 
         Returns:
-            float: Intermediate time resulting from calling time_func.
+            dict: Intermediate times from the run.
 
         """
-        if time_func is None:
-            time_func = time.time
+        if timer is None:
+            timer = time.time
+        if t0 is None:
+            t0 = timer()
         r = runner.get_runner(self.fyaml[run_uuid],
                               namespace=self.name + run_uuid)
-        t_int = time_func()
-        r.run()
+        times = r.run(timer=timer, t0=t0)
         assert(not r.error_flag)
-        return t_int
+        return times
 
     def time_run(self, *args, **kwargs):
         if self._use_mine:
@@ -498,9 +526,9 @@ class TimedRun(CisTestBase, tools.CisClass):
             if not self.can_run():
                 raise Exception("Cannot run this test.")
             write_perf_script(self.perfscript, nmsg, msg_size, nrep=nrep_remain,
-                              lang_src=self.lang_src,
-                              lang_dst=self.lang_dst,
-                              comm_type=self.comm_type)
+                              lang_src=self.lang_src, lang_dst=self.lang_dst,
+                              comm_type=self.comm_type,
+                              matlab_running=self.matlab_running)
             cmd = [sys.executable, self.perfscript, '--append=' + self.perf_file]
             subprocess.call(cmd)
             assert(os.path.isfile(self.perf_file))
@@ -545,7 +573,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             for i in range(nrep):
                 run_uuid = self.before_run(nmsg, msg_size)
                 t0 = time.time()
-                tI = self.run(run_uuid)
+                self.run(run_uuid, timer=time.time, t0=t0)
                 t1 = time.time()
                 out[i] = t1 - t0
                 self.after_run(run_uuid, np.mean(out))
@@ -572,7 +600,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                 plotted scalings and the fit.
 
         """
-        cls_kwargs_keys = ['name', 'scalings_file',
+        cls_kwargs_keys = ['name', 'scalings_file', 'matlab_running',
                            'perf_file', 'comm_type', 'platform', 'python_ver']
         cls_kwargs = {}
         for k in cls_kwargs_keys:
@@ -982,6 +1010,9 @@ def plot_scalings(compare='commtype', compare_values=None,
         style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = itertools.product(compare_values, repeat=2)
         var_kws = [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
+        if 'matlab' in compare_values:
+            var_kws.append({'lang_src': 'matlab', 'lang_dst': 'matlab',
+                            'matlab_running': True})
         kws2label = lambda x: '%s to %s' % (x['lang_src'], x['lang_dst'])  # noqa: E731
         yscale = 'linear'  # was log originally
     elif compare == 'platform':
@@ -997,11 +1028,13 @@ def plot_scalings(compare='commtype', compare_values=None,
         color_var = 'python_ver'
         color_map = {'2.7': 'b', '3.4': 'g', '3.5': 'orange', '3.6': 'r',
                      '3.7': 'm'}
-        style_var = None
-        style_map = None
+        style_var = 'lang_src'
+        style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = compare_values
         var_kws = [{color_var: k} for k in var_list]
-        kws2label = lambda x: x[color_var]  # noqa: E731
+        for k in var_list:
+            var_kws.append({color_var: k, 'lang_src': 'c', 'lang_dst': 'c'})
+        kws2label = lambda x: '%s (%s)' % (x[color_var], x[style_var])  # noqa: E731
         yscale = 'linear'
     else:
         raise ValueError("Invalid compare: '%s'" % compare)
@@ -1037,9 +1070,26 @@ def plot_scalings(compare='commtype', compare_values=None,
             sty = style_map[kws[style_var]]
         plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
         kws.update(kwargs)
+        if MatlabModelDriver.is_matlab_running():
+            MatlabModelDriver.kill_all()
+            assert(not MatlabModelDriver.is_matlab_running())
+        if kws.get('matlab_running', False):
+            nml = 0
+            for k in ['lang_src', 'lang_dst']:
+                if kws[k] == 'matlab':
+                    nml += 1
+            ml_sessions = []
+            for i in range(nml):
+                ml_sessions.append(MatlabModelDriver.start_matlab())
+            label += ' (Existing ML Session)'
+            plot_kws['alpha'] = 0.5
         axs, fit = TimedRun.class_plot(name=test_name, axs=axs, label=label,
                                        yscale=yscale, plot_kws=plot_kws, **kws)
         fits[label] = fit
+        if kws.get('matlab_running', False):
+            for v in ml_sessions:
+                MatlabModelDriver.stop_matlab(*v)
+            assert(not MatlabModelDriver.is_matlab_running())
     # Print a table
     print('%-20s\t%-20s\t%-20s' % ('Label', 'Time per Message (s)', 'Overhead (s)'))
     print('%-20s\t%-20s\t%-20s' % (20 * '=', 20 * '=', 20 * '='))
