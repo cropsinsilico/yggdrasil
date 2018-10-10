@@ -268,7 +268,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         if self.comm_type.startswith('IPC'):
             msg_size = [1, 1e2, 1e3, 1e4, 1e5]
         else:
-            msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7]
+            msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 5e6, 1e7]
         return msg_size
 
     @property
