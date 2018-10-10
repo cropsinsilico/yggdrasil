@@ -1009,11 +1009,10 @@ def plot_scalings(compare='commtype', compare_values=None,
         style_var = 'lang_dst'
         style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = itertools.product(compare_values, repeat=2)
-        var_kws = []  # {'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
+        var_kws = [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
         if 'matlab' in compare_values:
             var_kws.append({'lang_src': 'matlab', 'lang_dst': 'matlab',
                             'matlab_running': True})
-        var_kws += [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
         kws2label = lambda x: '%s to %s' % (x['lang_src'], x['lang_dst'])  # noqa: E731
         yscale = 'linear'  # was log originally
     elif compare == 'platform':
