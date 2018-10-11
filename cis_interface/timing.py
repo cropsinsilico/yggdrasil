@@ -266,7 +266,7 @@ class TimedRun(CisTestBase, tools.CisClass):
     def default_msg_size(self):
         r"""list: Default message sizes for scaling tests."""
         if self.comm_type.startswith('IPC'):
-            msg_size = [1, 1e2, 1e3, 1e4, 1e5]
+            msg_size = [1, 1e2, 1e3, 1e4, 5e4, 1e5]
         else:
             msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 5e6, 1e7]
         return msg_size
