@@ -12,7 +12,7 @@
 %\draftfalse
 
 % For Draft
-\ieeefalse
+\ieeetrue
 \twocoltrue
 \placefigtrue
 \inclfigtrue
@@ -72,7 +72,25 @@
 
 \usepackage[bookmarks=false]{hyperref}
 
+\ifieee
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@makecaption}
+  {\scshape}
+  {}
+  {}
+  {}
+\makeatletter
+\patchcmd{\@makecaption}
+  {\\}
+  {.\ }
+  {}
+  {}
+\def\tablename{Table}
+\makeatother
+\else
 %\makeatletter
+\fi
 
 %---------------------------------------------------------------------------------
 % CONTROL THINGS
@@ -86,37 +104,57 @@
 % MANUSCRIPT INFO
 \begin{document}
 
-\shorttitle{{\cis}}
+\ifieee
+\else
+	\shorttitle{{\cis}}
+\fi
 
 \title{{\cis}: A Python Package for Integrating Computational Models Across Languages and Scales}
 
-\author{Meagan~Lang\altaffilmark{1}}
+\ifieee
+	\author{Meagan~Lang%
+	\thanks{The authors are with the National Center for Supercomputing Application, University of Illinois, Urbana-Champaign, IL 61801 USA (e-mail: langmm@illinois.edu)}}
+\else
+	\author{Meagan~Lang\altaffilmark{1}}
 
-\altaffiltext{1}{National Center for Supercomputing Application, 
-University of Illinois, Urbana-Champaign, IL email: {\tt langmm@illinois.edu}}
+	\altaffiltext{1}{National Center for Supercomputing Application, University of Illinois, Urbana-Champaign, IL email: {\tt langmm@illinois.edu}}
+\fi
 
+
+\ifieee
+	\maketitle
+\fi
 
 %---------------------------------------------------------------------------------
 % ABSTRACT (145 words)
 \begin{abstract}
-Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\cis}, a Python package for running integration networks with connections between models across languages and scales. {\cis} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OSX, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\cis} is designed to be user-friendly, with visual tools developed in parallel for composing the integration networks. 
+Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\cis}, a Python package for running integration networks with connections between models across languages and scales. {\cis} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OS X, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\cis} is designed to be user-friendly, with visual tools developed in parallel for composing the integration networks. 
 \end{abstract}
 
-%\begin{IEEEkeywords}
-%Plant modeling, Modeling, Communication
-%\end{IEEEkeywords}
+\ifieee
+	\begin{IEEEkeywords}
+		Plant modeling, Modeling, Communication
+	\end{IEEEkeywords}
+	\IEEEpeerreviewmaketitle
+\else
+	\maketitle
+\fi
 
-%\IEEEpeerreviewmaketitle
-
-
-\maketitle
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
 % INTRO (183 words)
 \section{Introduction}\label{S:intro}
 %
 %\IEEEPARstart{C}{omputational} 
-Computational plant biologists have produced a wealth of computational models to describe the biological processes governing plant growth and development, covering scales from atomic to global. Although usually developed independently to address questions specific to an organ, species, or growth process, computational plant models can also have applications beyond their original scope. Many biological processes are the same across different species of plants, allowing models developed for one species to be adapted for another by modifying input parameters. In addition, computational models for different scales, organs, or processes can also be combined, or integrated, to probe more complex biological mechanisms. By integrating a metabolic flux model with a genetic regulatory model for carbon uptake, \citet{integration_prep} was able to identify gene candidates for regulating photosynthesis under elevated CO$_{2}$. With advances in compute power, it should be possible to link biologically related models to create complex integration networks capable of capturing the response of entire plants, fields, or regions. However, independently developed computational models often have compatibility issues resulting from differences in programming language or data format that make such collaborations difficult. 
+Computational plant biologists have produced a wealth of computational models to describe the biological processes governing plant growth and development, covering scales from atomic to global. Although usually developed independently to address questions specific to an organ, species, or growth process, computational plant models can also have applications beyond their original scope. Many biological processes are the same across different species of plants, allowing models developed for one species to be adapted for another by modifying input parameters. In addition, computational models for different scales, organs, or processes can also be combined, or integrated, to probe more complex biological mechanisms. By integrating a metabolic flux model with a genetic regulatory model for carbon uptake, 
+%
+\ifieee
+	\citep{integration_prep} 
+\else
+	\citet{integration_prep} 
+\fi
+%
+was able to identify gene candidates for regulating photosynthesis under elevated CO$_{2}$. With advances in compute power, it should be possible to link biologically related models to create complex integration networks capable of capturing the response of entire plants, fields, or regions. However, independently developed computational models often have compatibility issues resulting from differences in programming language or data format that make such collaborations difficult. 
 
 We present an Open Source Python package, {\cis}, for creating and running integration networks by connecting existing computational models written in Python, Matlab, C and C++. Although developed for the purpose of integrating plant biology models, {\cis} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\cis} package to integrate models, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} summarizes the features of the {\cis} package, describes a few use cases, and outlines areas for future development.
 
@@ -298,13 +336,13 @@ isolation with input/output form/to files rather than another model.
 \subsubsection{System V IPC Queues}\label{SSS:ipc}
 %
 The first communication mechanism used by {\cis} was System V interprocess 
-communication (IPC) message queues \citep{Rusling1999} on Posix (Linux and Mac OSX) systems. 
+communication (IPC) message queues \citep{Rusling1999} on Posix (Linux and Mac OS X) systems. 
 IPC message queues allow messages to be passed between models running on separate 
 processes on the same machine. While IPC message queues are light weight, fast 
 (See \S\ref{SS:results_commtype}), and are part of Posix operating systems, they do not work in all 
 situations. Sys V IPC queues are not natively supported by Windows operating systems 
 and do not allow communication between remote processes. In addition, IPC queues also 
-have relatively low default message size limits on Mac OSX systems (2048 bytes). Once 
+have relatively low default message size limits on Mac OS X systems (2048 bytes). Once 
 the queue is full or if the message is larger than the limit, any process attempting to send an additional message will block until a 
 sufficient number of messages has been removed from the queue to accommodate the new message. 
 For messages larger than the limit, the sending process will block indefinitely. 
@@ -352,7 +390,7 @@ used for establishing integration networks with remote models run a services
 All of the communication tools leveraged by {\cis} have intrinsic limits 
 on the allowed size for a single message. Some of these limits can be quite large 
 ($2^{20}$ for ZeroMQ and RabbitMQ), while others are very limiting 
-(2048 on Mac OSX for Sys V IPC queues). Although messages consisting of a few scalars are unlikely to 
+(2048 on Mac OS X for Sys V IPC queues). Although messages consisting of a few scalars are unlikely to 
 exceed these limits, biological inputs and outputs are often much more complex. 
 For example, structural data represented as a 3D mesh can easily exceed these 
 limits. To handle messages that are larger than the limit of the communication 
@@ -413,12 +451,12 @@ In addition, {\cis} offers the option to specify units for scalars, arrays, tabu
 % RESULTS
 \section{Results}\label{S:results}
 %
-In order to evaluate {\cis}, performance tests were run on machines with Linux, Mac OSX, and Windows operating systems for different communication mechanisms, Python versions, and language combinations. During each run, $N_{msg}$ messages of size $S_{msg}$ were sent from the source model (in one language) to the destination model (in another language) which then output the messages to file for verification. Performance tests were run using the perf package \citep{Stinner2018}. Each run was repeated 10 times to rule out fluctuations due to external loads on the test machines.
+In order to evaluate {\cis}, performance tests were run on machines with Linux, Mac OS X, and Windows operating systems for different communication mechanisms, Python versions, and language combinations. During each run, $N_{msg}$ messages of size $S_{msg}$ were sent from the source model (in one language) to the destination model (in another language) which then output the messages to file for verification. Performance tests were run using the perf package \citep{Stinner2018}. Each run was repeated 10 times to rule out fluctuations due to external loads on the test machines.
 
 % COMMTYPE
 \subsection{Communication Mechanism}\label{SS:results_commtype}
 %
-Figure \ref{fig:commtype} compares the execution times for the different communication mechanisms discussed in \S\ref{SS:communication} for sending different numbers/sizes of messages from one Python model to another Python model. The tests were run on a \todo{Dell?} tower with 10 quad-core Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz processors running Ubuntu 14.04. The left panel of Figure \ref{fig:commtype} shows the total time required to run both models and send a varying number of 1000 bytes messages from one model to the other. The right panel of Figure \ref{fig:commtype} shows the total time required to run the models and send 5 messages of varying lengths from one to the other. 
+Figure \ref{fig:commtype} compares the execution times for the different communication mechanisms discussed in \S\ref{SS:communication} for sending different numbers/sizes of messages from one Python model to another Python model. The tests were run on a Dell tower with Dual Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz processors running Ubuntu 14.04. The left panel of Figure \ref{fig:commtype} shows the total time required to run both models and send a varying number of 1000 bytes messages from one model to the other. The right panel of Figure \ref{fig:commtype} shows the total time required to run the models and send 5 messages of varying lengths from one to the other. 
 %
 \ifinclfig
  	\begin{figure}[htbp]
@@ -452,13 +490,13 @@ Although Sys V IPC queues are slightly faster than ZeroMQ TCP sockets in both ti
 % LANGUAGE
 \subsection{Language}\label{SS:results_language}
 %
-Figure \ref{fig:language} compares the execution times for integrations with communications between models in different combinations of languages and Table \ref{tab:language} reports the time per message and overhead. The runs for Figure \ref{fig:language} and Table \ref{tab:language} were run on the Linux machine from above while those for Figure \ref{fig:language_matlab} and Table \ref{tab:language_matlab} were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4 that had Matlab R2017a installed. In both cases, ZeroMQ communication was used. 
+Figure \ref{fig:language} compares the execution times for integrations with communications between models in different combinations of languages and Table \ref{tab:language} reports the time per message and overhead. The runs for Figure \ref{fig:language} and Table \ref{tab:language} were run on the Linux machine from above while those for Figure \ref{fig:language_matlab} and Table \ref{tab:language_matlab} were run on a 2015 MacBook Pro with a 2.9 GHz Intel Core i5 processor running macOS High Sierra 10.13.4 that had Matlab R2017a installed. In both cases, ZeroMQ communication was used with Python 2.7.
 %
 \ifinclfig
  	\begin{figure}[htbp]
 	\begin{center}
 	\includegraphics[width=\columnwidth,keepaspectratio]{./images/scaling_language.png}
-	\caption{Comparison of communication time scaling between languages on Linux. The same fiducial message size (1000 bytes) and count (5) was used as in Figure \ref{fig:commtype}.}
+	\caption{Comparison of communication time scaling between languages on Linux without Matlab. The same fiducial message size (1000 bytes) and count (5) was used as in Figure \ref{fig:commtype}.}
 	\label{fig:language}
 	\end{center}
 	\end{figure}
@@ -469,17 +507,17 @@ Figure \ref{fig:language} compares the execution times for integrations with com
 \begin{tabular}{|c|c|c|c|}
 \hline
 Source 	& Destination 	& Time per Message (s) 	& Overhead (s) 	\\\hline
-C 				& C					& 0.11				& 1.36			\\
-C 				& C++				& 0.12				& 1.42			\\
-C 				& Python				& 0.12				& 1.99			\\
+C 				& C					& 0.011				& 1.36			\\
+C 				& C++				& 0.012				& 1.42			\\
+C 				& Python				& 0.012				& 1.99			\\
 \hline%
-C++ 				& C					& 0.12				& 1.42			\\
-C++ 				& C++				& 0.11				& 1.49			\\
-C++ 				& Python				& 0.12				& 2.05			\\
+C++ 				& C					& 0.012				& 1.42			\\
+C++ 				& C++				& 0.011				& 1.49			\\
+C++ 				& Python				& 0.012				& 2.05			\\
 \hline%
-Python			& C					& 0.12				& 2.15			\\
-Python			& C++				& 0.12				& 2.21			\\
-Python			& Python				& 0.12				& 1.73			\\
+Python			& C					& 0.012				& 2.15			\\
+Python			& C++				& 0.012				& 2.21			\\
+Python			& Python				& 0.012				& 1.73			\\
 \hline
 \end{tabular}
 \end{center}
@@ -487,15 +525,60 @@ Python			& Python				& 0.12				& 1.73			\\
 \label{tab:language}
 \end{table}%
 %
-For the most part, the time required per message is not affected by the language of either model for smaller messages. There is a very small increase in the time per message when there is a Python model involved, but this is much lower than the standard deviation resulting from background activity on the test machine and so is in conclusive. Language does play a role for messages larger than the maximum ($2^{20}$ bytes), when messages must be broken into smaller pieces. In particular, integrations that include a C or C++ receiving model scale more strongly than for those that have a Python receiving model because, in addition to the input/output connection drivers, the Python interface itself is asynchronous while the C/C++ interface is not. This means that while Python receiving models have concurrent operations to receive, backlog, and confirm messages, C/C++ models will block on each receive until the input connection driver completes the confirmation handshake. In addition, because C/C++ models are not continuously receiving and backlogging messages, the channel will become saturated. Once it reaches its maximum, the input connection driver can no longer pass along messages and must wait for the model to receive the next message. One remedy that is being explored for future releases, is to make the C/C++ interface asynchronous as well. However, this is a low priority as only models with very rapid and high volume input (such as the test models) are affected.
+\ifinclfig
+ 	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[width=\columnwidth,keepaspectratio]{./images/scaling_language_matlab.png}
+	\caption{Comparison of communication time scaling between languages on Mac OS X including Matlab.}
+	\label{fig:language_matlab}
+	\end{center}
+	\end{figure}
+\fi
+%
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Source 	& Destination 	& Time per Message (s) 	& Overhead (s) 	\\\hline
+C 				& C					& 0.015				& 1.11			\\
+C 				& C++				& 0.016				& 1.15			\\
+C 				& Python				& 0.019				& 2.86			\\
+C				& Matlab				& 0.505				& 12.98			\\
+\hline%
+C++ 				& C					& 0.019				& 1.10			\\
+C++ 				& C++				& 0.016				& 1.25			\\
+C++ 				& Python				& 0.016				& 3.10			\\
+C++ 				& Matlab				& 0.505				& 13.45			\\
+\hline%
+Python			& C					& 0.019				& 3.17			\\
+Python			& C++				& 0.019				& 3.26			\\
+Python			& Python				& 0.019				& 2.86			\\
+Python			& Matlab				& 0.500				& 11.61			\\
+\hline%
+Matlab			& C					& 0.144				& 11.82			\\
+Matlab			& C++				& 0.142				& 14.79			\\
+Matlab			& Python				& 0.139				& 12.23			\\
+Matlab			& Matlab				& 0.559				& 19.28			\\
+\hline%
+Matlab (started)		& Matlab (started)		& 0.537				& 1.25			\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Effect of model language on performance (Mac OS X) with Matlab.}
+\label{tab:language_matlab}
+\end{table}%
+%
 
-The largest difference between the different test cases is in in the overhead. Every model driver entails some overhead. For interpreted languages (e.g. Python and Matlab), the majority of the overhead comes from starting the interpreter. For Matlab, this is particularly time consuming. Although this is only a one-time cost required at the start of an integration, {\cis} does offer ways to alleviate this if multiple runs are necessary by starting a Matlab engine prior to the first integration that can be used by subsequent runs \todo{(results that include existing Matlab engine)}.
+Except for Matlab models, the time required per message is not affected by the language of either model for smaller messages. There is a very small increase in the time per message when there is a Python model involved, but this is much lower than the standard deviation resulting from background activity on the test machine and so is in conclusive. Matlab models have a much higher time per message than any other language. This results from the way the Matlab interface was implemented, by calling the Python interface. The time required per message is largest when the receiving model is written in Matlab because the receiving models both receives messages from the other model and send output to a file, resulting in twice the number of calls to the wrapped interface. The performance of the Matlab interface may be improved in the future by either implementing it in Matlab directly or by wrapping the C routines.
+
+Language also plays a role for messages larger than the maximum ($2^{20}$ bytes), when messages must be broken into smaller pieces. In particular, integrations that include a C or C++ receiving model scale more strongly than for those that have a Python receiving model because, in addition to the input/output connection drivers, the Python interface itself is asynchronous while the C/C++ interface is not. This means that while Python receiving models have concurrent operations to receive, backlog, and confirm messages, C/C++ models will block on each receive until the input connection driver completes the confirmation handshake. In addition, because C/C++ models are not continuously receiving and backlogging messages, the channel will become saturated. Once it reaches its maximum, the input connection driver can no longer pass along messages and must wait for the model to receive the next message. One remedy that is being explored for future releases, is to make the C/C++ interface asynchronous as well. However, this is a low priority as only models with very rapid and high volume input (such as the test models) are affected.
+
+The largest difference between the different test cases is in in the overhead. Every model driver entails some overhead. For interpreted languages (e.g. Python and Matlab), the majority of the overhead comes from starting the interpreter. For Matlab, this is particularly time consuming ($>10$ s). Although this is only a one-time cost required at the start of an integration, {\cis} does offer ways to alleviate this if multiple runs are necessary by starting a Matlab engine prior to the first integration that can be used by subsequent runs. When Matlab is started in advance (the dashed-dotted orange line in Figure \ref{fig:language_matlab}), the overhead for Matlab models drops to 1.25\,s, less than Python (2.86\,s) but slightly more than C (1.11\,s).
 
 For compiled languages (C and C++), the overhead comes from compiling the source code which is done in serial. The time required for compilation will depend on the compiler used and the complexity of the model code. For command line compiled models, {\cis} forces the model to be recompiled every time to ensure any changes to the source code are propagated. However, for models that use Make and CMake, overhead due to compile time can be reduced by using existing builds.
 
 Interestingly, the recorded overheads were not symmetric or additive. For example, the Python-to-C integrations required more overhead than the C-to-Python integrations. This is because the models are started in parallel, but do not require the same amount of time to start and being execution. C models, while requiring compilation, start much faster than Python models. In a Python-to-C integration, the C model must wait for the Python model to finish its much slower startup and begin sending message, while in a C-to-Python integration, the C model can immediately begin sending messages that will be received by the Python model once it finishes starting up. In addition, the Python-to-Python integrations required less time than any of the other integrations that included Python because, although Python models take longer to start up, the start up is done in parallel while the compilation for the C and C++ models is done in serial. This source of overhead could be ameliorated by compiling models in parallel or in advanced, but is usually not significant enough to effect overall performance.
-%
-\todo{figure/table for Matlab \& discussion}
+
 
 % PYTHON VERSION
 \subsection{Python Version}\label{SS:results_python}
@@ -527,8 +610,7 @@ Python Version	& Language	& Time per Message (s) 	& Overhead (s) 	\\\hline
 \label{tab:python}
 \end{table}          
 %
-There is $\sim1$\,s additional overhead with Python 3.5 compared to Python 2.7 due to the increased startup time for the Python 3.5 interpreter. This overhead is only present for integrations that include Python models. For comparison, there is no difference in the time per message and overhead between the different Python versions for the C-to-C integration (dashed lines in Figure \ref{fig:python}). There is a slight difference in time per message between the two versions for Python models that is especially apparent in the scaling of execution time with message size for large messages ($>10^6$ bytes). 
-\todo{discussion of large message scaling}
+There is $\sim1$\,s additional overhead with Python 3.5 compared to Python 2.7 due to the increased startup time for the Python 3.5 interpreter. This overhead is only present for integrations that include Python models. For comparison, there is no difference in the time per message and overhead between the different Python versions for the C-to-C integration (dashed lines in Figure \ref{fig:python}). There is a slight difference in time per message between the two versions for all models that shows up in the scaling of execution time with message size for large messages ($>10^6$ bytes). Differences at large message sizes between the two versions arrises from the use of Python drivers to transport messages between models and is more pronounced in integrations with Python models due to the increased amount of Python code.
 
 % PLATFORM
 \subsection{Operating System}\label{SS:results_platform}
@@ -551,7 +633,7 @@ Figure \ref{fig:platform} and Table \ref{tab:platform} compare the execution tim
 \hline
 Operating System	& Time per Message (s) 	& Overhead (s) 	\\\hline
 Linux			& \todo{?}				& \todo{?}			\\
-Mac OSX			& \todo{?}				& \todo{?}			\\
+Mac OS X			& \todo{?}				& \todo{?}			\\
 Windows			& \todo{?}				& \todo{?}			\\\hline
 \end{tabular}
 \end{center}
@@ -570,9 +652,15 @@ Windows			& \todo{?}				& \todo{?}			\\\hline
 % CURRENT STATUS
 \subsection{Current Status}\label{SS:current}
 %
-{\cis} is an open-source Python package for connecting computational models across programming languages in scales to form integration networks. Models are run in parallel with asynchronous message passing handled under-the-hood via threading and one of three communication mechanisms. {\cis} works on Linux, Mac OSX, and Windows operating systems with Python 2.7, 3.4, 3.5, 3.6 and 3.7. {\cis} currently supports running models written in Python, C, C++, and Matlab with additional support for compiling models C/C++ using Make \citep{Stallman2004} or CMake \citep{Martin2006} and running models written in the LPy \citep{Boudon2012} DSL.
+{\cis} is an open-source Python package for connecting computational models across programming languages and scales to form integration networks. Models are run in parallel with asynchronous message passing handled under-the-hood via threading and one of three communication mechanisms. {\cis} works on Linux, Mac OS X, and Windows operating systems with Python 2.7, 3.4, 3.5, 3.6 and 3.7. {\cis} currently supports running models written in Python, C, C++, and Matlab with additional support for compiling models C/C++ using Make \citep{Stallman2004} or CMake \citep{Martin2006} and running models written in the LPy \citep{Boudon2012} DSL.
 
-{\cis} has already been used to integrate several plant models within the Crops in Silico organization with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. Each square is a model and lines between the models represent connections where information is exchanged. Solid lines are connections we have already implemented, dashed lines are connections we are currently working on, and dotted lines are connections planned for the future. Results from one integration can be found in \todo{cite Kavya/Yu}.
+{\cis} has already been used to integrate several plant models within the Crops in Silico organization with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. Each square is a model and lines between the models represent connections where information is exchanged. Solid lines are connections that have already implemented, dashed lines are connections currently being implemented, and dotted lines are connections planned for the future. Results from one integration, a metabolic model and genetic response to CO$_2$ model, can be found in 
+%
+\ifieee
+	\citep{integration_prep}. 
+\else
+	\citet{integration_prep}. 
+\fi
 %
 \ifinclfig
  	\begin{figure}[htbp]
@@ -592,17 +680,19 @@ Windows			& \todo{?}				& \todo{?}			\\\hline
 %
 {\cis} is being actively developed to expand the number of models 
 that can be used in integration networks and the complexity of integration 
-networks that can be handled. Several improvements are already in progress/planned for {\cis}.
+networks that can be executed. Several improvements are already in progress/planned for {\cis}.
 
 % LANGUAGE SUPPORT
 \subsubsection{Language Support}\label{SS:langsupport}
 %
 The biggest barrier to running new models is language support. Plant models 
 are written in many different languages. While the current language support 
-covers many, additional languages must be added to unlock the full potential. 
+covers many of the most popular languages among plant biologists, 
+additional languages must be added to unlock the full set of potential integrations. 
 Surveys of the plant modeling community have helped identify the core languages 
 that models have been written in. Based on these results, we plan to expand 
 {\cis} to support models written in R, Fortran, Java, and the SBML \citep{Hucka2003} DSL.
+
 We also plan to add support for running Matlab models using Octave \citep{Eaton2002}. Matlab 
 models require a Matlab license to run. Given that plant modelers do not all 
 use Matlab, it cannot be assumed that everyone will have access to a Matlab 
@@ -630,7 +720,7 @@ permit access to these models within integration networks.
 %
 Currently, modelers must explicitly specify how a model should process input 
 within the model code including things like which input variables are static 
-and read in once versus which variables change and should be looped over. 
+and received once versus which variables change and should be looped over. 
 We plan on adding options to {\cis} for dynamically generating model code 
 based a user provided function call and list of static/variable input channels. 
 This will allow better reusability of model code such as during parameter studies.
@@ -659,35 +749,42 @@ methods for parsing and serializing them.
 % GUI
 \subsubsection{Graphical User Interface}\label{SS:gui}
 %
-In an effort to make {\cis} as user friendly as possible, we have also begun work on a graphical user interface (GUI) for entering model information, composing integration networks from an existing palette of models, and displaying basic output from an integration run. The current prototype of the GUI can only handle model ingestion and network composition; model execution must be done locally. However, our ultimate goal with the GUI is to provide a service where users can register their model, compose and run integration networks on dedicated cloud compute resources, and view output in real time all from the web browser. \todo{Mike and Craig as authors/acknowledgements? Provide \href{https://hackathon.cis.ndslabs.org/}{link?}}
+In an effort to make {\cis} as user friendly as possible, we have also begun work on a graphical user interface (GUI) for entering model information, composing integration networks from an existing palette of models, and displaying basic output from an integration run. The current prototype of the GUI can only handle model ingestion and network composition; model execution must be done locally. However, our ultimate goal with the GUI is to provide a service where users can register their model, compose and run integration networks on dedicated cloud compute resources, and view output in real time all from the web browser. 
+%\todo{Provide \href{https://hackathon.cis.ndslabs.org/}{link?}}
 
 %---------------------------------------------------------------------------------
 % CODE
 \section*{Code}\label{S:code}
 The {\cis} package is available publicly on \href{https://github.com/cropsinsilico/cis_interface}{Github} and can be 
-installed using {\tt pip} or {\tt conda}. To ensure code health, {\cis} boasts 100\% code coverage with automated testing on Linux, Mac OSX, and Windows for Python version 2.7, 3.4, 3.5, 3.6, and 3.7 via continuous integration with TravisCI \citep{travisci} and Appveyor \citep{appveyor}. Full documentation for {\cis} can be found \href{https://cropsinsilico.github.io/cis_interface/}{here} including step-by-step directions from the tutorial conducted during the \href{https://cropsinsilico.github.io/cis_interface/hackathon2018/index.html}{2018 Crops in Silico Hackathon}.
+installed using {\tt pip} or {\tt conda}. To ensure code health, {\cis} boasts 100\% code coverage with automated testing on Linux, Mac OS X, and Windows for Python version 2.7, 3.4, 3.5, 3.6, and 3.7 via continuous integration with TravisCI \citep{travisci} and Appveyor \citep{appveyor}. Full documentation for {\cis} can be found \href{https://cropsinsilico.github.io/cis_interface/}{here} including step-by-step directions from the tutorial conducted during the \href{https://cropsinsilico.github.io/cis_interface/hackathon2018/index.html}{2018 Crops in Silico Hackathon}.
 
 %---------------------------------------------------------------------------------
 % TODO
-\section*{TODO}
 \todo{%
+\section*{TODO}
 \begin{itemize}
 	\item Fix code citations to include URLs
 	\item Increase size of font on figures or increase size of figures (depends on iSP format)
 	\item Get real in-prep citation from Kavya
 	\item Confirm sentence about Yu/Kavya integration for accuracy
 	\item Get grant numbers/titles for acknowledgments
-	\item Ask Matt what the hardware is for DXL
-	\item Add plots that include Matlab results when they finish
+	\item Ask Matt about author list
 	\item Add plots that include Windows results when they finish
+	\item Include statistics in tables on scaling at large message size?
+	\item Re-run Matlab-to-Matlab, $nmsg=5$, $msg\_size=1000$
 \end{itemize}
 }
 
 %---------------------------------------------------------------------------------
 % ACKNOWLEDGMENTS
-%\section*{Acknowledgment}
-%\acknowledgments
-%The authors would like to thank ...
+\section*{Acknowledgments}
+\ifieee
+\else
+\acknowledgments
+\fi
+%
+This work was supported by funding from the Foundation for Food and Agriculture Research (FFAR), Institute for Sustainability, Energy, and Environment (iSEE), and the National Center for Supercomputing Applications (NCSA).
+The authors would like to thank Mike Lambert and Craig Willis for their ongoing work on a graphical user interface for visually composing and running integration networks for {\cis} as well as David Raila for his work on the original integration code that {\cis} was based on.
 
 %---------------------------------------------------------------------------------
 % REFERENCES
