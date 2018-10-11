@@ -266,7 +266,7 @@ class TimedRun(CisTestBase, tools.CisClass):
     def default_msg_size(self):
         r"""list: Default message sizes for scaling tests."""
         if self.comm_type.startswith('IPC'):
-            msg_size = [1, 1e2, 1e3, 1e4, 1e5]
+            msg_size = [1, 1e2, 1e3, 1e4, 5e4, 1e5]
         else:
             msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 5e6, 1e7]
         return msg_size
@@ -997,8 +997,8 @@ def plot_scalings(compare='commtype', compare_values=None,
     if compare == 'commtype':
         color_var = 'comm_type'
         color_map = {'ZMQComm': 'b', 'IPCComm': 'r', 'RMQComm': 'g'}
-        style_var = None
-        style_map = None
+        style_var = 'comm_type'
+        style_map = {'ZMQComm': '-', 'IPCComm': '--', 'RMQComm': ':'}
         var_list = compare_values
         var_kws = [{color_var: k} for k in var_list]
         kws2label = lambda x: x['comm_type'].split('Comm')[0]  # noqa: E731
