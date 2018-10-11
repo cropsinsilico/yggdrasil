@@ -997,8 +997,8 @@ def plot_scalings(compare='commtype', compare_values=None,
     if compare == 'commtype':
         color_var = 'comm_type'
         color_map = {'ZMQComm': 'b', 'IPCComm': 'r', 'RMQComm': 'g'}
-        style_var = None
-        style_map = None
+        style_var = 'comm_type'
+        style_map = {'ZMQComm': '-', 'IPCComm': '--', 'RMQComm': ':'}
         var_list = compare_values
         var_kws = [{color_var: k} for k in var_list]
         kws2label = lambda x: x['comm_type'].split('Comm')[0]  # noqa: E731
