@@ -1082,7 +1082,7 @@ def plot_scalings(compare='commtype', compare_values=None,
             for i in range(nml):
                 ml_sessions.append(MatlabModelDriver.start_matlab())
             label += ' (Existing ML Session)'
-            plot_kws['alpha'] = 0.5
+            plot_kws['color'] = 'orange'
         axs, fit = TimedRun.class_plot(name=test_name, axs=axs, label=label,
                                        yscale=yscale, plot_kws=plot_kws, **kws)
         fits[label] = fit
