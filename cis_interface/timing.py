@@ -12,7 +12,7 @@ import itertools
 import numpy as np
 import pandas as pd
 import logging
-from cis_interface import tools, runner, examples, backwards
+from cis_interface import tools, runner, examples, backwards, platform
 from cis_interface import platform as cis_platform
 from cis_interface.tests import CisTestBase
 from cis_interface.drivers import MatlabModelDriver
@@ -529,7 +529,11 @@ class TimedRun(CisTestBase, tools.CisClass):
                               lang_src=self.lang_src, lang_dst=self.lang_dst,
                               comm_type=self.comm_type,
                               matlab_running=self.matlab_running)
-            cmd = [sys.executable, self.perfscript, '--append=' + self.perf_file]
+            copy_env = ['TMPDIR']
+            if platform._is_win:
+                copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS']
+            cmd = [sys.executable, self.perfscript, '--append=' + self.perf_file,
+                   '--inherit-environ=' + ','.join(copy_env)]
             subprocess.call(cmd)
             assert(os.path.isfile(self.perf_file))
             os.remove(self.perfscript)
