@@ -128,7 +128,7 @@
 %---------------------------------------------------------------------------------
 % ABSTRACT (145 words)
 \begin{abstract}
-Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\cis}, a Python package for running integration networks with connections between models across languages and scales. {\cis} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OS X, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\cis} is designed to be user-friendly, with visual tools developed in parallel for composing the integration networks. 
+Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\cis}, a Python package for running integration networks with connections between models across languages and scales. {\cis} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OS X, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\cis} is designed to be user-friendly, with visual tools developed in parallel for composing the integration networks and can be accessed at {\tt https://github.com/cropsinsilico/cis\_interface}.
 \end{abstract}
 
 \ifieee
@@ -146,7 +146,7 @@ Thousands of computational models have been created within the plant biology com
 \section{Introduction}\label{S:intro}
 %
 %\IEEEPARstart{C}{omputational} 
-Computational plant biologists have produced a wealth of computational models to describe the biological processes governing plant growth and development, covering scales from atomic to global. Although usually developed independently to address questions specific to an organ, species, or growth process, computational plant models can also have applications beyond their original scope. Many biological processes are the same across different species of plants, allowing models developed for one species to be adapted for another by modifying input parameters. In addition, computational models for different scales, organs, or processes can also be combined, or integrated, to probe more complex biological mechanisms. By integrating a metabolic flux model with a genetic regulatory model for carbon uptake, 
+Plant biologists have produced a wealth of computational models to describe the biological processes governing plant growth and development, covering scales from atomistic to global. Although usually developed independently to address questions specific to an organ, species, or growth process, computational plant models can also have applications beyond their original scope. Many biological processes are the same across different species of plants, allowing models developed for one species to be adapted for another by modifying input parameters. In addition, computational models for different scales, organs, or processes can also be combined, or integrated, to probe more complex biological mechanisms. By integrating a metabolic flux model with a genetic regulatory model for carbon uptake, 
 %
 \ifieee
 	\citep{integration_prep} 
@@ -156,14 +156,14 @@ Computational plant biologists have produced a wealth of computational models to
 %
 was able to identify gene candidates for regulating photosynthesis under elevated CO$_{2}$. With advances in computational power, it should be possible to link biologically-related models to create complex integration networks capable of capturing the response of entire plants, fields, or regions. However, independently developed computational models often have compatibility issues resulting from differences in programming language or data format that make such collaborations difficult. 
 
-We present an Open Source Python package, {\cis}, for creating and running integration networks by connecting existing computational models written in Python, Matlab, C and C++. Although developed for the purpose of integrating plant biology models, {\cis} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\cis} package to integrate models, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} summarizes the features of the {\cis} package, describes a few use cases, and outlines areas for future development.
+We present an Open Source Python package, {\cis}, for creating and running integration networks by connecting existing computational models written in Python, Matlab, C and C++. {\cis} is available on Github\footnote{{\tt https://github.com/cropsinsilico/cis\_interface}}, and can be installed from PyPI\footnote{{\tt https://pypi.org/project/cis\_interface/}} via {\tt pip install {\cis}} or conda-forge\footnote{{\tt https://github.com/conda-forge/cis\_interface-feedstock}} via {\tt conda -c conda-forge install {\cis}}. Although developed for the purpose of integrating plant biology models, {\cis} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\cis} package to integrate models, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} summarizes the features of the {\cis} package, describes a few use cases, and outlines areas for future development.
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
 % BACKGROUND
 \section{Background}\label{S:background}
 %
-Computational plant models are usually written with a very specific research question in mind. The resulting programs are highly tuned for one purpose and written specifically for scientists within an isolated group of collaborators. Scientists will generally write programs in the language they are most familiar with and, given that there is no consensus on one programming language as ideal for all scientific applications, the language of computational models will often vary between research groups, if not between members of the groups themselves. The same can be said of data formats which can be highly tailored to the target question and may or may not include metadata like the data types, field names, or units. To integrate two biological models, the following questions must be addressed:
+Computational plant models are usually written with a very specific research question in mind. The resulting programs are highly tuned for one purpose and written specifically for scientists within an isolated group of collaborators. Scientists will generally write programs in the language they are most familiar with and, given that there is no consensus on one programming language as ideal for all scientific applications, the language will often vary between research groups, if not between members within the groups themselves. The same can be said of data formats which can be highly tailored to the target question and may or may not include metadata like the data types, field names, or units. To integrate two biological models, the following questions must be addressed:
 %
 \begin{enumerate}
 	\item Orchestration: How will models be executed?
@@ -179,17 +179,17 @@ These three questions can be addressed through manual integration on the command
 % DOMAIN SPECIFIC LANGUAGE
 \subsection{Domain Specific Language (DSL)}\label{SS:dsl}
 %
-One solution is to agree upon a language. The questions of orchestration, communication, and translation become trivial when models are all written in the same language. Beyond selecting a single programming language, many communities have  developed dedicated domain specific languages (DSLs) for model representation. For example, the Systems Biology Markup Language \citep[SBML][]{Hucka2003} is an XML-based format for representing models of biological processes. Scientists can compose their models using SBML markup and then run their model using software designed to parse SBML files. Other DSLs for biological models include LPy \citep{Boudon2012}, CellML \citep{Cuellar2003}, and BioPAX \citep{Demir2010}. Dedicated model DSLs improve the reusability of models written in the DSL and have the advantage of often implicitly handling data transformation. However, they do nothing for existing models that are not in the DSL or cannot be expressed within the constraints of the DSL. In addition, learning a new DSL, in addition to a programming language, can be daunting for new researchers.
+One solution is to agree upon a language. The questions of orchestration, communication, and translation become trivial when models are all written in the same language. Beyond selecting a single programming language, many communities have  developed dedicated domain specific languages (DSLs) for model representation. For example, the Systems Biology Markup Language \citep[SBML][]{Hucka2003} is an XML-based format for representing models of biological processes. Scientists can compose their models using SBML markup and then run their model using software designed to parse SBML files. Other DSLs for biological models include LPy \citep{Boudon2012}, CellML \citep{Cuellar2003}, and BioPAX \citep{Demir2010}. Dedicated model DSLs improve the reusability of models written in the DSL and have the advantage of often implicitly handling data transformation. However, they provide no help for existing models that are not in the DSL or those that cannot be expressed within the constraints of the DSL. In addition, learning a new DSL, in addition to a programming language, can be daunting.
 
 %---------------------------------------------------------------------------------
 % FRAMEWORKS
 \subsection{Workflow/Data Flow/Framework}\label{SS:framework}
 %
-Another approach is a workflow/data flow/framework tool for models that are written in the same programming language or can be wrapped. For example, there are many generic tools in Python for coordinating the execution of tasks in parallel or serial \citep[e.g.][]{babuji18, celery, luigi}. While these tools are powerful for organizing complex work flows, it is the user's onus to make sure that the components they connect are compatible and handle any data transformation that might be necessary (e.g. unit conversion or field selection).
+Another approach is a workflow/data flow/framework tool for models that are written in the same programming language or can be wrapped. For example, there are many generic tools in Python for coordinating the execution of tasks in parallel or serial \citep[e.g.][]{babuji18, celery, luigi}. While these tools are powerful for organizing complex work flows, it is the user's onus to make sure that the components they connect are compatible and handle any data transformation that might be necessary, e.g. unit conversion or field selection.
 
-There are also domain specific frameworks for connecting biological models. For example, OpenAlea \citep{Pradal2015} allows users to compose networks from different components including plant models, analysis tools, and visualization tools. Domain specific frameworks are more intuitive and ultimately more flexible than DSLs in the types of operations they allow models to perform since they have access to the full power of a programming language. However, they are stricter in several respects: 1) the model must be written in (or exposable to), the language of the framework and 2) the model must be written in a way that is aware of the framework and/or the format of models with which it will interact. Like DSLs, frameworks also provided limited support for models written without them in mind. 
+There are also domain specific frameworks for connecting biological models. For example, OpenAlea \citep{Pradal2015} allows users to compose networks from different components including plant models, analysis tools, and visualization tools. Domain specific frameworks are more intuitive and ultimately more flexible than DSLs in the types of operations they allow models to perform since they have access to the full power of a programming language. However, they are stricter in several respects: 1) the model must be written in (or exposable to), the language of the framework and 2) the model must be written in a way that is aware of the framework and/or the format of models with which it will interact. Like DSLs, frameworks also provided limited support for models written without the framework in mind. 
 
-{\cis} interface is an example of a framework that overcomes these issues by exposing light-weight interfaces in the language of the model (See \S\ref{SSS:interface}) that permit messages to be passed between the model processes as they run in parallel (See \S\ref{SS:communication}). As a result, models writers only need knowledge of the language in which their model is written.
+{\cis} interface is an example of a framework that overcomes these issues by exposing simple and easily accessible interfaces in the language of the model (See \S\ref{SSS:interface}) that permit messages to be passed between the model processes as they run in parallel (See \S\ref{SS:communication}). As a result, models writers only need knowledge of the language in which their model is written.
 
 %---------------------------------------------------------------------------------
 % MESSAGE PASSING TOOLS
@@ -206,7 +206,7 @@ There are also domain specific frameworks for connecting biological models. For 
 
 \begin{itemize}
 	\item {\bf Easy to use.} Require as little modification to the model source code as possible and only in the language of the model itself.
-	\item {\bf Efficient.} Allow models to run in parallel with asynchronous communication that dosn't block when a message is sent.
+	\item {\bf Efficient.} Allow models to run in parallel with asynchronous communication that doesn't block model execution when a message is sent, but has yet to be received.
 	\item {\bf Flexible.} Provide the same interface to the user, regardless of the communication mechanism being used or the platform the model is being executed on.
 \end{itemize}
 
@@ -217,7 +217,7 @@ additional Domain Specific Language (DSL) support for LPy models \citep{Boudon20
 % ORCHESTRATION
 \subsection{Orchestration}\label{SS:orchestration}
 %
-{\cis} is executed via a command line interface (CLI), {\tt cisrun} with YAML specification files (\S\ref{SSS:yaml}) as input. Based on the information contained in the YAML specification files, {\cis} establishes a network of asynchronous communication channels (\S\ref{SS:communication}), and launches the models on new processes (\S\ref{SS:model_driver}).
+{\cis} is executed via a command line interface (CLI), {\tt cisrun} with specification files (\S\ref{SSS:yaml}) as input. Based on the information contained in the specification files, {\cis} establishes a network of asynchronous communication channels (\S\ref{SS:communication}), and launches the models on new processes (\S\ref{SS:model_driver}).
 %At execution, {\cis} launches models on new processes based on information contained in a YAML specification file (See \S\ref{SSS:yaml} below) and establishes 
 
 %---------------------------------------------------------------------------------
@@ -227,7 +227,7 @@ additional Domain Specific Language (DSL) support for LPy models \citep{Boudon20
 Users specify information about models and integration networks via declarative 
 YAML files \citep{Ben-Kiki2009}. The YAML file format was selected because it is human readable 
 and there are many existing tools for parsing YAML formats in different programming 
-languages. The declarative format allows user to specify exactly what they 
+languages \citep[e.g.][]{Simonov2006,pyyaml,jsyaml}. The declarative format allows user to specify exactly what they 
 want to do, without describing how it should be done. While the information 
 about models and integration networks can be contained in a single YAML 
 file, the information can naturally be split between two or more files, one (or more) containing 
@@ -321,7 +321,7 @@ resources are used. Figure \ref{fig:async} describes the general flow of message
 %
 \begin{enumerate}
 	\item A model sends a message in the form of a native data object via a language-specific API to one of the output channels declared in the model YAML. The output channel interface encodes the message and sends it.
-	\item An output connection driver (written in Python) runs in a separate thread on the master process, listening to the model output channel. When the model sends a message, the output connection driver checks that the message is in the expected format and then forwards it to an intermediate channel. The intermediate channel is used as a buffer for support on distributed architectures (e.g. if one model is running on a remote machine). In these cases, the intermediate channel will connect to a RabbitMQ broker using security credentials.
+	\item An output connection driver (written in Python) runs in a separate thread on the master process, listening to the model output channel. When the model sends a message, the output connection driver checks that the message is in the expected format and then forwards it to an intermediate channel. The intermediate channel is used as a buffer for support on distributed architectures (e.g. if one model is running on a remote machine). In these cases, the intermediate channel will connect to a RabbitMQ broker using security credentials (See \S\ref{SSS:rmq}).
 	\item An input connection driver (also written in Python) runs in a separate thread, listening to the intermediate channel. When a message is received, it is then forwarded to the input channel of the receiving model as specified in the integration network YAML.
 	\item The receiving model receives the message in the form of an analogous native data object. Interface receive calls can be either blocking or non-blocking, but are blocking by default.
 \end{enumerate}
@@ -437,17 +437,16 @@ to more complex data types and communication patterns.
 Messages are passed as raw bytes. In order to understand the messages begin passed, parallel processes that communicate must agree upon the format used to do so. Without community standards, different models will often use very different data formats for their input and output. Differences between data formats can include, but are not limited to, type, precision, fields, or units. While some data formats are self-descriptive and include these types of information as meta data, this is not true of all data formats. To combat this, {\cis} requires models to explicitly specify the format of input and output expected by a model in the model YAML. {\cis} can then handle a number of conversions between models without prompting as well as serialization/deserialization to the correct type in each of the supported languages. Data formats currently supported by {\cis} include:
 %
 \begin{itemize}
-	\item Scalars (e.g. integers, floats)
+	\item Scalars (e.g. integers, decimals)
 	\item Arrays
 	\item Text-encoded tables (e.g. CSV or tab-delimited)
-	\item Pandas data frames
-	\item PLY
-	\item OBJ
+	\item Pandas data frames \citep{pandas}
+	\item 3D geometry structures (PLY \citep{ply} \& OBJ \citep{obj})
 \end{itemize}
 
 %\subsubsection{Units}\label{SSS:units}
 %
-In addition, {\cis} offers the option to specify units for scalars, arrays, tabular data, and pandas data frames. Units are tracked using the {\tt unyt} package \citep{Goldbaum2018}. If two models use different units (and both are specified), {\cis} will automatically perform the necessary conversions before passing data from one model to the next.
+In addition, {\cis} offers the option to specify units for scalars, arrays, tabular data, and pandas data frames. Units are tracked using the {\tt unyt} package \citep{Goldbaum2018}, which allows physical units to be associated with scalars and arrays. If two models use different units (and both are specified), {\cis} will automatically perform the necessary conversions before passing data from one model to the next.
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
@@ -637,15 +636,14 @@ Figure \ref{fig:platform} and Table \ref{tab:platform} compare the execution tim
 Operating System	& Time per Message (s) 	& Overhead (s) 	\\\hline
 Linux			& 0.012				& 1.73			\\
 Mac OS X			& 0.019				& 2.86			\\
-Windows			& \todo{?}				& \todo{?}			\\\hline
+Windows			& 0.029				& 3.73			\\\hline
 \end{tabular}
 \end{center}
 \caption{Effect of operating system on performance.}
 \label{tab:platform}
 \end{table}%
 %
-Both the time per message and overhead changed between operating systems with the Linux machine performing the most consistently and fastest. Because the Linux test machine was very different from the test machine for both Mac OS X and Windows, it cannot be determined that operating system alone contributed to the observed differences. The same can be said of the Mac OS X and Windows tests given that operating systems are often optimized for their intended hardware. However, the tests do show that {\cis} performed consistently on each of the supported operating systems.
-\todo{Windows results \& discussion}
+Both the time per message and overhead changed between operating systems with the Linux machine performing the most consistently and fastest and Windows offering the slowest speeds. Because the Linux test machine was very different from the test machine for both Mac OS X and Windows, it cannot be determined that operating system alone contributed to the observed differences. The same can be said of comparing the Mac OS X and Windows tests given that operating systems are often optimized for their intended hardware. However, the tests do show that {\cis} performed consistently on each of the supported operating systems.
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
@@ -658,7 +656,7 @@ Both the time per message and overhead changed between operating systems with th
 %
 {\cis} is an open-source Python package for connecting computational models across programming languages and scales to form integration networks. Models are run in parallel with asynchronous message passing handled under-the-hood via threading and one of three communication mechanisms. {\cis} works on Linux, Mac OS X, and Windows operating systems with Python 2.7, 3.4, 3.5, 3.6 and 3.7. {\cis} currently supports running models written in Python, C, C++, and Matlab with additional support for compiling models C/C++ using Make \citep{Stallman2004} or CMake \citep{Martin2006} and running models written in the LPy \citep{Boudon2012} DSL.
 
-{\cis} has already been used to integrate several plant models within the Crops in Silico organization with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. Each square is a model and lines between the models represent connections where information is exchanged. Solid lines are connections that have already implemented, dashed lines are connections currently being implemented, and dotted lines are connections planned for the future. Results from one integration, a metabolic model and genetic response to CO$_2$ model, can be found in 
+{\cis} has already been used to integrate several plant models within the Crops in Silico organization with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. Each square is a model and lines between the models represent connections where information is exchanged. Solid lines are connections that have already been implemented, dashed lines are connections currently being implemented, and dotted lines are connections planned for the future. Results from one integration, a metabolic model and genetic response to CO$_2$ model, can be found in 
 %
 \ifieee
 	\citep{integration_prep}. 
