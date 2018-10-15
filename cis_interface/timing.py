@@ -23,6 +23,8 @@ elif cis_platform._is_osx:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 _linewidth = 2
+_legend_fontsize=14
+mpl.rc('font', size=18)
 
 
 _lang_list = tools.get_installed_lang()
@@ -672,7 +674,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         # xname = 'size'
         # self.info('%s: slope = %f, intercept = %f', xname, m, b)
         # Legend
-        axs[1].legend(loc='upper left', ncol=2)
+        axs[1].legend(loc='upper left', ncol=2, fontsize=_legend_fontsize)
         return axs, fit
         
     def plot_scaling(self, msg_size, msg_count, axs=None, label=None,
@@ -973,7 +975,7 @@ def plot_scalings(compare='commtype', compare_values=None,
 
     Args:
         compare (str, optional): Name of variable that should be compared.
-            Valid values are 'language', 'commtype', 'platform', 'python'.
+            Valid values are 'language', 'commtype', 'platform', 'python_ver'.
             Defaults to 'commtype'.
         compare_values (list, optional): Values that should be plotted.
             If not provided, the values will be determined based on the
@@ -992,7 +994,7 @@ def plot_scalings(compare='commtype', compare_values=None,
     default_vals = {'commtype': _comm_list,
                     'language': _lang_list,
                     'platform': ['Linux', 'OSX', 'Windows'],
-                    'python': ['2.7', '3.5']}
+                    'python_ver': ['2.7', '3.5']}
     if compare_values is None:
         compare_values = default_vals.get(compare, None)
     else:
@@ -1028,7 +1030,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         var_kws = [{color_var: k} for k in var_list]
         kws2label = lambda x: x[color_var]  # noqa: E731
         yscale = 'linear'
-    elif compare == 'python':
+    elif compare == 'python_ver':
         color_var = 'python_ver'
         color_map = {'2.7': 'b', '3.4': 'g', '3.5': 'orange', '3.6': 'r',
                      '3.7': 'm'}
@@ -1051,7 +1053,7 @@ def plot_scalings(compare='commtype', compare_values=None,
     if plotfile is None:
         plotbase = 'compare_%s_%s' % (test_name, compare)
         for k in sorted(default_vars.keys()):
-            v = default_vars[k]
+            v = kwargs.get(k, default_vars[k])
             if k not in var_kws[0]:
                 plotbase += '_%s' % v.replace('.', '')
         plotbase += '_%s' % kwargs.get('time_method', 'average')
@@ -1085,7 +1087,7 @@ def plot_scalings(compare='commtype', compare_values=None,
             ml_sessions = []
             for i in range(nml):
                 ml_sessions.append(MatlabModelDriver.start_matlab())
-            label += ' (Existing ML Session)'
+            label += ' (Existing)'
             plot_kws['color'] = 'orange'
         axs, fit = TimedRun.class_plot(name=test_name, axs=axs, label=label,
                                        yscale=yscale, plot_kws=plot_kws, **kws)
