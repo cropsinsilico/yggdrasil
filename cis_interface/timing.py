@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import copy
+import json
 import yaml
 import uuid
 import perf
@@ -520,11 +521,13 @@ class TimedRun(CisTestBase, tools.CisClass):
         """
         entry_name = self.entry_name(nmsg, msg_size)
         nrep_remain = nrep
+        if overwrite:
+            self.remove_benchmark(entry_name)
         if (self.perf is not None):
-            if (entry_name in self.perf.get_benchmark_names()) and (not overwrite):
+            if (entry_name in self.perf.get_benchmark_names()):
                 nrep_remain -= self.perf.get_benchmark(entry_name).get_nvalue()
         # TODO: Properly handle partial overwrite
-        if (self.perf is None) or overwrite or (nrep_remain > 0):
+        if (self.perf is None) or (nrep_remain > 0):
             if not self.can_run():
                 raise Exception("Cannot run this test.")
             write_perf_script(self.perfscript, nmsg, msg_size, nrep=nrep_remain,
@@ -931,6 +934,37 @@ class TimedRun(CisTestBase, tools.CisClass):
             avg.append(iavg)
             std.append(istd)
         return (sizes, mbo, avg, std)
+
+    def remove_benchmark(self, name, run_number=None):
+        r"""Remove all runs associated with a benchmark.
+
+        Args:
+            name (str): Name of the benchmark to be removed.
+
+        """
+        if not os.path.isfile(self.perf_file):
+            return
+        with open(self.perf_file, 'r') as fd:
+            perf_json = json.load(fd)
+        ibench = None
+        for i in range(len(perf_json['benchmarks'])):
+            if 'metadata' not in perf_json['benchmarks'][i]:
+                print(i, perf_json['benchmarks'][i])
+                continue
+            if perf_json['benchmarks'][i]['metadata']['name'] == name:
+                ibench = i
+                break
+        if ibench is None:
+            print("Could not locate a benchmark named '%s'" % name)
+            return
+        if run_number is None:
+            del perf_json['benchmarks'][ibench]
+        else:
+            del perf_json['benchmarks'][ibench]['runs'][run_number]
+        # Save output
+        with open(self.perf_file, 'w') as fd:
+            json.dump(perf_json, fd)
+        self.perf = self.load_perf()
 
     def load_perf(self):
         r"""Load perf BenchmarkSuite from file.
