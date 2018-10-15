@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import sys
+import copy
 import traceback
 from cis_interface import runner, schema, config, timing
 from cis_interface.drivers import GCCModelDriver
@@ -85,6 +86,22 @@ def cistime_os():
 def cistime_py():
     r"""Plot timing statistics comparing the different versions of Python."""
     timing.plot_scalings(compare='python')
+
+
+def cistime_paper():
+    r"""Create plots for timing."""
+    _lang_list = timing._lang_list
+    _lang_list_nomatlab = copy.deepcopy(_lang_list)
+    _lang_list_nomatlab.remove('matlab')
+    timing.plot_scalings(compare='platform', python_ver='2.7')
+    # All plots on Linux, no matlab
+    timing.plot_scalings(compare='commtype', platform='Linux', python_ver='2.7')
+    timing.plot_scalings(compare='python_ver', platform='Linux')
+    timing.plot_scalings(compare='language', platform='Linux', python_ver='2.7',
+                         compare_values=_lang_list_nomatlab)
+    # Language comparision on OSX, with matlab
+    timing.plot_scalings(compare='language', platform='OSX', python_ver='2.7',
+                         compare_values=_lang_list)
 
 
 if __name__ == '__main__':
