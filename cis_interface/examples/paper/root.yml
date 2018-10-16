@@ -1,0 +1,8 @@
+model:
+  name: RootModel
+  language: c
+  args: ./src/root.c
+  inputs:
+    - root_input
+  outputs:
+    - next_root_mass

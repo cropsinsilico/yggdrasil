@@ -1,0 +1,3 @@
+# nstep	root_growth_rate	init_root_mass
+# %d	%lf			%lf
+100	0.1			1
