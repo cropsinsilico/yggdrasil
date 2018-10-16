@@ -207,6 +207,8 @@ class CisRunner(CisClass):
         for k in key_order:
             self.info('%20s\t%f', k, times[k] - tprev)
             tprev = times[k]
+        self.info(40 * '=')
+        self.info('%20s\t%f', "Total", tprev - t0)
         return times
 
     @property

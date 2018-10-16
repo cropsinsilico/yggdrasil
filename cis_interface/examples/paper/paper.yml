@@ -1,0 +1,14 @@
+connections:
+  - input: ./Input/root_input.txt
+    output: root_input
+    filetype: table
+  - input: ./Input/shoot_input.txt
+    output: shoot_input
+    filetype: table
+  - input: next_root_mass
+    output: next_root_mass
+    field_names: root_mass
+  - input: next_shoot_mass
+    output: ./Output/shoot_output.txt
+    filetype: table
+    field_names: shoot_mass

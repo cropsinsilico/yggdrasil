@@ -1,0 +1,8 @@
+connections:
+  - input: ./Input/root_input.txt
+    output: root_input
+    filetype: table
+  - input: next_root_mass
+    output: ./Output/root_output.txt
+    filetype: table
+    field_names: root_mass

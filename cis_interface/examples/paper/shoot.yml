@@ -1,0 +1,9 @@
+model:
+  name: ShootModel
+  language: python
+  args: ./src/shoot.py
+  inputs:
+    - shoot_input
+    - next_root_mass
+  outputs:
+    - next_shoot_mass
