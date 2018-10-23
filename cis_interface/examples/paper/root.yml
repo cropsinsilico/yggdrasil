@@ -5,4 +5,5 @@ model:
   inputs:
     - root_input
   outputs:
-    - next_root_mass
+    - name: next_root_mass
+      units: g
