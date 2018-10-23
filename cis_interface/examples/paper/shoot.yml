@@ -4,6 +4,8 @@ model:
   args: ./src/shoot.py
   inputs:
     - shoot_input
-    - next_root_mass
+    - name: next_root_mass
+      units: kg
   outputs:
-    - next_shoot_mass
+    - name: next_shoot_mass
+      units: kg
