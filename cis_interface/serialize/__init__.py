@@ -119,9 +119,9 @@ def extract_formats(fmt_str):
 
     """
     fmt_regex = (
-        "%(?:\d+\\$)?[+-]?(?:[ 0]|\'.{1})?-?\d*(?:\\.\d+)?"
+        "%(?:\\d+\\$)?[+-]?(?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
         + "[lhjztL]*(?:64)?[bcdeEufFgGosxXi]"
-        + "(?:%(?:\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\d*(?:\\.\d+)?"
+        + "(?:%(?:\\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
         + "[lhjztL]*[eEfFgG]j)?")
     out = re.findall(fmt_regex, backwards.bytes2unicode(fmt_str))
     if isinstance(fmt_str, backwards.bytes_type):
