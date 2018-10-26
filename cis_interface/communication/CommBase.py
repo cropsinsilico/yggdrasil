@@ -551,7 +551,6 @@ class CommBase(tools.CisClass):
                 comm. Defaults to False.
 
         """
-        self.debug("")
         if (not skip_base):
             self.debug('')
             if linger and self.is_open:

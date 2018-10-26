@@ -550,15 +550,18 @@ class CisClass(logging.LoggerAdapter):
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
-        class_name = str(self.__class__).split("'")[1].split('.')[-1]
-        super(CisClass, self).__init__(logging.getLogger(self.__module__),
-                                       {'cis_name': self.name,
-                                        'cis_class': class_name})
+        self._cis_class = str(self.__class__).split("'")[1].split('.')[-1]
+        super(CisClass, self).__init__(logging.getLogger(self.__module__), {})
 
     @property
     def name(self):
-        r"""Name of the class object."""
+        r"""str: Name of the class object."""
         return self._name
+
+    @property
+    def cis_class(self):
+        r"""str: Name of the class."""
+        return self._cis_class
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
@@ -599,7 +602,7 @@ class CisClass(logging.LoggerAdapter):
             the_func = stack[2][3]
             prefix = '%s(%s).%s[%d]' % (the_class, self.name, the_func, the_line)
         else:
-            prefix = '%s(%s)' % (self.extra['cis_class'], self.name)
+            prefix = '%s(%s)' % (self.cis_class, self.name)
         new_msg = '%s: %s' % (prefix, self.as_str(msg))
         return new_msg, kwargs
 
