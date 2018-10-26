@@ -236,8 +236,8 @@ class TimedRun(CisTestBase, tools.CisClass):
         """
         # print(self.platform.lower(), cis_platform._platform.lower())
         # print(self.python_ver, backwards._python_version)
-        out = ((self.platform.lower() == cis_platform._platform.lower()) and
-               (self.python_ver == backwards._python_version))
+        out = ((self.platform.lower() == cis_platform._platform.lower())
+               and (self.python_ver == backwards._python_version))
         return out
 
     def entry_name(self, nmsg, msg_size):

@@ -224,8 +224,8 @@ class CisTestBase(unittest.TestCase):
         # Give comms time to close
         if ncurr_comm is None:
             Tout = x.start_timeout()
-            while ((not Tout.is_out) and
-                   (self.comm_count > self.nprev_comm)):  # pragma: debug
+            while ((not Tout.is_out)
+                   and (self.comm_count > self.nprev_comm)):  # pragma: debug
                 x.sleep()
             x.stop_timeout()
             ncurr_comm = self.comm_count
@@ -233,8 +233,8 @@ class CisTestBase(unittest.TestCase):
         # Give threads time to close
         if ncurr_thread is None:
             Tout = x.start_timeout()
-            while ((not Tout.is_out) and
-                   (self.thread_count > self.nprev_thread)):  # pragma: debug
+            while ((not Tout.is_out)
+                   and (self.thread_count > self.nprev_thread)):  # pragma: debug
                 x.sleep()
             x.stop_timeout()
             ncurr_thread = self.thread_count
@@ -244,8 +244,8 @@ class CisTestBase(unittest.TestCase):
         if ncurr_fd is None:
             if not self._first_test:
                 Tout = x.start_timeout()
-                while ((not Tout.is_out) and
-                       (self.fd_count > self.nprev_fd)):  # pragma: debug
+                while ((not Tout.is_out)
+                       and (self.fd_count > self.nprev_fd)):  # pragma: debug
                     x.sleep()
                 x.stop_timeout()
             ncurr_fd = self.fd_count
@@ -305,8 +305,8 @@ class CisTestBase(unittest.TestCase):
         Tout = self.start_timeout(2)
         if (os.stat(fname).st_size != fsize):  # pragma: debug
             print('file sizes not equal', os.stat(fname).st_size, fsize)
-        while ((not Tout.is_out) and
-               (os.stat(fname).st_size != fsize)):  # pragma: debug
+        while ((not Tout.is_out)
+               and (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         nt.assert_equal(os.stat(fname).st_size, fsize)
@@ -449,12 +449,12 @@ class IOInfo(object):
              'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
         self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
         self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
-        self.field_names_line = (self.comment +
-                                 self.delimiter.join(self.field_names) +
-                                 self.newline)
-        self.field_units_line = (self.comment +
-                                 self.delimiter.join(self.field_units) +
-                                 self.newline)
+        self.field_names_line = (self.comment
+                                 + self.delimiter.join(self.field_names)
+                                 + self.newline)
+        self.field_units_line = (self.comment
+                                 + self.delimiter.join(self.field_units)
+                                 + self.newline)
         self.file_elements = [('one', int(1), 1.0),
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]

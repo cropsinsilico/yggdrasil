@@ -1317,8 +1317,8 @@ class CommBase(tools.CisClass):
         if self.is_eof(msg_):
             flag = self.on_recv_eof()
             msg = msg_
-        elif ((self.recv_converter is not None) and
-              (not header.get('incomplete', False))):
+        elif ((self.recv_converter is not None)
+              and (not header.get('incomplete', False))):
             self.debug("Converting message")
             msg = self.recv_converter(msg_)
         else:

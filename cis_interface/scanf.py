@@ -191,8 +191,8 @@ def parse_cformat(format, i):
     # %[flags][width][.precision][length]specifier
     # float_format = "%([ -\+0]{,4})(\d*)((?:\.\d+)?)(L?)([eEfgG])"
     # First check for match to complex
-    complex_format = ("%([ -0]{,3})(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])" +
-                      "%(\+?[ -0]{,3}\+?)(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])j")
+    complex_format = ("%([ -0]{,3})(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])"
+                      + "%(\+?[ -0]{,3}\+?)(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])j")
     token = re.compile(complex_format)
     found = token.match(format, i)
     if found:
@@ -260,18 +260,18 @@ scanf_translate = [
         
         # langmm: complex
         ("%[fgeE]%[+-][fgeE]j",
-         "(" +
-         "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "[+-]" +
-         "(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "j)",
+         "("
+         + "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
+         + "[+-]"
+         + "(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
+         + "j)",
          complex),
         ("%\*[fgeE]%[+-][fgeE]j",
-         "(?:" +
-         "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "[+-]" +
-         "(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "j)",
+         "(?:"
+         + "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
+         + "[+-]"
+         + "(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
+         + "j)",
          None),
 
         ("%[fgeE]", "([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)", float),

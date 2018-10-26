@@ -13,8 +13,8 @@ try:
         _use_astropy = False
 except ImportError:  # pragma: no cover
     apy_ascii, apy_Table = None, None
-    # print("astropy is not installed, reading/writing as an array will be " +
-    #       "disabled. astropy can be installed using 'pip install astropy'.")
+    # print("astropy is not installed, reading/writing as an array will be "
+    #       + "disabled. astropy can be installed using 'pip install astropy'.")
     _use_astropy = False
 
 
@@ -119,10 +119,10 @@ def extract_formats(fmt_str):
 
     """
     fmt_regex = (
-        "%(?:\d+\\$)?[+-]?(?:[ 0]|\'.{1})?-?\d*(?:\\.\d+)?" +
-        "[lhjztL]*(?:64)?[bcdeEufFgGosxXi]" +
-        "(?:%(?:\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\d*(?:\\.\d+)?" +
-        "[lhjztL]*[eEfFgG]j)?")
+        "%(?:\d+\\$)?[+-]?(?:[ 0]|\'.{1})?-?\d*(?:\\.\d+)?"
+        + "[lhjztL]*(?:64)?[bcdeEufFgGosxXi]"
+        + "(?:%(?:\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\d*(?:\\.\d+)?"
+        + "[lhjztL]*[eEfFgG]j)?")
     out = re.findall(fmt_regex, backwards.bytes2unicode(fmt_str))
     if isinstance(fmt_str, backwards.bytes_type):
         out = [backwards.unicode2bytes(f) for f in out]
@@ -242,8 +242,8 @@ def cformat2nptype(cfmt, names=None):
     if isinstance(cfmt, backwards.string_types):
         fmt_list = extract_formats(backwards.bytes2unicode(cfmt))
         if len(fmt_list) == 0:
-            raise ValueError("Could not locate any format codes in the " +
-                             "provided format string (%s)." % cfmt)
+            raise ValueError("Could not locate any format codes in the "
+                             + "provided format string (%s)." % cfmt)
     else:
         fmt_list = cfmt
     nfmt = len(fmt_list)
@@ -335,8 +335,8 @@ def cformat2pyscanf(cfmt):
     cfmt_out = backwards.bytes2unicode(cfmt)
     fmt_list = extract_formats(cfmt_out)
     if len(fmt_list) == 0:
-        raise ValueError("Could not locate any format codes in the " +
-                         "provided format string (%s)." % cfmt)
+        raise ValueError("Could not locate any format codes in the "
+                         + "provided format string (%s)." % cfmt)
     for cfmt_str in fmt_list:
         # Hacky, but necessary to handle concatenation of a single byte
         if cfmt_str[-1] == 's':
@@ -381,8 +381,8 @@ def format_message(args, fmt_str):
     nfmt = len(extract_formats(fmt_str))
     args_ = []
     if len(args) < nfmt:
-        raise RuntimeError("Number of arguments (%d) does not match " % len(args) +
-                           "number of format fields (%d)." % nfmt)
+        raise RuntimeError("Number of arguments (%d) does not match " % len(args)
+                           + "number of format fields (%d)." % nfmt)
     for a in args:
         if np.iscomplexobj(a):
             args_ += [a.real, a.imag]
@@ -419,8 +419,8 @@ def process_message(msg, fmt_str):
     else:
         nargs = len(args)
     if nargs != nfmt:
-        raise ValueError("%d arguments were extracted, " % nargs +
-                         "but format string expected %d." % nfmt)
+        raise ValueError("%d arguments were extracted, " % nargs
+                         + "but format string expected %d." % nfmt)
     return args
 
 
@@ -455,8 +455,8 @@ def combine_flds(arrs, dtype=None):
                          (len(dtype), nflds))
     for i, a in enumerate(arrs):
         if a.shape != shape:
-            raise ValueError("Shape of array %d (%s) does " % (i, a.shape) +
-                             "match shape of 1st array (%s)." % shape)
+            raise ValueError("Shape of array %d (%s) does " % (i, a.shape)
+                             + "match shape of 1st array (%s)." % shape)
     # Combine arrays
     out = np.empty(shape, dtype=dtype)
     for i, a in enumerate(arrs):
@@ -486,8 +486,8 @@ def combine_eles(arrs, dtype=None):
     # Check types of arrays
     for i, a in enumerate(arrs):
         if not isinstance(a, (np.ndarray, np.void, list, tuple)):
-            raise TypeError("Elements must be arrays, lists or tuples. " +
-                            "Element %d has type %s." % (i, type(a)))
+            raise TypeError("Elements must be arrays, lists or tuples. "
+                            + "Element %d has type %s." % (i, type(a)))
     # Check that there are enough elements for each data type
     if dtype is None:
         if isinstance(arrs[0], (np.ndarray, np.void)):
@@ -499,12 +499,12 @@ def combine_eles(arrs, dtype=None):
     for i, a in enumerate(arrs):
         if isinstance(a, (np.ndarray, np.void)):
             if len(a.dtype) != nflds:
-                raise ValueError("Element %d has dtype %s, but " % (i, a.dtype) +
-                                 "%d fields are expected." % nflds)
+                raise ValueError("Element %d has dtype %s, but " % (i, a.dtype)
+                                 + "%d fields are expected." % nflds)
         else:
             if len(a) != nflds:
-                raise ValueError("Element %d has %d values, but " % (i, len(a)) +
-                                 "%d fields are expected." % nflds)
+                raise ValueError("Element %d has %d values, but " % (i, len(a))
+                                 + "%d fields are expected." % nflds)
     # Get data type
     if dtype is None:
         if isinstance(arrs[0], (np.ndarray, np.void)):
@@ -571,10 +571,10 @@ def consolidate_array(arrs, dtype=None):
         else:
             if len(arrs.dtype) == 0:
                 if arrs.shape[-1] != len(dtype):
-                    raise ValueError("The last dimension of the input array " +
-                                     "(%d) " % arrs.shape[-1] +
-                                     "dosn't match the number of fields in " +
-                                     "the dtype (%d)." % len(dtype))
+                    raise ValueError("The last dimension of the input array "
+                                     + "(%d) " % arrs.shape[-1]
+                                     + "dosn't match the number of fields in "
+                                     + "the dtype (%d)." % len(dtype))
                 out = np.empty(arrs.shape[:-1], dtype=dtype)
                 for i in range(arrs.shape[-1]):
                     out[dtype.names[i]] = arrs[..., i]
@@ -583,9 +583,9 @@ def consolidate_array(arrs, dtype=None):
                 for n1, n2 in zip(arrs.dtype.names, dtype.names):
                     out[n2] = arrs[n1]
             else:
-                raise ValueError("The input array data type (%s) " % arrs.dtype +
-                                 "is not compatible with the specified " +
-                                 "data type (%s)." % dtype)
+                raise ValueError("The input array data type (%s) " % arrs.dtype
+                                 + "is not compatible with the specified "
+                                 + "data type (%s)." % dtype)
     elif isinstance(arrs, (list, tuple)):
         if isinstance(arrs[0], (np.ndarray, np.void)):
             if len(arrs[0].dtype) > 1:
@@ -889,8 +889,8 @@ def bytes_to_array(data, dtype, order='C', shape=None):
 
     """
     if (len(data) % dtype.itemsize) != 0:
-        raise RuntimeError("Data length (%d) is not a multiple " % len(data) +
-                           "of the itemsize (%d)." % dtype.itemsize)
+        raise RuntimeError("Data length (%d) is not a multiple " % len(data)
+                           + "of the itemsize (%d)." % dtype.itemsize)
     nele = len(data) // dtype.itemsize
     ntyp = len(dtype)
     if (order == 'F') and (ntyp > 0):
@@ -994,8 +994,8 @@ def format_header(format_str=None, dtype=None,
         # if (len(x) == 0) or (x[0] == 'None'):
         #     continue
         assert(len(x) == nfld)
-        out.append(comment +
-                   delimiter.join([backwards.unicode2bytes(ix) for ix in x]))
+        out.append(comment
+                   + delimiter.join([backwards.unicode2bytes(ix) for ix in x]))
     out = newline.join(out) + newline
     return out
 
@@ -1050,8 +1050,8 @@ def discover_header(fd, serializer, newline=_default_newline,
         delimiter = header['delimiter']
     # Try to determine format from array without header
     str_fmt = backwards.unicode2bytes('%s')
-    if (((serializer.format_str is None) or
-         (str_fmt in serializer.format_str))):
+    if (((serializer.format_str is None)
+         or (str_fmt in serializer.format_str))):
         fd.seek(prev_pos + header_size)
         all_contents = fd.read()
         if len(all_contents) == 0:  # pragma: debug

@@ -18,8 +18,8 @@ from cis_interface.config import cis_cfg, cfg_logging
 
 _stack_in_log = False
 _stack_in_timeout = False
-if ((logging.getLogger("cis_interface").getEffectiveLevel() <=
-     logging.DEBUG)):  # pragma: debug
+if ((logging.getLogger("cis_interface").getEffectiveLevel()
+     <= logging.DEBUG)):  # pragma: debug
     _stack_in_log = False
     _stack_in_timeout = True
 _thread_registry = {}
@@ -159,8 +159,8 @@ _zmq_installed = is_zmq_installed()
 _zmq_installed_c = _zmq_installed
 if not (_ipc_installed or _zmq_installed):  # pragma: windows
     if is_zmq_installed(check_c=False):
-        logging.warning(("ZeroMQ C library not installed, but the Python package is. " +
-                         "Running C and C++ models will be disabled."))
+        logging.warning(("ZeroMQ C library not installed, but the Python package is. "
+                         + "Running C and C++ models will be disabled."))
         _zmq_installed_c = False
         _zmq_installed = True
     else:  # pragma: debug
@@ -280,8 +280,8 @@ def kill(pid, signum):
         handler = signal.getsignal(signum)
         # work around the synchronization problem when calling
         # kill from the main thread.
-        if (((signum in sigmap) and (thread.name == 'MainThread') and
-             callable(handler) and ((pid == os.getpid()) or (pid == 0)))):
+        if (((signum in sigmap) and (thread.name == 'MainThread')
+             and callable(handler) and ((pid == os.getpid()) or (pid == 0)))):
             event = threading.Event()
 
             def handler_set_event(signum, frame):
@@ -1059,8 +1059,8 @@ class CisThreadLoop(CisThread):
 
         """
         T = self.start_timeout(timeout, key_level=1, key=key)
-        while (self.is_alive() and (not self.was_loop) and
-               (not T.is_out)):  # pragma: debug
+        while (self.is_alive() and (not self.was_loop)
+               and (not T.is_out)):  # pragma: debug
             self.verbose_debug('Waiting for thread to enter loop...')
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
@@ -1088,8 +1088,8 @@ class CisThreadLoop(CisThread):
             if (not self.was_break):
                 self.set_loop_flag()
             while (not self.was_break):
-                if ((self.main_terminated and
-                     (not self._1st_main_terminated))):  # pragma: debug
+                if ((self.main_terminated
+                     and (not self._1st_main_terminated))):  # pragma: debug
                     self.on_main_terminated()
                 else:
                     self.run_loop()

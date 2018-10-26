@@ -7,8 +7,8 @@ try:
     import sysv_ipc
     _ipc_installed = tools._ipc_installed
 except ImportError:  # pragma: windows
-    logging.warn("Could not import sysv_ipc. " +
-                 "IPC support will be disabled.")
+    logging.warn("Could not import sysv_ipc. "
+                 + "IPC support will be disabled.")
     sysv_ipc = None
     _ipc_installed = False
 
@@ -111,9 +111,9 @@ def ipc_queues():
             elif platform._is_osx:
                 key_col = 2
             else:  # pragma: debug
-                raise NotImplementedError("Unsure what column the queue key " +
-                                          "is in on this platform " +
-                                          "(%s)" % sys.platform)
+                raise NotImplementedError("Unsure what column the queue key "
+                                          + "is in on this platform "
+                                          + "(%s)" % sys.platform)
             qlist.append(l.split()[key_col])
     return qlist
 

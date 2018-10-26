@@ -45,8 +45,8 @@ if __name__ == '__main__':
             break
         LI = msg[0]
         PR = calc_photosynthesis_rate(T, CO2, LI)
-        print("photosynthesis: light intensity = %f " % LI +
-              "--> photosynthesis rate = %f" % PR)
+        print("photosynthesis: light intensity = %f " % LI
+              + "--> photosynthesis rate = %f" % PR)
         flag = out_photo.send(PR)
         if not flag:
             print("photosynthesis: Failed to send output.")

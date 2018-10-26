@@ -208,8 +208,8 @@ class FileComm(CommBase.CommBase):
             if series_index is None:
                 series_index = self._series_index + 1
             if self._series_index != series_index:
-                if (((self.direction == 'send') or
-                     os.path.isfile(self.get_series_address(series_index)))):
+                if (((self.direction == 'send')
+                     or os.path.isfile(self.get_series_address(series_index)))):
                     self._file_close()
                     self._series_index = series_index
                     self._open()

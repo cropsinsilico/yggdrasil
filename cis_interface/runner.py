@@ -293,8 +293,8 @@ class CisRunner(CisClass):
         yml['models'] = []
         if yml['args'] not in self._outputchannels:
             if not os.path.isfile(yml['args']):
-                raise Exception(("Input driver %s could not locate a " +
-                                 "corresponding file or output channel %s") % (
+                raise Exception(("Input driver %s could not locate a "
+                                 + "corresponding file or output channel %s") % (
                                      yml["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
@@ -323,9 +323,9 @@ class CisRunner(CisClass):
                 assert(issubclass(drv_cls,
                                   FileOutputDriver.FileOutputDriver))
             except AssertionError:
-                raise Exception(("Output driver %s is not a subclass of " +
-                                 "FileOutputDriver and there is not a " +
-                                 "corresponding input channel %s.") % (
+                raise Exception(("Output driver %s is not a subclass of "
+                                 + "FileOutputDriver and there is not a "
+                                 + "corresponding input channel %s.") % (
                                      yml["name"], yml["args"]))
         else:
             
@@ -359,8 +359,8 @@ class CisRunner(CisClass):
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
-        self.info('Starting I/O drivers and models on system ' +
-                  '{} in namespace {} with rank {}'.format(
+        self.info('Starting I/O drivers and models on system '
+                  + '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))
         driver = dict(name='name')
         try:
