@@ -129,9 +129,9 @@ def prep_connection(yml, iodict):
     if ('input' in yml):
         if isinstance(yml['input'], list) and (len(yml['input']) == 1):
             yml['input'] = yml['input'][0]
-        if ((isinstance(yml['input'], str) and
-             (yml['input'] not in iodict['outputs']) and
-             ('input_file' not in yml))):
+        if ((isinstance(yml['input'], str)
+             and (yml['input'] not in iodict['outputs'])
+             and ('input_file' not in yml))):
             yml['input_file'] = yml.pop('input')
         elif isinstance(yml['input'], list):
             for x in yml['input']:
@@ -147,9 +147,9 @@ def prep_connection(yml, iodict):
     if ('output' in yml):
         if isinstance(yml['output'], list) and (len(yml['output']) == 1):
             yml['output'] = yml['output'][0]
-        if ((isinstance(yml['output'], str) and
-             (yml['output'] not in iodict['inputs']) and
-             ('output_file' not in yml))):
+        if ((isinstance(yml['output'], str)
+             and (yml['output'] not in iodict['inputs'])
+             and ('output_file' not in yml))):
             yml['output_file'] = yml.pop('output')
         elif isinstance(yml['output'], list):
             for x in yml['output']:
@@ -163,10 +163,10 @@ def prep_connection(yml, iodict):
         yml['output_file'].update(**rwmeth2filetype(yml.pop('write_meth')))
     # Error if neither input nor output is connected to a model
     if ('input_file' in yml) and ('output_file' in yml):
-        raise RuntimeError(("Input '%s' and Output '%s' are both being " +
-                            "considered as files since neither is connected " +
-                            "to a model.") % (yml['input_file']['name'],
-                                              yml['output_file']['name']))
+        raise RuntimeError(("Input '%s' and Output '%s' are both being "
+                            + "considered as files since neither is connected "
+                            + "to a model.") % (yml['input_file']['name'],
+                                                yml['output_file']['name']))
     # Move remaining keys to input/output comm/file
     working_dir = yml.pop('working_dir', None)
     s = get_schema()
@@ -483,8 +483,8 @@ def parse_connection(yml, existing):
             fname = os.path.join(yml['input_file']['working_dir'], fname)
         fname = os.path.normpath(fname)
         if not os.path.isfile(fname):
-            raise RuntimeError(("Input '%s' not found in any of the registered " +
-                                "model outputs and is not a file.") % fname)
+            raise RuntimeError(("Input '%s' not found in any of the registered "
+                                + "model outputs and is not a file.") % fname)
         args = fname
         name = ','.join(yml['output'])
         ocomm_pair = None

@@ -24,7 +24,7 @@ elif cis_platform._is_osx:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 _linewidth = 2
-_legend_fontsize=14
+_legend_fontsize = 14
 mpl.rc('font', size=18)
 
 
@@ -239,8 +239,8 @@ class TimedRun(CisTestBase, tools.CisClass):
         """
         # print(self.platform.lower(), cis_platform._platform.lower())
         # print(self.python_ver, backwards._python_version)
-        out = ((self.platform.lower() == cis_platform._platform.lower()) and
-               (self.python_ver == backwards._python_version))
+        out = ((self.platform.lower() == cis_platform._platform.lower())
+               and (self.python_ver == backwards._python_version))
         return out
 
     def entry_name(self, nmsg, msg_size):

@@ -532,9 +532,9 @@ class ZMQComm(AsyncComm.AsyncComm):
                                                nretry=2)
                 except zmq.ZMQError as e:
                     if (self.socket_type_name == 'PAIR') and (e.errno == 98):
-                        self.error(("There is already a 'PAIR' socket sending " +
-                                    "to %s. Maybe you meant to create a recv " +
-                                    "PAIR?") % self.address)
+                        self.error(("There is already a 'PAIR' socket sending "
+                                    + "to %s. Maybe you meant to create a recv "
+                                    + "PAIR?") % self.address)
                     self._bound = False
                     raise e
                 self.debug('Bound %s socket to %s.',
@@ -679,8 +679,8 @@ class ZMQComm(AsyncComm.AsyncComm):
 
     def _reply_handshake_send(self):
         r"""Do send side of handshake."""
-        if (((self.reply_socket_send is None) or
-             self.reply_socket_send.closed)):  # pragma: debug
+        if (((self.reply_socket_send is None)
+             or self.reply_socket_send.closed)):  # pragma: debug
             self.backlog_thread.set_break_flag()
             self.debug("SOCKET CLOSED")
             return False

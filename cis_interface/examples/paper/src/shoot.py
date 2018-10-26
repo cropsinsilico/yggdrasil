@@ -32,7 +32,7 @@ if __name__ == '__main__':
     nstep, r_s, S_t = input
 
     # Send initial shoot mass
-    flag = NextShootMass.send(S_t);
+    flag = NextShootMass.send(S_t)
     if not flag:
         print('shoot: Error sending initial shoot mass.')
         sys.exit(-1)

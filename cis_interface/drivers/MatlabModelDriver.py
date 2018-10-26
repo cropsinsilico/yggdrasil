@@ -7,8 +7,8 @@ try:  # pragma: matlab
     import matlab.engine
     _matlab_installed = True
 except ImportError:  # pragma: no matlab
-    debug("Could not import matlab.engine. " +
-          "Matlab support will be disabled.")
+    debug("Could not import matlab.engine. "
+          + "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface import backwards, tools
@@ -92,8 +92,8 @@ def start_matlab(skip_connect=False):  # pragma: matlab
     if not _matlab_installed:  # pragma: no matlab
         raise RuntimeError("Matlab is not installed.")
     old_matlab = set(matlab.engine.find_matlab())
-    screen_session = str('cis_matlab' + datetime.today().strftime("%Y%j%H%M%S") +
-                         '_%d' % len(old_matlab))
+    screen_session = str('cis_matlab' + datetime.today().strftime("%Y%j%H%M%S")
+                         + '_%d' % len(old_matlab))
     try:
         args = ['screen', '-dmS', screen_session, '-c',
                 os.path.join(os.path.dirname(__file__), 'matlab_screenrc'),
@@ -101,8 +101,8 @@ def start_matlab(skip_connect=False):  # pragma: matlab
                 '-r', '"matlab.engine.shareEngine"']
         subprocess.call(' '.join(args), shell=True)
         T = TimeOut(10)
-        while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0) and
-               not T.is_out):
+        while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0)
+               and not T.is_out):
             debug('Waiting for matlab engine to start')
             sleep(1)  # Usually 3 seconds
     except KeyboardInterrupt:  # pragma: debug
@@ -192,8 +192,8 @@ def stop_matlab(screen_session, matlab_engine, matlab_session,
         if matlab_session in matlab.engine.find_matlab():
             os.system(('screen -X -S %s quit') % screen_session)
         T = TimeOut(5)
-        while ((matlab_session in matlab.engine.find_matlab()) and
-               not T.is_out):
+        while ((matlab_session in matlab.engine.find_matlab())
+               and not T.is_out):
             debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
@@ -457,7 +457,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                     return
                 old_env[k] = self.mlengine.getenv(k)
                 self.mlengine.setenv(k, v, nargout=0)
-                new_env_str += "'%s', '%s', " % (k, v)
+                new_env_str += "'%s', %s, " % (k, repr(v))
         with self.lock:
             self.mlengine.eval('new_env = py.dict(pyargs(%s));' % new_env_str[:-2],
                                nargout=0)

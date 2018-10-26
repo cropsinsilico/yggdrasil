@@ -45,8 +45,8 @@ class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
     def test_a(self):
         r"""Dummy test to start matlab."""
         if self.instance.screen_session is None:  # pragma: debug
-            print("Matlab was not started by this test. Close any " +
-                  "existing Matlab sessions to test creation/removal.")
+            print("Matlab was not started by this test. Close any "
+                  + "existing Matlab sessions to test creation/removal.")
         else:
             with open(_session_fname, 'w') as f:
                 f.write(self.instance.screen_session)
@@ -62,8 +62,8 @@ class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
             self.instance.screen_session = session
             self.instance.started_matlab = True
         else:  # pragma: debug
-            print("Skipping removal of Matlab session as the test did " +
-                  "not create it.")
+            print("Skipping removal of Matlab session as the test did "
+                  + "not create it.")
 
             
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")

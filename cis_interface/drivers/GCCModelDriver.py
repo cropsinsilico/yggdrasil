@@ -346,8 +346,8 @@ class GCCModelDriver(ModelDriver):
                     self.run_args.append(a)
         # Check source file
         if len(self.src) == 0:
-            raise RuntimeError("Could not locate a source file in the " +
-                               "provided arguments.")
+            raise RuntimeError("Could not locate a source file in the "
+                               + "provided arguments.")
         
     def remove_products(self):
         r"""Delete products produced during the compilation process."""

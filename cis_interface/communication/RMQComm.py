@@ -5,8 +5,8 @@ try:
     import pika
     _rmq_installed = True
 except ImportError:
-    logging.warning("Could not import pika. " +
-                    "RabbitMQ support will be disabled.")
+    logging.warning("Could not import pika. "
+                    + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
 from cis_interface.schema import register_component

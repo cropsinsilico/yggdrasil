@@ -1,5 +1,7 @@
 function x_py = matlab2python(x_ml)
-  if isscalar(x_ml);
+  if isa(x_ml, 'py.object')
+    x_py = x_ml;
+  elseif isscalar(x_ml);
     if isa(x_ml, 'complex');
       x_py = x_ml;
     elseif isa(x_ml, 'float');

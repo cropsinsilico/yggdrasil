@@ -81,8 +81,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
             raise Exception("Connection ioloop could not be established.")
         if not self.channel_stable:  # pragma: debug
             self.force_close()
-            raise RuntimeError("Connection never finished opening " +
-                               "(%f/%f timeout)." % (T.elapsed, T.max_time))
+            raise RuntimeError("Connection never finished opening "
+                               + "(%f/%f timeout)." % (T.elapsed, T.max_time))
 
     def bind(self):
         r"""Declare queue to get random new queue."""
@@ -347,8 +347,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""bool: True if the connection ready for messages and not about to
         close. False otherwise."""
         with self.rmq_lock:
-            return (self.channel_open and (not self._closing) and
-                    (not self._opening))
+            return (self.channel_open and (not self._closing)
+                    and (not self._opening))
         
     def open_channel(self):
         r"""Open a RabbitMQ channel."""

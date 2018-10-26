@@ -20,8 +20,12 @@ function x_ml = python2matlab(x_py)
     end;
   elseif isa(x_py, 'py.bool')
     x_ml = logical(x_py);
+  elseif isa(x_py, ...
+             'py.cis_interface.serialize.PlySerialize.PlyDict')
+    x_ml = x_py;
   elseif isa(x_py, 'py.dict')
     % x_ml = struct(x_py);
+    disp(class(x_py));
     dict_keys = python2matlab(py.list(keys(x_py)));
     dict_vals = python2matlab(py.list(values(x_py)));
     x_ml = containers.Map(dict_keys, dict_vals);

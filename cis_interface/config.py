@@ -179,8 +179,8 @@ def update_config(config_file, config_base=None):
     with open(config_file, 'w') as fd:
         cp.write(fd)
     for sect, opt, desc in miss:
-        warnings.warn(("Could not locate option %s in section %s." +
-                       "Please set this in %s to: %s")
+        warnings.warn(("Could not locate option %s in section %s."
+                       + "Please set this in %s to: %s")
                       % (opt, sect, config_file, desc))
 
         

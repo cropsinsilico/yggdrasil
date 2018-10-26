@@ -94,8 +94,8 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         r"""Wait for drivers to start."""
         super(TestServerDriver, self).setup(*args, **kwargs)
         T = self.instance.start_timeout()
-        while ((not T.is_out) and ((not self.instance.is_valid) or
-                                   (not self.cli_drv.is_valid))):
+        while ((not T.is_out) and ((not self.instance.is_valid)
+                                   or (not self.cli_drv.is_valid))):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         
@@ -141,8 +141,8 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         if msg_send is None:
             msg_send = self.msg_short
         T = self.instance.start_timeout()
-        while ((not T.is_out) and ((not self.instance.is_valid) or
-                                   (not self.cli_drv.is_valid))):
+        while ((not T.is_out) and ((not self.instance.is_valid)
+                                   or (not self.cli_drv.is_valid))):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Send a message to local output

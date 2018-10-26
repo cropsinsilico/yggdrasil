@@ -28,8 +28,8 @@ class AsyncComm(CommBase.CommBase):
         
     """
     def __init__(self, name, dont_backlog=False, **kwargs):
-        self.dont_backlog = (dont_backlog or kwargs.get('matlab', False) or
-                             kwargs.get('is_inteface', False))
+        self.dont_backlog = (dont_backlog or kwargs.get('matlab', False)
+                             or kwargs.get('is_inteface', False))
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None
@@ -458,8 +458,8 @@ class AsyncComm(CommBase.CommBase):
         # If no backlog, receive from queue
         if no_backlog:
             T = self.start_timeout(timeout, key_suffix='_recv:direct')
-            while ((not T.is_out) and (self.n_msg_direct_recv == 0) and
-                   self.is_open_direct):
+            while ((not T.is_out) and (self.n_msg_direct_recv == 0)
+                   and self.is_open_direct):
                 self.sleep()
             self.stop_timeout(key_suffix='_recv:direct')
             if not self.is_open_direct:  # pragma: debug
