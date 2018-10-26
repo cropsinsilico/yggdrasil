@@ -74,7 +74,7 @@ def test_plot_scalings():
     timing.plot_scalings(compare='language', **kwargs)
     timing.plot_scalings(compare='platform', per_message=True,
                          compare_values=[platform._platform], **kwargs)
-    timing.plot_scalings(compare='python', per_message=True,
+    timing.plot_scalings(compare='python_ver', per_message=True,
                          compare_values=[backwards._python_version], **kwargs)
 
 
