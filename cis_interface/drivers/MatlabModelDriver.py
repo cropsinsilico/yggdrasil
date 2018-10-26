@@ -457,7 +457,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                     return
                 old_env[k] = self.mlengine.getenv(k)
                 self.mlengine.setenv(k, v, nargout=0)
-                new_env_str += "'%s', '%s', " % (k, v)
+                new_env_str += "'%s', %s, " % (k, repr(v))
         with self.lock:
             self.mlengine.eval('new_env = py.dict(pyargs(%s));' % new_env_str[:-2],
                                nargout=0)
