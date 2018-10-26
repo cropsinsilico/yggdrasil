@@ -28,7 +28,7 @@ def test_platform_error():
     else:
         test_platform = 'OSX'
     x = timing.TimedRun('python', 'python', platform=test_platform)
-    nt.assert_raises(Exception, x.time_run, 1, 1, nrep=1)
+    nt.assert_raises(Exception, x.time_run, 1, 1, nrep=1, overwrite=True)
 
 
 def test_scaling_count():
