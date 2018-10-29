@@ -409,12 +409,6 @@ class ZMQComm(AsyncComm.AsyncComm):
         # too large for stack allocation in C so 2**20 will be used.
         return 2**20
 
-    @property
-    def msgBufSize(self):
-        r"""int: Size of buffer that should be reservered for info added to
-        messages."""
-        return 100
-
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""

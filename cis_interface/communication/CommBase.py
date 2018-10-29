@@ -426,12 +426,6 @@ class CommBase(tools.CisClass):
         return get_CIS_MSG_MAX()
 
     @property
-    def msgBufSize(self):
-        r"""int: Size of buffer that should be reservered for info added to
-        messages."""
-        return 0
-
-    @property
     def empty_msg(self):
         r"""str: Empty message."""
         return backwards.unicode2bytes('')
