@@ -1078,8 +1078,9 @@ def plot_scalings(compare='commtype', compare_values=None,
         style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = compare_values
         var_kws = [{color_var: k} for k in var_list]
-        for k in var_list:
-            var_kws.append({color_var: k, 'lang_src': 'c', 'lang_dst': 'c'})
+        if 'c' in _lang_list:
+            for k in var_list:
+                var_kws.append({color_var: k, 'lang_src': 'c', 'lang_dst': 'c'})
         kws2label = lambda x: '%s (%s)' % (x[color_var], x[style_var])  # noqa: E731
         yscale = 'linear'
     else:
