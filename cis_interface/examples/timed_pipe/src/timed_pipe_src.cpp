@@ -2,6 +2,10 @@
 #include "CisInterface.hpp"
 
 int main(int argc, char *argv[]) {
+  if (argc != 3) {
+    printf("Error in C++ pipe_src: The message count and size must be provided as input arguments.\n");
+    return -1;
+  }
   int exit_code = 0;
   int ret = 0;
 
