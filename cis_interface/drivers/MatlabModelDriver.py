@@ -11,7 +11,7 @@ except ImportError:  # pragma: no matlab
           + "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface import backwards, tools
+from cis_interface import backwards, tools, platform
 from cis_interface.tools import TimeOut, sleep
 from cis_interface.schema import register_component
 
@@ -23,7 +23,10 @@ _incl_io = os.path.join(_top_dir, 'io')
 
 def kill_all():
     r"""Kill all Matlab shared engines."""
-    os.system(('pkill -f matlab.engine.shareEngine'))
+    if platform._is_win:  # pragma: windows
+        os.system(('taskkill /F /IM matlab.engine.shareEngine /T'))
+    else:
+        os.system(('pkill -f matlab.engine.shareEngine'))
 
 
 def is_matlab_running():
@@ -119,7 +122,7 @@ def start_matlab(skip_connect=False):  # pragma: matlab
     return screen_session, matlab_engine, new_matlab
 
 
-def connect_matlab(matlab_session, first_connect=False):
+def connect_matlab(matlab_session, first_connect=False):  # pragma: matlab
     r"""Connect to Matlab engine.
 
     Args:
