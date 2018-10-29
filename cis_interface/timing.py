@@ -73,6 +73,11 @@ def write_perf_script(script_file, nmsg, msg_size, nrep=10,
     lines = [
         'import perf',
         'import os',
+        #
+        # 'print("script")',
+        # 'for k, v in os.environ.items():',
+        # '    print("\'%s\': %s" % (k, v))',
+        #
         'from cis_interface import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
@@ -536,7 +541,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                               matlab_running=self.matlab_running)
             copy_env = ['TMPDIR']
             if platform._is_win:
-                copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS']
+                copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
+                             'INCLUDE', 'LIB', 'LIBPATH']
             cmd = [sys.executable, self.perfscript, '--append=' + self.perf_file,
                    '--inherit-environ=' + ','.join(copy_env)]
             subprocess.call(cmd)
