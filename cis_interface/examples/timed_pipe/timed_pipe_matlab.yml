@@ -2,9 +2,9 @@
 
 models:
   - name: timed_pipe_src
-    language: python
+    language: matlab
     args:
-      - ./src/timed_pipe_src.py
+      - ./src/timed_pipe_src.m
       - "{{PIPE_MSG_COUNT}}"
       - "{{PIPE_MSG_SIZE}}"
     outputs:
