@@ -636,7 +636,7 @@ def format2table(fmt_str):
         for s in seps:
             if not s.isspace():
                 raise RuntimeError("There is more than one column separator (%s)." % seps)
-        out['delimiter'] = min(s, key=len)
+        out['delimiter'] = min(seps, key=len)
     return out
 
 
