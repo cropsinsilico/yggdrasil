@@ -42,9 +42,9 @@ _comm_list = tools.get_installed_comm()
 #  - Add functions for overwriting specific entries
 
 
-def write_perf_script(script_file, nmsg, msg_size, nrep=10,
-                      lang_src='python', lang_dst='python',
-                      comm_type=None, matlab_running=False):
+def write_perf_script(script_file, nmsg, msg_size,
+                      lang_src, lang_dst, comm_type,
+                      nrep=10, matlab_running=False):
     r"""Write a script to run perf.
 
     Args:
@@ -53,23 +53,18 @@ def write_perf_script(script_file, nmsg, msg_size, nrep=10,
         nmsg (int): The number of messages that should be sent during the run.
         msg_size (int): The size (in bytes) of the test messages that should be
             sent during the run.
+        lang_src (str): The language that the source program should be in.
+        lang_dst (str): The language that the destination program should be in.
+        comm_type (str): The type of communication channel that should be used
+            for the test.
         nrep (int, optional): The number of times the test run should be
             repeated. Defaults to 3.
-        lang_src (str, optional): The language that the source program should
-            be in. Defaults to 'python',
-        lang_dst (str, optional): The language that the destination program
-            should be in. Defaults to 'python',
-        comm_type (str, optional): The type of communication channel that should
-            be used for the test. Defaults to the current default if not
-            provided.
         matlab_running (bool, optional): If True, the test will assert that
             there is an existing Matlab engine before starting, otherwise the
             test will assert that there is not an existing Matlab engine.
             Defaults to False.
 
     """
-    if comm_type is None:
-        comm_type = tools.get_default_comm()
     lines = [
         'import perf',
         'import os',
@@ -97,8 +92,7 @@ def write_perf_script(script_file, nmsg, msg_size, nrep=10,
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.perf_func,',
         '                             timer, nmsg, msg_size)']
-    if os.path.isfile(script_file):
-        os.remove(script_file)
+    assert(not os.path.isfile(script_file))
     with open(script_file, 'w') as fd:
         fd.write('\n'.join(lines))
 
@@ -126,13 +120,13 @@ def perf_func(loops, timer, nmsg, msg_size):
         while not flag:
             try:
                 t0 = perf.perf_counter()
-                timer.run(run_uuid, timer=perf.perf_counter, t0=t0)
+                timer.run(run_uuid, timer=perf.perf_counter)
                 t1 = perf.perf_counter()
                 tdif = t1 - t0
                 timer.after_run(run_uuid, tdif)
                 ttot += tdif
                 flag = True
-            except AssertionError as e:
+            except AssertionError as e:  # pragma: debug
                 warnings.warn("Error '%s'. Trying again." % e)
     return ttot
 
@@ -161,11 +155,10 @@ class TimedRun(CisTestBase, tools.CisClass):
         lang_src (str): Language that messages should be sent from.
         lang_dst (str): Language that messages should be sent to.
         name (str, optional): Name of the example. Defaults to 'timed_pipe'.
-        scalings_file (str, optional): Full path to the file where scalings
-            data should be logged. Defaults to 'scalings_{name}_{comm_type}.dat'.
-        perf_file (str, optional): Full path to file containing a perf
-            BenchmarkSuite that runs should be added to. Defaults to
-            'benches.json'.
+        filename (str, optional): Full path to the file where timing statistics
+           will be saved. This can be a perf json or a Python pickle of run data.
+           Defaults to 'scalings_{name}_{comm_type}.json' if dont_use_perf is
+           False, otherwise the extension is '.dat'.
         comm_type (str, optional): Name of communication class that should be
             used for tests. Defaults to the current default comm class.
         platform (str, optional): Platform that the test should be run on. If the
@@ -179,29 +172,28 @@ class TimedRun(CisTestBase, tools.CisClass):
             there is an existing Matlab engine before starting, otherwise the
             test will assert that there is not an existing Matlab engine.
             Defaults to False.
+        dont_use_perf (bool, optional): If True, the timings will be run without
+            using the perf package. Defaults to False.
 
     Attributes:
         lang_src (str): Language that messages should be sent from.
         lang_dst (str): Language that messages should be sent to.
         platform (str): Platform that the test is being run on.
         python_ver (str): Version of Python that the test should be run with.
-        scalings_file (str): Full path to the file where scalings data will be
-            saved.
-        perf_file (str): Full path to file containing a perf BenchmarkSuite
-            that runs will be added to.
+        filename (str): Full path to the file where timing statistics will be
+           saved. This can be a perf json or a Python pickle of run data.
         comm_type (str): Name of communication class that should be used for
             tests.
         matlab_running (bool): True if there was a Matlab engine running when
             the test was created. False otherwise.
+        dont_use_perf (bool): If True, the timings will be run without using the
+            perf package.
 
     """
 
-    _use_mine = False
-
-    def __init__(self, lang_src, lang_dst, name='timed_pipe',
-                 scalings_file=None, perf_file=None,
+    def __init__(self, lang_src, lang_dst, name='timed_pipe', filename=None,
                  comm_type=None, platform=None, python_ver=None,
-                 matlab_running=False, **kwargs):
+                 matlab_running=False, dont_use_perf=False, **kwargs):
         if comm_type is None:
             comm_type = tools.get_default_comm()
         if platform is None:
@@ -209,14 +201,15 @@ class TimedRun(CisTestBase, tools.CisClass):
         if python_ver is None:
             python_ver = backwards._python_version
         suffix = '%s_%s_py%s' % (name, platform, python_ver.replace('.', ''))
-        if scalings_file is None:
-            scalings_file = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
-        if perf_file is None:
-            perf_file = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
+        self.dont_use_perf = dont_use_perf
+        if filename is None:
+            if self.dont_use_perf:
+                filename = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
+            else:
+                filename = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
         assert(matlab_running == MatlabModelDriver.is_matlab_running())
         self.matlab_running = matlab_running
-        self.scalings_file = scalings_file
-        self.perf_file = perf_file
+        self.filename = filename
         self.comm_type = comm_type
         self.platform = platform
         self.python_ver = python_ver
@@ -226,10 +219,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
         self.lang_src = lang_src
         self.lang_dst = lang_dst
-        self.perf = self.load_perf()
-        self.data = self.load_scalings()
-        if self.name not in self.data:
-            self.data[self.name] = {}
+        self.data = self.load()
         self.fyaml = dict()
         self.foutput = dict()
         self.entries = dict()
@@ -261,7 +251,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                                             self.comm_type,
                                             self.lang_src, self.lang_dst,
                                             nmsg, msg_size)
-        if self.matlab_running and ('matlab' in [self.lang_src, self.lang_dst]):
+        if ((self.matlab_running
+             and ('matlab' in [self.lang_src, self.lang_dst]))):  # pragma: matlab
             out += '-MLStarted'
         return out
 
@@ -298,10 +289,10 @@ class TimedRun(CisTestBase, tools.CisClass):
         r"""float: Time required to set up communications and start models."""
         return self.fit_scaling_count()[1]
 
-    @property
-    def description_prefix(self):
-        r"""Prefix message with test name."""
-        return self.name
+    # @property
+    # def description_prefix(self):
+    #     r"""Prefix message with test name."""
+    #     return self.name
 
     @property
     def tempdir(self):
@@ -444,7 +435,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.entries[run_uuid] = (nmsg, msg_size)
         self.fyaml[run_uuid] = self.yamlfile_format % run_uuid
         self.foutput[run_uuid] = self.output_file_format % run_uuid
-        if os.path.isfile(self.fyaml[run_uuid]):
+        if os.path.isfile(self.fyaml[run_uuid]):  # pragma: debug
             os.remove(self.fyaml[run_uuid])
         self.make_yamlfile(self.fyaml[run_uuid])
         env = {'PIPE_MSG_COUNT': str(nmsg),
@@ -476,7 +467,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
         del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
 
-    def run(self, run_uuid, timer=None, t0=None):
+    def run(self, run_uuid, timer=time.time, t0=None):
         r"""Run test sending a set of messages between the designated models.
 
         Args:
@@ -491,8 +482,6 @@ class TimedRun(CisTestBase, tools.CisClass):
             dict: Intermediate times from the run.
 
         """
-        if timer is None:
-            timer = time.time
         if t0 is None:
             t0 = timer()
         r = runner.get_runner(self.fyaml[run_uuid],
@@ -501,13 +490,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         assert(not r.error_flag)
         return times
 
-    def time_run(self, *args, **kwargs):
-        if self._use_mine:
-            return self.time_run_mine(*args, **kwargs)
-        else:
-            return self.time_run_perf(*args, **kwargs)
-
-    def time_run_perf(self, nmsg, msg_size, nrep=10, overwrite=False):
+    def time_run(self, nmsg, msg_size, nrep=10, overwrite=False):
         r"""Time sending a set of messages between the designated models.
 
         Args:
@@ -525,82 +508,86 @@ class TimedRun(CisTestBase, tools.CisClass):
 
         """
         entry_name = self.entry_name(nmsg, msg_size)
-        nrep_remain = nrep
         if overwrite:
-            self.remove_benchmark(entry_name)
-        if (self.perf is not None):
-            if (entry_name in self.perf.get_benchmark_names()):
-                nrep_remain -= self.perf.get_benchmark(entry_name).get_nvalue()
-        # TODO: Properly handle partial overwrite
-        if (self.perf is None) or (nrep_remain > 0):
+            self.remove_entry(entry_name)
+        reps = self.get_entry(entry_name)
+        nrep_remain = nrep - len(reps)
+        # Only run if there are not enough existing reps to get stat
+        if nrep_remain > 0:
             if not self.can_run():
                 raise Exception("Cannot run this test.")
-            write_perf_script(self.perfscript, nmsg, msg_size, nrep=nrep_remain,
-                              lang_src=self.lang_src, lang_dst=self.lang_dst,
-                              comm_type=self.comm_type,
-                              matlab_running=self.matlab_running)
-            copy_env = ['TMPDIR']
-            if platform._is_win:
-                copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
-                             'INCLUDE', 'LIB', 'LIBPATH']
-            cmd = [sys.executable, self.perfscript, '--append=' + self.perf_file,
-                   '--inherit-environ=' + ','.join(copy_env)]
-            subprocess.call(cmd)
-            assert(os.path.isfile(self.perf_file))
-            os.remove(self.perfscript)
-            self.perf = self.load_perf()
-        out = self.perf.get_benchmark(entry_name)
-        if out.get_nvalue() < 2:
-            ret = (min(out.get_values()), out.mean(), 0.0)
+            if self.dont_use_perf:
+                self.time_run_mine(nmsg, msg_size, nrep_remain)
+            else:
+                self.time_run_perf(nmsg, msg_size, nrep_remain)
+            # Reload after new runs have been added
+            self.data = self.load()
+            reps = self.get_entry(entry_name)
+        # Calculate variables
+        if len(reps) < 2:
+            ret = (np.min(reps), np.mean(reps), 0.0)
         else:
-            ret = (min(out.get_values()), out.mean(), out.stdev())
-        # self.info(out.get_runs()[0].values)
-        # self.info(out.get_values())
-        # self.info((out.get_nvalue(), out.get_loops()))
+            ret = (np.min(reps), np.mean(reps), np.std(reps))
+        # self.info(reps)
         # self.info(ret)
-        self.info("Result for %s: %f +/- %f (%d runs)",
-                  self.entry_name(nmsg, msg_size), ret[1], ret[2],
-                  out.get_nvalue())
+        self.info("Result for %s: %f +/- %f (%d runs)", entry_name,
+                  ret[1], ret[2], len(reps))
         return ret
 
-    def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
-        r"""Time sending a set of messages between the designated models.
+    def time_run_perf(self, nmsg, msg_size, nrep):
+        r"""Time sending a set of messages between the designated models using
+        the perf package.
 
         Args:
             nmsg (int): Number of messages that should be sent.
             msg_size (int): Size of each message that should be sent.
-            nrep (int, optional): Number of times the test should be repeated
-                to get an average execution time and standard deviation.
-                Defaults to 10.
-            overwrite (bool, optional): If True, any existing entry for this
-                run will be overwritten. Defaults to False.
+            nrep (int): Number of times the test should be repeated. These reps
+                will be appended to the existing reps for this entry.
 
-        Returns:
-            tuple: Best of, average and standard deviation in the time (in seconds)
-                required to execute the program.
+        """
+        write_perf_script(self.perfscript, nmsg, msg_size,
+                          self.lang_src, self.lang_dst, self.comm_type,
+                          nrep=nrep, matlab_running=self.matlab_running)
+        copy_env = ['TMPDIR']
+        if platform._is_win:  # pragma: windows
+            copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
+                         'INCLUDE', 'LIB', 'LIBPATH']
+        cmd = [sys.executable, self.perfscript, '--append=' + self.filename,
+               '--inherit-environ=' + ','.join(copy_env)]
+        subprocess.call(cmd)
+        assert(os.path.isfile(self.filename))
+        os.remove(self.perfscript)
+
+    def time_run_mine(self, nmsg, msg_size, nrep):
+        r"""Time sending a set of messages between the designated models without
+        using the perf package.
+
+        Args:
+            nmsg (int): Number of messages that should be sent.
+            msg_size (int): Size of each message that should be sent.
+            nrep (int): Number of times the test should be repeated. These reps
+                will be appended to the existing reps for this entry.
 
         """
         entry_name = self.entry_name(nmsg, msg_size)
-        if entry_name not in self.data[self.name] or overwrite:
-            if not self.can_run():
-                raise Exception("Cannot run this test.")
-            out = np.zeros(nrep, 'double')
-            for i in range(nrep):
-                run_uuid = self.before_run(nmsg, msg_size)
-                t0 = time.time()
-                self.run(run_uuid, timer=time.time, t0=t0)
-                t1 = time.time()
-                out[i] = t1 - t0
-                self.after_run(run_uuid, np.mean(out))
-            self.data[self.name][entry_name] = (
-                np.min(out), np.mean(out), np.std(out))
-            self.save_scalings()
-        return self.data[self.name][entry_name]
+        old_reps = self.get_entry(entry_name)
+        new_reps = []
+        for i in range(nrep):
+            run_uuid = self.before_run(nmsg, msg_size)
+            t0 = time.time()
+            self.run(run_uuid, timer=time.time)
+            t1 = time.time()
+            new_reps.append(t1 - t0)
+            self.after_run(run_uuid, new_reps[-1])
+        if self.data is None:
+            self.data = dict()
+        self.data[entry_name] = tuple(list(old_reps) + list(new_reps))
+        self.save(self.data, overwrite=True)
 
     @classmethod
     def class_plot(cls, lang_src='python', lang_dst='python', **kwargs):
         """Create the class for a given combo of languages and comm types, then
-        call plot_scaling_join.
+        call plot_scaling_joint.
 
         Args:
             lang_src (str, optional): Language that messages should be sent from.
@@ -615,8 +602,8 @@ class TimedRun(CisTestBase, tools.CisClass):
                 plotted scalings and the fit.
 
         """
-        cls_kwargs_keys = ['name', 'scalings_file', 'matlab_running',
-                           'perf_file', 'comm_type', 'platform', 'python_ver']
+        cls_kwargs_keys = ['name', 'filename', 'matlab_running',
+                           'comm_type', 'platform', 'python_ver']
         cls_kwargs = {}
         for k in cls_kwargs_keys:
             if k in kwargs:
@@ -888,7 +875,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             mbo.append(imin)
             avg.append(iavg)
             std.append(istd)
-        return (counts, mbo, avg, std)
+        return (list(counts), mbo, avg, std)
 
     def scaling_size(self, nmsg, sizes=None, min_size=1, max_size=1e7,
                      nsamples=10, scaling='log', per_message=False, **kwargs):
@@ -939,87 +926,149 @@ class TimedRun(CisTestBase, tools.CisClass):
             mbo.append(imin)
             avg.append(iavg)
             std.append(istd)
-        return (sizes, mbo, avg, std)
+        return (list(sizes), mbo, avg, std)
 
-    def remove_benchmark(self, name, run_number=None):
-        r"""Remove all runs associated with a benchmark.
+    def get_entry(self, name):
+        r"""Get values for an entry.
 
         Args:
-            name (str): Name of the benchmark to be removed.
+            name (str): Name of the entry to return.
 
         """
-        if not os.path.isfile(self.perf_file):
-            return
-        with open(self.perf_file, 'r') as fd:
-            perf_json = json.load(fd)
-        ibench = None
-        for i in range(len(perf_json['benchmarks'])):
-            if 'metadata' not in perf_json['benchmarks'][i]:
-                print(i, perf_json['benchmarks'][i])
-                continue
-            if perf_json['benchmarks'][i]['metadata']['name'] == name:
-                ibench = i
-                break
-        if ibench is None:
-            print("Could not locate a benchmark named '%s'" % name)
-            return
-        if run_number is None:
-            del perf_json['benchmarks'][ibench]
-        else:
-            del perf_json['benchmarks'][ibench]['runs'][run_number]
-        # Save output
-        with open(self.perf_file, 'w') as fd:
-            json.dump(perf_json, fd)
-        self.perf = self.load_perf()
-
-    def load_perf(self):
-        r"""Load perf BenchmarkSuite from file.
-
-        Returns:
-            perf.BenchmarkSuite: Suite of performance data.
-
-        """
-        if os.path.isfile(self.perf_file):
-            out = perf.BenchmarkSuite.load(self.perf_file)
-        else:
-            out = None
+        out = tuple()
+        if self.has_entry(name):
+            if self.dont_use_perf:
+                out = self.data[name]
+            else:
+                out = self.data.get_benchmark(name).get_values()
         return out
 
-    def load_scalings(self):
-        r"""Load scalings data from pickle file.
+    def has_entry(self, name):
+        r"""Check to see if there is an entry with the provided name.
 
-        Returns:
-            dict: Loaded scalings data.
+        Args:
+            name (str): Name of the entry to check for.
 
         """
-        if os.path.isfile(self.scalings_file):
-            with open(self.scalings_file, 'rb') as fd:
+        out = False
+        if self.data is not None:
+            if self.dont_use_perf:
+                out = (name in self.data)
+            else:
+                out = (name in self.data.get_benchmark_names())
+        return out
+
+    def remove_entry(self, name):
+        r"""Remove all runs associated with an entry.
+
+        Args:
+            name (str): Name of the entry to be removed.
+
+        """
+        if not self.has_entry(name):
+            return
+        if self.dont_use_perf:
+            data_out = copy.deepcopy(self.data)
+            del data_out[name]
+        else:
+            data_out = copy.deepcopy(self.data)
+            data_bench = data_out.get_benchmark(name)
+            ibench = None
+            for i, this_bench in enumerate(data_out):
+                if this_bench == data_bench:
+                    ibench = i
+                    break
+            if ibench is None:  # pragma: debug
+                raise Exception("Could not find run '%s'" % name)
+            del data_out._benchmarks[ibench]
+            if len(data_out) is 0:
+                data_out = None
+                if os.path.isfile(self.filename):
+                    os.remove(self.filename)
+        # Save
+        self.save(data_out, overwrite=True)
+        # Reload
+        self.data = self.load()
+
+    def load(self, as_json=False):
+        r"""Load scalings data from a perf BenchmarkSuite json file or a
+        Python pickle.
+
+        Args:
+            as_json (bool, optional): If True and self.dont_use_perf is False,
+                the perf BenchmarkSuite data will be loaded as a dictionary from
+                the json. Defaults to False.
+
+        Returns:
+            perf.BenchmarkSuite or dict: Loaded scalings data. None is returned
+                if the file does not exit.
+
+        """
+        if not os.path.isfile(self.filename):
+            return None
+        if self.dont_use_perf:
+            with open(self.filename, 'rb') as fd:
                 if backwards.PY2:  # pragma: Python 2
                     out = backwards.pickle.load(fd)
                 else:  # pragma: Python 3
                     out = backwards.pickle.load(fd, encoding='latin1')
         else:
-            out = {}
+            assert(self.filename.endswith('.json'))
+            if as_json:
+                with open(self.filename, 'r') as fd:
+                    out = json.load(fd)
+            else:
+                out = perf.BenchmarkSuite.load(self.filename)
         return out
 
-    def save_scalings(self):
-        r"""Save scalings data to pickle file."""
-        with open(self.scalings_file, 'wb') as fd:
-            backwards.pickle.dump(self.data, fd)
+    def save(self, data, overwrite=False):
+        r"""Save scalings data to a new perf BenchmarkSuite json file or a
+        Python pickle. If the file exists and overwrite is not set, an error
+        will be raised. No file is written if data is None.
+
+        Args:
+            data (perf.BenchmarkSuite or dict): Data to be saved.
+            overwrite (bool, optional): If True, any existing file will be
+                overwritten. Defaults to False.
+
+        Raises:
+            RuntimeError: If the file already exists and overwrite is False.
+
+        """
+        if os.path.isfile(self.filename) and (not overwrite):
+            raise RuntimeError("'%s' exists" % self.filename)
+        if data is not None:
+            if self.dont_use_perf:
+                with open(self.filename, 'wb') as fd:
+                    backwards.pickle.dump(data, fd)
+            else:
+                if isinstance(data, perf.BenchmarkSuite):
+                    data.dump(self.filename, replace=overwrite)
+                else:
+                    with open(self.filename, 'w') as fd:
+                        json.dump(data, fd)
 
 
-def plot_scalings(compare='commtype', compare_values=None,
+def plot_scalings(compare='comm_type', compare_values=None,
                   plotfile=None, test_name='timed_pipe',
-                  **kwargs):
+                  cleanup_plot=False, **kwargs):
     r"""Plot comparison of scaling for chosen variable.
 
     Args:
         compare (str, optional): Name of variable that should be compared.
-            Valid values are 'language', 'commtype', 'platform', 'python_ver'.
-            Defaults to 'commtype'.
+            Valid values are 'language', 'comm_type', 'platform', 'python_ver'.
+            Defaults to 'comm_type'.
         compare_values (list, optional): Values that should be plotted.
             If not provided, the values will be determined based on the
             current platform.
+        plotfile (str, optional): Full path to the file where the plot will be
+            saved. If not provided, one is created based on the test parameters
+            in the current working directory.
+        test_name (str, optional): Name of the test that should be used. Defaults
+            to 'timed_pipe'.
+        cleanup_plot (bool, optional): If True, the create plotfile will be
+            removed before the function returns. This is generally only useful
+            for testing. Defaults to False.
         **kwargs: Additional keyword arguments are passed to plot_scaling_joint.
 
     Returns:
@@ -1031,7 +1080,7 @@ def plot_scalings(compare='commtype', compare_values=None,
                     'lang_dst': 'python',
                     'platform': cis_platform._platform,
                     'python_ver': backwards._python_version}
-    default_vals = {'commtype': _comm_list,
+    default_vals = {'comm_type': _comm_list,
                     'language': _lang_list,
                     'platform': ['Linux', 'OSX', 'Windows'],
                     'python_ver': ['2.7', '3.5']}
@@ -1040,7 +1089,7 @@ def plot_scalings(compare='commtype', compare_values=None,
     else:
         assert(isinstance(compare_values, list))
     per_message = kwargs.get('per_message', False)
-    if compare == 'commtype':
+    if compare == 'comm_type':
         color_var = 'comm_type'
         color_map = {'ZMQComm': 'b', 'IPCComm': 'r', 'RMQComm': 'g'}
         style_var = 'comm_type'
@@ -1056,7 +1105,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         style_map = {'python': '-', 'matlab': '-.', 'c': '--', 'cpp': ':'}
         var_list = itertools.product(compare_values, repeat=2)
         var_kws = [{'lang_src': l1, 'lang_dst': l2} for l1, l2 in var_list]
-        if 'matlab' in compare_values:
+        if 'matlab' in compare_values:  # pragma: matlab
             var_kws.append({'lang_src': 'matlab', 'lang_dst': 'matlab',
                             'matlab_running': True})
         kws2label = lambda x: '%s to %s' % (x['lang_src'], x['lang_dst'])  # noqa: E731
@@ -1092,7 +1141,7 @@ def plot_scalings(compare='commtype', compare_values=None,
                 k, compare))
     # Create plotfile name with information in it
     if plotfile is None:
-        plotbase = 'compare_%s_%s' % (test_name, compare)
+        plotbase = 'compare_%s_%s' % (test_name, compare.replace('_', ''))
         for k in sorted(default_vars.keys()):
             v = kwargs.get(k, default_vars[k])
             if k not in var_kws[0]:
@@ -1117,10 +1166,10 @@ def plot_scalings(compare='commtype', compare_values=None,
             sty = style_map[kws[style_var]]
         plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
         kws.update(kwargs)
-        if MatlabModelDriver.is_matlab_running():
+        if MatlabModelDriver.is_matlab_running():  # pragma: debug
             MatlabModelDriver.kill_all()
             assert(not MatlabModelDriver.is_matlab_running())
-        if kws.get('matlab_running', False):
+        if kws.get('matlab_running', False):  # pragma: matlab
             nml = 0
             for k in ['lang_src', 'lang_dst']:
                 if kws[k] == 'matlab':
@@ -1133,7 +1182,7 @@ def plot_scalings(compare='commtype', compare_values=None,
         axs, fit = TimedRun.class_plot(name=test_name, axs=axs, label=label,
                                        yscale=yscale, plot_kws=plot_kws, **kws)
         fits[label] = fit
-        if kws.get('matlab_running', False):
+        if kws.get('matlab_running', False):  # pragma: matlab
             for v in ml_sessions:
                 MatlabModelDriver.stop_matlab(*v)
             assert(not MatlabModelDriver.is_matlab_running())
@@ -1147,6 +1196,8 @@ def plot_scalings(compare='commtype', compare_values=None,
     # Save plot
     plt.savefig(plotfile)
     logging.info('plotfile: %s', plotfile)
+    if cleanup_plot:
+        os.remove(plotfile)
     return plotfile
 
 
