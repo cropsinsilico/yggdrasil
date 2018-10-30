@@ -4,6 +4,7 @@ import atexit
 import threading
 import numpy as np
 import pandas as pd
+from logging import info
 from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
@@ -471,7 +472,9 @@ class CommBase(tools.CisClass):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
         if out > 0:
-            print(cls, cls.comm_registry())
+            info('There are %d %s comms: %s',
+                 len(cls.comm_registry()), cls.__name__,
+                 [k for k in cls.comm_registry().keys()])
         return out
 
     @classmethod
