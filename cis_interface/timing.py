@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 _linewidth = 2
 _legend_fontsize = 14
 mpl.rc('font', size=18)
+_perf_warmups = 0
 
 
 _lang_list = tools.get_installed_lang()
@@ -76,6 +77,7 @@ def write_perf_script(script_file, nmsg, msg_size,
         'from cis_interface import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
+        'warmups = %d' % _perf_warmups,
         'msg_size = %d' % msg_size,
         'lang_src = "%s"' % lang_src,
         'lang_dst = "%s"' % lang_dst,
@@ -88,7 +90,7 @@ def write_perf_script(script_file, nmsg, msg_size,
         'timer = timing.TimedRun(lang_src, lang_dst,'
         '                        comm_type=comm_type,'
         '                        matlab_running=matlab_running)',
-        'runner = perf.Runner(values=1, processes=nrep)',
+        'runner = perf.Runner(values=1, processes=nrep, warmups=warmups)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.perf_func,',
         '                             timer, nmsg, msg_size)']
@@ -131,20 +133,20 @@ def perf_func(loops, timer, nmsg, msg_size):
     return ttot
 
 
-def get_source(lang, direction, name='timed_pipe'):
+def get_source(lang, direction, test_name='timed_pipe'):
     r"""Get the path to the source file.
 
     Args:
         lang (str): Language that should be returned.
         direction (str): 'src' or 'dst'.
-        name (str, optional): Name of the example. Defaults to 'timed_pipe'.
+        test_name (str, optional): Name of the example. Defaults to 'timed_pipe'.
 
     Returns:
         str: Full path to the source file.
 
     """
-    dir = os.path.join(examples._example_dir, name, 'src')
-    out = os.path.join(dir, '%s_%s%s' % (name, direction, examples.ext_map[lang]))
+    dir = os.path.join(examples._example_dir, test_name, 'src')
+    out = os.path.join(dir, '%s_%s%s' % (test_name, direction, examples.ext_map[lang]))
     return out
 
 
@@ -154,10 +156,10 @@ class TimedRun(CisTestBase, tools.CisClass):
     Args:
         lang_src (str): Language that messages should be sent from.
         lang_dst (str): Language that messages should be sent to.
-        name (str, optional): Name of the example. Defaults to 'timed_pipe'.
+        test_name (str, optional): Name of the example. Defaults to 'timed_pipe'.
         filename (str, optional): Full path to the file where timing statistics
            will be saved. This can be a perf json or a Python pickle of run data.
-           Defaults to 'scalings_{name}_{comm_type}.json' if dont_use_perf is
+           Defaults to 'scalings_{test_name}_{comm_type}.json' if dont_use_perf is
            False, otherwise the extension is '.dat'.
         comm_type (str, optional): Name of communication class that should be
             used for tests. Defaults to the current default comm class.
@@ -191,7 +193,7 @@ class TimedRun(CisTestBase, tools.CisClass):
 
     """
 
-    def __init__(self, lang_src, lang_dst, name='timed_pipe', filename=None,
+    def __init__(self, lang_src, lang_dst, test_name='timed_pipe', filename=None,
                  comm_type=None, platform=None, python_ver=None,
                  matlab_running=False, dont_use_perf=False, **kwargs):
         if comm_type is None:
@@ -200,42 +202,61 @@ class TimedRun(CisTestBase, tools.CisClass):
             platform = cis_platform._platform
         if python_ver is None:
             python_ver = backwards._python_version
-        suffix = '%s_%s_py%s' % (name, platform, python_ver.replace('.', ''))
+        suffix = '%s_%s_py%s' % (test_name, platform, python_ver.replace('.', ''))
         self.dont_use_perf = dont_use_perf
         if filename is None:
             if self.dont_use_perf:
                 filename = os.path.join(os.getcwd(), 'scaling_%s.dat' % suffix)
             else:
                 filename = os.path.join(os.getcwd(), 'scaling_%s.json' % suffix)
-        assert(matlab_running == MatlabModelDriver.is_matlab_running())
         self.matlab_running = matlab_running
         self.filename = filename
         self.comm_type = comm_type
         self.platform = platform
         self.python_ver = python_ver
-        self.program_name = name
-        name = '%s_%s_%s' % (name, lang_src, lang_dst)
+        self.program_name = test_name
+        name = '%s_%s_%s' % (test_name, lang_src, lang_dst)
         tools.CisClass.__init__(self, name)
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
         self.lang_src = lang_src
         self.lang_dst = lang_dst
-        self.data = self.load()
+        self._data = None
+        self.reload()
         self.fyaml = dict()
         self.foutput = dict()
         self.entries = dict()
 
-    def can_run(self):
+    @property
+    def data(self):
+        r"""dict or perf.BenchmarkSuite: Timing statistics data."""
+        return self._data
+
+    def can_run(self, raise_error=False):
         r"""Determine if the test can be run from the current platform and
         python version.
+
+        Args:
+            raise_error (bool, optional): If True, an error will be raised if
+                the test cannot be completed from the current platform. Defaults
+                to False.
 
         Returns:
             bool: True if the test can be run, False otherwise.
 
         """
-        # print(self.platform.lower(), cis_platform._platform.lower())
-        # print(self.python_ver, backwards._python_version)
         out = ((self.platform.lower() == cis_platform._platform.lower())
-               and (self.python_ver == backwards._python_version))
+               and (self.python_ver == backwards._python_version)
+               and (self.matlab_running == MatlabModelDriver.is_matlab_running()))
+        if (not out) and raise_error:
+            msg = ['Cannot run test with parameters:',
+                   '\tOperating System: %s' % self.platform,
+                   '\tPython Version: %s' % self.python_ver,
+                   '\tMatlab Running: %s' % self.matlab_running,
+                   'Because one or more platform properties are incompatible:',
+                   '\tOperating System: %s' % cis_platform._platform,
+                   '\tPython Version: %s' % backwards._python_version,
+                   '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running()]
+            raise RuntimeError('\n'.join(msg))
         return out
 
     def entry_name(self, nmsg, msg_size):
@@ -263,7 +284,9 @@ class TimedRun(CisTestBase, tools.CisClass):
 
     @property
     def default_msg_size(self):
-        r"""list: Default message sizes for scaling tests."""
+        r"""list: Default message sizes for scaling tests. This will vary
+        depending on the comm type so that the maximum size is not more than 10x
+        larger than the maximum message size."""
         if self.comm_type.startswith('IPC'):
             msg_size = [1, 1e2, 1e3, 1e4, 5e4, 1e5]
         else:
@@ -274,6 +297,16 @@ class TimedRun(CisTestBase, tools.CisClass):
     def default_msg_count(self):
         r"""list: Default message count for scaling tests."""
         return [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+    @property
+    def base_msg_size(self):
+        r"""int: Message size to use for tests varrying message count."""
+        return 1000
+
+    @property
+    def base_msg_count(self):
+        r"""int: Message count to use for tests varrying message size."""
+        return 5
 
     @property
     def time_per_byte(self):
@@ -352,12 +385,12 @@ class TimedRun(CisTestBase, tools.CisClass):
     @property
     def source_src(self):
         r"""str: Source file for language messages will be sent from."""
-        return get_source(self.lang_src, 'src', name=self.program_name)
+        return get_source(self.lang_src, 'src', test_name=self.program_name)
 
     @property
     def source_dst(self):
         r"""str: Source file for language messages will be sent to."""
-        return get_source(self.lang_dst, 'dst', name=self.program_name)
+        return get_source(self.lang_dst, 'dst', test_name=self.program_name)
 
     @property
     def yamlfile_format(self):
@@ -429,6 +462,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             str: Unique identifier for the run.
 
         """
+        assert(self.matlab_running == MatlabModelDriver.is_matlab_running())
         nmsg = int(nmsg)
         msg_size = int(msg_size)
         run_uuid = self.get_new_uuid()
@@ -514,14 +548,13 @@ class TimedRun(CisTestBase, tools.CisClass):
         nrep_remain = nrep - len(reps)
         # Only run if there are not enough existing reps to get stat
         if nrep_remain > 0:
-            if not self.can_run():
-                raise Exception("Cannot run this test.")
+            self.can_run(raise_error=True)
             if self.dont_use_perf:
                 self.time_run_mine(nmsg, msg_size, nrep_remain)
             else:
                 self.time_run_perf(nmsg, msg_size, nrep_remain)
             # Reload after new runs have been added
-            self.data = self.load()
+            self.reload()
             reps = self.get_entry(entry_name)
         # Calculate variables
         if len(reps) < 2:
@@ -553,7 +586,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
                          'INCLUDE', 'LIB', 'LIBPATH']
         cmd = [sys.executable, self.perfscript, '--append=' + self.filename,
-               '--inherit-environ=' + ','.join(copy_env)]
+               '--inherit-environ=' + ','.join(copy_env),
+               '--warmups=%d' % _perf_warmups]
         subprocess.call(cmd)
         assert(os.path.isfile(self.filename))
         os.remove(self.perfscript)
@@ -580,8 +614,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             new_reps.append(t1 - t0)
             self.after_run(run_uuid, new_reps[-1])
         if self.data is None:
-            self.data = dict()
-        self.data[entry_name] = tuple(list(old_reps) + list(new_reps))
+            self._data = dict()
+        self._data[entry_name] = tuple(list(old_reps) + list(new_reps))
         self.save(self.data, overwrite=True)
 
     @classmethod
@@ -602,8 +636,9 @@ class TimedRun(CisTestBase, tools.CisClass):
                 plotted scalings and the fit.
 
         """
-        cls_kwargs_keys = ['name', 'filename', 'matlab_running',
-                           'comm_type', 'platform', 'python_ver']
+        cls_kwargs_keys = ['test_name', 'filename', 'matlab_running',
+                           'comm_type', 'platform', 'python_ver',
+                           'dont_use_perf']
         cls_kwargs = {}
         for k in cls_kwargs_keys:
             if k in kwargs:
@@ -612,23 +647,23 @@ class TimedRun(CisTestBase, tools.CisClass):
         axs, fit = x.plot_scaling_joint(**kwargs)
         return axs, fit
 
-    def plot_scaling_joint(self, msg_size0=1000, msg_count0=5,
+    def plot_scaling_joint(self, msg_size0=None, msg_count0=None,
                            msg_size=None, msg_count=None, axs=None, **kwargs):
         r"""Plot scaling of run time with both count and size, side by side.
         Anywhere data is exchanged as a tuple for each plot, the plot of
         scaling with count is first and the scaling with size is second.
         
         Args:
-            msg_size0 (int): Size of messages to use for count scaling.
-            msg_count0 (int): Number of messages to use for size scaling.
+            msg_size0 (int, optional): Size of messages to use for count scaling.
+                Defaults to self.base_msg_size.
+            msg_count0 (int, optional): Number of messages to use for size
+                scaling. Defaults to self.base_msg_count.
             msg_size (list, np.ndarray, optional): List of message sizes to use
                 as x variable on the size scaling plot. Defaults to
-                [1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7] if not provided, unless the
-                IPC communication channels are being used. Then
-                [1, 1e2, 1e3, 1e4, 1e5].
+                self.default_msg_size.
             msg_count (list, np.ndarray, optional)): List of message counts to
                 use as x variable on the count scaling plot. Defaults to
-                [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].
+                self.default_msg_count.
             axs (tuple, optional): Pair of axes objects that lines should be
                 added to. If not provided, they are created.
             **kwargs: Additional keyword arguments are passed to plot_scaling.
@@ -638,6 +673,10 @@ class TimedRun(CisTestBase, tools.CisClass):
                 plotted scalings and the fit.
 
         """
+        if msg_size0 is None:
+            msg_size0 = self.base_msg_size
+        if msg_count0 is None:
+            msg_count0 = self.base_msg_count
         if msg_size is None:
             msg_size = self.default_msg_size
         if msg_count is None:
@@ -647,10 +686,9 @@ class TimedRun(CisTestBase, tools.CisClass):
             figure_buff = 0.75
             fig, axs = plt.subplots(1, 2, figsize=figure_size, sharey=True)
             axs[0].set_xlabel('Message Count (size = %d)' % msg_size0)
+            axs[0].set_ylabel('Time (s)')
             if kwargs.get('per_message', False):
                 axs[0].set_ylabel('Time per Message (s)')
-            else:
-                axs[0].set_ylabel('Time (s)')
             axs[1].set_xlabel('Message Size (count = %d)' % msg_count0)
             axs_wbuffer = figure_buff / figure_size[0]
             axs_hbuffer = figure_buff / figure_size[1]
@@ -711,6 +749,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             msg_size = np.array(msg_size)
         if isinstance(msg_count, list):
             msg_count = np.array(msg_count)
+        # Get data
         if isinstance(msg_size, np.ndarray) and isinstance(msg_count, np.ndarray):
             raise RuntimeError("Arrays provided for both msg_size & msg_count.")
         elif isinstance(msg_size, np.ndarray):
@@ -723,6 +762,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                                                   per_message=per_message, **kwargs)
         else:
             raise RuntimeError("Array not provided for msg_size or msg_count.")
+        # Parse input values
         if xscale is None:
             if xname == 'size':
                 xscale = 'log'
@@ -747,10 +787,9 @@ class TimedRun(CisTestBase, tools.CisClass):
         if axs is None:
             fig, axs = plt.subplots()
             axs.set_xlabel(xname)
+            axs.set_ylabel('Time (s)')
             if per_message:
                 axs.set_ylabel('Time per Message (s)')
-            else:
-                axs.set_ylabel('Time (s)')
         # Set axes scales
         if xscale == 'log':
             axs.set_xscale('log')
@@ -779,12 +818,12 @@ class TimedRun(CisTestBase, tools.CisClass):
             axs.plot(x, y, label=label, **plot_kws)
         return axs
 
-    def fit_scaling_count(self, msg_size=1000, counts=None, **kwargs):
+    def fit_scaling_count(self, msg_size=None, counts=None, **kwargs):
         r"""Do a linear fit to the scaling of execution time with message count.
 
         Args:
             msg_size (int, optional): Size of each message that should be sent.
-                Defaults to 1000.
+                Defaults to self.base_msg_size.
             counts (list, optional): List of counts to test. Defaults to
                 self.default_msg_count if not provided.
             **kwargs: Additional keyword arguments are passed to scaling_count.
@@ -793,6 +832,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             tuple: The slope and intercept of the linear fit.
 
         """
+        if msg_size is None:
+            msg_size = self.base_msg_size
         if counts is None:
             counts = self.default_msg_count
         out = self.scaling_count(msg_size, counts=counts, **kwargs)
@@ -800,12 +841,12 @@ class TimedRun(CisTestBase, tools.CisClass):
         y = out[2]
         return np.polyfit(x, y, 1)
 
-    def fit_scaling_size(self, msg_count=5, sizes=None, **kwargs):
+    def fit_scaling_size(self, msg_count=None, sizes=None, **kwargs):
         r"""Do a linear fit to the scaling of execution time with message count.
 
         Args:
             msg_count (int, optional): Number of messages that should be sent
-                for each size. Defaults to 5.
+                for each size. Defaults to self.base_msg_count.
             sizes (list, optional): List of sizes to test. Defaults to
                 self.default_msg_size if not provided.
             **kwargs: Additional keyword arguments are passed to scaling_size.
@@ -814,6 +855,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             tuple: The slope and intercept of the linear fit.
 
         """
+        if msg_count is None:
+            msg_count = self.base_msg_count
         if sizes is None:
             sizes = self.default_msg_size[:-2]
         max_size = self.max_msg_size
@@ -862,19 +905,19 @@ class TimedRun(CisTestBase, tools.CisClass):
                                      nsamples, dtype='int64')
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
-        if per_message:
-            min0, avg0, std0 = self.time_run(0, 0, **kwargs)
         mbo = []
         avg = []
         std = []
         for c in counts:
             imin, iavg, istd = self.time_run(c, msg_size, **kwargs)
-            if per_message:
-                imin = (imin - min0) / c
-                iavg = (iavg - avg0) / c
             mbo.append(imin)
             avg.append(iavg)
             std.append(istd)
+        if per_message:
+            t0 = self.startup_time
+            for i, c in enumerate(counts):
+                mbo[i] = (mbo[i] - t0) / c
+                avg[i] = (avg[i] - t0) / c
         return (list(counts), mbo, avg, std)
 
     def scaling_size(self, nmsg, sizes=None, min_size=1, max_size=1e7,
@@ -913,19 +956,19 @@ class TimedRun(CisTestBase, tools.CisClass):
                                     nsamples, dtype='int64')
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
-        if per_message:
-            min0, avg0, std0 = self.time_run(0, 0, **kwargs)
         mbo = []
         avg = []
         std = []
         for s in sizes:
             imin, iavg, istd = self.time_run(nmsg, s, **kwargs)
-            if per_message:
-                imin = (imin - min0) / nmsg
-                iavg = (iavg - avg0) / nmsg
             mbo.append(imin)
             avg.append(iavg)
             std.append(istd)
+        if per_message:
+            t0 = self.startup_time
+            for i, s in enumerate(sizes):
+                mbo[i] = (mbo[i] - t0) / nmsg
+                avg[i] = (avg[i] - t0) / nmsg
         return (list(sizes), mbo, avg, std)
 
     def get_entry(self, name):
@@ -988,7 +1031,11 @@ class TimedRun(CisTestBase, tools.CisClass):
         # Save
         self.save(data_out, overwrite=True)
         # Reload
-        self.data = self.load()
+        self.reload()
+
+    def reload(self):
+        r"""Reload scalings data and store it in the data attribute."""
+        self._data = self.load()
 
     def load(self, as_json=False):
         r"""Load scalings data from a perf BenchmarkSuite json file or a
@@ -1046,12 +1093,14 @@ class TimedRun(CisTestBase, tools.CisClass):
                     data.dump(self.filename, replace=overwrite)
                 else:
                     with open(self.filename, 'w') as fd:
-                        json.dump(data, fd)
+                        json.dump(data, fd, sort_keys=True,
+                                  separators=(',', ':'))
+                        fd.write("\n")
 
 
 def plot_scalings(compare='comm_type', compare_values=None,
                   plotfile=None, test_name='timed_pipe',
-                  cleanup_plot=False, **kwargs):
+                  cleanup_plot=False, use_paper_values=False, **kwargs):
     r"""Plot comparison of scaling for chosen variable.
 
     Args:
@@ -1069,21 +1118,36 @@ def plot_scalings(compare='comm_type', compare_values=None,
         cleanup_plot (bool, optional): If True, the create plotfile will be
             removed before the function returns. This is generally only useful
             for testing. Defaults to False.
+        use_paper_values (bool, optional): If True, use the values from the paper.
+            Defaults to False.
         **kwargs: Additional keyword arguments are passed to plot_scaling_joint.
 
     Returns:
         str: Path where the figure was saved.
 
     """
-    default_vars = {'comm_type': tools.get_default_comm(),
-                    'lang_src': 'python',
-                    'lang_dst': 'python',
-                    'platform': cis_platform._platform,
-                    'python_ver': backwards._python_version}
-    default_vals = {'comm_type': _comm_list,
-                    'language': _lang_list,
-                    'platform': ['Linux', 'OSX', 'Windows'],
-                    'python_ver': ['2.7', '3.5']}
+    if use_paper_values:
+        default_vars = {'comm_type': 'ZMQComm',
+                        'lang_src': 'python',
+                        'lang_dst': 'python',
+                        'platform': 'Linux',
+                        'python_ver': '2.7'}
+        default_vals = {'comm_type': ['ZMQComm', 'IPCComm'],
+                        'language': ['c', 'cpp', 'python'],
+                        'platform': ['Linux', 'OSX', 'Windows'],
+                        'python_ver': ['2.7', '3.5']}
+        if kwargs.get('platform', default_vars['platform']) == 'OSX':
+            default_vals['language'].append('matlab')
+    else:
+        default_vars = {'comm_type': tools.get_default_comm(),
+                        'lang_src': 'python',
+                        'lang_dst': 'python',
+                        'platform': cis_platform._platform,
+                        'python_ver': backwards._python_version}
+        default_vals = {'comm_type': _comm_list,
+                        'language': _lang_list,
+                        'platform': ['Linux', 'OSX', 'Windows'],
+                        'python_ver': ['2.7', '3.5']}
     if compare_values is None:
         compare_values = default_vals.get(compare, None)
     else:
@@ -1169,7 +1233,8 @@ def plot_scalings(compare='comm_type', compare_values=None,
         if MatlabModelDriver.is_matlab_running():  # pragma: debug
             MatlabModelDriver.kill_all()
             assert(not MatlabModelDriver.is_matlab_running())
-        if kws.get('matlab_running', False):  # pragma: matlab
+        if ((kws.get('matlab_running', False)
+             and MatlabModelDriver._matlab_installed)):  # pragma: matlab
             nml = 0
             for k in ['lang_src', 'lang_dst']:
                 if kws[k] == 'matlab':
@@ -1179,10 +1244,11 @@ def plot_scalings(compare='comm_type', compare_values=None,
                 ml_sessions.append(MatlabModelDriver.start_matlab())
             label += ' (Existing)'
             plot_kws['color'] = 'orange'
-        axs, fit = TimedRun.class_plot(name=test_name, axs=axs, label=label,
+        axs, fit = TimedRun.class_plot(test_name=test_name, axs=axs, label=label,
                                        yscale=yscale, plot_kws=plot_kws, **kws)
         fits[label] = fit
-        if kws.get('matlab_running', False):  # pragma: matlab
+        if ((kws.get('matlab_running', False)
+             and MatlabModelDriver._matlab_installed)):  # pragma: matlab
             for v in ml_sessions:
                 MatlabModelDriver.stop_matlab(*v)
             assert(not MatlabModelDriver.is_matlab_running())

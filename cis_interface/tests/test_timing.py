@@ -1,23 +1,30 @@
 import os
 import copy
 import nose.tools as nt
-import unittest
 from cis_interface import tools, timing, backwards, platform
+from cis_interface.tests import CisTestClass
 
 
 _test_size = 1
 _test_count = 1
 _test_nrep = 1
-_test_run = timing.TimedRun('python', 'python')
+_test_lang = 'c'
+# On windows, it's possible to not have a C/C++ communication library installed
+if 'c' not in timing._lang_list:  # pragma: windows
+    _test_lang = 'python'
+# _test_run = timing.TimedRun(_test_lang, _test_lang)
+# _test_run.time_run(_test_count, _test_size, nrep=_test_nrep)
 _this_platform = (platform._platform,
                   backwards._python_version,
                   tools.get_default_comm())
+_base_environment = {'platform': 'Linux',
+                     'python_ver': '2.7',
+                     'comm_type': 'ZMQComm'}
 _valid_platforms = [('Linux', '2.7', 'ZMQComm'),
                     ('Linux', '2.7', 'IPCComm'),
                     ('Linux', '3.5', 'ZMQComm'),
                     ('OSX', '2.7', 'ZMQComm'),
                     ('Windows', '2.7', 'ZMQComm')]
-_base_platform = ('Linux', '2.7', 'ZMQComm')
 _testfile_json = 'test_run123.json'
 _testfile_dat = 'test_run123.dat'
 
@@ -32,163 +39,303 @@ def test_get_source():
             assert(os.path.isfile(fname))
 
 
-def test_perf_func():
-    r"""Test perf_func."""
-    timing.perf_func(1, _test_run, _test_count, _test_size)
-
-
-@unittest.skipIf(_this_platform not in _valid_platforms, "New platform")
-def test_TimedRun():
-    r"""Test generic TimedRun behavior for existing run."""
-    nt.assert_raises(RuntimeError, _test_run.save, _test_run.data)
-    _test_run.save(_test_run.data, overwrite=True)
-
-
-def test_run():
-    r"""Test the two different methods for running."""
-    args = (_test_count, _test_size)
-    kwargs = {'nrep': _test_nrep, 'overwrite': True}
-    vals = [(False, _testfile_json), (True, None)]  # _testfile_dat)]
-    for dont_use_perf, testfile in vals:
-        if (testfile is not None) and os.path.isfile(testfile):  # pragma: debug
-            os.remove(testfile)
-        # Run twice so that overwrite is called and file exists
-        for i in range(2):
-            x = timing.TimedRun('python', 'python', filename=testfile,
-                                dont_use_perf=dont_use_perf)
-            x.time_run(*args, **kwargs)
-        entry = x.entry_name(*args)
-        x.remove_entry(entry)
-        assert(not x.has_entry(entry))
-        if os.path.isfile(x.filename):
-            os.remove(x.filename)
-
-
-def test_json():
-    r"""Test loading/saving perf data as json."""
-    x = _test_run.load(as_json=True)
-    _test_run.save(x, overwrite=True)
-
-
-def test_combos():
-    r"""Test different combinations of source/destination languages."""
-    # These should already exist in the record for the valid platforms
-    lang_list = timing._lang_list
-    for l1 in lang_list:
-        x = timing.TimedRun(l1, l1)
-        x.time_run(_test_count, _test_size, nrep=_test_nrep)
-
-
 def test_platform_error():
     r"""Test error when test cannot be performed."""
     if platform._is_osx:
         test_platform = 'Linux'
     else:
         test_platform = 'OSX'
-    if os.path.isfile(_testfile_json):  # pragma: debug
-        os.remove(_testfile_json)
-    x = timing.TimedRun('python', 'python', platform=test_platform,
-                        filename=_testfile_json)
-    nt.assert_raises(Exception, x.time_run,
-                     _test_count, _test_size, nrep=_test_nrep)
+    x = timing.TimedRun(_test_lang, _test_lang, platform=test_platform)
+    nt.assert_raises(RuntimeError, x.can_run, raise_error=True)
 
 
-def test_scaling_count():
-    r"""Test running scaling with number of messages."""
-    kwargs = dict(min_count=_test_count, max_count=_test_count,
-                  nsamples=1, nrep=_test_nrep)
-    x = _test_run
-    x.scaling_count(_test_size, scaling='log', **kwargs)
-    x.scaling_count(_test_size, scaling='linear',
-                    per_message=True, **kwargs)
-    nt.assert_raises(ValueError, x.scaling_count, _test_size,
-                     scaling='invalid')
+class TimedRunTestBase(CisTestClass):
+    r"""Base test class for the TimedRun class."""
+
+    _mod = 'cis_interface.timing'
+    _cls = 'TimedRun'
+    test_name = 'timed_pipe'
+    _filename = None
+    platform = None
+    python_ver = None
+    comm_type = None
+    dont_use_perf = False
+    language = _test_lang
+    count = 1
+    size = 1
+    nrep = 1
+
+    @property
+    def inst_args(self):
+        r"""list: Arguments for creating a class instance."""
+        return [self.language, self.language]
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        return {'test_name': self.test_name, 'filename': self._filename,
+                'platform': self.platform, 'python_ver': self.python_ver,
+                'comm_type': self.comm_type, 'dont_use_perf': self.dont_use_perf}
+
+    @property
+    def time_run_args(self):
+        r"""tuple: Arguments for time_run."""
+        return (self.count, self.size)
+
+    @property
+    def time_run_kwargs(self):
+        r"""dict: Keyword arguments for time_run."""
+        return {'nrep': self.nrep}
+
+    @property
+    def entry_name(self):
+        r"""str: Name of the entry for the provided time_run_args."""
+        return self.instance.entry_name(*self.time_run_args)
+
+    @property
+    def filename(self):
+        r"""str: Name of the file where data is stored."""
+        return self.instance.filename
+
+    def get_raw_data(self):
+        r"""Get the raw contents of the data file."""
+        out = ''
+        if os.path.isfile(self.filename):
+            with open(self.filename, 'r') as fd:
+                out = fd.read()
+        return out
+
+    def time_run(self):
+        r"""Perform a timed run."""
+        self.instance.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
-def test_scaling_size():
-    r"""Test running scaling with size of messages."""
-    kwargs = dict(min_size=_test_size, max_size=_test_size,
-                  nsamples=1, nrep=_test_nrep)
-    x = _test_run
-    x.scaling_size(_test_count, scaling='log', **kwargs)
-    x.scaling_size(_test_count, scaling='linear',
-                   per_message=True, **kwargs)
-    nt.assert_raises(ValueError, x.scaling_size, _test_count,
-                     scaling='invalid')
+class TestTimedRun(TimedRunTestBase):
+    r"""Test class for the TimedRun class using existing data."""
+
+    platform = _base_environment['platform']
+    python_ver = _base_environment['python_ver']
+    comm_type = _base_environment['comm_type']
+    language = 'python'
+
+    @property
+    def count(self):
+        r"""int: Number of messages to use for tests."""
+        return self.instance.base_msg_count
+
+    @property
+    def size(self):
+        r"""int: Size of messages to use for tests."""
+        return self.instance.base_msg_size
+    
+    def test_json(self):
+        r"""Test loading/saving perf data as json."""
+        old_text = self.get_raw_data()
+        x = self.instance.load(as_json=True)
+        self.instance.save(x, overwrite=True)
+        new_text = self.get_raw_data()
+        nt.assert_equal(new_text, old_text)
+
+    def test_save(self):
+        r"""Test save with/without overwrite."""
+        old_text = self.get_raw_data()
+        nt.assert_raises(RuntimeError, self.instance.save, self.instance.data)
+        self.instance.save(self.instance.data, overwrite=True)
+        new_text = self.get_raw_data()
+        nt.assert_equal(new_text, old_text)
+
+    def test_scaling_count(self):
+        r"""Test running scaling with number of messages."""
+        kwargs = dict(min_count=self.count, max_count=self.count,
+                      nsamples=1, nrep=self.nrep)
+        self.instance.scaling_count(self.size, scaling='log', **kwargs)
+        self.instance.scaling_count(self.size, scaling='linear',
+                                    per_message=True, **kwargs)
+        nt.assert_raises(ValueError, self.instance.scaling_count, self.size,
+                         scaling='invalid')
+
+    def test_scaling_size(self):
+        r"""Test running scaling with size of messages."""
+        kwargs = dict(min_size=self.size, max_size=self.size,
+                      nsamples=1, nrep=self.nrep)
+        self.instance.scaling_size(self.count, scaling='log', **kwargs)
+        self.instance.scaling_size(self.count, scaling='linear',
+                                   per_message=True, **kwargs)
+        nt.assert_raises(ValueError, self.instance.scaling_size, self.count,
+                         scaling='invalid')
+
+    def test_plot_scaling_joint(self):
+        r"""Test plot_scaling_joint."""
+        kwargs = dict(msg_size0=self.size, msg_count0=self.count,
+                      msg_size=[self.size], msg_count=[self.count],
+                      per_message=True, time_method='bestof')
+        self.instance.plot_scaling_joint(**kwargs)
+
+    def test_plot_scaling(self):
+        r"""Test plot_scaling corner cases not covered by test_plot_scaling_joint."""
+        self.instance.plot_scaling(self.size, [self.count], per_message=True,
+                                   time_method='average', yscale='linear')
+        self.instance.plot_scaling([self.size], self.count, per_message=False,
+                                   time_method='average', yscale='log')
+
+        if False:
+            # Test with msg_count on x linear/linear axs
+            args = (self.size, [self.count])
+            kwargs = {'axs': None, 'nrep': self.nrep,
+                      'time_method': 'average', 'per_message': True}
+            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+            kwargs['time_method'] = 'bestof'
+            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+            # Test with msg_size on x log/log axes
+            args = ([self.size], self.count)
+            kwargs = {'axs': None, 'nrep': self.nrep, 'time_method': 'average',
+                      'xscale': 'log', 'yscale': 'log'}
+            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+            kwargs['time_method'] = 'bestof'
+            kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
+        # Errors
+        nt.assert_raises(RuntimeError, self.instance.plot_scaling,
+                         [self.size], [self.count])
+        nt.assert_raises(RuntimeError, self.instance.plot_scaling,
+                         self.size, self.count)
+        nt.assert_raises(ValueError, self.instance.plot_scaling,
+                         [self.size], self.count, nrep=self.nrep,
+                         time_method='invalid')
+
+    def test_perfjson_to_pandas(self):
+        r"""Test perfjson_to_pandas."""
+        timing.perfjson_to_pandas(self.filename)
+
+    def test_fits(self):
+        r"""Test fits to scaling on one platform."""
+        self.instance.time_per_byte
+        self.instance.time_per_message
+        self.instance.startup_time
+
+    def test_plot_scalings(self):
+        r"""Test plot_scalings corner cases on test platform."""
+        kwargs = copy.deepcopy(self.inst_kwargs)
+        kwargs.update(msg_size=[self.size], msg_size0=self.size,
+                      msg_count=[self.count], msg_count0=self.count,
+                      cleanup_plot=True)
+        for c in ['comm_type', 'language', 'platform', 'python_ver']:
+            ikws = copy.deepcopy(kwargs)
+            ikws['compare'] = c
+            if c in ikws:
+                del ikws[c]
+            if c == 'language':
+                ikws['per_message'] = True
+                ikws['compare_values'] = [self.language]
+            timing.plot_scalings(**ikws)
+        # Errors
+        nt.assert_raises(ValueError, timing.plot_scalings, compare='invalid')
+        nt.assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
+                         comm_type='ZMQComm')
+
+    def test_production_runs(self):
+        r"""Test production tests (those used in paper)."""
+        # Limit language list for tests
+        for c in ['comm_type', 'language', 'platform', 'python_ver']:
+            kwargs = copy.deepcopy(self.inst_kwargs)
+            kwargs.update(compare=c, cleanup_plot=True, use_paper_values=True)
+            if c in kwargs:
+                del kwargs[c]
+            timing.plot_scalings(**kwargs)
+            # Also do OSX plot w/ Matlab
+            if c == 'language':
+                kwargs['platform'] = 'OSX'
+                timing.plot_scalings(**kwargs)
 
 
-def test_plot_scaling():
-    r"""Test plot_scaling."""
-    x = _test_run
-    axs = None
-    axs = x.plot_scaling(1, [1], nrep=2, axs=axs,
-                         time_method='average', per_message=True)
-    axs = x.plot_scaling(1, [1], nrep=2, axs=axs,
-                         time_method='bestof', per_message=True)
-    axs = None
-    axs = x.plot_scaling([1], 1, nrep=2, axs=axs,
-                         time_method='average', xscale='log', yscale='log')
-    axs = x.plot_scaling([1], 1, nrep=2, axs=axs,
-                         time_method='bestof', xscale='log', yscale='log')
-    nt.assert_raises(RuntimeError, x.plot_scaling, [1], [1])
-    nt.assert_raises(RuntimeError, x.plot_scaling, 1, 1)
-    nt.assert_raises(ValueError, x.plot_scaling, [1], 1, nrep=2,
-                     time_method='invalid')
+class TestTimedRunTemp(TimedRunTestBase):
+    r"""Test class for the TimedRun class using temporary data."""
+
+    _filename = 'test_run123.json'
+
+    @property
+    def description_prefix(self):
+        r"""String prefix to prepend docstr test message with."""
+        out = super(TestTimedRunTemp, self).description_prefix
+        out += ' Temporary'
+        return out
+
+    def cleanup_files(self):
+        r"""Remove the temporary file if it exists."""
+        if os.path.isfile(self.instance.filename):
+            os.remove(self.instance.filename)
+        if os.path.isfile(self.instance.perfscript):
+            os.remove(self.instance.perfscript)
+
+    def setup(self, *args, **kwargs):
+        r"""Cleanup the file if it exists and then reload."""
+        super(TestTimedRunTemp, self).setup(*args, **kwargs)
+        self.cleanup_files()
+        self.instance.reload()
+
+    def teardown(self, *args, **kwargs):
+        r"""Cleanup temporary files before destroying instance."""
+        self.cleanup_files()
+        super(TestTimedRunTemp, self).teardown(*args, **kwargs)
+
+    @property
+    def time_run_kwargs(self):
+        r"""dict: Keyword arguments for time_run."""
+        out = super(TestTimedRunTemp, self).time_run_kwargs
+        out['overwrite'] = True
+        return out
+
+    def test_perf_func(self):
+        r"""Test perf_func."""
+        timing.perf_func(1, self.instance, self.count, self.size)
+
+    def test_run_overwrite(self):
+        r"""Test performing a run twice, the second time with ovewrite."""
+        self.time_run()
+        # Reload instance to test load for existing file
+        self.clear_instance()
+        self.time_run()
+        self.instance.remove_entry(self.entry_name)
+        assert(not self.instance.has_entry(self.entry_name))
+
+    def test_languages(self):
+        r"""Test different combinations of source/destination languages."""
+        kwargs = copy.deepcopy(self.inst_kwargs)
+        for l1 in timing._lang_list:
+            args = (l1, l1)
+            x = timing.TimedRun(*args, **kwargs)
+            x.time_run(*self.time_run_args, **self.time_run_kwargs)
+
+    def test_comm_types(self):
+        r"""Test different comm types."""
+        args = copy.deepcopy(self.inst_args)
+        kwargs = copy.deepcopy(self.inst_kwargs)
+        for c in timing._comm_list:
+            kwargs['comm_type'] = c
+            x = timing.TimedRun(*args, **kwargs)
+            x.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
-@unittest.skipIf(_this_platform not in _valid_platforms, "New platform")
-def test_plot_scalings():
-    r"""Test plot_scalings corner cases on test platform."""
-    # Limit language list for tests
-    old_lang_list = timing._lang_list
-    timing._lang_list = ['python']
-    kwargs = dict(msg_size=[1], msg_size0=1, msg_count=[1], msg_count0=1,
-                  cleanup_plot=True)
-    if _this_platform in _valid_platforms:
-        timing.plot_scalings(compare='comm_type', **kwargs)
-        timing.plot_scalings(compare='language', **kwargs)
-        timing.plot_scalings(compare='platform', per_message=True,
-                             compare_values=[platform._platform], **kwargs)
-        timing.plot_scalings(compare='python_ver', per_message=True,
-                             compare_values=[backwards._python_version], **kwargs)
-    timing._lang_list = old_lang_list
+class TestTimedRunTempNoPerf(TestTimedRunTemp):
+    r"""Test class for the TimedRun class using temporary data without perf."""
 
+    _filename = None  # This forces use of standard name with .dat extension
+    dont_use_perf = True
 
-def test_plot_scalings_errors():
-    r"""Test plot_scalings errors."""
-    nt.assert_raises(ValueError, timing.plot_scalings, compare='invalid')
-    nt.assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
-                     comm_type='ZMQComm')
+    @property
+    def description_prefix(self):
+        r"""String prefix to prepend docstr test message with."""
+        out = super(TestTimedRunTempNoPerf, self).description_prefix
+        out += ' (w/o perf)'
+        return out
 
+    def test_perf_func(self):
+        r"""Disabled: Test perf_func."""
+        pass
 
-def test_perfjson_to_pandas():
-    r"""Test perfjson_to_pandas."""
-    fname = _test_run.filename
-    timing.perfjson_to_pandas(fname)
+    def test_languages(self):
+        r"""Disabled: Test different combinations of source/destination languages."""
+        pass
 
-
-def test_production_runs():
-    r"""Test production tests (those used in paper)."""
-    base_kwargs = {'platform': _base_platform[0],
-                   'python_ver': _base_platform[1],
-                   'comm_type': _base_platform[2]}
-    # Limit language list for tests
-    for c in ['comm_type', 'platform', 'python_ver']:
-        kwargs = copy.deepcopy(base_kwargs)
-        if c in kwargs:
-            del kwargs[c]
-        timing.plot_scalings(compare=c, cleanup_plot=True, **kwargs)
-    timing.plot_scalings(compare='language', cleanup_plot=True,
-                         platform='Linux', python_ver='2.7', comm_type='ZMQComm',
-                         compare_values=['c', 'cpp', 'python'])
-    timing.plot_scalings(compare='language', cleanup_plot=True,
-                         platform='OSX', python_ver='2.7', comm_type='ZMQComm',
-                         compare_values=['c', 'cpp', 'python', 'matlab'])
-
-
-@unittest.skipIf(_this_platform not in _valid_platforms, "New platform")
-def test_fits():
-    r"""Test fits to scaling on one platform."""
-    _test_run.time_per_byte
-    _test_run.time_per_message
-    _test_run.startup_time
+    def test_comm_types(self):
+        r"""Disabled: Test different comm types."""
+        pass
