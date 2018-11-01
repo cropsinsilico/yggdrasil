@@ -1,6 +1,9 @@
 import unittest
-from cis_interface.tools import _zmq_installed
+from cis_interface.communication import ZMQComm
 from cis_interface.drivers.tests import test_CommDriver as parent
+
+
+_zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")

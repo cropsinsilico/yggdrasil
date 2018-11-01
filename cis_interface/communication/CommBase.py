@@ -317,7 +317,7 @@ class CommBase(tools.CisClass):
         if comm is not None:
             assert(comm == self.comm_class)
         super(CommBase, self).__init__(name, **kwargs)
-        if not self.__class__.is_installed():
+        if not self.__class__.is_installed(language='python'):
             raise RuntimeError("Comm class %s not installed" % self.__class__)
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,
@@ -417,9 +417,40 @@ class CommBase(tools.CisClass):
         print('%s%-15s: %s' % (prefix, 'nrecv', self._n_recv))
 
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return True
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        lang_list = tools.get_supported_lang()
+        comm_class = str(cls).split("'")[1].split(".")[-1]
+        if language is None:
+            out = True
+            for l in lang_list:
+                if not cls.is_installed(language=l):
+                    out = False
+                    break
+        elif language in ['cpp', 'c++', 'make', 'cmake']:
+            out = cls.is_installed(language='c')
+        elif language in ['lpy', 'matlab']:
+            out = cls.is_installed(language='python')
+        elif language in ['executable']:
+            out = True
+        else:
+            if comm_class in ['CommBase', 'AsyncComm', 'ForkComm', 'ErrorClass']:
+                out = (language in lang_list)
+            else:
+                # Default to False for languages so subclasses must be explicit
+                out = False
+        return out
 
     @property
     def maxMsgSize(self):

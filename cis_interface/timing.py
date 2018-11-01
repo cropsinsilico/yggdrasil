@@ -34,6 +34,8 @@ for k in ['lpy', 'make', 'cmake']:
     if k in _lang_list:
         _lang_list.remove(k)
 _comm_list = tools.get_installed_comm()
+# if 'RMQComm' in _comm_list:
+#     _comm_list.remove('RMQComm')
 
 
 # TODO:

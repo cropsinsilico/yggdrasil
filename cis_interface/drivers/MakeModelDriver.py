@@ -63,7 +63,7 @@ class MakeModelDriver(ModelDriver):
     def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
-        if not tools._c_library_avail:  # pragma: windows
+        if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.compiled = False
@@ -103,7 +103,7 @@ class MakeModelDriver(ModelDriver):
                 machine.
 
         """
-        return tools._c_library_avail
+        return (len(tools.get_installed_comm(language='c')) > 0)
 
     def make_target(self, target):
         r"""Run the make command to make the target.

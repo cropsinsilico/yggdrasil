@@ -1,9 +1,11 @@
 import unittest
 import nose.tools as nt
-from cis_interface.tools import _ipc_installed
 from cis_interface.communication import new_comm
 from cis_interface.communication import IPCComm, CommBase
 from cis_interface.communication.tests import test_AsyncComm
+
+
+_ipc_installed = IPCComm.IPCComm.is_installed(language='python')
 
 
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")

@@ -28,7 +28,7 @@ def get_zmq_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if tools._zmq_installed_c:
+    if tools.is_comm_installed('ZMQComm', language='c'):
         if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
                 plib = cis_cfg.get('windows', '%s_static' % l, False)
@@ -61,7 +61,7 @@ def get_ipc_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if tools._ipc_installed:
+    if tools.is_comm_installed('IPCComm', language='c'):
         _compile_flags += ["-DIPCINSTALLED"]
     return _compile_flags, _linker_flags
 
@@ -79,7 +79,7 @@ def get_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if not tools._c_library_avail:  # pragma: windows
+    if not GCCModelDriver.is_installed():  # pragma: windows
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
     if platform._is_win:  # pragma: windows
@@ -89,11 +89,11 @@ def get_flags(for_cmake=False):
         if not for_cmake:
             _regex_win32 = os.path.split(_regex_win32_lib)
             _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
-    if tools._zmq_installed_c:
+    if tools.is_comm_installed('ZMQComm', language='c'):
         zmq_flags = get_zmq_flags(for_cmake=for_cmake)
         _compile_flags += zmq_flags[0]
         _linker_flags += zmq_flags[1]
-    if tools._ipc_installed:
+    if tools.is_comm_installed('IPCComm', language='c'):
         ipc_flags = get_ipc_flags(for_cmake=for_cmake)
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
@@ -261,7 +261,7 @@ class GCCModelDriver(ModelDriver):
 
     def __init__(self, name, args, cc=None, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)
-        if not tools._c_library_avail:  # pragma: windows
+        if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.cc = cc
@@ -290,7 +290,7 @@ class GCCModelDriver(ModelDriver):
                 machine.
 
         """
-        return tools._c_library_avail
+        return (len(tools.get_installed_comm(language='c')) > 0)
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax. Arguments ending with '.c' or

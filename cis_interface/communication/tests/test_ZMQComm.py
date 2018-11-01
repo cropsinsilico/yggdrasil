@@ -2,10 +2,13 @@ import unittest
 import nose.tools as nt
 import zmq
 from cis_interface import platform
-from cis_interface.tools import _zmq_installed, _ipc_installed
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_AsyncComm
-from cis_interface.communication import ZMQComm
+from cis_interface.communication import ZMQComm, IPCComm
+
+
+_zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
+_ipc_installed = IPCComm.IPCComm.is_installed(language='python')
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")

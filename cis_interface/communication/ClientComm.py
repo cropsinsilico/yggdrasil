@@ -44,9 +44,20 @@ class ClientComm(CommBase.CommBase):
                                          address=self.ocomm.address)
 
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return get_comm_class().is_installed()
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        return get_comm_class().is_installed(language=language)
 
     @property
     def maxMsgSize(self):
