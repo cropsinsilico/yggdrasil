@@ -20,7 +20,7 @@ from cis_interface.drivers import MatlabModelDriver
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':  # pragma: debug
     mpl.use('Agg')
-elif cis_platform._is_osx:
+elif cis_platform._is_mac:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 _linewidth = 2
@@ -1136,9 +1136,9 @@ def plot_scalings(compare='comm_type', compare_values=None,
                         'python_ver': '2.7'}
         default_vals = {'comm_type': ['ZMQComm', 'IPCComm'],
                         'language': ['c', 'cpp', 'python'],
-                        'platform': ['Linux', 'OSX', 'Windows'],
+                        'platform': ['Linux', 'MacOS', 'Windows'],
                         'python_ver': ['2.7', '3.5']}
-        if kwargs.get('platform', default_vars['platform']) == 'OSX':
+        if kwargs.get('platform', default_vars['platform']) == 'MacOS':
             default_vals['language'].append('matlab')
     else:
         default_vars = {'comm_type': tools.get_default_comm(),
@@ -1148,7 +1148,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
                         'python_ver': backwards._python_version}
         default_vals = {'comm_type': _comm_list,
                         'language': _lang_list,
-                        'platform': ['Linux', 'OSX', 'Windows'],
+                        'platform': ['Linux', 'MacOS', 'Windows'],
                         'python_ver': ['2.7', '3.5']}
     if compare_values is None:
         compare_values = default_vals.get(compare, None)
@@ -1178,7 +1178,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         yscale = 'linear'  # was log originally
     elif compare == 'platform':
         color_var = 'platform'
-        color_map = {'Linux': 'b', 'Windows': 'r', 'OSX': 'g'}
+        color_map = {'Linux': 'b', 'Windows': 'r', 'MacOS': 'g'}
         style_var = None
         style_map = None
         var_list = compare_values

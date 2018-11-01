@@ -145,7 +145,7 @@ class ModelDriver(Driver):
         if self.with_strace:
             if platform._is_linux:
                 pre_cmd = 'strace'
-            elif platform._is_osx:
+            elif platform._is_mac:
                 pre_cmd = 'dtrace'
             pre_args += [pre_cmd] + self.strace_flags
         elif self.with_valgrind:

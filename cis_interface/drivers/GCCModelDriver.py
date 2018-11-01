@@ -144,9 +144,9 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     Args:
         src (list): List of source files.
         out (str, optional): Path where compile executable should be saved.
-            Defaults to name of source file without extension on linux/osx and
+            Defaults to name of source file without extension on Linux/MacOS and
             with .exe extension on windows.
-        cc (str, optional): Compiler command. Defaults to gcc/g++ on linux/osx
+        cc (str, optional): Compiler command. Defaults to gcc/g++ on Linux/MacOS
             and cl on windows.
         ccflags (list, optional): Compiler flags. Defaults to [].
         ldflags (list, optional): Linker flags. Defaults to [].

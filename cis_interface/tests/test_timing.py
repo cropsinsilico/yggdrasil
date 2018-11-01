@@ -23,7 +23,7 @@ _base_environment = {'platform': 'Linux',
 _valid_platforms = [('Linux', '2.7', 'ZMQComm'),
                     ('Linux', '2.7', 'IPCComm'),
                     ('Linux', '3.5', 'ZMQComm'),
-                    ('OSX', '2.7', 'ZMQComm'),
+                    ('MacOS', '2.7', 'ZMQComm'),
                     ('Windows', '2.7', 'ZMQComm')]
 _testfile_json = 'test_run123.json'
 _testfile_dat = 'test_run123.dat'
@@ -41,10 +41,10 @@ def test_get_source():
 
 def test_platform_error():
     r"""Test error when test cannot be performed."""
-    if platform._is_osx:
+    if platform._is_mac:
         test_platform = 'Linux'
     else:
-        test_platform = 'OSX'
+        test_platform = 'MacOS'
     x = timing.TimedRun(_test_lang, _test_lang, platform=test_platform)
     nt.assert_raises(RuntimeError, x.can_run, raise_error=True)
 
@@ -241,9 +241,9 @@ class TestTimedRun(TimedRunTestBase):
             if c in kwargs:
                 del kwargs[c]
             timing.plot_scalings(**kwargs)
-            # Also do OSX plot w/ Matlab
+            # Also do MacOS plot w/ Matlab
             if c == 'language':
-                kwargs['platform'] = 'OSX'
+                kwargs['platform'] = 'MacOS'
                 timing.plot_scalings(**kwargs)
 
 

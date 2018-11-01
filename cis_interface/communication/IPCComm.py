@@ -6,7 +6,7 @@ from cis_interface.schema import register_component
 from cis_interface.communication import CommBase, AsyncComm
 try:
     import sysv_ipc
-    _ipc_installed = (platform._is_linux or platform._is_osx)
+    _ipc_installed = (platform._is_linux or platform._is_mac)
 except ImportError:  # pragma: windows
     logging.warn("Could not import sysv_ipc. "
                  + "IPC support will be disabled.")
@@ -109,7 +109,7 @@ def ipc_queues():
         if not skip:
             if platform._is_linux:
                 key_col = 0
-            elif platform._is_osx:
+            elif platform._is_mac:
                 key_col = 2
             else:  # pragma: debug
                 raise NotImplementedError("Unsure what column the queue key "

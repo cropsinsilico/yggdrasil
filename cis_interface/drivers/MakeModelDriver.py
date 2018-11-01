@@ -33,7 +33,7 @@ class MakeModelDriver(ModelDriver):
         args (str, list): Executable that should be created (make target) and
             any arguments for the executable.
         make_command (str, optional): Command that should be used for make.
-            Defaults to 'make' on linux/osx and 'nmake' on windows.
+            Defaults to 'make' on Linux/MacOS and 'nmake' on windows.
         makefile (str, optional): Path to make file either relative to makedir
             or absolute. Defaults to Makefile.
         makedir (str, optional): Directory where make should be invoked from
