@@ -27,7 +27,7 @@ class ModelDriver(Driver):
         client_of (str, list, optional): The names of ne or more servers that
             this model is a client of. Defaults to empty list.
         with_strace (bool, optional): If True, the command is run with strace (on
-            Linux) or dtrace (on OSX). Defaults to False.
+            Linux) or dtrace (on MacOS). Defaults to False.
         strace_flags (list, optional): Flags to pass to strace (or dtrace).
             Defaults to [].
         with_valgrind (bool, optional): If True, the command is run with valgrind.

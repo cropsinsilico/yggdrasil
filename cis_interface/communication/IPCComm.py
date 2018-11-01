@@ -91,7 +91,7 @@ def ipc_queues():
         # Linux
         '------ Message Queues --------',
         'key        msqid      owner      perms      used-bytes   messages    ',
-        # OSX
+        # MacOS
         'IPC status from',
         'Message Queues:',
         'T     ID     KEY        MODE       OWNER    GROUP']
@@ -209,7 +209,7 @@ class IPCComm(AsyncComm.AsyncComm):
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        # Based on IPC limit on OSX
+        # Based on IPC limit on MacOS
         return 2048
     
     @classmethod

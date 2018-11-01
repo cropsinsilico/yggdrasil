@@ -7,7 +7,6 @@ import sys
 import inspect
 import time
 import signal
-import warnings
 import atexit
 import uuid as uuid_gen
 import subprocess

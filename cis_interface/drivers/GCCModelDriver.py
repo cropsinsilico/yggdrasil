@@ -239,7 +239,7 @@ class GCCModelDriver(ModelDriver):
             compile command. Others are assumed to be runtime arguments.
         cc (str, optional): C/C++ Compiler that should be used. Defaults to
             gcc for '.c' files, and g++ for '.cpp' or '.cc' files on Linux or
-            OSX. Defaults to cl on Windows.
+            MacOS. Defaults to cl on Windows.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes (in additon to parent class's):
