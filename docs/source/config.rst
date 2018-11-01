@@ -50,7 +50,7 @@ Windows Options
 
 On Windows, it may be necessary for you to manually specify the location of
 the ``libzmq`` and ``czmq`` headers and libraries. These can be set using
-the following config options. This should not be necessary on Linux/OSX.
+the following config options. This should not be necessary on Linux/MacOS.
 
 ==============    ====================================================
 Option            Description
