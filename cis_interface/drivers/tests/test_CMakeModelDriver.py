@@ -92,7 +92,6 @@ class TestCMakeModelParam(parent.TestModelParam):
 
     def test_sbdir(self):
         r"""Test that source/build directories set correctly."""
-        print('test sourcedir', self.sourcedir)
         nt.assert_equal(self.instance.sourcedir, self.sourcedir)
         nt.assert_equal(self.instance.builddir, self.builddir)
         
