@@ -230,7 +230,7 @@ def get_default_comm():
     comm_list = get_installed_comm()
     if 'CIS_DEFAULT_COMM' in os.environ:
         _default_comm = os.environ['CIS_DEFAULT_COMM']
-        if _default_comm not in comm_list:  # pragma: debug
+        if not is_comm_installed(_default_comm, language='any'):  # pragma: debug
             raise Exception('Unsupported default comm %s set by CIS_DEFAULT_COMM' % (
                             _default_comm))
     else:
