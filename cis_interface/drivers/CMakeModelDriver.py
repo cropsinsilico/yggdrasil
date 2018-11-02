@@ -178,11 +178,14 @@ class CMakeModelDriver(ModelDriver):
         self.debug('')
         self.compiled = False
         self.target = self.args[0]
+        print('original sourcedir', sourcedir)
+        print('original workingdir', self.working_dir)
         if sourcedir is None:
             sourcedir = self.working_dir
         elif not os.path.isabs(sourcedir):
             sourcedir = os.path.realpath(os.path.join(self.working_dir, sourcedir))
         self.sourcedir = sourcedir
+        print(self.sourcedir)
         if builddir is None:
             builddir = os.path.join(sourcedir, 'build')
         elif not os.path.isabs(builddir):

@@ -92,6 +92,7 @@ class TestCMakeModelParam(parent.TestModelParam):
 
     def test_sbdir(self):
         r"""Test that source/build directories set correctly."""
+        print('test sourcedir', self.sourcedir)
         nt.assert_equal(self.instance.sourcedir, self.sourcedir)
         nt.assert_equal(self.instance.builddir, self.builddir)
         
@@ -106,7 +107,7 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
         # Version specifying sourcedir via working_dir
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
         # Relative paths
-        self._inst_kwargs['sourcedir'] = './'
+        self._inst_kwargs['sourcedir'] = '.'
         self._inst_kwargs['builddir'] = 'build'
         self._inst_kwargs['cmakeargs'] = '-Wdev'
 
