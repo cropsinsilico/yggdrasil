@@ -34,6 +34,11 @@ for k in ['lpy', 'make', 'cmake']:
     if k in _lang_list:
         _lang_list.remove(k)
 _comm_list = tools.get_installed_comm(language=_lang_list)
+if ((len(_lang_list) == 0) or (len(_comm_list) == 0)):  # pragma: debug
+    raise Exception("Timings cannot be performed if there is not at least one valid "
+                    + "language and one valid communication mechanism. "
+                    + "len(valid_languages) = %d, " % len(_lang_list)
+                    + "len(valid_comms) = %d " % len(_comm_list))
 
 
 # TODO:
@@ -1153,8 +1158,8 @@ def plot_scalings(compare='comm_type', compare_values=None,
                         'python_ver': ['2.7', '3.5']}
     if compare_values is None:
         compare_values = default_vals.get(compare, None)
-    assert(isinstance(compare_values, list))
-    assert(len(compare_values) > 0)
+    else:
+        assert(isinstance(compare_values, list))
     per_message = kwargs.get('per_message', False)
     if compare == 'comm_type':
         color_var = 'comm_type'
@@ -1201,6 +1206,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         yscale = 'linear'
     else:
         raise ValueError("Invalid compare: '%s'" % compare)
+    assert(len(var_kws) > 0)
     # Raise error if any of the varied keys are set in kwargs
     for k in var_kws[0].keys():
         if k in kwargs:
