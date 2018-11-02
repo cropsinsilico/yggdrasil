@@ -265,8 +265,8 @@ class TestZMQCommROUTER(TestZMQComm):
         pass
 
 
-@unittest.skipIf(_zmq_installed, "ZMQ library installed")
-def test_not_running():
-    r"""Test raise of an error if a ZMQ library is not installed."""
-    comm_kwargs = dict(comm='ZMQComm', direction='send', reverse_names=True)
-    nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
+# @unittest.skipIf(_zmq_installed, "ZMQ library installed")
+# def test_not_running():
+#     r"""Test raise of an error if a ZMQ library is not installed."""
+#     comm_kwargs = dict(comm='ZMQComm', direction='send', reverse_names=True)
+#     nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
