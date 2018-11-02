@@ -173,7 +173,7 @@ class CMakeModelDriver(ModelDriver):
     def __init__(self, name, args, sourcedir=None, builddir=None,
                  cmakeargs=None, preserve_cache=False, **kwargs):
         super(CMakeModelDriver, self).__init__(name, args, **kwargs)
-        if not tools._c_library_avail:  # pragma: windows
+        if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.compiled = False
@@ -203,6 +203,18 @@ class CMakeModelDriver(ModelDriver):
         # Compile in a new process
         self.debug("Making target.")
         self.run_cmake(self.target)
+
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return (len(tools.get_installed_comm(language='c')) > 0)
 
     def run_cmake(self, target=None):
         r"""Run the cmake command on the source.

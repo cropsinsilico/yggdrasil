@@ -7,7 +7,6 @@ import sys
 import inspect
 import time
 import signal
-import warnings
 import atexit
 import uuid as uuid_gen
 import subprocess
@@ -16,10 +15,14 @@ from cis_interface import backwards
 from cis_interface.config import cis_cfg, cfg_logging
 
 
+CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+CIS_MSG_BUF = 1024 * 2
+
+
 _stack_in_log = False
 _stack_in_timeout = False
-if ((logging.getLogger("cis_interface").getEffectiveLevel() <=
-     logging.DEBUG)):  # pragma: debug
+if ((logging.getLogger("cis_interface").getEffectiveLevel()
+     <= logging.DEBUG)):  # pragma: debug
     _stack_in_log = False
     _stack_in_timeout = True
 _thread_registry = {}
@@ -106,101 +109,170 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     return out
 
 
-def is_ipc_installed():
-    r"""Determine if the IPC libraries are installed.
+def get_supported_lang():
+    r"""Get a list of the model programming languages that are supported
+    by cis_interface.
 
     Returns:
-        bool: True if the IPC libraries are installed, False otherwise.
-
+        list: The names of programming languages supported by cis_interface.
+    
     """
-    return (platform._is_linux or platform._is_osx)
+    from cis_interface import schema
+    s = schema.get_schema()
+    out = s['model'].subtypes
+    if 'c++' in out:
+        out[out.index('c++')] = 'cpp'
+    return list(set(out))
 
 
-def is_zmq_installed(check_c=True):
-    r"""Determine if the libczmq & libzmq libraries are installed.
+def get_supported_comm():
+    r"""Get a list of the communication mechanisms supported by cis_interface.
 
     Returns:
-        bool: True if both libraries are installed, False otherwise.
+        list: The names of communication mechanisms supported by cis_interface.
 
     """
-    # Check existence of zmq python package
-    try:
-        import zmq
-    except ImportError:  # pragma: debug
-        return False
-    assert(zmq)
-    if not check_c:  # pragma: windows
-        return True
-    # Check existence of config paths for windows
-    if platform._is_win:  # pragma: windows
-        opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
-                'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
-        for o in opts:
-            if not cis_cfg.get('windows', o, None):  # pragma: debug
-                warnings.warn("Config option %s not set." % o)
-                return False
-        return True
-    else:
-        process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        outs, errs = process.communicate()
-        # Python 3
-        # try:
-        #     outs, errs = process.communicate(timeout=15)
-        # except subprocess.TimeoutExpired:
-        #     process.kill()
-        #     outs, errs = process.communicate()
-        return (backwards.unicode2bytes('zmq') not in errs)
+    from cis_interface import schema
+    s = schema.get_schema()
+    out = s['comm'].classes
+    out.remove('CommBase')
+    return list(set(out))
 
 
-_ipc_installed = is_ipc_installed()
-_zmq_installed = is_zmq_installed()
-_zmq_installed_c = _zmq_installed
-if not (_ipc_installed or _zmq_installed):  # pragma: windows
-    if is_zmq_installed(check_c=False):
-        logging.warning(("ZeroMQ C library not installed, but the Python package is. " +
-                         "Running C and C++ models will be disabled."))
-        _zmq_installed_c = False
-        _zmq_installed = True
-    else:  # pragma: debug
-        raise Exception('Neither ZMQ or IPC installed.')
-_c_library_avail = (_ipc_installed or _zmq_installed_c)
+def is_lang_installed(lang):
+    r"""Check to see if cis_interface can run models written in a programming
+    language on the current machine.
 
-CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
-CIS_MSG_BUF = 1024 * 2
+    Args:
+        lang (str): Programming language to check.
+
+    Returns:
+        bool: True if models in the provided language can be run on the current
+            machine, False otherwise.
+
+    """
+    from cis_interface import schema, drivers
+    s = schema.get_schema()
+    drv = drivers.import_driver(s.language2class[lang])
+    return drv.is_installed()
+
+
+def is_comm_installed(comm, language=None):
+    r"""Check to see if cis_interface can use a communication mechanism on the
+    current machine.
+
+    Args:
+        comm (str): Communication mechanism to check.
+        language (str, optional): Specific programming language that
+            communication mechanism should be check for. Defaults to None and
+            all supported languages will be checked.
+
+    Returns:
+        bool: True if the communication mechanism can be used on the current
+            machine, False otherwise.
+
+    """
+    from cis_interface import communication
+    cmm = communication.get_comm_class(comm)
+    return cmm.is_installed(language=language)
+
+
+def get_installed_lang():
+    r"""Get a list of the languages that are supported by cis_interface on the
+    current machine. This checks for the necessary interpreters, licenses, and/or
+    compilers.
+
+    Returns:
+        list: The name of languages supported on the current machine.
+    
+    """
+    out = []
+    all_lang = get_supported_lang()
+    for k in all_lang:
+        if is_lang_installed(k):
+            out.append(k)
+    return out
+
+
+def get_installed_comm(language=None):
+    r"""Get a list of the communication channel types that are supported by
+    cis_interface on the current machine. This checks the operating system,
+    supporting libraries, and broker credentials. The order indicates the
+    prefered order of use.
+
+    Args:
+        language (str, optional): Specific programming language that installed
+            comms should be located for. Defaults to None and all languages
+            supported on the current platform will be checked.
+
+    Returns:
+        list: The names of the the communication channel types supported on
+            the current machine.
+
+    """
+    out = []
+    all_comm = get_supported_comm()
+    for k in all_comm:
+        if is_comm_installed(k, language=language):
+            out.append(k)
+    # Fix order to denote preference
+    out_sorted = []
+    for k in ['ZMQComm', 'IPCComm', 'RMQComm']:
+        if k in out:
+            out.remove(k)
+            out_sorted.append(k)
+    out_sorted += out
+    return out_sorted
 
 
 def get_default_comm():
     r"""Get the default comm that should be used for message passing."""
+    comm_list = get_installed_comm()
     if 'CIS_DEFAULT_COMM' in os.environ:
         _default_comm = os.environ['CIS_DEFAULT_COMM']
-        if _default_comm not in ['ZMQComm', 'IPCComm', 'RMQComm']:  # pragma: debug
-            raise Exception('Unrecognized default comm %s set by CIS_DEFAULT_COMM' % (
+        if not is_comm_installed(_default_comm, language='any'):  # pragma: debug
+            raise Exception('Unsupported default comm %s set by CIS_DEFAULT_COMM' % (
                             _default_comm))
-    elif _zmq_installed_c:
-        _default_comm = 'ZMQComm'
-    elif _ipc_installed:
-        _default_comm = 'IPCComm'
-    elif _zmq_installed:  # pragma: windows
-        _default_comm = 'ZMQComm'
-    else:  # pragma: debug
-        raise Exception('Neither ZMQ nor IPC installed.')
+    else:
+        if len(comm_list) > 0:
+            _default_comm = comm_list[0]
+        else:  # pragma: windows
+            # Locate comm that maximizes languages that can be run
+            tally = {}
+            for c in get_supported_comm():
+                tally[c] = 0
+                for l in get_supported_lang():
+                    if is_comm_installed(c, language=l):
+                        tally[c] += 1
+            _default_comm = max(tally)
+            if tally[_default_comm] == 0:  # pragma: debug
+                raise Exception('Could not locate an installed comm.')
+    if _default_comm == 'RMQComm':  # pragma: debug
+        raise NotImplementedError('RMQComm cannot be the default comm because '
+                                  + 'there is not an RMQ C interface.')
     return _default_comm
 
 
-def get_CIS_MSG_MAX():
-    r"""Get the maximum message size for the default comm."""
-    _default_comm = get_default_comm()
-    if _default_comm == 'IPCComm':
+def get_CIS_MSG_MAX(comm_type=None):
+    r"""Get the maximum message size for a given comm type.
+
+    Args:
+        comm_type (str, optional): The name of the communication type that the
+            maximum message size should be returned for. Defaults to result of
+            get_default_comm() if not provided.
+
+    Returns:
+        int: Maximum message size (in bytes).
+
+    """
+    if comm_type is None:
+        comm_type = get_default_comm()
+    if comm_type == 'IPCComm':
         # OS X limit is 2kb
         out = 1024 * 2
     else:
         out = 2**20
     return out
-
-
-CIS_MSG_MAX = get_CIS_MSG_MAX()
 
 
 # https://stackoverflow.com/questions/35772001/
@@ -225,8 +297,8 @@ def kill(pid, signum):
         handler = signal.getsignal(signum)
         # work around the synchronization problem when calling
         # kill from the main thread.
-        if (((signum in sigmap) and (thread.name == 'MainThread') and
-             callable(handler) and ((pid == os.getpid()) or (pid == 0)))):
+        if (((signum in sigmap) and (thread.name == 'MainThread')
+             and callable(handler) and ((pid == os.getpid()) or (pid == 0)))):
             event = threading.Event()
 
             def handler_set_event(signum, frame):
@@ -495,15 +567,18 @@ class CisClass(logging.LoggerAdapter):
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
-        class_name = str(self.__class__).split("'")[1].split('.')[-1]
-        super(CisClass, self).__init__(logging.getLogger(self.__module__),
-                                       {'cis_name': self.name,
-                                        'cis_class': class_name})
+        self._cis_class = str(self.__class__).split("'")[1].split('.')[-1]
+        super(CisClass, self).__init__(logging.getLogger(self.__module__), {})
 
     @property
     def name(self):
-        r"""Name of the class object."""
+        r"""str: Name of the class object."""
         return self._name
+
+    @property
+    def cis_class(self):
+        r"""str: Name of the class."""
+        return self._cis_class
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
@@ -544,7 +619,7 @@ class CisClass(logging.LoggerAdapter):
             the_func = stack[2][3]
             prefix = '%s(%s).%s[%d]' % (the_class, self.name, the_func, the_line)
         else:
-            prefix = '%s(%s)' % (self.extra['cis_class'], self.name)
+            prefix = '%s(%s)' % (self.cis_class, self.name)
         new_msg = '%s: %s' % (prefix, self.as_str(msg))
         return new_msg, kwargs
 
@@ -1001,8 +1076,8 @@ class CisThreadLoop(CisThread):
 
         """
         T = self.start_timeout(timeout, key_level=1, key=key)
-        while (self.is_alive() and (not self.was_loop) and
-               (not T.is_out)):  # pragma: debug
+        while (self.is_alive() and (not self.was_loop)
+               and (not T.is_out)):  # pragma: debug
             self.verbose_debug('Waiting for thread to enter loop...')
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
@@ -1030,8 +1105,8 @@ class CisThreadLoop(CisThread):
             if (not self.was_break):
                 self.set_loop_flag()
             while (not self.was_break):
-                if ((self.main_terminated and
-                     (not self._1st_main_terminated))):  # pragma: debug
+                if ((self.main_terminated
+                     and (not self._1st_main_terminated))):  # pragma: debug
                     self.on_main_terminated()
                 else:
                     self.run_loop()

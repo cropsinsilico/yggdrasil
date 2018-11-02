@@ -28,7 +28,7 @@ def get_zmq_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if tools._zmq_installed_c:
+    if tools.is_comm_installed('ZMQComm', language='c'):
         if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
                 plib = cis_cfg.get('windows', '%s_static' % l, False)
@@ -61,7 +61,7 @@ def get_ipc_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if tools._ipc_installed:
+    if tools.is_comm_installed('IPCComm', language='c'):
         _compile_flags += ["-DIPCINSTALLED"]
     return _compile_flags, _linker_flags
 
@@ -79,7 +79,7 @@ def get_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if not tools._c_library_avail:  # pragma: windows
+    if not GCCModelDriver.is_installed():  # pragma: windows
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
     if platform._is_win:  # pragma: windows
@@ -89,11 +89,11 @@ def get_flags(for_cmake=False):
         if not for_cmake:
             _regex_win32 = os.path.split(_regex_win32_lib)
             _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
-    if tools._zmq_installed_c:
+    if tools.is_comm_installed('ZMQComm', language='c'):
         zmq_flags = get_zmq_flags(for_cmake=for_cmake)
         _compile_flags += zmq_flags[0]
         _linker_flags += zmq_flags[1]
-    if tools._ipc_installed:
+    if tools.is_comm_installed('IPCComm', language='c'):
         ipc_flags = get_ipc_flags(for_cmake=for_cmake)
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
@@ -144,9 +144,9 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     Args:
         src (list): List of source files.
         out (str, optional): Path where compile executable should be saved.
-            Defaults to name of source file without extension on linux/osx and
+            Defaults to name of source file without extension on Linux/MacOS and
             with .exe extension on windows.
-        cc (str, optional): Compiler command. Defaults to gcc/g++ on linux/osx
+        cc (str, optional): Compiler command. Defaults to gcc/g++ on Linux/MacOS
             and cl on windows.
         ccflags (list, optional): Compiler flags. Defaults to [].
         ldflags (list, optional): Linker flags. Defaults to [].
@@ -239,7 +239,7 @@ class GCCModelDriver(ModelDriver):
             compile command. Others are assumed to be runtime arguments.
         cc (str, optional): C/C++ Compiler that should be used. Defaults to
             gcc for '.c' files, and g++ for '.cpp' or '.cc' files on Linux or
-            OSX. Defaults to cl on Windows.
+            MacOS. Defaults to cl on Windows.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes (in additon to parent class's):
@@ -261,7 +261,7 @@ class GCCModelDriver(ModelDriver):
 
     def __init__(self, name, args, cc=None, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)
-        if not tools._c_library_avail:  # pragma: windows
+        if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.cc = cc
@@ -279,6 +279,18 @@ class GCCModelDriver(ModelDriver):
             self.args = [os.path.join(".", self.efile)]
         self.args += self.run_args
         self.debug('Compiled executable with %s', self.cc)
+
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return (len(tools.get_installed_comm(language='c')) > 0)
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax. Arguments ending with '.c' or
@@ -334,8 +346,8 @@ class GCCModelDriver(ModelDriver):
                     self.run_args.append(a)
         # Check source file
         if len(self.src) == 0:
-            raise RuntimeError("Could not locate a source file in the " +
-                               "provided arguments.")
+            raise RuntimeError("Could not locate a source file in the "
+                               + "provided arguments.")
         
     def remove_products(self):
         r"""Delete products produced during the compilation process."""

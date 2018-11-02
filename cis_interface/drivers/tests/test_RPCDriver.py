@@ -78,8 +78,8 @@ class TestRPCDriver(TestRPCParam, parent.TestDriver):
         nt.assert_equal(self.recv_comm.n_msg, 0)
         # Wait as ZMQ comm takes a while to know message was sent
         Tout = self.instance.start_timeout()
-        while ((not Tout.is_out) and
-               (self.instance.n_msg_out > 0)):  # pragma: debug
+        while ((not Tout.is_out)
+               and (self.instance.n_msg_out > 0)):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
         nt.assert_equal(self.instance.n_msg_out, 0)

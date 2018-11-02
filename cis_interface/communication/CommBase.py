@@ -4,6 +4,7 @@ import atexit
 import threading
 import numpy as np
 import pandas as pd
+from logging import info
 from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
@@ -316,7 +317,7 @@ class CommBase(tools.CisClass):
         if comm is not None:
             assert(comm == self.comm_class)
         super(CommBase, self).__init__(name, **kwargs)
-        if not self.__class__.is_installed():
+        if not self.__class__.is_installed(language='python'):
             raise RuntimeError("Comm class %s not installed" % self.__class__)
         suffix = determine_suffix(no_suffix=no_suffix,
                                   reverse_names=reverse_names,
@@ -416,9 +417,52 @@ class CommBase(tools.CisClass):
         print('%s%-15s: %s' % (prefix, 'nrecv', self._n_recv))
 
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return True
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked. If set to 'any', the
+                result will be True if this comm is installed for any of the
+                supported languages.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        lang_list = tools.get_supported_lang()
+        comm_class = str(cls).split("'")[1].split(".")[-1]
+        use_any = False
+        if language in [None, 'all']:
+            language = lang_list
+        elif language == 'any':
+            use_any = True
+            language = lang_list
+        if isinstance(language, list):
+            out = (not use_any)
+            for l in language:
+                if not cls.is_installed(language=l):
+                    if not use_any:
+                        out = False
+                        break
+                elif use_any:
+                    out = True
+                    break
+        elif language in ['cpp', 'c++', 'make', 'cmake']:
+            out = cls.is_installed(language='c')
+        elif language in ['lpy', 'matlab']:
+            out = cls.is_installed(language='python')
+        elif language in ['executable']:
+            out = True
+        else:
+            if comm_class in ['CommBase', 'AsyncComm', 'ForkComm', 'ErrorClass']:
+                out = (language in lang_list)
+            else:
+                # Default to False for languages so subclasses must be explicit
+                out = False
+        return out
 
     @property
     def maxMsgSize(self):
@@ -471,7 +515,9 @@ class CommBase(tools.CisClass):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
         if out > 0:
-            print(cls, cls.comm_registry())
+            info('There are %d %s comms: %s',
+                 len(cls.comm_registry()), cls.__name__,
+                 [k for k in cls.comm_registry().keys()])
         return out
 
     @classmethod
@@ -610,7 +656,7 @@ class CommBase(tools.CisClass):
         else:
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain)
-        self.debug("Finished")
+        self.debug("Finished (timeout_drain = %s)", str(self._timeout_drain))
 
     def matlab_atexit(self):  # pragma: matlab
         r"""Close operations including draining receive."""
@@ -879,7 +925,8 @@ class CommBase(tools.CisClass):
         kws.update(**kwargs)
         if work_comm_name is None:
             cls = kws.get("comm", tools.get_default_comm())
-            work_comm_name = 'temp_%s_%s.%s' % (cls, kws['direction'], kws['uuid'])
+            work_comm_name = '%s_temp_%s_%s.%s' % (
+                self.name, cls, kws['direction'], kws['uuid'])
         c = new_comm(work_comm_name, **kws)
         self.add_work_comm(c)
         return c
@@ -958,8 +1005,8 @@ class CommBase(tools.CisClass):
         kws['address'] = header['address']
         if work_comm_name is None:
             cls = kws.get("comm", tools.get_default_comm())
-            work_comm_name = 'temp_%s_%s.%s' % (
-                cls, kws['direction'], header['id'])
+            work_comm_name = '%s_temp_%s_%s.%s' % (
+                self.name, cls, kws['direction'], header['id'])
         c = get_comm(work_comm_name, **kws)
         return c
 
@@ -1055,6 +1102,7 @@ class CommBase(tools.CisClass):
             bool: True if EOF message should be sent, False otherwise.
 
         """
+        self.debug('')
         msg_s = backwards.unicode2bytes(self.eof_msg)
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
@@ -1309,8 +1357,8 @@ class CommBase(tools.CisClass):
         if self.is_eof(msg_):
             flag = self.on_recv_eof()
             msg = msg_
-        elif ((self.recv_converter is not None) and
-              (not header.get('incomplete', False))):
+        elif ((self.recv_converter is not None)
+              and (not header.get('incomplete', False))):
             self.debug("Converting message")
             msg = self.recv_converter(msg_)
         else:
@@ -1350,6 +1398,7 @@ class CommBase(tools.CisClass):
             self.exception('Failed to recv.')
             return (False, None)
         if self.single_use and self._used:
+            self.debug('Linger close on single use')
             self.linger_close()
         return (flag, msg)
 

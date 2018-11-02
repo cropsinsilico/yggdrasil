@@ -133,7 +133,7 @@ def cformat2regex(flags, width, precision, length, specifier):
         str: Regex expression that will match the provided components.
 
     """
-    pat_dec = '[-+]?\d+(?:\.\d+)?'
+    pat_dec = '[-+]?\\d+(?:\\.\\d+)?'
     pat_sub = ''
     pad_zero = 0
     # Left padding specified in flags
@@ -144,7 +144,7 @@ def cformat2regex(flags, width, precision, length, specifier):
             pad_zero = int(width)
     else:
         if ('-' not in flags) and width and (specifier != 's'):
-            pat_sub += "\s{,%s}" % width
+            pat_sub += "\\s{,%s}" % width
         if '+' in flags:
             pat_sub += '[-+]'
     if precision and specifier in 'diuoxX':
@@ -155,17 +155,17 @@ def cformat2regex(flags, width, precision, length, specifier):
     if specifier == 'f':
         pat_sub += pat_dec
     elif specifier in 'eE':
-        pat_sub += '%s%s[+-]\d+' % (pat_dec, specifier)
+        pat_sub += '%s%s[+-]\\d+' % (pat_dec, specifier)
     elif specifier in 'gG':
-        pat_sub += '%s(?:[eE][+-]\d+)?' % (pat_dec)
+        pat_sub += '%s(?:[eE][+-]\\d+)?' % (pat_dec)
     elif specifier in 'diu':
-        pat_sub += '\d+'
+        pat_sub += '\\d+'
     elif specifier in 'cs':
         if not width:
             if specifier == 'c':
                 pat_sub += '.'
             else:
-                pat_sub += '\S+'
+                pat_sub += '\\S+'
         else:
             pat_sub += '.{%s}' % width
     elif specifier in 'xX':
@@ -173,7 +173,7 @@ def cformat2regex(flags, width, precision, length, specifier):
             pat_sub += '0%s' % specifier
         if pad_zero:
             pat_sub += '0{,%d}' % pad_zero
-        pat_sub += '[\dA-Za-f]+'
+        pat_sub += '[\\dA-Za-f]+'
     elif specifier == 'o':
         if '#' in flags:
             pat_sub += '0'
@@ -181,7 +181,7 @@ def cformat2regex(flags, width, precision, length, specifier):
             pat_sub += '0{,%d}' % pad_zero
         pat_sub += '[0-7]*'
     if ('-' in flags) and ('0' not in flags) and width:
-        pat_sub += "\s{,%s}" % width
+        pat_sub += "\\s{,%s}" % width
     return pat_sub
 
 
@@ -189,10 +189,10 @@ def parse_cformat(format, i):
     pattern = None
     cast = None
     # %[flags][width][.precision][length]specifier
-    # float_format = "%([ -\+0]{,4})(\d*)((?:\.\d+)?)(L?)([eEfgG])"
+    # float_format = "%([ -\\+0]{,4})(\\d*)((?:\\.\\d+)?)(L?)([eEfgG])"
     # First check for match to complex
-    complex_format = ("%([ -0]{,3})(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])" +
-                      "%(\+?[ -0]{,3}\+?)(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])j")
+    complex_format = ("%([ -0]{,3})(\\d*)((?:\\.\\d+)?)([hlL]{,2})([eEfgG])"
+                      + "%(\\+?[ -0]{,3}\\+?)(\\d*)((?:\\.\\d+)?)([hlL]{,2})([eEfgG])j")
     token = re.compile(complex_format)
     found = token.match(format, i)
     if found:
@@ -203,7 +203,7 @@ def parse_cformat(format, i):
         pattern = "(%s%sj)" % (pat_sub1, pat_sub2)
         return found, pattern, cast
     # Then check for generic
-    any_format = "%([\* \-\+#0]{,6})(\d*)((?:\.\d+)?)([hlL]{,2})([cdieEfgGosuxX])"
+    any_format = "%([\\* \\-\\+#0]{,6})(\\d*)((?:\\.\\d+)?)([hlL]{,2})([cdieEfgGosuxX])"
     token = re.compile(any_format)
     found = token.match(format, i)
     if found:
@@ -241,54 +241,54 @@ def parse_cformat(format, i):
 scanf_translate = [
     (re.compile(_token), _pattern, _cast) for _token, _pattern, _cast in [
         ("%c", "(.)", lambda x:x),
-        ("%\*c", "(?:.)", None),
+        ("%\\*c", "(?:.)", None),
         
-        ("%(\d)c", "(.{%s})", lambda x:x),
-        ("%\*(\d)c", "(?:.{%s})", None),
+        ("%(\\d)c", "(.{%s})", lambda x:x),
+        ("%\\*(\\d)c", "(?:.{%s})", None),
         
-        ("%(\d)[di]", "([+-]?\d{%s})", int),
-        ("%\*(\d)[di]", "(?:[+-]?\d{%s})", None),
+        ("%(\\d)[di]", "([+-]?\\d{%s})", int),
+        ("%\\*(\\d)[di]", "(?:[+-]?\\d{%s})", None),
         
-        ("%-(\d)[di]", "(.{%s})", int),
-        ("%\*-(\d)[di]", "(?:.{%s})", None),
+        ("%-(\\d)[di]", "(.{%s})", int),
+        ("%\\*-(\\d)[di]", "(?:.{%s})", None),
         
-        ("%[di]", "([+-]?\d+)", int),
-        ("%\*[di]", "(?:[+-]?\d+)", None),
+        ("%[di]", "([+-]?\\d+)", int),
+        ("%\\*[di]", "(?:[+-]?\\d+)", None),
         
-        ("%u", "(\d+)", int),
-        ("%\*u", "(?:\d+)", None),
+        ("%u", "(\\d+)", int),
+        ("%\\*u", "(?:\\d+)", None),
         
         # langmm: complex
         ("%[fgeE]%[+-][fgeE]j",
-         "(" +
-         "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "[+-]" +
-         "(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "j)",
+         "("
+         + "(?:[-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][-+]?\\d+)?)"
+         + "[+-]"
+         + "(?:(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][-+]?\\d+)?)"
+         + "j)",
          complex),
-        ("%\*[fgeE]%[+-][fgeE]j",
-         "(?:" +
-         "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "[+-]" +
-         "(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)" +
-         "j)",
+        ("%\\*[fgeE]%[+-][fgeE]j",
+         "(?:"
+         + "(?:[-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][-+]?\\d+)?)"
+         + "[+-]"
+         + "(?:(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][-+]?\\d+)?)"
+         + "j)",
          None),
 
-        ("%[fgeE]", "([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)", float),
-        ("%\*[fgeE]", "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)", None),
+        ("%[fgeE]", "([-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][-+]?\\d+)?)", float),
+        ("%\\*[fgeE]", "(?:[-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][-+]?\\d+)?)", None),
         
         # langmm: Added to allows matching of %5s
-        ("%(\d)s", "(.{%s})", lambda x:x.strip()),
-        ("%\*(\d)s", "(?:.{%s})", None),
+        ("%(\\d)s", "(.{%s})", lambda x:x.strip()),
+        ("%\\*(\\d)s", "(?:.{%s})", None),
         
-        ("%s", "(\S+)", lambda x:x),
-        ("%\*s", "(?:\S+)", None),
+        ("%s", "(\\S+)", lambda x:x),
+        ("%\\*s", "(?:\\S+)", None),
         
-        ("%([xX])", "(0%s[\dA-Za-f]+)", lambda x:int(x, 16)),
-        ("%\*([xX])", "(?:0%s[\dA-Za-f]+)", None),
+        ("%([xX])", "(0%s[\\dA-Za-f]+)", lambda x:int(x, 16)),
+        ("%\\*([xX])", "(?:0%s[\\dA-Za-f]+)", None),
         
         ("%o", "(0[0-7]*)", lambda x:int(x, 8)),
-        ("%\*o", "(?:0[0-7]*)", None),
+        ("%\\*o", "(?:0[0-7]*)", None),
     ]]
 
 
@@ -304,7 +304,7 @@ def scanf_compile(format, collapseWhitespace=True):
     For example:
     >>> format_re, casts = _scanf_compile('%s - %d errors, %d warnings')
     >>> print format_re.pattern
-    (\S+) \- ([+-]?\d+) errors, ([+-]?\d+) warnings
+    (\\S+) \\- ([+-]?\\d+) errors, ([+-]?\\d+) warnings
 
     Translated formats are cached for faster reuse
     """
@@ -346,7 +346,7 @@ def scanf_compile(format, collapseWhitespace=True):
     if DEBUG:
         print("DEBUG: %r -> %s" % (format, format_pat))
     if collapseWhitespace:
-        format_pat = re.sub('\s+', r'\\s+', format_pat)
+        format_pat = re.sub('\\s+', r'\\s+', format_pat)
 
     format_re = re.compile(format_pat)
     if len(scanf_cache) > SCANF_CACHE_SIZE:
