@@ -33,9 +33,7 @@ _lang_list = tools.get_installed_lang()
 for k in ['lpy', 'make', 'cmake']:
     if k in _lang_list:
         _lang_list.remove(k)
-_comm_list = tools.get_installed_comm()
-# if 'RMQComm' in _comm_list:
-#     _comm_list.remove('RMQComm')
+_comm_list = tools.get_installed_comm(language=_lang_list)
 
 
 # TODO:
@@ -248,7 +246,10 @@ class TimedRun(CisTestBase, tools.CisClass):
         """
         out = ((self.platform.lower() == cis_platform._platform.lower())
                and (self.python_ver == backwards._python_version)
-               and (self.matlab_running == MatlabModelDriver.is_matlab_running()))
+               and (self.matlab_running == MatlabModelDriver.is_matlab_running())
+               and (self.lang_src in _lang_list)
+               and (self.lang_dst in _lang_list)
+               and (self.comm_type in _comm_list))
         if (not out) and raise_error:
             msg = ['Cannot run test with parameters:',
                    '\tOperating System: %s' % self.platform,
@@ -1152,8 +1153,8 @@ def plot_scalings(compare='comm_type', compare_values=None,
                         'python_ver': ['2.7', '3.5']}
     if compare_values is None:
         compare_values = default_vals.get(compare, None)
-    else:
-        assert(isinstance(compare_values, list))
+    assert(isinstance(compare_values, list))
+    assert(len(compare_values) > 0)
     per_message = kwargs.get('per_message', False)
     if compare == 'comm_type':
         color_var = 'comm_type'

@@ -433,8 +433,10 @@ class CommBase(tools.CisClass):
         lang_list = tools.get_supported_lang()
         comm_class = str(cls).split("'")[1].split(".")[-1]
         if language is None:
+            language = lang_list
+        if isinstance(language, list):
             out = True
-            for l in lang_list:
+            for l in language:
                 if not cls.is_installed(language=l):
                     out = False
                     break
