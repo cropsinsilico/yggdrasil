@@ -263,7 +263,7 @@ class TestTimedRunTemp(TimedRunTestBase):
         r"""Remove the temporary file if it exists."""
         if os.path.isfile(self.instance.filename):
             os.remove(self.instance.filename)
-        if os.path.isfile(self.instance.perfscript):
+        if os.path.isfile(self.instance.perfscript):  # pragma: debug
             os.remove(self.instance.perfscript)
 
     def setup(self, *args, **kwargs):
