@@ -31,8 +31,8 @@ def determine_suffix(no_suffix=False, reverse_names=False,
     if no_suffix:
         suffix = ''
     else:
-        if ((((direction == 'send') and (not reverse_names)) or
-             ((direction == 'recv') and reverse_names))):
+        if ((((direction == 'send') and (not reverse_names))
+             or ((direction == 'recv') and reverse_names))):
             suffix = '_OUT'
         else:
             suffix = '_IN'

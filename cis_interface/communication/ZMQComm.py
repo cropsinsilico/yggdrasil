@@ -4,7 +4,11 @@ import uuid
 import zmq
 import threading
 import logging
-from cis_interface import backwards, tools
+import subprocess
+import warnings
+from cis_interface import backwards, tools, platform
+from cis_interface.config import cis_cfg
+from cis_interface.schema import register_component
 from cis_interface.communication import CommBase, AsyncComm
 
 
@@ -23,6 +27,39 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = backwards.unicode2bytes('CIS_REPLY')
 _purge_msg = backwards.unicode2bytes('CIS_PURGE')
 _global_context = zmq.Context.instance()
+
+
+def check_czmq():
+    r"""Determine if the necessary C/C++ libraries are installed for ZeroMQ.
+
+    Returns:
+        bool: True if the libraries are installed, False otherwise.
+
+    """
+    # Check that the libraries are installed
+    if platform._is_win:  # pragma: windows
+        opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
+                'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
+        for o in opts:
+            if not cis_cfg.get('windows', o, None):  # pragma: debug
+                warnings.warn("Config option %s not set." % o)
+                return False
+        return True
+    else:
+        process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        outs, errs = process.communicate()
+        # Python 3
+        # try:
+        #     outs, errs = process.communicate(timeout=15)
+        # except subprocess.TimeoutExpired:
+        #     process.kill()
+        #     outs, errs = process.communicate()
+        return (backwards.unicode2bytes('zmq') not in errs)
+
+
+_zmq_installed_c = check_czmq()
 
 
 def get_ipc_host():
@@ -283,6 +320,7 @@ class ZMQProxy(CommBase.CommServer):
         CommBase.unregister_comm('ZMQComm', 'DEALER_server_' + self.srv_address)
 
 
+@register_component
 class ZMQComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O using ZeroMQ sockets.
 
@@ -314,6 +352,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             to a dealer socket.
 
     """
+
+    _commtype = 'zmq'
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
@@ -397,9 +437,26 @@ class ZMQComm(AsyncComm.AsyncComm):
                                    self._n_reply_recv[k]))
 
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return tools._zmq_installed
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        if language == 'python':
+            out = True  # ZMQ is a requirement so it should always be installed
+        elif language == 'c':
+            out = _zmq_installed_c
+        else:
+            out = super(ZMQComm, cls).is_installed(language=language)
+        return out
 
     @property
     def maxMsgSize(self):
@@ -525,9 +582,9 @@ class ZMQComm(AsyncComm.AsyncComm):
                                                nretry=2)
                 except zmq.ZMQError as e:
                     if (self.socket_type_name == 'PAIR') and (e.errno == 98):
-                        self.error(("There is already a 'PAIR' socket sending " +
-                                    "to %s. Maybe you meant to create a recv " +
-                                    "PAIR?") % self.address)
+                        self.error(("There is already a 'PAIR' socket sending "
+                                    + "to %s. Maybe you meant to create a recv "
+                                    + "PAIR?") % self.address)
                     self._bound = False
                     raise e
                 self.debug('Bound %s socket to %s.',
@@ -672,13 +729,15 @@ class ZMQComm(AsyncComm.AsyncComm):
 
     def _reply_handshake_send(self):
         r"""Do send side of handshake."""
-        if (((self.reply_socket_send is None) or
-             self.reply_socket_send.closed)):  # pragma: debug
+        if (((self.reply_socket_send is None)
+             or self.reply_socket_send.closed)):  # pragma: debug
             self.backlog_thread.set_break_flag()
             self.debug("SOCKET CLOSED")
             return False
         out = self.reply_socket_send.poll(timeout=1, flags=zmq.POLLIN)
         if out == 0:
+            if (self.loop_count % 100) == 0:
+                self.debug('No reply handshake waiting')
             return False
         msg = self.reply_socket_send.recv(flags=zmq.NOBLOCK)
         if msg == self.eof_msg:  # pragma: debug
@@ -698,19 +757,30 @@ class ZMQComm(AsyncComm.AsyncComm):
                 return False
             out = socket.poll(timeout=1, flags=zmq.POLLOUT)
             if out == 0:  # pragma: debug
+                if (self.loop_count % 100) == 0:
+                    self.debug('Cannot initiate reply handshake')
                 return False
             socket.send(msg_send, flags=zmq.NOBLOCK)
             if msg_send == self.eof_msg:  # pragma: debug
                 self.error("REPLY EOF SENT")
                 return True
-            out = socket.poll(timeout=self.zmq_sleeptime, flags=zmq.POLLIN)
+            tries = 10
+            out = 0
+            while (out == 0) and (tries > 0):
+                out = socket.poll(timeout=self.zmq_sleeptime,
+                                  flags=zmq.POLLIN)
+                if out == 0:
+                    self.debug("No response waiting. %d tries left.", tries)
+                    tries -= 1
             if out == 0:
+                self.error('No response received.')
                 return False
             msg_recv = socket.recv(flags=zmq.NOBLOCK)
             assert(msg_recv == msg_send)
             self._n_reply_recv[key] += 1
             return True
-        except zmq.ZMQError:  # pragma: debug
+        except zmq.ZMQError as e:  # pragma: debug
+            self.error("ZMQ Error: %s", e)
             return False
 
     def _close_direct(self, linger=False):
@@ -821,6 +891,10 @@ class ZMQComm(AsyncComm.AsyncComm):
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
+        for v in self._work_comms.values():
+            if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
+                self.debug("Work comm not confirmed")
+                return False
         if self.is_open_backlog:
             return (self._n_zmq_recv == self._n_reply_recv)
         return True  # pragma: debug
@@ -906,21 +980,22 @@ class ZMQComm(AsyncComm.AsyncComm):
             header_kwargs['zmq_reply'] = self.set_reply_socket_send()
         return super(ZMQComm, self).on_send(msg, header_kwargs=header_kwargs)
         
-    def _send_multipart_worker(self, msg, header, **kwargs):
-        r"""Send multipart message to the worker comm identified.
+    # This is only needed when base is not asynchronous
+    # def _send_multipart_worker(self, msg, header, **kwargs):
+    #     r"""Send multipart message to the worker comm identified.
 
-        Args:
-            msg (str): Message to be sent.
-            header (dict): Message info including work comm address.
+    #     Args:
+    #         msg (str): Message to be sent.
+    #         header (dict): Message info including work comm address.
 
-        Returns:
-            bool: Success or failure of sending the message.
+    #     Returns:
+    #         bool: Success or failure of sending the message.
 
-        """
-        workcomm = self.get_work_comm(header)
-        args = [msg]
-        self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
-        return True
+    #     """
+    #     workcomm = self.get_work_comm(header)
+    #     args = [msg]
+    #     self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
+    #     return True
 
     def _send_direct(self, msg, topic='', identity=None, **kwargs):
         r"""Send a message.

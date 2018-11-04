@@ -636,8 +636,8 @@ class TestPsiPickleInput(TestBase):
 
     def setup(self):
         r"""Create a test file and start the driver."""
-        if (((not os.path.isfile(self.tempfile)) or
-             (os.stat(self.tempfile).st_size == 0))):
+        if (((not os.path.isfile(self.tempfile))
+             or (os.stat(self.tempfile).st_size == 0))):
             self.write_pickle(self.tempfile)
         skip_start = False
         if self.inst_kwargs.get('src_type', 1) == 0:
@@ -653,8 +653,8 @@ class TestPsiPickleInput(TestBase):
     def test_recv(self):
         r"""Test receiving a pickle from a remote file."""
         Tout = self.instance.start_timeout()
-        while ((not Tout.is_out) and
-               (os.stat(self.tempfile).st_size == 0)):  # pragma: debug
+        while ((not Tout.is_out)
+               and (os.stat(self.tempfile).st_size == 0)):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
         msg_flag, res = self.instance.recv(timeout=self.timeout)
@@ -751,8 +751,8 @@ class TestPsiPandasInput(TestBase):
 
     def setup(self):
         r"""Create a test file and start the driver."""
-        if (((not os.path.isfile(self.tempfile)) or
-             (os.stat(self.tempfile).st_size == 0))):
+        if (((not os.path.isfile(self.tempfile))
+             or (os.stat(self.tempfile).st_size == 0))):
             self.write_pandas(self.tempfile)
         skip_start = False
         if self.inst_kwargs.get('src_type', 1) == 0:
@@ -768,8 +768,8 @@ class TestPsiPandasInput(TestBase):
     def test_recv(self):
         r"""Test receiving a pandas from a remote file."""
         Tout = self.instance.start_timeout()
-        while ((not Tout.is_out) and
-               (os.stat(self.tempfile).st_size == 0)):  # pragma: debug
+        while ((not Tout.is_out)
+               and (os.stat(self.tempfile).st_size == 0)):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
         msg_flag, res = self.instance.recv(timeout=self.timeout)

@@ -110,13 +110,13 @@ int alloc_ply(ply_t *p, int nvert, int nface, int do_color) {
   cislog_debug("alloc_ply: Allocated %d vertices.", nvert);
   // Allocate vertex colors
   if (do_color) {
-    int **new_vert = (int**)malloc(p->nvert*sizeof(int*));
-    if (new_vert == NULL) {
+    int **new_vert_colors = (int**)malloc(p->nvert*sizeof(int*));
+    if (new_vert_colors == NULL) {
       cislog_error("alloc_ply: Failed to allocate vertex_colors.");
       free_ply(p);
       return -1;
     }
-    p->vertex_colors = new_vert;
+    p->vertex_colors = new_vert_colors;
     for (i = 0; i < p->nvert; i++) {
       int *ivert = (int*)malloc(3*sizeof(int));
       if (ivert == NULL) {
@@ -175,6 +175,10 @@ int alloc_ply(ply_t *p, int nvert, int nface, int do_color) {
 static inline
 int serialize_ply(const seri_t s, char *buf, const size_t buf_size,
 		  int *args_used, va_list ap) {
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  s;
+#endif
   args_used[0] = 0;
   int msg_len = 0;
   int ilen;
@@ -285,6 +289,11 @@ int serialize_ply(const seri_t s, char *buf, const size_t buf_size,
 static inline
 int deserialize_ply(const seri_t s, const char *buf, const size_t buf_siz,
 		    va_list ap) {
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  s;
+  buf_siz;
+#endif
   int out = 1;
   int do_colors = 0;
   int n_sub_matches;
@@ -404,7 +413,7 @@ int deserialize_ply(const seri_t s, const char *buf, const size_t buf_siz,
 	break;
       } else {
 	for (j = 0; j < 3; j++) {
-	  p->vertices[i][j] = atof(iline + sind[j + 1]);
+	  p->vertices[i][j] = (float)atof(iline + sind[j + 1]);
 	}
 	if (do_colors) {
 	  for (j = 0; j < 3; j++) {

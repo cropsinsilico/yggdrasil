@@ -2,9 +2,9 @@
 
 models:
   - name: timed_pipe_src
-    language: python
+    language: c
     args:
-      - ./src/timed_pipe_src.py
+      - ./src/timed_pipe_src.c
       - "{{PIPE_MSG_COUNT}}"
       - "{{PIPE_MSG_SIZE}}"
     outputs:

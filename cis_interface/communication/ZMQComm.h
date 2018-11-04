@@ -391,6 +391,10 @@ int set_reply_recv(const comm_t *comm, const char* address) {
 static inline
 char* check_reply_send(const comm_t *comm, const char *data, const int len,
 		       int *new_len) {
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  comm;
+#endif
   char *out = (char*)malloc(len + 1);
   memcpy(out, data, len + 1);
   new_len[0] = len;
@@ -459,6 +463,7 @@ int new_zmq_address(comm_t *comm) {
   char protocol[50] = "tcp";
   char host[50] = "localhost";
   char address[100];
+  comm->msgBufSize = 100;
   if (strcmp(host, "localhost") == 0)
     strcpy(host, "127.0.0.1");
   if ((strcmp(protocol, "inproc") == 0) ||
@@ -523,6 +528,7 @@ int init_zmq_comm(comm_t *comm) {
   int ret = -1;
   if (comm->valid == 0)
     return ret;
+  comm->msgBufSize = 100;
   zsock_t *s = zsock_new(ZMQ_PAIR);
   if (s == NULL) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
@@ -708,15 +714,16 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
 static inline
 int zmq_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
+  int ret = -1;
   cislog_debug("zmq_comm_recv(%s)", x.name);
   zsock_t *s = (zsock_t*)(x.handle);
   if (s == NULL) {
     cislog_error("zmq_comm_recv(%s): socket handle is NULL", x.name);
-    return -1;
+    return ret;
   }
   while (1) {
     int nmsg = zmq_comm_nmsg(x);
-    if (nmsg < 0) return -1;
+    if (nmsg < 0) return ret;
     else if (nmsg > 0) break;
     else {
       cislog_debug("zmq_comm_recv(%s): no messages, sleep", x.name);
@@ -726,9 +733,11 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   zframe_t *out = zframe_recv(s);
   if (out == NULL) {
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
-    return -1;
+    return ret;
   }
+  // Realloc and copy data
   size_t len_recv = zframe_size(out) + 1;
+  // size_t len_recv = (size_t)ret + 1;
   if (len_recv > len) {
     if (allow_realloc) {
       cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
@@ -746,11 +755,23 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
       return -((int)(len_recv - 1));
     }
   }
-  memcpy(*data, zframe_data(out), len_recv);
-  (*data)[len_recv-1] = '\0';
+  memcpy(*data, zframe_data(out), len_recv - 1);
   zframe_destroy(&out);
-  int ret = (int)len_recv - 1;
-  ret = check_reply_recv(&x, *data, (size_t)ret);
+  (*data)[len_recv-1] = '\0';
+  ret = (int)len_recv - 1;
+  /*
+  if (strlen(*data) != ret) {
+    cislog_error("zmq_comm_recv(%s): Size of string (%d) doesn't match expected (%d)",
+		 x.name, strlen(*data), ret);
+    return -1;
+  }
+  */
+  // Check reply
+  ret = check_reply_recv(&x, *data, ret);
+  if (ret < 0) {
+    cislog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
+    return ret;
+  }
   cislog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
   return ret;
 };

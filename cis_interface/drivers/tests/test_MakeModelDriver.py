@@ -1,19 +1,21 @@
 import os
 import nose.tools as nt
 import unittest
-from cis_interface import tools
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface.drivers.MakeModelDriver import MakeModelDriver
 
 
-@unittest.skipIf(tools._c_library_avail, "C Library installed")
+_driver_installed = MakeModelDriver.is_installed()
+
+
+@unittest.skipIf(_driver_installed, "C Library installed")
 def test_MakeModelDriver_no_C_library():  # pragma: windows
     r"""Test MakeModelDriver error when C library not installed."""
     nt.assert_raises(RuntimeError, MakeModelDriver, 'test', scripts['make'])
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_MakeModelDriver_error_notarget():
     r"""Test MakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['make'])
@@ -21,14 +23,14 @@ def test_MakeModelDriver_error_notarget():
                      makedir=makedir)
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_MakeModelDriver_error_nofile():
     r"""Test MakeModelDriver error for missing Makefile."""
     makedir, target = os.path.split(scripts['make'])
     nt.assert_raises(IOError, MakeModelDriver, 'test', 'invalid')
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestMakeModelParam(parent.TestModelParam):
     r"""Test parameters for MakeModelDriver."""
 
@@ -44,7 +46,7 @@ class TestMakeModelParam(parent.TestModelParam):
         self._inst_kwargs['makefile'] = self.makefile
         
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestMakeModelDriverNoStart(TestMakeModelParam,
                                  parent.TestModelDriverNoStart):
     r"""Test runner for MakeModelDriver without start."""
@@ -63,7 +65,7 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
         super(TestMakeModelDriverNoStart, self).teardown()
         
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestMakeModelDriver(TestMakeModelParam, parent.TestModelDriver):
     r"""Test runner for MakeModelDriver."""
 

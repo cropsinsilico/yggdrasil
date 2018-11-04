@@ -1,7 +1,7 @@
 import copy
 import numpy as np
-import matplotlib as mpl
-import matplotlib.cm as cm
+from matplotlib import cm
+from matplotlib import colors as mpl_colors
 from cis_interface import backwards
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
@@ -332,9 +332,9 @@ class PlyDict(dict):
         # print(vmin, vmax)
         cmap = cm.get_cmap(color_map)
         if scaling == 'log':
-            norm = mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
+            norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)
         elif scaling == 'linear':
-            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+            norm = mpl_colors.Normalize(vmin=vmin, vmax=vmax)
         else:  # pragma: debug
             raise Exception("Scaling must be 'linear' or 'log'.")
         m = cm.ScalarMappable(norm=norm, cmap=cmap)

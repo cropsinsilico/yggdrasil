@@ -2,13 +2,14 @@ import sys
 import logging
 from subprocess import Popen, PIPE
 from cis_interface import platform, tools
+from cis_interface.schema import register_component
 from cis_interface.communication import CommBase, AsyncComm
 try:
     import sysv_ipc
-    _ipc_installed = tools._ipc_installed
+    _ipc_installed = (platform._is_linux or platform._is_mac)
 except ImportError:  # pragma: windows
-    logging.warn("Could not import sysv_ipc. " +
-                 "IPC support will be disabled.")
+    logging.warn("Could not import sysv_ipc. "
+                 + "IPC support will be disabled.")
     sysv_ipc = None
     _ipc_installed = False
 
@@ -90,7 +91,7 @@ def ipc_queues():
         # Linux
         '------ Message Queues --------',
         'key        msqid      owner      perms      used-bytes   messages    ',
-        # OSX
+        # MacOS
         'IPC status from',
         'Message Queues:',
         'T     ID     KEY        MODE       OWNER    GROUP']
@@ -108,12 +109,12 @@ def ipc_queues():
         if not skip:
             if platform._is_linux:
                 key_col = 0
-            elif platform._is_osx:
+            elif platform._is_mac:
                 key_col = 2
             else:  # pragma: debug
-                raise NotImplementedError("Unsure what column the queue key " +
-                                          "is in on this platform " +
-                                          "(%s)" % sys.platform)
+                raise NotImplementedError("Unsure what column the queue key "
+                                          + "is in on this platform "
+                                          + "(%s)" % sys.platform)
             qlist.append(l.split()[key_col])
     return qlist
 
@@ -168,6 +169,7 @@ class IPCServer(CommBase.CommServer):
         super(IPCServer, self).terminate(*args, **kwargs)
 
 
+@register_component
 class IPCComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O via IPC message queues.
 
@@ -176,6 +178,8 @@ class IPCComm(AsyncComm.AsyncComm):
         
     """
 
+    _commtype = 'ipc'
+
     def _init_before_open(self, **kwargs):
         r"""Initialize empty queue and server class."""
         self.q = None
@@ -183,14 +187,29 @@ class IPCComm(AsyncComm.AsyncComm):
         super(IPCComm, self)._init_before_open(**kwargs)
             
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return _ipc_installed
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        if language in ['python', 'c']:
+            out = _ipc_installed
+        else:
+            out = super(IPCComm, cls).is_installed(language=language)
+        return out
 
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        # Based on IPC limit on OSX
+        # Based on IPC limit on MacOS
         return 2048
     
     @classmethod

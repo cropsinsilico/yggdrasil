@@ -4,9 +4,9 @@ from cis_interface.interface.CisInterface import CisRpcClient, CIS_MSG_BUF
 
 
 def rand_str(length):
-    charset = ("0123456789" +
-               "abcdefghijklmnopqrstuvwxyz" +
-               "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    charset = ("0123456789"
+               + "abcdefghijklmnopqrstuvwxyz"
+               + "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     out = ''
     while (len(out) < (length - 1)):
         index = int(random.random() * len(charset))

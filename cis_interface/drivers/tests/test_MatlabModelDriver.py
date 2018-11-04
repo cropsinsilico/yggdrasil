@@ -11,6 +11,13 @@ from cis_interface.examples import yamls as ex_yamls
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 
 
+def test_is_matlab_running():
+    r"""Test if there is Matlab engine running."""
+    MatlabModelDriver.is_matlab_running()
+    MatlabModelDriver.kill_all()
+    assert(not MatlabModelDriver.is_matlab_running())
+
+
 @unittest.skipIf(MatlabModelDriver._matlab_installed, "Matlab installed.")
 def test_matlab_not_installed():  # pragma: no matlab
     r"""Assert that errors are raise when Matlab is not installed."""
@@ -40,8 +47,8 @@ class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
     def test_a(self):
         r"""Dummy test to start matlab."""
         if self.instance.screen_session is None:  # pragma: debug
-            print("Matlab was not started by this test. Close any " +
-                  "existing Matlab sessions to test creation/removal.")
+            print("Matlab was not started by this test. Close any "
+                  + "existing Matlab sessions to test creation/removal.")
         else:
             with open(_session_fname, 'w') as f:
                 f.write(self.instance.screen_session)
@@ -57,8 +64,8 @@ class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
             self.instance.screen_session = session
             self.instance.started_matlab = True
         else:  # pragma: debug
-            print("Skipping removal of Matlab session as the test did " +
-                  "not create it.")
+            print("Skipping removal of Matlab session as the test did "
+                  + "not create it.")
 
             
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")

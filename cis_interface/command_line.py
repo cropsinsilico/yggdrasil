@@ -2,7 +2,7 @@
 import os
 import sys
 import traceback
-from cis_interface import runner, schema, config
+from cis_interface import runner, schema, config, timing
 from cis_interface.drivers import GCCModelDriver
 
 
@@ -65,6 +65,26 @@ def regen_schema():
 def update_config():
     r"""Update the user config file for cis_interface."""
     config.update_config(config.usr_config_file, config.def_config_file)
+
+
+def cistime_comm():
+    r"""Plot timing statistics comparing the different communication mechanisms."""
+    timing.plot_scalings(compare='commtype')
+
+
+def cistime_lang():
+    r"""Plot timing statistics comparing the different languages."""
+    timing.plot_scalings(compare='language')
+
+
+def cistime_os():
+    r"""Plot timing statistics comparing the different operating systems."""
+    timing.plot_scalings(compare='platform')
+
+
+def cistime_py():
+    r"""Plot timing statistics comparing the different versions of Python."""
+    timing.plot_scalings(compare='python')
 
 
 if __name__ == '__main__':

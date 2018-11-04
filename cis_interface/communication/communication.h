@@ -482,14 +482,14 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     return -1;
   }
   // Try to send body in header
-  if (len < x.maxMsgSize) {
+  if (len < (x.maxMsgSize - x.msgBufSize)) {
     headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
       cislog_error("comm_send_multipart: Failed to format header.");
       free(headbuf);
       return -1;
     }
-    if (((size_t)headlen + len) < x.maxMsgSize) {
+    if (((size_t)headlen + len) < (x.maxMsgSize - x.msgBufSize)) {
       if (((size_t)headlen + len + 1) > (size_t)headbuf_len) {
         char *t_headbuf = (char*)realloc(headbuf, (size_t)headlen + len + 1);
         if (t_headbuf == NULL) {
@@ -553,8 +553,8 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
   size_t msgsiz;
   size_t prev = 0;
   while (prev < head.size) {
-    if ((head.size - prev) > xmulti.maxMsgSize)
-      msgsiz = xmulti.maxMsgSize;
+    if ((head.size - prev) > (xmulti.maxMsgSize - xmulti.msgBufSize))
+      msgsiz = xmulti.maxMsgSize - xmulti.msgBufSize;
     else
       msgsiz = head.size - prev;
     ret = comm_send_single(xmulti, data + prev, msgsiz);
@@ -609,7 +609,7 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
       sending_eof = 1;
       cislog_debug("comm_send(%s): Sending EOF", x.name);
     } else {
-      cislog_error("comm_send(%s): EOF already sent", x.name);
+      cislog_debug("comm_send(%s): EOF already sent", x.name);
       return ret;
     }
   }
@@ -926,7 +926,7 @@ int comm_send_nolimit_eof(const comm_t x) {
     ret = comm_send_nolimit(x, buf, strlen(buf));
     x.sent_eof[0] = 1;
   } else {
-    cislog_error("comm_send_nolimit_eof(%s): EOF already sent", x.name);
+    cislog_debug("comm_send_nolimit_eof(%s): EOF already sent", x.name);
   }
   return ret;
 };

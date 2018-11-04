@@ -34,3 +34,16 @@ class PythonModelDriver(ModelDriver):
         if 'python' not in self.args[0] or self.args[0].endswith('.py'):
             python_exec = sys.executable
             self.args = [python_exec] + self.args
+
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        # This is being run so python exists
+        return True

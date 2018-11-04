@@ -10,6 +10,9 @@ from cis_interface.tests import CisTestBase
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
+_c_comm_installed = tools.get_installed_comm(language='c')
+
+
 class TestExample(CisTestBase, tools.CisClass):
     r"""Base class for running examples."""
 
@@ -91,31 +94,6 @@ class TestExample(CisTestBase, tools.CisClass):
             out.append(icont)
         return out
 
-    def check_file_exists(self, fname):
-        r"""Check that a file exists."""
-        Tout = self.start_timeout(2)
-        while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
-        assert(os.path.isfile(fname))
-
-    def check_file_size(self, fname, fsize):
-        r"""Check that file is the correct size."""
-        Tout = self.start_timeout(2)
-        if (os.stat(fname).st_size != fsize):  # pragma: debug
-            print('file sizes not equal', os.stat(fname).st_size, fsize)
-        while ((not Tout.is_out) and
-               (os.stat(fname).st_size != fsize)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
-        nt.assert_equal(os.stat(fname).st_size, fsize)
-
-    def check_file_contents(self, fname, result):
-        r"""Check that the contents of a file are correct."""
-        with open(fname, 'r') as fd:
-            ocont = fd.read()
-        nt.assert_equal(ocont, result)
-
     def check_results(self):
         r"""This should be overridden with checks for the result."""
         if self.output_files is None:
@@ -157,7 +135,7 @@ class TestExample(CisTestBase, tools.CisClass):
                 if os.path.isfile(fout):
                     os.remove(fout)
 
-    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_all(self):
         r"""Test the version of the example that uses all languages."""
         self.language = 'all'
@@ -170,14 +148,14 @@ class TestExample(CisTestBase, tools.CisClass):
         self.run_example()
         self.language = None
 
-    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_c(self):
         r"""Test the C version of the example."""
         self.language = 'c'
         self.run_example()
         self.language = None
 
-    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_cpp(self):
         r"""Test the C++ version of the example."""
         self.language = 'cpp'

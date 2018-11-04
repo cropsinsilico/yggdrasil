@@ -8,10 +8,13 @@ from cis_interface.drivers.GCCModelDriver import (
     GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags)
 
 
+_driver_installed = GCCModelDriver.is_installed()
+
+
 def test_get_zmq_flags():
     r"""Test get_zmq_flags."""
     cc, ld = get_zmq_flags()
-    if not tools._zmq_installed_c:
+    if not tools.is_comm_installed('ZMQComm', language='c'):
         nt.assert_equal(len(cc), 0)
         nt.assert_equal(len(ld), 0)
 
@@ -19,7 +22,7 @@ def test_get_zmq_flags():
 def test_get_ipc_flags():
     r"""Test get_ipc_flags."""
     cc, ld = get_ipc_flags()
-    if not tools._ipc_installed:  # pragma: windows
+    if not tools.is_comm_installed('IPCComm', language='c'):  # pragma: windows
         nt.assert_equal(len(cc), 0)
         nt.assert_equal(len(ld), 0)
 
@@ -27,24 +30,24 @@ def test_get_ipc_flags():
 def test_get_flags():
     r"""Test get_flags."""
     cc, ld = get_flags()
-    if not tools._c_library_avail:  # pragma: windows
+    if not _driver_installed:  # pragma: windows
         nt.assert_equal(len(cc), 0)
         nt.assert_equal(len(ld), 0)
 
 
-@unittest.skipIf(tools._c_library_avail, "C Library installed")
+@unittest.skipIf(_driver_installed, "C Library installed")
 def test_GCCModelDriver_no_C_library():  # pragma: windows
     r"""Test GCCModelDriver error when C library not installed."""
     nt.assert_raises(RuntimeError, GCCModelDriver, 'test', scripts['c'])
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_GCCModelDriver_errors():
     r"""Test GCCModelDriver errors."""
     nt.assert_raises(RuntimeError, GCCModelDriver, 'test', 'test.py')
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestGCCModelParam(parent.TestModelParam):
     r"""Test parameters for GCCModelDriver."""
 
@@ -60,7 +63,7 @@ class TestGCCModelParam(parent.TestModelParam):
             self.args = src + ['1', '-I' + script_dir, '-L' + script_dir]
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestGCCModelDriverNoStart(TestGCCModelParam,
                                 parent.TestModelDriverNoStart):
     r"""Test runner for GCCModelDriver without start."""
@@ -84,7 +87,7 @@ class TestGCCModelDriverNoStart(TestGCCModelParam,
         super(TestGCCModelDriverNoStart, self).teardown()
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestGCCModelDriverNoStart_std(TestGCCModelDriverNoStart):
     r"""Test runner for GCCModelDriver with std lib specified."""
 
@@ -93,7 +96,7 @@ class TestGCCModelDriverNoStart_std(TestGCCModelDriverNoStart):
         self.args.append('-std=c++11')
 
 
-@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestGCCModelDriver(TestGCCModelParam, parent.TestModelDriver):
     r"""Test runner for GCCModelDriver."""
 

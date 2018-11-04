@@ -43,8 +43,8 @@ class TestExampleAsciiIO(TestExample):
     def output_table(self):
         r"""str: Output table for the run."""
         for o, yml in self.runner.outputdrivers.items():
-            if (((yml['driver'] == 'AsciiTableOutputDriver') and
-                 (not yml.get('as_array', False)))):
+            if (((yml['driver'] == 'AsciiTableOutputDriver')
+                 and (not yml.get('as_array', False)))):
                 return os.path.join(self.tempdir, yml['args'])
         raise Exception('Could not locate output table in yaml.')  # pragma: debug
 
@@ -52,8 +52,8 @@ class TestExampleAsciiIO(TestExample):
     def output_array(self):
         r"""str: Output array for the run."""
         for o, yml in self.runner.outputdrivers.items():
-            if (((yml['driver'] == 'AsciiTableOutputDriver') and
-                 (yml.get('as_array', False)))):
+            if (((yml['driver'] == 'AsciiTableOutputDriver')
+                 and (yml.get('as_array', False)))):
                 return os.path.join(self.tempdir, yml['args'])
         raise Exception('Could not locate output array in yaml.')  # pragma: debug
 

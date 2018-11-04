@@ -99,6 +99,23 @@ class FileComm(CommBase.CommBase):
             if v is not None:
                 setattr(self, k, func_conv(v))
 
+    @classmethod
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        # Filesystem is implied
+        return True
+
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
@@ -208,8 +225,8 @@ class FileComm(CommBase.CommBase):
             if series_index is None:
                 series_index = self._series_index + 1
             if self._series_index != series_index:
-                if (((self.direction == 'send') or
-                     os.path.isfile(self.get_series_address(series_index)))):
+                if (((self.direction == 'send')
+                     or os.path.isfile(self.get_series_address(series_index)))):
                     self._file_close()
                     self._series_index = series_index
                     self._open()

@@ -61,7 +61,7 @@ class TestCommBase(CisTestClassInfo):
     @property
     def is_installed(self):
         r"""bool: Is the communication class installed."""
-        return self.import_cls.is_installed()
+        return self.import_cls.is_installed(language='python')
 
     @property
     def send_inst_kwargs(self):
@@ -327,9 +327,9 @@ class TestCommBase(CisTestClassInfo):
             for i in range(n_recv):
                 if not is_eof:
                     T = recv_instance.start_timeout(self.timeout, key_suffix=tkey)
-                    while ((not T.is_out) and (not recv_instance.is_closed) and
-                           (getattr(recv_instance,
-                                    n_msg_recv_meth) == 0)):  # pragma: debug
+                    while ((not T.is_out) and (not recv_instance.is_closed)
+                           and (getattr(recv_instance,
+                                        n_msg_recv_meth) == 0)):  # pragma: debug
                         recv_instance.sleep()
                     recv_instance.stop_timeout(key_suffix=tkey)
                     assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
@@ -351,8 +351,8 @@ class TestCommBase(CisTestClassInfo):
                 assert(send_instance.is_closed)
         # Make sure no messages outgoing
         T = send_instance.start_timeout(self.timeout, key_suffix=tkey)
-        while ((not T.is_out) and
-               (getattr(send_instance, n_msg_send_meth) != 0)):  # pragma: debug
+        while ((not T.is_out) and (getattr(send_instance,
+                                           n_msg_send_meth) != 0)):  # pragma: debug
             send_instance.sleep()
         send_instance.stop_timeout(key_suffix=tkey)
         # Print status of comms
@@ -433,8 +433,8 @@ class TestCommBase(CisTestClassInfo):
             flag = self.send_instance.send(self.msg_short)
             assert(flag)
             T = self.recv_instance.start_timeout()
-            while ((not T.is_out) and
-                   (self.recv_instance.n_msg != nrecv)):  # pragma: debug
+            while ((not T.is_out) and (self.recv_instance.n_msg
+                                       != nrecv)):  # pragma: debug
                 self.recv_instance.sleep()
             self.recv_instance.stop_timeout()
             nt.assert_greater(self.recv_instance.n_msg, 0)
@@ -451,3 +451,7 @@ class TestCommBase(CisTestClassInfo):
         msg_send = dict(f0=self.map_sent2recv(self.msg_short))
         self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
                           msg_send=msg_send)
+
+    def test_is_installed(self):
+        r"""Test class is_installed method."""
+        assert(not self.import_cls.is_installed(language='invalid'))
