@@ -424,7 +424,9 @@ class CommBase(tools.CisClass):
         Args:
             language (str, optional): Specific language that should be checked
                 for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
+                on the current platform will be checked. If set to 'any', the
+                result will be True if this comm is installed for any of the
+                supported languages.
 
         Returns:
             bool: Is the comm installed.
@@ -432,13 +434,21 @@ class CommBase(tools.CisClass):
         """
         lang_list = tools.get_supported_lang()
         comm_class = str(cls).split("'")[1].split(".")[-1]
-        if language is None:
+        use_any = False
+        if language in [None, 'all']:
+            language = lang_list
+        elif language == 'any':
+            use_any = True
             language = lang_list
         if isinstance(language, list):
-            out = True
+            out = (not use_any)
             for l in language:
                 if not cls.is_installed(language=l):
-                    out = False
+                    if not use_any:
+                        out = False
+                        break
+                elif use_any:
+                    out = True
                     break
         elif language in ['cpp', 'c++', 'make', 'cmake']:
             out = cls.is_installed(language='c')

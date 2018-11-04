@@ -106,7 +106,7 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
         # Version specifying sourcedir via working_dir
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
         # Relative paths
-        self._inst_kwargs['sourcedir'] = './'
+        self._inst_kwargs['sourcedir'] = '.'
         self._inst_kwargs['builddir'] = 'build'
         self._inst_kwargs['cmakeargs'] = '-Wdev'
 
