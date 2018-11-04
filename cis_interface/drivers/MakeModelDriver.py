@@ -33,7 +33,7 @@ class MakeModelDriver(ModelDriver):
         args (str, list): Executable that should be created (make target) and
             any arguments for the executable.
         make_command (str, optional): Command that should be used for make.
-            Defaults to 'make' on linux/osx and 'nmake' on windows.
+            Defaults to 'make' on Linux/MacOS and 'nmake' on windows.
         makefile (str, optional): Path to make file either relative to makedir
             or absolute. Defaults to Makefile.
         makedir (str, optional): Directory where make should be invoked from
@@ -63,7 +63,7 @@ class MakeModelDriver(ModelDriver):
     def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
-        if not tools._c_library_avail:  # pragma: windows
+        if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.compiled = False
@@ -103,7 +103,7 @@ class MakeModelDriver(ModelDriver):
                 machine.
 
         """
-        return tools._c_library_avail
+        return (len(tools.get_installed_comm(language='c')) > 0)
 
     def make_target(self, target):
         r"""Run the make command to make the target.

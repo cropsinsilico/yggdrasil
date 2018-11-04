@@ -111,6 +111,10 @@ class TestFileComm(parent.TestCommBase):
         assert(not flag)
         nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
 
+    def test_is_installed(self):
+        r"""Test class is_installed method."""
+        assert(self.import_cls.is_installed(language='invalid'))
+
 
 class TestFileComm_readline(TestFileComm):
     r"""Test for FileComm communication class with read_meth = 'readline'."""

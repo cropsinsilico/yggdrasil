@@ -355,11 +355,7 @@ class CisTestClass(CisTestBase):
 
     def teardown(self, *args, **kwargs):
         r"""Remove the instance."""
-        if hasattr(self, '_instance'):
-            inst = self._instance
-            self._instance = None
-            self.remove_instance(inst)
-            delattr(self, '_instance')
+        self.clear_instance()
         super(CisTestClass, self).teardown(*args, **kwargs)
 
     @property
@@ -421,6 +417,14 @@ class CisTestClass(CisTestBase):
         r"""Remove an instance of the class."""
         # print("removed instance")
         pass
+
+    def clear_instance(self):
+        r"""Clear the instance."""
+        if hasattr(self, '_instance'):
+            inst = self._instance
+            self._instance = None
+            self.remove_instance(inst)
+            delattr(self, '_instance')
 
 
 class IOInfo(object):

@@ -4,7 +4,11 @@ import uuid
 import zmq
 import threading
 import logging
-from cis_interface import backwards, tools
+import subprocess
+import warnings
+from cis_interface import backwards, tools, platform
+from cis_interface.config import cis_cfg
+from cis_interface.schema import register_component
 from cis_interface.communication import CommBase, AsyncComm
 
 
@@ -23,7 +27,39 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = backwards.unicode2bytes('CIS_REPLY')
 _purge_msg = backwards.unicode2bytes('CIS_PURGE')
 _global_context = zmq.Context.instance()
-_zmq_installed = tools._zmq_installed
+
+
+def check_czmq():
+    r"""Determine if the necessary C/C++ libraries are installed for ZeroMQ.
+
+    Returns:
+        bool: True if the libraries are installed, False otherwise.
+
+    """
+    # Check that the libraries are installed
+    if platform._is_win:  # pragma: windows
+        opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
+                'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
+        for o in opts:
+            if not cis_cfg.get('windows', o, None):  # pragma: debug
+                warnings.warn("Config option %s not set." % o)
+                return False
+        return True
+    else:
+        process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        outs, errs = process.communicate()
+        # Python 3
+        # try:
+        #     outs, errs = process.communicate(timeout=15)
+        # except subprocess.TimeoutExpired:
+        #     process.kill()
+        #     outs, errs = process.communicate()
+        return (backwards.unicode2bytes('zmq') not in errs)
+
+
+_zmq_installed_c = check_czmq()
 
 
 def get_ipc_host():
@@ -284,6 +320,7 @@ class ZMQProxy(CommBase.CommServer):
         CommBase.unregister_comm('ZMQComm', 'DEALER_server_' + self.srv_address)
 
 
+@register_component
 class ZMQComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O using ZeroMQ sockets.
 
@@ -315,6 +352,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             to a dealer socket.
 
     """
+
+    _commtype = 'zmq'
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
@@ -398,9 +437,26 @@ class ZMQComm(AsyncComm.AsyncComm):
                                    self._n_reply_recv[k]))
 
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return tools._zmq_installed
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        if language == 'python':
+            out = True  # ZMQ is a requirement so it should always be installed
+        elif language == 'c':
+            out = _zmq_installed_c
+        else:
+            out = super(ZMQComm, cls).is_installed(language=language)
+        return out
 
     @property
     def maxMsgSize(self):
@@ -408,12 +464,6 @@ class ZMQComm(AsyncComm.AsyncComm):
         # Based on limit of 32bit int, this could be 2**30, but this is
         # too large for stack allocation in C so 2**20 will be used.
         return 2**20
-
-    @property
-    def msgBufSize(self):
-        r"""int: Size of buffer that should be reservered for info added to
-        messages."""
-        return 100
 
     @classmethod
     def underlying_comm_class(self):

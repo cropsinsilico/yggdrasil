@@ -391,11 +391,13 @@ def test_format2table():
     sout['fmts'] = [sfmt]
     del sout['newline'], sout['comment']
     fmt = backwards.unicode2bytes("# %5s\t%ld\t%lf\t%g%+gj\n")
+    fmt2 = backwards.unicode2bytes("# %5s\t\t%ld\t%lf\t%g%+gj\n")
     nt.assert_equal(dict(fmts=[]), serialize.format2table('hello'))
     nt.assert_equal(sout, serialize.format2table(sfmt))
     nt.assert_equal(fmt, serialize.table2format(**out))
     nt.assert_equal(out, serialize.format2table(fmt))
     nt.assert_equal(fmt, serialize.table2format(fmts=out['fmts']))
+    nt.assert_equal(out, serialize.format2table(fmt2))
     nt.assert_raises(RuntimeError, serialize.format2table, "%5s,%ld\t%g\n")
 
 

@@ -12,7 +12,7 @@ class TestClientParam(parent.TestConnectionParam):
         self.args = None
         self.attr_list += ['comm', 'response_drivers',
                            'request_name', 'request_address']
-        # Increased to allow forwarding between IPC comms on OSX
+        # Increased to allow forwarding between IPC comms on MacOS
         # self.timeout = 5.0
         self.route_timeout = 2 * self.timeout
         # self.debug_flag = True

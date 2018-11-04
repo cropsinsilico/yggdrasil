@@ -10,6 +10,9 @@ from cis_interface.tests import CisTestBase
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
+_c_comm_installed = tools.get_installed_comm(language='c')
+
+
 class TestExample(CisTestBase, tools.CisClass):
     r"""Base class for running examples."""
 
@@ -132,7 +135,7 @@ class TestExample(CisTestBase, tools.CisClass):
                 if os.path.isfile(fout):
                     os.remove(fout)
 
-    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_all(self):
         r"""Test the version of the example that uses all languages."""
         self.language = 'all'
@@ -145,14 +148,14 @@ class TestExample(CisTestBase, tools.CisClass):
         self.run_example()
         self.language = None
 
-    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_c(self):
         r"""Test the C version of the example."""
         self.language = 'c'
         self.run_example()
         self.language = None
 
-    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
+    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_cpp(self):
         r"""Test the C++ version of the example."""
         self.language = 'cpp'

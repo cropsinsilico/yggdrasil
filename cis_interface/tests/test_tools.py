@@ -28,16 +28,6 @@ def test_locate_path():
     assert(not fpath)
 
 
-def test_is_zmq_installed():
-    r"""Test determination if zmq is installed or not."""
-    tools.is_zmq_installed()
-    
-
-def test_is_ipc_installed():
-    r"""Test determination if ipc is installed or not."""
-    tools.is_ipc_installed()
-
-
 def test_popen_nobuffer():
     r"""Test open of process without buffer."""
     ans = os.getcwd()  # + '\n'

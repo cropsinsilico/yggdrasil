@@ -61,7 +61,7 @@ class TestCommBase(CisTestClassInfo):
     @property
     def is_installed(self):
         r"""bool: Is the communication class installed."""
-        return self.import_cls.is_installed()
+        return self.import_cls.is_installed(language='python')
 
     @property
     def send_inst_kwargs(self):
@@ -451,3 +451,7 @@ class TestCommBase(CisTestClassInfo):
         msg_send = dict(f0=self.map_sent2recv(self.msg_short))
         self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
                           msg_send=msg_send)
+
+    def test_is_installed(self):
+        r"""Test class is_installed method."""
+        assert(not self.import_cls.is_installed(language='invalid'))

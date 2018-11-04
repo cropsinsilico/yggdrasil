@@ -30,8 +30,12 @@ comm:
 comm_schema_subtypes:
   CommBase:
   - default
+  IPCComm:
+  - ipc
   RMQComm:
   - rmq
+  ZMQComm:
+  - zmq
 comm_subtype_attr: _commtype
 connection:
   input:

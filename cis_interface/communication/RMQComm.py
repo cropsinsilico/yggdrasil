@@ -178,9 +178,24 @@ class RMQComm(AsyncComm.AsyncComm):
         return args, kwargs
 
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return _rmq_server_running
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        if language == 'python':
+            out = _rmq_server_running
+        else:
+            out = super(RMQComm, cls).is_installed(language=language)
+        return out
 
     @classmethod
     def underlying_comm_class(self):

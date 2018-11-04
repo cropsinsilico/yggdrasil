@@ -14,6 +14,8 @@ _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 def test_is_matlab_running():
     r"""Test if there is Matlab engine running."""
     MatlabModelDriver.is_matlab_running()
+    MatlabModelDriver.kill_all()
+    assert(not MatlabModelDriver.is_matlab_running())
 
 
 @unittest.skipIf(MatlabModelDriver._matlab_installed, "Matlab installed.")

@@ -2,10 +2,13 @@ import unittest
 import nose.tools as nt
 import zmq
 from cis_interface import platform
-from cis_interface.tools import _zmq_installed, _ipc_installed
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_AsyncComm
-from cis_interface.communication import ZMQComm
+from cis_interface.communication import ZMQComm, IPCComm
+
+
+_zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
+_ipc_installed = IPCComm.IPCComm.is_installed(language='python')
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
@@ -40,7 +43,7 @@ def test_invalid_protocol():
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-@unittest.skipIf(platform._is_osx, "Testing on OSX")
+@unittest.skipIf(platform._is_mac, "Testing on MacOS")
 @unittest.skipIf(platform._is_win, "Testing on Windows")
 def test_error_on_send_open_twice():
     r"""Test creation of the same send socket twice for an error."""
@@ -262,8 +265,8 @@ class TestZMQCommROUTER(TestZMQComm):
         pass
 
 
-@unittest.skipIf(_zmq_installed, "ZMQ library installed")
-def test_not_running():
-    r"""Test raise of an error if a ZMQ library is not installed."""
-    comm_kwargs = dict(comm='ZMQComm', direction='send', reverse_names=True)
-    nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
+# @unittest.skipIf(_zmq_installed, "ZMQ library installed")
+# def test_not_running():
+#     r"""Test raise of an error if a ZMQ library is not installed."""
+#     comm_kwargs = dict(comm='ZMQComm', direction='send', reverse_names=True)
+#     nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
