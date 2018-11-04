@@ -28,14 +28,15 @@ class AsyncComm(CommBase.CommBase):
         
     """
     def __init__(self, name, dont_backlog=False, **kwargs):
-        self.dont_backlog = (dont_backlog or kwargs.get('matlab', False) or
-                             kwargs.get('is_inteface', False))
+        self.dont_backlog = (dont_backlog or kwargs.get('matlab', False)
+                             or kwargs.get('is_inteface', False))
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
         self.backlog_open = False
+        self.loop_count = 0
         super(AsyncComm, self).__init__(name, **kwargs)
 
     def printStatus(self, nindent=0):
@@ -289,11 +290,17 @@ class AsyncComm(CommBase.CommBase):
     def run_backlog_send(self):
         r"""Continue trying to send buffered messages."""
         if not self.is_open_backlog:  # pragma: debug
+            self.debug("Backlog closed")
             self._close_backlog()
             return
         if not self.send_backlog():  # pragma: debug
+            self.debug("Stopping because send_backlog failed")
             self._close_backlog()
             return
+        self.loop_count += 1
+        if (self.loop_count % 100) == 0:
+            self.debug("Sleeping (is_confirmed_send=%s)",
+                       str(self.is_confirmed_send))
         self.sleep()
 
     def run_backlog_recv(self):
@@ -311,6 +318,10 @@ class AsyncComm(CommBase.CommBase):
             self.debug("Stopping backlog recv thread")
             self.backlog_thread.set_break_flag()
             return
+        self.loop_count += 1
+        if (self.loop_count % 100) == 0:
+            self.debug("Sleeping (is_confirmed_recv=%s)",
+                       str(self.is_confirmed_recv))
         self.sleep()
 
     def send_backlog(self):
@@ -447,8 +458,8 @@ class AsyncComm(CommBase.CommBase):
         # If no backlog, receive from queue
         if no_backlog:
             T = self.start_timeout(timeout, key_suffix='_recv:direct')
-            while ((not T.is_out) and (self.n_msg_direct_recv == 0) and
-                   self.is_open_direct):
+            while ((not T.is_out) and (self.n_msg_direct_recv == 0)
+                   and self.is_open_direct):
                 self.sleep()
             self.stop_timeout(key_suffix='_recv:direct')
             if not self.is_open_direct:  # pragma: debug

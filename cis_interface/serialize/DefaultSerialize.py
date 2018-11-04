@@ -86,8 +86,8 @@ class DefaultSerialize(object):
     def is_user_defined(self):
         r"""bool: True if serialization or deserialization function was user
         defined."""
-        return ((self._func_serialize is not None) or
-                (self._func_deserialize is not None))
+        return ((self._func_serialize is not None)
+                or (self._func_deserialize is not None))
 
     @property
     def serializer_type(self):
@@ -116,8 +116,8 @@ class DefaultSerialize(object):
     def serializer_info(self):
         r"""dict: Information about serializer required to reconstruct it."""
         if self.is_user_defined:
-            raise RuntimeError("Cannot get serializer info for user " +
-                               "defined functions.")
+            raise RuntimeError("Cannot get serializer info for user "
+                               + "defined functions.")
         out = dict(stype=self.serializer_type)
         if self.format_str:
             out['format_str'] = self.format_str
@@ -181,8 +181,8 @@ class DefaultSerialize(object):
         else:
             if isinstance(args, (list, tuple)):
                 if len(args) != 1:
-                    raise Exception("No format string and more than one " +
-                                    "argument provided.")
+                    raise Exception("No format string and more than one "
+                                    + "argument provided.")
                 out = args[0]
             else:
                 out = args

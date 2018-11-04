@@ -2,7 +2,7 @@ from cis_interface import backwards, tools, serialize
 from cis_interface.communication import DefaultComm
 
 
-CIS_MSG_MAX = tools.CIS_MSG_MAX
+CIS_MSG_MAX = tools.get_CIS_MSG_MAX()
 CIS_MSG_EOF = tools.CIS_MSG_EOF
 CIS_MSG_BUF = tools.CIS_MSG_BUF
 

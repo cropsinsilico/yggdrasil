@@ -178,9 +178,9 @@ def update_config(config_file, config_base=None):
         miss += update_config_windows(cp)
     with open(config_file, 'w') as fd:
         cp.write(fd)
-    for sect, opt, desc in miss:
-        warnings.warn(("Could not locate option %s in section %s." +
-                       "Please set this in %s to: %s")
+    for sect, opt, desc in miss:  # pragma: windows
+        warnings.warn(("Could not locate option %s in section %s."
+                       + "Please set this in %s to: %s")
                       % (opt, sect, config_file, desc))
 
         

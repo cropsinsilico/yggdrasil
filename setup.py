@@ -53,10 +53,12 @@ else:
 # Create requirements list based on platform
 requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 "pystache", "nose", "pyzmq", "psutil",
-                "matplotlib", "cerberus", "jsonschema",
+                "matplotlib<3.0; python_version < '3.5'",
+                "matplotlib; python_version >= '3.5'",
+                "cerberus", "jsonschema",
                 'pandas<0.21; python_version == "3.4"',
                 'pandas; python_version != "3.4"',
-                "pint", "unyt",
+                "perf", "pint", "unyt",
                 'sysv_ipc; platform_system != "Windows"']
 test_requirements = ['pytest', 'nose']
 # optional_requirements = ["pika", "astropy"]
@@ -108,7 +110,11 @@ setup(
                             'cisldflags=cis_interface.command_line:ld_flags',
                             'cistest=cis_interface:run_nose',
                             'cisschema=cis_interface.command_line:regen_schema',
-                            'cisconfig=cis_interface.command_line:update_config'],
+                            'cisconfig=cis_interface.command_line:update_config',
+                            'cistime_comm=cis_interface.command_line:cistime_comm',
+                            'cistime_lang=cis_interface.command_line:cistime_lang',
+                            'cistime_os=cis_interface.command_line:cistime_os',
+                            'cistime_py=cis_interface.command_line:cistime_py'],
     },
     license="BSD",
 )

@@ -177,8 +177,8 @@ class ConnectionDriver(Driver):
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
         T = self.start_timeout(timeout)
-        while ((not T.is_out) and
-               (self.nrecv != (self.nsent + self.nskip))):  # pragma: debug
+        while ((not T.is_out)
+               and (self.nrecv != (self.nsent + self.nskip))):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         return (self.nrecv == (self.nsent + self.nskip))
@@ -188,15 +188,15 @@ class ConnectionDriver(Driver):
         r"""bool: Returns True if the connection is open and the parent class
         is valid."""
         with self.lock:
-            return (super(ConnectionDriver, self).is_valid and
-                    self.is_comm_open and not (self.single_use and self._used))
+            return (super(ConnectionDriver, self).is_valid
+                    and self.is_comm_open and not (self.single_use and self._used))
 
     @property
     def is_comm_open(self):
         r"""bool: Returns True if both communicators are open."""
         with self.lock:
-            return (self.icomm.is_open and self.ocomm.is_open and
-                    not self._comm_closed)
+            return (self.icomm.is_open and self.ocomm.is_open
+                    and not self._comm_closed)
 
     @property
     def is_comm_closed(self):
@@ -373,8 +373,8 @@ class ConnectionDriver(Driver):
             with self.lock:
                 if (not self.icomm.is_open):
                     break
-                elif ((self.icomm.n_msg_recv_drain == 0) and
-                      self.icomm.is_confirmed_recv):
+                elif ((self.icomm.n_msg_recv_drain == 0)
+                      and self.icomm.is_confirmed_recv):
                     break
             self.sleep()
         self.stop_timeout()
@@ -386,8 +386,8 @@ class ConnectionDriver(Driver):
             with self.lock:
                 if (not self.ocomm.is_open):
                     break
-                elif ((self.ocomm.n_msg_send_drain == 0) and
-                      self.ocomm.is_confirmed_send):
+                elif ((self.ocomm.n_msg_send_drain == 0)
+                      and self.ocomm.is_confirmed_send):
                     break
             self.sleep()
         self.stop_timeout()
@@ -523,8 +523,8 @@ class ConnectionDriver(Driver):
         if not flag:
             self.debug("1st send failed, will keep trying for %f s in silence.",
                        float(self.timeout_send_1st))
-        while ((not T.is_out) and (not flag) and
-               self.ocomm.is_open):  # pragma: debug
+        while ((not T.is_out) and (not flag)
+               and self.ocomm.is_open):  # pragma: debug
             flag = self._send_message(*args, **kwargs)
             if not flag:
                 self.sleep()
@@ -627,8 +627,8 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('receiving')
             return
-        if ((isinstance(msg, type(self.icomm.serializer.empty_msg)) and
-             (msg == self.icomm.serializer.empty_msg))):
+        if ((isinstance(msg, type(self.icomm.serializer.empty_msg))
+             and (msg == self.icomm.serializer.empty_msg))):
             self.state = 'waiting'
             self.verbose_debug(':run: Waiting for next message.')
             self.sleep()
@@ -652,8 +652,8 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('processing')
             return
-        elif ((isinstance(msg, type(self.ocomm.serializer.empty_msg)) and
-               (msg == self.ocomm.serializer.empty_msg))):
+        elif ((isinstance(msg, type(self.ocomm.serializer.empty_msg))
+               and (msg == self.ocomm.serializer.empty_msg))):
             self.debug('Message skipped.')
             self.nskip += 1
             return

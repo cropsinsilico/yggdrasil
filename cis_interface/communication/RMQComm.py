@@ -5,8 +5,8 @@ try:
     import pika
     _rmq_installed = True
 except ImportError:
-    logging.warning("Could not import pika. " +
-                    "RabbitMQ support will be disabled.")
+    logging.warning("Could not import pika. "
+                    + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
 from cis_interface.schema import register_component
@@ -36,6 +36,7 @@ def check_rmq_server(url=None, **kwargs):
             otherwise.
 
     """
+    out = True
     if not _rmq_installed:
         return False
     if url is not None:
@@ -51,14 +52,16 @@ def check_rmq_server(url=None, **kwargs):
                                                virtual_host=vhost,
                                                credentials=credentials)
     # Try to establish connection
+    logging.getLogger("pika").propagate = False
     try:
         connection = pika.BlockingConnection(parameters)
         if not connection.is_open:  # pragma: debug
-            return False
+            raise BaseException("Connection was not openned.")
         connection.close()
     except BaseException:  # pragma: debug
-        return False
-    return True
+        out = False
+    logging.getLogger("pika").propagate = True
+    return out
 
 
 _rmq_server_running = check_rmq_server()
@@ -175,9 +178,24 @@ class RMQComm(AsyncComm.AsyncComm):
         return args, kwargs
 
     @classmethod
-    def is_installed(cls):
-        r"""bool: Is the comm installed."""
-        return _rmq_server_running
+    def is_installed(cls, language=None):
+        r"""Determine if the necessary libraries are installed for this
+        communication class.
+
+        Args:
+            language (str, optional): Specific language that should be checked
+                for compatibility. Defaults to None and all languages supported
+                on the current platform will be checked.
+
+        Returns:
+            bool: Is the comm installed.
+
+        """
+        if language == 'python':
+            out = _rmq_server_running
+        else:
+            out = super(RMQComm, cls).is_installed(language=language)
+        return out
 
     @classmethod
     def underlying_comm_class(self):
@@ -318,7 +336,8 @@ class RMQComm(AsyncComm.AsyncComm):
                                                  auto_delete=True,
                                                  passive=True)
             except (pika.exceptions.ChannelClosed,
-                    pika.exceptions.ConnectionClosed):  # pragma: debug
+                    pika.exceptions.ConnectionClosed,
+                    AttributeError):  # pragma: debug
                 self._close_direct()
         return res
         

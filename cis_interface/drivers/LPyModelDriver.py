@@ -3,13 +3,13 @@
 #
 import os
 import sys
-from logging import warning
+from logging import debug
 from cis_interface.drivers.ModelDriver import ModelDriver
 try:  # pragma: lpy
     from openalea import lpy
 except ImportError:  # pragma: no lpy
-    warning("Could not import openalea.lpy. " +
-            "LPy support will be disabled.")
+    debug("Could not import openalea.lpy. "
+          + "LPy support will be disabled.")
     lpy = None
 from cis_interface.schema import register_component
 _lpy_installed = (lpy is not None)
@@ -38,3 +38,15 @@ class LPyModelDriver(ModelDriver):  # pragma: lpy
         super(LPyModelDriver, self).__init__(name, args, **kwargs)
         self.debug(args)
         self.args = [sys.executable, _model_script] + self.args
+
+    @classmethod
+    def is_installed(self):
+        r"""Determine if this model driver is installed on the current
+        machine.
+
+        Returns:
+            bool: Truth of if this model driver can be run on the current
+                machine.
+
+        """
+        return _lpy_installed

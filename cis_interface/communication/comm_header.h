@@ -307,7 +307,7 @@ int format_comm_header(const comm_head_t head, char *buf, const size_t bufsiz) {
 static inline
 comm_head_t parse_comm_header(const char *buf, const size_t bufsiz) {
   comm_head_t out = init_header(0, NULL, NULL);
-  size_t sind, eind;
+  size_t sind = 0, eind = 0;
   int ret;
 #ifdef _WIN32
   // Windows regex of newline is buggy

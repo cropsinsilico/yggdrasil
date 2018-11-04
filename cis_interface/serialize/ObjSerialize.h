@@ -168,13 +168,13 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   cislog_debug("alloc_obj: Allocated %d vertices.", nvert);
   // Allocate vertex colors
   if (do_color) {
-    int **new_vert = (int**)malloc(p->nvert*sizeof(int*));
-    if (new_vert == NULL) {
+    int **new_vert_colors = (int**)malloc(p->nvert*sizeof(int*));
+    if (new_vert_colors == NULL) {
       cislog_error("alloc_obj: Failed to allocate vertex_colors.");
       free_obj(p);
       return -1;
     }
-    p->vertex_colors = new_vert;
+    p->vertex_colors = new_vert_colors;
     for (i = 0; i < p->nvert; i++) {
       int *ivert = (int*)malloc(3*sizeof(int));
       if (ivert == NULL) {
@@ -295,6 +295,10 @@ int alloc_obj(obj_t *p, int nvert, int nface,
 static inline
 int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
 		  int *args_used, va_list ap) {
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  s;
+#endif
   args_used[0] = 0;
   int msg_len = 0;
   int ilen;
@@ -309,7 +313,7 @@ int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
   if (strlen(p.material) != 0) {
     sprintf(header_format + strlen(header_format), "usemtl %s\n", p.material);
   }
-  ilen = strlen(header_format);
+  ilen = (int)strlen(header_format);
   if (ilen >= (buf_size - msg_len)) {
     cislog_error("serialize_obj: Buffer (size = %d) is not large "
 		 "enough to contain the header (size = %d).", buf_size, ilen);
@@ -414,6 +418,10 @@ int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
 static inline
 int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
 		    va_list ap) {
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  s;
+#endif
   int out = 1;
   int do_colors = 0;
   size_t *sind = NULL;
@@ -488,7 +496,7 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
       } else if (find_matches(re_matl, iline, &sind, &eind) == n_re_matl) {
 	// Material
 	cislog_debug("deserialize_obj: Material");
-	int matl_size = eind[1] - sind[1];
+	int matl_size = (int)(eind[1] - sind[1]);
 	memcpy(p->material, iline+sind[1], matl_size);
 	p->material[matl_size] = '\0';
 	cmatl++;
@@ -496,7 +504,7 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
 	// Vertex
 	cislog_debug("deserialize_obj: Vertex");
 	for (j = 0; j < 3; j++) {
-	  p->vertices[cvert][j] = atof(iline + sind[j+1]);
+	  p->vertices[cvert][j] = (float)atof(iline + sind[j+1]);
 	}
 	if (do_colors) {
 	  for (j = 0; j < 3; j++) {
@@ -508,19 +516,20 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
 	// Normals
 	cislog_debug("deserialize_obj: Normals");
 	for (j = 0; j < 3; j++) {
-	  p->normals[cnorm][j] = atof(iline + sind[j+1]);
+	  p->normals[cnorm][j] = (float)atof(iline + sind[j+1]);
 	}
 	cnorm++;
       } else if (find_matches(re_texc, iline, &sind, &eind) == n_re_texc) {
 	// Texcoords
 	cislog_debug("deserialize_obj: Texcoords");
 	for (j = 0; j < 2; j++) {
-	  p->texcoords[ctexc][j] = atof(iline + sind[j+1]);
+	  p->texcoords[ctexc][j] = (float)atof(iline + sind[j+1]);
 	}
 	ctexc++;
       } else if (find_matches(re_face, iline, &sind, &eind) == n_re_face) {
 	// Face
-	int n_sub_matches = find_matches(re_face, iline, &sind, &eind);
+	//int n_sub_matches2 = 
+  find_matches(re_face, iline, &sind, &eind);
 	cislog_debug("deserialize_obj: Face");
 	for (j = 0; j < 3; j++) {
 	  p->faces[cface][j] = atoi(iline + sind[3*j+1]) - 1;

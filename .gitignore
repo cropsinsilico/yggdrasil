@@ -5,9 +5,13 @@ cis_interface/tests/scripts/Makefile
 
 # Intermediate docs
 docs/build
+docs/source/cis_interface.inc
 docs/source/cis_interface*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
+
+# Plots for timing purposes
+scaling_*.png
 
 # Coverage
 .coveragerc
@@ -16,6 +20,9 @@ htmlcov
 
 # temp for storing notes, whatever, etc.   not managed
 tmp/
+
+# Cache
+.cache/
 
 # Temporary file copies
 *~
@@ -39,6 +46,7 @@ tmp/
 # Packaging things
 cis_interface.egg-info
 dist/
+build/
 
 
 # Windows image file caches

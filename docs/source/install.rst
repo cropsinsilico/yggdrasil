@@ -62,7 +62,7 @@ script (e.g. ``.bashrc`` or ``.bash_profile``), using one of the following::
   $ set PATH "%PATH%:<scripts_dir>   # (windows)
 
 These commands will only add the directory to your path for the current 
-session. For the change to be permanent on Linux/OSX, the appropriate command 
+session. For the change to be permanent on Linux/MacOS, the appropriate command 
 from above can be added to your ``.bashrc`` or ``.bash_profile``. On 
 Windows (>=7), the following command will permanently modify your path::
 
@@ -91,7 +91,7 @@ that it cannot find these libraries, you can manually set them in your
 
 .. note::
    Although not required, the ZeroMQ libraries are also recommended for message 
-   passing on Linux and Mac OSX operating systems as the IPC V message queues 
+   passing on Linux and MacOS operating systems as the IPC V message queues 
    have default upper limits of 2048 bytes on some operating systems and will 
    have to send larger messages piecemeal, adding to the message passing 
    overhead.

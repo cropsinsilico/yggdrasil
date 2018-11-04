@@ -20,12 +20,12 @@ while flag
   fprintf('  Vertices:\n');
   for i = 1:ply.nvert
     fprintf('   %f, %f, %f\n', ...
-	    ply['vertices'][i][0], ply['vertices'][i][1], ply['vertices'][i][2]);
+            ply{'vertices'}{i}{1}, ply{'vertices'}{i}{2}, ply{'vertices'}{i}{3});
   end;
   fprintf('  Faces:\n');
   for i = 1:ply.nface
     fprintf('   %d, %d, %d\n', ...
-	    ply['faces'][i][0], ply['faces'][i][1], ply['faces'][i][2]);
+            ply{'faces'}{i}{1}, ply{'faces'}{i}{2}, ply{'faces'}{i}{3});
   end;
 
   % Send output to output channel

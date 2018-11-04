@@ -3,6 +3,7 @@ import sys
 import logging
 # import atexit
 import os
+import time
 import signal
 from pprint import pformat
 from itertools import chain
@@ -165,15 +166,50 @@ class CisRunner(CisClass):
         for k, v in self._old_handlers.items():
             signal.signal(k, v)
 
-    def run(self, signal_handler=None):
-        r"""Run all of the models and wait for them to exit."""
+    def run(self, signal_handler=None, timer=None, t0=None):
+        r"""Run all of the models and wait for them to exit.
+
+        Args:
+            signal_handler (function, optional): Function that should be used as
+                a signal handler. Defaults to None and is set by
+                set_signal_handler.
+            timer (function, optional): Function that should be called to get
+                intermediate timing statistics. Defaults to time.time if not
+                provided.
+            t0 (float, optional): Zero point for timing statistics. Is set
+                using the provided timer if not provided.
+
+        Returns:
+            dict: Intermediate times from the run.
+
+        """
+        if timer is None:
+            timer = time.time
+        if t0 is None:
+            t0 = timer()
+        times = {}
+        times['init'] = timer()
         self.loadDrivers()
+        times['load drivers'] = timer()
         self.startDrivers()
+        times['start drivers'] = timer()
         self.set_signal_handler(signal_handler)
         self.waitModels()
+        times['run models'] = timer()
         self.reset_signal_handler()
         self.closeChannels()
+        times['close channels'] = timer()
         self.cleanup()
+        times['clean up'] = timer()
+        tprev = t0
+        key_order = ['init', 'load drivers', 'start drivers', 'run models',
+                     'close channels', 'clean up']
+        for k in key_order:
+            self.info('%20s\t%f', k, times[k] - tprev)
+            tprev = times[k]
+        self.info(40 * '=')
+        self.info('%20s\t%f', "Total", tprev - t0)
+        return times
 
     @property
     def all_drivers(self):
@@ -259,8 +295,8 @@ class CisRunner(CisClass):
         yml['models'] = []
         if yml['args'] not in self._outputchannels:
             if not os.path.isfile(yml['args']):
-                raise Exception(("Input driver %s could not locate a " +
-                                 "corresponding file or output channel %s") % (
+                raise Exception(("Input driver %s could not locate a "
+                                 + "corresponding file or output channel %s") % (
                                      yml["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
@@ -289,9 +325,9 @@ class CisRunner(CisClass):
                 assert(issubclass(drv_cls,
                                   FileOutputDriver.FileOutputDriver))
             except AssertionError:
-                raise Exception(("Output driver %s is not a subclass of " +
-                                 "FileOutputDriver and there is not a " +
-                                 "corresponding input channel %s.") % (
+                raise Exception(("Output driver %s is not a subclass of "
+                                 + "FileOutputDriver and there is not a "
+                                 + "corresponding input channel %s.") % (
                                      yml["name"], yml["args"]))
         else:
             
@@ -325,8 +361,8 @@ class CisRunner(CisClass):
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
-        self.info('Starting I/O drivers and models on system ' +
-                  '{} in namespace {} with rank {}'.format(
+        self.info('Starting I/O drivers and models on system '
+                  + '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))
         driver = dict(name='name')
         try:

@@ -12,7 +12,7 @@ class TestClientParam(parent.TestConnectionParam):
         self.args = None
         self.attr_list += ['comm', 'response_drivers',
                            'request_name', 'request_address']
-        # Increased to allow forwarding between IPC comms on OSX
+        # Increased to allow forwarding between IPC comms on MacOS
         # self.timeout = 5.0
         self.route_timeout = 2 * self.timeout
         # self.debug_flag = True
@@ -89,8 +89,8 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         r"""Wait for drivers to start."""
         super(TestClientDriver, self).setup(*args, **kwargs)
         T = self.instance.start_timeout(self.timeout)
-        while ((not T.is_out) and ((not self.instance.is_valid) or
-                                   (not self.srv_drv.is_valid))):
+        while ((not T.is_out) and ((not self.instance.is_valid)
+                                   or (not self.srv_drv.is_valid))):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
 
@@ -104,8 +104,8 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         if msg_send is None:
             msg_send = self.msg_short
         T = self.instance.start_timeout(self.timeout)
-        while ((not T.is_out) and ((not self.instance.is_valid) or
-                                   (not self.srv_drv.is_valid))):
+        while ((not T.is_out) and ((not self.instance.is_valid)
+                                   or (not self.srv_drv.is_valid))):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Send a message to local output

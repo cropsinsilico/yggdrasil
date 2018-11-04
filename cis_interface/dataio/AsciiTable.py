@@ -73,8 +73,8 @@ class AsciiTable(AsciiFile):
                     self.discover_format_str()
                 else:
                     raise RuntimeError("'format_str' must be provided for output")
-        if ((isinstance(column_names, (list, tuple)) and
-             (len(column_names) == self.ncols))):
+        if ((isinstance(column_names, (list, tuple))
+             and (len(column_names) == self.ncols))):
             self.column_names = tuple([c for c in column_names])
 
     @property
@@ -85,8 +85,8 @@ class AsciiTable(AsciiFile):
                 fmts = serialize.nptype2cformat(self.dtype, asbytes=True)
                 self._format_str = self.column.join(fmts) + self.newline
             else:  # pragma: debug
-                raise RuntimeError("Format string not set " +
-                                   "and cannot be determined.")
+                raise RuntimeError("Format string not set "
+                                   + "and cannot be determined.")
         return self._format_str
 
     @property
