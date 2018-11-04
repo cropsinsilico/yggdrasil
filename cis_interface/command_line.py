@@ -95,12 +95,12 @@ def cistime_paper():
     _lang_list_nomatlab.remove('matlab')
     timing.plot_scalings(compare='platform', python_ver='2.7')
     # All plots on Linux, no matlab
-    timing.plot_scalings(compare='commtype', platform='Linux', python_ver='2.7')
+    timing.plot_scalings(compare='comm_type', platform='Linux', python_ver='2.7')
     timing.plot_scalings(compare='python_ver', platform='Linux')
     timing.plot_scalings(compare='language', platform='Linux', python_ver='2.7',
                          compare_values=_lang_list_nomatlab)
-    # Language comparision on OSX, with matlab
-    timing.plot_scalings(compare='language', platform='OSX', python_ver='2.7',
+    # Language comparision on MacOS, with matlab
+    timing.plot_scalings(compare='language', platform='MacOS', python_ver='2.7',
                          compare_values=_lang_list)
 
 
