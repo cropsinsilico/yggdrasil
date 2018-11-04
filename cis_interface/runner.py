@@ -18,23 +18,6 @@ COLOR_TRACE = '\033[30;43;22m'
 COLOR_NORMAL = '\033[0m'
 
 
-# def setup_cis_logging(prog, level=None):
-#     r"""Set the log lovel based on environment variable 'CIS_DEBUG'. If the
-#     variable is not set, the log level is set to 'NOTSET'.
-
-#     Args:
-#         prog (str): Name to prepend log messages with.
-#         level (str, optional): String specifying the logging level. Defaults
-#             to None and the environment variable 'CIS_DEBUG' is used.
-
-#     """
-#     if level is None:
-#         level = cis_cfg.get('debug', 'cis', 'NOTSET')
-#     logLevel = eval('logging.' + level)
-#     logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
-#                         prog + ': %(message)s' + COLOR_NORMAL)
-
-
 class CisRunner(CisClass):
     r"""This class handles the orchestration of starting the model and
     IO drivers, monitoring their progress, and cleaning up on exit.
@@ -48,12 +31,6 @@ class CisRunner(CisClass):
             from. Defaults to None.
         rank (int, optional): Rank of this set of models if run in parallel.
             Defaults to 0.
-        cis_debug_level (str, optional): Level for CiS debug messages. Defaults
-            to environment variable 'CIS_DEBUG'.
-        rmq_debug_level (str, optional): Level for RabbitMQ debug messages.
-            Defaults to environment variable 'RMQ_DEBUG'.
-        cis_debug_prefix (str, optional): Prefix for CiS debug messages.
-            Defaults to namespace.
 
     Attributes:
         namespace (str): Name that should be used to uniquely identify any RMQ
@@ -71,9 +48,7 @@ class CisRunner(CisClass):
     ..todo:: namespace, host, and rank do not seem strictly necessary.
 
     """
-    def __init__(self, modelYmls, namespace, host=None, rank=0,
-                 cis_debug_level=None, rmq_debug_level=None,
-                 cis_debug_prefix=None):
+    def __init__(self, modelYmls, namespace, host=None, rank=0):
         super(CisRunner, self).__init__('runner')
         self.namespace = namespace
         self.host = host
@@ -87,10 +62,6 @@ class CisRunner(CisClass):
         self._outputchannels = {}
         self._old_handlers = {}
         self.error_flag = False
-        # Setup logging
-        # if cis_debug_prefix is None:
-        #     cis_debug_prefix = namespace
-        # setup_cis_logging(cis_debug_prefix, level=cis_debug_level)
         # Update environment based on config
         cfg_environment()
         # Parse yamls
@@ -330,7 +301,6 @@ class CisRunner(CisClass):
                                  + "corresponding input channel %s.") % (
                                      yml["name"], yml["args"]))
         else:
-            
             # TODO: Add input comm environment variables somehow
             pass
         drv = self.createDriver(yml)
