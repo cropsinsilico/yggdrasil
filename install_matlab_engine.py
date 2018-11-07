@@ -39,6 +39,7 @@ def install_matlab(as_user=False):
     mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
     if not os.path.isdir(mtl_setup):
         return False
+    print("Using Matlab Python engine located at: %s" % mtl_setup)
     blddir = os.path.join(os.path.expanduser('~'), 'matlab_python_api')
     if not os.path.isdir(blddir):
         os.mkdir(blddir)

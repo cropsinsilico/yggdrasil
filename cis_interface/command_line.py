@@ -2,26 +2,39 @@
 import os
 import sys
 import traceback
-from cis_interface import runner, schema, config, timing
+from cis_interface import runner, schema, config, timing, yamlfile
 from cis_interface.drivers import GCCModelDriver
+import argparse
 
 
 def cisrun():
     r"""Start a run."""
-    prog = sys.argv[0].split(os.path.sep)[-1]
-    # Print help
-    if '-h' in sys.argv:
-        print('Usage: cisrun [YAMLFILE1] [YAMLFILE2]...')
-        return
-    models = sys.argv[1:]
-    cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
-    try:
-        cisRunner.run()
-        cisRunner.debug("runner returns, exiting")
-    except Exception as ex:
-        cisRunner.pprint("cisrun exception: %s" % type(ex))
-        print(traceback.format_exc())
-    print('')
+    parser = argparse.ArgumentParser(
+        prog='cisrun',
+        description="CLI for running model networks using cis_interface")
+    parser.add_argument('yamlfile', nargs='+',
+                        help="one or more yaml specification files to read "
+                             + "run model and connection information from")
+    parser.add_argument('--validate', action='store_true',
+                        help="validate the provided specification files "
+                             + "without running the integration")
+    args = parser.parse_args()
+    models = args.yamlfile
+    if args.validate:
+        try:
+            yamlfile.parse_yaml(models)
+            print("Provided YAML specification is valid")
+        except BaseException:
+            raise
+    else:
+        cisRunner = runner.get_runner(models)
+        try:
+            cisRunner.run()
+            cisRunner.debug("runner returns, exiting")
+        except Exception as ex:
+            cisRunner.pprint("cisrun exception: %s" % type(ex))
+            print(traceback.format_exc())
+        print('')
 
 
 def ciscc():
@@ -67,24 +80,22 @@ def update_config():
     config.update_config(config.usr_config_file, config.def_config_file)
 
 
-def cistime_comm():
-    r"""Plot timing statistics comparing the different communication mechanisms."""
-    timing.plot_scalings(compare='commtype')
-
-
-def cistime_lang():
-    r"""Plot timing statistics comparing the different languages."""
-    timing.plot_scalings(compare='language')
-
-
-def cistime_os():
-    r"""Plot timing statistics comparing the different operating systems."""
-    timing.plot_scalings(compare='platform')
-
-
-def cistime_py():
-    r"""Plot timing statistics comparing the different versions of Python."""
-    timing.plot_scalings(compare='python')
+def cistime():
+    r"""Plot timing statistics."""
+    parser = argparse.ArgumentParser(
+        prog='cistime',
+        description="Plot timing statistics for cis_interface.")
+    parser.add_argument('--compare', choices=['comm_type', 'language',
+                                              'platform', 'python_ver'],
+                        help=("aspect that should be varied for comparison. "
+                              + "If not provided, statistics for the default "
+                              + "configuration on the current platform will be "
+                              + "plotted."))
+    args = parser.parse_args()
+    if args.compare is None:
+        timing.plot_scalings(compare='language', compare_values=['python'])
+    else:
+        timing.plot_scalings(compare=args.compare)
 
 
 if __name__ == '__main__':
