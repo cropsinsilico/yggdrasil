@@ -311,8 +311,9 @@ class CisBaseType(object):
             raise TypeError("Message to be deserialized is not bytes type.")
         if len(msg) == 0:
             obj = self._empty_msg
+            metadata = dict()
         else:
             metadata, data = msg.split(self.sep)
             metadata = json.loads(backwards.bytes2unicode(metadata))
             obj = self.__class__.decode(metadata, data, self._typedef)
-        return obj
+        return obj, metadata

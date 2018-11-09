@@ -135,7 +135,7 @@ class TestCisBaseType(CisTestClassInfo):
             for x in self._valid_decoded:
                 msg = self.instance.serialize(x)
                 y = self.instance.deserialize(msg)
-                self.assert_result_equal(y, x)
+                self.assert_result_equal(y[0], x)
 
     def test_deserialize_error(self):
         r"""Test error when deserializing message that is not bytes."""
@@ -144,7 +144,8 @@ class TestCisBaseType(CisTestClassInfo):
     def test_deserialize_empty(self):
         r"""Test call for empty string."""
         out = self.instance.deserialize(self._empty_msg)
-        self.assert_result_equal(out, self.instance._empty_msg)
+        self.assert_result_equal(out[0], self.instance._empty_msg)
+        nt.assert_equal(out[1], dict())
         # nt.assert_equal(out, self.instance._empty_msg)
 
 
