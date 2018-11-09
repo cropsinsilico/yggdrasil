@@ -44,9 +44,9 @@ class CisBaseType(object):
     sep = backwards.unicode2bytes(':CIS_TAG:')
 
     def __init__(self, **typedef):
+        self._typedef = {}
         typedef.setdefault('typename', self.name)
-        self.__class__.validate_definition(typedef)
-        self._typedef = typedef
+        self.update_typedef(**typedef)
 
     # Methods to be overridden by subclasses
     @classmethod
@@ -111,6 +111,39 @@ class CisBaseType(object):
         raise NotImplementedError("Method must be overridden by the subclass.")
 
     # Methods not to be modified by subclasses
+    def update_typedef(self, **kwargs):
+        r"""Update the current typedef with new values.
+
+        Args:
+            **kwargs: All keyword arguments are considered to be new type
+                definitions. If they are a vliad definition property, they
+                will be copied to the typedef associated with the instance.
+
+        Returns:
+            dict: A dictionary of keyword arguments that were not added to the
+                type definition.
+
+        Raises:
+            CisTypeError: If the current type does not match the type being
+                updated to.
+
+        """
+        typename0 = self._typedef.get('typename', None)
+        typename1 = kwargs.get('typename', None)
+        # Check typename to make sure this is possible
+        if typename1 and typename0 and (typename1 != typename0):
+            raise CisTypeError("Cannot update typedef for type '%s' to be '%s'."
+                               % (typename0, typename1))
+        # Copy over valid properties
+        definition_schema = self.__class__.definition_schema()
+        all_keys = [k for k in kwargs.keys()]
+        for k in all_keys:
+            if k in definition_schema['properties']:
+                self._typedef[k] = kwargs.pop(k)
+        # Validate
+        self.__class__.validate_definition(self._typedef)
+        return kwargs
+
     @classmethod
     def definition_schema(cls):
         r"""JSON schema for validating a type definition."""

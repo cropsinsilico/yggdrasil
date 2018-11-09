@@ -1,5 +1,6 @@
 import uuid
-from cis_interface import backwards, tools, serialize
+import copy
+from cis_interface import backwards, tools, serialize, datatypes
 
 
 CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
@@ -12,6 +13,8 @@ class DefaultSerialize(object):
     a bytes message.
 
     Args:
+        typename (str, optional): If provided, this string describes the type
+            that should be used. Defaults to None and is ignored.
         format_str (str, optional): If provided, this string will be used to
             format messages from a list of arguments and parse messages to
             get a list of arguments in C printf/scanf style. Defaults to
@@ -33,6 +36,8 @@ class DefaultSerialize(object):
             to None.
 
     Attributes:
+        typename (str): If provided, this string describes the type that should
+            be used.
         format_str (str): Format string used to format/parse bytes messages
             from/to a list of arguments in C printf/scanf style.
         as_array (bool): True or False depending if serialized/deserialized
@@ -45,9 +50,13 @@ class DefaultSerialize(object):
             input and returns a deserialized python object.
 
     """
-    def __init__(self, format_str=None, as_array=False,
+    def __init__(self, typename=None, format_str=None, as_array=False,
                  field_names=None, field_units=None,
                  func_serialize=None, func_deserialize=None, **kwargs):
+        self.typename = typename
+        self.datatype = None
+        if self.typename:
+            self.datatype = datatypes.get_type_class(self.typename)(**kwargs)
         self.format_str = format_str
         self.as_array = as_array
         self._alias = None
@@ -94,6 +103,8 @@ class DefaultSerialize(object):
         r"""int: Type of serializer."""
         if self.is_user_defined:
             out = -1
+        elif self.datatype:
+            out = -2  # should eventually be 0
         elif self.format_str is None:
             out = 0
         elif not self.as_array:
@@ -106,7 +117,9 @@ class DefaultSerialize(object):
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
         stype = self.serializer_type
-        if stype <= 0:
+        if stype == -2:
+            out = self.datatype._empty_msg
+        elif stype <= 0:
             out = backwards.unicode2bytes('')
         else:
             out = tuple()
@@ -118,15 +131,20 @@ class DefaultSerialize(object):
         if self.is_user_defined:
             raise RuntimeError("Cannot get serializer info for user "
                                + "defined functions.")
-        out = dict(stype=self.serializer_type)
-        if self.format_str:
-            out['format_str'] = self.format_str
-        if self.as_array:
-            out['as_array'] = int(self.as_array)
-        if self.field_names:
-            out['field_names'] = self.field_names
-        if self.field_units:
-            out['field_units'] = self.field_units
+        if self.datatype:
+            out = copy.deepcopy(self.datatype._typedef)
+            # This should be removed once full JSON headers used
+            out['stype'] = self.serializer_type
+        else:
+            out = dict(stype=self.serializer_type)
+            if self.format_str:
+                out['format_str'] = self.format_str
+            if self.as_array:
+                out['as_array'] = int(self.as_array)
+            if self.field_names:
+                out['field_names'] = self.field_names
+            if self.field_units:
+                out['field_units'] = self.field_units
         return out
 
     @property
@@ -172,6 +190,9 @@ class DefaultSerialize(object):
         if self._func_serialize is not None:
             # Return directly to check and raise TypeError
             return self._func_serialize(args)
+        elif self.datatype:
+            # TODO: Transition to using JSON encoding for all header info
+            return self.datatype.serialize(args)
         elif self.format_str is not None:
             if self.as_array:
                 out = serialize.array_to_bytes(args, dtype=self.numpy_dtype,
@@ -201,6 +222,9 @@ class DefaultSerialize(object):
         """
         if self._func_deserialize is not None:
             out = self._func_deserialize(msg)
+        elif self.datatype:
+            # TODO: Transition to using JSON encoding for all header info
+            out = self.datatype.deserialize(msg)[0]  # excludes header info
         elif self.format_str is not None:
             if self.as_array:
                 if len(msg) == 0:
@@ -268,13 +292,19 @@ class DefaultSerialize(object):
         key_list = ['format_str', 'as_array', 'field_names', 'field_units']
         for k in key_list:
             setattr(self, k, kwargs.get(k, getattr(self, k)))
+        if kwargs.get('typename', None):
+            if kwargs['typename'] == self.typename:
+                self.datatype.update_typedef(**kwargs)
+            else:
+                self.typename = kwargs['typename']
+                self.datatype = datatypes.get_type_class(self.typename)(**kwargs)
         if 'stype' in kwargs:
             stype = kwargs['stype']
-            if (self.serializer_type != stype) and (stype != 0):
+            if (self.serializer_type != stype) and (stype not in [0, -2]):
                 sinfo = self.serializer_info
                 sinfo['stype'] = stype
                 self._alias = serialize.get_serializer(**sinfo)
-                assert(self.serializer_type == stype)
+            assert(self.serializer_type == stype)
 
     def deserialize(self, msg):
         r"""Deserialize a message.

@@ -41,6 +41,9 @@ def guess_serializer(msg, **kwargs):
     if sinfo.get('stype', 0) > 3:
         # Don't guess for Pandas, Pickle, Map
         pass
+    elif sinfo.get('stype', 0) == -2:
+        # Don't guess for CisType
+        pass
     elif isinstance(msg, np.ndarray):
         names = [backwards.unicode2bytes(n) for n in msg.dtype.names]
         sinfo.setdefault('field_names', names)
@@ -79,7 +82,7 @@ def get_serializer(stype=None, **kwargs):
     """
     if stype is None:
         stype = 0
-    if stype in [0, 1, 2]:
+    if stype in [0, 1, 2, -2]:
         from cis_interface.serialize import DefaultSerialize
         cls = DefaultSerialize.DefaultSerialize
     elif stype in [3]:

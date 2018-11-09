@@ -15,7 +15,7 @@ class TestDefaultSerialize(CisTestClassInfo):
         self._empty_obj = backwards.unicode2bytes('')
         self._header_info = dict(arg1='1', arg2='two')
         self._objects = self.file_lines
-        self.attr_list += ['format_str', 'as_array', 'field_names',
+        self.attr_list += ['typename', 'format_str', 'as_array', 'field_names',
                            'field_units', 'nfields', 'field_formats',
                            'numpy_dtype', 'scanf_format_str', 'serializer_info']
 
@@ -224,6 +224,44 @@ class TestDefaultSerialize_alias(TestDefaultSerialize_format):
         alias = self.instance
         self._instance = DefaultSerialize.DefaultSerialize()
         self._instance._alias = alias
+
+
+class TestDefaultSerialize_type(TestDefaultSerialize):
+    r"""Test class for DefaultSerialize class with types."""
+    def __init__(self, *args, **kwargs):
+        super(TestDefaultSerialize_type, self).__init__(*args, **kwargs)
+        self.typename = 'float'
+        self._inst_kwargs = {'typename': self.typename}
+        self._objects = [float(x) for x in range(5)]
+        self._empty_obj = {}
+
+    def _func_serialize(self, args):
+        r"""Method that serializes using repr."""
+        return backwards.unicode2bytes(repr(args))
+
+    def _func_deserialize(self, args):
+        r"""Method that deserializes using eval."""
+        if len(args) == 0:
+            return self._empty_obj
+        x = eval(backwards.bytes2unicode(args))
+        return x
+
+    def test_field_specs(self):
+        r"""Test field specifiers."""
+        nt.assert_equal(self.instance.format_str, None)
+        nt.assert_equal(self.instance.nfields, 0)
+        nt.assert_equal(self.instance.field_names, None)
+        nt.assert_equal(self.instance.field_units, None)
+        nt.assert_equal(self.instance.field_formats, [])
+        nt.assert_equal(self.instance.numpy_dtype, None)
+        nt.assert_equal(self.instance.scanf_format_str, None)
+        nt.assert_equal(self.instance.is_user_defined, False)
+        nt.assert_equal(self.instance.serializer_type, -2)
+        
+    # def test_serialize_sinfo(self):
+    #     r"""Test error on serialize with serializer info for function."""
+    #     nt.assert_raises(RuntimeError, self.instance.serialize,
+    #                      self._objects[0], add_serializer_info=True)
 
 
 class TestDefaultSerialize_func_error(TestDefaultSerialize_func):

@@ -43,6 +43,11 @@ class TestCisBaseType(CisTestClassInfo):
         r"""Assert that serialized/deserialized objects equal."""
         nt.assert_equal(x, y)
 
+    def test_update_typedef(self):
+        r"""Test update_typedef raises error on non-matching typename."""
+        nt.assert_raises(CisBaseType.CisTypeError, self.instance.update_typedef,
+                         typename='invalid')
+
     def test_definition_schema(self):
         r"""Test definition schema."""
         s = self.import_cls.definition_schema()
