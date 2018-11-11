@@ -1,3 +1,4 @@
+import copy
 import nose.tools as nt
 import jsonschema
 from cis_interface import backwards
@@ -10,6 +11,7 @@ class TestCisBaseType(CisTestClassInfo):
 
     _mod = 'CisBaseType'
     _cls = 'CisBaseType'
+    _explicit = False
 
     def __init__(self, *args, **kwargs):
         super(TestCisBaseType, self).__init__(*args, **kwargs)
@@ -30,7 +32,7 @@ class TestCisBaseType(CisTestClassInfo):
     @property
     def typedef(self):
         r"""dict: Type definition."""
-        out = self._typedef
+        out = copy.deepcopy(self._typedef)
         out['typename'] = self.import_cls.name
         return out
 
@@ -43,10 +45,30 @@ class TestCisBaseType(CisTestClassInfo):
         r"""Assert that serialized/deserialized objects equal."""
         nt.assert_equal(x, y)
 
+    def test_fixed2base(self):
+        r"""Test conversion of type definition from fixed type to the base."""
+        if self._explicit:
+            t1 = self.typedef
+            x1 = self.import_cls.typedef_fixed2base(t1)
+            t2 = copy.deepcopy(x1)
+            t2['typename'] = t1['typename']
+            x2 = self.import_cls.typedef_fixed2base(t2)
+            nt.assert_equal(x1, x2)
+            y = self.import_cls.typedef_base2fixed(x1)
+            nt.assert_equal(y, self.typedef)
+
+    def test_extract_typedef(self):
+        r"""Test extract_typedef."""
+        self.import_cls.extract_typedef(self._valid_encoded[0])
+
     def test_update_typedef(self):
         r"""Test update_typedef raises error on non-matching typename."""
+        self.instance.update_typedef(**self.typedef)
         nt.assert_raises(CisBaseType.CisTypeError, self.instance.update_typedef,
                          typename='invalid')
+        if self._explicit:
+            typedef_base = self.import_cls.typedef_fixed2base(self.typedef)
+            self.instance.update_typedef(**typedef_base)
 
     def test_definition_schema(self):
         r"""Test definition schema."""
@@ -145,6 +167,8 @@ class TestCisBaseType(CisTestClassInfo):
     def test_deserialize_error(self):
         r"""Test error when deserializing message that is not bytes."""
         nt.assert_raises(TypeError, self.instance.deserialize, self)
+        nt.assert_raises(ValueError, self.instance.deserialize,
+                         backwards.unicode2bytes('invalid'))
         
     def test_deserialize_empty(self):
         r"""Test call for empty string."""

@@ -19,7 +19,6 @@ class TestCisScalarType(parent.TestCisBaseType):
     _type = 'float'
     _shape = 1
     _array_contents = None
-    _explicit = False
 
     def __init__(self, *args, **kwargs):
         super(TestCisScalarType, self).__init__(*args, **kwargs)

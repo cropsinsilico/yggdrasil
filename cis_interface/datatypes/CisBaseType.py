@@ -111,12 +111,33 @@ class CisBaseType(object):
         raise NotImplementedError("Method must be overridden by the subclass.")
 
     # Methods not to be modified by subclasses
+    @classmethod
+    def extract_typedef(cls, metadata):
+        r"""Extract the minimum typedef required for this type from the provided
+        metadata.
+
+        Args:
+            metadata (dict): Message metadata.
+
+        Returns:
+            dict: Encoded type definition with unncessary properties removed.
+
+        """
+        out = copy.deepcopy(metadata)
+        reqkeys = cls.definition_schema()['required']
+        keylist = [k for k in out.keys()]
+        for k in keylist:
+            if k not in reqkeys:
+                del out[k]
+        cls.validate_definition(out)
+        return out
+
     def update_typedef(self, **kwargs):
         r"""Update the current typedef with new values.
 
         Args:
             **kwargs: All keyword arguments are considered to be new type
-                definitions. If they are a vliad definition property, they
+                definitions. If they are a valid definition property, they
                 will be copied to the typedef associated with the instance.
 
         Returns:
@@ -232,7 +253,9 @@ class CisBaseType(object):
                 return False
             for k, v in typedef.items():
                 if not cls.check_meta_compat(k, metadata.get(k, None), v):
-                    # print("Incompatible elements: ", k, metadata.get(k, None), v)
+                    # print("Incompatible elements: ", k)
+                    # print("    1.", metadata.get(k, None))
+                    # print("    2.", v)
                     return False
         return True
 
@@ -272,6 +295,12 @@ class CisBaseType(object):
             tuple(dict, bytes): Encoded object with type definition and data
                 serialized to bytes.
 
+        Raises:
+            ValueError: If the object does not match the type definition.
+            ValueError: If the encoded metadata does not match the type
+                definition.
+            TypeError: If the encoded data is not of bytes type.
+
         """
         # This is slightly redundent, maybe pass None
         if not cls.check_decoded(obj, typedef):
@@ -300,6 +329,10 @@ class CisBaseType(object):
 
         Returns:
             object: Decoded object.
+
+        Raises:
+            ValueError: If the metadata does not match the type definition.
+            ValueError: If the decoded object does not match type definition.
 
         """
         if not cls.check_encoded(metadata, typedef):
@@ -338,6 +371,7 @@ class CisBaseType(object):
 
         Raises:
             TypeError: If msg is not bytes type (str on Python 2).
+            ValueError: If msg does not contain the header separator.
 
         """
         if not isinstance(msg, backwards.bytes_type):
@@ -346,7 +380,9 @@ class CisBaseType(object):
             obj = self._empty_msg
             metadata = dict()
         else:
-            metadata, data = msg.split(self.sep)
+            if self.sep not in msg:
+                raise ValueError("Separator '%s' not in message." % self.sep)
+            metadata, data = msg.split(self.sep, 1)
             metadata = json.loads(backwards.bytes2unicode(metadata))
             obj = self.__class__.decode(metadata, data, self._typedef)
         return obj, metadata

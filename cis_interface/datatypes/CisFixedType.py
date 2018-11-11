@@ -56,11 +56,12 @@ class CisFixedType(CisBaseType):
 
         """
         out = copy.deepcopy(typedef)
-        for k, v in cls.fixed_properties.items():
-            if k in out:
-                assert(out[k] == v)
-                del out[k]
-        out['typename'] = cls.name
+        if out.get('typename', None) == cls.base().name:
+            for k, v in cls.fixed_properties.items():
+                if k in out:
+                    assert(out[k] == v)
+                    del out[k]
+            out['typename'] = cls.name
         return out
 
     @classmethod
@@ -76,12 +77,14 @@ class CisFixedType(CisBaseType):
 
         """
         out = copy.deepcopy(typedef)
-        for k, v in cls.fixed_properties.items():
-            if k in out:
-                assert(out[k] == v)
-            else:
-                out[k] = v
-        out['typename'] = cls.base().name
+        if out.get('typename', None) == cls.name:
+            for k, v in cls.fixed_properties.items():
+                if k in out:
+                    assert(out[k] == v)
+                else:
+                    out[k] = v
+            out['typename'] = cls.base().name
+        return out
 
     @classmethod
     def encode_type(cls, obj):
@@ -121,21 +124,56 @@ class CisFixedType(CisBaseType):
         return out
 
     @classmethod
-    def check_decoded(cls, obj, typedef=None):
-        r"""Checks if an object is of the this type.
+    def check_encoded(cls, metadata, typedef=None):
+        r"""Checks if the metadata for an encoded object matches the type
+        definition.
 
         Args:
-            obj (object): Object to be tested.
-            typedef (dict): Type properties that object should be tested
-                against. If None, this will always return True.
+            metadata (dict): Meta data to be tested.
+            typedef (dict, optional): Type properties that object should
+                be tested against. Defaults to None and object may have
+                any values for the type properties (so long as they match
+                the schema.
 
         Returns:
-            bool: Truth of if the input object is of this type.
+            bool: True if the metadata matches the type definition, False
+                otherwise.
 
         """
-        out = super(CisFixedType, cls).check_decoded(obj, typedef)
-        if out:
-            # Check data against strict fixed propertes
-            typedef_fixed = cls.typedef_fixed2base(typedef)
-            out = cls.base().check_decoded(obj, typedef_fixed)
+        out = cls.typedef_base2fixed(metadata)
+        return super(CisFixedType, cls).check_encoded(out, typedef=typedef)
+
+    @classmethod
+    def extract_typedef(cls, metadata):
+        r"""Extract the minimum typedef required for this type from the provided
+        metadata.
+
+        Args:
+            metadata (dict): Message metadata.
+
+        Returns:
+            dict: Encoded type definition with unncessary properties removed.
+
+        """
+        out = cls.typedef_base2fixed(metadata)
+        out = super(CisFixedType, cls).extract_typedef(out)
+        return out
+
+    def update_typedef(self, **kwargs):
+        r"""Update the current typedef with new values.
+
+        Args:
+            **kwargs: All keyword arguments are considered to be new type
+                definitions. If they are a valid definition property, they
+                will be copied to the typedef associated with the instance.
+
+        Returns:
+            dict: A dictionary of keyword arguments that were not added to the
+                type definition.
+
+        """
+        typename = kwargs.get('typename', None)
+        if typename == self.__class__.base().name:
+            kwargs = self.__class__.typedef_base2fixed(kwargs)
+        out = super(CisFixedType, self).update_typedef(**kwargs)
         return out

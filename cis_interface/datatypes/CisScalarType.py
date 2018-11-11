@@ -136,6 +136,7 @@ class CisScalarType(CisBaseType):
         """
         out = dtype2definition(data2dtype(obj))
         out['units'] = units.get_units(obj)
+        out.setdefault('typename', cls.name)
         return out
 
     @classmethod
@@ -168,8 +169,6 @@ class CisScalarType(CisBaseType):
             object: Decoded object.
 
         """
-        if 'type' not in cls.properties:
-            typedef.setdefault('typename', cls.name)
         dtype = definition2dtype(typedef)
         arr = np.fromstring(obj, dtype=dtype)
         if 'shape' in typedef:
@@ -194,8 +193,6 @@ class CisScalarType(CisBaseType):
         typedef0 = cls.encode_type(obj)
         typedef1 = copy.deepcopy(typedef0)
         typedef1.update(**typedef)
-        if 'type' not in cls.properties:
-            typedef1.setdefault('typename', cls.name)
         dtype = definition2dtype(typedef1)
         arr = cls.to_array(obj).astype(dtype)
         out = cls.from_array(arr, typedef0['units'])
