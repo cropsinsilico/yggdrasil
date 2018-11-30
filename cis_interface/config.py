@@ -186,7 +186,7 @@ def update_config(config_file, config_base=None):
         
 # In order read: defaults, user, local files
 if not os.path.isfile(usr_config_file):
-    print('Creating user config file: "%s".' % usr_config_file)
+    logging.info('Creating user config file: "%s".' % usr_config_file)
     update_config(usr_config_file)
 assert(os.path.isfile(usr_config_file))
 assert(os.path.isfile(def_config_file))
