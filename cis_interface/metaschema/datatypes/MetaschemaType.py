@@ -1,15 +1,12 @@
 import copy
 import json
 import jsonschema
-from cis_interface import backwards
+from cis_interface import backwards, metaschema
+from cis_interface.metaschema.datatypes import (
+    MetaschemaTypeError, compare_schema)
 
 
-class CisTypeError(TypeError):
-    r"""Error that should be raised when a class encounters a type it cannot handle."""
-    pass
-
-
-class CisBaseType(object):
+class MetaschemaType(object):
     r"""Base type that should be subclassed by user defined types. Attributes
     should be overwritten to match the type.
 
@@ -21,50 +18,39 @@ class CisBaseType(object):
     Attributes:
         name (str): Name of the type for use in YAML files & form options.
         description (str): A short description of the type.
-        properties (dict): JSON schema definitions for properties of the
-            type.
+        properties (list): List of JSON schema properties that this type uses.
         definition_properties (list): Type properties that are required for YAML
             or form entries specifying the type. These will also be used to
             validate type definitions.
         metadata_properties (list): Type properties that are required for
             deserializing instances of the type that have been serialized.
-        data_schema (dict): JSON schema for validating a JSON friendly
-            representation of the type.
+        python_types (list): List of python types that this type encompasses.
+        specificity (int): Specificity of the type. Types with larger values are
+            more specific while types with smaller values are more general. Base
+            types have a specificity of 0. More specific types are checked first
+            before more general ones.
+        is_fixed (bool): True if the type is a fixed version of another type. See
+            FixedMetaschemaType for details.
 
     """
 
     name = 'base'
     description = 'A generic base type for users to build on.'
-    properties = {}
-    definition_properties = []
-    metadata_properties = []
-    data_schema = {'description': 'JSON friendly version of type instance.',
-                   'type': 'string'}
+    properties = ['type']
+    definition_properties = ['type']
+    metadata_properties = ['type']
+    python_types = []
+    specificity = 0
+    is_fixed = False
     _empty_msg = {}
-    sep = backwards.unicode2bytes(':CIS_TAG:')
-
+    _replaces_existing = False
+    
     def __init__(self, **typedef):
         self._typedef = {}
-        typedef.setdefault('typename', self.name)
+        typedef.setdefault('type', self.name)
         self.update_typedef(**typedef)
 
     # Methods to be overridden by subclasses
-    @classmethod
-    def encode_type(cls, obj):
-        r"""Encode an object's type definition.
-
-        Args:
-            obj (object): Object to encode.
-
-        Raises:
-            CisTypeError: If the object is not the correct type.
-
-        Returns:
-            dict: Encoded type definition.
-
-        """
-        raise NotImplementedError("Method must be overridden by the subclass.")
-
     @classmethod
     def encode_data(cls, obj, typedef):
         r"""Encode an object's data.
@@ -112,6 +98,67 @@ class CisBaseType(object):
 
     # Methods not to be modified by subclasses
     @classmethod
+    def issubtype(cls, t):
+        r"""Determine if this type is a subclass of the provided type.
+
+        Args:
+            t (str): Type name to check against.
+
+        Returns:
+            bool: True if this type is a subtype of the specified type t.
+
+        """
+        return (cls.name == t)
+
+    @classmethod
+    def validate(cls, obj):
+        r"""Validate an object to check if it could be of this type.
+
+        Args:
+            obj (object): Object to validate.
+
+        Returns:
+            bool: True if the object could be of this type, False otherwise.
+
+        """
+        if not cls.python_types:
+            raise NotImplementedError("Attribute 'python_types' must be set.")
+        return isinstance(obj, cls.python_types)
+
+    @classmethod
+    def encode_type(cls, obj, **kwargs):
+        r"""Encode an object's type definition.
+
+        Args:
+            obj (object): Object to encode.
+            **kwargs: Additional keyword arguments are treated as additional
+                schema properties.
+
+        Raises:
+            MetaschemaTypeError: If the object is not the correct type.
+
+        Returns:
+            dict: Encoded type definition.
+
+        """
+        if not cls.python_types:
+            raise NotImplementedError("Attribute 'python_types' must be set.")
+        if not isinstance(obj, cls.python_types):
+            raise MetaschemaTypeError(
+                ("'%s' type objects cannot be encoded as '%s' type. "
+                 + "Must be one of: '%s'")
+                % (type(obj), cls.name, str(cls.python_types)))
+        out = copy.deepcopy(kwargs)
+        for x in cls.properties:
+            if x == 'type':
+                out['type'] = cls.name
+            else:
+                prop_cls = metaschema.properties.get_metaschema_property(x)
+                out[x] = prop_cls.encode(obj)
+                # out[x] = metaschema.properties.get_metaschema_property(x).encode(obj)
+        return out
+
+    @classmethod
     def extract_typedef(cls, metadata):
         r"""Extract the minimum typedef required for this type from the provided
         metadata.
@@ -124,7 +171,7 @@ class CisBaseType(object):
 
         """
         out = copy.deepcopy(metadata)
-        reqkeys = cls.definition_schema()['required']
+        reqkeys = cls.definition_schema().get('required', [])
         keylist = [k for k in out.keys()]
         for k in keylist:
             if k not in reqkeys:
@@ -145,48 +192,60 @@ class CisBaseType(object):
                 type definition.
 
         Raises:
-            CisTypeError: If the current type does not match the type being
+            MetaschemaTypeError: If the current type does not match the type being
                 updated to.
 
         """
-        typename0 = self._typedef.get('typename', None)
-        typename1 = kwargs.get('typename', None)
+        typename0 = self._typedef.get('type', None)
+        typename1 = kwargs.get('type', None)
         # Check typename to make sure this is possible
         if typename1 and typename0 and (typename1 != typename0):
-            raise CisTypeError("Cannot update typedef for type '%s' to be '%s'."
-                               % (typename0, typename1))
+            raise MetaschemaTypeError(
+                "Cannot update typedef for type '%s' to be '%s'."
+                % (typename0, typename1))
         # Copy over valid properties
-        definition_schema = self.__class__.definition_schema()
         all_keys = [k for k in kwargs.keys()]
+        req_keys = self.definition_schema().get('required', [])
         for k in all_keys:
-            if k in definition_schema['properties']:
+            if k in req_keys:
                 self._typedef[k] = kwargs.pop(k)
         # Validate
         self.__class__.validate_definition(self._typedef)
         return kwargs
 
     @classmethod
+    def metaschema(cls):
+        r"""JSON meta schema for validating schemas for this type."""
+        if cls.name == 'base':  # This is patch to allow tests to run
+            out = copy.deepcopy(metaschema.get_metaschema())
+            out['definitions']['simpleTypes']['enum'].append('base')
+        else:
+            out = metaschema.get_metaschema()
+        return out
+
+    @classmethod
+    def validator(cls):
+        r"""JSON schema validator for the meta schema that includes added types."""
+        return metaschema.get_validator()
+
+    @classmethod
     def definition_schema(cls):
-        r"""JSON schema for validating a type definition."""
-        out = {"$schema": "http://json-schema.org/draft-07/schema#",
-               'title': cls.name,
+        r"""JSON schema for validating a type definition schema."""
+        out = {'title': cls.name,
                'description': cls.description,
                'type': 'object',
                'required': copy.deepcopy(cls.definition_properties),
-               'properties': copy.deepcopy(cls.properties)}
-        out['required'] += ['typename']
-        out['properties']['typename'] = {
-            'description': 'Name of the type encoded.',
-            'type': 'string',
-            'enum': [cls.name]}
+               'properties': {'type': {'enum': [cls.name]}}}
         return out
 
     @classmethod
     def metadata_schema(cls):
         r"""JSON schema for validating a JSON serialization of the type."""
-        out = cls.definition_schema()
-        out['required'] = copy.deepcopy(cls.metadata_properties)
-        out['required'] += ['typename']
+        out = {'title': cls.name,
+               'description': cls.description,
+               'type': 'object',
+               'required': copy.deepcopy(cls.metadata_properties),
+               'properties': {'type': {'enum': [cls.name]}}}
         return out
 
     @classmethod
@@ -197,7 +256,8 @@ class CisBaseType(object):
             obj (string): Encoded object to validate.
 
         """
-        jsonschema.validate(obj, cls.metadata_schema())
+        jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
+        jsonschema.validate(obj, cls.metadata_schema(), cls=cls.validator())
 
     @classmethod
     def validate_definition(cls, obj):
@@ -207,23 +267,20 @@ class CisBaseType(object):
             obj (object): Type definition to validate.
 
         """
-        jsonschema.validate(obj, cls.definition_schema())
+        jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
+        jsonschema.validate(obj, cls.definition_schema(), cls=cls.validator())
 
     @classmethod
-    def check_meta_compat(cls, k, v1, v2):
-        r"""Check that two metadata values are compatible.
+    def validate_instance(cls, obj, typedef):
+        r"""Validates an object against a type definition.
 
         Args:
-            k (str): Key for the entry.
-            v1 (object): Value 1.
-            v2 (object): Value 2.
-
-        Returns:
-            bool: True if the two entries are compatible going from v1 to v2,
-                False otherwise.
+            obj (object): Object to validate against a type definition.
+            typedef (dict): Type definition to validate against.
 
         """
-        return (v1 == v2)
+        cls.validate_definition(typedef)
+        jsonschema.validate(obj, typedef, cls=cls.validator())
 
     @classmethod
     def check_encoded(cls, metadata, typedef=None):
@@ -244,19 +301,19 @@ class CisBaseType(object):
         """
         try:
             cls.validate_metadata(metadata)
-        except jsonschema.exceptions.ValidationError:
+        except jsonschema.exceptions.ValidationError as e:
             return False
         if typedef is not None:
             try:
                 cls.validate_definition(typedef)
             except jsonschema.exceptions.ValidationError:
                 return False
-            for k, v in typedef.items():
-                if not cls.check_meta_compat(k, metadata.get(k, None), v):
-                    # print("Incompatible elements: ", k)
-                    # print("    1.", metadata.get(k, None))
-                    # print("    2.", v)
-                    return False
+            errors = [e for e in compare_schema(metadata, typedef)]
+            if errors:
+                # print("Error in comparison")
+                # for e in errors:
+                #     print('\t%s' % e)
+                return False
         return True
 
     @classmethod
@@ -272,13 +329,15 @@ class CisBaseType(object):
             bool: Truth of if the input object is of this type.
 
         """
-        try:
-            datadef = cls.encode_type(obj)
-            datadef['typename'] = cls.name
-        except CisTypeError:
-            # print('CisTypeError in check_decoded', type(obj), obj)
+        if not cls.validate(obj):
             return False
-        return cls.check_encoded(datadef, typedef)
+        if typedef is None:
+            return False
+        try:
+            cls.validate_instance(obj, typedef)
+        except jsonschema.exceptions.ValidationError:
+            return False
+        return True
 
     @classmethod
     def encode(cls, obj, typedef=None):
@@ -307,13 +366,9 @@ class CisBaseType(object):
             raise ValueError("Object is not correct type for encoding.")
         obj_t = cls.transform_type(obj, typedef)
         metadata = cls.encode_type(obj_t)
-        metadata['typename'] = cls.name
         data = cls.encode_data(obj_t, metadata)
         if not cls.check_encoded(metadata, typedef):
             raise ValueError("Object was not encoded correctly.")
-        if not isinstance(data, backwards.bytes_type):
-            raise TypeError("Encoded data must be of type %s, not %s" % (
-                            backwards.bytes_type, type(data)))
         return metadata, data
 
     @classmethod
@@ -355,9 +410,10 @@ class CisBaseType(object):
         """
         metadata, data = self.__class__.encode(obj, self._typedef)
         metadata.update(**kwargs)
+        if 'data' in metadata:
+            raise RuntimeError("Data is a reserved keyword in the metadata.")
+        metadata['data'] = data
         msg = backwards.unicode2bytes(json.dumps(metadata, sort_keys=True))
-        msg += self.sep
-        msg += data
         return msg
     
     def deserialize(self, msg):
@@ -380,9 +436,7 @@ class CisBaseType(object):
             obj = self._empty_msg
             metadata = dict()
         else:
-            if self.sep not in msg:
-                raise ValueError("Separator '%s' not in message." % self.sep)
-            metadata, data = msg.split(self.sep, 1)
-            metadata = json.loads(backwards.bytes2unicode(metadata))
+            metadata = json.loads(backwards.bytes2unicode(msg))
+            data = metadata.pop('data', self._empty_msg)
             obj = self.__class__.decode(metadata, data, self._typedef)
         return obj, metadata

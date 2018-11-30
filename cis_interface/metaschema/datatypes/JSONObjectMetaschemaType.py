@@ -1,20 +1,23 @@
-from cis_interface.datatypes import register_type
-from cis_interface.datatypes.CisContainerBase import CisContainerBase
+from cis_interface.metaschema.datatypes import register_type
+from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
+    ContainerMetaschemaType)
 
 
 @register_type
-class CisMapType(CisContainerBase):
+class JSONObjectMetaschemaType(ContainerMetaschemaType):
     r"""Type associated with a map."""
 
-    name = 'map'
+    name = 'object'
     description = 'A container mapping between keys and values.'
-    properties = {'contents': {
-                  'description': 'Map between keys and type of each value.',
-                  'type': 'object',  # TODO: expansion 'cistype' type
-                  'minProperties': 1}
-                  }
-    _python_types = (dict, )
+    properties = ContainerMetaschemaType.properties + ['properties']
+    definition_properties = ContainerMetaschemaType.definition_properties
+    metadata_properties = ContainerMetaschemaType.metadata_properties + ['properties']
+    python_types = (dict, )
+    _replaces_existing = True
+    
     _container_type = dict
+    _json_type = 'object'
+    _json_property = 'properties'
 
     @classmethod
     def _iterate(cls, container):

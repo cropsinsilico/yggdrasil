@@ -1,30 +1,25 @@
 import copy
 import numpy as np
-import nose.tools as nt
 from cis_interface import units
-from cis_interface.datatypes.tests import test_CisBaseType as parent
-from cis_interface.datatypes.CisScalarType import _valid_types, definition2dtype
+from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as parent
+from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
+    _valid_types)
 
 
-def test_definition2dtype_errors():
-    r"""Check that error raised if type not specified."""
-    nt.assert_raises(KeyError, definition2dtype, {})
-
-
-class TestCisScalarType(parent.TestCisBaseType):
-    r"""Test class for CisScalarType class with float."""
-    _mod = 'CisScalarType'
-    _cls = 'CisScalarType'
+class TestScalarMetaschemaType(parent.TestMetaschemaType):
+    r"""Test class for ScalarMetaschemaType class with float."""
+    _mod = 'ScalarMetaschemaType'
+    _cls = 'ScalarMetaschemaType'
     _prec = 32
     _type = 'float'
     _shape = 1
     _array_contents = None
 
     def __init__(self, *args, **kwargs):
-        super(TestCisScalarType, self).__init__(*args, **kwargs)
+        super(TestScalarMetaschemaType, self).__init__(*args, **kwargs)
         if not self._explicit:
-            self._typedef['type'] = self._type
-        if self._type == 'string':
+            self._typedef['subtype'] = self._type
+        if self._type == 'bytes':
             dtype = 'S%d' % (self._prec // 8)
         elif self._type == 'unicode':
             dtype = 'U%d' % (self._prec // 32)
@@ -36,16 +31,23 @@ class TestCisScalarType(parent.TestCisBaseType):
             self._array = np.array(self._array_contents, dtype)
         if 'Array' not in self._cls:
             self._value = self._array[0]
+            self._invalid_decoded.append(self._array)
         else:
             self._value = self._array
-        self._valid_encoded = [{'typename': self.import_cls.name,
+            if self._array.ndim == 1:
+                self._invalid_decoded.append(self._array[0])
+                self._invalid_decoded.append(np.ones((3, 4), dtype))
+            else:
+                self._invalid_decoded.append(self._array[0][0])
+                self._invalid_decoded.append(self._array[0])
+        self._valid_encoded = [{'type': self.import_cls.name,
                                 'precision': self._prec,
                                 'units': '',
                                 'data': self._value.tobytes()}]
         if not self._explicit:
-            self._valid_encoded[0]['type'] = self._type
+            self._valid_encoded[0]['subtype'] = self._type
         self._valid_decoded = [self._value]
-        if self._type == 'string':
+        if self._type == 'bytes':
             new_dtype = 'S%d' % (self._prec * 2 // 8)
         elif self._type == 'unicode':
             new_dtype = 'U%d' % (self._prec * 2 // 32)
@@ -60,7 +62,7 @@ class TestCisScalarType(parent.TestCisBaseType):
             (self._value, self._value, None)]
         if not self._explicit:
             self._compatible_objects.append(
-                (self._value, self._prec_value, {'type': self._type,
+                (self._value, self._prec_value, {'subtype': self._type,
                                                  'precision': self._prec * 2}))
         else:
             self._compatible_objects.append(
@@ -72,7 +74,7 @@ for t in _valid_types.keys():
     iattr_imp = {'_type': t}
     if t == 'complex':
         iattr_imp['_prec'] = 64
-    elif t in ('string', 'unicode'):
+    elif t in ('bytes', 'unicode'):
         iattr_imp['_array_contents'] = ['one', 'two', 'three']
         max_len = len(max(iattr_imp['_array_contents'], key=len))
         if t == 'unicode':
@@ -80,34 +82,37 @@ for t in _valid_types.keys():
         else:
             iattr_imp['_prec'] = max_len * 8
     iattr_exp = copy.deepcopy(iattr_imp)
-    iattr_exp['_cls'] = 'Cis%sType' % t.title()
+    iattr_exp['_cls'] = '%sMetaschemaType' % t.title()
     iattr_exp['_explicit'] = True
-    cls_imp = type('TestCisScalarType_%s' % t, (TestCisScalarType, ), iattr_imp)
-    cls_exp = type('Test%s' % iattr_exp['_cls'], (TestCisScalarType, ), iattr_exp)
+    cls_imp = type('TestScalarMetaschemaType_%s' % t,
+                   (TestScalarMetaschemaType, ), iattr_imp)
+    cls_exp = type('Test%s' % iattr_exp['_cls'],
+                   (TestScalarMetaschemaType, ), iattr_exp)
     globals()[cls_imp.__name__] = cls_imp
     globals()[cls_exp.__name__] = cls_exp
     del cls_imp, cls_exp
 
 
-class TestCisScalarType_prec(TestCisScalarType):
-    r"""Test class for CisScalarType class with precision."""
+class TestScalarMetaschemaType_prec(TestScalarMetaschemaType):
+    r"""Test class for ScalarMetaschemaType class with precision."""
 
     def __init__(self, *args, **kwargs):
-        super(TestCisScalarType_prec, self).__init__(*args, **kwargs)
+        super(TestScalarMetaschemaType_prec, self).__init__(*args, **kwargs)
         self._typedef['precision'] = self._prec
         self._valid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
-        self._invalid_encoded[-1]['precision'] = self._prec / 2
+        for x in self._invalid_encoded:
+            x['precision'] = self._prec / 2  # compatible precision
         # Version with incorrect precision
         self._invalid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
         self._invalid_encoded[-1]['precision'] = self._prec * 2
         self._invalid_decoded.append(self._prec_value)
 
 
-class TestCisScalarType_units(TestCisScalarType):
-    r"""Test class for CisScalarType class with units."""
+class TestScalarMetaschemaType_units(TestScalarMetaschemaType):
+    r"""Test class for ScalarMetaschemaType class with units."""
 
     def __init__(self, *args, **kwargs):
-        super(TestCisScalarType_units, self).__init__(*args, **kwargs)
+        super(TestScalarMetaschemaType_units, self).__init__(*args, **kwargs)
         self._typedef['units'] = 'cm'
         self._valid_encoded.append(copy.deepcopy(self._valid_encoded[0]))
         self._valid_encoded[-1]['units'] = 'cm'

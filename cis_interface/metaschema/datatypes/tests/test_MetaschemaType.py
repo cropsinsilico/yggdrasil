@@ -1,24 +1,26 @@
+import numpy as np
 import copy
 import nose.tools as nt
 import jsonschema
 from cis_interface import backwards
-from cis_interface.datatypes import CisBaseType
+from cis_interface.metaschema.datatypes import MetaschemaType, MetaschemaTypeError
 from cis_interface.tests import CisTestClassInfo
 
 
-class TestCisBaseType(CisTestClassInfo):
-    r"""Test class for CisBaseType class."""
+class TestMetaschemaType(CisTestClassInfo):
+    r"""Test class for MetaschemaType class."""
 
-    _mod = 'CisBaseType'
-    _cls = 'CisBaseType'
+    _mod = 'MetaschemaType'
+    _cls = 'MetaschemaType'
     _explicit = False
 
     def __init__(self, *args, **kwargs):
-        super(TestCisBaseType, self).__init__(*args, **kwargs)
+        super(TestMetaschemaType, self).__init__(*args, **kwargs)
         self._empty_msg = backwards.unicode2bytes('')
         self._typedef = {}
-        self._valid_encoded = [{'typename': self.import_cls.name,
-                                'data': 'nothing'}]
+        self._valid_encoded = []
+        # {'type': self.import_cls.name,
+        # 'data': 'nothing'}]
         self._invalid_encoded = [{}]
         self._valid_decoded = ['nothing']
         self._invalid_decoded = [None]
@@ -27,13 +29,13 @@ class TestCisBaseType(CisTestClassInfo):
     @property
     def mod(self):
         r"""str: Absolute name of module containing class to be tested."""
-        return 'cis_interface.datatypes.%s' % self._mod
+        return 'cis_interface.metaschema.datatypes.%s' % self._mod
 
     @property
     def typedef(self):
         r"""dict: Type definition."""
         out = copy.deepcopy(self._typedef)
-        out['typename'] = self.import_cls.name
+        out['type'] = self.import_cls.name
         return out
 
     @property
@@ -43,7 +45,20 @@ class TestCisBaseType(CisTestClassInfo):
 
     def assert_result_equal(self, x, y):
         r"""Assert that serialized/deserialized objects equal."""
-        nt.assert_equal(x, y)
+        if isinstance(x, dict):
+            for k in x.keys():
+                assert(k in y)
+                self.assert_result_equal(x[k], y[k])
+            for k in y.keys():
+                assert(k in x)
+        elif isinstance(x, (list, tuple)):
+            assert(len(x) == len(y))
+            for ix, iy in zip(x, y):
+                self.assert_result_equal(ix, iy)
+        elif isinstance(x, np.ndarray):
+            np.testing.assert_array_equal(x, y)
+        else:
+            nt.assert_equal(x, y)
 
     def test_fixed2base(self):
         r"""Test conversion of type definition from fixed type to the base."""
@@ -51,7 +66,7 @@ class TestCisBaseType(CisTestClassInfo):
             t1 = self.typedef
             x1 = self.import_cls.typedef_fixed2base(t1)
             t2 = copy.deepcopy(x1)
-            t2['typename'] = t1['typename']
+            t2['type'] = t1['type']
             x2 = self.import_cls.typedef_fixed2base(t2)
             nt.assert_equal(x1, x2)
             y = self.import_cls.typedef_base2fixed(x1)
@@ -59,13 +74,14 @@ class TestCisBaseType(CisTestClassInfo):
 
     def test_extract_typedef(self):
         r"""Test extract_typedef."""
-        self.import_cls.extract_typedef(self._valid_encoded[0])
+        if len(self._valid_encoded) > 0:
+            self.import_cls.extract_typedef(self._valid_encoded[0])
 
     def test_update_typedef(self):
         r"""Test update_typedef raises error on non-matching typename."""
         self.instance.update_typedef(**self.typedef)
-        nt.assert_raises(CisBaseType.CisTypeError, self.instance.update_typedef,
-                         typename='invalid')
+        nt.assert_raises(MetaschemaTypeError, self.instance.update_typedef,
+                         type='invalid')
         if self._explicit:
             typedef_base = self.import_cls.typedef_fixed2base(self.typedef)
             self.instance.update_typedef(**typedef_base)
@@ -84,7 +100,7 @@ class TestCisBaseType(CisTestClassInfo):
 
     def test_encode_data(self):
         r"""Test encode/decode data & type."""
-        if self._cls == 'CisBaseType':
+        if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
                 nt.assert_raises(NotImplementedError, self.import_cls.encode_type, x)
                 nt.assert_raises(NotImplementedError, self.import_cls.encode_data,
@@ -102,8 +118,9 @@ class TestCisBaseType(CisTestClassInfo):
     def test_check_encoded(self):
         r"""Test check_encoded."""
         # Test invalid for incorrect typedef
-        nt.assert_equal(self.import_cls.check_encoded(self._valid_encoded[0],
-                                                      {}), False)
+        if len(self._valid_encoded) > 0:
+            nt.assert_equal(self.import_cls.check_encoded(self._valid_encoded[0],
+                                                          {}), False)
         # Test valid
         for x in self._valid_encoded:
             nt.assert_equal(self.import_cls.check_encoded(x, self.typedef), True)
@@ -114,7 +131,7 @@ class TestCisBaseType(CisTestClassInfo):
     def test_check_decoded(self):
         r"""Test check_decoded."""
         # Not implemented for base class
-        if self._cls == 'CisBaseType':
+        if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
                 nt.assert_raises(NotImplementedError, self.import_cls.check_decoded,
                                  x, self.typedef)
@@ -131,7 +148,7 @@ class TestCisBaseType(CisTestClassInfo):
 
     def test_encode_errors(self):
         r"""Test error on encode."""
-        if self._cls == 'CisBaseType':
+        if self._cls == 'MetaschemaType':
             nt.assert_raises(NotImplementedError, self.import_cls.encode,
                              self._invalid_decoded[0], self.typedef)
         else:
@@ -145,7 +162,7 @@ class TestCisBaseType(CisTestClassInfo):
 
     def test_transform_type(self):
         r"""Test transform_type."""
-        if self._cls == 'CisBaseType':
+        if self._cls == 'MetaschemaType':
             nt.assert_raises(NotImplementedError, self.import_cls.transform_type,
                              None, None)
         else:
@@ -155,7 +172,7 @@ class TestCisBaseType(CisTestClassInfo):
 
     def test_serialize(self):
         r"""Test serialize/deserialize."""
-        if self._cls == 'CisBaseType':
+        if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
                 nt.assert_raises(NotImplementedError, self.instance.serialize, x)
         else:
@@ -178,7 +195,7 @@ class TestCisBaseType(CisTestClassInfo):
         # nt.assert_equal(out, self.instance._empty_msg)
 
 
-class CisErrorType(CisBaseType.CisBaseType):
+class CisErrorType(MetaschemaType.MetaschemaType):
     r"""Class with impropert user defined methods."""
 
     _check_encoded = True
@@ -233,8 +250,3 @@ def test_decode_error_decoded():
     r"""Test error in decode for failed decode_data."""
     nt.assert_raises(ValueError, CisErrorType_decode.decode,
                      {}, backwards.unicode2bytes(''))
-
-
-def test_encode_error_bytes():
-    r"""Test error in encode for encode that dosn't produce bytes."""
-    nt.assert_raises(TypeError, CisErrorType.encode, None)

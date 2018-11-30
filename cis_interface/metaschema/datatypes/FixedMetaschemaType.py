@@ -1,26 +1,53 @@
+import jsonschema
 import copy
-from cis_interface.datatypes import register_type
-from cis_interface.datatypes.CisBaseType import CisBaseType
+from cis_interface.metaschema.datatypes import register_type
+from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
 def create_fixed_type_class(name, description, base, fixed_properties,
-                            target_globals):
+                            target_globals=None, **kwargs):
     r"""Create a fixed class.
 
     Args:
+        name (str); Name of the fixed type.
+        description (str): Description of the fixed type.
+        base (MetaschemaType): Base class that should be used.
+        fixed_properties (dict): Mapping between properties that are fixed
+            and the value they are fixed to.
+        target_globals (dict, optional): Globals dictionary for module where the
+            fixed class should be added. If None, the new class is returned.
+            Defaults to None.
+        **kwargs: Additional keyword arguments are treated as attributes that
+            should be set on the fixed class.
+
+    Returns:
+        str, class: The name of the class created if target_globals is provided,
+            the created class if target_globals is None.
 
     """
     iattr = {'name': name,
              'description': description,
-             'fixed_properties': fixed_properties}
-    new_cls = register_type(type('Cis%sType' % name.title(),
-                                 (CisFixedType, base, ), iattr))
-    target_globals[new_cls.__name__] = new_cls
-    # globals()[new_cls.__name__] = new_cls
-    del new_cls
+             'fixed_properties': fixed_properties,
+             'specificity': base.specificity + 1}
+    iattr.update(kwargs)
+    for k in ['properties', 'definition_properties', 'metadata_properties']:
+        iattr[k] = copy.deepcopy(getattr(base, k))
+        for x in fixed_properties.keys():
+            if x == 'type':
+                continue
+            if x in iattr[k]:
+                iattr[k].remove(x)
+    new_cls = register_type(type('%sMetaschemaType' % name.title(),
+                                 (FixedMetaschemaType, base, ), iattr))
+    if target_globals is not None:
+        target_globals[new_cls.__name__] = new_cls
+        del new_cls
+        return name
+    else:
+        return new_cls
 
 
-class CisFixedType(CisBaseType):
+class FixedMetaschemaType(MetaschemaType):
     r"""Class that should be used to alias another type, but with certain
     properties fixed.
 
@@ -35,6 +62,7 @@ class CisFixedType(CisBaseType):
 
     """
 
+    is_fixed = True
     fixed_properties = {}
 
     @classmethod
@@ -56,12 +84,14 @@ class CisFixedType(CisBaseType):
 
         """
         out = copy.deepcopy(typedef)
-        if out.get('typename', None) == cls.base().name:
+        if cls.base().is_fixed:
+            out = cls.base().typedef_base2fixed(out)
+        if out.get('type', None) == cls.base().name:
             for k, v in cls.fixed_properties.items():
                 if k in out:
                     assert(out[k] == v)
                     del out[k]
-            out['typename'] = cls.name
+            out['type'] = cls.name
         return out
 
     @classmethod
@@ -77,14 +107,54 @@ class CisFixedType(CisBaseType):
 
         """
         out = copy.deepcopy(typedef)
-        if out.get('typename', None) == cls.name:
+        if out.get('type', None) == cls.name:
             for k, v in cls.fixed_properties.items():
+                if (k == 'type') or (k not in cls.base().properties):
+                    continue
                 if k in out:
                     assert(out[k] == v)
                 else:
                     out[k] = v
-            out['typename'] = cls.base().name
+            out['type'] = cls.base().name
+        if cls.base().is_fixed:
+            out = cls.base().typedef_fixed2base(out)
         return out
+
+    @classmethod
+    def issubtype(cls, t):
+        r"""Determine if this type is a subclass of the provided type.
+
+        Args:
+            t (str): Type name to check against.
+
+        Returns:
+            bool: True if this type is a subtype of the specified type t.
+
+        """
+        if super(FixedMetaschemaType, cls).issubtype(t):
+            return True
+        if cls.base().issubtype(t):
+            return True
+        return False
+
+    @classmethod
+    def validate(cls, obj):
+        r"""Validate an object to check if it could be of this type.
+
+        Args:
+            obj (object): Object to validate.
+
+        Returns:
+            bool: True if the object could be of this type, False otherwise.
+
+        """
+        if not super(FixedMetaschemaType, cls).validate(obj):
+            return False
+        try:
+            jsonschema.validate(obj, cls.fixed_properties, cls=cls.validator())
+        except jsonschema.exceptions.ValidationError:
+            return False
+        return True
 
     @classmethod
     def encode_type(cls, obj):
@@ -100,27 +170,8 @@ class CisFixedType(CisBaseType):
             dict: Encoded type definition.
 
         """
-        out = super(CisFixedType, cls).encode_type(obj)
+        out = super(FixedMetaschemaType, cls).encode_type(obj)
         out = cls.typedef_base2fixed(out)
-        return out
-
-    @classmethod
-    def definition_schema(cls):
-        r"""JSON schema for validating a type definition."""
-        out = super(CisFixedType, cls).definition_schema()
-        for k in cls.fixed_properties.keys():
-            if k in out['required']:
-                out['required'].remove(k)
-            del out['properties'][k]
-        return out
-
-    @classmethod
-    def metadata_schema(cls):
-        r"""JSON schema for validating a JSON serialization of the type."""
-        out = super(CisFixedType, cls).metadata_schema()
-        for k in cls.fixed_properties.keys():
-            if k in out['required']:
-                out['required'].remove(k)
         return out
 
     @classmethod
@@ -141,7 +192,7 @@ class CisFixedType(CisBaseType):
 
         """
         out = cls.typedef_base2fixed(metadata)
-        return super(CisFixedType, cls).check_encoded(out, typedef=typedef)
+        return super(FixedMetaschemaType, cls).check_encoded(out, typedef=typedef)
 
     @classmethod
     def extract_typedef(cls, metadata):
@@ -156,7 +207,7 @@ class CisFixedType(CisBaseType):
 
         """
         out = cls.typedef_base2fixed(metadata)
-        out = super(CisFixedType, cls).extract_typedef(out)
+        out = super(FixedMetaschemaType, cls).extract_typedef(out)
         return out
 
     def update_typedef(self, **kwargs):
@@ -172,8 +223,8 @@ class CisFixedType(CisBaseType):
                 type definition.
 
         """
-        typename = kwargs.get('typename', None)
+        typename = kwargs.get('type', None)
         if typename == self.__class__.base().name:
             kwargs = self.__class__.typedef_base2fixed(kwargs)
-        out = super(CisFixedType, self).update_typedef(**kwargs)
+        out = super(FixedMetaschemaType, self).update_typedef(**kwargs)
         return out

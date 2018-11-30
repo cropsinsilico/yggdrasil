@@ -1,27 +1,28 @@
-import json
-import base64
-from cis_interface import backwards
-from cis_interface.datatypes import (get_type_class, complete_typedef,
-                                     guess_type_from_obj)
-from cis_interface.datatypes.CisBaseType import CisBaseType, CisTypeError
+import copy
+from cis_interface.metaschema.datatypes import (
+    get_type_class, complete_typedef, MetaschemaTypeError,
+    encode_type, encode_data)
+from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
-class CisContainerBase(CisBaseType):
+class ContainerMetaschemaType(MetaschemaType):
     r"""Type associated with a container of subtypes."""
 
     name = 'container'
     description = 'A container of other types.'
-    properties = {'contents': {'description': 'Subtypes of container contents.',
-                               'type': 'object',  # TODO: expansion 'cistype' type
-                               'minProperties': 1}}
-    definition_properties = ['contents']
-    metadata_properties = ['contents']
-    _python_types = tuple()
+    python_types = []
+
     _container_type = None
+    _json_type = None
+    _json_property = None
+    _default_items_schema = None
 
     def __init__(self, *args, **kwargs):
         self._typecls = self._container_type()
-        super(CisContainerBase, self).__init__(*args, **kwargs)
+        if self._default_items_schema is not None:
+            kwargs.setdefault(self._json_property,
+                              copy.deepcopy(self._default_items_schema))
+        super(ContainerMetaschemaType, self).__init__(*args, **kwargs)
 
     @classmethod
     def _iterate(cls, container):
@@ -66,6 +67,25 @@ class CisContainerBase(CisBaseType):
         raise NotImplementedError("This must be overwritten by the subclass.")
 
     @classmethod
+    def _get_element(cls, container, index, default):
+        r"""Get an element from the container if it exists, otherwise return
+        the default.
+
+        Args:
+            container (obj): Object that should be returned from.
+            index (obj): Index of element that should be returned.
+            default (obj): Default that should be returned if the index is not
+                in the container.
+
+        Returns:
+            object: Container contents at specified element.
+
+        """
+        if cls._has_element(container, index):
+            return container[index]
+        return default
+
+    @classmethod
     def encode_type(cls, obj):
         r"""Encode an object's type definition.
 
@@ -76,15 +96,19 @@ class CisContainerBase(CisBaseType):
             dict: Encoded type definition.
 
         """
-        if not isinstance(obj, cls._python_types):
-            raise CisTypeError("Only '%s' types can be encoded as this type."
-                               % str(cls._python_types))
-        # Encode subtypes in metadata
-        out = {'contents': cls._container_type()}
-        for k, v in cls._iterate(obj):
-            cls._assign(out['contents'], k,
-                        guess_type_from_obj(v).__class__.encode_type(v))
-        out.setdefault('typename', cls.name)
+        if False:
+            if not isinstance(obj, cls.python_types):
+                raise MetaschemaTypeError(
+                    "Only '%s' types can be encoded as this type."
+                    % str(cls.python_types))
+            # Encode subtypes in metadata
+            out = {'type': cls.name}
+            if cls._json_property in cls.properties:
+                out[cls._json_property] = cls._container_type()
+                for k, v in cls._iterate(obj):
+                    v_encoded = encode_type(v)
+                    cls._assign(out[cls._json_property], k, v_encoded)
+        out = super(ContainerMetaschemaType, cls).encode_type(obj)
         return out
 
     @classmethod
@@ -101,14 +125,11 @@ class CisContainerBase(CisBaseType):
 
         """
         container = cls._container_type()
-        for k, v in cls._iterate(typedef['contents']):
-            vcls = get_type_class(v['typename'])
-            vbytes = vcls.encode_data(obj[k], v)
-            cls._assign(container, k,
-                        base64.encodestring(vbytes).decode('ascii'))
-            # backwards.bytes2unicode(vcls.encode_data(obj[k], v)))
-        bytes = backwards.unicode2bytes(json.dumps(container))
-        return bytes
+        for k, v in cls._iterate(obj):
+            vtypedef = cls._get_element(typedef[cls._json_property], k, None)
+            vbytes = encode_data(v, typedef=vtypedef)
+            cls._assign(container, k, vbytes)
+        return container
 
     @classmethod
     def decode_data(cls, obj, typedef):
@@ -123,11 +144,11 @@ class CisContainerBase(CisBaseType):
             object: Decoded object.
 
         """
-        container = json.loads(backwards.bytes2unicode(obj))
-        for k, v in cls._iterate(typedef['contents']):
-            vcls = get_type_class(v['typename'])
-            vbytes = base64.decodestring(container[k].encode('ascii'))
-            cls._assign(container, k, vcls.decode_data(vbytes, v))
+        container = cls._container_type()
+        for k, v in cls._iterate(obj):
+            vtypedef = cls._get_element(typedef[cls._json_property], k, {})
+            vcls = get_type_class(vtypedef['type'])
+            cls._assign(container, k, vcls.decode_data(v, vtypedef))
         return container
 
     @classmethod
@@ -146,9 +167,12 @@ class CisContainerBase(CisBaseType):
         """
         if typedef is None:
             return obj
-        for k, v in cls._iterate(typedef['contents']):
-            vcls = get_type_class(v['typename'])
-            cls._assign(obj, k, vcls.transform_type(obj[k], typedef=v))
+        if cls._json_property in typedef:
+            for k, v in cls._iterate(obj):
+                if cls._has_element(typedef[cls._json_property], k):
+                    vtype = cls._get_element(typedef[cls._json_property], k, None)
+                    vcls = get_type_class(vtype['type'])  # required
+                    cls._assign(obj, k, vcls.transform_type(obj[k], typedef=vtype))
         return obj
 
     @classmethod
@@ -163,14 +187,15 @@ class CisContainerBase(CisBaseType):
             dict: Encoded type definition with unncessary properties removed.
 
         """
-        out = super(CisContainerBase, cls).extract_typedef(metadata)
-        contents = out['contents']
-        if isinstance(contents, cls._python_types):
-            for k, v in cls._iterate(contents):
-                if 'typename' in v:
-                    vcls = get_type_class(v['typename'])
-                    cls._assign(contents, k, vcls.extract_typedef(v))
-            out['contents'] = contents
+        out = super(ContainerMetaschemaType, cls).extract_typedef(metadata)
+        if cls._json_property in out:
+            contents = out[cls._json_property]
+            if isinstance(contents, cls.python_types):
+                for k, v in cls._iterate(contents):
+                    if 'type' in v:
+                        vcls = get_type_class(v['type'])
+                        cls._assign(contents, k, vcls.extract_typedef(v))
+                out[cls._json_property] = contents
         return out
 
     def update_typedef(self, **kwargs):
@@ -186,9 +211,9 @@ class CisContainerBase(CisBaseType):
                 type definition.
 
         """
-        map = kwargs.get('contents', None)
+        map = kwargs.get(self._json_property, None)
         map_out = self._container_type()
-        if isinstance(map, self._python_types):
+        if isinstance(map, self.python_types):
             for k, v in self._iterate(map):
                 v_typedef = complete_typedef(v)
                 if self._has_element(self._typecls, k):
@@ -196,45 +221,10 @@ class CisContainerBase(CisBaseType):
                                  self._typecls[k].update_typedef(**v_typedef))
                 else:
                     self._assign(self._typecls, k,
-                                 get_type_class(v_typedef['typename'])(**v_typedef))
+                                 get_type_class(v_typedef['type'])(**v_typedef))
                 self._assign(map, k, self._typecls[k]._typedef)
-            kwargs['contents'] = map
-        out = super(CisContainerBase, self).update_typedef(**kwargs)
+            kwargs[self._json_property] = map
+        out = super(ContainerMetaschemaType, self).update_typedef(**kwargs)
         if map_out:
-            out['contents'] = map_out
-        return out
-
-    @classmethod
-    def check_meta_compat(cls, k, v1, v2):
-        r"""Check that two metadata values are compatible.
-
-        Args:
-            k (str): Key for the entry.
-            v1 (object): Value 1.
-            v2 (object): Value 2.
-
-        Returns:
-            bool: True if the two entries are compatible going from v1 to v2,
-                False otherwise.
-
-        """
-        if k == 'contents':
-            assert(isinstance(v1, cls._python_types))
-            assert(isinstance(v2, cls._python_types))
-            if len(v1) != len(v2):
-                return False
-            for kt, vt1 in cls._iterate(v1):
-                vt2 = v2[kt]
-                if ('typename' not in vt1) or ('typename' not in vt2):
-                    return False
-                tcls = get_type_class(vt2['typename'])
-                if not tcls.check_encoded(vt1, vt2):
-                    # print("Encoding for '%s' incorrect" % kt)
-                    # print(tcls)
-                    # print(vt1)
-                    # print(vt2)
-                    return False
-            out = True
-        else:
-            out = super(CisContainerBase, cls).check_meta_compat(k, v1, v2)
+            out[self._json_property] = map_out
         return out

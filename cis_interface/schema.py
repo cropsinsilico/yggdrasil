@@ -8,7 +8,6 @@ import cerberus
 import collections
 from cis_interface.drivers import import_all_drivers
 from cis_interface.communication import import_all_comms
-from cis_interface.datatypes import import_all_types
 
 
 _schema_fname = os.path.abspath(os.path.join(
@@ -68,6 +67,8 @@ def inherit_schema(orig, key, value, **kwargs):
 
 def init_registry():
     r"""Initialize the registries and schema."""
+    from cis_interface.metaschema import (
+        import_all_classes as import_all_types)
     global _registry_complete
     if not _registry_complete:
         import_all_drivers()

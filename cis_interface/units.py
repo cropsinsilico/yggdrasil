@@ -6,6 +6,12 @@ _ureg_unyt = unyt.UnitRegistry()
 _ureg_pint = pint.UnitRegistry()
 _ureg_pint.define('micro_mole = 1e-6 * mole = uMol = umol')
 _use_unyt = True
+if _use_unyt:
+    _unit_quantity = unyt.array.unyt_quantity
+    _unit_array = unyt.array.unyt_array
+else:
+    _unit_quantity = _ureg_pint.Quantity
+    _unit_array = _ureg_pint.Quantity
 
 
 def has_units(obj):
@@ -72,7 +78,10 @@ def add_units(arr, unit_str):
     if is_null_unit(unit_str):
         return arr
     if _use_unyt:
-        out = unyt.unyt_array(arr, unit_str)
+        if isinstance(arr, np.ndarray) and (arr.ndim > 0):
+            out = unyt.unyt_array(arr, unit_str)
+        else:
+            out = unyt.unyt_quantity(arr, unit_str)
     else:
         out = _ureg_pint.Quantity(arr, unit_str)
     return out

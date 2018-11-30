@@ -1,0 +1,103 @@
+{
+	"definitions": {
+		"colors": {
+			"precision": 8,
+			"subtype": "uint",
+			"type": "1darray"
+		},
+		"coords": {
+			"precision": 32,
+			"subtype": "float",
+			"type": "1darray"
+		},
+		"indexes": {
+			"precision": 32,
+			"subtype": "int",
+			"type": "1darray"
+		}
+	},
+	"description": "A mapping container for Ply 3D data.",
+	"properties": {
+		"edge": {
+			"description": "Map of edge properties.",
+			"properties": {
+				"blue": {
+					"$ref": "#/definitions/colors"
+				},
+				"green": {
+					"$ref": "#/definitions/colors"
+				},
+				"red": {
+					"$ref": "#/definitions/colors"
+				},
+				"vertex1": {
+					"$ref": "#/definitions/indexes"
+				},
+				"vertex2": {
+					"$ref": "#/definitions/indexes"
+				}
+			},
+			"required": [
+				"vertex1",
+				"vertex2"
+			],
+			"type": "object"
+		},
+		"face": {
+			"description": "Map of face properties.",
+			"properties": {
+				"vertex_indices": {
+					"items": {
+						"$ref": "#/definitions/indexes"
+					},
+					"type": "array"
+				}
+			},
+			"required": [
+				"vertex_indices"
+			],
+			"type": "object"
+		},
+		"material": {
+			"description": "Map of material properties.",
+			"properties": {},
+			"type": "object"
+		},
+		"vertex": {
+			"description": "Map of vertex properties.",
+			"properties": {
+				"blue": {
+					"$ref": "#/definitions/colors"
+				},
+				"green": {
+					"$ref": "#/definitions/colors"
+				},
+				"red": {
+					"$ref": "#/definitions/colors"
+				},
+				"x": {
+					"$ref": "#/definitions/coords"
+				},
+				"y": {
+					"$ref": "#/definitions/coords"
+				},
+				"z": {
+					"$ref": "#/definitions/coords"
+				}
+			},
+			"required": [
+				"x",
+				"y",
+				"z"
+			],
+			"type": "object"
+		}
+	},
+	"required": [
+		"vertex",
+		"face",
+		"edge"
+	],
+	"title": "ply",
+	"type": "object"
+}
