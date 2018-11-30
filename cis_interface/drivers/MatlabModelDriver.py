@@ -11,7 +11,7 @@ except ImportError:  # pragma: no matlab
           + "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface import backwards, tools, platform
+from cis_interface import backwards, tools, platform, config
 from cis_interface.tools import TimeOut, sleep
 from cis_interface.schema import register_component
 
@@ -78,13 +78,16 @@ def install_matlab_engine():  # pragma: matlab
         print(result)
     
 
-def start_matlab(skip_connect=False):  # pragma: matlab
+def start_matlab(skip_connect=False, timeout=None):  # pragma: matlab
     r"""Start a Matlab shared engine session inside a detached screen
     session.
 
     Args:
         skip_connect (bool, optional): If True, the engine is not connected.
             Defaults to False.
+        timeout (int, optional): Time (in seconds) that should be waited for
+            Matlab to start up. Defaults to None and is set from the config
+            option ('matlab', 'startup_waittime_s').
 
     Returns:
         str: Name of the screen session running matlab.
@@ -95,6 +98,8 @@ def start_matlab(skip_connect=False):  # pragma: matlab
     """
     if not _matlab_installed:  # pragma: no matlab
         raise RuntimeError("Matlab is not installed.")
+    if timeout is None:
+        timeout = float(config.cis_cfg.get('matlab', 'startup_waittime_s', 10))
     old_matlab = set(matlab.engine.find_matlab())
     screen_session = str('cis_matlab' + datetime.today().strftime("%Y%j%H%M%S")
                          + '_%d' % len(old_matlab))
@@ -104,7 +109,7 @@ def start_matlab(skip_connect=False):  # pragma: matlab
                 'matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
                 '-r', '"matlab.engine.shareEngine"']
         subprocess.call(' '.join(args), shell=True)
-        T = TimeOut(10)
+        T = TimeOut(timeout)
         while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0)
                and not T.is_out):
             debug('Waiting for matlab engine to start')
