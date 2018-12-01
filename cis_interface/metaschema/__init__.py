@@ -105,8 +105,6 @@ def get_validator(overwrite=False):
             if v.schema is not None:
                 if (not v._replaces_existing):
                     assert(k not in all_validators)
-                if (not v._replaces_existing) and (k in all_validators):
-                    raise ValueError("Property '%s' already in validators" % v.name)
                 all_validators[k] = v.wrapped_validate
         # Get set of datatypes
         # TODO: This will need to be changed with deprecation in jsonschema

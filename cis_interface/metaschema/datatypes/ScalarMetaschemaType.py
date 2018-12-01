@@ -32,24 +32,11 @@ class ScalarMetaschemaType(MetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if not super(ScalarMetaschemaType, cls).validate(obj):
-            return False
-        if ((isinstance(obj, ScalarMetaschemaProperties._all_python_arrays)
-             and (cls.name not in ['1darray', 'ndarray']))):
-            try:
-                len(obj)
-            except TypeError:
-                pass
-            else:
-                # raise MetaschemaTypeError("Cannot encode array as scalar.")
-                return False
-        try:
+        if super(ScalarMetaschemaType, cls).validate(obj):
             dtype = ScalarMetaschemaProperties.data2dtype(obj)
-        except BaseException as e:
-            return False
-        for k in ScalarMetaschemaProperties._valid_numpy_types:
-            if dtype.name.startswith(k):
-                return True
+            for k in ScalarMetaschemaProperties._valid_numpy_types:
+                if dtype.name.startswith(k):
+                    return True
         return False
         
     @classmethod

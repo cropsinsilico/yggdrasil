@@ -34,3 +34,10 @@ class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
     def test_container_errors(self):
         r"""Test errors on container operations."""
         nt.assert_raises(RuntimeError, self.import_cls._assign, [], 10, None)
+
+    def test_item_dictionary(self):
+        r"""Test dictionary as items value."""
+        x = [1, 2, 3]
+        typedef = {'type': 'array', 'items': {'type': 'int'}}
+        self.import_cls.validate_instance(x, typedef)
+        self.import_cls.encode_data(x, typedef)

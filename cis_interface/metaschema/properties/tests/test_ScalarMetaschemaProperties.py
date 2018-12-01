@@ -4,6 +4,12 @@ from cis_interface import units
 from cis_interface.metaschema.properties import ScalarMetaschemaProperties
 from cis_interface.metaschema.properties.tests import (
     test_MetaschemaProperty as parent)
+from cis_interface.metaschema.datatypes import MetaschemaTypeError
+
+
+def test_data2dtype_errors():
+    r"""Check that error is raised for list, dict, & tuple objects."""
+    nt.assert_raises(MetaschemaTypeError, ScalarMetaschemaProperties.data2dtype, [])
 
 
 def test_definition2dtype_errors():
@@ -23,6 +29,10 @@ class TestSubtypeMetaschemaProperty(parent.TestMetaschemaProperty):
         self._invalid = [(int(1), 'float'), (float(1), 'int')]
         self._valid_compare = [('int', 'int')]
         self._invalid_compare = [('float', 'int')]
+
+    def test_invalid_encode(self):
+        r"""Test invalid encode for object dtype."""
+        nt.assert_raises(MetaschemaTypeError, self.import_cls.encode, object)
 
 
 class TestPrecisionMetaschemaProperty(parent.TestMetaschemaProperty):

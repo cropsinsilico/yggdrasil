@@ -37,7 +37,7 @@ def test_register_metaschema_property():
              {'name': existing_validator, '_validate': fake_validate})
     nt.assert_raises(ValueError, properties.register_metaschema_property, x)
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),
-             {'name': existing_validator, 'validate': fake_validate})
+             {'name': existing_validator, 'schema': {}})
     nt.assert_raises(ValueError, properties.register_metaschema_property, x)
     # Error when property not in existing metaschema
     get_metaschema()  # ensures it has been initialized

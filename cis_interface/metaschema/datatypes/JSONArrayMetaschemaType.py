@@ -1,5 +1,4 @@
-from cis_interface.metaschema.datatypes import register_type, get_type_class
-from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
+from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
@@ -89,52 +88,3 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             return container
         return super(JSONArrayMetaschemaType, cls)._get_element(
             container, index, default)
-        
-    @classmethod
-    def extract_typedef(cls, metadata):
-        r"""Extract the minimum typedef required for this type from the provided
-        metadata.
-
-        Args:
-            metadata (dict): Message metadata.
-
-        Returns:
-            dict: Encoded type definition with unncessary properties removed.
-
-        """
-        out = super(JSONArrayMetaschemaType, cls).extract_typedef(metadata)
-        if (cls._json_property in out) and isinstance(out[cls._json_property], dict):
-            if 'type' in out[cls._json_property]:
-                vcls = get_type_class(out[cls._json_property]['type'])
-                out[cls._json_property] = vcls.extract_typedef(out[cls._json_property])
-        return out
-
-    def update_typedef(self, **kwargs):
-        r"""Update the current typedef with new values.
-
-        Args:
-            **kwargs: All keyword arguments are considered to be new type
-                definitions. If they are a valid definition property, they
-                will be copied to the typedef associated with the instance.
-
-        Returns:
-            dict: A dictionary of keyword arguments that were not added to the
-                type definition.
-
-        """
-        map = kwargs.get(self._json_property, None)
-        map_out = None
-        if isinstance(map, dict) and ('type' in map):
-            if isinstance(self._typecls, MetaschemaType):
-                map_out = self._typecls.update_typedef(**map)
-            elif len(self._typecls) == 0:
-                self._typecls = get_type_class(map['type'])(**map)
-            else:
-                raise Exception("Cannot change from an array of types "
-                                + "to a single type.")
-        elif isinstance(self._typecls, MetaschemaType):
-            raise Exception("Cannot change from a single type to an array.")
-        out = super(JSONArrayMetaschemaType, self).update_typedef(**kwargs)
-        if map_out:
-            out[self._json_property] = map_out
-        return out

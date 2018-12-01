@@ -1,5 +1,6 @@
 import os
 import json
+import copy
 import numpy as np
 from cis_interface import backwards
 from cis_interface.metaschema.datatypes import register_type_from_file, _schema_dir
@@ -8,22 +9,31 @@ from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
 
 
 _schema_file = os.path.join(_schema_dir, 'ply.json')
+_index_type = ('int', 'uint')
+_color_type = ('int', 'uint')
+_coord_type = 'float'
+_index_fmt = '%d'
+_color_fmt = '%d'
+_coord_fmt = '%6.4f'
+_index_conv = np.int32
+_color_conv = np.uint8
+_coord_conv = np.float32
 _map_ply2py = {'char': 'int8', 'uchar': 'uint8',
                'short': 'int16', 'ushort': 'uint16',
                'int': 'int32', 'uint': 'uint32',
                'float': 'float32', 'double': 'float64'}
 _map_py2ply = {v: k for k, v in _map_ply2py.items()}
-_default_element_order = ['vertex', 'face', 'edge', 'material']
-_default_property_order = {'vertex': ['x', 'y', 'z', 'red', 'green', 'blue'],
-                           'face': ['vertex_index'],
-                           'edge': ['vertex1', 'vertex2', 'red', 'green', 'blue'],
-                           'material': ['ambient_red', 'ambient_green',
-                                        'ambient_blue', 'ambient_coeff',
-                                        'diffuse_red', 'diffuse_green',
-                                        'diffuse_blue', 'diffuse_coeff',
-                                        'specular_red', 'specular_green',
-                                        'specular_blue', 'specular_coeff',
-                                        'specular_power']}
+_default_element_order = ['material', 'vertices', 'faces', 'edges']
+_default_property_order = {'vertices': ['x', 'y', 'z', 'red', 'green', 'blue'],
+                           'faces': [],
+                           'edges': ['vertex1', 'vertex2', 'red', 'green', 'blue']}
+# 'materials': ['ambient_red', 'ambient_green',
+#               'ambient_blue', 'ambient_coeff',
+#               'diffuse_red', 'diffuse_green',
+#               'diffuse_blue', 'diffuse_coeff',
+#               'specular_red', 'specular_green',
+#               'specular_blue', 'specular_coeff',
+#               'specular_power']}
 
 
 def create_schema(overwrite=False):
@@ -41,52 +51,98 @@ def create_schema(overwrite=False):
         'title': 'ply',
         'description': 'A mapping container for Ply 3D data.',
         'type': 'object',
-        'required': ['vertex', 'face', 'edge'],  # 'material'],
-        'definitions': {'indexes': {'type': '1darray',
-                                    'subtype': 'int',
-                                    'precision': 32},
-                        'colors': {'type': '1darray',
-                                   'subtype': 'uint',
-                                   'precision': 8},
-                        'coords': {'type': '1darray',
-                                   'subtype': 'float',
-                                   'precision': 32}},
-        'properties': {
+        'required': ['vertices', 'faces'],
+        'definitions': {
+            'index': {'type': ('int', 'uint')},
+            'color': {'type': ('int', 'uint')},
+            'coord': {'type': 'float'},
             'vertex': {
-                'description': 'Map of vertex properties.',
-                'type': 'object', 'properties': {},
-                'required': ['x', 'y', 'z']},
+                'description': 'Map describing a single vertex.',
+                'type': 'object', 'required': ['x', 'y', 'z'],
+                'additionalProperties': False,
+                'properties': {'x': {'type': _coord_type},
+                               'y': {'type': _coord_type},
+                               'z': {'type': _coord_type},
+                               'red': {'type': _color_type},
+                               'blue': {'type': _color_type},
+                               'green': {'type': _color_type}}},
             'face': {
-                'description': 'Map of face properties.',
-                'type': 'object',
+                'description': 'Map describing a single face.',
+                'type': 'object', 'required': ['vertex_index'],
+                'additionalProperties': False,
                 'properties': {
-                    'vertex_indices': {'type': 'array',
-                                       'items': {"$ref": "#/definitions/indexes"}}},
-                'required': ['vertex_indices']},
+                    'vertex_index': {
+                        'type': 'array', 'minItems': 3,
+                        'items': {'type': _index_type}}}},
             'edge': {
-                'description': 'Map of edge properties.',
-                'type': 'object', 'properties': {},
-                'required': ['vertex1', 'vertex2']},
+                'description': 'Vertex indices describing an edge.',
+                'type': 'object', 'required': ['vertex1', 'vertex2'],
+                'additionalProperties': False,
+                'properties': {
+                    'vertex1': {'type': _index_type},
+                    'vertex2': {'type': _index_type},
+                    'red': {'type': _color_type},
+                    'green': {'type': _color_type},
+                    'blue': {'type': _color_type}}}
+            # 'material': {
+            #     'description': 'Map of material parameters.',
+            #     'type': 'object',
+            #     'required': ['ambient_red', 'ambient_green',
+            #                  'ambient_blue', 'ambient_coeff',
+            #                  'diffuse_red', 'diffuse_green',
+            #                  'diffuse_blue', 'diffuse_coeff',
+            #                  'specular_red', 'specular_green',
+            #                  'specular_blue', 'specular_coeff',
+            #                  'specular_power'],
+            #     'properties': {'ambient_red': {'type': _color_type},
+            #                    'ambient_green': {'type': _color_type},
+            #                    'ambient_blue': {'type': _color_type},
+            #                    'ambient_coeff': {'type': _coord_type},
+            #                    'diffuse_red': {'type': _color_type},
+            #                    'diffuse_green': {'type': _color_type},
+            #                    'diffuse_blue': {'type': _color_type},
+            #                    'diffuse_coeff': {'type': _coord_type},
+            #                    'specular_red': {'type': _color_type},
+            #                    'specular_green': {'type': _color_type},
+            #                    'specular_blue': {'type': _color_type},
+            #                    'specular_coeff': {'type': _coord_type},
+            #                    'specular_power': {'type': _coord_type}}}},
+        },
+        'properties': {
             'material': {
-                'description': 'Map of material properties.',
-                'type': 'object', 'properties': {}}}}
-    for x in ['x', 'y', 'z']:
-        schema['properties']['vertex']['properties'][x] = {
-            "$ref": "#/definitions/coords"}
-    for x in ['red', 'green', 'blue']:
-        schema['properties']['vertex']['properties'][x] = {
-            "$ref": "#/definitions/colors"}
-    for x in ['vertex1', 'vertex2']:
-        schema['properties']['edge']['properties'][x] = {
-            "$ref": "#/definitions/indexes"}
-    for x in ['red', 'green', 'blue']:
-        schema['properties']['edge']['properties'][x] = {
-            "$ref": "#/definitions/colors"}
+                'description': 'Name of the material to use.',
+                'type': 'unicode'},
+            # 'materials': {
+            #     'description': 'Array of materials.',
+            #     'type': 'array', 'items': {'$ref': '#/definitions/material'}},
+            'vertices': {
+                'description': 'Array of vertices.',
+                'type': 'array', 'items': {'$ref': '#/definitions/vertex'}},
+            'edges': {
+                'description': 'Array of edges.',
+                'type': 'array', 'items': {'$ref': '#/definitions/edge'}},
+            'faces': {
+                'description': 'Array of faces.',
+                'type': 'array', 'items': {'$ref': '#/definitions/face'}}}}
     with open(_schema_file, 'w') as fd:
         json.dump(schema, fd, sort_keys=True, indent="\t")
 
 
-if not os.path.isfile(_schema_file):
+def get_schema():
+    r"""Return the Ply schema, initializing it if necessary.
+
+    Returns:
+        dict: Ply schema.
+    
+    """
+    if not os.path.isfile(_schema_file):
+        create_schema()
+    with open(_schema_file, 'r') as fd:
+        out = json.load(fd)
+    return out
+
+
+if not os.path.isfile(_schema_file):  # pragma: debug
     create_schema()
     
 
@@ -127,20 +183,327 @@ def translate_ply2py(type_ply):
     return np.dtype(_map_ply2py[type_ply]).type
 
 
-def translate_py2ply(type_py):
-    r"""Get the correpsonding Ply type string for the provided Python type.
+def translate_py2ply(py_obj):
+    r"""Get the correpsonding Ply type string for the provided Python object.
 
     Args:
-        type_py (type): Python type.
+        py_obj (object): Python object.
 
     Returns:
         str: Ply type string.
 
     """
+    type_py = np.array([py_obj]).dtype
     type_np = np.dtype(type_py).name
     if type_np not in _map_py2ply:
         raise ValueError("Could not find ply type string for numpy type '%s'." % type_np)
     return _map_py2ply[type_np]
+
+
+class PlyDict(dict):
+    r"""Enhanced dictionary class for storing Ply information."""
+    
+    def count_elements(self, element_name):
+        r"""Get the count of a certain element in the dictionary.
+
+        Args:
+            element_name (str): Name of the element to count.
+
+        Returns:
+            int: Number of the provided element.
+
+        """
+        if element_name not in self:
+            raise ValueError("'%s' is not a valid property." % element_name)
+        return len(self[element_name])
+
+    @property
+    def mesh(self):
+        r"""list: Vertices for each face in the structure."""
+        mesh = []
+        for i in range(self.count_elements('faces')):
+            imesh = []
+            for f in self['faces']:
+                for v in f['vertex_index']:
+                    imesh += [self['vertices'][v][k] for k in ['x', 'y', 'z']]
+            mesh.append(imesh)
+        return mesh
+
+    @classmethod
+    def from_shape(cls, shape, d, conversion=1.0):  # pragma: lpy
+        r"""Create a ply dictionary from a PlantGL shape and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer): Descritizer.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        out = None
+        d.process(shape)
+        if d.result is not None:
+            out = cls()
+            # Vertices
+            for p in d.result.pointList:
+                new_vert = {}
+                for k in ['x', 'y', 'z']:
+                    new_vert[k] = conversion * getattr(p, k)
+                out['vertices'].append(new_vert)
+            # Colors
+            if d.result.colorPerVertex and d.result.colorList:
+                if d.result.isColorIndexListToDefault():
+                    for i, c in enumerate(d.result.colorList):
+                        for k in ['red', 'green', 'blue']:
+                            out['vertices'][i][k] = getattr(c, k)
+                else:  # pragma: debug
+                    raise Exception("Indexed vertex colors not supported.")
+            # elif not shape.appearance.isAmbientToDefault():
+            #     c = shape.appearance.ambient
+            #     for k in ['red', 'green', 'blue']:
+            #         for v in out['vertices']:
+            #             v[k] = getattr(c, k)
+            # Material
+            if (shape.appearance.name != shape.appearance.DEFAULT_MATERIAL.name):
+                out['material'] = shape.appearance.name
+            # Faces
+            for i3 in d.result.indexList:
+                out['faces'].append({'vertex_index': [i3[0], i3[1], i3[2]]})
+        return out
+
+    @classmethod
+    def from_scene(cls, scene, d=None, conversion=1.0):  # pragma: lpy
+        r"""Create a ply dictionary from a PlantGL scene and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer, optional): Descritizer. Defaults
+                to openalea.plantgl.all.Tesselator.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        if d is None:
+            from openalea.plantgl.all import Tesselator
+            d = Tesselator()
+        out = cls()
+        for k, shapes in scene.todict().items():
+            for shape in shapes:
+                d.clear()
+                iply = cls.from_shape(shape, d, conversion=conversion)
+                if iply is not None:
+                    out.append(iply)
+                d.clear()
+        return out
+
+    def to_scene(self, conversion=1.0, name=None):  # pragma: lpy
+        r"""Create a PlantGL scene from a Ply dictionary.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+        
+
+        """
+        import openalea.plantgl.all as pgl
+        smb_class, args, kwargs = self.to_geom_args(conversion=conversion,
+                                                    name=name)
+        smb = smb_class(*args, **kwargs)
+        if name is not None:
+            smb.setName(name)
+        if self.get('material', None) is not None:
+            mat = pgl.Material(self['material'])
+            shp = pgl.Shape(smb, mat)
+        else:
+            shp = pgl.Shape(smb)
+        if name is not None:
+            shp.setName(name)
+        scn = pgl.Scene([shp])
+        return scn
+
+    def to_geom_args(self, conversion=1.0, name=None):  # pragma: lpy
+        r"""Get arguments for creating a PlantGL geometry.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+            tuple: Class, arguments and keyword arguments for PlantGL geometry.
+
+        """
+        import openalea.plantgl.all as pgl
+        kwargs = dict()
+        # Add vertices
+        obj_points = []
+        obj_colors = []
+        for v in self['vertices']:
+            xarr = conversion * np.array([v[k] for k in ['x', 'y', 'z']])
+            obj_points.append(pgl.Vector3(xarr[0], xarr[1], xarr[2]))
+            c = [v.get(k, None) for k in ['red', 'green', 'blue']]
+            if None not in c:
+                obj_colors.append(pgl.Color4(c[0], c[1], c[2], 1))
+        points = pgl.Point3Array(obj_points)
+        if obj_colors:
+            colors = pgl.Color4Array(obj_colors)
+            kwargs['colorList'] = colors
+            kwargs['colorPerVertex'] = True
+        # Add indices
+        obj_indices = []
+        nind = None
+        index_class = pgl.Index3
+        array_class = pgl.Index3Array
+        smb_class = pgl.TriangleSet
+        for f in self['faces']:
+            if nind is None:
+                nind = len(f['vertex_index'])
+                if nind == 3:
+                    pass
+                else:
+                    raise ValueError("No PlantGL class for faces with %d vertices."
+                                     % nind)
+            else:
+                if len(f['vertex_index']) != nind:
+                    raise ValueError("Faces do not all contain %d vertices." % nind)
+            f_int = [int(_f) for _f in f['vertex_index']]
+            obj_indices.append(index_class(*f_int))
+        indices = array_class(obj_indices)
+        args = (points, indices)
+        return smb_class, args, kwargs
+
+    def append(self, solf):
+        r"""Append new ply information to this dictionary.
+
+        Args:
+            solf (PlyDict): Another ply to append to this one.
+
+        """
+        nvert = self.count_elements('vertices')
+        # Vertex fields
+        self['vertices'] += solf['vertices']
+        # Face fields
+        for f in solf['faces']:
+            self['faces'].append({'vertex_index': [v + nvert for v in
+                                                   f['vertex_index']]})
+        # Edge fields
+        for e in solf['edges']:
+            self['edges'].append({'vertex1': e['vertex1'] + nvert,
+                                  'vertex2': e['vertex2'] + nvert})
+
+    def merge(self, ply_list, no_copy=False):
+        r"""Merge a list of ply dictionaries.
+
+        Args:
+            ply_list (list): Ply dictionaries.
+            no_copy (bool, optional): If True, the current dictionary will be
+                updated, otherwise a copy will be returned with the update.
+                Defaults to False.
+
+        Returns:
+            dict: Merged ply dictionary.
+
+        """
+        if not isinstance(ply_list, list):
+            ply_list = [ply_list]
+        # Merge fields
+        if no_copy:
+            out = self
+        else:
+            out = copy.deepcopy(self)
+        for x in ply_list:
+            out.append(x)
+        return out
+
+    def apply_scalar_map(self, scalar_arr, color_map=None,
+                         vmin=None, vmax=None, scaling='linear',
+                         scale_by_area=False, no_copy=False):
+        r"""Set the color of faces in a 3D object based on a scalar map.
+        This creates a copy unless no_copy is True.
+
+        Args:
+            scalar_arr (arr): Scalar values that should be mapped to colors
+                for each face.
+            color_map (str, optional): The name of the color map that should
+                be used. Defaults to 'plasma'.
+            vmin (float, optional): Value that should map to the minimum of the
+                colormap. Defaults to min(scalar_arr).
+            vmax (float, optional): Value that should map to the maximum of the
+                colormap. Defaults to max(scalar_arr).
+            scaling (str, optional): Scaling that should be used to map the scalar
+                array onto the colormap. Defaults to 'linear'.
+            scale_by_area (bool, optional): If True, the elements of the scalar
+                array will be multiplied by the area of the corresponding face.
+                If True, vmin and vmax should be in terms of the scaled array.
+                Defaults to False.
+            no_copy (bool, optional): If True, the returned object will not be a
+                copy. Defaults to False.
+
+        Returns:
+            dict: Ply with updated vertex colors.
+
+        """
+        from matplotlib import cm
+        from matplotlib import colors as mpl_colors
+        # Scale by area
+        if scale_by_area:
+            scalar_arr = copy.deepcopy(scalar_arr)
+            for i, f in enumerate(self['faces']):
+                fv = f['vertex_index']
+                if len(fv) > 3:
+                    raise NotImplementedError("Area calc not implemented "
+                                              + "for faces above triangle.")
+                v0 = np.array([self['vertices'][fv[0]][k] for k in 'xyz'])
+                v1 = np.array([self['vertices'][fv[1]][k] for k in 'xyz'])
+                v2 = np.array([self['vertices'][fv[2]][k] for k in 'xyz'])
+                a = np.sqrt(np.sum((v0 - v1)**2))
+                b = np.sqrt(np.sum((v1 - v2)**2))
+                c = np.sqrt(np.sum((v2 - v0)**2))
+                s = (a + b + c) / 2.0
+                area = np.sqrt(s * (s - a) * (s - b) * (s - c))
+                scalar_arr[i] = area * scalar_arr[i]
+        # Map vertices onto faces
+        vertex_scalar = [[] for x in self['vertices']]
+        for i in range(len(self['faces'])):
+            for v in self['faces'][i]['vertex_index']:
+                vertex_scalar[v].append(scalar_arr[i])
+        for i in range(len(vertex_scalar)):
+            vertex_scalar[i] = np.mean(vertex_scalar[i])
+        vertex_scalar = np.array(vertex_scalar)
+        if scaling == 'log':
+            vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)
+        # Get color scaling
+        if color_map is None:
+            # color_map = 'summer'
+            color_map = 'plasma'
+        if vmin is None:
+            vmin = vertex_scalar.min()
+        if vmax is None:
+            vmax = vertex_scalar.max()
+        # print(vmin, vmax)
+        cmap = cm.get_cmap(color_map)
+        if scaling == 'log':
+            norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)
+        elif scaling == 'linear':
+            norm = mpl_colors.Normalize(vmin=vmin, vmax=vmax)
+        else:  # pragma: debug
+            raise Exception("Scaling must be 'linear' or 'log'.")
+        m = cm.ScalarMappable(norm=norm, cmap=cmap)
+        # Scale colors
+        vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype('int')[:, :3].tolist()
+        if no_copy:
+            out = self
+        else:
+            out = copy.deepcopy(self)
+        for i, c in enumerate(vertex_colors):
+            for j, k in enumerate(['red', 'green', 'blue']):
+                out['vertices'][i][k] = c[j]
+        return out
 
 
 # The base class could be anything since it is discarded during registration,
@@ -151,8 +514,9 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
     r"""Ply 3D structure map."""
 
     @classmethod
-    def encode_data(cls, obj, typedef, element_order=[], property_order={},
-                    comments=[], newline='\n', plyformat='ascii 1.0'):
+    def encode_data(cls, obj, typedef, element_order=None, property_order=None,
+                    default_rgb=[0, 0, 0], comments=[], newline='\n',
+                    plyformat='ascii 1.0'):
         r"""Encode an object's data.
 
         Args:
@@ -167,6 +531,8 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                 be written to the file. If not provided, the orders are determined
                 based on typical ply files with remaining elements output in sorted
                 order.
+            default_rgb (list, optional): Default color in RGB that should be
+                used for missing colors. Defaults to [0, 0, 0].
             comments (list, optional): List of comments that should be included in
                 the file header. Defaults to lines describing the automated origin
                 of the file.
@@ -179,65 +545,77 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             bytes, str: Serialized message.
 
         """
-        # Default order
-        if not element_order:
+        # Default order to allow user definited elements
+        if element_order is None:
+            element_order = []
             for k in _default_element_order:
-                if k in obj:
+                if (k in obj):
                     element_order.append(k)
             for k in sorted(obj.keys()):
                 if k not in element_order:
                     element_order.append(k)
-        if not property_order:
+        if property_order is None:
+            property_order = {}
             for e in element_order:
+                if e == 'material':
+                    continue
+                assert(isinstance(obj[e], (list, tuple)))
+                if len(obj[e]) == 0:
+                    continue
                 property_order[e] = []
-                for k in _default_property_order[e]:
-                    if k in obj[e]:
-                        property_order[e].append(k)
-                for k in sorted(obj[e].keys()):
+                if e in _default_property_order:
+                    for k in _default_property_order[e]:
+                        if k in obj[e][0]:
+                            property_order[e].append(k)
+                for k in sorted(obj[e][0].keys()):
                     if k not in property_order[e]:
                         property_order[e].append(k)
-        # TODO: validate & set defaults
-        # metadata, data = self.encode(obj, self._typedef)
         # Get information needed
         size_map = {}
         type_map = {}
         for e in element_order:
+            if e == 'material':
+                continue
+            assert(isinstance(obj[e], (list, tuple)))
             type_map[e] = {}
+            size_map[e] = len(obj[e])
+            if len(obj[e]) == 0:
+                continue
             for p in property_order[e]:
-                if e not in size_map:
-                    size_map[e] = len(obj[e][p])
-                assert(len(obj[e][p]) == size_map[e])
-                if isinstance(obj[e][p], np.ndarray):
-                    type_map[e][p] = translate_py2ply(obj[e][p].dtype)
-                elif isinstance(obj[e][p], list):
-                    subtype = translate_py2ply(type(obj[e][p][0][0]))
+                if isinstance(obj[e][0][p], list):
+                    subtype = translate_py2ply(obj[e][0][p][0])
                     type_map[e][p] = 'list uchar %s' % subtype
                 else:
-                    raise ValueError("Cannot determine Ply type for Python type '%s'"
-                                     % type(obj[e][p]))
+                    type_map[e][p] = translate_py2ply(obj[e][0][p])
         # Encode header
         header = ['ply', 'format %s' % plyformat]
         header += ['comment ' + c for c in comments]
         for e in element_order:
-            header.append('element %s %d' % (e, size_map[e]))
-            for p in property_order[e]:
-                header.append('property %s %s' % (type_map[e][p], p))
+            if e == 'material':
+                header += ['comment material: %s' % obj[e]]
+            else:
+                header.append('element %s %d' % (e, size_map[e]))
+                if size_map[e] > 0:
+                    for p in property_order[e]:
+                        header.append('property %s %s' % (type_map[e][p], p))
         header.append('end_header')
         # Encode body
         body = []
         for e in element_order:
-            for i in range(size_map[e]):
+            if (e not in obj) or (e == 'material'):
+                continue
+            for x in obj[e]:
                 iline = ''
                 for p in property_order[e]:
                     if type_map[e][p].startswith('list'):
                         vars = type_map[e][p].split()
-                        ientry = obj[e][p][i]
+                        ientry = x[p]
                         ifmt = translate_ply2fmt(vars[2])
                         iline += translate_ply2fmt(vars[1]) % len(ientry)
-                        for x in ientry:
-                            iline += ifmt % x
+                        for ix in ientry:
+                            iline += ifmt % ix
                     else:
-                        iline += translate_ply2fmt(type_map[e][p]) % obj[e][p][i]
+                        iline += translate_ply2fmt(type_map[e][p]) % x[p]
                 body.append(iline.strip())  # Ensure trailing spaces are removed
         return newline.join(header + body)
 
@@ -268,7 +646,11 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             if line.startswith('format'):
                 metadata['plyformat'] = line.split(maxsplit=1)
             elif line.startswith('comment'):
-                metadata['comments'].append(line.split(maxsplit=1))
+                out = line.split(maxsplit=1)[-1]
+                if out.startswith('material:'):
+                    metadata['element_order'].append('material')
+                    obj['material'] = out.split(maxsplit=1)[-1]
+                metadata['comments'].append(out)
             elif line.startswith('element'):
                 vars = line.split()
                 e = vars[1]
@@ -276,25 +658,24 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                 type_map[e] = {}
                 metadata['element_order'].append(e)
                 metadata['property_order'][e] = []
-                obj[e] = {}
+                obj[e] = []
             elif line.startswith('property'):
                 vars = line.split()
                 p = vars[-1]
                 type_map[e][p] = ' '.join(vars[1:-1])
                 metadata['property_order'][e].append(p)
-                if vars[1] == 'list':
-                    obj[e][p] = []
-                else:
-                    obj[e][p] = np.empty(size_map[e], dtype=translate_ply2py(vars[1]))
             elif 'end_header' in line:
                 headline = i + 1
                 break
         # Parse body
         i = headline
         for e in metadata['element_order']:
+            if e == 'material':
+                continue
             for ie in range(size_map[e]):
                 vars = lines[i].split()
                 iv = 0
+                new = {}
                 for p in metadata['property_order'][e]:
                     if type_map[e][p].startswith('list'):
                         type_vars = type_map[e][p].split()
@@ -306,16 +687,19 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                         for ip in range(count):
                             plist.append(plist_type(vars[iv]))
                             iv += 1
-                        obj[e][p].append(np.array(plist, dtype=plist_type))
+                        new[p] = plist
                     else:
                         prop_type = translate_ply2py(type_map[e][p])
-                        obj[e][p][ie] = prop_type(vars[iv])
+                        new[p] = prop_type(vars[iv])
                         iv += 1
                 assert(iv == len(vars))
+                obj[e].append(new)
                 i += 1
         # Check that all properties filled in
         for e in metadata['element_order']:
+            if e not in metadata['property_order']:
+                continue
             for p in metadata['property_order'][e]:
-                assert(len(obj[e][p]) == size_map[e])
+                assert(len(obj[e]) == size_map[e])
         # Return
         return obj

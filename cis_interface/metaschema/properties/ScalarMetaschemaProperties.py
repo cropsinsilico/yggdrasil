@@ -62,26 +62,6 @@ def data2dtype(data):
     return dtype
 
 
-def dtype2definition(dtype):
-    r"""Get type definition from numpy data type.
-
-    Args:
-        dtype (np.dtype): Numpy data type.
-
-    Returns:
-        dict: Type definition.
-
-    """
-    out = {}
-    for k, v in _valid_types.items():
-        if dtype.name.startswith(v):
-            out['subtype'] = k
-    if 'subtype' not in out:
-        raise MetaschemaTypeError('Cannot find type string for dtype %s' % dtype)
-    out['precision'] = dtype.itemsize * 8  # in bits
-    return out
-
-
 def definition2dtype(props):
     r"""Get numpy data type for a type definition.
 

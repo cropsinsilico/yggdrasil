@@ -155,7 +155,6 @@ class MetaschemaType(object):
             else:
                 prop_cls = metaschema.properties.get_metaschema_property(x)
                 out[x] = prop_cls.encode(obj)
-                # out[x] = metaschema.properties.get_metaschema_property(x).encode(obj)
         return out
 
     @classmethod
@@ -301,7 +300,7 @@ class MetaschemaType(object):
         """
         try:
             cls.validate_metadata(metadata)
-        except jsonschema.exceptions.ValidationError as e:
+        except jsonschema.exceptions.ValidationError:
             return False
         if typedef is not None:
             try:
@@ -322,8 +321,8 @@ class MetaschemaType(object):
 
         Args:
             obj (object): Object to be tested.
-            typedef (dict): Type properties that object should be tested
-                against. If None, this will always return True.
+            typedef (dict, optional): Type properties that object should be tested
+                against. Defaults to None and is not used.
 
         Returns:
             bool: Truth of if the input object is of this type.
@@ -332,7 +331,7 @@ class MetaschemaType(object):
         if not cls.validate(obj):
             return False
         if typedef is None:
-            return False
+            return True
         try:
             cls.validate_instance(obj, typedef)
         except jsonschema.exceptions.ValidationError:

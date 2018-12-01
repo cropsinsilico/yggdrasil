@@ -1,4 +1,3 @@
-import copy
 from cis_interface.metaschema.datatypes import (
     get_type_class, complete_typedef, MetaschemaTypeError,
     encode_type, encode_data)
@@ -15,13 +14,9 @@ class ContainerMetaschemaType(MetaschemaType):
     _container_type = None
     _json_type = None
     _json_property = None
-    _default_items_schema = None
 
     def __init__(self, *args, **kwargs):
         self._typecls = self._container_type()
-        if self._default_items_schema is not None:
-            kwargs.setdefault(self._json_property,
-                              copy.deepcopy(self._default_items_schema))
         super(ContainerMetaschemaType, self).__init__(*args, **kwargs)
 
     @classmethod
@@ -81,9 +76,10 @@ class ContainerMetaschemaType(MetaschemaType):
             object: Container contents at specified element.
 
         """
+        out = default
         if cls._has_element(container, index):
-            return container[index]
-        return default
+            out = container[index]
+        return out
 
     @classmethod
     def encode_type(cls, obj):
@@ -126,7 +122,10 @@ class ContainerMetaschemaType(MetaschemaType):
         """
         container = cls._container_type()
         for k, v in cls._iterate(obj):
-            vtypedef = cls._get_element(typedef[cls._json_property], k, None)
+            if cls._json_property in typedef:
+                vtypedef = cls._get_element(typedef[cls._json_property], k, None)
+            else:
+                vtypedef = None
             vbytes = encode_data(v, typedef=vtypedef)
             cls._assign(container, k, vbytes)
         return container
@@ -167,12 +166,12 @@ class ContainerMetaschemaType(MetaschemaType):
         """
         if typedef is None:
             return obj
-        if cls._json_property in typedef:
-            for k, v in cls._iterate(obj):
-                if cls._has_element(typedef[cls._json_property], k):
-                    vtype = cls._get_element(typedef[cls._json_property], k, None)
-                    vcls = get_type_class(vtype['type'])  # required
-                    cls._assign(obj, k, vcls.transform_type(obj[k], typedef=vtype))
+        # if cls._json_property in typedef:
+        #     for k, v in cls._iterate(obj):
+        #         if cls._has_element(typedef[cls._json_property], k):
+        #             vtype = cls._get_element(typedef[cls._json_property], k, None)
+        #             vcls = get_type_class(vtype['type'])  # required
+        #             cls._assign(obj, k, vcls.transform_type(obj[k], typedef=vtype))
         return obj
 
     @classmethod
@@ -188,14 +187,14 @@ class ContainerMetaschemaType(MetaschemaType):
 
         """
         out = super(ContainerMetaschemaType, cls).extract_typedef(metadata)
-        if cls._json_property in out:
-            contents = out[cls._json_property]
-            if isinstance(contents, cls.python_types):
-                for k, v in cls._iterate(contents):
-                    if 'type' in v:
-                        vcls = get_type_class(v['type'])
-                        cls._assign(contents, k, vcls.extract_typedef(v))
-                out[cls._json_property] = contents
+        # if cls._json_property in out:
+        #     contents = out[cls._json_property]
+        #     if isinstance(contents, cls.python_types):
+        #         for k, v in cls._iterate(contents):
+        #             if 'type' in v:
+        #                 vcls = get_type_class(v['type'])
+        #                 cls._assign(contents, k, vcls.extract_typedef(v))
+        #         out[cls._json_property] = contents
         return out
 
     def update_typedef(self, **kwargs):

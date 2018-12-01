@@ -20,9 +20,20 @@ def test_get_type_class():
     nt.assert_raises(ValueError, datatypes.get_type_class, 'invalid')
 
 
-def test_error_duplicate():
-    r"""Test error in register_type for duplicate."""
+def test_register_type_errors():
+    r"""Test errors in register_type for duplicate."""
     nt.assert_raises(ValueError, datatypes.register_type, ScalarMetaschemaType)
+    fake_prop = type('FakeType', (ScalarMetaschemaType, ),
+                     {'name': 'number'})
+    nt.assert_raises(ValueError, datatypes.register_type, fake_prop)
+    fake_prop = type('FakeType', (ScalarMetaschemaType, ),
+                     {'name': 'new', 'properties': ['invalid']})
+    nt.assert_raises(ValueError, datatypes.register_type, fake_prop)
+
+
+def test_add_type_from_schema_errors():
+    r"""Test errors in add_type_from_schema."""
+    nt.assert_raises(ValueError, datatypes.add_type_from_schema, 'invalid_file')
 
 
 def test_get_type_from_def():
@@ -55,6 +66,7 @@ def test_encode_decode():
         y = datatypes.encode(x)
         z = datatypes.decode(y)
         nt.assert_equal(z, x)
+        datatypes.encode_data(x)
 
 
 def test_compare_schema():

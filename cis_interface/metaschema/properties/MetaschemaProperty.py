@@ -61,7 +61,7 @@ class MetaschemaProperty(object):
 
         """
         if cls._encode is not None:
-            return cls._encode(instance)
+            return cls._encode(cls, instance)
         raise NotImplementedError("Encode method not set.")
     
     @classmethod
@@ -84,7 +84,7 @@ class MetaschemaProperty(object):
         if cls._validate is False:
             return
         elif cls._validate is not None:
-            errors = cls._validate(validator, value, instance, schema) or ()
+            errors = cls._validate(cls, validator, value, instance, schema) or ()
         else:
             for t in cls.types:
                 if validator.is_type(instance, t):
@@ -112,7 +112,7 @@ class MetaschemaProperty(object):
 
         """
         if cls._compare is not None:
-            return cls._compare(prop1, prop2)
+            return cls._compare(cls, prop1, prop2)
         if (prop1 != prop2):
             yield '%s is not equal to %s' % (prop1, prop2)
 

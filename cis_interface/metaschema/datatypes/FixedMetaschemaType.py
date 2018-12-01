@@ -84,8 +84,8 @@ class FixedMetaschemaType(MetaschemaType):
 
         """
         out = copy.deepcopy(typedef)
-        if cls.base().is_fixed:
-            out = cls.base().typedef_base2fixed(out)
+        # if cls.base().is_fixed:
+        #     out = cls.base().typedef_base2fixed(out)
         if out.get('type', None) == cls.base().name:
             for k, v in cls.fixed_properties.items():
                 if k in out:
@@ -116,8 +116,8 @@ class FixedMetaschemaType(MetaschemaType):
                 else:
                     out[k] = v
             out['type'] = cls.base().name
-        if cls.base().is_fixed:
-            out = cls.base().typedef_fixed2base(out)
+        # if cls.base().is_fixed:
+        #     out = cls.base().typedef_fixed2base(out)
         return out
 
     @classmethod
@@ -152,7 +152,8 @@ class FixedMetaschemaType(MetaschemaType):
             return False
         try:
             jsonschema.validate(obj, cls.fixed_properties, cls=cls.validator())
-        except jsonschema.exceptions.ValidationError:
+        except jsonschema.exceptions.ValidationError as e:
+            print(e)
             return False
         return True
 

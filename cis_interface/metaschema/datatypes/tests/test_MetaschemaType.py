@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import pprint
 import nose.tools as nt
 import jsonschema
 from cis_interface import backwards
@@ -25,6 +26,8 @@ class TestMetaschemaType(CisTestClassInfo):
         self._valid_decoded = ['nothing']
         self._invalid_decoded = [None]
         self._compatible_objects = []
+        self._encode_type_kwargs = {}
+        self._encode_data_kwargs = {}
 
     @property
     def mod(self):
@@ -46,18 +49,45 @@ class TestMetaschemaType(CisTestClassInfo):
     def assert_result_equal(self, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         if isinstance(x, dict):
+            if not isinstance(y, dict):  # pragma: debug
+                raise AssertionError("Second variable is not a dictionary.")
             for k in x.keys():
-                assert(k in y)
+                if k not in y:  # pragma: debug
+                    print('x')
+                    pprint.pprint(x)
+                    print('y')
+                    pprint.pprint(y)
+                    raise AssertionError("Key '%s' not in second dictionary." % k)
                 self.assert_result_equal(x[k], y[k])
             for k in y.keys():
-                assert(k in x)
+                if k not in x:  # pragma: debug
+                    print('x')
+                    pprint.pprint(x)
+                    print('y')
+                    pprint.pprint(y)
+                    raise AssertionError("Key '%s' not in first dictionary." % k)
         elif isinstance(x, (list, tuple)):
-            assert(len(x) == len(y))
+            if not isinstance(y, (list, tuple)):  # pragma: debug
+                raise AssertionError("Second variable is not a list or tuple.")
+            if len(x) != len(y):  # pragma: debug
+                print('x')
+                pprint.pprint(x)
+                print('y')
+                pprint.pprint(y)
+                raise AssertionError("Sizes do not match. %d vs. %d"
+                                     % (len(x), len(y)))
             for ix, iy in zip(x, y):
                 self.assert_result_equal(ix, iy)
         elif isinstance(x, np.ndarray):
             np.testing.assert_array_equal(x, y)
         else:
+            if isinstance(y, (dict, list, tuple, np.ndarray)):  # pragma: debug
+                print('x')
+                pprint.pprint(x)
+                print('y')
+                pprint.pprint(y)
+                raise AssertionError("Compared objects are different types. "
+                                     "%s vs. %s" % (type(x), type(y)))
             nt.assert_equal(x, y)
 
     def test_fixed2base(self):
@@ -105,15 +135,15 @@ class TestMetaschemaType(CisTestClassInfo):
                 nt.assert_raises(NotImplementedError, self.import_cls.encode_type, x)
                 nt.assert_raises(NotImplementedError, self.import_cls.encode_data,
                                  x, self.typedef)
-            for x in self._valid_encoded:
-                nt.assert_raises(NotImplementedError, self.import_cls.decode_data,
-                                 x['data'], self.typedef)
+            nt.assert_raises(NotImplementedError, self.import_cls.decode_data, None,
+                             self.typedef)
         else:
             for x in self._valid_decoded:
-                y = self.import_cls.encode_type(x)
-                z = self.import_cls.encode_data(x, y)
+                y = self.import_cls.encode_type(x, **self._encode_type_kwargs)
+                z = self.import_cls.encode_data(x, y, **self._encode_data_kwargs)
                 x2 = self.import_cls.decode_data(z, y)
                 self.assert_result_equal(x2, x)
+            nt.assert_raises(MetaschemaTypeError, self.import_cls.encode_type, None)
 
     def test_check_encoded(self):
         r"""Test check_encoded."""
@@ -136,6 +166,10 @@ class TestMetaschemaType(CisTestClassInfo):
                 nt.assert_raises(NotImplementedError, self.import_cls.check_decoded,
                                  x, self.typedef)
         else:
+            # Test object alone
+            if len(self._valid_decoded) > 0:
+                x = self._valid_decoded[0]
+                nt.assert_equal(self.import_cls.check_decoded(x, None), True)
             # Test valid
             for x in self._valid_decoded:
                 nt.assert_equal(self.import_cls.check_decoded(x, self.typedef), True)
@@ -180,6 +214,12 @@ class TestMetaschemaType(CisTestClassInfo):
                 msg = self.instance.serialize(x)
                 y = self.instance.deserialize(msg)
                 self.assert_result_equal(y[0], x)
+
+    def test_serialize_error(self):
+        r"""Test error when serializing metadata that already contains 'data'."""
+        if (self._cls != 'MetaschemaType') and (len(self._valid_decoded) > 0):
+            nt.assert_raises(RuntimeError, self.instance.serialize,
+                             self._valid_decoded[0], data='something')
 
     def test_deserialize_error(self):
         r"""Test error when deserializing message that is not bytes."""

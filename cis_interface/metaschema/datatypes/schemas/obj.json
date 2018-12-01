@@ -1,14 +1,5 @@
 {
 	"definitions": {
-		"color": {
-			"type": [
-				"int",
-				"uint"
-			]
-		},
-		"coord": {
-			"type": "float"
-		},
 		"curve": {
 			"additionalProperties": false,
 			"description": "Properties of describing a curve.",
@@ -49,7 +40,7 @@
 			"type": "array"
 		},
 		"face": {
-			"description": "Array of vertex, texture, and normal indices describing a line",
+			"description": "Array of vertex, texture, and normal indices describing a face.",
 			"items": {
 				"additionalProperties": false,
 				"properties": {
@@ -80,14 +71,8 @@
 			"minItems": 3,
 			"type": "array"
 		},
-		"index": {
-			"type": [
-				"int",
-				"uint"
-			]
-		},
 		"line": {
-			"description": "Array of vertex indices and texture indices describing a line",
+			"description": "Array of vertex indices and texture indices describing a line.",
 			"items": {
 				"additionalProperties": false,
 				"properties": {
@@ -184,28 +169,30 @@
 				"vertex_indices": {
 					"items": {
 						"additionalProperties": false,
-						"normal_index": {
-							"type": [
-								"int",
-								"uint"
-							]
+						"properties": {
+							"normal_index": {
+								"type": [
+									"int",
+									"uint"
+								]
+							},
+							"texcoord_index": {
+								"type": [
+									"int",
+									"uint"
+								]
+							},
+							"vertex_index": {
+								"type": [
+									"int",
+									"uint"
+								]
+							}
 						},
 						"required": [
 							"vertex_index"
 						],
-						"texcoord_index": {
-							"type": [
-								"int",
-								"uint"
-							]
-						},
-						"type": "object",
-						"vertex_index": {
-							"type": [
-								"int",
-								"uint"
-							]
-						}
+						"type": "object"
 					},
 					"minItems": 2,
 					"type": "array"

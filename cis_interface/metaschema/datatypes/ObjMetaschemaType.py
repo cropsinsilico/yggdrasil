@@ -4,21 +4,15 @@ from cis_interface import backwards
 from cis_interface.metaschema.datatypes import register_type_from_file, _schema_dir
 from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
+from cis_interface.metaschema.datatypes.PlyMetaschemaType import (
+    _index_type, _color_type, _coord_type,
+    _index_conv, _color_conv, _coord_conv,
+    _index_fmt, _color_fmt, _coord_fmt)
+    
 
-
-_index_type = ('int', 'uint')
-_color_type = ('int', 'uint')
-_coord_type = 'float'
-_index_fmt = '%d'
-_float_fmt = '%6.4f'
 _schema_file = os.path.join(_schema_dir, 'obj.json')
-_map_obj2py = {'char': 'int8', 'uchar': 'uint8',
-               'short': 'int16', 'ushort': 'uint16',
-               'int': 'int32', 'uint': 'uint32',
-               'float': 'float32', 'double': 'float64'}
-_map_py2obj = {v: k for k, v in _map_obj2py.items()}
-_default_element_order = ['vertices', 'params', 'normals', 'texcoords',
-                          'lines', 'faces', 'curves', 'curve2Ds', 'surfaces']
+_default_element_order = ['material', 'vertices', 'params', 'normals', 'texcoords',
+                          'points', 'lines', 'faces', 'curves', 'curve2Ds', 'surfaces']
 # TODO: Unclear what standard puts colors after coords and how that is
 # reconciled with the weight (i.e. do colors go before or after weight)
 _default_property_order = {
@@ -26,15 +20,31 @@ _default_property_order = {
     'params': ['u', 'v', 'w'],
     'normals': ['i', 'j', 'k'],
     'texcoords': ['u', 'v', 'w'],
+    'points': 'vertex_indices',
     'lines': ['vertex_index', 'texcoord_index'],
     'faces': ['vertex_index', 'texcoord_index', 'normal_index'],
-    'curves': ['starting_param', 'ending_param', 'vertex_indices'],
-    'curve2Ds': ['param_indices'],
+    'curves': ['starting_param', 'ending_param', ['vertex_indices']],
+    'curve2Ds': 'param_indices',
     'surfaces': ['starting_param_u', 'ending_param_u',
                  'starting_param_v', 'ending_param_v',
                  {'vertex_indices': ['vertex_index', 'texcoord_index', 'normal_index']}]}
-# TODO: ['vertex_index', 'texcoord_index', 'normal_index']
-_map_element2code = {'vertices': 'v', 'params': 'vp', 'normals': 'vn', 'texcoords': 'vt',
+_default_property_formats = {}
+_default_property_converters = {}
+for k in ['x', 'y', 'z', 'u', 'v', 'w', 'i', 'j', 'k',
+          'starting_param', 'ending_param',
+          'starting_param_u', 'ending_param_u',
+          'starting_param_v', 'ending_param_v']:
+    _default_property_formats[k] = _coord_fmt
+    _default_property_converters[k] = _coord_conv
+for k in ['red', 'green', 'blue']:
+    _default_property_formats[k] = _color_fmt
+    _default_property_converters[k] = _color_conv
+for k in ['vertex_index', 'texcoord_index', 'normal_index', 'param_index',
+          'vertex_indices', 'param_indices']:
+    _default_property_formats[k] = _index_fmt
+    _default_property_converters[k] = _index_conv
+_map_element2code = {'material': 'usemtl', 'vertices': 'v',
+                     'params': 'vp', 'normals': 'vn', 'texcoords': 'vt',
                      'points': 'p', 'lines': 'l', 'faces': 'f',
                      'curves': 'curv', 'curve2Ds': 'curv2', 'surfaces': 'surf'}
 _map_code2element = {v: k for k, v in _map_element2code.items()}
@@ -57,9 +67,6 @@ def create_schema(overwrite=False):
         'type': 'object',
         'required': ['vertices', 'faces'],
         'definitions': {
-            'index': {'type': ('int', 'uint')},
-            'color': {'type': ('int', 'uint')},
-            'coord': {'type': 'float'},
             'vertex': {
                 'description': 'Map describing a single vertex.',
                 'type': 'object', 'required': ['x', 'y', 'z'],
@@ -98,7 +105,7 @@ def create_schema(overwrite=False):
                 'items': {'type': _index_type}},
             'line': {
                 'description': ('Array of vertex indices and texture indices '
-                                + 'describing a line'),
+                                + 'describing a line.'),
                 'type': 'array', 'minItems': 2,
                 'items': {'type': 'object', 'required': ['vertex_index'],
                           'additionalProperties': False,
@@ -107,7 +114,7 @@ def create_schema(overwrite=False):
                                'texcoord_index': {'type': _index_type}}}},
             'face': {
                 'description': ('Array of vertex, texture, and normal indices '
-                                + 'describing a line'),
+                                + 'describing a face.'),
                 'type': 'array', 'minItems': 3,
                 'items': {'type': 'object', 'required': ['vertex_index'],
                           'additionalProperties': False,
@@ -146,9 +153,10 @@ def create_schema(overwrite=False):
                         'type': 'array', 'minItems': 2,
                         'items': {'type': 'object', 'required': ['vertex_index'],
                                   'additionalProperties': False,
-                                  'vertex_index': {'type': _index_type},
-                                  'texcoord_index': {'type': _index_type},
-                                  'normal_index': {'type': _index_type}}}}}},
+                                  'properties': {
+                                      'vertex_index': {'type': _index_type},
+                                      'texcoord_index': {'type': _index_type},
+                                      'normal_index': {'type': _index_type}}}}}}},
         'properties': {
             'material': {
                 'description': 'Name of the material to use.',
@@ -187,7 +195,21 @@ def create_schema(overwrite=False):
         json.dump(schema, fd, sort_keys=True, indent="\t")
 
 
-if not os.path.isfile(_schema_file):
+def get_schema():
+    r"""Return the Obj schema, initializing it if necessary.
+
+    Returns:
+        dict: Obj schema.
+    
+    """
+    if not os.path.isfile(_schema_file):
+        create_schema()
+    with open(_schema_file, 'r') as fd:
+        out = json.load(fd)
+    return out
+
+
+if not os.path.isfile(_schema_file):  # pragma: debug
     create_schema()
 
 
@@ -199,18 +221,70 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
     r"""Obj 3D structure map."""
 
     @classmethod
-    def from_ply(cls, ply):
-        r"""Convert a Ply object to an Obj object.
-
-        Args:
-            ply (dict): Ply type object.
-
-        Returns:
-            dict: Obj data container.
-
-        """
-        out = {}
+    def _decode_object_property(cls, values, order):
+        if isinstance(values, (list, tuple)):
+            if not isinstance(order, (list, tuple)):
+                out = [cls._decode_object_property(v, order) for v in values]
+            elif (len(values) > 0) and ('/' in values[0]):
+                out = [cls._decode_object_property(v, order) for v in values]
+            else:
+                out = {}
+                for i, (o, v) in enumerate(zip(order, values)):
+                    if not v:
+                        continue
+                    if isinstance(o, dict):
+                        assert(len(o) == 1)
+                        osub = list(o.keys())[0]
+                        out[osub] = cls._decode_object_property(values[i:], o[osub])
+                        break
+                    elif isinstance(o, (list, tuple)):
+                        assert(len(o) == 1)
+                        osub = o[0]
+                        out[osub] = cls._decode_object_property(values[i:], osub)
+                    else:
+                        out[o] = cls._decode_object_property(v, o)
+        else:
+            if not isinstance(order, (list, tuple)):
+                ftranslate = _default_property_converters[order]
+                out = ftranslate(values)
+            else:
+                assert('/' in values)
+                subvalues = values.split('/')
+                assert(len(order) == len(subvalues))
+                out = cls._decode_object_property(subvalues, order)
         return out
+
+    @classmethod
+    def _encode_object_property(cls, obj, order, req_keys=False):
+        if req_keys:
+            sep = '/'
+        else:
+            sep = ' '
+        plist = []
+        if isinstance(obj, (list, tuple)):
+            for x in obj:
+                plist.append(cls._encode_object_property(x, order, req_keys=True))
+            return sep.join(plist)
+        elif isinstance(obj, dict):
+            for i, k in enumerate(order):
+                if isinstance(k, dict):
+                    assert(len(k) == 1)
+                    ksub = list(k.keys())[0]
+                    if ksub in obj:
+                        plist.append(cls._encode_object_property(obj[ksub], k[ksub]))
+                elif isinstance(k, (list, tuple)):
+                    assert(len(k) == 1)
+                    ksub = k[0]
+                    if ksub in obj:
+                        plist.append(cls._encode_object_property(obj[ksub], ksub))
+                else:
+                    if k in obj:
+                        plist.append(cls._encode_object_property(obj[k], k))
+                    elif req_keys:
+                        plist.append('')
+            return sep.join(plist)
+        else:
+            return _default_property_formats[order] % obj
 
     @classmethod
     def encode_data(cls, obj, typedef, comments=[], newline='\n'):
@@ -235,66 +309,17 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                   '# Generated by cis_interface']
         header += ['# ' + c for c in comments]
         header += ['']
-        if 'material' in obj:
-            header.append('usemtl %s' % obj['material'])
         # Encode body
         body = []
         for e in _default_element_order:
-            if (e in ['material']) or (e not in obj):
+            if (e not in obj):
+                continue
+            if (e == 'material'):
+                body.append('%s %s' % (_map_element2code[e], obj['material']))
                 continue
             for ie in obj[e]:
-                plist = []
-                fmtlist = []
-                if e in ['vertices', 'params', 'normals', 'texcoords']:
-                    for p in _default_property_order[e]:
-                        if p in ie:
-                            plist.append(ie[p])
-                            if p in ['red', 'blue', 'green']:
-                                fmtlist.append(_index_fmt)
-                            else:
-                                fmtlist.append(_float_fmt)
-                elif e in ['lines', 'faces']:
-                    for iie in ie:
-                        vfmtlist = []
-                        for p in _default_property_order[e]:
-                            if p in iie:
-                                plist.append(iie[p])
-                                vfmtlist.append(_index_fmt)
-                            else:
-                                vfmtlist.append('')
-                        fmtlist.append('/'.join(vfmtlist))
-                elif e in ['curves']:
-                    for p in _default_property_order[e]:
-                        if p in ie:
-                            if p == 'vertex_indices':
-                                plist += [x for x in ie[p]]
-                                fmtlist += [_index_fmt for x in ie[p]]
-                            else:
-                                plist.append(ie[p])
-                                fmtlist.append(_float_fmt)
-                elif e in ['curve2Ds']:
-                    plist += [x for x in ie]
-                    fmtlist += [_index_fmt for x in ie]
-                elif e in ['surface']:
-                    for p in _default_property_order[e]:
-                        if p in ie:
-                            if isinstance(p, dict):
-                                assert('vertex_indices' in p)
-                                for iie in ie['vertex_indices']:
-                                    vfmtlist = []
-                                    for vp in p['vertex_indices']:
-                                        if vp in iie:
-                                            plist.append(iie[vp])
-                                            vfmtlist.append(_index_fmt)
-                                        else:
-                                            vfmtlist.append('')
-                                    fmtlist.append('/'.join(vfmtlist))
-                            else:
-                                plist.append(ie[p])
-                                fmtlist.append(_float_fmt)
-                else:
-                    raise ValueError("Unsupported element '%s'" % e)
-                iline = _map_element2code[e] + ' ' + ' '.join(fmtlist) % tuple(plist)
+                ivalue = cls._encode_object_property(ie, _default_property_order[e])
+                iline = '%s %s' % (_map_element2code[e], ivalue)
                 body.append(iline.strip())  # Ensure trailing spaces are removed
         return newline.join(header + body)
 
@@ -324,53 +349,16 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                 continue
             if values[0] not in _map_code2element:
                 raise ValueError("Type code '%s' on line %d not understood"
-                                 % values[0], line_count)
+                                 % (values[0], line_count))
             e = _map_code2element[values[0]]
             if e not in out:
                 out[e] = []
             if e in ['material']:
                 out[e] = values[1]
                 continue
-            elif e in ['vertices', 'params', 'normals', 'texcoords']:
-                new = {}
-                for v, p in zip(values[1:], _default_property_order[e]):
-                    new[p] = float(v)
-                    if p in ['red', 'green', 'blue']:
-                        new[p] = int(new[p])
-            elif e in ['lines', 'faces']:
-                new = []
-                for v in values[1:]:
-                    vnew = {}
-                    for vv, p in zip(v.split('/'), _default_property_order[e]):
-                        if vv:
-                            vnew[p] = int(float(vv))
-                    new.append(vnew)
-            elif e in ['curves']:
-                new = {}
-                for i, (v, p) in enumerate(zip(values[1:], _default_property_order[e])):
-                    if p == 'vertex_indices':
-                        new[p] = [int(float(vv)) for vv in values[1:][i:]]
-                        break
-                    else:
-                        new[p] = float(v)
-            elif e in ['curve2Ds']:
-                new = [int(float(v)) for v in values[1:]]
-            elif e in ['surface']:
-                new = {}
-                for i, (v, p) in enumerate(zip(values[1:], _default_property_order[e])):
-                    if isinstance(p, dict):
-                        assert('vertex_indices' in p)
-                        new['vertex_indices'] = []
-                        for v in values[1:][i:]:
-                            inew = {}
-                            for vv, vp in zip(v.split('/'), p['vertex_indices']):
-                                if vv:
-                                    inew[vp] = int(float(vv))
-                            new['vertex_indices'].append(inew)
-                        break
-                    else:
-                        new[p] = float(v)
-            out[e].append(new)
+            else:
+                out[e].append(
+                    cls._decode_object_property(values[1:], _default_property_order[e]))
         # Return
         # out.update(**metadata)
         return out

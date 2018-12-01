@@ -32,7 +32,7 @@ class TestShapeMetaschemaProperty(parent.TestMetaschemaProperty):
         valid = np.zeros(nele, 'float')
         self._valid = [(valid, nele), (units.add_units(valid, 'cm'), nele)]
         self._invalid = [(valid, (nele[0], nele[1] - 1))]
-        self._valid_compare = [(nele, nele), 
+        self._valid_compare = [(nele, nele),
                                (nele, list(nele))]
         self._invalid_compare = [(nele, nele[::-1]),
                                  (nele, nele[:-1])]

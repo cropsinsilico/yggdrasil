@@ -149,10 +149,10 @@ def import_all_types():
     curr = get_metaschema()
     new_names = []
     for n in names:
-        if n not in curr['definitions']['simpleTypes']['enum']:
+        if n not in curr['definitions']['simpleTypes']['enum']:  # pragma: debug
             reload = True
             new_names.append(n)
-    if reload:
+    if reload:  # pragma: debug
         raise Exception("The metaschema needs to be regenerated to include the "
                         + "following new schemas found in schema files: %s"
                         % new_names)
@@ -236,8 +236,7 @@ def guess_type_from_msg(msg):
     try:
         metadata = json.loads(backwards.bytes2unicode(msg))
         cls = _type_registry[metadata['type']]
-        typedef = cls.extract_typedef(metadata)
-        return cls(**typedef)
+        return cls
     except BaseException:
         raise ValueError("Could not guess type.")
 
@@ -257,9 +256,7 @@ def guess_type_from_obj(obj):
     """
     type_encoder = get_metaschema_property('type')
     cls = get_type_class(type_encoder.encode(obj))
-    metadata = cls.encode_type(obj)
-    typedef = cls.extract_typedef(metadata)
-    return cls(**typedef)
+    return cls
 
 
 def encode_type(obj):
@@ -293,6 +290,9 @@ def encode_data(obj, typedef=None):
         cls = get_type_class(typedef['type'])
     else:
         cls = guess_type_from_obj(obj)
+        if typedef is None:
+            metadata = cls.encode_type(obj)
+            typedef = cls.extract_typedef(metadata)
     return cls.encode_data(obj, typedef=typedef)
 
 
@@ -306,8 +306,11 @@ def encode(obj):
         bytes: Encoded message.
 
     """
-    typedef = guess_type_from_obj(obj)
-    msg = typedef.serialize(obj)
+    cls = guess_type_from_obj(obj)
+    metadata = cls.encode_type(obj)
+    typedef = cls.extract_typedef(metadata)
+    cls_inst = cls(**typedef)
+    msg = cls_inst.serialize(obj)
     return msg
 
 
@@ -321,40 +324,43 @@ def decode(msg):
         object: Decoded Python object.
 
     """
-    typedef = guess_type_from_msg(msg)
-    obj = typedef.deserialize(msg)[0]
+    cls = guess_type_from_msg(msg)
+    metadata = json.loads(backwards.bytes2unicode(msg))
+    typedef = cls.extract_typedef(metadata)
+    cls_inst = cls(**typedef)
+    obj = cls_inst.deserialize(msg)[0]
     return obj
 
 
-def resolve_schema_references(schema, resolver=None):
-    r"""Resolve references within a schema.
-
-    Args:
-        schema (dict): Schema with references to resolve.
-        top_level (dict, optional): Reference to the top level schema.
-
-    Returns:
-        dict: Schema with references replaced with internal references.
-
-    """
-    if resolver is None:
-        if 'definitions' not in schema:
-            return schema
-        out = copy.deepcopy(schema)
-        resolver = jsonschema.RefResolver.from_schema(out)
-    else:
-        out = schema
-    if isinstance(out, dict):
-        if (len(out) == 1) and ('$ref' in out):
-            scope, resolved = resolver.resolve(out['$ref'])
-            out = resolved
-        else:
-            for k, v in out.items():
-                out[k] = resolve_schema_references(v, resolver=resolver)
-    elif isinstance(out, (list, tuple)):
-        for i in range(len(out)):
-            out[i] = resolve_schema_references(out[i])
-    return out
+# def resolve_schema_references(schema, resolver=None):
+#     r"""Resolve references within a schema.
+#
+#     Args:
+#         schema (dict): Schema with references to resolve.
+#         top_level (dict, optional): Reference to the top level schema.
+#
+#     Returns:
+#         dict: Schema with references replaced with internal references.
+#
+#     """
+#     if resolver is None:
+#         if 'definitions' not in schema:
+#             return schema
+#         out = copy.deepcopy(schema)
+#         resolver = jsonschema.RefResolver.from_schema(out)
+#     else:
+#         out = schema
+#     if isinstance(out, dict):
+#         if (len(out) == 1) and ('$ref' in out):
+#             scope, resolved = resolver.resolve(out['$ref'])
+#             out = resolved
+#         else:
+#             for k, v in out.items():
+#                 out[k] = resolve_schema_references(v, resolver=resolver)
+#     elif isinstance(out, (list, tuple)):
+#         for i in range(len(out)):
+#             out[i] = resolve_schema_references(out[i])
+#     return out
 
 
 def compare_schema(schema1, schema2):
@@ -369,8 +375,8 @@ def compare_schema(schema1, schema2):
 
     """
     # TODO: Resolve references
-    schema1 = resolve_schema_references(schema1)
-    schema2 = resolve_schema_references(schema2)
+    # schema1 = resolve_schema_references(schema1)
+    # schema2 = resolve_schema_references(schema2)
     # Convert fixed types to base types
     if ('type' in schema2) and ('type' in schema1):
         type_cls1 = get_type_class(schema1['type'])

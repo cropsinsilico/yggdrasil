@@ -1,40 +1,47 @@
 {
 	"definitions": {
-		"colors": {
-			"precision": 8,
-			"subtype": "uint",
-			"type": "1darray"
+		"color": {
+			"type": [
+				"int",
+				"uint"
+			]
 		},
-		"coords": {
-			"precision": 32,
-			"subtype": "float",
-			"type": "1darray"
+		"coord": {
+			"type": "float"
 		},
-		"indexes": {
-			"precision": 32,
-			"subtype": "int",
-			"type": "1darray"
-		}
-	},
-	"description": "A mapping container for Ply 3D data.",
-	"properties": {
 		"edge": {
-			"description": "Map of edge properties.",
+			"additionalProperties": false,
+			"description": "Vertex indices describing an edge.",
 			"properties": {
 				"blue": {
-					"$ref": "#/definitions/colors"
+					"type": [
+						"int",
+						"uint"
+					]
 				},
 				"green": {
-					"$ref": "#/definitions/colors"
+					"type": [
+						"int",
+						"uint"
+					]
 				},
 				"red": {
-					"$ref": "#/definitions/colors"
+					"type": [
+						"int",
+						"uint"
+					]
 				},
 				"vertex1": {
-					"$ref": "#/definitions/indexes"
+					"type": [
+						"int",
+						"uint"
+					]
 				},
 				"vertex2": {
-					"$ref": "#/definitions/indexes"
+					"type": [
+						"int",
+						"uint"
+					]
 				}
 			},
 			"required": [
@@ -44,45 +51,61 @@
 			"type": "object"
 		},
 		"face": {
-			"description": "Map of face properties.",
+			"additionalProperties": false,
+			"description": "Map describing a single face.",
 			"properties": {
-				"vertex_indices": {
+				"vertex_index": {
 					"items": {
-						"$ref": "#/definitions/indexes"
+						"type": [
+							"int",
+							"uint"
+						]
 					},
+					"minItems": 3,
 					"type": "array"
 				}
 			},
 			"required": [
-				"vertex_indices"
+				"vertex_index"
 			],
 			"type": "object"
 		},
-		"material": {
-			"description": "Map of material properties.",
-			"properties": {},
-			"type": "object"
+		"index": {
+			"type": [
+				"int",
+				"uint"
+			]
 		},
 		"vertex": {
-			"description": "Map of vertex properties.",
+			"additionalProperties": false,
+			"description": "Map describing a single vertex.",
 			"properties": {
 				"blue": {
-					"$ref": "#/definitions/colors"
+					"type": [
+						"int",
+						"uint"
+					]
 				},
 				"green": {
-					"$ref": "#/definitions/colors"
+					"type": [
+						"int",
+						"uint"
+					]
 				},
 				"red": {
-					"$ref": "#/definitions/colors"
+					"type": [
+						"int",
+						"uint"
+					]
 				},
 				"x": {
-					"$ref": "#/definitions/coords"
+					"type": "float"
 				},
 				"y": {
-					"$ref": "#/definitions/coords"
+					"type": "float"
 				},
 				"z": {
-					"$ref": "#/definitions/coords"
+					"type": "float"
 				}
 			},
 			"required": [
@@ -93,10 +116,37 @@
 			"type": "object"
 		}
 	},
+	"description": "A mapping container for Ply 3D data.",
+	"properties": {
+		"edges": {
+			"description": "Array of edges.",
+			"items": {
+				"$ref": "#/definitions/edge"
+			},
+			"type": "array"
+		},
+		"faces": {
+			"description": "Array of faces.",
+			"items": {
+				"$ref": "#/definitions/face"
+			},
+			"type": "array"
+		},
+		"material": {
+			"description": "Name of the material to use.",
+			"type": "unicode"
+		},
+		"vertices": {
+			"description": "Array of vertices.",
+			"items": {
+				"$ref": "#/definitions/vertex"
+			},
+			"type": "array"
+		}
+	},
 	"required": [
-		"vertex",
-		"face",
-		"edge"
+		"vertices",
+		"faces"
 	],
 	"title": "ply",
 	"type": "object"
