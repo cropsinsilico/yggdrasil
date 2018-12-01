@@ -5,7 +5,7 @@ from cis_interface.metaschema.datatypes.tests import (
 
 
 class TestJSONObjectMetaschemaType(parent.TestMetaschemaType):
-    r"""Test class for JSONObjectMetaschemaType class with float."""
+    r"""Test class for JSONObjectMetaschemaType class."""
 
     _mod = 'JSONObjectMetaschemaType'
     _cls = 'JSONObjectMetaschemaType'

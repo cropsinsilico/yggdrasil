@@ -33,6 +33,7 @@
 				"string",
 				"ply",
 				"obj",
+				"schema",
 				"scalar",
 				"int",
 				"uint",
