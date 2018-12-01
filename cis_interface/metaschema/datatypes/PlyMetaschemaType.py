@@ -1,6 +1,7 @@
 import os
 import json
 import copy
+import warnings
 import numpy as np
 from cis_interface import backwards
 from cis_interface.metaschema.datatypes import register_type_from_file, _schema_dir
@@ -123,7 +124,10 @@ def create_schema(overwrite=False):
                 'type': 'array', 'items': {'$ref': '#/definitions/edge'}},
             'faces': {
                 'description': 'Array of faces.',
-                'type': 'array', 'items': {'$ref': '#/definitions/face'}}}}
+                'type': 'array', 'items': {'$ref': '#/definitions/face'}}},
+        'dependencies': {
+            'edges': ['vertices'],
+            'faces': ['vertices']}}
     with open(_schema_file, 'w') as fd:
         json.dump(schema, fd, sort_keys=True, indent="\t")
 
@@ -195,6 +199,9 @@ def translate_py2ply(py_obj):
     """
     type_py = np.array([py_obj]).dtype
     type_np = np.dtype(type_py).name
+    if type_np == 'int64':
+        warnings.warn("Ply dosn't support long. Precision will be lost.")
+        return _map_py2ply['int32']
     if type_np not in _map_py2ply:
         raise ValueError("Could not find ply type string for numpy type '%s'." % type_np)
     return _map_py2ply[type_np]
@@ -703,3 +710,27 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                 assert(len(obj[e]) == size_map[e])
         # Return
         return obj
+
+    @classmethod
+    def updated_fixed_properties(cls, obj):
+        r"""Get a version of the fixed properties schema that includes information
+        from the object.
+
+        Args:
+            obj (object): Object to use to put constraints on the fixed properties
+                schema.
+
+        Returns:
+            dict: Fixed properties schema with object dependent constraints.
+
+        """
+        out = super(PlyMetaschemaType, cls).updated_fixed_properties(obj)
+        # Constrain indices on number of elements they refer to
+        if isinstance(obj, dict) and ('vertices' in obj):
+            nvert = len(obj['vertices'])
+            out['definitions']['face']['properties']['vertex_index']['items'][
+                'maximum'] = nvert - 1
+            for k in ['vertex1', 'vertex2']:
+                out['definitions']['edge']['properties'][k][
+                    'maximum'] = nvert - 1
+        return out

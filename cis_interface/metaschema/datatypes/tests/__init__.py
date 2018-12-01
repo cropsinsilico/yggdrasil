@@ -6,16 +6,32 @@ from cis_interface.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
 
 
-_valid_objects = [backwards.bytes2unicode('hello'),
-                  backwards.unicode2bytes('hello'),
-                  float(1), int(1), np.uint(1), complex(1, 1),
-                  {'a': 'hello'}, ['hello', 1]]
+def test_func():  # pragma: debug
+    pass
+
+
+_valid_objects = {'unicode': backwards.bytes2unicode('hello'),
+                  'bytes': backwards.unicode2bytes('hello'),
+                  'float': float(1), 'int': int(1),
+                  'uint': np.uint(1), 'complex': complex(1, 1),
+                  'object': {'a': 'hello'}, 'array': ['hello', 1],
+                  'ply': {'vertices': [{k: 0.0 for k in 'xyz'},
+                                       {k: 0.0 for k in 'xyz'},
+                                       {k: 0.0 for k in 'xyz'}],
+                          'faces': [{'vertex_index': [0, 1, 2]}]},
+                  'obj': {'vertices': [{k: 0.0 for k in 'xyz'},
+                                       {k: 0.0 for k in 'xyz'},
+                                       {k: 0.0 for k in 'xyz'}],
+                          'faces': [[{'vertex_index': 0},
+                                     {'vertex_index': 1},
+                                     {'vertex_index': 2}]]},
+                  'schema': {'type': 'string'},
+                  'function': test_func}
 
 
 def test_get_type_class():
     r"""Test get_type_class."""
-    valid_types = ['scalar', '1darray', 'ndarray']
-    for v in valid_types:
+    for v in _valid_objects.keys():
         datatypes.get_type_class(v)
     nt.assert_raises(ValueError, datatypes.get_type_class, 'invalid')
 
@@ -53,16 +69,16 @@ def test_guess_type_from_msg():
 
 def test_guess_type_from_obj():
     r"""Test guess_type_from_obj."""
-    invalid_objects = [ScalarMetaschemaType]
-    for x in _valid_objects:
-        datatypes.guess_type_from_obj(x)
+    invalid_objects = [object, object()]
+    for t, x in _valid_objects.items():
+        nt.assert_equal(datatypes.guess_type_from_obj(x).name, t)
     for x in invalid_objects:
         nt.assert_raises(datatypes.MetaschemaTypeError, datatypes.guess_type_from_obj, x)
 
 
 def test_encode_decode():
     r"""Test encode/decode for valid objects."""
-    for x in _valid_objects:
+    for x in _valid_objects.values():
         y = datatypes.encode(x)
         z = datatypes.decode(y)
         nt.assert_equal(z, x)

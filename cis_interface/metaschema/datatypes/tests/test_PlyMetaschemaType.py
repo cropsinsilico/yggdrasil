@@ -161,6 +161,8 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
                                {'vertices': [], 'faces': [],
                                 'alt_verts': copy.deepcopy(_test_value['vertices'])}]
         self._invalid_encoded = [{}]
+        self._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
+                                  'faces': [{'vertex_index': [0, 1, 2]}]}]
         self._compatible_objects = [(self._value, self._value, None)]
         self._encode_data_kwargs = {'comments': ['Test comment']}
 

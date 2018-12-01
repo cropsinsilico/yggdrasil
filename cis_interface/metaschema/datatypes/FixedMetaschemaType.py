@@ -138,6 +138,21 @@ class FixedMetaschemaType(MetaschemaType):
         return False
 
     @classmethod
+    def updated_fixed_properties(cls, obj):
+        r"""Get a version of the fixed properties schema that includes information
+        from the object.
+
+        Args:
+            obj (object): Object to use to put constraints on the fixed properties
+                schema.
+
+        Returns:
+            dict: Fixed properties schema with object dependent constraints.
+
+        """
+        return copy.deepcopy(cls.fixed_properties)
+
+    @classmethod
     def validate(cls, obj):
         r"""Validate an object to check if it could be of this type.
 
@@ -151,9 +166,10 @@ class FixedMetaschemaType(MetaschemaType):
         if not super(FixedMetaschemaType, cls).validate(obj):
             return False
         try:
-            jsonschema.validate(obj, cls.fixed_properties, cls=cls.validator())
-        except jsonschema.exceptions.ValidationError as e:
-            print(e)
+            jsonschema.validate(obj, cls.updated_fixed_properties(obj),
+                                cls=cls.validator())
+        except jsonschema.exceptions.ValidationError:
+            # print(e)
             return False
         return True
 

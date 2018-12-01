@@ -69,6 +69,24 @@ class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
         self._valid_encoded = [self._fulldef]
         self._valid_decoded = [self._value,
                                {'vertices': self._value['vertices'],
-                                'faces': self._value['faces']}]
+                                'faces': [[{'vertex_index': 0},
+                                           {'vertex_index': 1},
+                                           {'vertex_index': 2}]]}]
         self._invalid_encoded = [{}]
+        self._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
+                                  'faces': [[{'vertex_index': 0},
+                                             {'vertex_index': 1},
+                                             {'vertex_index': 2}]]},
+                                 {'vertices': [], 'faces': None,
+                                  'lines': [[None]],
+                                  'surfaces': [{'vertex_indices': [[]]}]},
+                                 {'vertices': self._value['vertices'],
+                                  'texcoords': self._value['texcoords'],
+                                  'normals': self._value['normals'],
+                                  'faces': [[{'vertex_index': 0,
+                                              'texcoord_index': 100,
+                                              'normal_index': 100},
+                                             {'vertex_index': 1},
+                                             {'vertex_index': 2}]]},
+                                 None]
         self._compatible_objects = [(self._value, self._value, None)]

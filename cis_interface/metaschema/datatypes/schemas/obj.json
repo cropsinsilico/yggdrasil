@@ -272,6 +272,23 @@
 			"type": "object"
 		}
 	},
+	"dependencies": {
+		"curve2Ds": [
+			"params"
+		],
+		"curves": [
+			"vertices"
+		],
+		"faces": [
+			"vertices"
+		],
+		"lines": [
+			"vertices"
+		],
+		"surfaces": [
+			"vertices"
+		]
+	},
 	"description": "A mapping container for Obj 3D data.",
 	"properties": {
 		"curve2Ds": {

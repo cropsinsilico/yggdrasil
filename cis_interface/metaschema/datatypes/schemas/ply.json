@@ -116,6 +116,14 @@
 			"type": "object"
 		}
 	},
+	"dependencies": {
+		"edges": [
+			"vertices"
+		],
+		"faces": [
+			"vertices"
+		]
+	},
 	"description": "A mapping container for Ply 3D data.",
 	"properties": {
 		"edges": {

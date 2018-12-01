@@ -141,13 +141,9 @@ class MetaschemaType(object):
             dict: Encoded type definition.
 
         """
-        if not cls.python_types:
-            raise NotImplementedError("Attribute 'python_types' must be set.")
-        if not isinstance(obj, cls.python_types):
-            raise MetaschemaTypeError(
-                ("'%s' type objects cannot be encoded as '%s' type. "
-                 + "Must be one of: '%s'")
-                % (type(obj), cls.name, str(cls.python_types)))
+        if not cls.validate(obj):
+            raise MetaschemaTypeError("Object could not be encoded as '%s' type."
+                                      % cls.name)
         out = copy.deepcopy(kwargs)
         for x in cls.properties:
             if x == 'type':

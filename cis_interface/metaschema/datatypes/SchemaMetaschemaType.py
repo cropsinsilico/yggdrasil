@@ -1,3 +1,5 @@
+import copy
+import jsonschema
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
@@ -12,6 +14,7 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
     properties = ['type']
     definition_properties = ['type']
     metadata_properties = ['type']
+    specificity = JSONObjectMetaschemaType.specificity + 1
 
     @classmethod
     def encode_data(cls, obj, typedef):
@@ -58,3 +61,24 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
 
         """
         return obj
+
+    @classmethod
+    def validate(cls, obj):
+        r"""Validate an object to check if it could be of this type.
+
+        Args:
+            obj (object): Object to validate.
+
+        Returns:
+            bool: True if the object could be of this type, False otherwise.
+
+        """
+        if not super(SchemaMetaschemaType, cls).validate(obj):
+            return False
+        try:
+            x = copy.deepcopy(cls.metaschema())
+            x['additionalProperties'] = False
+            jsonschema.validate(obj, x, cls=cls.validator())
+        except jsonschema.exceptions.ValidationError:
+            return False
+        return True

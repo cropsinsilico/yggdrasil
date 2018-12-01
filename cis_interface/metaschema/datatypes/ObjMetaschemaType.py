@@ -28,6 +28,8 @@ _default_property_order = {
     'surfaces': ['starting_param_u', 'ending_param_u',
                  'starting_param_v', 'ending_param_v',
                  {'vertex_indices': ['vertex_index', 'texcoord_index', 'normal_index']}]}
+_index_properties = ['vertex_indices', 'vertex_index', 'texcoord_index',
+                     'normal_index', 'param_indices']
 _default_property_formats = {}
 _default_property_converters = {}
 for k in ['x', 'y', 'z', 'u', 'v', 'w', 'i', 'j', 'k',
@@ -190,7 +192,13 @@ def create_schema(overwrite=False):
                 'type': 'array', 'items': {'$ref': '#/definitions/curve2D'}},
             'surfaces': {
                 'description': 'Array of surfaces.',
-                'type': 'array', 'items': {'$ref': '#/definitions/surface'}}}}
+                'type': 'array', 'items': {'$ref': '#/definitions/surface'}}},
+        'dependencies': {
+            'lines': ['vertices'],
+            'faces': ['vertices'],
+            'curves': ['vertices'],
+            'curve2Ds': ['params'],
+            'surfaces': ['vertices']}}
     with open(_schema_file, 'w') as fd:
         json.dump(schema, fd, sort_keys=True, indent="\t")
 
@@ -219,40 +227,6 @@ if not os.path.isfile(_schema_file):  # pragma: debug
 @register_type_from_file(_schema_file)
 class ObjMetaschemaType(JSONObjectMetaschemaType):
     r"""Obj 3D structure map."""
-
-    @classmethod
-    def _decode_object_property(cls, values, order):
-        if isinstance(values, (list, tuple)):
-            if not isinstance(order, (list, tuple)):
-                out = [cls._decode_object_property(v, order) for v in values]
-            elif (len(values) > 0) and ('/' in values[0]):
-                out = [cls._decode_object_property(v, order) for v in values]
-            else:
-                out = {}
-                for i, (o, v) in enumerate(zip(order, values)):
-                    if not v:
-                        continue
-                    if isinstance(o, dict):
-                        assert(len(o) == 1)
-                        osub = list(o.keys())[0]
-                        out[osub] = cls._decode_object_property(values[i:], o[osub])
-                        break
-                    elif isinstance(o, (list, tuple)):
-                        assert(len(o) == 1)
-                        osub = o[0]
-                        out[osub] = cls._decode_object_property(values[i:], osub)
-                    else:
-                        out[o] = cls._decode_object_property(v, o)
-        else:
-            if not isinstance(order, (list, tuple)):
-                ftranslate = _default_property_converters[order]
-                out = ftranslate(values)
-            else:
-                assert('/' in values)
-                subvalues = values.split('/')
-                assert(len(order) == len(subvalues))
-                out = cls._decode_object_property(subvalues, order)
-        return out
 
     @classmethod
     def _encode_object_property(cls, obj, order, req_keys=False):
@@ -284,7 +258,48 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                         plist.append('')
             return sep.join(plist)
         else:
-            return _default_property_formats[order] % obj
+            if order in _index_properties:
+                # Add one at write to indexes as .obj is not zero indexed
+                return _default_property_formats[order] % (obj + 1)
+            else:
+                return _default_property_formats[order] % obj
+
+    @classmethod
+    def _decode_object_property(cls, values, order):
+        if isinstance(values, (list, tuple)):
+            if not isinstance(order, (list, tuple)):
+                out = [cls._decode_object_property(v, order) for v in values]
+            elif (len(values) > 0) and ('/' in values[0]):
+                out = [cls._decode_object_property(v, order) for v in values]
+            else:
+                out = {}
+                for i, (o, v) in enumerate(zip(order, values)):
+                    if not v:
+                        continue
+                    if isinstance(o, dict):
+                        assert(len(o) == 1)
+                        osub = list(o.keys())[0]
+                        out[osub] = cls._decode_object_property(values[i:], o[osub])
+                        break
+                    elif isinstance(o, (list, tuple)):
+                        assert(len(o) == 1)
+                        osub = o[0]
+                        out[osub] = cls._decode_object_property(values[i:], osub)
+                    else:
+                        out[o] = cls._decode_object_property(v, o)
+        else:
+            if not isinstance(order, (list, tuple)):
+                ftranslate = _default_property_converters[order]
+                out = ftranslate(values)
+                if order in _index_properties:
+                    # Subtract 1 from indexes because .obj is not zero indexed
+                    out -= 1
+            else:
+                assert('/' in values)
+                subvalues = values.split('/')
+                assert(len(order) == len(subvalues))
+                out = cls._decode_object_property(subvalues, order)
+        return out
 
     @classmethod
     def encode_data(cls, obj, typedef, comments=[], newline='\n'):
@@ -361,4 +376,73 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                     cls._decode_object_property(values[1:], _default_property_order[e]))
         # Return
         # out.update(**metadata)
+        return out
+
+    @classmethod
+    def updated_fixed_properties(cls, obj):
+        r"""Get a version of the fixed properties schema that includes information
+        from the object.
+
+        Args:
+            obj (object): Object to use to put constraints on the fixed properties
+                schema.
+
+        Returns:
+            dict: Fixed properties schema with object dependent constraints.
+
+        """
+        out = super(ObjMetaschemaType, cls).updated_fixed_properties(obj)
+        # Constrain dependencies for indexes into other elements
+        depend_map = {'vertex_index': 'vertices', 'vertex_indices': 'vertices',
+                      'texcoord_index': 'texcoords',
+                      'normal_index': 'normals'}
+        check_depends = {'lines': ['texcoord_index'],
+                         'faces': ['texcoord_index', 'normal_index'],
+                         'surfaces:vertex_indices': ['texcoord_index', 'normal_index']}
+        for e, props in check_depends.items():
+            sube = None
+            if ':' in e:
+                e, sube = e.split(':')
+            if not ((e in obj) and isinstance(obj[e], (list, tuple))):
+                continue
+            req_flags = {k: False for k in props}
+            for o in obj[e]:
+                if sum(req_flags.values()) == len(props):
+                    break
+                if isinstance(o, dict):
+                    assert(sube)
+                    if (((sube not in o) or (not isinstance(o[sube], (list, tuple)))
+                         or (len(o[sube]) == 0) or (not isinstance(o[sube][0], dict)))):
+                        continue
+                    for p in props:
+                        if p in o[sube][0]:
+                            req_flags[p] = True
+                elif isinstance(o, (list, tuple)):
+                    if (len(o) == 0) or (not isinstance(o[0], dict)):
+                        continue
+                    for p in props:
+                        if p in o[0]:
+                            req_flags[p] = True
+            # Set dependencies
+            for p in req_flags.keys():
+                if not req_flags[p]:
+                    continue
+                if depend_map[p] not in out['dependencies'][e]:
+                    out['dependencies'][e].append(depend_map[p])
+        # Contrain indices on number of elements refered to
+        if ('vertices' in obj) and isinstance(obj['vertices'], (list, tuple)):
+            out['definitions']['curve']['properties']['vertex_indices']['items'][
+                'maximum'] = len(obj['vertices']) - 1
+        if ('params' in obj) and isinstance(obj['params'], (list, tuple)):
+            out['definitions']['curve2D']['items']['maximum'] = len(obj['params']) - 1
+        for e in ['line', 'face', 'surface']:
+            if e == 'surface':
+                iprop = out['definitions'][e]['properties']['vertex_indices'][
+                    'items']['properties']
+            else:
+                iprop = out['definitions'][e]['items']['properties']
+            for k, e_depends in depend_map.items():
+                if k in iprop:
+                    if (e_depends in obj) and isinstance(obj[e_depends], (list, tuple)):
+                        iprop[k]['maximum'] = len(obj[e_depends]) - 1
         return out
