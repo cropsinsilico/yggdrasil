@@ -3,9 +3,11 @@ import copy
 import shutil
 import tempfile
 import nose.tools as nt
+import unittest
 from cis_interface.metaschema.datatypes.tests import (
     test_PlyMetaschemaType as parent)
 from cis_interface.metaschema.datatypes import ObjMetaschemaType
+from cis_interface.drivers.LPyModelDriver import _lpy_installed
 
 
 old_value = parent._test_value
@@ -55,6 +57,27 @@ def test_create_schema():
     shutil.move(temp, ObjMetaschemaType._schema_file)
 
 
+class TestObjDict(parent.TestPlyDict):
+    r"""Test for ObjDict class."""
+    
+    _mod = 'ObjMetaschemaType'
+    _cls = 'ObjDict'
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        return _test_value
+
+    def test_apply_scalar_map(self):
+        r"""Test applying a scalar colormap."""
+        super(TestObjDict, self).test_apply_scalar_map(_as_obj=True)
+
+    @unittest.skipIf(not _lpy_installed, "LPy library not installed.")
+    def test_to_from_scene(self):  # pragma: lpy
+        r"""Test conversion to/from PlantGL scene."""
+        super(TestObjDict, self).test_to_from_scene(_as_obj=True)
+
+
 class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
     r"""Test class for ObjMetaschemaType class with float."""
 
@@ -68,6 +91,7 @@ class TestObjMetaschemaType(parent.TestPlyMetaschemaType):
         self._typedef = {'type': self.import_cls.name}
         self._valid_encoded = [self._fulldef]
         self._valid_decoded = [self._value,
+                               ObjMetaschemaType.ObjDict(**_test_value),
                                {'vertices': self._value['vertices'],
                                 'faces': [[{'vertex_index': 0},
                                            {'vertex_index': 1},

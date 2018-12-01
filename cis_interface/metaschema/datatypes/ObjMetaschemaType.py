@@ -1,10 +1,12 @@
 import os
 import json
+import copy
 from cis_interface import backwards
 from cis_interface.metaschema.datatypes import register_type_from_file, _schema_dir
 from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 from cis_interface.metaschema.datatypes.PlyMetaschemaType import (
+    PlyDict,
     _index_type, _color_type, _coord_type,
     _index_conv, _color_conv, _coord_conv,
     _index_fmt, _color_fmt, _coord_fmt)
@@ -446,3 +448,198 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                     if (e_depends in obj) and isinstance(obj[e_depends], (list, tuple)):
                         iprop[k]['maximum'] = len(obj[e_depends]) - 1
         return out
+
+
+class ObjDict(PlyDict):
+    r"""Enhanced dictionary class for storing Obj information."""
+
+    _type_class = ObjMetaschemaType
+
+    @property
+    def mesh(self):
+        r"""list: Vertices for each face in the structure."""
+        mesh = []
+        for i in range(self.count_elements('faces')):
+            imesh = []
+            for f in self['faces']:
+                for v in f:
+                    imesh += [self['vertices'][v['vertex_index']][k]
+                              for k in ['x', 'y', 'z']]
+            mesh.append(imesh)
+        return mesh
+
+    @classmethod
+    def from_shape(cls, shape, d, conversion=1.0):  # pragma: lpy
+        r"""Create a ply dictionary from a PlantGL shape and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer): Descritizer.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        iobj = super(ObjDict, cls).from_shape(shape, d, conversion=conversion,
+                                              _as_obj=True)
+        if iobj is not None:
+            # Texcoords
+            if d.result.texCoordList:
+                for t in d.result.texCoordList:
+                    # TODO: Should the coords be scaled?
+                    iobj['texcoords'].append({'u': t.x, 'v': t.y})
+                if d.result.texCoordIndexList:
+                    for i, t in enumerate(d.result.texCoordIndexList):
+                        if t[0] < len(iobj['texcoords']):
+                            for j in range(3):
+                                iobj['faces'][i][j]['texcoord_index'] = t[j]
+            # Normals
+            if d.result.normalList:
+                for n in d.result.normalList:
+                    iobj['normals'].append({'i': n.x, 'j': n.y, 'k': n.z})
+                if d.result.normalIndexList:
+                    for i, n in enumerate(d.result.normalIndexList):
+                        if n[0] < len(iobj['normals']):
+                            for j in range(3):
+                                iobj['faces'][i][j]['normal_index'] = n[j]
+        return iobj
+
+    def to_geom_args(self, conversion=1.0, name=None):  # pragma: lpy
+        r"""Get arguments for creating a PlantGL geometry.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+            tuple: Class, arguments and keyword arguments for PlantGL geometry.
+
+        """
+        import openalea.plantgl.all as pgl
+        smb_class, args, kwargs = super(ObjDict, self).to_geom_args(
+            conversion=conversion, name=name, _as_obj=True)
+        index_class = pgl.Index3
+        array_class = pgl.Index3Array
+        # Texture coords
+        if self.get('texcoords', []):
+            obj_texcoords = []
+            for t in self['texcoords']:
+                obj_texcoords.append(pgl.Vector2(t['u'], t['v']))
+            kwargs['texCoordList'] = pgl.Point2Array(obj_texcoords)
+            obj_ftexcoords = []
+            for i, f in enumerate(self['faces']):
+                entry = []
+                for _f in f:
+                    if 'texcoord_index' not in _f:
+                        raise ValueError("'texcoord_index' missing from face %d" % i)
+                    entry.append(_f['texcoord_index'])
+                obj_ftexcoords.append(index_class(*entry))
+                kwargs['texCoordIndexList'] = array_class(obj_ftexcoords)
+        # Normals
+        if self.get('normals', []):
+            obj_normals = []
+            for n in self['normals']:
+                obj_normals.append(pgl.Vector3(n['i'], n['j'], n['k']))
+            kwargs['normalList'] = pgl.Point3Array(obj_normals)
+            obj_fnormals = []
+            for i, f in enumerate(self['faces']):
+                entry = []
+                for _f in f:
+                    if 'normal_index' not in _f:
+                        raise ValueError("'normal_index' missing from face %d" % i)
+                    entry.append(_f['normal_index'])
+                    obj_fnormals.append(index_class(*entry))
+                kwargs['normalIndexList'] = array_class(obj_fnormals)
+        return smb_class, args, kwargs
+
+    def append(self, solf):
+        r"""Append new ply information to this dictionary.
+
+        Args:
+            solf (ObjDict): Another ply to append to this one.
+
+        """
+        exist_map = {'vertex_index': len(self.get('vertices', [])),
+                     'texcoord_index': len(self.get('texcoords', [])),
+                     'normal_index': len(self.get('normals', [])),
+                     'param_index': len(self.get('params', []))}
+        exist_map.update(points=exist_map['vertex_index'],
+                         curve2Ds=exist_map['param_index'])
+        # Vertex fields
+        for k in ['vertices', 'texcoords', 'normals', 'params']:
+            if k in solf:
+                if k not in self:
+                    self[k] = []
+                self[k] += solf[k]
+        # Points/2D curves
+        for k in ['points', 'curve2Ds']:
+            if k in solf:
+                if k not in self:
+                    self[k] = []
+                for x in solf[k]:
+                    self[k].append([v + exist_map[k] for v in x])
+        # Face/line fields
+        for k in ['lines', 'faces']:
+            if k in solf:
+                if k not in self:
+                    self[k] = []
+                for x in solf[k]:
+                    iele = [{ik: v[ik] + exist_map[ik] for ik in v.keys()} for v in x]
+                    self[k].append(iele)
+        # Curves
+        k = 'curves'
+        if k in solf:
+            if k not in self:
+                self[k] = []
+            for x in solf[k]:
+                iele = copy.deepcopy(x)
+                iele['vertex_indices'] = [v + exist_map['vertex_index']
+                                          for v in x['vertex_indices']]
+        # Surfaces
+        k = 'surfaces'
+        if k in solf:
+            if k not in self:
+                self[k] = []
+            for x in solf[k]:
+                iele = copy.deepcopy(x)
+                iele['vertex_indices'] = [{ik: v[ik] + exist_map[ik] for ik in v.keys()}
+                                          for v in x['vertex_indices']]
+        # Merge material using first in list
+        material = None
+        for x in [self, solf]:
+            if x.get('material', None) is not None:
+                material = x['material']
+                break
+        if material is not None:
+            self['material'] = material
+        return self
+
+    def apply_scalar_map(self, *args, **kwargs):
+        r"""Set the color of faces in a 3D object based on a scalar map.
+        This creates a copy unless no_copy is True.
+
+        Args:
+            scalar_arr (arr): Scalar values that should be mapped to colors
+                for each face.
+            color_map (str, optional): The name of the color map that should
+                be used. Defaults to 'plasma'.
+            vmin (float, optional): Value that should map to the minimum of the
+                colormap. Defaults to min(scalar_arr).
+            vmax (float, optional): Value that should map to the maximum of the
+                colormap. Defaults to max(scalar_arr).
+            scaling (str, optional): Scaling that should be used to map the scalar
+                array onto the colormap. Defaults to 'linear'.
+            scale_by_area (bool, optional): If True, the elements of the scalar
+                array will be multiplied by the area of the corresponding face.
+                If True, vmin and vmax should be in terms of the scaled array.
+                Defaults to False.
+            no_copy (bool, optional): If True, the returned object will not be a
+                copy. Defaults to False.
+
+        Returns:
+            dict: Obj with updated vertex colors.
+
+        """
+        kwargs['_as_obj'] = True
+        return super(ObjDict, self).apply_scalar_map(*args, **kwargs)

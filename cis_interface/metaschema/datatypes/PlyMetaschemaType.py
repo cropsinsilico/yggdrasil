@@ -207,312 +207,6 @@ def translate_py2ply(py_obj):
     return _map_py2ply[type_np]
 
 
-class PlyDict(dict):
-    r"""Enhanced dictionary class for storing Ply information."""
-    
-    def count_elements(self, element_name):
-        r"""Get the count of a certain element in the dictionary.
-
-        Args:
-            element_name (str): Name of the element to count.
-
-        Returns:
-            int: Number of the provided element.
-
-        """
-        if element_name not in self:
-            raise ValueError("'%s' is not a valid property." % element_name)
-        return len(self[element_name])
-
-    @property
-    def mesh(self):
-        r"""list: Vertices for each face in the structure."""
-        mesh = []
-        for i in range(self.count_elements('faces')):
-            imesh = []
-            for f in self['faces']:
-                for v in f['vertex_index']:
-                    imesh += [self['vertices'][v][k] for k in ['x', 'y', 'z']]
-            mesh.append(imesh)
-        return mesh
-
-    @classmethod
-    def from_shape(cls, shape, d, conversion=1.0):  # pragma: lpy
-        r"""Create a ply dictionary from a PlantGL shape and descritizer.
-
-        Args:
-            scene (openalea.plantgl.scene): Scene that should be descritized.
-            d (openalea.plantgl.descritizer): Descritizer.
-            conversion (float, optional): Conversion factor that should be
-                applied to the vertex positions. Defaults to 1.0.
-
-        """
-        out = None
-        d.process(shape)
-        if d.result is not None:
-            out = cls()
-            # Vertices
-            for p in d.result.pointList:
-                new_vert = {}
-                for k in ['x', 'y', 'z']:
-                    new_vert[k] = conversion * getattr(p, k)
-                out['vertices'].append(new_vert)
-            # Colors
-            if d.result.colorPerVertex and d.result.colorList:
-                if d.result.isColorIndexListToDefault():
-                    for i, c in enumerate(d.result.colorList):
-                        for k in ['red', 'green', 'blue']:
-                            out['vertices'][i][k] = getattr(c, k)
-                else:  # pragma: debug
-                    raise Exception("Indexed vertex colors not supported.")
-            # elif not shape.appearance.isAmbientToDefault():
-            #     c = shape.appearance.ambient
-            #     for k in ['red', 'green', 'blue']:
-            #         for v in out['vertices']:
-            #             v[k] = getattr(c, k)
-            # Material
-            if (shape.appearance.name != shape.appearance.DEFAULT_MATERIAL.name):
-                out['material'] = shape.appearance.name
-            # Faces
-            for i3 in d.result.indexList:
-                out['faces'].append({'vertex_index': [i3[0], i3[1], i3[2]]})
-        return out
-
-    @classmethod
-    def from_scene(cls, scene, d=None, conversion=1.0):  # pragma: lpy
-        r"""Create a ply dictionary from a PlantGL scene and descritizer.
-
-        Args:
-            scene (openalea.plantgl.scene): Scene that should be descritized.
-            d (openalea.plantgl.descritizer, optional): Descritizer. Defaults
-                to openalea.plantgl.all.Tesselator.
-            conversion (float, optional): Conversion factor that should be
-                applied to the vertex positions. Defaults to 1.0.
-
-        """
-        if d is None:
-            from openalea.plantgl.all import Tesselator
-            d = Tesselator()
-        out = cls()
-        for k, shapes in scene.todict().items():
-            for shape in shapes:
-                d.clear()
-                iply = cls.from_shape(shape, d, conversion=conversion)
-                if iply is not None:
-                    out.append(iply)
-                d.clear()
-        return out
-
-    def to_scene(self, conversion=1.0, name=None):  # pragma: lpy
-        r"""Create a PlantGL scene from a Ply dictionary.
-
-        Args:
-            conversion (float, optional): Conversion factor that should be
-                applied to the vertices. Defaults to 1.0.
-            name (str, optional): Name that should be given to the created
-                PlantGL symbol. Defaults to None and is ignored.
-
-        Returns:
-        
-
-        """
-        import openalea.plantgl.all as pgl
-        smb_class, args, kwargs = self.to_geom_args(conversion=conversion,
-                                                    name=name)
-        smb = smb_class(*args, **kwargs)
-        if name is not None:
-            smb.setName(name)
-        if self.get('material', None) is not None:
-            mat = pgl.Material(self['material'])
-            shp = pgl.Shape(smb, mat)
-        else:
-            shp = pgl.Shape(smb)
-        if name is not None:
-            shp.setName(name)
-        scn = pgl.Scene([shp])
-        return scn
-
-    def to_geom_args(self, conversion=1.0, name=None):  # pragma: lpy
-        r"""Get arguments for creating a PlantGL geometry.
-
-        Args:
-            conversion (float, optional): Conversion factor that should be
-                applied to the vertices. Defaults to 1.0.
-            name (str, optional): Name that should be given to the created
-                PlantGL symbol. Defaults to None and is ignored.
-
-        Returns:
-            tuple: Class, arguments and keyword arguments for PlantGL geometry.
-
-        """
-        import openalea.plantgl.all as pgl
-        kwargs = dict()
-        # Add vertices
-        obj_points = []
-        obj_colors = []
-        for v in self['vertices']:
-            xarr = conversion * np.array([v[k] for k in ['x', 'y', 'z']])
-            obj_points.append(pgl.Vector3(xarr[0], xarr[1], xarr[2]))
-            c = [v.get(k, None) for k in ['red', 'green', 'blue']]
-            if None not in c:
-                obj_colors.append(pgl.Color4(c[0], c[1], c[2], 1))
-        points = pgl.Point3Array(obj_points)
-        if obj_colors:
-            colors = pgl.Color4Array(obj_colors)
-            kwargs['colorList'] = colors
-            kwargs['colorPerVertex'] = True
-        # Add indices
-        obj_indices = []
-        nind = None
-        index_class = pgl.Index3
-        array_class = pgl.Index3Array
-        smb_class = pgl.TriangleSet
-        for f in self['faces']:
-            if nind is None:
-                nind = len(f['vertex_index'])
-                if nind == 3:
-                    pass
-                else:
-                    raise ValueError("No PlantGL class for faces with %d vertices."
-                                     % nind)
-            else:
-                if len(f['vertex_index']) != nind:
-                    raise ValueError("Faces do not all contain %d vertices." % nind)
-            f_int = [int(_f) for _f in f['vertex_index']]
-            obj_indices.append(index_class(*f_int))
-        indices = array_class(obj_indices)
-        args = (points, indices)
-        return smb_class, args, kwargs
-
-    def append(self, solf):
-        r"""Append new ply information to this dictionary.
-
-        Args:
-            solf (PlyDict): Another ply to append to this one.
-
-        """
-        nvert = self.count_elements('vertices')
-        # Vertex fields
-        self['vertices'] += solf['vertices']
-        # Face fields
-        for f in solf['faces']:
-            self['faces'].append({'vertex_index': [v + nvert for v in
-                                                   f['vertex_index']]})
-        # Edge fields
-        for e in solf['edges']:
-            self['edges'].append({'vertex1': e['vertex1'] + nvert,
-                                  'vertex2': e['vertex2'] + nvert})
-
-    def merge(self, ply_list, no_copy=False):
-        r"""Merge a list of ply dictionaries.
-
-        Args:
-            ply_list (list): Ply dictionaries.
-            no_copy (bool, optional): If True, the current dictionary will be
-                updated, otherwise a copy will be returned with the update.
-                Defaults to False.
-
-        Returns:
-            dict: Merged ply dictionary.
-
-        """
-        if not isinstance(ply_list, list):
-            ply_list = [ply_list]
-        # Merge fields
-        if no_copy:
-            out = self
-        else:
-            out = copy.deepcopy(self)
-        for x in ply_list:
-            out.append(x)
-        return out
-
-    def apply_scalar_map(self, scalar_arr, color_map=None,
-                         vmin=None, vmax=None, scaling='linear',
-                         scale_by_area=False, no_copy=False):
-        r"""Set the color of faces in a 3D object based on a scalar map.
-        This creates a copy unless no_copy is True.
-
-        Args:
-            scalar_arr (arr): Scalar values that should be mapped to colors
-                for each face.
-            color_map (str, optional): The name of the color map that should
-                be used. Defaults to 'plasma'.
-            vmin (float, optional): Value that should map to the minimum of the
-                colormap. Defaults to min(scalar_arr).
-            vmax (float, optional): Value that should map to the maximum of the
-                colormap. Defaults to max(scalar_arr).
-            scaling (str, optional): Scaling that should be used to map the scalar
-                array onto the colormap. Defaults to 'linear'.
-            scale_by_area (bool, optional): If True, the elements of the scalar
-                array will be multiplied by the area of the corresponding face.
-                If True, vmin and vmax should be in terms of the scaled array.
-                Defaults to False.
-            no_copy (bool, optional): If True, the returned object will not be a
-                copy. Defaults to False.
-
-        Returns:
-            dict: Ply with updated vertex colors.
-
-        """
-        from matplotlib import cm
-        from matplotlib import colors as mpl_colors
-        # Scale by area
-        if scale_by_area:
-            scalar_arr = copy.deepcopy(scalar_arr)
-            for i, f in enumerate(self['faces']):
-                fv = f['vertex_index']
-                if len(fv) > 3:
-                    raise NotImplementedError("Area calc not implemented "
-                                              + "for faces above triangle.")
-                v0 = np.array([self['vertices'][fv[0]][k] for k in 'xyz'])
-                v1 = np.array([self['vertices'][fv[1]][k] for k in 'xyz'])
-                v2 = np.array([self['vertices'][fv[2]][k] for k in 'xyz'])
-                a = np.sqrt(np.sum((v0 - v1)**2))
-                b = np.sqrt(np.sum((v1 - v2)**2))
-                c = np.sqrt(np.sum((v2 - v0)**2))
-                s = (a + b + c) / 2.0
-                area = np.sqrt(s * (s - a) * (s - b) * (s - c))
-                scalar_arr[i] = area * scalar_arr[i]
-        # Map vertices onto faces
-        vertex_scalar = [[] for x in self['vertices']]
-        for i in range(len(self['faces'])):
-            for v in self['faces'][i]['vertex_index']:
-                vertex_scalar[v].append(scalar_arr[i])
-        for i in range(len(vertex_scalar)):
-            vertex_scalar[i] = np.mean(vertex_scalar[i])
-        vertex_scalar = np.array(vertex_scalar)
-        if scaling == 'log':
-            vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)
-        # Get color scaling
-        if color_map is None:
-            # color_map = 'summer'
-            color_map = 'plasma'
-        if vmin is None:
-            vmin = vertex_scalar.min()
-        if vmax is None:
-            vmax = vertex_scalar.max()
-        # print(vmin, vmax)
-        cmap = cm.get_cmap(color_map)
-        if scaling == 'log':
-            norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)
-        elif scaling == 'linear':
-            norm = mpl_colors.Normalize(vmin=vmin, vmax=vmax)
-        else:  # pragma: debug
-            raise Exception("Scaling must be 'linear' or 'log'.")
-        m = cm.ScalarMappable(norm=norm, cmap=cmap)
-        # Scale colors
-        vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype('int')[:, :3].tolist()
-        if no_copy:
-            out = self
-        else:
-            out = copy.deepcopy(self)
-        for i, c in enumerate(vertex_colors):
-            for j, k in enumerate(['red', 'green', 'blue']):
-                out['vertices'][i][k] = c[j]
-        return out
-
-
 # The base class could be anything since it is discarded during registration,
 # but is set to JSONObjectMetaschemaType here for transparancy since this is
 # what the base class is determined to be on loading the schema
@@ -733,4 +427,342 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             for k in ['vertex1', 'vertex2']:
                 out['definitions']['edge']['properties'][k][
                     'maximum'] = nvert - 1
+        return out
+
+
+class PlyDict(dict):
+    r"""Enhanced dictionary class for storing Ply information."""
+
+    _type_class = PlyMetaschemaType
+
+    def __init__(self, *args, **kwargs):
+        super(PlyDict, self).__init__(*args, **kwargs)
+        self._type_class.validate(self)
+    
+    def count_elements(self, element_name):
+        r"""Get the count of a certain element in the dictionary.
+
+        Args:
+            element_name (str): Name of the element to count.
+
+        Returns:
+            int: Number of the provided element.
+
+        """
+        if element_name not in self:
+            raise ValueError("'%s' is not a valid property." % element_name)
+        return len(self[element_name])
+
+    @property
+    def mesh(self):
+        r"""list: Vertices for each face in the structure."""
+        mesh = []
+        for i in range(self.count_elements('faces')):
+            imesh = []
+            for f in self['faces']:
+                for v in f['vertex_index']:
+                    imesh += [self['vertices'][v][k] for k in ['x', 'y', 'z']]
+            mesh.append(imesh)
+        return mesh
+
+    @classmethod
+    def from_shape(cls, shape, d, conversion=1.0, _as_obj=False):  # pragma: lpy
+        r"""Create a ply dictionary from a PlantGL shape and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer): Descritizer.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        out = None
+        d.process(shape)
+        if d.result is not None:
+            out = cls()
+            # Vertices
+            for p in d.result.pointList:
+                new_vert = {}
+                for k in ['x', 'y', 'z']:
+                    new_vert[k] = conversion * getattr(p, k)
+                out['vertices'].append(new_vert)
+            # Colors
+            if d.result.colorPerVertex and d.result.colorList:
+                if d.result.isColorIndexListToDefault():
+                    for i, c in enumerate(d.result.colorList):
+                        for k in ['red', 'green', 'blue']:
+                            out['vertices'][i][k] = getattr(c, k)
+                else:  # pragma: debug
+                    raise Exception("Indexed vertex colors not supported.")
+            # elif not shape.appearance.isAmbientToDefault():
+            #     c = shape.appearance.ambient
+            #     for k in ['red', 'green', 'blue']:
+            #         for v in out['vertices']:
+            #             v[k] = getattr(c, k)
+            # Material
+            if (shape.appearance.name != shape.appearance.DEFAULT_MATERIAL.name):
+                out['material'] = shape.appearance.name
+            # Faces
+            if _as_obj:
+                for i3 in d.result.indexList:
+                    out['faces'].append([{'vertex_index': x}
+                                         for x in [i3[0], i3[1], i3[2]]])
+            else:
+                for i3 in d.result.indexList:
+                    out['faces'].append({'vertex_index': [i3[0], i3[1], i3[2]]})
+        return out
+
+    @classmethod
+    def from_scene(cls, scene, d=None, conversion=1.0):  # pragma: lpy
+        r"""Create a ply dictionary from a PlantGL scene and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer, optional): Descritizer. Defaults
+                to openalea.plantgl.all.Tesselator.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        if d is None:
+            from openalea.plantgl.all import Tesselator
+            d = Tesselator()
+        out = cls()
+        for k, shapes in scene.todict().items():
+            for shape in shapes:
+                d.clear()
+                iply = cls.from_shape(shape, d, conversion=conversion)
+                if iply is not None:
+                    out.append(iply)
+                d.clear()
+        return out
+
+    def to_scene(self, conversion=1.0, name=None):  # pragma: lpy
+        r"""Create a PlantGL scene from a Ply dictionary.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+        
+
+        """
+        import openalea.plantgl.all as pgl
+        smb_class, args, kwargs = self.to_geom_args(conversion=conversion,
+                                                    name=name)
+        smb = smb_class(*args, **kwargs)
+        if name is not None:
+            smb.setName(name)
+        if self.get('material', None) is not None:
+            mat = pgl.Material(self['material'])
+            shp = pgl.Shape(smb, mat)
+        else:
+            shp = pgl.Shape(smb)
+        if name is not None:
+            shp.setName(name)
+        scn = pgl.Scene([shp])
+        return scn
+
+    def to_geom_args(self, conversion=1.0, name=None, _as_obj=False):  # pragma: lpy
+        r"""Get arguments for creating a PlantGL geometry.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+            tuple: Class, arguments and keyword arguments for PlantGL geometry.
+
+        """
+        import openalea.plantgl.all as pgl
+        kwargs = dict()
+        # Add vertices
+        obj_points = []
+        obj_colors = []
+        for v in self['vertices']:
+            xarr = conversion * np.array([v[k] for k in ['x', 'y', 'z']])
+            obj_points.append(pgl.Vector3(xarr[0], xarr[1], xarr[2]))
+            c = [v.get(k, None) for k in ['red', 'green', 'blue']]
+            if None not in c:
+                obj_colors.append(pgl.Color4(c[0], c[1], c[2], 1))
+        points = pgl.Point3Array(obj_points)
+        if obj_colors:
+            colors = pgl.Color4Array(obj_colors)
+            kwargs['colorList'] = colors
+            kwargs['colorPerVertex'] = True
+        # Add indices
+        obj_indices = []
+        nind = None
+        index_class = pgl.Index3
+        array_class = pgl.Index3Array
+        smb_class = pgl.TriangleSet
+        for f in self['faces']:
+            if nind is None:
+                if _as_obj:
+                    nind = len(f)
+                else:
+                    nind = len(f['vertex_index'])
+                if nind == 3:
+                    pass
+                else:
+                    raise ValueError("No PlantGL class for faces with %d vertices."
+                                     % nind)
+            else:
+                if _as_obj:
+                    if len(f) != nind:
+                        raise ValueError("Faces do not all contain %d vertices." % nind)
+                else:
+                    if len(f['vertex_index']) != nind:
+                        raise ValueError("Faces do not all contain %d vertices." % nind)
+            if _as_obj:
+                f_int = [int(_f['vertex_index']) for _f in f]
+            else:
+                f_int = [int(_f) for _f in f['vertex_index']]
+            obj_indices.append(index_class(*f_int))
+        indices = array_class(obj_indices)
+        args = (points, indices)
+        return smb_class, args, kwargs
+
+    def append(self, solf):
+        r"""Append new ply information to this dictionary.
+
+        Args:
+            solf (PlyDict): Another ply to append to this one.
+
+        """
+        nvert = self.count_elements('vertices')
+        # Vertex fields
+        self['vertices'] += solf['vertices']
+        # Face fields
+        for f in solf['faces']:
+            self['faces'].append({'vertex_index': [v + nvert for v in
+                                                   f['vertex_index']]})
+        # Edge fields
+        if 'edges' in solf:
+            if 'edges' not in self:
+                self['edges'] = []
+            for e in solf['edges']:
+                self['edges'].append({'vertex1': e['vertex1'] + nvert,
+                                      'vertex2': e['vertex2'] + nvert})
+
+    def merge(self, ply_list, no_copy=False):
+        r"""Merge a list of ply dictionaries.
+
+        Args:
+            ply_list (list): Ply dictionaries.
+            no_copy (bool, optional): If True, the current dictionary will be
+                updated, otherwise a copy will be returned with the update.
+                Defaults to False.
+
+        Returns:
+            dict: Merged ply dictionary.
+
+        """
+        if not isinstance(ply_list, list):
+            ply_list = [ply_list]
+        # Merge fields
+        if no_copy:
+            out = self
+        else:
+            out = copy.deepcopy(self)
+        for x in ply_list:
+            out.append(x)
+        return out
+
+    def apply_scalar_map(self, scalar_arr, color_map=None,
+                         vmin=None, vmax=None, scaling='linear',
+                         scale_by_area=False, no_copy=False, _as_obj=False):
+        r"""Set the color of faces in a 3D object based on a scalar map.
+        This creates a copy unless no_copy is True.
+
+        Args:
+            scalar_arr (arr): Scalar values that should be mapped to colors
+                for each face.
+            color_map (str, optional): The name of the color map that should
+                be used. Defaults to 'plasma'.
+            vmin (float, optional): Value that should map to the minimum of the
+                colormap. Defaults to min(scalar_arr).
+            vmax (float, optional): Value that should map to the maximum of the
+                colormap. Defaults to max(scalar_arr).
+            scaling (str, optional): Scaling that should be used to map the scalar
+                array onto the colormap. Defaults to 'linear'.
+            scale_by_area (bool, optional): If True, the elements of the scalar
+                array will be multiplied by the area of the corresponding face.
+                If True, vmin and vmax should be in terms of the scaled array.
+                Defaults to False.
+            no_copy (bool, optional): If True, the returned object will not be a
+                copy. Defaults to False.
+
+        Returns:
+            dict: Ply with updated vertex colors.
+
+        """
+        from matplotlib import cm
+        from matplotlib import colors as mpl_colors
+        # Scale by area
+        if scale_by_area:
+            scalar_arr = copy.deepcopy(scalar_arr)
+            for i, f in enumerate(self['faces']):
+                if _as_obj:
+                    fv = [_f['vertex_index'] for _f in f]
+                else:
+                    fv = f['vertex_index']
+                if len(fv) > 3:
+                    raise NotImplementedError("Area calc not implemented "
+                                              + "for faces above triangle.")
+                v0 = np.array([self['vertices'][fv[0]][k] for k in 'xyz'])
+                v1 = np.array([self['vertices'][fv[1]][k] for k in 'xyz'])
+                v2 = np.array([self['vertices'][fv[2]][k] for k in 'xyz'])
+                a = np.sqrt(np.sum((v0 - v1)**2))
+                b = np.sqrt(np.sum((v1 - v2)**2))
+                c = np.sqrt(np.sum((v2 - v0)**2))
+                s = (a + b + c) / 2.0
+                area = np.sqrt(s * (s - a) * (s - b) * (s - c))
+                scalar_arr[i] = area * scalar_arr[i]
+        # Map vertices onto faces
+        vertex_scalar = [[] for x in self['vertices']]
+        if _as_obj:
+            for i in range(len(self['faces'])):
+                for v in self['faces'][i]:
+                    vertex_scalar[v['vertex_index']].append(scalar_arr[i])
+        else:
+            for i in range(len(self['faces'])):
+                for v in self['faces'][i]['vertex_index']:
+                    vertex_scalar[v].append(scalar_arr[i])
+        for i in range(len(vertex_scalar)):
+            vertex_scalar[i] = np.mean(vertex_scalar[i])
+        vertex_scalar = np.array(vertex_scalar)
+        if scaling == 'log':
+            vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)
+        # Get color scaling
+        if color_map is None:
+            # color_map = 'summer'
+            color_map = 'plasma'
+        if vmin is None:
+            vmin = vertex_scalar.min()
+        if vmax is None:
+            vmax = vertex_scalar.max()
+        # print(vmin, vmax)
+        cmap = cm.get_cmap(color_map)
+        if scaling == 'log':
+            norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)
+        elif scaling == 'linear':
+            norm = mpl_colors.Normalize(vmin=vmin, vmax=vmax)
+        else:  # pragma: debug
+            raise Exception("Scaling must be 'linear' or 'log'.")
+        m = cm.ScalarMappable(norm=norm, cmap=cmap)
+        # Scale colors
+        vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype('int')[:, :3].tolist()
+        if no_copy:
+            out = self
+        else:
+            out = copy.deepcopy(self)
+        for i, c in enumerate(vertex_colors):
+            for j, k in enumerate(['red', 'green', 'blue']):
+                out['vertices'][i][k] = c[j]
         return out

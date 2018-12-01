@@ -111,16 +111,27 @@ class TestPlyDict(CisTestClassInfo):
         ply1.merge([self.instance], no_copy=True)
         nt.assert_equal(ply1, ply2)
 
-    def test_apply_scalar_map(self):
+    def test_append(self):
+        r"""Test appending ply objects."""
+        basic = self.import_cls(vertices=self.instance['vertices'],
+                                faces=[])
+        basic.append(self.instance)
+
+    def test_apply_scalar_map(self, _as_obj=False):
         r"""Test applying a scalar colormap."""
         o = copy.deepcopy(self.instance)
         scalar_arr = np.arange(o.count_elements('faces')).astype('float')
         nt.assert_raises(NotImplementedError, o.apply_scalar_map,
                          scalar_arr, scale_by_area=True)
         new_faces = []
-        for f in o['faces']:
-            if len(f['vertex_index']) == 3:
-                new_faces.append(f)
+        if _as_obj:
+            for f in o['faces']:
+                if len(f) == 3:
+                    new_faces.append(f)
+        else:
+            for f in o['faces']:
+                if len(f['vertex_index']) == 3:
+                    new_faces.append(f)
         o['faces'] = new_faces
         for scale in ['linear', 'log']:
             o2 = copy.deepcopy(o)
@@ -130,18 +141,25 @@ class TestPlyDict(CisTestClassInfo):
             nt.assert_equal(o1, o2)
 
     @unittest.skipIf(not _lpy_installed, "LPy library not installed.")
-    def test_to_from_scene(self):  # pragma: lpy
+    def test_to_from_scene(self, _as_obj=False):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene."""
         o1 = self.instance
         cls = o1.__class__
         s = o1.to_scene(name='test')
         o2 = cls.from_scene(s)
         nt.assert_equal(o2, o1)
-        o2['faces'] = [[0, 1, 2, 3]]
+        if _as_obj:
+            o2['faces'] = [[{'vertex_index': x} for x in [0, 1, 2, 3]]]
+            o3 = copy.deepcopy(o2)
+            o3['faces'] = [[{'vertex_index': x} for x in [0, 1, 2]],
+                           [{'vertex_index': x} for x in [0, 1, 2, 3]]]
+        else:
+            o2['faces'] = [{'vertex_index': [0, 1, 2, 3]}]
+            o3 = copy.deepcopy(o2)
+            o3['faces'] = [{'vertex_index': [0, 1, 2]},
+                           {'vertex_index': [0, 1, 2, 3]}]
         nt.assert_raises(ValueError, o2.to_scene)
-        o2['faces'] = [[0, 1, 2],
-                       [0, 1, 2, 3]]
-        nt.assert_raises(ValueError, o2.to_scene)
+        nt.assert_raises(ValueError, o3.to_scene)
 
 
 class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
