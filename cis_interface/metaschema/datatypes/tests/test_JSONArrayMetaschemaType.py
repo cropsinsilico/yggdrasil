@@ -30,6 +30,7 @@ class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
         self._invalid_encoded.append(copy.deepcopy(self._fulldef))
         self._invalid_encoded[-1]['items'][0]['type'] = 'invalid'
         self._compatible_objects = [(self._value, self._value, None)]
+        self._valid_normalize += [('1, 1 ', ['1', '1'])]
 
     def test_container_errors(self):
         r"""Test errors on container operations."""

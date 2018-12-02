@@ -126,6 +126,19 @@ class MetaschemaType(object):
         return isinstance(obj, cls.python_types)
 
     @classmethod
+    def normalize(cls, obj):
+        r"""Normalize an object, if possible, to conform to this type.
+
+        Args:
+            obj (object): Object to normalize.
+
+        Returns:
+            object: Normalized object.
+
+        """
+        return obj
+
+    @classmethod
     def encode_type(cls, obj, **kwargs):
         r"""Encode an object's type definition.
 
@@ -330,7 +343,7 @@ class MetaschemaType(object):
             return True
         try:
             cls.validate_instance(obj, typedef)
-        except jsonschema.exceptions.ValidationError:
+        except jsonschema.exceptions.ValidationError as e:
             return False
         return True
 

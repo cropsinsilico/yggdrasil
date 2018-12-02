@@ -3,7 +3,8 @@ import copy
 import pprint
 import json
 import jsonschema
-from cis_interface import schema
+import cis_interface
+from cis_interface.metaschema import normalizer
 from cis_interface.metaschema.properties import (
     get_registered_properties, import_all_properties)
 from cis_interface.metaschema.datatypes import (
@@ -16,9 +17,10 @@ _base_validator = jsonschema.validators.validator_for({"$schema": ""})
 # TODO: this should be included in release as YAML/JSON and then loaded
 _metaschema_fbase = '.cis_metaschema.json'
 _metaschema_fname = os.path.abspath(os.path.join(
-    os.path.dirname(schema.__file__), _metaschema_fbase))
+    os.path.dirname(cis_interface.__file__), _metaschema_fbase))
 _metaschema = None
 _validator = None
+_normalizer = None
 
 
 if os.path.isfile(_metaschema_fname):
@@ -119,6 +121,78 @@ def get_validator(overwrite=False):
                                                   validators=all_validators,
                                                   default_types=all_datatypes)
     return _validator
+
+
+def get_normalizer(overwrite=False):
+    r"""Return the normalizer that includes cis expansion types.
+
+    Args:
+        overwrite (bool, optional): If True, the existing normalizer will be
+            overwritten. Defaults to False.
+
+    Returns:
+        Normalizer: JSON schema normalizer.
+
+    """
+    global _normalizer
+    if (_normalizer is None) or overwrite:
+        metaschema = get_metaschema()
+        # Get set of normalizers
+        all_normalizers = {'$ref': normalizer._normalize_ref}
+        for k, v in get_registered_properties().items():
+            if hasattr(v, 'normalize'):
+                assert(k not in all_normalizers)
+                all_normalizers[k] = v.normalize
+        # Get set of datatypes
+        all_datatypes = get_validator().DEFAULT_TYPES
+        _normalizer = normalizer.create(meta_schema=metaschema,
+                                        normalizers=all_normalizers,
+                                        default_types=all_datatypes)
+    return _normalizer
+
+
+def validate_schema(obj):
+    r"""Validate a schema against the metaschema.
+
+    Args:
+        obj (dict): Schema to be validated.
+
+    Raises:
+        ValidationError: If the schema is not valid.
+
+    """
+    cls = get_validator()
+    cls.check_schema(obj)
+
+
+def validate_instance(obj, schema):
+    r"""Validate an instance against a schema.
+
+    Args:
+
+    Raises:
+        ValidationError: If the object is not valid.
+
+    """
+    cls = get_validator()
+    cls.check_schema(schema)
+    cls(schema).validate(obj)
+
+
+def normalize_instance(obj, schema):
+    r"""Normalize an object using the provided schema.
+
+    Args:
+        obj (object): Object to be normalized using the provided schema.
+        schema (dict): Schema to use to normalize the provided object.
+    
+    Returns:
+        object: Normalized instance.
+
+    """
+    validate_schema(schema)
+    cls = get_normalizer()
+    return cls(schema).normalize(obj)
 
 
 def import_all_classes():

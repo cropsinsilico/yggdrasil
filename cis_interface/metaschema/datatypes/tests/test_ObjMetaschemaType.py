@@ -37,6 +37,7 @@ _test_value['vertices'][0]['w'] = 1.0
 for f in old_value['faces']:
     new = [{'vertex_index': x, 'texcoord_index': 0} for x in f['vertex_index']]
     _test_value['faces'].append(new)
+_test_value['faces'][0][0]['normal_index'] = 0
 for e in old_value['edges']:
     new = [{'vertex_index': e['vertex%d' % x]} for x in [1, 2]]
     _test_value['lines'].append(new)

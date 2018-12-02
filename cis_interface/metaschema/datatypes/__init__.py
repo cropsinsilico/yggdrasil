@@ -35,7 +35,7 @@ def register_type(type_class):
     if type_name in _type_registry:
         raise ValueError("Type '%s' already registered." % type_name)
     if (((not type_class._replaces_existing)
-         and (type_name in _base_validator.DEFAULT_TYPES))):
+         and (type_name in _base_validator.DEFAULT_TYPES))):  # pragma: debug
         raise ValueError("Type '%s' is a JSON default type which cannot be replaced."
                          % type_name)
     # Check properties
@@ -57,7 +57,8 @@ def register_type(type_class):
     # Add to registry
     type_class._datatype = type_name
     type_class._schema_type = 'type'
-    # type_class._schema = type_class.definition_schema()
+    # type_class._schema_required = type_class.definition_schema()['required']
+    # type_class._schema_properties = {}  # TODO: Transfer from
     # TODO: Enable schema tracking once ported to jsonschema
     # from cis_interface.schema import register_component
     # register_component(type_class)

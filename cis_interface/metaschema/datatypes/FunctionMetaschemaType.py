@@ -14,6 +14,24 @@ class FunctionMetaschemaType(MetaschemaType):
                     types.BuiltinMethodType, types.MethodType)
 
     @classmethod
+    def normalize(cls, obj):
+        r"""Normalize an object, if possible, to conform to this type.
+
+        Args:
+            obj (object): Object to normalize.
+
+        Returns:
+            object: Normalized object.
+
+        """
+        if isinstance(obj, str):
+            try:
+                obj = cls.decode_data(obj, {'type': 'function'})
+            except (ValueError, AttributeError):
+                pass
+        return obj
+
+    @classmethod
     def encode_data(cls, obj, typedef):
         r"""Encode an object's data.
 

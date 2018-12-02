@@ -1,7 +1,7 @@
 import numpy as np
 import copy
 import base64
-from cis_interface import units
+from cis_interface import units, backwards
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
 from cis_interface.metaschema.datatypes.FixedMetaschemaType import (
@@ -39,6 +39,37 @@ class ScalarMetaschemaType(MetaschemaType):
                     return True
         return False
         
+    @classmethod
+    def normalize(cls, obj):
+        r"""Normalize an object, if possible, to conform to this type.
+
+        Args:
+            obj (object): Object to normalize.
+
+        Returns:
+            object: Normalized object.
+
+        """
+        if cls.is_fixed and ('subtype' in cls.fixed_properties):
+            if (cls.fixed_properties['subtype'] == 'bytes'):
+                if isinstance(obj, backwards.string_types):
+                    obj = backwards.unicode2bytes(obj)
+                else:
+                    obj = backwards.unicode2bytes(str(obj))
+            elif (cls.fixed_properties['subtype'] == 'unicode'):
+                if isinstance(obj, backwards.string_types):
+                    obj = backwards.bytes2unicode(obj)
+                else:
+                    obj = backwards.bytes2unicode(str(obj))
+            else:
+                dtype = ScalarMetaschemaProperties._python_scalars[
+                    cls.fixed_properties['subtype']][0]
+                try:
+                    obj = dtype(obj)
+                except (TypeError, ValueError):
+                    pass
+        return obj
+
     @classmethod
     def encode_data(cls, obj, typedef):
         r"""Encode an object's data.

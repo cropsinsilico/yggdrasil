@@ -28,6 +28,7 @@ class TestMetaschemaType(CisTestClassInfo):
         self._compatible_objects = []
         self._encode_type_kwargs = {}
         self._encode_data_kwargs = {}
+        self._valid_normalize = [(None, None)]
 
     @property
     def mod(self):
@@ -90,6 +91,21 @@ class TestMetaschemaType(CisTestClassInfo):
                                      "%s vs. %s" % (type(x), type(y)))
             nt.assert_equal(x, y)
 
+    def test_validate(self):
+        r"""Test validation."""
+        if self._cls == 'MetaschemaType':
+            for x in self._valid_decoded:
+                nt.assert_raises(NotImplementedError, self.import_cls.validate, x)
+        else:
+            for x in self._valid_decoded:
+                nt.assert_equal(self.import_cls.validate(x), True)
+
+    def test_normalize(self):
+        r"""Test normalization."""
+        for (x, y) in self._valid_normalize:
+            z = self.import_cls.normalize(x)
+            self.assert_result_equal(z, y)
+
     def test_fixed2base(self):
         r"""Test conversion of type definition from fixed type to the base."""
         if self._explicit:
@@ -143,7 +159,8 @@ class TestMetaschemaType(CisTestClassInfo):
                 z = self.import_cls.encode_data(x, y, **self._encode_data_kwargs)
                 x2 = self.import_cls.decode_data(z, y)
                 self.assert_result_equal(x2, x)
-            nt.assert_raises(MetaschemaTypeError, self.import_cls.encode_type, None)
+            if self._cls != 'JSONNullMetaschemaType':
+                nt.assert_raises(MetaschemaTypeError, self.import_cls.encode_type, None)
 
     def test_check_encoded(self):
         r"""Test check_encoded."""

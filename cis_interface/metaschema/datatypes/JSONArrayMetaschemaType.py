@@ -20,6 +20,21 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
     _json_property = 'items'
 
     @classmethod
+    def normalize(cls, obj):
+        r"""Normalize an object, if possible, to conform to this type.
+
+        Args:
+            obj (object): Object to normalize.
+
+        Returns:
+            object: Normalized object.
+
+        """
+        if isinstance(obj, str):
+            obj = [v.strip() for v in obj.split(',')]
+        return obj
+
+    @classmethod
     def _iterate(cls, container):
         r"""Iterate over the contents of the container. Each element returned
         should be a tuple including an index and a value.

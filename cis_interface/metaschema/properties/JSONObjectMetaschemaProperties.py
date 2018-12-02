@@ -1,3 +1,5 @@
+from jsonschema.compat import iteritems
+from cis_interface.metaschema import normalizer as normalizer_mod
 from cis_interface.metaschema.datatypes import encode_type, compare_schema
 from cis_interface.metaschema.properties import register_metaschema_property
 from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
@@ -23,3 +25,19 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
                 continue
             for e in compare_schema(prop1[k], prop2[k]):
                 yield e
+
+    @classmethod
+    def normalize(cls, normalizer, value, instance, schema):
+        r"""Normalization method for 'properties' container property."""
+        if not isinstance(instance, dict):
+            return instance
+        for property, subschema in iteritems(value):
+            iprop = instance.get(property, normalizer_mod.UndefinedProperty())
+            iprop = normalizer.descend(
+                iprop,
+                subschema,
+                path=property,
+                schema_path=property)
+            if not isinstance(iprop, normalizer_mod.UndefinedProperty):
+                instance[property] = iprop
+        return instance

@@ -3,6 +3,7 @@ from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as pare
 
 
 def valid_function():  # pragma: debug
+    r"""Valid function for testing."""
     pass
 
 
@@ -20,6 +21,7 @@ class TestFunctionMetaschemaType(parent.TestMetaschemaType):
         self._invalid_encoded = [{}]
         self._invalid_decoded = [object]
         self._compatible_objects = [(self._value, self._value, None)]
+        self._valid_normalize += [('%s:valid_function' % __name__, valid_function)]
 
     def test_decode_data_errors(self):
         r"""Test errors in decode_data."""

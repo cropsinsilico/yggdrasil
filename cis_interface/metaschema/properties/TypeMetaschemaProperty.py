@@ -51,3 +51,20 @@ class TypeMetaschemaProperty(MetaschemaProperty):
         type_cls = get_type_class(prop1)
         if not type_cls.issubtype(prop2):
             yield "Type '%s' is not a subtype of type '%s'" % (prop1, prop2)
+
+    @classmethod
+    def normalize(cls, normalizer, value, instance, schema):
+        r"""Method to normalize the instance based on the property value.
+
+        Args:
+            normalizer (Normalizer): Normalizer class.
+            value (object): Property value.
+            instance (object): Object to normalize.
+            schema (dict): Schema containing this property.
+
+        Returns:
+            object: Normalized object.
+
+        """
+        type_cls = get_type_class(value)
+        return type_cls.normalize(instance)

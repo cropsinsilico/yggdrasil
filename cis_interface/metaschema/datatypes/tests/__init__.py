@@ -1,32 +1,9 @@
-import numpy as np
 import nose.tools as nt
 from cis_interface import backwards
 from cis_interface.metaschema import datatypes
+from cis_interface.metaschema.tests import _valid_objects
 from cis_interface.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
-
-
-def test_func():  # pragma: debug
-    pass
-
-
-_valid_objects = {'unicode': backwards.bytes2unicode('hello'),
-                  'bytes': backwards.unicode2bytes('hello'),
-                  'float': float(1), 'int': int(1),
-                  'uint': np.uint(1), 'complex': complex(1, 1),
-                  'object': {'a': 'hello'}, 'array': ['hello', 1],
-                  'ply': {'vertices': [{k: 0.0 for k in 'xyz'},
-                                       {k: 0.0 for k in 'xyz'},
-                                       {k: 0.0 for k in 'xyz'}],
-                          'faces': [{'vertex_index': [0, 1, 2]}]},
-                  'obj': {'vertices': [{k: 0.0 for k in 'xyz'},
-                                       {k: 0.0 for k in 'xyz'},
-                                       {k: 0.0 for k in 'xyz'}],
-                          'faces': [[{'vertex_index': 0},
-                                     {'vertex_index': 1},
-                                     {'vertex_index': 2}]]},
-                  'schema': {'type': 'string'},
-                  'function': test_func}
 
 
 def test_get_type_class():
@@ -39,9 +16,9 @@ def test_get_type_class():
 def test_register_type_errors():
     r"""Test errors in register_type for duplicate."""
     nt.assert_raises(ValueError, datatypes.register_type, ScalarMetaschemaType)
-    fake_prop = type('FakeType', (ScalarMetaschemaType, ),
-                     {'name': 'number'})
-    nt.assert_raises(ValueError, datatypes.register_type, fake_prop)
+    # fake_prop = type('FakeType', (ScalarMetaschemaType, ),
+    #                  {'name': 'number'})
+    # nt.assert_raises(ValueError, datatypes.register_type, fake_prop)
     fake_prop = type('FakeType', (ScalarMetaschemaType, ),
                      {'name': 'new', 'properties': ['invalid']})
     nt.assert_raises(ValueError, datatypes.register_type, fake_prop)
