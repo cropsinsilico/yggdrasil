@@ -21,9 +21,15 @@ class AsciiTableComm(AsciiFileComm):
     """
     
     _filetype = 'table'
-    _schema = inherit_schema(AsciiFileComm._schema, 'filetype', _filetype,
-                             delimiter={'type': 'string', 'required': False},
-                             use_astropy={'type': 'boolean', 'required': False})
+    _schema_properties = inherit_schema(
+        AsciiFileComm._schema_properties, 'filetype', _filetype,
+        field_names={'type': 'array', 'items': {'type': 'string'}},
+        field_units={'type': 'array', 'items': {'type': 'string'}},
+        format_str={'type': 'string'},
+        as_array={'type': 'boolean', 'default': False},
+        delimiter={'type': 'unicode',
+                   'default': backwards.bytes2unicode(serialize._default_delimiter)},
+        use_astropy={'type': 'boolean', 'default': False})
 
     def _init_before_open(self, delimiter=None, use_astropy=False,
                           serializer_kwargs=None, **kwargs):

@@ -82,3 +82,18 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
         except jsonschema.exceptions.ValidationError:
             return False
         return True
+
+    @classmethod
+    def normalize(cls, obj):
+        r"""Normalize an object, if possible, to conform to this type.
+
+        Args:
+            obj (object): Object to normalize.
+
+        Returns:
+            object: Normalized object.
+
+        """
+        if isinstance(obj, str):
+            return {'type': obj}
+        return obj

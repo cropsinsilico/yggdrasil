@@ -50,16 +50,16 @@ class FileComm(CommBase.CommBase):
 
     _filetype = 'binary'
     _schema_type = 'file'
-    _schema = dict(CommBase.CommBase._schema,
-                   working_dir={'type': 'string', 'required': True},
-                   filetype={'type': 'string', 'required': False,
-                             'default': _filetype},
-                   append={'type': 'boolean', 'required': False},
-                   in_temp={'type': 'boolean', 'required': False},
-                   newline={'type': 'string', 'required': False,
-                            'default': backwards.bytes2unicode(
-                                serialize._default_newline)},
-                   is_series={'type': 'boolean', 'required': False})
+    _schema_required = ['name', 'filetype', 'working_dir']
+    _schema_properties = {'name': {'type': 'string'},
+                          'working_dir': {'type': 'string'},
+                          'filetype': {'type': 'string', 'default': _filetype},
+                          'append': {'type': 'boolean', 'default': False},
+                          'in_temp': {'type': 'boolean', 'default': False},
+                          'newline': {'type': 'unicode',
+                                      'default': backwards.bytes2unicode(
+                                          serialize._default_newline)},
+                          'is_series': {'type': 'boolean', 'default': False}}
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)

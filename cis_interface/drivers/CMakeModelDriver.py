@@ -164,11 +164,12 @@ class CMakeModelDriver(ModelDriver):
     """
 
     _language = 'cmake'
-    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
-                             sourcedir={'type': 'string', 'required': False},
-                             builddir={'type': 'string', 'required': False},
-                             cmakeargs={'type': 'list', 'required': False,
-                                        'schema': {'type': 'string'}})
+    _schema_properties = inherit_schema(
+        ModelDriver._schema_properties, 'language', _language,
+        sourcedir={'type': 'string'},
+        builddir={'type': 'string'},
+        cmakeargs={'type': 'array', 'default': [],
+                   'items': {'type': 'string'}})
 
     def __init__(self, name, args, sourcedir=None, builddir=None,
                  cmakeargs=None, preserve_cache=False, **kwargs):

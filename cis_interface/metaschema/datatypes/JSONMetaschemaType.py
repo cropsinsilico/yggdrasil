@@ -165,4 +165,6 @@ class JSONStringMetaschemaType(JSONMetaschemaType):
             object: Normalized object.
 
         """
-        return str(obj)
+        if not isinstance(obj, (list, tuple, dict)):
+            return str(obj)
+        return obj

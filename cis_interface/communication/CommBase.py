@@ -294,16 +294,11 @@ class CommBase(tools.CisClass):
 
     _commtype = 'default'
     _schema_type = 'comm'
-    _schema = {'name': {'type': 'string', 'required': True},
-               'dtype': {'type': 'string', 'required': False},  # TODO: add values
-               'units': {'type': 'string', 'required': False},  # TODO: add values
-               'format_str': {'type': 'string', 'required': False},
-               'as_array': {'type': 'boolean', 'required': False},
-               'field_names': {'type': 'list', 'required': False,
-                               'schema': {'type': 'string'}},
-               'field_units': {'type': 'list', 'required': False,
-                               'schema': {'type': 'string'}},  # TODO: coerce units
-               'stype': {'type': 'integer', 'required': False}}
+    _schema_required = ['name']
+    _schema_properties = {'name': {'type': 'string'},
+                          'commtype': {'type': 'string', 'default': _commtype},
+                          'datatype': {'type': 'schema',
+                                       'default': {'type': 'bytes'}}}
 
     def __init__(self, name, address=None, direction='send',
                  dont_open=False, is_interface=False, recv_timeout=0.0,

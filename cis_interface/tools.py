@@ -540,6 +540,7 @@ class CisClass(logging.LoggerAdapter):
             are suppressed.
 
     """
+
     def __init__(self, name, uuid=None, working_dir=None,
                  timeout=60.0, sleeptime=0.01, **kwargs):
         self._name = name

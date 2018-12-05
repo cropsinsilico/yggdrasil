@@ -1,47 +1,28 @@
 import os
+import pprint
 import tempfile
 import nose.tools as nt
 from cis_interface import schema
 
 
-def direct_translate(msg):  # pragma: no cover
-    r"""Test translator that just returns passed message."""
-    return msg
-
-
-def test_str_to_function():
-    r"""Test conversion from string to function."""
-    sfunc = '%s:direct_translate' % __name__
-    for s in [direct_translate, sfunc, [sfunc]]:
-        f = schema.str_to_function(s)
-        if isinstance(s, list):
-            nt.assert_equal(f, [direct_translate])
-        else:
-            nt.assert_equal(f, direct_translate)
-    nt.assert_raises(TypeError, schema.str_to_function, 1)
-    nt.assert_raises(ValueError, schema.str_to_function, 'invalid')
-    nt.assert_raises(AttributeError, schema.str_to_function,
-                     '%s:invalid' % __name__)
-
-
-def test_CisSchemaValidator():
-    r"""Test schema validator."""
-    v = schema.CisSchemaValidator()
-    test_vals = {
-        'string': [('s', 's'), (1, '1'), (1.0, '1.0'),
-                   (['1', 1], ['1', '1']),
-                   ({'1': 1, '2': '2'}, {'1': '1', '2': '2'})],
-        'integer': [('1', 1), (1, 1), (1.0, 1)],
-        'boolean': [('True', True), ('False', False),
-                    (True, True), (False, False),
-                    (1, True), (0, False)],
-        'list': [('1, 1 ', ['1', '1']), ([1, 1], [1, 1])],
-        'function': [('%s:direct_translate' % __name__, direct_translate)]}
-    for k, vals in test_vals.items():
-        f = getattr(v, '_normalize_coerce_%s' % k)
-        for res, ans in vals:
-            nt.assert_equal(f(res), ans)
-    nt.assert_raises(TypeError, v._normalize_coerce_list, 1)
+_normalize_objects = [
+    ({'models': [{'outputs': [{'name': 'outputA',
+                               'column_names': ['a', 'b'],
+                               'column_units': ['cm', 'g'],
+                               'column': '\t'}],
+                  'working_dir': os.getcwd()}],
+      'connections': [{'inputs': 'outputA',
+                       'outputs': 'fileA.txt',
+                       'working_dir': os.getcwd()}]},
+     {'models': [{'inputs': [], 'outputs': [{'name': 'outputA'}],
+                  'working_dir': os.getcwd()}],
+      'connections': [{'inputs': [{'name': 'outputA'}],
+                       'outputs': [{'name': 'fileA.txt',
+                                    'filetype': 'binary',
+                                    'working_dir': os.getcwd(),
+                                    'field_names': ['a', 'b'],
+                                    'field_units': ['cm', 'g'],
+                                    'delimiter': '\t'}]}]})]
 
 
 def test_SchemaRegistry():
@@ -87,3 +68,31 @@ def test_create_schema():
     assert(os.path.isfile(fname))
     nt.assert_equal(s2, s0)
     os.remove(fname)
+
+
+def test_cdriver2filetype_error():
+    r"""Test errors in cdriver2filetype."""
+    nt.assert_raises(ValueError, schema.cdriver2filetype, 'invalid')
+
+
+def test_standardize():
+    r"""Test standardize."""
+    vals = [(False, ['inputs', 'outputs'],
+             {'input': 'inputA'}, {'inputs': [{'name': 'inputA'}],
+                                   'outputs': []}),
+            (True, ['input', 'output'],
+             {'inputs': 'inputA'}, {'input': [{'name': 'inputA'}],
+                                    'output': []})]
+    for is_singular, keys, x, y in vals:
+        schema.standardize(x, keys, is_singular=is_singular)
+        nt.assert_equal(x, y)
+
+
+def test_normalize():
+    r"""Test normalization of legacy formats."""
+    s = schema.get_schema()
+    for x, y in _normalize_objects:
+        z = s.normalize(x, no_defaults=True)
+        pprint.pprint(y)
+        pprint.pprint(z)
+        nt.assert_equal(z, y)

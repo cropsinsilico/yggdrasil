@@ -256,8 +256,9 @@ class GCCModelDriver(ModelDriver):
     """
 
     _language = ['c', 'c++', 'cpp']
-    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
-                             cc={'type': 'string', 'required': False})
+    _schema_properties = inherit_schema(
+        ModelDriver._schema_properties, 'language', _language,
+        cc={'type': 'string'})  # default will depend on whats being compiled
 
     def __init__(self, name, args, cc=None, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)

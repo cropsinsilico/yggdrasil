@@ -63,4 +63,5 @@ class TestJSONStringMetaschemaType(TestJSONBooleanMetaschemaType):
         super(TestJSONStringMetaschemaType, self).__init__(*args, **kwargs)
         self._valid_decoded = ['hello']
         self._invalid_decoded = [None]
-        self._valid_normalize = [(1, '1'), (1.0, '1.0')]
+        self._valid_normalize = [(1, '1'), (1.0, '1.0'),
+                                 ([1, 2, 3], [1, 2, 3])]

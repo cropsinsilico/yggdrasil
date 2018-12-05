@@ -59,26 +59,27 @@ class ModelDriver(Driver):
 
     _language = 'executable'
     _schema_type = 'model'
-    _schema = {'name': {'type': 'string', 'required': True},
-               'language': {'type': 'string', 'required': True},
-               'args': {'type': ['list', 'string'], 'required': True,
-                        'schema': {'type': 'string'}},
-               'inputs': {'type': 'list', 'required': False,
-                          'schema': {'type': 'dict',
-                                     'schema': 'comm'}},
-               'outputs': {'type': 'list', 'required': False,
-                           'schema': {'type': 'dict',
-                                      'schema': 'comm'}},
-               'working_dir': {'type': 'string', 'required': True},
-               'is_server': {'type': 'boolean', 'required': False},
-               'client_of': {'type': 'list', 'required': False,
-                             'schema': {'type': 'string'}},
-               'with_strace': {'type': 'boolean', 'required': False},
-               'strace_flags': {'type': 'list', 'required': False,
-                                'schema': {'type': 'string'}},
-               'with_valgrind': {'type': 'boolean', 'required': False},
-               'valgrind_flags': {'type': 'list', 'required': False,
-                                  'schema': {'type': 'string'}}}
+    _schema_required = ['name', 'language', 'args', 'working_dir']
+    _schema_properties = {
+        'name': {'type': 'string'},
+        'language': {'type': 'string'},
+        'args': {'oneOf': [{'type': 'string'},
+                           {'type': 'array',
+                            'items': {'type': 'string'}}]},
+        'inputs': {'type': 'array', 'default': [],
+                   'items': {'$ref': '#/definitions/comm'}},
+        'outputs': {'type': 'array', 'default': [],
+                    'items': {'$ref': '#/definitions/comm'}},
+        'working_dir': {'type': 'string'},
+        'is_server': {'type': 'boolean', 'default': False},
+        'client_of': {'type': 'array', 'items': {'type': 'string'},
+                      'default': []},
+        'with_strace': {'type': 'boolean', 'default': False},
+        'strace_flags': {'type': 'array', 'default': [],
+                         'items': {'type': 'string'}},
+        'with_valgrind': {'type': 'boolean', 'default': False},
+        'valgrind_flags': {'type': 'array', 'default': [],
+                           'items': {'type': 'string'}}}
 
     def __init__(self, name, args, is_server=False, client_of=[],
                  with_strace=False, strace_flags=None,

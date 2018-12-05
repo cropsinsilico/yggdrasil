@@ -1,387 +1,631 @@
-comm:
-  as_array: &id001
-    required: false
-    type: boolean
-  dtype: &id002
-    required: false
-    type: string
-  field_names: &id003
-    required: false
-    schema:
-      type: string
-    type: list
-  field_units: &id004
-    required: false
-    schema:
-      type: string
-    type: list
-  format_str: &id005
-    required: false
-    type: string
-  name: &id006
-    required: true
-    type: string
-  stype: &id007
-    required: false
-    type: integer
-  units: &id008
-    required: false
-    type: string
-comm_schema_subtypes:
-  CommBase:
-  - default
-  IPCComm:
-  - ipc
-  RMQComm:
-  - rmq
-  ZMQComm:
-  - zmq
-comm_subtype_attr: _commtype
-connection:
-  input:
-    excludes: input_file
-    required: true
-    schema:
-      type: string
-    type:
-    - string
-    - list
-  input_file:
-    excludes: input
-    required: true
-    schema: file
-    type: dict
-  onexit:
-    required: false
-    type: string
-  output:
-    excludes: output_file
-    required: true
-    schema:
-      type: string
-    type:
-    - string
-    - list
-  output_file:
-    excludes: output
-    required: true
-    schema: file
-    type: dict
-  translator:
-    required: false
-    schema:
-      type: function
-    type:
-    - function
-    - list
-connection_schema_subtypes:
-  AsciiFileInputDriver:
-  - !!python/tuple
-    - AsciiFileComm
-    - DefaultComm
-    - input
-  AsciiFileOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - AsciiFileComm
-    - output
-  AsciiMapInputDriver:
-  - !!python/tuple
-    - AsciiMapComm
-    - DefaultComm
-    - input
-  AsciiMapOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - AsciiMapComm
-    - output
-  AsciiTableInputDriver:
-  - !!python/tuple
-    - AsciiTableComm
-    - DefaultComm
-    - input
-  AsciiTableOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - AsciiTableComm
-    - output
-  ConnectionDriver:
-  - !!python/tuple
-    - DefaultComm
-    - DefaultComm
-    - null
-  FileInputDriver:
-  - !!python/tuple
-    - FileComm
-    - DefaultComm
-    - input
-  FileOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - FileComm
-    - output
-  InputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - DefaultComm
-    - input
-  ObjFileInputDriver:
-  - !!python/tuple
-    - ObjFileComm
-    - DefaultComm
-    - input
-  ObjFileOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - ObjFileComm
-    - output
-  OutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - DefaultComm
-    - output
-  PandasFileInputDriver:
-  - !!python/tuple
-    - PandasFileComm
-    - DefaultComm
-    - input
-  PandasFileOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - PandasFileComm
-    - output
-  PickleFileInputDriver:
-  - !!python/tuple
-    - PickleFileComm
-    - DefaultComm
-    - input
-  PickleFileOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - PickleFileComm
-    - output
-  PlyFileInputDriver:
-  - !!python/tuple
-    - PlyFileComm
-    - DefaultComm
-    - input
-  PlyFileOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - PlyFileComm
-    - output
-  RMQInputDriver:
-  - !!python/tuple
-    - RMQComm
-    - DefaultComm
-    - input
-  RMQOutputDriver:
-  - !!python/tuple
-    - DefaultComm
-    - RMQComm
-    - output
-file:
-  append:
-    required: false
-    type: boolean
-  as_array: *id001
-  comment:
-    dependencies:
-      filetype:
-      - ascii
-      - table
-    required: false
-    type: string
-  delimiter:
-    dependencies:
-      filetype:
-      - pandas
-      - table
-    required: false
-    type: string
-  dtype: *id002
-  field_names: *id003
-  field_units: *id004
-  filetype:
-    allowed:
-    - ascii
-    - binary
-    - map
-    - obj
-    - pandas
-    - pickle
-    - ply
-    - table
-    default: binary
-    required: false
-    type: string
-  format_str: *id005
-  in_temp:
-    required: false
-    type: boolean
-  is_series:
-    required: false
-    type: boolean
-  name: *id006
-  newline:
-    default: '
+additionalProperties: false
+definitions:
+  comm:
+    $id: '#comm'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      properties:
+        args:
+          type: string
+        commtype:
+          default: default
+          enum:
+          - rmq
+          - ipc
+          - default
+          - zmq
+          type: string
+        datatype:
+          default:
+            type: bytes
+          type: schema
+        driver:
+          type: string
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    - anyOf:
+      - properties:
+          commtype:
+            enum:
+            - default
+        title: CommBase
+      - properties:
+          commtype:
+            enum:
+            - rmq
+        title: RMQComm
+      - properties:
+          commtype:
+            enum:
+            - ipc
+        title: IPCComm
+      - properties:
+          commtype:
+            enum:
+            - zmq
+        title: ZMQComm
+    description: Schema for comm components.
+    title: comm
+  connection:
+    $id: '#connection'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      properties:
+        args:
+          type: string
+        direction:
+          enum:
+          - output
+          - input
+          - null
+        driver:
+          type: string
+        icomm_type:
+          enum:
+          - PickleFileComm
+          - FileComm
+          - ObjFileComm
+          - AsciiFileComm
+          - DefaultComm
+          - AsciiTableComm
+          - PlyFileComm
+          - PandasFileComm
+          - RMQComm
+          - AsciiMapComm
+        inputs:
+          items:
+            anyOf:
+            - $ref: '#/definitions/comm'
+            - $ref: '#/definitions/file'
+          minItems: 1
+          type: array
+        ocomm_type:
+          enum:
+          - FileComm
+          - ObjFileComm
+          - DefaultComm
+          - AsciiFileComm
+          - AsciiTableComm
+          - PlyFileComm
+          - PandasFileComm
+          - RMQComm
+          - PickleFileComm
+          - AsciiMapComm
+        onexit:
+          type: string
+        outputs:
+          items:
+            anyOf:
+            - $ref: '#/definitions/comm'
+            - $ref: '#/definitions/file'
+          minItems: 1
+          type: array
+        translator:
+          oneOf:
+          - type: function
+          - items:
+              type: function
+            type: array
+      required:
+      - inputs
+      - outputs
+      type: object
+    - anyOf:
+      - properties:
+          direction:
+            enum:
+            - null
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: ConnectionDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - FileComm
+        title: FileOutputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - PandasFileComm
+        title: PandasFileOutputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - AsciiMapComm
+        title: AsciiMapOutputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - FileComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: FileInputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - ObjFileComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: ObjFileInputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - PickleFileComm
+        title: PickleFileOutputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - AsciiMapComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: AsciiMapInputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - AsciiFileComm
+        title: AsciiFileOutputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - AsciiTableComm
+        title: AsciiTableOutputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - AsciiFileComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: AsciiFileInputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - AsciiTableComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: AsciiTableInputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: OutputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - RMQComm
+        title: RMQOutputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - PlyFileComm
+        title: PlyFileOutputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: InputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - RMQComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: RMQInputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - PlyFileComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: PlyFileInputDriver
+      - properties:
+          direction:
+            enum:
+            - output
+          icomm_type:
+            enum:
+            - DefaultComm
+          ocomm_type:
+            enum:
+            - ObjFileComm
+        title: ObjFileOutputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - PickleFileComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: PickleFileInputDriver
+      - properties:
+          direction:
+            enum:
+            - input
+          icomm_type:
+            enum:
+            - PandasFileComm
+          ocomm_type:
+            enum:
+            - DefaultComm
+        title: PandasFileInputDriver
+    description: Schema for connection components.
+    title: connection
+  file:
+    $id: '#file'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      properties:
+        append:
+          default: false
+          type: boolean
+        args:
+          type: string
+        as_array: &id002
+          default: false
+          type: boolean
+        comment: &id001
+          type: unicode
+        delimiter: &id003
+          default: "\t"
+          type: unicode
+        driver:
+          type: string
+        field_names: &id004
+          items:
+            type: string
+          type: array
+        field_units: &id005
+          items:
+            type: string
+          type: array
+        filetype:
+          default: binary
+          enum:
+          - pandas
+          - ascii
+          - binary
+          - pickle
+          - table
+          - ply
+          - obj
+          - map
+          type: string
+        format_str: &id006
+          type: string
+        in_temp:
+          default: false
+          type: boolean
+        is_series:
+          default: false
+          type: boolean
+        name:
+          type: string
+        newline:
+          default: '
 
-      '
-    required: false
-    type: string
-  stype: *id007
-  units: *id008
-  use_astropy:
-    dependencies:
-      filetype:
-      - table
-    required: false
-    type: boolean
-  working_dir:
-    required: true
-    type: string
-file_schema_subtypes:
-  AsciiFileComm:
-  - ascii
-  AsciiMapComm:
-  - map
-  AsciiTableComm:
-  - table
-  FileComm:
-  - binary
-  ObjFileComm:
-  - obj
-  PandasFileComm:
-  - pandas
-  PickleFileComm:
-  - pickle
-  PlyFileComm:
-  - ply
-file_subtype_attr: _filetype
-model:
-  args:
-    required: true
-    schema:
-      type: string
-    type:
-    - list
-    - string
-  builddir:
-    dependencies:
-      language:
-      - cmake
-    required: false
-    type: string
-  cc:
-    dependencies:
-      language:
-      - c
-      - c++
-      - cpp
-    required: false
-    type: string
-  client_of:
-    required: false
-    schema:
-      type: string
-    type: list
-  cmakeargs:
-    dependencies:
-      language:
-      - cmake
-    required: false
-    schema:
-      type: string
-    type: list
-  inputs:
-    required: false
-    schema:
-      schema: comm
-      type: dict
-    type: list
-  is_server:
-    required: false
-    type: boolean
-  language:
-    allowed:
-    - c
-    - c++
-    - cmake
-    - cpp
-    - executable
-    - lpy
-    - make
-    - matlab
-    - python
-    required: true
-    type: string
-  make_command:
-    dependencies:
-      language:
-      - make
-    required: false
-    type: string
-  makedir:
-    dependencies:
-      language:
-      - make
-    required: false
-    type: string
-  makefile:
-    dependencies:
-      language:
-      - make
-    required: false
-    type: string
-  name:
-    required: true
-    type: string
-  outputs:
-    required: false
-    schema:
-      schema: comm
-      type: dict
-    type: list
-  sourcedir:
-    dependencies:
-      language:
-      - cmake
-    required: false
-    type: string
-  strace_flags:
-    required: false
-    schema:
-      type: string
-    type: list
-  valgrind_flags:
-    required: false
-    schema:
-      type: string
-    type: list
-  with_strace:
-    required: false
-    type: boolean
-  with_valgrind:
-    required: false
-    type: boolean
-  working_dir:
-    required: true
-    type: string
-model_schema_subtypes:
-  CMakeModelDriver:
-  - cmake
-  GCCModelDriver:
-  - c
-  - c++
-  - cpp
-  LPyModelDriver:
-  - lpy
-  MakeModelDriver:
-  - make
-  MatlabModelDriver:
-  - matlab
-  ModelDriver:
-  - executable
-  PythonModelDriver:
-  - python
-model_subtype_attr: _language
+            '
+          type: unicode
+        use_astropy: &id007
+          default: false
+          type: boolean
+        working_dir:
+          type: string
+      required:
+      - name
+      - filetype
+      - working_dir
+      type: object
+    - anyOf:
+      - properties:
+          filetype:
+            enum:
+            - binary
+        title: FileComm
+      - properties:
+          filetype:
+            enum:
+            - map
+        title: AsciiMapComm
+      - properties:
+          filetype:
+            enum:
+            - ply
+        title: PlyFileComm
+      - properties:
+          comment: *id001
+          filetype:
+            enum:
+            - ascii
+        title: AsciiFileComm
+      - properties:
+          as_array: *id002
+          comment:
+            type: unicode
+          delimiter: *id003
+          field_names: *id004
+          field_units: *id005
+          filetype:
+            enum:
+            - table
+          format_str: *id006
+          use_astropy: *id007
+        title: AsciiTableComm
+      - properties:
+          delimiter:
+            default: "\t"
+            type: unicode
+          filetype:
+            enum:
+            - pandas
+        title: PandasFileComm
+      - properties:
+          filetype:
+            enum:
+            - obj
+        title: ObjFileComm
+      - properties:
+          filetype:
+            enum:
+            - pickle
+        title: PickleFileComm
+    description: Schema for file components.
+    title: file
+  model:
+    $id: '#model'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver:
+        - args
+      properties:
+        args:
+          oneOf:
+          - type: string
+          - items:
+              type: string
+            type: array
+        builddir: &id012
+          type: string
+        cc: &id008
+          type: string
+        client_of:
+          default: []
+          items:
+            type: string
+          type: array
+        cmakeargs: &id013
+          default: []
+          items:
+            type: string
+          type: array
+        driver:
+          type: string
+        inputs:
+          default: []
+          items:
+            $ref: '#/definitions/comm'
+          type: array
+        is_server:
+          default: false
+          type: boolean
+        language:
+          enum:
+          - executable
+          - cmake
+          - make
+          - matlab
+          - c
+          - c++
+          - lpy
+          - cpp
+          - python
+          type: string
+        make_command: &id009
+          default: make
+          type: string
+        makedir: &id010
+          type: string
+        makefile: &id011
+          default: Makefile
+          type: string
+        name:
+          type: string
+        outputs:
+          default: []
+          items:
+            $ref: '#/definitions/comm'
+          type: array
+        sourcedir: &id014
+          type: string
+        strace_flags:
+          default: []
+          items:
+            type: string
+          type: array
+        valgrind_flags:
+          default: []
+          items:
+            type: string
+          type: array
+        with_strace:
+          default: false
+          type: boolean
+        with_valgrind:
+          default: false
+          type: boolean
+        working_dir:
+          type: string
+      required:
+      - name
+      - language
+      - args
+      - working_dir
+      type: object
+    - anyOf:
+      - properties:
+          language:
+            enum:
+            - executable
+        title: ModelDriver
+      - properties:
+          cc: *id008
+          language:
+            enum:
+            - c
+            - c++
+            - cpp
+        title: GCCModelDriver
+      - properties:
+          language:
+            enum:
+            - make
+          make_command: *id009
+          makedir: *id010
+          makefile: *id011
+        title: MakeModelDriver
+      - properties:
+          language:
+            enum:
+            - lpy
+        title: LPyModelDriver
+      - properties:
+          language:
+            enum:
+            - matlab
+        title: MatlabModelDriver
+      - properties:
+          builddir: *id012
+          cmakeargs: *id013
+          language:
+            enum:
+            - cmake
+          sourcedir: *id014
+        title: CMakeModelDriver
+      - properties:
+          language:
+            enum:
+            - python
+        title: PythonModelDriver
+    description: Schema for model components.
+    title: model
+description: Schema for cis_interface YAML input files.
+properties:
+  connections:
+    items:
+      $ref: '#/definitions/connection'
+    type: array
+  models:
+    items:
+      $ref: '#/definitions/model'
+    minItems: 1
+    type: array
+required:
+- models
+title: YAML Schema
+type: object

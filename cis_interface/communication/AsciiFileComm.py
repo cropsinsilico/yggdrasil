@@ -21,8 +21,9 @@ class AsciiFileComm(FileComm):
     """
 
     _filetype = 'ascii'
-    _schema = inherit_schema(FileComm._schema, 'filetype', _filetype,
-                             comment={'type': 'string', 'required': False})
+    _schema_properties = inherit_schema(
+        FileComm._schema_properties, 'filetype', _filetype,
+        comment={'type': 'unicode'})
 
     def _init_before_open(self, comment=serialize._default_comment, **kwargs):
         r"""Get absolute path and set attributes."""

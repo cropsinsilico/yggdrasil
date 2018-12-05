@@ -123,12 +123,15 @@ def get_validator(overwrite=False):
     return _validator
 
 
-def get_normalizer(overwrite=False):
+def get_normalizer(overwrite=False, normalizers=None, attr=None, **kwargs):
     r"""Return the normalizer that includes cis expansion types.
 
     Args:
         overwrite (bool, optional): If True, the existing normalizer will be
             overwritten. Defaults to False.
+        normalizers (dict, optional): Additional normalizers to add.
+        attr (dict, optional): Attributes to add to the normalizer class.
+        **kwargs: Additional keyword arguments are passed to normalizer.create.
 
     Returns:
         Normalizer: JSON schema normalizer.
@@ -138,7 +141,10 @@ def get_normalizer(overwrite=False):
     if (_normalizer is None) or overwrite:
         metaschema = get_metaschema()
         # Get set of normalizers
-        all_normalizers = {'$ref': normalizer._normalize_ref}
+        all_normalizers = {'$ref': normalizer._normalize_ref,
+                           'allOf': normalizer._normalize_allOf,
+                           'oneOf': normalizer._normalize_oneOf,
+                           'anyOf': normalizer._normalize_anyOf}
         for k, v in get_registered_properties().items():
             if hasattr(v, 'normalize'):
                 assert(k not in all_normalizers)
@@ -147,7 +153,14 @@ def get_normalizer(overwrite=False):
         all_datatypes = get_validator().DEFAULT_TYPES
         _normalizer = normalizer.create(meta_schema=metaschema,
                                         normalizers=all_normalizers,
-                                        default_types=all_datatypes)
+                                        default_types=all_datatypes, **kwargs)
+    if isinstance(normalizers, dict):
+        for k, v in normalizers.items():
+            if k not in _normalizer.NORMALIZERS:
+                _normalizer.NORMALIZERS[k] = v
+    if isinstance(attr, dict):
+        for k, v in attr.items():
+            setattr(_normalizer, k, v)
     return _normalizer
 
 
@@ -179,19 +192,20 @@ def validate_instance(obj, schema):
     cls(schema).validate(obj)
 
 
-def normalize_instance(obj, schema):
+def normalize_instance(obj, schema, **kwargs):
     r"""Normalize an object using the provided schema.
 
     Args:
         obj (object): Object to be normalized using the provided schema.
         schema (dict): Schema to use to normalize the provided object.
+        **kwargs: Additional keyword arguments are passed to get_normalizer.
     
     Returns:
         object: Normalized instance.
 
     """
     validate_schema(schema)
-    cls = get_normalizer()
+    cls = get_normalizer(**kwargs)
     return cls(schema).normalize(obj)
 
 

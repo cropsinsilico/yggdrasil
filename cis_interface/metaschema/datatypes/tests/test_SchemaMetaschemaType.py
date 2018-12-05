@@ -17,3 +17,4 @@ class TestSchemaMetaschemaType(parent.TestJSONObjectMetaschemaType):
         self._valid_decoded = [self._value]
         self._invalid_encoded = [{}]
         self._compatible_objects = [(self._value, self._value, None)]
+        self._valid_normalize += [('float', {'type': 'float'})]

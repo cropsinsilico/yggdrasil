@@ -3,6 +3,11 @@ from cis_interface import tools, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
 from cis_interface.schema import register_component, inherit_schema
+if platform._is_win:  # pragma: windows
+    _default_make_command = 'nmake'
+else:
+    _default_make_command = 'make'
+_default_makefile = 'Makefile'
 
 
 def setup_environ(compile_flags=[], linker_flags=[]):
@@ -55,10 +60,11 @@ class MakeModelDriver(ModelDriver):
     """
 
     _language = 'make'
-    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
-                             make_command={'type': 'string', 'required': False},
-                             makefile={'type': 'string', 'required': False},
-                             makedir={'type': 'string', 'required': False})
+    _schema_properties = inherit_schema(
+        ModelDriver._schema_properties, 'language', _language,
+        make_command={'type': 'string', 'default': _default_make_command},
+        makefile={'type': 'string', 'default': _default_makefile},
+        makedir={'type': 'string'})  # default will depend on makefile
 
     def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
@@ -68,10 +74,7 @@ class MakeModelDriver(ModelDriver):
         self.debug('')
         self.compiled = False
         if make_command is None:
-            if platform._is_win:  # pragma: windows
-                make_command = 'nmake'
-            else:
-                make_command = 'make'
+            make_command = _default_make_command
         self.target = self.args[0]
         if makedir is None:
             if (makefile is not None) and os.path.isabs(makefile):
@@ -79,7 +82,7 @@ class MakeModelDriver(ModelDriver):
             else:
                 makedir = self.working_dir
         if makefile is None:
-            makefile = 'Makefile'
+            makefile = _default_makefile
         self.make_command = make_command
         self.makedir = makedir
         self.makefile = makefile

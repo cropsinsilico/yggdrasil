@@ -17,8 +17,10 @@ class PandasFileComm(FileComm):
     """
 
     _filetype = 'pandas'
-    _schema = inherit_schema(FileComm._schema, 'filetype', _filetype,
-                             delimiter={'type': 'string', 'required': False})
+    _schema_properties = inherit_schema(
+        FileComm._schema_properties, 'filetype', _filetype,
+        delimiter={'type': 'unicode',
+                   'default': backwards.bytes2unicode(serialize._default_delimiter)})
 
     def _init_before_open(self, delimiter='\t', serializer_kwargs=None, **kwargs):
         r"""Set up dataio and attributes."""
