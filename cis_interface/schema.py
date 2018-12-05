@@ -670,6 +670,10 @@ def standardize(instance, keys, is_singular=False, suffixes=None):
     if suffixes is not None:
         for s in suffixes:
             altkeys.append(['%s%s' % (k, s) for k in keys])
+            if is_singular:
+                altkeys.append(['%ss%s' % (k, s) for k in keys])
+            else:
+                altkeys.append(['%s%s' % (k[:-1], s) for k in keys])
     if is_singular:
         altkeys.append(['%ss' % k for k in keys])
     else:
