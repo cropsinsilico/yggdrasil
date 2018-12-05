@@ -1,4 +1,3 @@
-import sys
 from cis_interface.interface import CisInput, CisOutput
 
 
@@ -29,7 +28,4 @@ if __name__ == '__main__':
             prate[0], grate))
         flag = output.send(grate)
         if not flag:
-            print('growth: Error sending growth rate.')
-            sys.exit(-1)
-
-    sys.exit(0)
+            raise RuntimeError('growth: Error sending growth rate.')

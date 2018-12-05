@@ -17,17 +17,14 @@ output = randsample(charset, msg_size-1, true);
 [flag, vars] = rpc.call(output);
 if (~flag)
   error('maxMsgCli(M): RPC ERROR');
-  exit(-1);
 end;
 
 % Check to see if response matches
 if (vars{1} ~= output)
   error('maxMsgCli(M): ERROR: input/output do not match');
-  exit(-1);
 else
   disp('maxMsgCli(M): CONFIRM');
 end;
 
 % All done, say goodbye
 disp('maxMsgCli(M): Goodbye!');
-exit(0);

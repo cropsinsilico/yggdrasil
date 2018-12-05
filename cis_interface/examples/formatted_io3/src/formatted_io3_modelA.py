@@ -25,5 +25,4 @@ while True:
     # If there is an error, the flag will be False
     flag = out_channel.send(arr)
     if not flag:
-        print("Model A: Error sending output.")
-        break
+        raise RuntimeError("Model A: Error sending output.")

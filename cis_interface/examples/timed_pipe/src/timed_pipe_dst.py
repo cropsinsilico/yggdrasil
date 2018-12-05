@@ -1,5 +1,4 @@
 from __future__ import print_function
-import sys
 from cis_interface.interface.CisInterface import CisInput, CisOutput
 
 
@@ -20,8 +19,7 @@ def run():
             break
         ret = outf.send(buf)
         if not ret:
-            print("pipe_dst(P): SEND ERROR ON MSG %d" % count)
-            sys.exit(-1)
+            raise RuntimeError("pipe_dst(P): SEND ERROR ON MSG %d" % count)
         count += 1
 
     print('Goodbye from Python destination. Received %d messages.' % count)

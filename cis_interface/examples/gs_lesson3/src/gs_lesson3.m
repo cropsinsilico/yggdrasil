@@ -27,5 +27,3 @@ while flag
   end
   
 end
-
-exit(0);

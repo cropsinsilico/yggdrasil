@@ -1,5 +1,4 @@
 from __future__ import print_function
-import sys
 from cis_interface.interface.CisInterface import CisInput, CisOutput
 
 
@@ -16,29 +15,25 @@ def runhello():
     # Receive input from a local file
     ret, buf = inf.recv()
     if not ret:
-        print('hello(P): ERROR FILE RECV')
-        sys.exit(-1)
+        raise RuntimeError('hello(P): ERROR FILE RECV')
     print('hello(P): Received %d bytes from file: %s' % (len(buf), buf))
 
     # Send output to the output queue
     ret = outq.send(buf)
     if not ret:
-        print('hello(P): ERROR QUEUE SEND')
-        sys.exit(-1)
+        raise RuntimeError('hello(P): ERROR QUEUE SEND')
     print('hello(P): Sent to outq')
 
     # Receive input form the input queue
     ret, buf = inq.recv()
     if not ret:
-        print('hello(P): ERROR QUEUE RECV')
-        sys.exit(-1)
+        raise RuntimeError('hello(P): ERROR QUEUE RECV')
     print('hello(P): Received %d bytes from queue: %s' % (len(buf), buf))
 
     # Send output to a local file
     ret = outf.send(buf)
     if not ret:
-        print('hello(P): ERROR FILE SEND')
-        sys.exit(-1)
+        raise RuntimeError('hello(P): ERROR FILE SEND')
     print('hello(P): Sent to outf')
 
     print('Goodbye from Python')

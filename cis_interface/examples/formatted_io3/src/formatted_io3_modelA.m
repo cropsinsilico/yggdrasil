@@ -26,10 +26,8 @@ while flag
   % If there is an error, the flag will be False
   flag = out_channel.send(arr);
   if (~flag)
-    disp('Model A: Error sending output.');
+    error('Model A: Error sending output.');
     break;
   end;
   
 end;
-
-exit(0);
