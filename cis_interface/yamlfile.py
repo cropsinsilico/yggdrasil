@@ -63,11 +63,6 @@ def prep_yaml(files):
         yml_all[k] = []
         for yml in yamls:
             yml_all[k] += yml[k]
-    # Normalize the schema
-    s = get_schema()
-    yml_all = s.normalize(yml_all, no_defaults=True)
-    # print('normalized')
-    # pprint.pprint(yml_all)
     return yml_all
 
 
@@ -88,18 +83,18 @@ def parse_yaml(files):
         dict: Dictionary of information parsed from the yamls.
 
     """
+    s = get_schema()
     # Parse files using schema
     yml_prep = prep_yaml(files)
     # print('prepped')
     # pprint.pprint(yml_prep)
-    v = get_schema()
-    yml_norm = v.normalize(yml_prep)
-    v.validate(yml_norm)
-    yml_all = yml_norm
+    yml_norm = s.validate(yml_prep, normalize=True)
+    # print('normalized')
+    # pprint.pprint(yml_norm)
     # Parse models, then connections to ensure connections can be processed
     existing = None
     for k in ['models', 'connections']:
-        for yml in yml_all[k]:
+        for yml in yml_norm[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
     # Make sure that I/O channels initialized
     for io in ['input', 'output']:
@@ -109,6 +104,8 @@ def parse_yaml(files):
                     io, k))
     # Link io drivers back to models
     existing = link_model_io(existing)
+    # print('drivers')
+    # pprint.pprint(existing)
     return existing
 
 
@@ -133,6 +130,7 @@ def parse_component(yml, ctype, existing=None):
         dict: All components identified.
 
     """
+    s = get_schema()
     if not isinstance(yml, dict):
         raise TypeError("Component entry in yml must be a dictionary.")
     ctype_list = ['input', 'output', 'model', 'connection',
@@ -146,6 +144,16 @@ def parse_component(yml, ctype, existing=None):
         existing = parse_model(yml, existing)
     elif ctype == 'connection':
         existing = parse_connection(yml, existing)
+    elif ctype in ['input', 'output']:
+        for k in ['icomm_kws', 'ocomm_kws']:
+            if k not in yml:
+                continue
+            for x in yml[k]['comm']:
+                if 'comm' not in x:
+                    if 'filetype' in x:
+                        x['comm'] = s['file'].subtype2class[x['filetype']]
+                    elif 'commtype' in x:
+                        x['comm'] = s['comm'].subtype2class[x['commtype']]
     # Ensure component dosn't already exist
     if yml['name'] in existing[ctype]:
         pprint.pprint(existing)
@@ -259,21 +267,21 @@ def parse_connection(yml, existing):
     if iname:  # empty name results when all of the inputs are files
         iyml = yml['inputs']
         xo = {'name': iname, 'model_driver': [],
-              'icomm_kwargs': {'comm': []},
-              'ocomm_kwargs': {'comm': []}}
+              'icomm_kws': {'comm': []},
+              'ocomm_kws': {'comm': []}}
         for i, y in enumerate(iyml):
             if not is_file['inputs'][i]:
-                xo['icomm_kwargs']['comm'].append(existing['output'][y['name']])
-                xo['icomm_kwargs']['comm'][-1].update(**y)
+                xo['icomm_kws']['comm'].append(existing['output'][y['name']])
+                xo['icomm_kws']['comm'][-1].update(**y)
                 xo['model_driver'] += existing['output'][y['name']]['model_driver']
                 del existing['output'][y['name']]
         # Add single non-file intermediate output comm if there are any non-file
         # outputs and an output comm for each file output
         if (sum(is_file['outputs']) < len(is_file['outputs'])):
-            xo['ocomm_kwargs']['comm'].append({'name': args, 'no_suffix': True})
+            xo['ocomm_kws']['comm'].append({'name': args, 'no_suffix': True})
         for i, y in enumerate(yml['outputs']):
             if is_file['outputs'][i]:
-                xo['ocomm_kwargs']['comm'].append(y)
+                xo['ocomm_kws']['comm'].append(y)
         existing = parse_component(xo, 'output', existing)
         xo['args'] = args
         xo['driver'] = 'OutputDriver'
@@ -282,24 +290,27 @@ def parse_connection(yml, existing):
     if oname:  # empty name results when all of the outputs are files
         oyml = yml['outputs']
         xi = {'name': oname, 'model_driver': [],
-              'icomm_kwargs': {'comm': []},
-              'ocomm_kwargs': {'comm': []}}
+              'icomm_kws': {'comm': []},
+              'ocomm_kws': {'comm': []}}
         for i, y in enumerate(oyml):
             if not is_file['outputs'][i]:
-                xi['ocomm_kwargs']['comm'].append(existing['input'][y['name']])
-                xi['ocomm_kwargs']['comm'][-1].update(**y)
+                xi['ocomm_kws']['comm'].append(existing['input'][y['name']])
+                xi['ocomm_kws']['comm'][-1].update(**y)
                 xi['model_driver'] += existing['input'][y['name']]['model_driver']
                 del existing['input'][y['name']]
         # Add single non-file intermediate input comm if there are any non-file
         # inputs and an input comm for each file input
         if (sum(is_file['inputs']) < len(is_file['inputs'])):
-            xo['icomm_kwargs']['comm'].append({'name': args, 'no_suffix': True})
+            xi['icomm_kws']['comm'].append({'name': args, 'no_suffix': True})
         for i, y in enumerate(yml['inputs']):
             if is_file['inputs'][i]:
-                xi['icomm_kwargs']['comm'].append(y)
+                xi['icomm_kws']['comm'].append(y)
         existing = parse_component(xi, 'input', existing)
         xi['args'] = args
         xi['driver'] = 'InputDriver'
+
+    # Parse drivers
+    
     # Transfer connection keywords to one connection driver
     conn_keys_gen = ['inputs', 'outputs']
     conn_keys = list(set(schema['connection'].properties) - set(conn_keys_gen))

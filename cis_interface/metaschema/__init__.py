@@ -20,7 +20,6 @@ _metaschema_fname = os.path.abspath(os.path.join(
     os.path.dirname(cis_interface.__file__), _metaschema_fbase))
 _metaschema = None
 _validator = None
-_normalizer = None
 
 
 if os.path.isfile(_metaschema_fname):
@@ -87,12 +86,14 @@ def get_metaschema():
     return copy.deepcopy(_metaschema)
 
 
-def get_validator(overwrite=False):
+def get_validator(overwrite=False, normalizers=None, **kwargs):
     r"""Return the validator that includes cis expansion types.
 
     Args:
         overwrite (bool, optional): If True, the existing validator will be
             overwritten. Defaults to False.
+        normalizers (dict, optional): Additional normalizers to add.
+        **kwargs: Additional keyword arguments are passed to normalizer.create.
 
     Returns:
         jsonschema.IValidator: JSON schema validator.
@@ -104,10 +105,9 @@ def get_validator(overwrite=False):
         # Get set of validators
         all_validators = copy.deepcopy(_base_validator.VALIDATORS)
         for k, v in get_registered_properties().items():
-            if v.schema is not None:
-                if (not v._replaces_existing):
-                    assert(k not in all_validators)
-                all_validators[k] = v.wrapped_validate
+            if (not v._replaces_existing):
+                assert(k not in all_validators)
+            all_validators[k] = v.wrapped_validate
         # Get set of datatypes
         # TODO: This will need to be changed with deprecation in jsonschema
         all_datatypes = copy.deepcopy(_base_validator.DEFAULT_TYPES)
@@ -116,52 +116,15 @@ def get_validator(overwrite=False):
                 # Error raised on registration
                 assert(k not in all_datatypes)
             all_datatypes[k] = v.python_types
-        # Use default base and update validators
-        _validator = jsonschema.validators.create(meta_schema=metaschema,
-                                                  validators=all_validators,
-                                                  default_types=all_datatypes)
-    return _validator
-
-
-def get_normalizer(overwrite=False, normalizers=None, attr=None, **kwargs):
-    r"""Return the normalizer that includes cis expansion types.
-
-    Args:
-        overwrite (bool, optional): If True, the existing normalizer will be
-            overwritten. Defaults to False.
-        normalizers (dict, optional): Additional normalizers to add.
-        attr (dict, optional): Attributes to add to the normalizer class.
-        **kwargs: Additional keyword arguments are passed to normalizer.create.
-
-    Returns:
-        Normalizer: JSON schema normalizer.
-
-    """
-    global _normalizer
-    if (_normalizer is None) or overwrite:
-        metaschema = get_metaschema()
         # Get set of normalizers
-        all_normalizers = {'$ref': normalizer._normalize_ref,
-                           'allOf': normalizer._normalize_allOf,
-                           'oneOf': normalizer._normalize_oneOf,
-                           'anyOf': normalizer._normalize_anyOf}
-        for k, v in get_registered_properties().items():
-            if hasattr(v, 'normalize'):
-                assert(k not in all_normalizers)
-                all_normalizers[k] = v.normalize
-        # Get set of datatypes
-        all_datatypes = get_validator().DEFAULT_TYPES
-        _normalizer = normalizer.create(meta_schema=metaschema,
-                                        normalizers=all_normalizers,
-                                        default_types=all_datatypes, **kwargs)
-    if isinstance(normalizers, dict):
-        for k, v in normalizers.items():
-            if k not in _normalizer.NORMALIZERS:
-                _normalizer.NORMALIZERS[k] = v
-    if isinstance(attr, dict):
-        for k, v in attr.items():
-            setattr(_normalizer, k, v)
-    return _normalizer
+        if normalizers is None:
+            normalizers = {}
+        # Use default base and update validators
+        _validator = normalizer.create(meta_schema=metaschema,
+                                       validators=all_validators,
+                                       normalizers=normalizers,
+                                       default_types=all_datatypes, **kwargs)
+    return _validator
 
 
 def validate_schema(obj):
@@ -178,10 +141,13 @@ def validate_schema(obj):
     cls.check_schema(obj)
 
 
-def validate_instance(obj, schema):
+def validate_instance(obj, schema, **kwargs):
     r"""Validate an instance against a schema.
 
     Args:
+        obj (object): Object to be validated using the provided schema.
+        schema (dict): Schema to use to validate the provided object.
+        **kwargs: Additional keyword arguments are passed to validate.
 
     Raises:
         ValidationError: If the object is not valid.
@@ -189,7 +155,7 @@ def validate_instance(obj, schema):
     """
     cls = get_validator()
     cls.check_schema(schema)
-    cls(schema).validate(obj)
+    return cls(schema).validate(obj, **kwargs)
 
 
 def normalize_instance(obj, schema, **kwargs):
@@ -198,15 +164,15 @@ def normalize_instance(obj, schema, **kwargs):
     Args:
         obj (object): Object to be normalized using the provided schema.
         schema (dict): Schema to use to normalize the provided object.
-        **kwargs: Additional keyword arguments are passed to get_normalizer.
+        **kwargs: Additional keyword arguments are passed to normalize.
     
     Returns:
         object: Normalized instance.
 
     """
-    validate_schema(schema)
-    cls = get_normalizer(**kwargs)
-    return cls(schema).normalize(obj)
+    cls = get_validator()
+    cls.check_schema(schema)
+    return cls(schema).normalize(obj, **kwargs)
 
 
 def import_all_classes():

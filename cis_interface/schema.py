@@ -157,7 +157,8 @@ class ComponentSchema(object):
             prop_default[subt]['enum'] = []
         # Get list of properties for each subtype and move properties to
         # base for brevity
-        for k, v in self._storage.items():
+        for k, v0 in self._storage.items():
+            v = copy.deepcopy(v0)
             combo['allOf'][1]['anyOf'].append(v)
             for p in v['properties'].keys():
                 if p in self.subtype_keys:
@@ -169,21 +170,24 @@ class ComponentSchema(object):
         for subt in self.subtype_keys:
             prop_default[subt]['enum'] = list(set(prop_default[subt]['enum']))
         out.update(**combo)
-        # Legacy schema to allow valdiation
-        default_schema = out['allOf'][0]
-        legacy = {'dependencies': {'driver': ['args']},
-                  'properties': {'driver': {'type': 'string'},
-                                 'args': {'type': 'string'}}}
-        if 'dependencies' not in default_schema:
-            default_schema['dependencies'] = {}
-        for k, v in legacy['dependencies'].items():
-            if k not in default_schema['dependencies']:
-                default_schema['dependencies'][k] = []
-            default_schema['dependencies'][k] = list(
-                set(default_schema['dependencies'][k] + v))
-        for k, v in legacy['properties'].items():
-            if k not in default_schema['properties']:
-                default_schema['properties'][k] = v
+        return out
+
+    @property
+    def full_schema(self):
+        r"""dict: Schema for evaluating YAML input file that fully specifies
+        the properties for each component."""
+        out = self.schema
+        del out['allOf'][0]['additionalProperties']
+        prop_default = out['allOf'][0]['properties']
+        # Remove subtype specific properties from the default
+        for x in out['allOf'][1]['anyOf']:
+            for p in x['properties'].keys():
+                if (p in prop_default) and (p not in self.subtype_keys):
+                    del prop_default[p]
+        # Update subtype properties to include base properties
+        for x in out['allOf'][1]['anyOf']:
+            x['properties'].update(copy.deepcopy(prop_default))
+            x['additionalProperties'] = False
         return out
 
     @classmethod
@@ -312,7 +316,13 @@ class ComponentSchema(object):
                 {'type': 'object',
                  'required': comp_cls._schema_required,
                  'properties': comp_cls._schema_properties,
-                 'additionalProperties': False})
+                 'additionalProperties': False,
+                 'dependencies': {'driver': ['args']}})
+            legacy_properties = {'driver': {'type': 'string'},
+                                 'args': {'type': 'string'}}
+            for k, v in legacy_properties.items():
+                if k not in self._base_schema['properties']:
+                    self._base_schema['properties'][k] = v
         # Add sub schema
         new_schema = {'title': name,
                       'required': [],
@@ -399,6 +409,15 @@ class SchemaRegistry(object):
             out['definitions'].setdefault(k, {'type': 'string'})
         return out
 
+    @property
+    def full_schema(self):
+        r"""dict: Schema for evaluating YAML input file that fully specifies
+        the properties for each component."""
+        out = self.schema
+        for k, v in self._storage.items():
+            out['definitions'][k] = v.full_schema
+        return out
+
     def __getitem__(self, k):
         return self.get(k)
 
@@ -452,14 +471,19 @@ class SchemaRegistry(object):
         with open(fname, 'w') as f:
             yaml.dump(out, f, default_flow_style=False)
 
-    def validate(self, obj):
+    def validate(self, obj, **kwargs):
         r"""Validate an object against this schema.
 
         Args:
             obj (object): Object to valdiate.
+            **kwargs: Additional keyword arguments are passed to validate_instance.
 
         """
-        return metaschema.validate_instance(obj, self.schema)
+        if kwargs.get('normalize', False):
+            kwargs.setdefault('normalizers', self._normalizers)
+            # kwargs.setdefault('no_defaults', True)
+            kwargs.setdefault('schema_registry', self)
+        return metaschema.validate_instance(obj, self.schema, **kwargs)
 
     def validate_component(self, comp_name, obj):
         r"""Validate an object against a specific component.
@@ -472,7 +496,7 @@ class SchemaRegistry(object):
         comp_schema = self.get_component_schema(comp_name)
         return metaschema.validate_instance(obj, comp_schema)
 
-    def normalize(self, obj, iodict=None, **kwargs):
+    def normalize(self, obj, backwards_compat=False, **kwargs):
         r"""Normalize an object against this schema.
 
         Args:
@@ -484,9 +508,9 @@ class SchemaRegistry(object):
 
         """
         kwargs.setdefault('normalizers', self._normalizers)
-        kwargs['attr'] = {'schema_registry': self,
-                          'iodict': iodict}
-        return metaschema.normalize_instance(obj, self.schema, **kwargs)
+        # kwargs.setdefault('no_defaults', True)
+        kwargs.setdefault('schema_registry', self)
+        return metaschema.normalize_instance(obj, self.full_schema, **kwargs)
 
     # def is_valid(self, obj):
     #     r"""Determine if an object is valid under this schema.
@@ -672,8 +696,10 @@ def standardize(instance, keys, is_singular=False, suffixes=None):
             altkeys.append(['%s%s' % (k, s) for k in keys])
             if is_singular:
                 altkeys.append(['%ss%s' % (k, s) for k in keys])
+                altkeys.append(['%s%ss' % (k, s) for k in keys])
             else:
                 altkeys.append(['%s%s' % (k[:-1], s) for k in keys])
+                altkeys.append(['%s%ss' % (k[:-1], s) for k in keys])
     if is_singular:
         altkeys.append(['%ss' % k for k in keys])
     else:
@@ -700,7 +726,8 @@ def _normalize_root(normalizer, value, instance, schema):
     #     normalizer.schema_registry = get_schema()
     if getattr(normalizer, 'iodict', None) is None:
         normalizer.iodict = {'inputs': {}, 'outputs': {}, 'connections': [],
-                             'input_drivers': [], 'output_drivers': [], 'pairs': []}
+                             'input_drivers': [], 'output_drivers': [], 'pairs': [],
+                             'inputs_extra': {}, 'outputs_extra': {}}
     standardize(instance, ['models', 'connections'])
     return instance
 
@@ -710,6 +737,9 @@ def _normalize_modelio_first(normalizer, value, instance, schema):
     r"""Normalizes set of model inputs/outputs before each input/output is normalized."""
     if isinstance(instance, dict):
         standardize(instance, ['inputs', 'outputs'])
+        for io in ['inputs', 'outputs']:
+            for x in instance[io]:
+                x.setdefault('working_dir', instance['working_dir'])
     return instance
 
 
@@ -720,10 +750,17 @@ def _normalize_modelio_elements(normalizer, value, instance, schema):
     io = normalizer.current_schema_path[2]
     # Register io if dict set
     iodict = getattr(normalizer, 'iodict', None)
+    s = getattr(normalizer, 'schema_registry', None)
     if (iodict is not None) and isinstance(instance, dict) and ('name' in instance):
         # Register io if dict set
         if instance['name'] not in iodict[io]:
             iodict[io][instance['name']] = instance
+            # Move non-comm keywords to a buffer
+            if (s is not None):
+                comm_keys = s.get_component_keys('comm')
+                extra_keys = {}
+                migrate_keys(instance, [extra_keys], comm_keys)
+                iodict['%s_extra' % io][instance['name']] = extra_keys
         # Add driver to list
         if ('driver' in instance) and ('args' in instance):
             opp_map = {'inputs': 'output', 'outputs': 'input'}
@@ -743,19 +780,6 @@ def _normalize_modelio_elements(normalizer, value, instance, schema):
             else:
                 iodict['%s_drivers' % io[:-1]].append(
                     (instance['args'], instance['name']))
-
-    return instance
-
-
-@SchemaRegistry.register_normalizer(('models', 1))
-def _normalize_modelio_last(normalizer, value, instance, schema):
-    r"""Normalizes set of model inputs/outputs after each input/output is normalized."""
-    if isinstance(instance, dict):
-        for io in ['inputs', 'outputs']:
-            for x in instance[io]:
-                if isinstance(x, dict) and ('driver' in x):
-                    if 'working_dir' in instance:
-                        x.setdefault('working_dir', instance['working_dir'])
     return instance
 
 
@@ -780,15 +804,13 @@ def _normalize_connio_base(normalizer, value, instance, schema):
         # File input
         for k, v in iodict['input_drivers']:
             iyml = iodict['inputs'][v]
-            fyml = dict(name=k, filetype=cdriver2filetype(iyml['driver']),
-                        working_dir=iyml['working_dir'])
+            fyml = dict(name=k, filetype=cdriver2filetype(iyml['driver']))
             conn = dict(input=fyml, output=v)
             new_connections.append(([iyml], conn))
         # File output
         for k, v in iodict['output_drivers']:
             oyml = iodict['outputs'][v]
-            fyml = dict(name=k, filetype=cdriver2filetype(oyml['driver']),
-                        working_dir=oyml['working_dir'])
+            fyml = dict(name=k, filetype=cdriver2filetype(oyml['driver']))
             conn = dict(output=fyml, input=v)
             new_connections.append(([oyml], conn))
         # Transfer keyword arguments from input/output to connection
@@ -818,37 +840,42 @@ def _normalize_connio_first(normalizer, value, instance, schema):
             target_files = []
             for io in ['inputs', 'outputs']:
                 for x in instance[io]:
-                    y = iodict[opp_map[io]].get(x['name'], None)
+                    y = iodict['%s_extra' % opp_map[io]].get(x['name'], None)
                     if y is None:
                         target_files.append(x)
                         continue
                     y_keys = list(y.keys())
                     for k in y_keys:
-                        if k not in comm_keys:
-                            val = y.pop(k)
-                            if k == 'translator':
-                                instance.setdefault(k, [])
-                                instance[k].append(val)
-                            elif (k in conn_keys):
-                                instance.setdefault(k, val)
-                            else:
-                                x.setdefault(k, val)
+                        val = y.pop(k)
+                        if k == 'translator':
+                            instance.setdefault(k, [])
+                            if not isinstance(val, (list, tuple)):
+                                val = [val]
+                            instance[k] += val
+                        else:
+                            instance.setdefault(k, val)
             # Move everything but comm keywords down to files, then move
             # remainder down to input comms
-            migrate_keys(instance, target_files,
-                         conn_keys + ['working_dir'] + comm_keys)
-            migrate_keys(instance, instance['inputs'],
-                         conn_keys + ['working_dir'])
+            migrate_keys(instance, target_files, conn_keys + comm_keys)
+            instance.pop('working_dir', None)
+            migrate_keys(instance, instance['inputs'] + instance['outputs'], conn_keys)
     return instance
 
 
-# @SchemaRegistry.register_normalizer([('connections', 0, 'inputs', 0, 0),
-#                                      ('connections', 0, 'outputs', 0, 0)])
-# def _normalize_connio_elements_comm(normalizer, value, instance, schema):
-#     r"""Normalize connection inputs/outputs as comms."""
-#     if isinstance(instance, dict):
-#         pass
-#     return instance
+@SchemaRegistry.register_normalizer([('connections', 0, 'inputs', 0, 0),
+                                     ('connections', 0, 'outputs', 0, 0)])
+def _normalize_connio_elements_comm(normalizer, value, instance, schema):
+    r"""Normalize connection inputs/outputs as comms."""
+    io = normalizer.current_schema_path[2]
+    if isinstance(instance, dict):
+        # Check to see if is file
+        iodict = getattr(normalizer, 'iodict', None)
+        opp_map = {'inputs': 'outputs', 'outputs': 'inputs'}
+        if iodict is not None:
+            if (((instance['name'] in iodict[opp_map[io]])
+                 and ('commtype' not in instance))):
+                instance['commtype'] = schema['properties']['commtype']['default']
+    return instance
 
 
 @SchemaRegistry.register_normalizer([('connections', 0, 'inputs', 1, 0),
@@ -871,15 +898,6 @@ def _normalize_connio_elements_file(normalizer, value, instance, schema):
 def _normalize_connio_last(normalizer, value, instance, schema):
     r"""Normalize set of connections after they have been normalized."""
     if isinstance(instance, dict):
-        working_dir = instance.pop('working_dir', None)
-        # Check for file type
-        for io in ['inputs', 'outputs']:
-            for x in instance[io]:
-                if 'filetype' in x:
-                    if working_dir is not None:
-                        x.setdefault('working_dir', working_dir)
-                    else:
-                        assert('working_dir' in x)
         # Check that files properly specified
         s = getattr(normalizer, 'schema_registry', None)
         if s is not None:
@@ -892,11 +910,6 @@ def _normalize_connio_last(normalizer, value, instance, schema):
                 pprint.pprint(instance)
                 raise RuntimeError(("Both the input and output for this connection "
                                     + "appear to be files."))
-            for io in ['inputs', 'outputs']:
-                for x in instance[io]:
-                    if (not is_file[io]) and ('filetype' in x):
-                        raise ValueError(('Filetype specified for %s, '
-                                          + 'but %s is not file.') % (io, io))
         # Copy file keys from partner comm(s) to the file comm(s)
         comm_keys = s.get_component_keys('comm')
         opp_map = {'inputs': 'outputs', 'outputs': 'inputs'}
@@ -919,8 +932,8 @@ def _normalize_model_driver(normalizer, value, instance, schema):
     return instance
 
 
-@SchemaRegistry.register_normalizer([('connections', 0, 'inputs', 0, 0),
-                                     ('connections', 0, 'outputs', 0, 0)])
+@SchemaRegistry.register_normalizer([('connections', 0, 'inputs', 1, 0),
+                                     ('connections', 0, 'outputs', 1, 0)])
 def _normalize_rwmeth(normalizer, value, instance, schema):
     r"""Normalize older style of specifying 'read_meth' or 'write_meth' instead
     of filetype."""
@@ -928,7 +941,8 @@ def _normalize_rwmeth(normalizer, value, instance, schema):
         # Replace old read/write methd with filetype
         for k in ['read_meth', 'write_meth']:
             val = instance.pop(k, None)
-            if (val is not None) and ('filetype' not in instance):
+            if (((val is not None)
+                 and (instance.get('filetype', None) in [None, 'binary']))):
                 instance.update(rwmeth2filetype(val))
     return instance
 
@@ -949,8 +963,8 @@ def _normalize_ascii_table(normalizer, value, instance, schema):
 
 @SchemaRegistry.register_normalizer([('models', 0, 'inputs', 0),
                                      ('models', 0, 'outputs', 0),
-                                     ('connections', 0, 'inputs', 1, 0),
-                                     ('connections', 0, 'outputs', 1, 0)])
+                                     ('connections', 0, 'inputs', 0, 0),
+                                     ('connections', 0, 'outputs', 0, 0)])
 def _normalize_datatype(normalizer, value, instance, schema):
     r"""Normalize the datatype if the type information is in the comm."""
     if isinstance(instance, dict) and ('datatype' not in instance):

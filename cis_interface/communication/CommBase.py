@@ -294,11 +294,12 @@ class CommBase(tools.CisClass):
 
     _commtype = 'default'
     _schema_type = 'comm'
-    _schema_required = ['name']
+    _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {'name': {'type': 'string'},
                           'commtype': {'type': 'string', 'default': _commtype},
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}}}
+    is_file = False
 
     def __init__(self, name, address=None, direction='send',
                  dont_open=False, is_interface=False, recv_timeout=0.0,
@@ -331,7 +332,6 @@ class CommBase(tools.CisClass):
         self.is_server = is_server
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
-        self.is_file = False
         self.matlab = matlab
         self.recv_converter = recv_converter
         self.send_converter = send_converter

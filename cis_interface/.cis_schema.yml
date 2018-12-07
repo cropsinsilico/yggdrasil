@@ -14,9 +14,9 @@ definitions:
           default: default
           enum:
           - rmq
-          - ipc
           - default
           - zmq
+          - ipc
           type: string
         datatype:
           default:
@@ -28,6 +28,8 @@ definitions:
           type: string
       required:
       - name
+      - commtype
+      - datatype
       type: object
     - anyOf:
       - properties:
@@ -64,23 +66,23 @@ definitions:
           type: string
         direction:
           enum:
-          - output
           - input
+          - output
           - null
         driver:
           type: string
         icomm_type:
           enum:
-          - PickleFileComm
-          - FileComm
-          - ObjFileComm
-          - AsciiFileComm
-          - DefaultComm
-          - AsciiTableComm
-          - PlyFileComm
-          - PandasFileComm
-          - RMQComm
           - AsciiMapComm
+          - PickleFileComm
+          - PlyFileComm
+          - AsciiTableComm
+          - RMQComm
+          - PandasFileComm
+          - AsciiFileComm
+          - FileComm
+          - DefaultComm
+          - ObjFileComm
         inputs:
           items:
             anyOf:
@@ -90,16 +92,16 @@ definitions:
           type: array
         ocomm_type:
           enum:
-          - FileComm
-          - ObjFileComm
-          - DefaultComm
-          - AsciiFileComm
-          - AsciiTableComm
-          - PlyFileComm
-          - PandasFileComm
-          - RMQComm
-          - PickleFileComm
           - AsciiMapComm
+          - PickleFileComm
+          - PlyFileComm
+          - AsciiTableComm
+          - RMQComm
+          - PandasFileComm
+          - AsciiFileComm
+          - FileComm
+          - DefaultComm
+          - ObjFileComm
         onexit:
           type: string
         outputs:
@@ -110,11 +112,9 @@ definitions:
           minItems: 1
           type: array
         translator:
-          oneOf:
-          - type: function
-          - items:
-              type: function
-            type: array
+          items:
+            type: function
+          type: array
       required:
       - inputs
       - outputs
@@ -387,12 +387,12 @@ definitions:
         filetype:
           default: binary
           enum:
-          - pandas
           - ascii
-          - binary
-          - pickle
           - table
+          - binary
           - ply
+          - pandas
+          - pickle
           - obj
           - map
           type: string
@@ -485,11 +485,9 @@ definitions:
         - args
       properties:
         args:
-          oneOf:
-          - type: string
-          - items:
-              type: string
-            type: array
+          items:
+            type: string
+          type: array
         builddir: &id012
           type: string
         cc: &id008
@@ -516,15 +514,15 @@ definitions:
           type: boolean
         language:
           enum:
-          - executable
-          - cmake
-          - make
-          - matlab
-          - c
-          - c++
-          - lpy
-          - cpp
           - python
+          - make
+          - executable
+          - matlab
+          - c++
+          - cpp
+          - cmake
+          - lpy
+          - c
           type: string
         make_command: &id009
           default: make

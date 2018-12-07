@@ -20,7 +20,5 @@ class OutputDriver(ConnectionDriver):
     def __init__(self, name, args, **kwargs):
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['name'] = args
-        ocomm_kws['no_suffix'] = True
-        ocomm_kws['env'] = kwargs.get('comm_env', dict())
         kwargs['ocomm_kws'] = ocomm_kws
         super(OutputDriver, self).__init__(name, **kwargs)

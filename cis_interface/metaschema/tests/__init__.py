@@ -46,15 +46,20 @@ _normalize_objects = [
     ({'type': 'complex'}, '(1+0j)', (1 + 0j)),
     ({'type': 'complex'}, 'hello', 'hello'),
     ({'type': 'object',
+      'properties': {'a': {'type': 'int', 'default': '2'},
+                     'b': {'type': 'int', 'default': '2'}}},
+     {'b': '2'}, {'a': 2, 'b': 2}),
+    ({'type': 'object',
       'definitions': {'ab': {'type': 'int', 'default': '1'}},
       'properties': {'a': {'$ref': '#/definitions/ab'},
                      'b': {'$ref': '#/definitions/ab'}}},
      {'b': '1'}, {'a': 1, 'b': 1}),
     ({'type': 'object',
       'definitions': {'ab': {'type': 'int'}},
+      'required': ['a', 'b'],
       'properties': {'a': {'$ref': '#/definitions/ab'},
                      'b': {'$ref': '#/definitions/ab'}}},
-     {'b': '1'}, {'b': 1}),
+     {'b': '1'}, {'b': '1'}),
     ({'type': 'object', 'properties': {'a': {'type': 'int'}}}, None, None),
     ({'type': 'object', 'properties': {'a': {'type': 'int'}}}, {}, {}),
     ({'type': 'array', 'items': {'type': 'int'}},
@@ -93,11 +98,6 @@ def test_get_validator():
     metaschema.get_validator()
 
 
-def test_get_normalizer():
-    r"""Test get_normalizer."""
-    metaschema.get_normalizer()
-
-
 def test_validate_instance():
     r"""Test validate_instance."""
     for k, v in _valid_objects.items():
@@ -107,7 +107,7 @@ def test_validate_instance():
 def test_normalize_instance():
     r"""Test normalize_instance."""
     for schema, x, y in _normalize_objects:
-        z = metaschema.normalize_instance(x, schema)
+        z = metaschema.normalize_instance(x, schema, test_attr=1)
         nt.assert_equal(z, y)
 
 

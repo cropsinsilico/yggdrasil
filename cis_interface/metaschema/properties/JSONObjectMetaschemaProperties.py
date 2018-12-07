@@ -10,6 +10,8 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'properties' property."""
 
     name = 'properties'
+    _replaces_existing = True
+    _validate = False
 
     @classmethod
     def encode(cls, instance):
@@ -27,17 +29,21 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
                 yield e
 
     @classmethod
-    def normalize(cls, normalizer, value, instance, schema):
+    def normalize(cls, validator, value, instance, schema):
         r"""Normalization method for 'properties' container property."""
         if not isinstance(instance, dict):
             return instance
         for property, subschema in iteritems(value):
-            iprop = instance.get(property, normalizer_mod.UndefinedProperty())
-            iprop = normalizer.descend(
-                iprop,
-                subschema,
-                path=property,
-                schema_path=property)
-            if not isinstance(iprop, normalizer_mod.UndefinedProperty):
-                instance[property] = iprop
+            if property not in instance:
+                instance[property] = normalizer_mod.UndefinedProperty()
         return instance
+
+    @classmethod
+    def post_validate(cls, validator, value, instance, schema):
+        r"""Actions performed after validation if normalizing."""
+        if not isinstance(instance, dict):
+            return
+        norm_keys = list(validator._normalized.keys())
+        for k in norm_keys:
+            if isinstance(validator._normalized[k], normalizer_mod.UndefinedProperty):
+                del validator._normalized[k]

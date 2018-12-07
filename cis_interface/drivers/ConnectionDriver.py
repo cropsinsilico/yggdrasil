@@ -1,11 +1,12 @@
 """Module for funneling messages from one comm to another."""
 import os
+import pprint
 import numpy as np
 import threading
 from cis_interface import backwards
 from cis_interface.communication import new_comm, get_comm_class
 from cis_interface.drivers.Driver import Driver
-from cis_interface.schema import register_component, str_to_function
+from cis_interface.schema import register_component, get_schema
 
 
 @register_component
@@ -56,20 +57,17 @@ class ConnectionDriver(Driver):
     _icomm_type = 'DefaultComm'
     _ocomm_type = 'DefaultComm'
     _schema_type = 'connection'
-    _schema = {'input': {'type': ['string', 'list'], 'required': True,
-                         'schema': {'type': 'string'},
-                         'excludes': 'input_file'},
-               'input_file': {'required': True, 'type': 'dict',
-                              'excludes': 'input', 'schema': 'file'},
-               'output': {'type': ['string', 'list'], 'required': True,
-                          'schema': {'type': 'string'},
-                          'excludes': 'output_file'},
-               'output_file': {'required': True, 'type': 'dict',
-                               'excludes': 'output', 'schema': 'file'},
-               'translator': {'type': ['function', 'list'],
-                              'schema': {'type': 'function'},
-                              'required': False},
-               'onexit': {'type': 'string', 'required': False}}
+    _schema_required = ['inputs', 'outputs']
+    _schema_properties = {
+        'inputs': {'type': 'array', 'minItems': 1,
+                   'items': {'anyOf': [{'$ref': '#/definitions/comm'},
+                                       {'$ref': '#/definitions/file'}]}},
+        'outputs': {'type': 'array', 'minItems': 1,
+                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
+                                        {'$ref': '#/definitions/file'}]}},
+        'translator': {'type': 'array', 'items': {'type': 'function'}},
+        'onexit': {'type': 'string'}}
+    
     _is_input = False
     _is_output = False
 
@@ -84,8 +82,8 @@ class ConnectionDriver(Driver):
             out = None
         return out
 
-    def __init__(self, name, translator=None, timeout_send_1st=None,
-                 single_use=False, onexit=None, **kwargs):
+    def __init__(self, name, translator=None, single_use=False,
+                 onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Translator
         if translator is None:
@@ -94,8 +92,6 @@ class ConnectionDriver(Driver):
             translator = [translator]
         self.translator = []
         for t in translator:
-            if isinstance(t, str):
-                t = str_to_function(t)
             if not hasattr(t, '__call__'):
                 raise ValueError("Translator %s not callable." % t)
             self.translator.append(t)
@@ -104,10 +100,7 @@ class ConnectionDriver(Driver):
         self.onexit = onexit
         # Attributes
         self._eof_sent = False
-        if timeout_send_1st is None:
-            timeout_send_1st = self.timeout
         self.single_use = single_use
-        self.timeout_send_1st = timeout_send_1st
         self._first_send_done = False
         self._comm_opened = threading.Event()
         self._comm_closed = False
@@ -132,47 +125,64 @@ class ConnectionDriver(Driver):
                    self.ocomm.name, self.ocomm.address)
         self.debug(80 * '=')
 
+    def _init_single_comm(self, name, io, comm_kws, **kwargs):
+        r"""Parse keyword arguments for input/output comm."""
+        self.debug("Creating %s comm", io)
+        s = get_schema()
+        if comm_kws is None:
+            comm_kws = dict()
+        if io == 'input':
+            direction = 'recv'
+            comm_type = self._icomm_type
+            touches_model = self._is_input
+            attr_comm = 'icomm'
+            comm_kws['close_on_eof_recv'] = False
+        else:
+            direction = 'send'
+            comm_type = self._ocomm_type
+            touches_model = self._is_output
+            attr_comm = 'ocomm'
+        comm_kws['direction'] = direction
+        comm_kws['dont_open'] = True
+        comm_kws['reverse_names'] = True
+        comm_kws.setdefault('comm', comm_type)
+        assert(name == self.name)
+        comm_kws.setdefault('name', name)
+        if not isinstance(comm_kws['comm'], list):
+            comm_kws['comm'] = [comm_kws['comm']]
+        any_files = False
+        if touches_model:
+            comm_kws['no_suffix'] = True
+            for x in comm_kws['comm']:
+                if get_comm_class(x['comm']).is_file:
+                    any_files = True
+                    ikws = s['file'].get_subtype_properties(x['comm'])
+                else:
+                    ikws = s['comm'].get_subtype_properties(x['comm'])
+            for k in ikws:
+                if (k not in comm_kws) and (k in kwargs):
+                    comm_kws[k] = kwargs[k]
+        if any_files and (io == 'input'):
+            kwargs.setdefault('timeout_send_1st', 60)
+        print('%s comm_kws' % attr_comm)
+        pprint.pprint(comm_kws)
+        setattr(self, attr_comm, new_comm(comm_kws.pop('name'), **comm_kws))
+        setattr(self, '%s_kws' % attr_comm, comm_kws)
+        print('%s opp_comms' % attr_comm, getattr(self, attr_comm).opp_comms)
+        self.env.update(**getattr(self, attr_comm).opp_comms)
+
     def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        if icomm_kws is None:
-            icomm_kws = dict()
-        if ocomm_kws is None:
-            ocomm_kws = dict()
-        # Input communicator
-        self.debug("Creating input comm")
-        icomm_kws['direction'] = 'recv'
-        icomm_kws['dont_open'] = True
-        icomm_kws['reverse_names'] = True
-        icomm_kws['close_on_eof_recv'] = False
-        icomm_kws.setdefault('comm', self._icomm_type)
-        icomm_kws.setdefault('name', name)
-        if self._is_input:
-            ikws = get_comm_class(icomm_kws['comm'])._schema
-            for k in ikws:
-                if (k not in icomm_kws) and (k in kwargs):
-                    icomm_kws[k] = kwargs[k]
-        self.icomm = new_comm(icomm_kws.pop('name'), **icomm_kws)
-        self.icomm_kws = icomm_kws
-        self.env.update(**self.icomm.opp_comms)
-        # Output communicator
-        self.debug("Creating output comm")
-        ocomm_kws['direction'] = 'send'
-        ocomm_kws['dont_open'] = True
-        ocomm_kws['reverse_names'] = True
-        ocomm_kws.setdefault('comm', self._ocomm_type)
-        ocomm_kws.setdefault('name', name)
-        if self._is_output:
-            okws = get_comm_class(ocomm_kws['comm'])._schema
-            for k in okws:
-                if (k not in ocomm_kws) and (k in kwargs):
-                    ocomm_kws[k] = kwargs[k]
+        self._init_single_comm(name, 'input', icomm_kws, **kwargs)
         try:
-            self.ocomm = new_comm(ocomm_kws.pop('name'), **ocomm_kws)
+            self._init_single_comm(name, 'output', ocomm_kws, **kwargs)
         except BaseException:
             self.icomm.close()
             raise
-        self.ocomm_kws = ocomm_kws
-        self.env.update(**self.ocomm.opp_comms)
+        if self._is_input:
+            self.comm_env.update(**self.icomm.opp_comms)
+        # Apply keywords dependent on comms
+        self.timeout_send_1st = kwargs.get('timeout_send_1st', self.timeout)
         
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""

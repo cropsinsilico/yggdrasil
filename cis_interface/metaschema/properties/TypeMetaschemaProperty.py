@@ -13,6 +13,8 @@ class TypeMetaschemaProperty(MetaschemaProperty):
     r"""Type property with validation of new properties."""
 
     name = 'type'
+    _replaces_existing = True
+    _validate = False
 
     @classmethod
     def encode(cls, instance):

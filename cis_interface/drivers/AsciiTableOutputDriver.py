@@ -34,16 +34,6 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
 
     _ocomm_type = 'AsciiTableComm'
 
-    def __init__(self, name, args, **kwargs):
-        alias_keys = [('column_names', 'field_names'),
-                      ('column_units', 'field_units'),
-                      ('column', 'delimiter')]
-        for old, new in alias_keys:
-            if kwargs.get(old, None) is not None:
-                kwargs.setdefault(new, kwargs.pop(old))
-        super(AsciiTableOutputDriver, self).__init__(name, args, **kwargs)
-        self.debug('(%s)', args)
-
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
         sinfo = self.ocomm.serializer.serializer_info

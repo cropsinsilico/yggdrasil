@@ -34,7 +34,8 @@ def register_metaschema_property(prop_class):
         if (prop_class.schema is not None):
             raise ValueError("Replacement property '%s' modifies the default schema."
                              % prop_name)
-        if (prop_class._validate is not None) or ('validate' in prop_class.__dict__):
+        if (((prop_class._validate not in [None, False])
+             or ('validate' in prop_class.__dict__))):
             raise ValueError("Replacement property '%s' modifies the default validator."
                              % prop_name)
         prop_class._validate = False

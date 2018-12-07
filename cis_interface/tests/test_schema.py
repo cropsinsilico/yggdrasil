@@ -6,7 +6,10 @@ from cis_interface import schema
 
 
 _normalize_objects = [
-    ({'models': [{'outputs': [{'name': 'outputA',
+    ({'models': [{'name': 'modelA',
+                  'language': 'c',
+                  'args': 'model.c',
+                  'outputs': [{'name': 'outputA',
                                'column_names': ['a', 'b'],
                                'column_units': ['cm', 'g'],
                                'column': '\t'}],
@@ -14,15 +17,32 @@ _normalize_objects = [
       'connections': [{'inputs': 'outputA',
                        'outputs': 'fileA.txt',
                        'working_dir': os.getcwd()}]},
-     {'models': [{'inputs': [], 'outputs': [{'name': 'outputA'}],
-                  'working_dir': os.getcwd()}],
-      'connections': [{'inputs': [{'name': 'outputA'}],
+     {'models': [{'name': 'modelA',
+                  'language': 'c',
+                  'args': ['model.c'],
+                  'inputs': [], 'outputs': [{'name': 'outputA',
+                                             'commtype': 'default',
+                                             'datatype': {'type': 'bytes'}}],
+                  'working_dir': os.getcwd(),
+                  'client_of': [],
+                  'is_server': False,
+                  'strace_flags': [], 'valgrind_flags': [],
+                  'with_strace': False, 'with_valgrind': False}],
+      'connections': [{'inputs': [{'name': 'outputA',
+                                   'commtype': 'default',
+                                   'datatype': {'type': 'bytes'}}],
                        'outputs': [{'name': 'fileA.txt',
                                     'filetype': 'binary',
                                     'working_dir': os.getcwd(),
                                     'field_names': ['a', 'b'],
                                     'field_units': ['cm', 'g'],
-                                    'delimiter': '\t'}]}]})]
+                                    'delimiter': '\t',
+                                    'append': False,
+                                    'as_array': False,
+                                    'in_temp': False,
+                                    'is_series': False,
+                                    'newline': '\n',
+                                    'use_astropy': False}]}]})]
 
 
 def test_SchemaRegistry():
@@ -48,6 +68,8 @@ def test_default_schema():
     for k in s.keys():
         assert(isinstance(s[k].subtypes, list))
         assert(isinstance(s[k].classes, list))
+        for ksub in s[k].classes:
+            s[k].get_subtype_properties(ksub)
 
 
 def test_create_schema():
@@ -77,14 +99,16 @@ def test_cdriver2filetype_error():
 
 def test_standardize():
     r"""Test standardize."""
-    vals = [(False, ['inputs', 'outputs'],
-             {'input': 'inputA'}, {'inputs': [{'name': 'inputA'}],
-                                   'outputs': []}),
-            (True, ['input', 'output'],
-             {'inputs': 'inputA'}, {'input': [{'name': 'inputA'}],
-                                    'output': []})]
-    for is_singular, keys, x, y in vals:
-        schema.standardize(x, keys, is_singular=is_singular)
+    vals = [(False, ['inputs', 'outputs'], ['_file'],
+             {'input': 'inputA', 'output_file': 'outputA'},
+             {'inputs': [{'name': 'inputA'}],
+              'outputs': [{'name': 'outputA'}]}),
+            (True, ['input', 'output'], ['_file'],
+             {'inputs': 'inputA', 'output_files': 'outputA'},
+             {'input': [{'name': 'inputA'}],
+              'output': [{'name': 'outputA'}]})]
+    for is_singular, keys, suffixes, x, y in vals:
+        schema.standardize(x, keys, suffixes=suffixes, is_singular=is_singular)
         nt.assert_equal(x, y)
 
 
@@ -92,7 +116,7 @@ def test_normalize():
     r"""Test normalization of legacy formats."""
     s = schema.get_schema()
     for x, y in _normalize_objects:
-        z = s.normalize(x, no_defaults=True)
+        a = s.normalize(x, backwards_compat=True)
         pprint.pprint(y)
-        pprint.pprint(z)
-        nt.assert_equal(z, y)
+        pprint.pprint(a)
+        nt.assert_equal(a, y)

@@ -8,6 +8,8 @@ class ItemsMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'items' property."""
 
     name = 'items'
+    _replaces_existing = True
+    _validate = False
 
     @classmethod
     def encode(cls, instance):
@@ -40,17 +42,3 @@ class ItemsMetaschemaProperty(MetaschemaProperty):
         for p1, p2 in zip(prop1, prop2):
             for e in compare_schema(p1, p2):
                 yield e
-
-    @classmethod
-    def normalize(cls, normalizer, value, instance, schema):
-        r"""Normalization method for 'items' container property."""
-        if not isinstance(instance, (list, tuple)):
-            return instance
-        if isinstance(value, dict):
-            for index, item in enumerate(instance):
-                instance[index] = normalizer.descend(item, value, path=index)
-        else:
-            for (index, item), subschema in zip(enumerate(instance), value):
-                instance[index] = normalizer.descend(item, subschema, path=index,
-                                                     schema_path=index)
-        return instance

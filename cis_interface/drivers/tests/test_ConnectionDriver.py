@@ -45,8 +45,8 @@ class TestConnectionParam(parent.TestParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
-        out['icomm_kws'] = {'comm': self.icomm_name}
-        out['ocomm_kws'] = {'comm': self.ocomm_name}
+        out['icomm_kws'] = {'comm': {'name': self.icomm_name}}
+        out['ocomm_kws'] = {'comm': {'name': self.ocomm_name}}
         return out
 
     # @property
@@ -281,7 +281,7 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionDriverTranslate, self).inst_kwargs
-        out['translator'] = '%s:direct_translate' % __name__
+        out['translator'] = direct_translate
         out['onexit'] = 'printStatus'
         return out
 
@@ -294,10 +294,6 @@ def test_ConnectionDriverOnexit_errors():
 
 def test_ConnectionDriverTranslate_errors():
     r"""Test that errors are raised for invalid translators."""
-    nt.assert_raises(ValueError, ConnectionDriver, 'test',
-                     translator='invalid:invalid:invalid')
-    nt.assert_raises(AttributeError, ConnectionDriver, 'test',
-                     translator='%s:noexist_translate' % __name__)
     assert(not hasattr(invalid_translate, '__call__'))
     nt.assert_raises(ValueError, ConnectionDriver, 'test',
-                     translator='%s:invalid_translate' % __name__)
+                     translator=invalid_translate)

@@ -63,9 +63,8 @@ class ModelDriver(Driver):
     _schema_properties = {
         'name': {'type': 'string'},
         'language': {'type': 'string'},
-        'args': {'oneOf': [{'type': 'string'},
-                           {'type': 'array',
-                            'items': {'type': 'string'}}]},
+        'args': {'type': 'array',
+                 'items': {'type': 'string'}},
         'inputs': {'type': 'array', 'default': [],
                    'items': {'$ref': '#/definitions/comm'}},
         'outputs': {'type': 'array', 'default': [],

@@ -1,8 +1,7 @@
 # Normalizer adapated from the jsonschema validator
-import numbers
+import copy
 import contextlib
-from jsonschema.compat import str_types, int_types, iteritems
-from jsonschema import RefResolver
+import jsonschema
 
 
 class UndefinedProperty(object):
@@ -10,92 +9,89 @@ class UndefinedProperty(object):
     pass
 
 
-def _normalize_ref(normalizer, ref, instance, schema):
-    scope, resolved = normalizer.resolver.resolve(ref)
-    normalizer.resolver.push_scope(scope)
-    try:
-        instance = normalizer.descend(instance, resolved)
-    finally:
-        normalizer.resolver.pop_scope()
-    return instance
+class UninitializedNormalized(object):
+    r"""Class to be used as a flag for uninitialized normalized value."""
+    pass
 
 
-def _normalize_allOf(normalizer, allOf, instance, schema):
-    for index, subschema in enumerate(allOf):
-        instance = normalizer.descend(instance, subschema, schema_path=index)
-    return instance
+def create(*args, **kwargs):
+    normalizers = kwargs.pop('normalizers', ())
+    no_defaults = kwargs.pop('no_defaults', ())
+    validator_class = jsonschema.validators.create(*args, **kwargs)
 
-
-def _normalize_oneOf(normalizer, oneOf, instance, schema):
-    subschemas = enumerate(oneOf)
-    for index, subschema in subschemas:
-        instance = normalizer.descend(instance, subschema, schema_path=index)
-    return instance
-
-
-def _normalize_anyOf(normalizer, anyOf, instance, schema):
-    for index, subschema in enumerate(anyOf):
-        instance = normalizer.descend(instance, subschema, schema_path=index)
-    return instance
-
-
-def create(meta_schema, normalizers=(), version=None, default_types=None,
-           no_defaults=False):  # noqa: C901, E501
-    if default_types is None:
-        default_types = {
-            u"array": list, u"boolean": bool, u"integer": int_types,
-            u"null": type(None), u"number": numbers.Number, u"object": dict,
-            u"string": str_types,
-        }
-
-    class Normalizer(object):
+    class Normalizer(validator_class):
         NORMALIZERS = dict(normalizers)
-        META_SCHEMA = dict(meta_schema)
-        DEFAULT_TYPES = dict(default_types)
-        NODEFAULTS = no_defaults
+        NO_DEFAULTS = no_defaults
 
-        def __init__(self, schema, types=(), resolver=None):
-
+        def __init__(self, *args, **kwargs):
+            super(Normalizer, self).__init__(*args, **kwargs)
+            self._normalized = UninitializedNormalized()
+            self._normalizing = False
+            self._old_settings = {}
             self._path_stack = []
             self._schema_path_stack = []
-            self._types = dict(self.DEFAULT_TYPES)
-            self._types.update(types)
+            self._normalized_stack = []
 
-            if resolver is None:
-                resolver = RefResolver.from_schema(schema)
-
-            self.resolver = resolver
-            self.schema = schema
-
-        def iter_instance(self, instance, _schema=None):
+        def iter_errors(self, instance, _schema=None):
             if _schema is None:
                 _schema = self.schema
 
-            ref = _schema.get(u"$ref")
-            if ref is not None:
-                normalizers = [(u"$ref", ref)]
-            else:
+            if self._normalizing:
 
-                # print(self.current_schema_path, instance)
-                if self.current_schema_path in self.NORMALIZERS:
-                    normalizers = self.NORMALIZERS[self.current_schema_path]
-                    for n in normalizers:
-                        instance = n(self, None, instance, _schema)
+                if isinstance(self._normalized, UninitializedNormalized):
+                    self._normalized = copy.deepcopy(instance)
+                instance = self._normalized
 
-                normalizers = iteritems(_schema)
-                if isinstance(instance, UndefinedProperty):
-                    if (not self.NODEFAULTS) and ('default' in _schema):
-                        instance = _schema['default']
-                    else:
-                        return instance
+            if self._normalizing and (u"$ref" not in _schema):
 
-            for k, v in normalizers:
-                normalizer = self.NORMALIZERS.get(k, None)
-                if normalizer is None:
-                    continue
+                # Path based normalization
+                try:
+                    # print(self.current_schema_path, instance, type(instance), _schema)
+                    if self.current_schema_path in self.NORMALIZERS:
+                        normalizers = self.NORMALIZERS[self.current_schema_path]
+                        for n in normalizers:
+                            instance = n(self, None, instance, _schema)
+                except BaseException as e:
+                    error = jsonschema.ValidationError(str(e))
+                    # set details if not already set by the called fn
+                    error._set(
+                        validator=n,
+                        validator_value=None,
+                        instance=instance,
+                        schema=_schema)
+                    yield error
+                self._normalized = instance
 
-                instance = normalizer(self, v, instance, _schema)
-            return instance
+                # Do default and type first so normalization can be validated
+                for k in ['default', 'type']:
+                    if (((k != 'default')
+                         and isinstance(instance, UndefinedProperty))):
+                        return
+                    if k not in _schema:
+                        continue
+                    v = _schema[k]
+                    validator = self.VALIDATORS.get(k)
+                    if validator is None:
+                        continue
+                    errors = validator(self, v, instance, _schema) or ()
+                    for error in errors:
+                        # set details if not already set by the called fn
+                        error._set(
+                            validator=k,
+                            validator_value=v,
+                            instance=instance,
+                            schema=_schema,
+                        )
+                        if k != u"$ref":
+                            error.schema_path.appendleft(k)
+                        yield error
+
+                    instance = self._normalized
+
+                self._normalized = instance
+
+            for e in super(Normalizer, self).iter_errors(instance, _schema=_schema):
+                yield e
 
         @property
         def current_path(self):
@@ -106,25 +102,81 @@ def create(meta_schema, normalizers=(), version=None, default_types=None,
             return tuple(self._schema_path_stack)
 
         @contextlib.contextmanager
-        def append_path(self, path, schema_path):
+        def normalizing(self, **kwargs):
+            for k, v in kwargs.items():
+                if k == 'normalizers':
+                    v.update(self.NORMALIZERS)
+                if hasattr(self, k.upper()):
+                    ksub = k.upper()
+                else:
+                    ksub = k
+                self._old_settings[ksub] = getattr(self, ksub, None)
+                setattr(self, ksub, v)
+            self._normalizing = True
+            try:
+                yield
+            finally:
+                for k, v in self._old_settings.items():
+                    if v is None:
+                        delattr(self, k)
+                    else:
+                        setattr(self, k, v)
+                self._old_settings = {}
+                self._normalizing = False
+
+        def descend(self, instance, schema, path=None, schema_path=None):
+            if self._normalizing:
+                if path is not None:
+                    self._normalized_stack.append(self._normalized)
+                    self._normalized = UninitializedNormalized()
+                else:
+                    self._normalized_stack.append(self._normalized)
+                    self._normalized = copy.deepcopy(self._normalized)
             if path is not None:
                 self._path_stack.append(path)
             if schema_path is not None:
                 self._schema_path_stack.append(schema_path)
+            failed = False
             try:
-                yield
+                for error in super(Normalizer, self).descend(instance, schema,
+                                                             path=path,
+                                                             schema_path=schema_path):
+                    failed = True
+                    yield error
             finally:
+                if self._normalizing:
+                    old_normalized = self._normalized_stack.pop()
+                    if not (failed or isinstance(self._normalized, UndefinedProperty)):
+                        if path is not None:
+                            old_normalized[path] = self._normalized
+                        else:
+                            old_normalized = self._normalized
+                    self._normalized = old_normalized
                 if path is not None:
                     self._path_stack.pop()
                 if schema_path is not None:
                     self._schema_path_stack.pop()
 
-        def descend(self, instance, schema, path=None, schema_path=None):
-            with self.append_path(path, schema_path):
-                out = self.iter_instance(instance, schema)
-            return out
+        def validate(self, instance, _schema=None, normalize=False, **kwargs):
+            if normalize:
+                with self.normalizing(**kwargs):
+                    super(Normalizer, self).validate(instance, _schema=_schema)
+                out = self._normalized
+                return out
+            else:
+                super(Normalizer, self).validate(instance, _schema=_schema)
 
-        def normalize(self, *args, **kwargs):
-            return self.iter_instance(*args, **kwargs)
+        def normalize(self, instance, _schema=None, **kwargs):
+            with self.normalizing(**kwargs):
+                errors = list(self.iter_errors(instance, _schema=_schema))
+                # for e in errors[::-1]:
+                #     print(80 * '-')
+                #     print(e)
+                # print(80 * '-')
+            if errors:
+                # raise jsonschema.ValidationError('error')
+                return instance
+            else:
+                return self._normalized
 
     return Normalizer

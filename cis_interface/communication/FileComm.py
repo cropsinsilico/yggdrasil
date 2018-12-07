@@ -60,6 +60,7 @@ class FileComm(CommBase.CommBase):
                                       'default': backwards.bytes2unicode(
                                           serialize._default_newline)},
                           'is_series': {'type': 'boolean', 'default': False}}
+    is_file = True
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
@@ -85,7 +86,6 @@ class FileComm(CommBase.CommBase):
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
         self.open_as_binary = open_as_binary
-        self.is_file = True
         self.is_series = is_series
         self._series_index = 0
         # Put string attributes in the correct format

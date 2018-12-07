@@ -76,8 +76,13 @@ def get_comm(name, comm=None, new_comm_class=None, **kwargs):
     if new_comm_class is not None:
         comm = new_comm_class
     if isinstance(comm, list):
-        kwargs['comm'] = comm
-        comm = 'ForkComm'
+        if len(comm) == 1:
+            name = comm[0].pop('name')
+            kwargs.update(comm[0])
+            return new_comm(name, **kwargs)
+        else:
+            kwargs['comm'] = comm
+            comm = 'ForkComm'
     comm_cls = get_comm_class(comm)
     return comm_cls(name, **kwargs)
     
@@ -102,8 +107,13 @@ def new_comm(name, comm=None, **kwargs):
     #     comm = kwargs.get('base_comm', tools.get_default_comm())
     #     kwargs['new_comm_class'] = 'ErrorComm'
     if isinstance(comm, list):
-        kwargs['comm'] = comm
-        comm = 'ForkComm'
+        if len(comm) == 1:
+            name = comm[0].pop('name')
+            kwargs.update(comm[0])
+            return new_comm(name, **kwargs)
+        else:
+            kwargs['comm'] = comm
+            comm = 'ForkComm'
     comm_cls = get_comm_class(comm)
     return comm_cls.new_comm(name, **kwargs)
 

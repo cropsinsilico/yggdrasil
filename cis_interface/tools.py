@@ -153,7 +153,7 @@ def is_lang_installed(lang):
     """
     from cis_interface import schema, drivers
     s = schema.get_schema()
-    drv = drivers.import_driver(s.language2class[lang])
+    drv = drivers.import_driver(s['model'].subtype2class[lang])
     return drv.is_installed()
 
 

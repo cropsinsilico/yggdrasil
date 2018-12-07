@@ -117,7 +117,28 @@ class MetaschemaProperty(object):
             yield '%s is not equal to %s' % (prop1, prop2)
 
     @classmethod
-    def wrapped_validate(cls, *args, **kwargs):
+    def normalize(cls, validator, value, instance, schema):
+        r"""Method to normalize the instance based on the property value.
+
+        Args:
+            validator (Validator): Validator class.
+            value (object): Property value.
+            instance (object): Object to normalize.
+            schema (dict): Schema containing this property.
+
+        Returns:
+            object: Normalized object.
+
+        """
+        return instance
+
+    @classmethod
+    def post_validate(cls, validator, value, instance, schema):
+        r"""Actions performed after validation if normalizing."""
+        pass
+
+    @classmethod
+    def wrapped_validate(cls, validator, value, instance, schema):
         r"""Wrapped validator that handles errors produced by the native
         validate method and ensures that the property is parsed by the base
         validator and raises the correct error if necessary.
@@ -129,12 +150,21 @@ class MetaschemaProperty(object):
 
         """
         from cis_interface.metaschema import _base_validator
-        failed = False
-        errors = cls.validate(*args, **kwargs) or ()
-        for e in errors:
-            failed = True
-            yield jsonschema.ValidationError(e)
-        if (not failed) and (cls.name in _base_validator.VALIDATORS):
-            errors = _base_validator.VALIDATORS[cls.name](*args, **kwargs) or ()
+        if validator._normalizing:
+            validator._normalized = cls.normalize(validator, value, instance, schema)
+            instance = validator._normalized
+        try:
+            failed = False
+            errors = cls.validate(validator, value, instance, schema) or ()
             for e in errors:
-                yield e
+                failed = True
+                yield jsonschema.ValidationError(e)
+            if (not failed) and (cls.name in _base_validator.VALIDATORS):
+                errors = _base_validator.VALIDATORS[cls.name](
+                    validator, value, instance, schema) or ()
+                for e in errors:
+                    failed = True
+                    yield e
+        finally:
+            if validator._normalizing and (not failed):
+                cls.post_validate(validator, value, instance, schema)
