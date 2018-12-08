@@ -103,6 +103,7 @@ class SubtypeMetaschemaProperty(MetaschemaProperty):
         for k, v in _valid_types.items():
             if dtype.name.startswith(v):
                 out = k
+                break
         if out is None:
             raise MetaschemaTypeError('Cannot find subtype string for dtype %s'
                                       % dtype)

@@ -18,6 +18,7 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
     _container_type = list
     _json_type = 'array'
     _json_property = 'items'
+    _empty_msg = []
 
     @classmethod
     def normalize(cls, obj):

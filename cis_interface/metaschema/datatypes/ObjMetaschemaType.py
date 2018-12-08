@@ -230,6 +230,8 @@ if not os.path.isfile(_schema_file):  # pragma: debug
 class ObjMetaschemaType(JSONObjectMetaschemaType):
     r"""Obj 3D structure map."""
 
+    _empty_msg = {'vertices': [], 'faces': []}
+
     @classmethod
     def _encode_object_property(cls, obj, order, req_keys=False):
         if req_keys:

@@ -214,6 +214,8 @@ def translate_py2ply(py_obj):
 class PlyMetaschemaType(JSONObjectMetaschemaType):
     r"""Ply 3D structure map."""
 
+    _empty_msg = {'vertices': [], 'faces': []}
+
     @classmethod
     def encode_data(cls, obj, typedef, element_order=None, property_order=None,
                     default_rgb=[0, 0, 0], comments=[], newline='\n',

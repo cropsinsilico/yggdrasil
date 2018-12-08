@@ -18,6 +18,7 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
     _container_type = dict
     _json_type = 'object'
     _json_property = 'properties'
+    _empty_msg = {}
 
     @classmethod
     def _iterate(cls, container):

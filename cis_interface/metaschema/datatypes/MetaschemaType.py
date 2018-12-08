@@ -3,7 +3,7 @@ import json
 import jsonschema
 from cis_interface import backwards, metaschema
 from cis_interface.metaschema.datatypes import (
-    MetaschemaTypeError, compare_schema)
+    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD)
 
 
 class MetaschemaType(object):
@@ -42,7 +42,7 @@ class MetaschemaType(object):
     python_types = []
     specificity = 0
     is_fixed = False
-    _empty_msg = {}
+    _empty_msg = backwards.unicode2bytes('')
     _replaces_existing = False
     
     def __init__(self, **typedef):
@@ -420,8 +420,10 @@ class MetaschemaType(object):
         metadata.update(**kwargs)
         if 'data' in metadata:
             raise RuntimeError("Data is a reserved keyword in the metadata.")
-        metadata['data'] = data
-        msg = backwards.unicode2bytes(json.dumps(metadata, sort_keys=True))
+        data = backwards.unicode2bytes(json.dumps(data, sort_keys=True))
+        metadata['size'] = len(data)
+        metadata = backwards.unicode2bytes(json.dumps(metadata, sort_keys=True))
+        msg = metadata + CIS_MSG_HEAD + data
         return msg
     
     def deserialize(self, msg):
@@ -442,9 +444,17 @@ class MetaschemaType(object):
             raise TypeError("Message to be deserialized is not bytes type.")
         if len(msg) == 0:
             obj = self._empty_msg
-            metadata = dict()
+            metadata = dict(size=0)
+        elif CIS_MSG_HEAD not in msg:
+            # obj = msg
+            # metadata = dict(size=len(msg))
+            raise ValueError("Header marker not in message.")
         else:
-            metadata = json.loads(backwards.bytes2unicode(msg))
-            data = metadata.pop('data', self._empty_msg)
+            metadata, data = msg.split(CIS_MSG_HEAD, 1)
+            metadata = json.loads(backwards.bytes2unicode(metadata))
+            if len(data) < metadata['size']:
+                metadata['incomplete'] = True
+                return data, metadata
+            data = json.loads(backwards.bytes2unicode(data))
             obj = self.__class__.decode(metadata, data, self._typedef)
         return obj, metadata

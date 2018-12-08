@@ -11,6 +11,7 @@ from cis_interface.metaschema.properties import get_metaschema_property
 _type_registry = {}
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
 _base_validator = jsonschema.validators.validator_for({"$schema": ""})
+CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
 
 
 class MetaschemaTypeError(TypeError):
@@ -235,8 +236,12 @@ def guess_type_from_msg(msg):
 
     """
     try:
-        metadata = json.loads(backwards.bytes2unicode(msg))
-        cls = _type_registry[metadata['type']]
+        if CIS_MSG_HEAD in msg:
+            metadata, data = msg.split(CIS_MSG_HEAD, 1)
+            metadata = json.loads(backwards.bytes2unicode(metadata))
+            cls = _type_registry[metadata['type']]
+        else:
+            raise Exception
         return cls
     except BaseException:
         raise ValueError("Could not guess type.")
@@ -326,7 +331,7 @@ def decode(msg):
 
     """
     cls = guess_type_from_msg(msg)
-    metadata = json.loads(backwards.bytes2unicode(msg))
+    metadata = json.loads(backwards.bytes2unicode(msg.split(CIS_MSG_HEAD, 1)[0]))
     typedef = cls.extract_typedef(metadata)
     cls_inst = cls(**typedef)
     obj = cls_inst.deserialize(msg)[0]

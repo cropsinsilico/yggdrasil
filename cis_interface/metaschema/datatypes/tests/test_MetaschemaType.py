@@ -248,8 +248,15 @@ class TestMetaschemaType(CisTestClassInfo):
         r"""Test call for empty string."""
         out = self.instance.deserialize(self._empty_msg)
         self.assert_result_equal(out[0], self.instance._empty_msg)
-        nt.assert_equal(out[1], dict())
+        nt.assert_equal(out[1], dict(size=0))
         # nt.assert_equal(out, self.instance._empty_msg)
+
+    def test_deserialize_incomplete(self):
+        r"""Test call for incomplete message."""
+        if (self._cls != 'MetaschemaType') and (len(self._valid_decoded) > 0):
+            out = self.instance.serialize(self._valid_decoded[0])
+            obj, metadata = self.instance.deserialize(out[:-1])
+            nt.assert_equal(metadata['incomplete'], True)
 
 
 class CisErrorType(MetaschemaType.MetaschemaType):
