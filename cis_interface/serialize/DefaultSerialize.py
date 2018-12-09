@@ -1,86 +1,128 @@
 import uuid
-import copy
-from cis_interface import backwards, tools, serialize, datatypes
+import numpy as np
+from cis_interface import backwards, tools, serialize
+from cis_interface.serialize import register_serializer
+from cis_interface.metaschema import get_metaschema
+from cis_interface.metaschema.datatypes import (
+    guess_type_from_obj, get_type_from_def, get_type_class)
+from cis_interface.metaschema.datatypes.ScalarMetaschemaType import ScalarMetaschemaType
+from cis_interface.metaschema.datatypes import CIS_MSG_HEAD
 
 
-CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
 HEAD_VAL_SEP = backwards.unicode2bytes(':CIS:')
 HEAD_KEY_SEP = backwards.unicode2bytes(',CIS,')
+_metaschema = get_metaschema()
 
 
+def oldstyle2datatype(format_str=None, field_names=None, field_units=None,
+                      as_array=False, **kwargs):
+    r"""Convert old, table-style serialization spec to a a data type definition.
+
+    Args:
+        format_str (str, optional): If provided, this string will be used to
+            determine the data types of elements. Defaults to None and is
+            ignored. If this is None, the other old table-style spec keywords
+            will also be ignored.
+        field_names (list, optional): The names of fields in the format string.
+            Defaults to None and is ignored.
+        field_units (list, optional): The units of fields in the format string.
+            Defaults to None and is ignored.
+        as_array (bool, optional): If True, each of the arguments being
+            serialized/deserialized will be arrays. Otherwise each argument
+            should be a scalar. Defaults to False.
+        **kwargs: Additional keyword arguments are treated as part of the type
+            definition and will override keys set from the old style spec.
+
+    Returns:
+        tuple(dict, dict): Type definition and extra keywords.
+
+    """
+    if format_str is None:
+        return {}, kwargs
+    typedef = {'type': 'array', 'items': []}
+    for i, fmt in enumerate(serialize.extract_formats(format_str)):
+        nptype = serialize.cformat2nptype(fmt)
+        itype = ScalarMetaschemaType.encode_type(np.ones(1, nptype)[0])
+        itype = ScalarMetaschemaType.extract_typedef(itype)
+        if as_array:
+            itype['type'] = '1darray'
+        else:
+            itype['type'] = itype.pop('subtype')
+        if field_names is not None:
+            itype['title'] = backwards.bytes2unicode(field_names[i])
+        if field_units is not None:
+            itype['units'] = backwards.bytes2unicode(field_units[i])
+        typedef['items'].append(itype)
+    return typedef, kwargs
+
+
+@register_serializer
 class DefaultSerialize(object):
     r"""Default class for serializing/deserializing a python object into/from
     a bytes message.
 
     Args:
-        typename (str, optional): If provided, this string describes the type
-            that should be used. Defaults to None and is ignored.
-        format_str (str, optional): If provided, this string will be used to
-            format messages from a list of arguments and parse messages to
-            get a list of arguments in C printf/scanf style. Defaults to
-            None and messages are assumed to already be bytes.
-        as_array (bool, optional): If True, each of the arguments being
-            serialized/deserialized will be arrays that are converted to/from
-            bytes in column major ('F') order. Otherwise, each argument should
-            be a scalar. Defaults to False.
-        field_names (list, optional): The names of fields in the format string.
-            If not provided, names are set based on the order of the fields in
-            the format string.
-        field_units (list, optional): The units of fields in the format string.
-            If not provided, all fields are assumed to be dimensionless.
         func_serialize (func, optional): Callable object that takes python
             objects as input and returns a bytes string representation. Defaults
             to None.
         func_deserialize (func, optional): Callable object that takes a bytes
             string as input and returns a deserialized python object. Defaults
             to None.
+        **kwargs: Additional keyword args are processed as part of the type
+            definition.
 
     Attributes:
-        typename (str): If provided, this string describes the type that should
-            be used.
-        format_str (str): Format string used to format/parse bytes messages
-            from/to a list of arguments in C printf/scanf style.
-        as_array (bool): True or False depending if serialized/deserialized
-            python objects will be arrays or scalars.
-        field_names (list): The names of fields in the format string.
-        field_units (list): The units of fields in the format string.
         func_serialize (func): Callable object that takes python object as input
             and returns a bytes string representation.
         func_deserialize (func): Callable object that takes a bytes string as
             input and returns a deserialized python object.
 
     """
-    def __init__(self, typename=None, format_str=None, as_array=False,
-                 field_names=None, field_units=None,
-                 func_serialize=None, func_deserialize=None, **kwargs):
-        self.typename = typename
-        self.datatype = None
-        if self.typename:
-            self.datatype = datatypes.get_type_class(self.typename)(**kwargs)
-        self.format_str = format_str
-        self.as_array = as_array
-        self._alias = None
-        if field_names is not None:
-            field_names = [backwards.unicode2bytes(n) for n in field_names]
-        self.field_names = field_names
-        if field_units is not None:
-            field_units = [backwards.unicode2bytes(n) for n in field_units]
-        self.field_units = field_units
-        if isinstance(func_serialize, DefaultSerialize):
-            self._func_serialize = func_serialize.func_serialize
-        else:
-            self._func_serialize = func_serialize
-        if isinstance(func_deserialize, DefaultSerialize):
-            self._func_deserialize = func_deserialize.func_deserialize
-        else:
-            self._func_deserialize = func_deserialize
 
-    # @property
-    # def serializer_class(self):
-    #     r"""str: String representation of the class."""
-    #     cls = str(self.__class__).split("'")
-    #     print(cls)
-    #     return cls
+    _seritype = 'default'
+    _schema_type = 'serializer'
+    _schema_requried = []
+    _schema_properties = {'format_str': {'type': 'string'}}
+
+    def __init__(self, func_serialize=None, func_deserialize=None, **kwargs):
+        self._alias = None
+        self.is_user_defined = False
+        self.extra_kwargs = {}
+        # Set user defined serialization/deserialization functions
+        if func_serialize is not None:
+            assert(not hasattr(self, 'func_serialize'))
+            if issubclass(func_serialize.__class__, DefaultSerialize):
+                self.func_serialize = func_serialize.func_serialize
+            else:
+                self.func_serialize = func_serialize
+            self.is_user_defined = True
+        if func_deserialize is not None:
+            assert(not hasattr(self, 'func_deserialize'))
+            if issubclass(func_deserialize.__class__, DefaultSerialize):
+                self.func_deserialize = func_deserialize.func_deserialize
+            else:
+                self.func_deserialize = func_deserialize
+            self.is_user_defined = True
+        # Set properties to None
+        for k, v in self._schema_properties.items():
+            setattr(self, k, v.get('default', None))
+        # Update typedef
+        self.datatype = get_type_from_def({'type': 'bytes'})
+        self.str_datatype = get_type_from_def({'type': 'bytes'})
+        self.update_serializer(**kwargs)
+        if self.is_user_defined:
+            self._initialized = True
+        else:
+            self._initialized = (self.typedef != {'type': 'bytes'})
+
+    @property
+    def typedef(self):
+        r"""dict: Type definition."""
+        if self.is_user_defined:
+            return self.str_datatype._typedef
+        # raise RuntimeError("Cannot get type def for user "
+        #                        + "defined functions.")
+        return self.datatype._typedef
 
     def __getattribute__(self, name):
         r"""Return alias result if there is one."""
@@ -92,59 +134,39 @@ class DefaultSerialize(object):
             return self._alias.__getattribute__(name)
 
     @property
-    def is_user_defined(self):
-        r"""bool: True if serialization or deserialization function was user
-        defined."""
-        return ((self._func_serialize is not None)
-                or (self._func_deserialize is not None))
-
-    @property
-    def serializer_type(self):
-        r"""int: Type of serializer."""
+    def serializer_info(self):
+        r"""dict: Serializer info."""
         if self.is_user_defined:
-            out = -1
-        elif self.datatype:
-            out = -2  # should eventually be 0
-        elif self.format_str is None:
-            out = 0
-        elif not self.as_array:
-            out = 1
-        else:
-            out = 2
+            raise RuntimeError("Cannot define serializer information for user "
+                               + "supplied functions.")
+        out = {}  # copy.deepcopy(self.typedef)
+        out['seritype'] = self._seritype
+        for k in self._schema_properties.keys():
+            v = getattr(self, k, None)
+            if v is not None:
+                if isinstance(v, backwards.bytes_type):
+                    out[k] = backwards.bytes2unicode(v)
+                else:
+                    out[k] = v
         return out
+
+    # @property
+    # def is_user_defined(self):
+    #     r"""bool: True if serialization or deserialization function was user
+    #     defined."""
+    #     for k in ['func_serialize', 'func_deserialize']:
+    #         if ((getattr(self, k, None) is not None)
+    #             and (k in self.__dict__)):
+    #             return True
+    #     return False
 
     @property
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
-        stype = self.serializer_type
-        if stype == -2:
-            out = self.datatype._empty_msg
-        elif stype <= 0:
+        if self.is_user_defined:
             out = backwards.unicode2bytes('')
         else:
-            out = tuple()
-        return out
-
-    @property
-    def serializer_info(self):
-        r"""dict: Information about serializer required to reconstruct it."""
-        if self.is_user_defined:
-            raise RuntimeError("Cannot get serializer info for user "
-                               + "defined functions.")
-        if self.datatype:
-            out = copy.deepcopy(self.datatype._typedef)
-            # This should be removed once full JSON headers used
-            out['stype'] = self.serializer_type
-        else:
-            out = dict(stype=self.serializer_type)
-            if self.format_str:
-                out['format_str'] = self.format_str
-            if self.as_array:
-                out['as_array'] = int(self.as_array)
-            if self.field_names:
-                out['field_names'] = self.field_names
-            if self.field_units:
-                out['field_units'] = self.field_units
+            out = self.datatype._empty_msg
         return out
 
     @property
@@ -160,6 +182,44 @@ class DefaultSerialize(object):
         return len(self.field_formats)
 
     @property
+    def field_names(self):
+        r"""list: Names for each field in the data type."""
+        if self.typedef['type'] == 'array':
+            out = []
+            for i, t in enumerate(self.typedef['items']):
+                out.append(backwards.unicode2bytes(t.get('title', 'f%d' % i)))
+            assert(len(out) == self.nfields)
+        else:
+            out = None
+        return out
+
+    @property
+    def field_units(self):
+        r"""list: Units for each field in the data type."""
+        if self.typedef['type'] == 'array':
+            out = []
+            for i, t in enumerate(self.typedef['items']):
+                out.append(backwards.unicode2bytes(t.get('units', '')))
+            assert(len(out) == self.nfields)
+        else:
+            out = None
+        return out
+
+    @property
+    def as_array(self):
+        r"""bool: True if the entire table columns are sent/received, False
+        otherwise."""
+        if self.typedef['type'] == 'array':
+            out = True
+            for t in self.typedef['items']:
+                if t['type'] != '1darray':
+                    out = False
+                    break
+        else:
+            out = None
+        return out
+
+    @property
     def numpy_dtype(self):
         r"""np.dtype: Data type associated with the format string."""
         if self.format_str is None:
@@ -173,73 +233,64 @@ class DefaultSerialize(object):
             return None
         return serialize.cformat2pyscanf(self.format_str)
         
-    def func_serialize(self, args):
-        r"""Default method for serializing object into message.
+    def update_from_message(self, msg, **kwargs):
+        r"""Update serializer information based on the message.
 
         Args:
-            args (obj): List of arguments to be formatted or a ready made message.
+            msg (obj): Python object being sent as a message.
+            **kwargs: Additional keyword arguments are assumed to be typedef
+                options and are passed to update_serializer.
 
-        Returns:
-            bytes, str: Serialized message.
+        """
+        kwargs.update(self.typedef)
+        cls = guess_type_from_obj(msg)
+        typedef = cls.encode_type(msg, **kwargs)
+        self.update_serializer(extract=True, **typedef)
+
+    def update_serializer(self, extract=False, **kwargs):
+        r"""Update serializer with provided information.
+
+        Args:
+            extract (bool, optional): If True, the updated typedef will be
+                the bare minimum as extracted from total set of provided
+                keywords, otherwise the entire set will be sued. Defaults to
+                False.
+            **kwargs: Additional keyword arguments are processed as part of
+                they type definition and are parsed for old-style keywords.
 
         Raises:
-            Exception: If there is no format string and more than one argument
-                is provided.
+            RuntimeError: If there are keywords that are not valid typedef
+                keywords (currect or old-style).
 
         """
-        if self._func_serialize is not None:
-            # Return directly to check and raise TypeError
-            return self._func_serialize(args)
-        elif self.datatype:
-            # TODO: Transition to using JSON encoding for all header info
-            return self.datatype.serialize(args)
-        elif self.format_str is not None:
-            if self.as_array:
-                out = serialize.array_to_bytes(args, dtype=self.numpy_dtype,
-                                               order='F')
-            else:
-                out = serialize.format_message(args, self.format_str)
-        else:
-            if isinstance(args, (list, tuple)):
-                if len(args) != 1:
-                    raise Exception("No format string and more than one "
-                                    + "argument provided.")
-                out = args[0]
-            else:
-                out = args
-        out = backwards.unicode2bytes(out)
-        return out
-
-    def func_deserialize(self, msg):
-        r"""Default method for deseserializing a message.
-
-        Args:
-            msg (str, bytes): Message to be deserialized.
-
-        Returns:
-            tuple(obj, dict): Deserialized message and header information.
-
-        """
-        if self._func_deserialize is not None:
-            out = self._func_deserialize(msg)
-        elif self.datatype:
-            # TODO: Transition to using JSON encoding for all header info
-            out = self.datatype.deserialize(msg)[0]  # excludes header info
-        elif self.format_str is not None:
-            if self.as_array:
-                if len(msg) == 0:
-                    out = self.empty_msg
-                    # out = np.empty(0, self.numpy_dtype)
-                else:
-                    out = serialize.bytes_to_array(msg, self.numpy_dtype, order='F')
-            else:
-                if len(msg) == 0:
-                    out = self.empty_msg
-                else:
-                    out = serialize.process_message(msg, self.format_str)
-        else:
-            out = msg
-        return out
+        # Create alias if another seritype is needed
+        seritype = kwargs.pop('seritype', self._seritype)
+        if seritype != self._seritype:
+            kwargs.update(extract=extract, seritype=seritype)
+            self._alias = serialize.get_serializer(**kwargs)
+            assert(self._seritype == seritype)
+            return
+        # Set attributes and remove unused metadata keys
+        for k in ['size', 'id']:
+            kwargs.pop(k, None)
+        for k in self._schema_properties.keys():
+            if k in kwargs:
+                setattr(self, k, kwargs.pop(k))
+        kwargs['format_str'] = self.format_str
+        typedef, kwargs = oldstyle2datatype(**kwargs)
+        for k in _metaschema['properties'].keys():
+            if k in kwargs:
+                typedef[k] = kwargs.pop(k)
+        if (len(kwargs) > 0):
+            self.extra_kwargs.update(kwargs)
+            # pprint.pprint(kwargs)
+            # raise RuntimeError("There were unprocessed keyword arguments.")
+        if typedef.get('type', None):
+            if typedef['type'] != self.typedef['type']:
+                self.datatype = get_type_class(typedef['type'])()
+            if extract:
+                typedef = self.datatype.extract_typedef(typedef)
+            self.datatype.update_typedef(**typedef)
 
     def serialize(self, args, header_kwargs=None, add_serializer_info=False):
         r"""Serialize a message.
@@ -248,9 +299,8 @@ class DefaultSerialize(object):
             args (obj): List of arguments to be formatted or a ready made message.
             header_kwargs (dict, optional): Keyword arguments that should be
                 added to the header. Defaults to None and no header is added.
-            add_serializer_info (bool, optional): If True, add enough information
-                about this serializer to the header that the message can be
-                recovered.
+            add_serializer_info (bool, optional): If True, serializer information
+                will be added to the metadata. Defaults to False.
 
         Returns:
             bytes, str: Serialized message.
@@ -262,49 +312,25 @@ class DefaultSerialize(object):
         """
         if isinstance(args, backwards.bytes_type) and (args == tools.CIS_MSG_EOF):
             return args
-        else:
-            out = self.func_serialize(args)
-            if not isinstance(out, backwards.bytes_type):
-                raise TypeError("Serialization function did not yield bytes type.")
+        if not self._initialized:
+            self.update_from_message(args)
+            self._initialized = True
+        metadata = {}
+        metadata.setdefault('id', str(uuid.uuid4()))
         if add_serializer_info:
-            if header_kwargs is None:
-                header_kwargs = dict()
-            header_kwargs.update(**self.serializer_info)
+            metadata.update(self.serializer_info)
         if header_kwargs is not None:
-            header_kwargs.setdefault('size', len(out))
-            header_kwargs.setdefault('id', str(uuid.uuid4()))
-            out = self.format_header(header_kwargs) + out
+            metadata.update(header_kwargs)
+        if hasattr(self, 'func_serialize'):
+            data = self.func_serialize(args)
+            if not isinstance(data, backwards.bytes_type):
+                raise TypeError("Serialization function did not yield bytes type.")
+            out = self.str_datatype.serialize(data, **metadata)
+        else:
+            out = self.datatype.serialize(args, **metadata)
+        if not isinstance(out, backwards.bytes_type):
+            raise TypeError("Serialization function did not yield bytes type.")
         return out
-
-    def update_from_message(self, msg, **kwargs):
-        r"""Update serializer information based on the message.
-
-        Args:
-            msg (obj): Python object being sent as a message.
-
-        """
-        kwargs.update(**self.serializer_info)
-        sinfo = serialize.guess_serializer(msg, **kwargs)
-        self.update_serializer(**sinfo)
-
-    def update_serializer(self, **kwargs):
-        r"""Update serializer with provided information."""
-        key_list = ['format_str', 'as_array', 'field_names', 'field_units']
-        for k in key_list:
-            setattr(self, k, kwargs.get(k, getattr(self, k)))
-        if kwargs.get('typename', None):
-            if kwargs['typename'] == self.typename:
-                self.datatype.update_typedef(**kwargs)
-            else:
-                self.typename = kwargs['typename']
-                self.datatype = datatypes.get_type_class(self.typename)(**kwargs)
-        if 'stype' in kwargs:
-            stype = kwargs['stype']
-            if (self.serializer_type != stype) and (stype not in [0, -2]):
-                sinfo = self.serializer_info
-                sinfo['stype'] = stype
-                self._alias = serialize.get_serializer(**sinfo)
-            assert(self.serializer_type == stype)
 
     def deserialize(self, msg):
         r"""Deserialize a message.
@@ -321,20 +347,22 @@ class DefaultSerialize(object):
         """
         if not isinstance(msg, backwards.bytes_type):
             raise TypeError("Message to be deserialized is not bytes type.")
-        header_info = self.parse_header(msg)
-        # Update parameters based on header info
-        if 'stype' in header_info:
-            self.update_serializer(**header_info)
-        body = header_info.pop('body')
-        if len(body) < header_info['size']:
-            header_info['incomplete'] = True
-            return body, header_info
-        if body == tools.CIS_MSG_EOF:
-            header_info['eof'] = True
-            out = body
+        if isinstance(msg, backwards.bytes_type) and (msg == tools.CIS_MSG_EOF):
+            out = msg
+            metadata = {'eof': True}
+        elif hasattr(self, 'func_deserialize'):
+            out, metadata = self.str_datatype.deserialize(msg)
+            if not ((metadata['size'] == 0) or (metadata.get('incomplete', False))):
+                out = self.func_deserialize(out)
         else:
-            out = self.func_deserialize(body)
-        return out, header_info
+            out, metadata = self.datatype.deserialize(msg)
+        # Update serializer
+        if not (self._initialized
+                or metadata.get('eof', False)
+                or metadata.get('incomplete', False)):
+            self.update_from_message(out, **metadata)
+            self._initialized = True
+        return out, metadata
 
     def format_header(self, header_info):
         r"""Format header info to form a string that should prepend a message.

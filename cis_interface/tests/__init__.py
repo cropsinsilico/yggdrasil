@@ -14,7 +14,7 @@ import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
-from cis_interface import backwards, platform, serialize
+from cis_interface import backwards, platform, serialize, units
 from cis_interface.communication import cleanup_comms, get_comm_class
 from cis_interface.serialize.PlySerialize import PlyDict
 from cis_interface.serialize.ObjSerialize import ObjDict
@@ -438,7 +438,7 @@ class IOInfo(object):
 
     def __init__(self):
         self.field_names = ['name', 'count', 'size']
-        self.field_units = ['n/a', 'g', 'cm']
+        self.field_units = ['n/a', 'umol', 'cm']
         self.nfields = len(self.field_names)
         self.comment = backwards.unicode2bytes('# ')
         self.delimiter = backwards.unicode2bytes('\t')
@@ -489,7 +489,14 @@ class IOInfo(object):
         r"""list: File rows."""
         out = []
         for x in self.file_elements:
-            out.append((backwards.unicode2bytes(x[0]), x[1], x[2]))
+            iout = []
+            for i in range(len(x)):
+                if i == 0:
+                    iout.append(backwards.unicode2bytes(x[i]))
+                else:
+                    iout.append(units.add_units(x[i], self.field_units[i]))
+            out.append(iout)
+            # out.append((backwards.unicode2bytes(x[0]), x[1], x[2]))
         return out
         
     @property
@@ -536,7 +543,7 @@ class IOInfo(object):
     def file_array(self):
         r"""np.ndarray: Numpy structure array of mock file contents."""
         out = np.zeros(len(self.file_rows), dtype=self.file_dtype)
-        for i, row in enumerate(self.file_rows):
+        for i, row in enumerate(self.file_elements):
             out[i] = row
         return out
 
