@@ -1,6 +1,5 @@
 """Testing things."""
 import os
-import copy
 import shutil
 import uuid
 import importlib
@@ -16,8 +15,7 @@ from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface import backwards, platform, serialize, units
 from cis_interface.communication import cleanup_comms, get_comm_class
-from cis_interface.serialize.PlySerialize import PlyDict
-from cis_interface.serialize.ObjSerialize import ObjDict
+
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -437,6 +435,12 @@ class IOInfo(object):
     """
 
     def __init__(self):
+        from cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType import (
+            _test_value as _ply_test_value)
+        from cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType import (
+            _test_value as _obj_test_value)
+        from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
+        from cis_interface.metaschema.datatypes.ObjMetaschemaType import ObjDict
         self.field_names = ['name', 'count', 'size']
         self.field_units = ['n/a', 'umol', 'cm']
         self.nfields = len(self.field_names)
@@ -463,18 +467,8 @@ class IOInfo(object):
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]
         self.map_dict = dict(args1=1, args2='2')
-        self.ply_dict = dict(vertices=[[0.0, 0.0, 0.0],
-                                       [0.0, 1.0, 0.0],
-                                       [1.0, 0.0, 0.0],
-                                       [1.0, 1.0, 0.0]],
-                             faces=[[0, 1, 2], [1, 2, 3]])
-        self.obj_dict = copy.deepcopy(self.ply_dict)
-        self.obj_dict.update(normals=copy.deepcopy(self.obj_dict['vertices']),
-                             texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [5.0, 6.0]],
-                             face_normals=[[0, 1, 2], None, None],
-                             face_texcoords=[[0, 1, 2], None, None],
-                             material='material')
-        self.obj_dict['faces'].append([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+        self.ply_dict = _ply_test_value
+        self.obj_dict = _obj_test_value
         self.ply_dict = PlyDict(**self.ply_dict)
         self.obj_dict = ObjDict(**self.obj_dict)
 

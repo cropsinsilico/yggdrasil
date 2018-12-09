@@ -1,10 +1,8 @@
 import nose.tools as nt
-from cis_interface import backwards
-from cis_interface.serialize.tests.test_DefaultSerialize import \
-    TestDefaultSerialize
+from cis_interface.serialize.tests import test_DefaultSerialize as parent
 
 
-class TestMatSerialize(TestDefaultSerialize):
+class TestMatSerialize(parent.TestDefaultSerialize):
     r"""Test class for TestMatSerialize class."""
 
     def __init__(self, *args, **kwargs):
@@ -17,11 +15,6 @@ class TestMatSerialize(TestDefaultSerialize):
         r"""Assert that serialized/deserialized objects equal."""
         self.assert_equal_data_dict(x, y)
 
-    def test_serialize_empty(self):
-        r"""Test serialization of an empty string."""
-        test_msg = backwards.unicode2bytes('')
-        nt.assert_equal(self.instance.serialize(test_msg), test_msg)
-        
     def test_serialize_errors(self):
         r"""Test serialize errors."""
         nt.assert_raises(TypeError, self.instance.serialize, ['blah', 'blah'])

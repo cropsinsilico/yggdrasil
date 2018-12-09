@@ -4,6 +4,7 @@ import nose.tools as nt
 from cis_interface.tests import CisTestClassInfo
 from cis_interface import backwards, tools, serialize
 from cis_interface.serialize import DefaultSerialize
+from cis_interface.metaschema.datatypes import encode_type
 
 
 class TestDefaultSerialize(CisTestClassInfo):
@@ -71,10 +72,7 @@ class TestDefaultSerialize(CisTestClassInfo):
         temp_seri = serialize.get_serializer(
             seritype=self.instance.serializer_info['seritype'])
         for iobj in self._objects:
-            hout.update(
-                self.instance.datatype.encode_type(
-                    iobj,
-                    typedef=self.instance.typedef))
+            hout.update(encode_type(iobj, typedef=self.instance.typedef))
             msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
                                           add_serializer_info=True)
             iout, ihead = self.instance.deserialize(msg)

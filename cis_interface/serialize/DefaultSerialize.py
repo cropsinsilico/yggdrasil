@@ -1,4 +1,5 @@
 import uuid
+import copy
 import numpy as np
 from cis_interface import backwards, tools, serialize
 from cis_interface.serialize import register_serializer
@@ -83,6 +84,7 @@ class DefaultSerialize(object):
     _schema_type = 'serializer'
     _schema_requried = []
     _schema_properties = {'format_str': {'type': 'string'}}
+    _default_type = {'type': 'bytes'}
 
     def __init__(self, func_serialize=None, func_deserialize=None, **kwargs):
         self._alias = None
@@ -107,13 +109,12 @@ class DefaultSerialize(object):
         for k, v in self._schema_properties.items():
             setattr(self, k, v.get('default', None))
         # Update typedef
-        self.datatype = get_type_from_def({'type': 'bytes'})
+        self.datatype = get_type_from_def(self._default_type)
         self.str_datatype = get_type_from_def({'type': 'bytes'})
         self.update_serializer(**kwargs)
-        if self.is_user_defined:
-            self._initialized = True
-        else:
-            self._initialized = (self.typedef != {'type': 'bytes'})
+        self._initialized = (self.typedef != self._default_type)
+        if 'format_str' not in self._schema_properties:
+            self.format_str = None
 
     @property
     def typedef(self):
@@ -150,16 +151,6 @@ class DefaultSerialize(object):
                     out[k] = v
         return out
 
-    # @property
-    # def is_user_defined(self):
-    #     r"""bool: True if serialization or deserialization function was user
-    #     defined."""
-    #     for k in ['func_serialize', 'func_deserialize']:
-    #         if ((getattr(self, k, None) is not None)
-    #             and (k in self.__dict__)):
-    #             return True
-    #     return False
-
     @property
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
@@ -184,11 +175,16 @@ class DefaultSerialize(object):
     @property
     def field_names(self):
         r"""list: Names for each field in the data type."""
-        if self.typedef['type'] == 'array':
+        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
             out = []
+            any_names = False
             for i, t in enumerate(self.typedef['items']):
+                if 'title' in t:
+                    any_names = True
                 out.append(backwards.unicode2bytes(t.get('title', 'f%d' % i)))
             assert(len(out) == self.nfields)
+            if not any_names:
+                out = None
         else:
             out = None
         return out
@@ -196,11 +192,16 @@ class DefaultSerialize(object):
     @property
     def field_units(self):
         r"""list: Units for each field in the data type."""
-        if self.typedef['type'] == 'array':
+        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
             out = []
+            any_units = False
             for i, t in enumerate(self.typedef['items']):
+                if 'units' in t:
+                    any_units = True
                 out.append(backwards.unicode2bytes(t.get('units', '')))
             assert(len(out) == self.nfields)
+            if not any_units:
+                out = None
         else:
             out = None
         return out
@@ -209,7 +210,7 @@ class DefaultSerialize(object):
     def as_array(self):
         r"""bool: True if the entire table columns are sent/received, False
         otherwise."""
-        if self.typedef['type'] == 'array':
+        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
             out = True
             for t in self.typedef['items']:
                 if t['type'] != '1darray':
@@ -242,9 +243,10 @@ class DefaultSerialize(object):
                 options and are passed to update_serializer.
 
         """
-        kwargs.update(self.typedef)
+        out = copy.deepcopy(self.typedef)
+        out.update(kwargs)
         cls = guess_type_from_obj(msg)
-        typedef = cls.encode_type(msg, **kwargs)
+        typedef = cls.encode_type(msg, **out)
         self.update_serializer(extract=True, **typedef)
 
     def update_serializer(self, extract=False, **kwargs):
@@ -276,7 +278,8 @@ class DefaultSerialize(object):
         for k in self._schema_properties.keys():
             if k in kwargs:
                 setattr(self, k, kwargs.pop(k))
-        kwargs['format_str'] = self.format_str
+                if k == 'format_str':
+                    kwargs[k] = getattr(self, k)
         typedef, kwargs = oldstyle2datatype(**kwargs)
         for k in _metaschema['properties'].keys():
             if k in kwargs:
@@ -325,6 +328,7 @@ class DefaultSerialize(object):
             data = self.func_serialize(args)
             if not isinstance(data, backwards.bytes_type):
                 raise TypeError("Serialization function did not yield bytes type.")
+            metadata['metadata'] = self.datatype.encode_type(args, typedef=self.typedef)
             out = self.str_datatype.serialize(data, **metadata)
         else:
             out = self.datatype.serialize(args, **metadata)
@@ -352,12 +356,21 @@ class DefaultSerialize(object):
             metadata = {'eof': True}
         elif hasattr(self, 'func_deserialize'):
             out, metadata = self.str_datatype.deserialize(msg)
-            if not ((metadata['size'] == 0) or (metadata.get('incomplete', False))):
+            if metadata['size'] == 0:
+                out = self.empty_msg
+            elif not metadata.get('incomplete', False):
+                for k, v in metadata.items():
+                    if k not in ['type', 'precision', 'units', 'metadata']:
+                        metadata['metadata'][k] = v
+                metadata = metadata.pop('metadata')
+                if not self._initialized:
+                    self.update_serializer(extract=False, **metadata)
                 out = self.func_deserialize(out)
         else:
             out, metadata = self.datatype.deserialize(msg)
         # Update serializer
         if not (self._initialized
+                or (metadata.get('size', 0) == 0)
                 or metadata.get('eof', False)
                 or metadata.get('incomplete', False)):
             self.update_from_message(out, **metadata)

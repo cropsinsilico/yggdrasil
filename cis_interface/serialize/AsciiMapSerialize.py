@@ -1,7 +1,10 @@
-from cis_interface import backwards
+import json
+from cis_interface import backwards, serialize
+from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
+@register_serializer
 class AsciiMapSerialize(DefaultSerialize):
     r"""Class for serializing/deserializing name/value mapping.
 
@@ -13,15 +16,13 @@ class AsciiMapSerialize(DefaultSerialize):
 
     """
     
-    def __init__(self, *args, **kwargs):
-        self.delimiter = backwards.bytes2unicode(kwargs.pop('delimiter', '\t'))
-        self.newline = backwards.bytes2unicode(kwargs.pop('newline', '\n'))
-        super(AsciiMapSerialize, self).__init__(*args, **kwargs)
-
-    @property
-    def serializer_type(self):
-        r"""int: Type of serializer."""
-        return 7
+    _seritype = 'ascii_map'
+    _schema_properties = {
+        'delimiter': {'type': 'unicode',
+                      'default': backwards.bytes2unicode(serialize._default_delimiter)},
+        'newline': {'type': 'unicode',
+                    'default': backwards.bytes2unicode(serialize._default_newline)}}
+    _default_type = {'type': 'object'}
 
     @property
     def empty_msg(self):
@@ -46,9 +47,8 @@ class AsciiMapSerialize(DefaultSerialize):
                 raise ValueError("Serialization of non-string keys not supported.")
             out += k + self.delimiter
             if isinstance(v, backwards.string_types):
-                out += "'%s'" % backwards.bytes2unicode(v)
-            else:
-                out += repr(v)
+                v = backwards.bytes2unicode(v)
+            out += json.dumps(v)
             out += self.newline
         return backwards.unicode2bytes(out)
 
@@ -72,7 +72,7 @@ class AsciiMapSerialize(DefaultSerialize):
                 if len(kv) <= 1:
                     continue
                 elif len(kv) == 2:
-                    out[kv[0]] = eval(kv[1])
+                    out[kv[0]] = json.loads(kv[1])
                 else:
                     raise ValueError("Line has more than one delimiter: " + l)
         return out

@@ -82,49 +82,6 @@ def get_serializer_class(seri_name):
     return _serializer_registry[seri_name]
 
 
-def guess_serializer(msg, **kwargs):
-    r"""Guess the type of serializer required based on the message object.
-
-    Args:
-        msg (obj): Python object that needs to be serialized.
-        **kwargs: Additional keyword arguments are passed to the serializer.
-
-    Returns:
-        dict: Extracted keyword arguments for creating a serializer.
-
-    """
-    sinfo = dict(**kwargs)
-    kws_fmt = {k: kwargs.get(k, None) for k in ['delimiter', 'newline']}
-    kws_fmt['comment'] = backwards.unicode2bytes('')
-    if sinfo.get('stype', 0) > 3:
-        # Don't guess for Pandas, Pickle, Map
-        pass
-    elif sinfo.get('stype', 0) == -2:
-        # Don't guess for CisType
-        pass
-    elif isinstance(msg, np.ndarray):
-        names = [backwards.unicode2bytes(n) for n in msg.dtype.names]
-        sinfo.setdefault('field_names', names)
-        sinfo.setdefault('format_str', table2format(msg.dtype, **kws_fmt))
-        sinfo.setdefault('as_array', True)
-    elif isinstance(msg, (list, tuple)):
-        if 'format_str' not in sinfo:
-            typ_list = []
-            for x in msg:
-                if isinstance(x, backwards.string_types):
-                    typ_list.append(np.dtype('S1'))
-                else:
-                    typ_list.append(np.dtype(type(x)))
-            new_type = dict(formats=typ_list,
-                            names=['f%d' % i for i in range(len(typ_list))])
-            row_dtype = np.dtype(new_type)
-            format_str = table2format(row_dtype, **kws_fmt)
-            format_str = format_str.replace(backwards.unicode2bytes('%1s'),
-                                            backwards.unicode2bytes('%s'))
-            sinfo.setdefault('format_str', format_str)
-    return sinfo
-
-
 def get_serializer(seritype='default', **kwargs):
     r"""Create a serializer from the provided information.
 

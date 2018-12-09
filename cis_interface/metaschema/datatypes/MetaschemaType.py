@@ -190,19 +190,22 @@ class MetaschemaType(object):
         return out
 
     @classmethod
-    def extract_typedef(cls, metadata):
+    def extract_typedef(cls, metadata, reqkeys=None):
         r"""Extract the minimum typedef required for this type from the provided
         metadata.
 
         Args:
             metadata (dict): Message metadata.
+            reqkeys (list, optional): Set of keys to keep in the definition.
+                Defaults to the required definition keys.
 
         Returns:
             dict: Encoded type definition with unncessary properties removed.
 
         """
         out = copy.deepcopy(metadata)
-        reqkeys = cls.definition_schema().get('required', [])
+        if reqkeys is None:
+            reqkeys = cls.definition_schema().get('required', [])
         keylist = [k for k in out.keys()]
         for k in keylist:
             if k not in reqkeys:

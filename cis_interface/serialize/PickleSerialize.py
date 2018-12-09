@@ -1,21 +1,17 @@
 from cis_interface import backwards
+from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
+@register_serializer
 class PickleSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message by pickling.
     """
 
-    @property
-    def serializer_type(self):
-        r"""int: Type of serializer."""
-        return 4
-        
-    @property
-    def empty_msg(self):
-        r"""obj: Object indicating empty message."""
-        return backwards.unicode2bytes('')
-            
+    _seritype = 'pickle'
+    _schema_properties = dict()
+    _default_type = {'type': 'bytes'}
+
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -39,8 +35,5 @@ class PickleSerialize(DefaultSerialize):
             obj: Deserialized Python object.
 
         """
-        if len(msg) == 0:
-            out = self.empty_msg
-        else:
-            out = backwards.pickle.loads(msg)
+        out = backwards.pickle.loads(msg)
         return out

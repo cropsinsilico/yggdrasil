@@ -1,8 +1,7 @@
-from cis_interface.serialize.tests.test_DefaultSerialize import \
-    TestDefaultSerialize
+from cis_interface.serialize.tests import test_DefaultSerialize as parent
 
 
-class TestPickleSerialize(TestDefaultSerialize):
+class TestPickleSerialize(parent.TestDefaultSerialize):
     r"""Test class for TestPickleSerialize class."""
 
     def __init__(self, *args, **kwargs):

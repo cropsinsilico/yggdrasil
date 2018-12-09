@@ -1,10 +1,9 @@
 import nose.tools as nt
 from cis_interface import backwards
-from cis_interface.serialize.tests.test_DefaultSerialize import \
-    TestDefaultSerialize
+from cis_interface.serialize.tests import test_DefaultSerialize as parent
 
 
-class TestAsciiMapSerialize(TestDefaultSerialize):
+class TestAsciiMapSerialize(parent.TestDefaultSerialize):
     r"""Test class for TestAsciiMapSerialize class."""
 
     def __init__(self, *args, **kwargs):
@@ -23,7 +22,3 @@ class TestAsciiMapSerialize(TestDefaultSerialize):
         r"""Test error on serializing dictionary with non-string values."""
         obj = {1: 'here'}
         nt.assert_raises(ValueError, self.instance.serialize, obj)
-
-    # def assert_result_equal(self, x, y):
-    #     r"""Assert that serialized/deserialized objects equal."""
-    #     np.testing.assert_array_equal(x, y)

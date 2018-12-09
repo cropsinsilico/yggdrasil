@@ -2,10 +2,12 @@ import pandas
 import copy
 import numpy as np
 from cis_interface import backwards, platform
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.serialize import register_serializer
+from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
-class PandasSerialize(DefaultSerialize):
+@register_serializer
+class PandasSerialize(AsciiTableSerialize):
     r"""Class for serializing/deserializing Pandas data frames.
 
     Args:
@@ -16,21 +18,12 @@ class PandasSerialize(DefaultSerialize):
 
     """
 
-    def __init__(self, *args, **kwargs):
-        self.delimiter = backwards.bytes2unicode(kwargs.pop('delimiter', '\t'))
-        self.write_header = kwargs.pop('write_header', True)
-        super(PandasSerialize, self).__init__(*args, **kwargs)
+    _seritype = 'pandas'
+    _schema_properties = dict(
+        AsciiTableSerialize._schema_properties,
+        write_header={'type': 'bool', 'default': True})
+    _default_type = {'type': 'array'}
 
-    @property
-    def serializer_type(self):
-        r"""int: Type of serializer."""
-        return 6
-        
-    @property
-    def empty_msg(self):
-        r"""obj: Object indicating empty message."""
-        return backwards.unicode2bytes('')
-            
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -42,9 +35,9 @@ class PandasSerialize(DefaultSerialize):
 
         """
         fd = backwards.StringIO()
-        if backwards.PY2:
+        if backwards.PY2:  # pragma: Python 2
             args_ = args
-        else:
+        else:  # pragma: Python 3
             # For Python 3 and higher, bytes need to be encoded
             args_ = copy.deepcopy(args)
             for c in args.columns:
@@ -68,29 +61,26 @@ class PandasSerialize(DefaultSerialize):
             obj: Deserialized Python object.
 
         """
-        if len(msg) == 0:
-            out = self.empty_msg
-        else:
-            fd = backwards.BytesIO(msg)
-            out = pandas.read_csv(fd, sep=self.delimiter, encoding='utf8')
-            fd.close()
-            if not backwards.PY2:
-                # For Python 3 and higher, make sure strings are bytes
+        fd = backwards.BytesIO(msg)
+        out = pandas.read_csv(fd, sep=self.delimiter, encoding='utf8')
+        fd.close()
+        if not backwards.PY2:
+            # For Python 3 and higher, make sure strings are bytes
+            for c, d in zip(out.columns, out.dtypes):
+                if d == object:
+                    out[c] = out[c].apply(lambda s: s.encode('utf-8'))
+        # On windows, long != longlong and longlong requires special cformat
+        # For now, long will be used to preserve the use of %ld to match long
+        if platform._is_win:  # pragma: windows
+            if np.dtype('longlong').itemsize == 8:
+                new_dtypes = dict()
                 for c, d in zip(out.columns, out.dtypes):
-                    if d == object:
-                        out[c] = out[c].apply(lambda s: s.encode('utf-8'))
-            # On windows, long != longlong and longlong requires special cformat
-            # For now, long will be used to preserve the use of %ld to match long
-            if platform._is_win:  # pragma: windows
-                if np.dtype('longlong').itemsize == 8:
-                    new_dtypes = dict()
-                    for c, d in zip(out.columns, out.dtypes):
-                        if d == np.dtype('longlong'):
-                            new_dtypes[c] = np.int32
-                        else:
-                            new_dtypes[c] = d
-                    out = out.astype(new_dtypes, copy=False)
-            # for c, d in zip(out.columns, out.dtypes):
-            #     if d == object:
-            #         out[c] = out[c].apply(lambda s: s.strip())
+                    if d == np.dtype('longlong'):
+                        new_dtypes[c] = np.int32
+                    else:
+                        new_dtypes[c] = d
+                out = out.astype(new_dtypes, copy=False)
+        # for c, d in zip(out.columns, out.dtypes):
+        #     if d == object:
+        #         out[c] = out[c].apply(lambda s: s.strip())
         return out

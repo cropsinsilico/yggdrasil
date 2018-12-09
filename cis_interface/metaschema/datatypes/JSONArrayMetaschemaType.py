@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+from cis_interface import serialize
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -13,7 +15,7 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
     properties = ContainerMetaschemaType.properties + ['items']
     definition_properties = ContainerMetaschemaType.definition_properties
     metadata_properties = ContainerMetaschemaType.metadata_properties + ['items']
-    python_types = (list, tuple, np.ndarray)
+    python_types = (list, tuple, np.ndarray, pd.DataFrame)
     _replaces_existing = True
 
     _container_type = list
@@ -63,6 +65,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             object: Coerced object.
 
         """
+        if isinstance(obj, pd.DataFrame):
+            obj = serialize.pandas2numpy(obj)
         if isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
             return [obj[n] for n in obj.dtype.names]
         return obj
