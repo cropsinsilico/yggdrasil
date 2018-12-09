@@ -78,6 +78,9 @@ def get_metaschema():
             all original JSON schema rules with the addition of types and
             property definitions.
 
+    .. note:: This function should not be called at the module level as it can
+              cause the metaschema (if it dosn't exist) to be generated before
+              all of the necessary modules have been loaded.
 
     """
     global _metaschema
@@ -124,6 +127,7 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
                                        validators=all_validators,
                                        normalizers=normalizers,
                                        default_types=all_datatypes, **kwargs)
+        _validator._base_validator = _base_validator
     return _validator
 
 

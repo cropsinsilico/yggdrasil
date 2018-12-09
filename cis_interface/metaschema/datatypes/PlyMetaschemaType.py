@@ -318,6 +318,10 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                         for ix in ientry:
                             iline += ifmt % ix
                     else:
+                        # if p not in x:
+                        #     if p in ['red', 'green', 'blue']:
+                        #         rgb_index = ['red', 'green', 'blue'].index(p)
+                        #         x[p] = default_rgb[rgb_index]
                         iline += translate_ply2fmt(type_map[e][p]) % x[p]
                 body.append(iline.strip())  # Ensure trailing spaces are removed
         return newline.join(header + body)
@@ -649,8 +653,12 @@ class PlyDict(dict):
             if 'edges' not in self:
                 self['edges'] = []
             for e in solf['edges']:
-                self['edges'].append({'vertex1': e['vertex1'] + nvert,
-                                      'vertex2': e['vertex2'] + nvert})
+                iedge = {'vertex1': e['vertex1'] + nvert,
+                         'vertex2': e['vertex2'] + nvert}
+                for k in ['red', 'green', 'blue']:
+                    if k in e:
+                        iedge[k] = e[k]
+                self['edges'].append(iedge)
 
     def merge(self, ply_list, no_copy=False):
         r"""Merge a list of ply dictionaries.

@@ -152,7 +152,6 @@ class MetaschemaProperty(object):
                 method.
 
         """
-        from cis_interface.metaschema import _base_validator
         if validator._normalizing:
             validator._normalized = cls.normalize(validator, value, instance, schema)
             instance = validator._normalized
@@ -162,8 +161,8 @@ class MetaschemaProperty(object):
             for e in errors:
                 failed = True
                 yield jsonschema.ValidationError(e)
-            if (not failed) and (cls.name in _base_validator.VALIDATORS):
-                errors = _base_validator.VALIDATORS[cls.name](
+            if (not failed) and (cls.name in validator._base_validator.VALIDATORS):
+                errors = validator._base_validator.VALIDATORS[cls.name](
                     validator, value, instance, schema) or ()
                 for e in errors:
                     failed = True

@@ -1,6 +1,7 @@
 from cis_interface import backwards
 from cis_interface.communication import FileComm
 from cis_interface.schema import register_component
+from cis_interface.serialize.PickleSerialize import PickleSerialize
 
 
 @register_component
@@ -14,10 +15,10 @@ class PickleFileComm(FileComm.FileComm):
     """
 
     _filetype = 'pickle'
+    _default_serializer = PickleSerialize
 
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')
-        kwargs['serializer_kwargs'] = dict(stype=4)
         super(PickleFileComm, self).__init__(name, **kwargs)
 
     def _recv(self, timeout=0):

@@ -5,6 +5,25 @@ from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 
 
+def _normalize_schema(validator, ref, instance, schema):
+    r"""Normalize a schema at the root to handle case where only type
+    string specified."""
+    if isinstance(instance, str):
+        instance = dict(type=instance)
+    return instance
+
+
+def _validate_schema(validator, ref, instance, schema):
+    r"""Validate a schema at the root to handle case where only type
+    string specified."""
+    if validator._normalizing and (ref == '#'):
+        validator._normalized = _normalize_schema(validator, ref, instance, schema)
+    errors = validator._base_validator.VALIDATORS['$ref'](
+        validator, ref, instance, schema) or ()
+    for e in errors:
+        yield e
+    
+
 @register_type
 class SchemaMetaschemaType(JSONObjectMetaschemaType):
     r"""Schema type."""
@@ -80,5 +99,12 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
 
         """
         if isinstance(obj, str):
-            return {'type': obj}
+            obj = {'type': obj}
+        x = copy.deepcopy(cls.metaschema())
+        validators = {u'$ref': _validate_schema}
+        normalizers = {tuple(): [_normalize_schema]}
+        validator_class = copy.deepcopy(cls.validator())
+        obj = validator_class(x).normalize(obj, no_defaults=True,
+                                           normalizers=normalizers,
+                                           validators=validators)
         return obj

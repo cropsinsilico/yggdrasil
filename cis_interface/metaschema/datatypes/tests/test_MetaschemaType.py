@@ -244,7 +244,7 @@ class TestMetaschemaType(CisTestClassInfo):
         r"""Test call for empty string."""
         out = self.instance.deserialize(self._empty_msg)
         self.assert_result_equal(out[0], self.instance._empty_msg)
-        nt.assert_equal(out[1], dict(size=0))
+        nt.assert_equal(out[1], dict(size=0, incomplete=False))
         # nt.assert_equal(out, self.instance._empty_msg)
 
     def test_deserialize_incomplete(self):

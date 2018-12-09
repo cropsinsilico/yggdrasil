@@ -3,6 +3,7 @@ import tempfile
 from cis_interface import backwards, platform, serialize
 from cis_interface.communication import CommBase
 from cis_interface.schema import register_component
+from cis_interface.serialize.DirectSerialize import DirectSerialize
 
 
 @register_component
@@ -54,47 +55,43 @@ class FileComm(CommBase.CommBase):
     _schema_properties = {'name': {'type': 'string'},
                           'working_dir': {'type': 'string'},
                           'filetype': {'type': 'string', 'default': _filetype},
+                          'datatype': {'type': 'schema',
+                                       'default': {'type': 'bytes'}},
                           'append': {'type': 'boolean', 'default': False},
                           'in_temp': {'type': 'boolean', 'default': False},
                           'newline': {'type': 'unicode',
                                       'default': backwards.bytes2unicode(
                                           serialize._default_newline)},
                           'is_series': {'type': 'boolean', 'default': False}}
+    _default_serializer = DirectSerialize
+    _attr_conv = ['newline', 'platform_newline']
     is_file = True
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
         return super(FileComm, self).__init__(*args, **kwargs)
 
-    def _init_before_open(self, read_meth='read', append=False, in_temp=False,
-                          open_as_binary=True, newline=None, is_series=False,
-                          **kwargs):
+    def _init_before_open(self, read_meth='read', open_as_binary=True, **kwargs):
         r"""Get absolute path and set attributes."""
         super(FileComm, self)._init_before_open(**kwargs)
+        # Process file class keywords
         if not hasattr(self, '_fd'):
             self._fd = None
         if read_meth not in ['read', 'readline']:
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
-        self.append = append
-        if newline is None:
-            newline = serialize._default_newline
-        self.newline = newline
         self.platform_newline = platform._newline
-        self.in_temp = in_temp
         if self.in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
         self.open_as_binary = open_as_binary
-        self.is_series = is_series
         self._series_index = 0
         # Put string attributes in the correct format
-        attr_conv = ['newline', 'platform_newline']
         if self.open_as_binary:
             func_conv = backwards.unicode2bytes
         else:
             func_conv = backwards.bytes2unicode
-        for k in attr_conv:
+        for k in self._attr_conv:
             v = getattr(self, k)
             if v is not None:
                 setattr(self, k, func_conv(v))

@@ -1,5 +1,6 @@
 from cis_interface.communication.PlyFileComm import PlyFileComm
 from cis_interface.schema import register_component
+from cis_interface.serialize.ObjSerialize import ObjSerialize
 
 
 @register_component
@@ -14,10 +15,4 @@ class ObjFileComm(PlyFileComm):
     """
 
     _filetype = 'obj'
-
-    def _init_before_open(self, serializer_kwargs=None, **kwargs):
-        if serializer_kwargs is None:
-            serializer_kwargs = {}
-        serializer_kwargs.setdefault('stype', 9)
-        kwargs['serializer_kwargs'] = serializer_kwargs
-        super(ObjFileComm, self)._init_before_open(**kwargs)
+    _default_serializer = ObjSerialize

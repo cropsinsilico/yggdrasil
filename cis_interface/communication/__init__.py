@@ -77,7 +77,7 @@ def get_comm(name, comm=None, new_comm_class=None, **kwargs):
         comm = new_comm_class
     if isinstance(comm, list):
         if len(comm) == 1:
-            name = comm[0].pop('name')
+            name = comm[0].pop('name', name)
             kwargs.update(comm[0])
             return new_comm(name, **kwargs)
         else:
@@ -108,7 +108,7 @@ def new_comm(name, comm=None, **kwargs):
     #     kwargs['new_comm_class'] = 'ErrorComm'
     if isinstance(comm, list):
         if len(comm) == 1:
-            name = comm[0].pop('name')
+            name = comm[0].pop('name', name)
             kwargs.update(comm[0])
             return new_comm(name, **kwargs)
         else:

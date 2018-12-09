@@ -1,4 +1,3 @@
-import uuid
 import copy
 import numpy as np
 from cis_interface import backwards, tools, serialize
@@ -7,12 +6,9 @@ from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class)
 from cis_interface.metaschema.datatypes.ScalarMetaschemaType import ScalarMetaschemaType
-from cis_interface.metaschema.datatypes import CIS_MSG_HEAD
 
 
-HEAD_VAL_SEP = backwards.unicode2bytes(':CIS:')
-HEAD_KEY_SEP = backwards.unicode2bytes(',CIS,')
-_metaschema = get_metaschema()
+_oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
 
 
 def oldstyle2datatype(format_str=None, field_names=None, field_units=None,
@@ -265,6 +261,7 @@ class DefaultSerialize(object):
                 keywords (currect or old-style).
 
         """
+        _metaschema = get_metaschema()
         # Create alias if another seritype is needed
         seritype = kwargs.pop('seritype', self._seritype)
         if seritype != self._seritype:
@@ -278,8 +275,9 @@ class DefaultSerialize(object):
         for k in self._schema_properties.keys():
             if k in kwargs:
                 setattr(self, k, kwargs.pop(k))
-                if k == 'format_str':
-                    kwargs[k] = getattr(self, k)
+        for k in _oldstyle_kws:
+            if (k not in kwargs) and hasattr(self, k):
+                kwargs[k] = getattr(self, k)
         typedef, kwargs = oldstyle2datatype(**kwargs)
         for k in _metaschema['properties'].keys():
             if k in kwargs:
@@ -289,13 +287,15 @@ class DefaultSerialize(object):
             # pprint.pprint(kwargs)
             # raise RuntimeError("There were unprocessed keyword arguments.")
         if typedef.get('type', None):
-            if typedef['type'] != self.typedef['type']:
-                self.datatype = get_type_class(typedef['type'])()
+            self.datatype = get_type_class(typedef['type'])()
+            # if typedef['type'] != self.typedef['type']:
+            #     self.datatype = get_type_class(typedef['type'])()
             if extract:
                 typedef = self.datatype.extract_typedef(typedef)
             self.datatype.update_typedef(**typedef)
 
-    def serialize(self, args, header_kwargs=None, add_serializer_info=False):
+    def serialize(self, args, header_kwargs=None, add_serializer_info=False,
+                  no_metadata=False):
         r"""Serialize a message.
 
         Args:
@@ -304,6 +304,8 @@ class DefaultSerialize(object):
                 added to the header. Defaults to None and no header is added.
             add_serializer_info (bool, optional): If True, serializer information
                 will be added to the metadata. Defaults to False.
+            no_metadata (bool, optional): If True, no metadata will be added to
+                the serialized message. Defaults to False.
 
         Returns:
             bytes, str: Serialized message.
@@ -313,22 +315,30 @@ class DefaultSerialize(object):
 
 
         """
+        is_eof = False
         if isinstance(args, backwards.bytes_type) and (args == tools.CIS_MSG_EOF):
-            return args
-        if not self._initialized:
+            is_eof = True
+        if not (self._initialized or is_eof):
             self.update_from_message(args)
             self._initialized = True
-        metadata = {}
-        metadata.setdefault('id', str(uuid.uuid4()))
+        metadata = {'no_metadata': no_metadata}
         if add_serializer_info:
             metadata.update(self.serializer_info)
         if header_kwargs is not None:
             metadata.update(header_kwargs)
         if hasattr(self, 'func_serialize'):
-            data = self.func_serialize(args)
-            if not isinstance(data, backwards.bytes_type):
-                raise TypeError("Serialization function did not yield bytes type.")
-            metadata['metadata'] = self.datatype.encode_type(args, typedef=self.typedef)
+            if is_eof:
+                data = args
+                if no_metadata:
+                    return data
+            else:
+                data = self.func_serialize(args)
+                if not isinstance(data, backwards.bytes_type):
+                    raise TypeError("Serialization function did not yield bytes type.")
+                if no_metadata:
+                    return data
+                metadata['metadata'] = self.datatype.encode_type(
+                    args, typedef=self.typedef)
             out = self.str_datatype.serialize(data, **metadata)
         else:
             out = self.datatype.serialize(args, **metadata)
@@ -336,11 +346,13 @@ class DefaultSerialize(object):
             raise TypeError("Serialization function did not yield bytes type.")
         return out
 
-    def deserialize(self, msg):
+    def deserialize(self, msg, **kwargs):
         r"""Deserialize a message.
 
         Args:
             msg (str, bytes): Message to be deserialized.
+            **kwargs: Additional keyword arguments are passed to the deserialize
+                method of the datatype class.
 
         Returns:
             tuple(obj, dict): Deserialized message and header information.
@@ -349,25 +361,22 @@ class DefaultSerialize(object):
             TypeError: If msg is not bytes type (str on Python 2).
 
         """
-        if not isinstance(msg, backwards.bytes_type):
-            raise TypeError("Message to be deserialized is not bytes type.")
-        if isinstance(msg, backwards.bytes_type) and (msg == tools.CIS_MSG_EOF):
-            out = msg
-            metadata = {'eof': True}
-        elif hasattr(self, 'func_deserialize'):
-            out, metadata = self.str_datatype.deserialize(msg)
+        if hasattr(self, 'func_deserialize'):
+            out, metadata = self.str_datatype.deserialize(msg, **kwargs)
             if metadata['size'] == 0:
                 out = self.empty_msg
-            elif not metadata.get('incomplete', False):
-                for k, v in metadata.items():
-                    if k not in ['type', 'precision', 'units', 'metadata']:
-                        metadata['metadata'][k] = v
-                metadata = metadata.pop('metadata')
+            elif not (metadata.get('incomplete', False)
+                      or metadata.get('eof', False)):
+                if 'metadata' in metadata:
+                    for k, v in metadata.items():
+                        if k not in ['type', 'precision', 'units', 'metadata']:
+                            metadata['metadata'][k] = v
+                    metadata = metadata.pop('metadata')
                 if not self._initialized:
-                    self.update_serializer(extract=False, **metadata)
+                    self.update_serializer(extract=True, **metadata)
                 out = self.func_deserialize(out)
         else:
-            out, metadata = self.datatype.deserialize(msg)
+            out, metadata = self.datatype.deserialize(msg, **kwargs)
         # Update serializer
         if not (self._initialized
                 or (metadata.get('size', 0) == 0)
@@ -377,32 +386,16 @@ class DefaultSerialize(object):
             self._initialized = True
         return out, metadata
 
-    def format_header(self, header_info):
-        r"""Format header info to form a string that should prepend a message.
+    # def format_header(self, header_info):
+    #     r"""Format header info to form a string that should prepend a message.
 
-        Args:
-            header_info (dict): Properties that should be included in the header.
+    #     Args:
+    #         header_info (dict): Properties that should be included in the header.
 
-        Returns:
-            str: Message with header in front.
+    #     Returns:
+    #         str: Message with header in front.
 
-        """
-        header = backwards.bytes2unicode(CIS_MSG_HEAD)
-        header_str = {}
-        for k, v in header_info.items():
-            if isinstance(v, list):
-                header_str[k] = ','.join([backwards.bytes2unicode(x) for x in v])
-            elif isinstance(v, backwards.string_types):
-                header_str[k] = backwards.bytes2unicode(v)
-            else:
-                header_str[k] = str(v)
-        header += backwards.bytes2unicode(HEAD_KEY_SEP).join(
-            ['%s%s%s' % (backwards.bytes2unicode(k),
-                         backwards.bytes2unicode(HEAD_VAL_SEP),
-                         backwards.bytes2unicode(v)) for k, v in
-             header_str.items()])
-        header += backwards.bytes2unicode(CIS_MSG_HEAD)
-        return backwards.unicode2bytes(header)
+    #     """
 
     def parse_header(self, msg):
         r"""Extract header info from a message.
@@ -414,23 +407,4 @@ class DefaultSerialize(object):
             dict: Message properties.
 
         """
-        if CIS_MSG_HEAD not in msg:
-            out = dict(body=msg, size=len(msg))
-            return out
-        _, header, body = msg.split(CIS_MSG_HEAD)
-        out = dict(body=body)
-        for x in header.split(HEAD_KEY_SEP):
-            k, v = x.split(HEAD_VAL_SEP)
-            out[backwards.bytes2unicode(k)] = backwards.bytes2unicode(v)
-        for k in ['size', 'as_array', 'stype']:
-            if k in out:
-                out[k] = int(float(out[k]))
-        for k in ['format_str', 'field_names', 'field_units']:
-            if k in out:
-                out[k] = backwards.unicode2bytes(out[k])
-                if k in ['field_names', 'field_units']:
-                    out[k] = out[k].split(backwards.unicode2bytes(','))
-        # for k in ['format_str']:
-        #     if k in out:
-        #         out[k] = backwards.unicode2bytes(out[k])
-        return out
+        return self.datatype.deserialize(msg, no_data=True)

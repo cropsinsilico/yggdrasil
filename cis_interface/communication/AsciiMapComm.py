@@ -1,5 +1,6 @@
 from cis_interface.communication import FileComm
 from cis_interface.schema import register_component
+from cis_interface.serialize.AsciiMapSerialize import AsciiMapSerialize
 
 
 @register_component
@@ -13,8 +14,4 @@ class AsciiMapComm(FileComm.FileComm):
     """
 
     _filetype = 'map'
-
-    def __init__(self, name, **kwargs):
-        kwargs.setdefault('readmeth', 'read')
-        kwargs['serializer_kwargs'] = dict(stype=7)
-        super(AsciiMapComm, self).__init__(name, **kwargs)
+    _default_serializer = AsciiMapSerialize

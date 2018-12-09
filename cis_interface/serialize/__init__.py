@@ -1037,9 +1037,7 @@ def discover_header(fd, serializer, newline=_default_newline,
                           lineno_format=lineno_format,
                           lineno_names=lineno_names,
                           lineno_units=lineno_units)
-    for k in ['format_str', 'field_names', 'field_units']:
-        if header.get(k, False):
-            setattr(serializer, k, header[k])
+    serializer.update_serializer(as_array=serializer.as_array, **header)
     if (delimiter is None) or ('format_str' in header):
         delimiter = header['delimiter']
     # Try to determine format from array without header
@@ -1055,12 +1053,15 @@ def discover_header(fd, serializer, newline=_default_newline,
                              comment=comment,
                              delimiter=delimiter,
                              use_astropy=use_astropy)
-        serializer.field_names = arr.dtype.names
+        field_names = arr.dtype.names
         if serializer.format_str is None:
-            serializer.format_str = table2format(
+            format_str = table2format(
                 arr.dtype, delimiter=delimiter,
                 comment=backwards.unicode2bytes(''),
                 newline=header['newline'])
+        else:
+            format_str = serializer.format_str
+        serializer.update_serializer(format_str=format_str, field_names=field_names)
         while str_fmt in serializer.format_str:
             ifld = serializer.field_formats.index(str_fmt)
             max_len = len(max(arr[serializer.field_names[ifld]], key=len))

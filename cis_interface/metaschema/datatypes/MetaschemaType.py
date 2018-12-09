@@ -1,8 +1,9 @@
 import copy
 import json
+import uuid
 import pprint
 import jsonschema
-from cis_interface import backwards, metaschema
+from cis_interface import backwards, metaschema, tools
 from cis_interface.metaschema.datatypes import (
     MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class)
 
@@ -40,6 +41,7 @@ class MetaschemaType(object):
     properties = ['type', 'title']
     definition_properties = ['type']
     metadata_properties = ['type']
+    extract_properties = ['type', 'title']
     python_types = []
     specificity = 0
     is_fixed = False
@@ -190,6 +192,20 @@ class MetaschemaType(object):
         return out
 
     @classmethod
+    def get_extract_properties(cls, metadata):
+        r"""Get the list of properties that should be kept when extracting a
+        typedef from message metadata.
+
+        Args:
+            metadata (dict): Metadata that typedef is being extracted from.
+
+        Returns:
+            list: Keywords that should be kept in the typedef.
+
+        """
+        return copy.deepcopy(cls.extract_properties)
+
+    @classmethod
     def extract_typedef(cls, metadata, reqkeys=None):
         r"""Extract the minimum typedef required for this type from the provided
         metadata.
@@ -205,7 +221,8 @@ class MetaschemaType(object):
         """
         out = copy.deepcopy(metadata)
         if reqkeys is None:
-            reqkeys = cls.definition_schema().get('required', [])
+            reqkeys = cls.get_extract_properties(metadata)
+            # reqkeys = cls.definition_schema().get('required', [])
         keylist = [k for k in out.keys()]
         for k in keylist:
             if k not in reqkeys:
@@ -438,17 +455,25 @@ class MetaschemaType(object):
         out = cls.transform_type(out, typedef)
         return out
 
-    def serialize(self, obj, **kwargs):
+    def serialize(self, obj, no_metadata=False, **kwargs):
         r"""Serialize a message.
 
         Args:
             obj (object): Python object to be formatted.
+            no_metadata (bool, optional): If True, no metadata will be added to
+                the serialized message. Defaults to False.
 
         Returns:
             bytes, str: Serialized message.
 
         """
-        metadata, data = self.encode(obj, self._typedef)
+        if isinstance(obj, backwards.bytes_type) and (obj == tools.CIS_MSG_EOF):
+            metadata = {}
+            data = obj
+            is_eof = True
+        else:
+            metadata, data = self.encode(obj, self._typedef)
+            is_eof = False
         for k, v in kwargs.items():
             if (k in metadata) and (v != metadata[k]):
                 print(k)
@@ -458,17 +483,28 @@ class MetaschemaType(object):
             metadata[k] = v
         if 'data' in metadata:
             raise RuntimeError("Data is a reserved keyword in the metadata.")
-        data = backwards.unicode2bytes(json.dumps(data, sort_keys=True))
+        if not is_eof:
+            data = backwards.unicode2bytes(json.dumps(data, sort_keys=True))
+        if no_metadata:
+            return data
         metadata['size'] = len(data)
+        metadata.setdefault('id', str(uuid.uuid4()))
         metadata = backwards.unicode2bytes(json.dumps(metadata, sort_keys=True))
         msg = metadata + CIS_MSG_HEAD + data
         return msg
     
-    def deserialize(self, msg):
+    def deserialize(self, msg, no_data=False, metadata=None, no_json=False):
         r"""Deserialize a message.
 
         Args:
             msg (str, bytes): Message to be deserialized.
+            no_data (bool, optional): If True, only the metadata is returned.
+                Defaults to False.
+            metadata (dict, optional): Metadata that should be used to deserialize
+                the message instead of the current header content. Defaults to
+                None and is not used.
+            no_json (bool, optional): If True, the raw data is returned without
+                deserializing with json.
 
         Returns:
             tuple(obj, dict): Deserialized message and header information.
@@ -481,18 +517,33 @@ class MetaschemaType(object):
         if not isinstance(msg, backwards.bytes_type):
             raise TypeError("Message to be deserialized is not bytes type.")
         if len(msg) == 0:
-            obj = self._empty_msg
+            data = msg
             metadata = dict(size=0)
         elif CIS_MSG_HEAD not in msg:
-            # obj = msg
-            # metadata = dict(size=len(msg))
-            raise ValueError("Header marker not in message.")
-        else:
+            data = msg
+            if metadata is None:
+                metadata = dict(size=len(msg))
+                if (data != tools.CIS_MSG_EOF) and (self._typedef != {'type': 'bytes'}):
+                    raise ValueError("Header marker not in message.")
+        if metadata is None:
             metadata, data = msg.split(CIS_MSG_HEAD, 1)
-            metadata = json.loads(backwards.bytes2unicode(metadata))
-            if len(data) < metadata['size']:
-                metadata['incomplete'] = True
-                return data, metadata
+            if len(metadata) == 0:
+                metadata = dict(size=len(data))
+            else:
+                metadata = json.loads(backwards.bytes2unicode(metadata))
+        metadata['incomplete'] = (len(data) < metadata['size'])
+        if no_data:
+            return metadata
+        if metadata['incomplete']:
+            return data, metadata
+        if len(data) == 0:
+            obj = self._empty_msg
+        elif (data == tools.CIS_MSG_EOF):
+            obj = data
+            metadata['eof'] = True
+        elif no_json:
+            obj = data
+        else:
             data = json.loads(backwards.bytes2unicode(data))
             obj = self.decode(metadata, data, self._typedef)
         return obj, metadata

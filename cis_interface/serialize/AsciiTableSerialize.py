@@ -1,6 +1,9 @@
+import copy
 from cis_interface import backwards, serialize, units
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.metaschema.datatypes import (
+    guess_type_from_obj)
 from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype)
 
@@ -52,6 +55,8 @@ class AsciiTableSerialize(DefaultSerialize):
                    'default': backwards.bytes2unicode(serialize._default_delimiter)},
         newline={'type': 'unicode',
                  'default': backwards.bytes2unicode(serialize._default_newline)},
+        comment={'type': 'unicode',
+                 'default': backwards.bytes2unicode(serialize._default_comment)},
         use_astropy={'type': 'boolean', 'default': False})
     _default_type = {'type': 'array'}
 
@@ -64,7 +69,13 @@ class AsciiTableSerialize(DefaultSerialize):
                 options and are passed to update_serializer.
 
         """
-        super(AsciiTableSerialize, self).update_from_message(msg, **kwargs)
+        # Update typedef with the full definition
+        out = copy.deepcopy(self.typedef)
+        out.update(kwargs)
+        cls = guess_type_from_obj(msg)
+        typedef = cls.encode_type(msg, **out)
+        self.update_serializer(extract=False, **typedef)
+        # Get format information from precision etc.
         assert(self.typedef['type'] == 'array')
         if self.format_str is None:
             fmts = []
@@ -78,8 +89,11 @@ class AsciiTableSerialize(DefaultSerialize):
                     fmts.append(serialize.nptype2cformat(idtype, asbytes=True))
             if fmts:
                 self.format_str = serialize.table2format(
-                    fmts=fmts, delimiter=self.delimiter, newline=self.newline,
+                    fmts=fmts,
+                    delimiter=backwards.unicode2bytes(self.delimiter),
+                    newline=backwards.unicode2bytes(self.newline),
                     comment=backwards.unicode2bytes(''))
+        super(AsciiTableSerialize, self).update_from_message(msg, **kwargs)
 
     def func_serialize(self, args):
         r"""Serialize a message.

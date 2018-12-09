@@ -33,7 +33,7 @@ class TestDefaultSerialize(CisTestClassInfo):
 
     def empty_head(self, msg):
         r"""dict: Empty header for message only contains the size."""
-        out = dict(size=len(msg))
+        out = dict(size=len(msg), incomplete=False)
         if msg == tools.CIS_MSG_EOF:
             out['eof'] = True
         return out
@@ -76,7 +76,8 @@ class TestDefaultSerialize(CisTestClassInfo):
             msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
                                           add_serializer_info=True)
             iout, ihead = self.instance.deserialize(msg)
-            hout.update(size=ihead['size'], id=ihead['id'])
+            hout.update(size=ihead['size'], id=ihead['id'],
+                        incomplete=False)
             self.assert_result_equal(iout, self.map_sent2recv(iobj))
             nt.assert_equal(ihead, hout)
             # Use info to reconstruct serializer

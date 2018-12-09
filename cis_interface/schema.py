@@ -669,7 +669,7 @@ def migrate_keys(from_dict, to_dict, key_list):
                 d.setdefault(k, v)
 
 
-def standardize(instance, keys, is_singular=False, suffixes=None):
+def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
     r"""Standardize a component such that each key contains a list of dictionaries.
 
     Args:
@@ -682,6 +682,7 @@ def standardize(instance, keys, is_singular=False, suffixes=None):
         suffixes (list, optional): Suffixes to add to the keys to get a set of
             alternate keys that should also be checked. Defaults to None as is
             ignored.
+        altkeys (list, optional): List of lists of alternate keys. Defaults to None.
 
     """
     for k in keys:
@@ -690,7 +691,8 @@ def standardize(instance, keys, is_singular=False, suffixes=None):
         if not isinstance(instance[k], list):
             instance[k] = [instance[k]]
     # Get list of alternate keys from suffixes and plurality
-    altkeys = []
+    if altkeys is None:
+        altkeys = []
     if suffixes is not None:
         for s in suffixes:
             altkeys.append(['%s%s' % (k, s) for k in keys])
@@ -758,8 +760,9 @@ def _normalize_modelio_elements(normalizer, value, instance, schema):
             # Move non-comm keywords to a buffer
             if (s is not None):
                 comm_keys = s.get_component_keys('comm')
+                type_keys = list(metaschema.get_metaschema()['properties'].keys())
                 extra_keys = {}
-                migrate_keys(instance, [extra_keys], comm_keys)
+                migrate_keys(instance, [extra_keys], comm_keys + type_keys)
                 iodict['%s_extra' % io][instance['name']] = extra_keys
         # Add driver to list
         if ('driver' in instance) and ('args' in instance):
@@ -829,7 +832,20 @@ def _normalize_connio_base(normalizer, value, instance, schema):
 def _normalize_connio_first(normalizer, value, instance, schema):
     r"""Normalizes set of connection before each connection is normalized."""
     if isinstance(instance, dict):
-        standardize(instance, ['inputs', 'outputs'], suffixes=['_file', '_files'])
+        standardize(instance, ['inputs', 'outputs'], suffixes=['_file', '_files'],
+                    altkeys=[['from', 'to']])
+        # Handle indexed inputs/outputs
+        for io in ['inputs', 'outputs']:
+            pruned = []
+            pruned_names = []
+            for x in instance[io]:
+                if ':' in x['name']:
+                    name = x['name'].split(':')[0]
+                    x['name'] = name
+                if x['name'] not in pruned_names:
+                    pruned_names.append(x['name'])
+                    pruned.append(x)
+            instance[io] = pruned
         # Move non-comm properties from model inputs/outputs
         s = getattr(normalizer, 'schema_registry', None)
         iodict = getattr(normalizer, 'iodict', None)

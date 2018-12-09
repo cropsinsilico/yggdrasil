@@ -1,6 +1,7 @@
-from cis_interface import serialize, backwards
+from cis_interface import serialize
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
 from cis_interface.schema import register_component, inherit_schema
+from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
 @register_component
@@ -23,23 +24,14 @@ class AsciiTableComm(AsciiFileComm):
     _filetype = 'table'
     _schema_properties = inherit_schema(
         AsciiFileComm._schema_properties, 'filetype', _filetype,
-        field_names={'type': 'array', 'items': {'type': 'string'}},
-        field_units={'type': 'array', 'items': {'type': 'string'}},
-        format_str={'type': 'string'},
-        as_array={'type': 'boolean', 'default': False},
-        delimiter={'type': 'unicode',
-                   'default': backwards.bytes2unicode(serialize._default_delimiter)},
-        use_astropy={'type': 'boolean', 'default': False})
+        **AsciiTableSerialize._schema_properties)
+    _default_serializer = AsciiTableSerialize
+    _attr_conv = AsciiFileComm._attr_conv + ['delimiter', 'format_str']
 
-    def _init_before_open(self, delimiter=None, use_astropy=False,
-                          serializer_kwargs=None, **kwargs):
+    def _init_before_open(self, **kwargs):
         r"""Set up dataio and attributes."""
-        if serializer_kwargs is None:
-            serializer_kwargs = {}
         self.header_was_read = False
         self.header_was_written = False
-        serializer_kwargs.update(stype=3, use_astropy=use_astropy)
-        kwargs['serializer_kwargs'] = serializer_kwargs
         super(AsciiTableComm, self)._init_before_open(**kwargs)
         if self.serializer.as_array:
             self.read_meth = 'read'
@@ -47,9 +39,6 @@ class AsciiTableComm(AsciiFileComm):
             self.read_meth = 'readline'
         if self.append:
             self.header_was_written = True
-        if delimiter is None:
-            delimiter = serialize._default_delimiter
-        self.delimiter = backwards.unicode2bytes(delimiter)
         
     def read_header(self):
         r"""Read header lines from the file and update serializer info."""
@@ -58,9 +47,9 @@ class AsciiTableComm(AsciiFileComm):
         pos = self.record_position()
         self.change_position(0)
         serialize.discover_header(self.fd, self.serializer,
-                                  newline=self.newline, comment=self.comment,
+                                  newline=self.newline,
+                                  comment=self.comment,
                                   delimiter=self.delimiter)
-        self.delimiter = self.serializer.table_info['delimiter']
         self.change_position(*pos)
         self.header_was_read = True
 

@@ -1,6 +1,7 @@
 from cis_interface import backwards, serialize
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
 
 
 @register_serializer
@@ -27,3 +28,29 @@ class PlySerialize(DefaultSerialize):
         newline={'type': 'unicode',
                  'default': backwards.bytes2unicode(serialize._default_newline)})
     _default_type = {'type': 'ply'}
+
+    def func_serialize(self, args):
+        r"""Serialize a message.
+
+        Args:
+            args: List of arguments to be formatted or numpy array to be
+                serialized.
+
+        Returns:
+            bytes, str: Serialized message.
+
+        """
+        return backwards.unicode2bytes(self.datatype.encode_data(args, self.typedef))
+
+    def func_deserialize(self, msg):
+        r"""Deserialize a message.
+
+        Args:
+            msg: Message to be deserialized.
+
+        Returns:
+            obj: Deserialized message.
+
+        """
+        return PlyDict(self.datatype.decode_data(backwards.bytes2unicode(msg),
+                                                 self.typedef))

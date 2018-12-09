@@ -1,5 +1,6 @@
 from cis_interface.communication.FileComm import FileComm
 from cis_interface.schema import register_component
+from cis_interface.serialize.PlySerialize import PlySerialize
 
 
 @register_component
@@ -14,12 +15,9 @@ class PlyFileComm(FileComm):
     """
 
     _filetype = 'ply'
+    _default_serializer = PlySerialize
 
-    def _init_before_open(self, serializer_kwargs=None, **kwargs):
-        if serializer_kwargs is None:
-            serializer_kwargs = {}
-        serializer_kwargs.setdefault('stype', 8)
-        kwargs['serializer_kwargs'] = serializer_kwargs
+    def _init_before_open(self, **kwargs):
         super(PlyFileComm, self)._init_before_open(**kwargs)
         self.read_meth = 'read'
         if self.append:
@@ -37,11 +35,11 @@ class PlyFileComm(FileComm):
         """
         if (msg != self.eof_msg) and (self.fd.tell() != 0):
             self.fd.seek(0)
-            msg_ply, header = self.serializer.deserialize(msg)
+            msg_ply, header = self.deserialize(msg)
             with open(self.current_address, 'rb') as fd:
-                old_ply, header = self.serializer.deserialize(fd.read())
+                old_ply, header = self.deserialize(fd.read())
             old_ply.append(msg_ply)
-            new_msg = self.serializer.serialize(old_ply)
+            new_msg = self.serialize(old_ply)
         else:
             new_msg = msg
         return super(PlyFileComm, self)._send(new_msg)

@@ -1,10 +1,11 @@
 from cis_interface import backwards, serialize
-from cis_interface.communication.FileComm import FileComm
+from cis_interface.communication.AsciiTableComm import AsciiTableComm
 from cis_interface.schema import register_component, inherit_schema
+from cis_interface.serialize.PandasSerialize import PandasSerialize
 
 
 @register_component
-class PandasFileComm(FileComm):
+class PandasFileComm(AsciiTableComm):
     r"""Class for handling I/O from/to a pandas csv file on disk.
 
     Args:
@@ -18,20 +19,23 @@ class PandasFileComm(FileComm):
 
     _filetype = 'pandas'
     _schema_properties = inherit_schema(
-        FileComm._schema_properties, 'filetype', _filetype,
-        delimiter={'type': 'unicode',
-                   'default': backwards.bytes2unicode(serialize._default_delimiter)})
+        AsciiTableComm._schema_properties, 'filetype', _filetype)
+    _default_serializer = PandasSerialize
 
-    def _init_before_open(self, delimiter='\t', serializer_kwargs=None, **kwargs):
+    def _init_before_open(self, **kwargs):
         r"""Set up dataio and attributes."""
-        if serializer_kwargs is None:
-            serializer_kwargs = {}
-        serializer_kwargs.update(stype=6, delimiter=delimiter)
-        kwargs['serializer_kwargs'] = serializer_kwargs
         super(PandasFileComm, self)._init_before_open(**kwargs)
         self.read_meth = 'read'
         if self.append:
             self.serializer.write_header = False
+
+    def read_header(self):
+        r"""Read header lines from the file and update serializer info."""
+        return
+
+    def write_header(self):
+        r"""Write header lines to the file based on the serializer info."""
+        return
 
     def send_dict(self, args_dict, field_order=None, **kwargs):
         r"""Send a message with fields specified in the input dictionary.

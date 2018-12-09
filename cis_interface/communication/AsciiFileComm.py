@@ -23,11 +23,12 @@ class AsciiFileComm(FileComm):
     _filetype = 'ascii'
     _schema_properties = inherit_schema(
         FileComm._schema_properties, 'filetype', _filetype,
-        comment={'type': 'unicode'})
+        comment={'type': 'unicode',
+                 'default': backwards.bytes2unicode(serialize._default_comment)})
+    _attr_conv = FileComm._attr_conv + ['comment']
 
-    def _init_before_open(self, comment=serialize._default_comment, **kwargs):
+    def _init_before_open(self, **kwargs):
         r"""Get absolute path and set attributes."""
-        self.comment = backwards.unicode2bytes(comment)
         kwargs.setdefault('read_meth', 'readline')
         super(AsciiFileComm, self)._init_before_open(**kwargs)
 
@@ -40,7 +41,7 @@ class AsciiFileComm(FileComm):
 
         """
         kwargs = super(AsciiFileComm, self).opp_comm_kwargs()
-        kwargs['comment'] = self.comment
+        kwargs['comment'] = self.serializer.comment
         return kwargs
 
     def _recv(self, timeout=0):

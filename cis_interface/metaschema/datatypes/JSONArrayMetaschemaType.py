@@ -15,6 +15,7 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
     properties = ContainerMetaschemaType.properties + ['items']
     definition_properties = ContainerMetaschemaType.definition_properties
     metadata_properties = ContainerMetaschemaType.metadata_properties + ['items']
+    extract_properties = ContainerMetaschemaType.extract_properties + ['items']
     python_types = (list, tuple, np.ndarray, pd.DataFrame)
     _replaces_existing = True
 

@@ -435,12 +435,6 @@ class IOInfo(object):
     """
 
     def __init__(self):
-        from cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType import (
-            _test_value as _ply_test_value)
-        from cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType import (
-            _test_value as _obj_test_value)
-        from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
-        from cis_interface.metaschema.datatypes.ObjMetaschemaType import ObjDict
         self.field_names = ['name', 'count', 'size']
         self.field_units = ['n/a', 'umol', 'cm']
         self.nfields = len(self.field_names)
@@ -463,14 +457,10 @@ class IOInfo(object):
         self.field_units_line = (self.comment
                                  + self.delimiter.join(self.field_units)
                                  + self.newline)
-        self.file_elements = [('one', int(1), 1.0),
-                              ('two', int(2), 2.0),
-                              ('three', int(3), 3.0)]
+        self.file_elements = [('one', np.int32(1), 1.0),
+                              ('two', np.int32(2), 2.0),
+                              ('three', np.int32(3), 3.0)]
         self.map_dict = dict(args1=1, args2='2')
-        self.ply_dict = _ply_test_value
-        self.obj_dict = _obj_test_value
-        self.ply_dict = PlyDict(**self.ply_dict)
-        self.obj_dict = ObjDict(**self.obj_dict)
 
     @property
     def header_lines(self):
@@ -504,7 +494,8 @@ class IOInfo(object):
     @property
     def pandas_file_contents(self):
         r"""str: Contents of mock Pandas file."""
-        s = serialize.get_serializer(stype=6, delimiter=self.delimiter,
+        s = serialize.get_serializer(seritype='pandas',
+                                     delimiter=self.delimiter,
                                      write_header=True)
         out = s.serialize(self.pandas_frame)
         return out
@@ -512,15 +503,19 @@ class IOInfo(object):
     @property
     def ply_file_contents(self):
         r"""The contents of a file containing the ply data."""
-        serializer = serialize.get_serializer(stype=8)
-        out = serializer.serialize(self.ply_dict)
+        from cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType import (
+            _test_value as _ply_test_value)
+        serializer = serialize.get_serializer(seritype='ply')
+        out = serializer.serialize(_ply_test_value)
         return out
 
     @property
     def obj_file_contents(self):
         r"""The contents of a file containing the obj data."""
-        serializer = serialize.get_serializer(stype=9)
-        out = serializer.serialize(self.obj_dict)
+        from cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType import (
+            _test_value as _obj_test_value)
+        serializer = serialize.get_serializer(seritype='obj')
+        out = serializer.serialize(_obj_test_value)
         return out
 
     @property

@@ -159,10 +159,7 @@ class ContainerMetaschemaType(MetaschemaType):
             dict: Encoded type definition with unncessary properties removed.
 
         """
-        reqkeys = cls.definition_schema().get('required', [])
-        reqkeys.append(cls._json_property)
-        out = super(ContainerMetaschemaType, cls).extract_typedef(
-            metadata, reqkeys=reqkeys)
+        out = super(ContainerMetaschemaType, cls).extract_typedef(metadata)
         if cls._json_property in out:
             contents = out[cls._json_property]
             if isinstance(contents, cls.python_types):

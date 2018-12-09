@@ -19,6 +19,8 @@ class ScalarMetaschemaType(MetaschemaType):
     definition_properties = MetaschemaType.definition_properties + ['subtype']
     metadata_properties = (MetaschemaType.metadata_properties
                            + ['subtype', 'precision', 'units'])
+    extract_properties = (MetaschemaType.extract_properties
+                          + ['subtype', 'precision', 'units'])
     python_types = ScalarMetaschemaProperties._all_python_scalars
 
     @classmethod
@@ -180,6 +182,26 @@ class ScalarMetaschemaType(MetaschemaType):
             if dtype is None:
                 dtype = ScalarMetaschemaProperties.data2dtype(out)
             out = units.add_units(out, unit_str, dtype=dtype)
+        return out
+
+    @classmethod
+    def get_extract_properties(cls, metadata):
+        r"""Get the list of properties that should be kept when extracting a
+        typedef from message metadata.
+
+        Args:
+            metadata (dict): Metadata that typedef is being extracted from.
+
+        Returns:
+            list: Keywords that should be kept in the typedef.
+
+        """
+        out = super(ScalarMetaschemaType, cls).get_extract_properties(metadata)
+        dtype = metadata.get('subtype', metadata['type'])
+        if dtype in ScalarMetaschemaProperties._flexible_types:
+            out.remove('precision')
+        if len(metadata.get('units', '')) == 0:
+            out.remove('units')
         return out
 
 

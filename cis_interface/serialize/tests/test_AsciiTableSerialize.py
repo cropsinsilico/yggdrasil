@@ -1,6 +1,6 @@
 import numpy as np
 import nose.tools as nt
-from cis_interface import backwards
+from cis_interface import backwards, units
 from cis_interface.serialize import AsciiTableSerialize
 from cis_interface.serialize.tests import test_DefaultSerialize as parent
 
@@ -83,7 +83,8 @@ class TestAsciiTableSerialize_asarray(TestAsciiTableSerialize):
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
-        return [obj[n] for n in obj.dtype.names]
+        return [units.add_units(obj[n], backwards.bytes2unicode(u))
+                for n, u in zip(obj.dtype.names, self.field_units)]
 
     def assert_result_equal(self, x, y):
         r"""Assert that serialized/deserialized objects equal."""

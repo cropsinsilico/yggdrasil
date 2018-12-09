@@ -12,6 +12,7 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
     properties = ContainerMetaschemaType.properties + ['properties']
     definition_properties = ContainerMetaschemaType.definition_properties
     metadata_properties = ContainerMetaschemaType.metadata_properties + ['properties']
+    extract_properties = ContainerMetaschemaType.extract_properties + ['properties']
     python_types = (dict, )
     _replaces_existing = True
     

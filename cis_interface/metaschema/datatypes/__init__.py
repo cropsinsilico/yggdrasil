@@ -146,18 +146,19 @@ def import_all_types():
     for f in schema_files:
         names.append(add_type_from_schema(f))
     # TODO: Need to make sure metaschema updated if it was already loaded
-    from cis_interface.metaschema import get_metaschema
-    reload = False
-    curr = get_metaschema()
-    new_names = []
-    for n in names:
-        if n not in curr['definitions']['simpleTypes']['enum']:  # pragma: debug
-            reload = True
-            new_names.append(n)
-    if reload:  # pragma: debug
-        raise Exception("The metaschema needs to be regenerated to include the "
-                        + "following new schemas found in schema files: %s"
-                        % new_names)
+    from cis_interface.metaschema import _metaschema
+    if _metaschema is not None:
+        reload = False
+        curr = _metaschema
+        new_names = []
+        for n in names:
+            if n not in curr['definitions']['simpleTypes']['enum']:  # pragma: debug
+                reload = True
+                new_names.append(n)
+        if reload:  # pragma: debug
+            raise Exception("The metaschema needs to be regenerated to include the "
+                            + "following new schemas found in schema files: %s"
+                            % new_names)
     
 
 def complete_typedef(typedef):

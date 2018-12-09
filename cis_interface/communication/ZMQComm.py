@@ -709,7 +709,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         """
         if self.direction == 'send':
             return msg, None
-        header = self.serializer.parse_header(msg)
+        header = self.serializer.parse_header(msg.split(_flag_zmq_filter)[-1])
         address = header.get('zmq_reply', None)
         if (address is None):
             address = self.reply_socket_address
@@ -956,9 +956,9 @@ class ZMQComm(AsyncComm.AsyncComm):
 
         """
         flag, msg_s = super(ZMQComm, self).on_send_eof()
-        header = dict(zmq_reply=self.set_reply_socket_send(),
-                      size=len(msg_s), id=str(uuid.uuid4()))
-        return flag, self.serializer.format_header(header) + msg_s
+        header_kwargs = dict(zmq_reply=self.set_reply_socket_send())
+        out = self.serializer.serialize(msg_s, header_kwargs=header_kwargs)
+        return flag, out
         
     def on_send(self, msg, header_kwargs=None):
         r"""Process message to be sent including handling serializing

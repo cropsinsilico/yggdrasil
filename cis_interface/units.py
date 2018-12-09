@@ -78,6 +78,8 @@ def add_units(arr, unit_str, dtype=None):
         unyt.unyt_array: Array with units.
 
     """
+    if isinstance(unit_str, backwards.bytes_type):
+        unit_str = backwards.bytes2unicode(unit_str)
     if is_null_unit(unit_str):
         return arr
     if dtype is None:

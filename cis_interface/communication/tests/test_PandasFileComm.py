@@ -1,10 +1,10 @@
 import pandas as pd
 import numpy as np
 from cis_interface import serialize, backwards
-from cis_interface.communication.tests import test_FileComm as parent
+from cis_interface.communication.tests import test_AsciiTableComm as parent
 
 
-class TestPandasFileComm(parent.TestFileComm):
+class TestPandasFileComm(parent.TestAsciiTableComm):
     r"""Test for PandasFileComm communication class."""
     def __init__(self, *args, **kwargs):
         super(TestPandasFileComm, self).__init__(*args, **kwargs)
@@ -84,6 +84,13 @@ class TestPandasFileComm_names(TestPandasFileComm):
 
 class TestPandasFileComm_single(TestPandasFileComm):
     r"""Test for PandasFileComm communication class with field names sent."""
+
+    @property
+    def send_inst_kwargs(self):
+        r"""dict: Keyword arguments for send instance."""
+        out = super(TestPandasFileComm_single, self).send_inst_kwargs
+        out['field_names'] = None
+        return out
 
     def test_send_recv_dict(self):
         r"""Test send/recv Pandas data frame as dict."""

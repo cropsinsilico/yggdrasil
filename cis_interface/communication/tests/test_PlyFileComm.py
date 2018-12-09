@@ -1,4 +1,7 @@
 from cis_interface.communication.tests import test_FileComm as parent
+from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
+from cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType import (
+    _test_value as _ply_test_value)
 
 
 class TestPlyFileComm(parent.TestFileComm):
@@ -6,6 +9,7 @@ class TestPlyFileComm(parent.TestFileComm):
     def __init__(self, *args, **kwargs):
         super(TestPlyFileComm, self).__init__(*args, **kwargs)
         self.comm = 'PlyFileComm'
+        self.ply_dict = PlyDict(**_ply_test_value)
 
     @property
     def msg_short(self):

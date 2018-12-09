@@ -109,6 +109,10 @@ class TestAsciiTableComm_AsArray(TestAsciiTableComm):
 
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
+        if isinstance(x, list):
+            order = [backwards.bytes2unicode(n) for n in self.field_names]
+            xdict = {k: ix for k, ix in zip(order, x)}
+            x = serialize.dict2numpy(xdict, order=order)
         np.testing.assert_array_equal(x, y)
 
     @property
@@ -127,7 +131,16 @@ class TestAsciiTableComm_AsArray(TestAsciiTableComm):
             obj: Merged message.
 
         """
-        return np.hstack(msg_list)
+        tot_list = [np.hstack([x[i] for x in msg_list])
+                    for i in range(len(self.field_names))]
+        order = [backwards.bytes2unicode(n) for n in self.field_names]
+        dtypes = [x.dtype for x in tot_list]
+        shape = tot_list[0].shape
+        dtype = np.dtype(dict(names=order, formats=dtypes))
+        out = np.empty(shape, dtype)
+        for i, n in enumerate(order):
+            out[n] = tot_list[i]
+        return out
 
     def test_send_recv_dict(self):
         r"""Test send/recv numpy array as dict."""
