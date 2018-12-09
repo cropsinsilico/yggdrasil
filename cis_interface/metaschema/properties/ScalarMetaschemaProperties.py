@@ -36,6 +36,7 @@ for t, t_np in _valid_types.items():
         _python_scalars[t].append(np.dtype(t_np + str(p)).type)
 _all_python_scalars = [units._unit_quantity]
 for k in _python_scalars.keys():
+    _python_scalars[k].append(units._unit_quantity)
     _all_python_scalars += list(_python_scalars[k])
     _python_scalars[k] = tuple(_python_scalars[k])
 _all_python_arrays = tuple(set([np.ndarray, units._unit_array]))
@@ -57,6 +58,8 @@ def data2dtype(data):
         dtype = data_nounits.dtype
     elif isinstance(data_nounits, (list, dict, tuple)):
         raise MetaschemaTypeError
+    elif isinstance(data_nounits, np.dtype(_valid_types['bytes']).type):
+        dtype = np.array(data_nounits).dtype
     else:
         dtype = np.array([data_nounits]).dtype
     return dtype
@@ -96,7 +99,7 @@ class SubtypeMetaschemaProperty(MetaschemaProperty):
               'enum': [k for k in sorted(_valid_types.keys())]}
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Encoder for the 'subtype' scalar property."""
         dtype = data2dtype(instance)
         out = None
@@ -120,7 +123,7 @@ class PrecisionMetaschemaProperty(MetaschemaProperty):
               'minimum': 1}
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Encoder for the 'precision' scalar property."""
         dtype = data2dtype(instance)
         out = dtype.itemsize * 8  # in bits
@@ -142,9 +145,12 @@ class UnitsMetaschemaProperty(MetaschemaProperty):
               'type': 'string'}
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Encoder for the 'units' scalar property."""
-        return units.get_units(instance)
+        out = units.get_units(instance)
+        if (not out) and (typedef is not None):
+            out = typedef
+        return out
 
     @classmethod
     def compare(cls, prop1, prop2):

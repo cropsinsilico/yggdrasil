@@ -34,7 +34,13 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         if super(ScalarMetaschemaType, cls).validate(obj):
             dtype = ScalarMetaschemaProperties.data2dtype(obj)
-            for k in ScalarMetaschemaProperties._valid_numpy_types:
+            if cls.is_fixed and ('subtype' in cls.fixed_properties):
+                type_list = [
+                    ScalarMetaschemaProperties._valid_types[
+                        cls.fixed_properties['subtype']]]
+            else:
+                type_list = ScalarMetaschemaProperties._valid_numpy_types
+            for k in type_list:
                 if dtype.name.startswith(k):
                     return True
         return False
@@ -106,7 +112,7 @@ class ScalarMetaschemaType(MetaschemaType):
         arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
-        return cls.from_array(arr, typedef['units'])
+        return cls.from_array(arr, unit_str=typedef['units'], dtype=dtype)
 
     @classmethod
     def transform_type(cls, obj, typedef=None):
@@ -128,7 +134,7 @@ class ScalarMetaschemaType(MetaschemaType):
         typedef1.update(**typedef)
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef1)
         arr = cls.to_array(obj).astype(dtype)
-        out = cls.from_array(arr, typedef0['units'])
+        out = cls.from_array(arr, unit_str=typedef0['units'], dtype=dtype)
         return units.convert_to(out, typedef1['units'])
 
     @classmethod
@@ -151,13 +157,16 @@ class ScalarMetaschemaType(MetaschemaType):
         return arr
         
     @classmethod
-    def from_array(cls, arr, unit_str=None):
+    def from_array(cls, arr, unit_str=None, dtype=None):
         r"""Get object representation of the data.
 
         Args:
             arr (np.ndarray): Numpy array.
             unit_str (str, optional): Units that should be added to returned
                 object.
+            dtype (np.dtype, optional): Numpy data type that should be maintained
+                as a base class when adding units. Defaults to None and is
+                determined from the object.
 
         Returns:
             object: Object representation of the data in the input array.
@@ -168,7 +177,9 @@ class ScalarMetaschemaType(MetaschemaType):
         else:
             out = arr
         if unit_str is not None:
-            out = units.add_units(out, unit_str)
+            if dtype is None:
+                dtype = ScalarMetaschemaProperties.data2dtype(out)
+            out = units.add_units(out, unit_str, dtype=dtype)
         return out
 
 

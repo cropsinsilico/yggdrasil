@@ -8,7 +8,7 @@ from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaPro
 def test_dynamic():
     r"""Test dynamic creation of property."""
 
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         return None
 
     def validate(cls, validator, value, instance, schema):

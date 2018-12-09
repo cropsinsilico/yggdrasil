@@ -64,12 +64,15 @@ def get_data(obj):
     return out
 
 
-def add_units(arr, unit_str):
+def add_units(arr, unit_str, dtype=None):
     r"""Add units to an array or scalar.
 
     Args:
         arr (np.ndarray, float, int): Scalar or array of data to add units to.
         unit_str (str): Unit string.
+        dtype (np.dtype, optional): Numpy data type that should be maintained for
+            array/qunatity with units. If not provided, this is determined from the
+            array.
 
     Returns:
         unyt.unyt_array: Array with units.
@@ -77,11 +80,16 @@ def add_units(arr, unit_str):
     """
     if is_null_unit(unit_str):
         return arr
+    if dtype is None:
+        if isinstance(arr, np.ndarray):
+            dtype = arr.dtype
+        else:
+            dtype = np.array([arr]).dtype
     if _use_unyt:
         if isinstance(arr, np.ndarray) and (arr.ndim > 0):
-            out = unyt.unyt_array(arr, unit_str)
+            out = unyt.unyt_array(arr, unit_str, dtype=dtype)
         else:
-            out = unyt.unyt_quantity(arr, unit_str)
+            out = unyt.unyt_quantity(arr, unit_str, dtype=dtype)
     else:
         out = _ureg_pint.Quantity(arr, unit_str)
     return out

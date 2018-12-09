@@ -265,19 +265,22 @@ def guess_type_from_obj(obj):
     return cls
 
 
-def encode_type(obj):
+def encode_type(obj, typedef=None):
     r"""Encode an object into a JSON schema that can be used to both
     describe the object and validate others.
 
     Args:
         obj (object): Python object to be encoded.
+        typedef (dict, optional): Type properties that should be used to
+            initialize the encoded type definition in certain cases.
+            Defaults to None and is ignored.
 
     Returns:
         dict: Encoded JSON schema describing the object.
 
     """
     cls = guess_type_from_obj(obj)
-    return cls.encode_type(obj)
+    return cls.encode_type(obj, typedef=typedef)
 
 
 def encode_data(obj, typedef=None):

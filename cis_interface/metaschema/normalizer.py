@@ -2,6 +2,7 @@
 import copy
 import contextlib
 import jsonschema
+from cis_interface.metaschema.datatypes import get_type_class
 
 
 class UndefinedProperty(object):
@@ -178,5 +179,11 @@ def create(*args, **kwargs):
                 return instance
             else:
                 return self._normalized
+
+        def is_type(self, instance, type):
+            out = super(Normalizer, self).is_type(instance, type)
+            if out:
+                out = get_type_class(type).validate(instance)
+            return out
 
     return Normalizer

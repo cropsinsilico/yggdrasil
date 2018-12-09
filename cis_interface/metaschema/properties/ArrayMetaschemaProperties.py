@@ -13,7 +13,7 @@ class LengthMetaschemaProperty(MetaschemaProperty):
               'minimum': 1}
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Encoder for the 'length' 1darray property."""
         return len(instance)
 
@@ -29,7 +29,7 @@ class ShapeMetaschemaProperty(MetaschemaProperty):
                         'minimum': 1}}
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Encoder for the 'shape' ndarray property."""
         return list(instance.shape)
 

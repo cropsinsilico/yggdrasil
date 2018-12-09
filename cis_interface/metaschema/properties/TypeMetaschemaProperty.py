@@ -17,11 +17,14 @@ class TypeMetaschemaProperty(MetaschemaProperty):
     _validate = False
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Method to encode the property given the object.
 
         Args:
             instance (object): Object to get property for.
+            typedef (object, None): Template value in type definition to use
+                for initializing encoding some cases. Defaults to None and
+                is ignored.
 
         Returns:
             object: Encoded property for instance.

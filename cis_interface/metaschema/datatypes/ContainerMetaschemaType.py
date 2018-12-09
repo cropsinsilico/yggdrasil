@@ -1,6 +1,5 @@
 from cis_interface.metaschema.datatypes import (
-    get_type_class, complete_typedef, MetaschemaTypeError,
-    encode_type, encode_data)
+    get_type_class, complete_typedef, encode_data)
 from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -79,32 +78,6 @@ class ContainerMetaschemaType(MetaschemaType):
         out = default
         if cls._has_element(container, index):
             out = container[index]
-        return out
-
-    @classmethod
-    def encode_type(cls, obj):
-        r"""Encode an object's type definition.
-
-        Args:
-            obj (object): Object to encode.
-
-        Returns:
-            dict: Encoded type definition.
-
-        """
-        if False:
-            if not isinstance(obj, cls.python_types):
-                raise MetaschemaTypeError(
-                    "Only '%s' types can be encoded as this type."
-                    % str(cls.python_types))
-            # Encode subtypes in metadata
-            out = {'type': cls.name}
-            if cls._json_property in cls.properties:
-                out[cls._json_property] = cls._container_type()
-                for k, v in cls._iterate(obj):
-                    v_encoded = encode_type(v)
-                    cls._assign(out[cls._json_property], k, v_encoded)
-        out = super(ContainerMetaschemaType, cls).encode_type(obj)
         return out
 
     @classmethod

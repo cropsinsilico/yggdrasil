@@ -173,11 +173,13 @@ class FixedMetaschemaType(MetaschemaType):
         return True
 
     @classmethod
-    def encode_type(cls, obj):
+    def encode_type(cls, obj, **kwargs):
         r"""Encode an object's type definition.
 
         Args:
             obj (object): Object to encode.
+            **kwargs: Additional keyword arguments are treated as additional
+                schema properties.
 
         Raises:
             CisTypeError: If the object is not the correct type.
@@ -186,7 +188,7 @@ class FixedMetaschemaType(MetaschemaType):
             dict: Encoded type definition.
 
         """
-        out = super(FixedMetaschemaType, cls).encode_type(obj)
+        out = super(FixedMetaschemaType, cls).encode_type(obj, **kwargs)
         out = cls.typedef_base2fixed(out)
         return out
 

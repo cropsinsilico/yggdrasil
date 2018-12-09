@@ -42,21 +42,6 @@ class JSONMetaschemaType(MetaschemaType):
         """
         return obj
 
-    @classmethod
-    def transform_type(cls, obj, typedef=None):
-        r"""Transform an object based on type info.
-
-        Args:
-            obj (object): Object to transform.
-            typedef (dict): Type definition that should be used to transform the
-                object.
-
-        Returns:
-            object: Transformed object.
-
-        """
-        return obj
-
 
 @register_type
 class JSONBooleanMetaschemaType(JSONMetaschemaType):

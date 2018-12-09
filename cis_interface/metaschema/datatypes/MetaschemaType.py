@@ -1,9 +1,10 @@
 import copy
 import json
+import pprint
 import jsonschema
 from cis_interface import backwards, metaschema
 from cis_interface.metaschema.datatypes import (
-    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD)
+    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class)
 
 
 class MetaschemaType(object):
@@ -36,7 +37,7 @@ class MetaschemaType(object):
 
     name = 'base'
     description = 'A generic base type for users to build on.'
-    properties = ['type']
+    properties = ['type', 'title']
     definition_properties = ['type']
     metadata_properties = ['type']
     python_types = []
@@ -94,7 +95,20 @@ class MetaschemaType(object):
             object: Transformed object.
 
         """
-        raise NotImplementedError("Method must be overridden by the subclass.")
+        return obj
+
+    @classmethod
+    def coerce_type(cls, obj):
+        r"""Coerce objects of specific types to match the data type.
+
+        Args:
+            obj (object): Object to be coerced.
+
+        Returns:
+            object: Coerced object.
+
+        """
+        return obj
 
     # Methods not to be modified by subclasses
     @classmethod
@@ -139,11 +153,14 @@ class MetaschemaType(object):
         return obj
 
     @classmethod
-    def encode_type(cls, obj, **kwargs):
+    def encode_type(cls, obj, typedef=None, **kwargs):
         r"""Encode an object's type definition.
 
         Args:
             obj (object): Object to encode.
+            typedef (dict, optional): Type properties that should be used to
+                initialize the encoded type definition in certain cases.
+                Defaults to None and is ignored.
             **kwargs: Additional keyword arguments are treated as additional
                 schema properties.
 
@@ -154,6 +171,9 @@ class MetaschemaType(object):
             dict: Encoded type definition.
 
         """
+        obj = cls.coerce_type(obj)
+        if typedef is None:
+            typedef = {}
         if not cls.validate(obj):
             raise MetaschemaTypeError("Object could not be encoded as '%s' type."
                                       % cls.name)
@@ -161,9 +181,12 @@ class MetaschemaType(object):
         for x in cls.properties:
             if x == 'type':
                 out['type'] = cls.name
+            elif x == 'title':
+                if x in typedef:
+                    out[x] = typedef[x]
             else:
                 prop_cls = metaschema.properties.get_metaschema_property(x)
-                out[x] = prop_cls.encode(obj)
+                out[x] = prop_cls.encode(obj, typedef=typedef.get(x, None))
         return out
 
     @classmethod
@@ -213,12 +236,12 @@ class MetaschemaType(object):
                 % (typename0, typename1))
         # Copy over valid properties
         all_keys = [k for k in kwargs.keys()]
-        req_keys = self.definition_schema().get('required', [])
+        # req_keys = self.definition_schema().get('required', [])
         for k in all_keys:
-            if k in req_keys:
-                self._typedef[k] = kwargs.pop(k)
+            # if k in req_keys:
+            self._typedef[k] = kwargs.pop(k)
         # Validate
-        self.__class__.validate_definition(self._typedef)
+        self.validate_definition(self._typedef)
         return kwargs
 
     @classmethod
@@ -309,16 +332,16 @@ class MetaschemaType(object):
         """
         try:
             cls.validate_metadata(metadata)
-        except jsonschema.exceptions.ValidationError:
+        except jsonschema.exceptions.ValidationError as e:
             return False
         if typedef is not None:
             try:
                 cls.validate_definition(typedef)
-            except jsonschema.exceptions.ValidationError:
+            except jsonschema.exceptions.ValidationError as e:
                 return False
             errors = [e for e in compare_schema(metadata, typedef)]
             if errors:
-                # print("Error in comparison")
+                # print("Error(s) in comparison")
                 # for e in errors:
                 #     print('\t%s' % e)
                 return False
@@ -343,7 +366,7 @@ class MetaschemaType(object):
             return True
         try:
             cls.validate_instance(obj, typedef)
-        except jsonschema.exceptions.ValidationError as e:
+        except jsonschema.exceptions.ValidationError:
             return False
         return True
 
@@ -369,11 +392,12 @@ class MetaschemaType(object):
             TypeError: If the encoded data is not of bytes type.
 
         """
+        obj = cls.coerce_type(obj)
         # This is slightly redundent, maybe pass None
         if not cls.check_decoded(obj, typedef):
             raise ValueError("Object is not correct type for encoding.")
         obj_t = cls.transform_type(obj, typedef)
-        metadata = cls.encode_type(obj_t)
+        metadata = cls.encode_type(obj_t, typedef=typedef)
         data = cls.encode_data(obj_t, metadata)
         if not cls.check_encoded(metadata, typedef):
             raise ValueError("Object was not encoded correctly.")
@@ -399,6 +423,11 @@ class MetaschemaType(object):
 
         """
         if not cls.check_encoded(metadata, typedef):
+            if (typedef == {'type': 'bytes'}) and ('type' in metadata):
+                new_cls = get_type_class(metadata['type'])
+                return new_cls.decode(metadata, data)
+            pprint.pprint(metadata)
+            pprint.pprint(typedef)
             raise ValueError("Metadata does not match type definition.")
         out = cls.decode_data(data, metadata)
         if not cls.check_decoded(out, typedef):
@@ -416,8 +445,14 @@ class MetaschemaType(object):
             bytes, str: Serialized message.
 
         """
-        metadata, data = self.__class__.encode(obj, self._typedef)
-        metadata.update(**kwargs)
+        metadata, data = self.encode(obj, self._typedef)
+        for k, v in kwargs.items():
+            if (k in metadata) and (v != metadata[k]):
+                print(k)
+                pprint.pprint(v)
+                pprint.pprint(metadata[k])
+                raise RuntimeError("Key '%s' set by the type encoder." % k)
+            metadata[k] = v
         if 'data' in metadata:
             raise RuntimeError("Data is a reserved keyword in the metadata.")
         data = backwards.unicode2bytes(json.dumps(data, sort_keys=True))
@@ -456,5 +491,5 @@ class MetaschemaType(object):
                 metadata['incomplete'] = True
                 return data, metadata
             data = json.loads(backwards.bytes2unicode(data))
-            obj = self.__class__.decode(metadata, data, self._typedef)
+            obj = self.decode(metadata, data, self._typedef)
         return obj, metadata

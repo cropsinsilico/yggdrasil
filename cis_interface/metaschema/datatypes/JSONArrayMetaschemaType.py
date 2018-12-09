@@ -1,3 +1,4 @@
+import numpy as np
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -12,13 +13,29 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
     properties = ContainerMetaschemaType.properties + ['items']
     definition_properties = ContainerMetaschemaType.definition_properties
     metadata_properties = ContainerMetaschemaType.metadata_properties + ['items']
-    python_types = (list, tuple)
+    python_types = (list, tuple, np.ndarray)
     _replaces_existing = True
 
     _container_type = list
     _json_type = 'array'
     _json_property = 'items'
     _empty_msg = []
+
+    @classmethod
+    def validate(cls, obj):
+        r"""Validate an object to check if it could be of this type.
+
+        Args:
+            obj (object): Object to validate.
+
+        Returns:
+            bool: True if the object could be of this type, False otherwise.
+
+        """
+        out = super(JSONArrayMetaschemaType, cls).validate(obj)
+        if out and isinstance(obj, np.ndarray):
+            out = (len(obj.dtype) > 0)
+        return out
 
     @classmethod
     def normalize(cls, obj):
@@ -33,6 +50,21 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         """
         if isinstance(obj, str):
             obj = [v.strip() for v in obj.split(',')]
+        return obj
+
+    @classmethod
+    def coerce_type(cls, obj):
+        r"""Coerce objects of specific types to match the data type.
+
+        Args:
+            obj (object): Object to be coerced.
+
+        Returns:
+            object: Coerced object.
+
+        """
+        if isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
+            return [obj[n] for n in obj.dtype.names]
         return obj
 
     @classmethod

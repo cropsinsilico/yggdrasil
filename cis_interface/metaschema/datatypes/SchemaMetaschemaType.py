@@ -48,21 +48,6 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
         return obj
 
     @classmethod
-    def transform_type(cls, obj, typedef=None):
-        r"""Transform an object based on type info.
-
-        Args:
-            obj (object): Object to transform.
-            typedef (dict): Type definition that should be used to transform the
-                object.
-
-        Returns:
-            object: Transformed object.
-
-        """
-        return obj
-
-    @classmethod
     def validate(cls, obj):
         r"""Validate an object to check if it could be of this type.
 

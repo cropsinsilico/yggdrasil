@@ -50,18 +50,21 @@ class MetaschemaProperty(object):
         self._compare = compare
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Method to encode the property given the object.
 
         Args:
             instance (object): Object to get property for.
+            typedef (object, None): Template value in type definition to use
+                for initializing encoding some cases. Defaults to None and
+                is ignored.
 
         Returns:
             object: Encoded property for instance.
 
         """
         if cls._encode is not None:
-            return cls._encode(cls, instance)
+            return cls._encode(cls, instance, typedef=typedef)
         raise NotImplementedError("Encode method not set.")
     
     @classmethod
@@ -91,7 +94,7 @@ class MetaschemaProperty(object):
                     break
             else:
                 return
-            x = cls.encode(instance)
+            x = cls.encode(instance, typedef=value)
             errors = cls.compare(x, value) or ()
         for e in errors:
             yield e

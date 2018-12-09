@@ -1,3 +1,4 @@
+import copy
 from cis_interface.metaschema.datatypes import encode_type, compare_schema
 from cis_interface.metaschema.properties import register_metaschema_property
 from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
@@ -12,9 +13,14 @@ class ItemsMetaschemaProperty(MetaschemaProperty):
     _validate = False
 
     @classmethod
-    def encode(cls, instance):
+    def encode(cls, instance, typedef=None):
         r"""Encoder for the 'items' container property."""
-        return [encode_type(v) for v in instance]
+        if isinstance(typedef, (list, tuple)):
+            typedef_list = typedef
+        else:
+            typedef_list = [copy.deepcopy(typedef) for x in instance]
+        assert(len(typedef_list) == len(instance))
+        return [encode_type(v, typedef=t) for v, t in zip(instance, typedef_list)]
 
     @classmethod
     def compare(cls, prop1, prop2):

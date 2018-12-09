@@ -213,13 +213,9 @@ class TestMetaschemaType(CisTestClassInfo):
 
     def test_transform_type(self):
         r"""Test transform_type."""
-        if self._cls == 'MetaschemaType':
-            nt.assert_raises(NotImplementedError, self.import_cls.transform_type,
-                             None, None)
-        else:
-            for x, y, typedef in self._compatible_objects:
-                z = self.import_cls.transform_type(x, typedef)
-                self.assert_result_equal(z, y)
+        for x, y, typedef in self._compatible_objects:
+            z = self.import_cls.transform_type(x, typedef)
+            self.assert_result_equal(z, y)
 
     def test_serialize(self):
         r"""Test serialize/deserialize."""
@@ -276,7 +272,7 @@ class CisErrorType(MetaschemaType.MetaschemaType):
         return cls._check_decoded
 
     @classmethod
-    def encode_type(cls, obj):
+    def encode_type(cls, obj, typedef=None):
         r"""Encode type."""
         return {}
 
