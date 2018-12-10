@@ -149,7 +149,7 @@ def connect_matlab(matlab_session, first_connect=False):  # pragma: matlab
     try:
         matlab_engine.eval("CisInterface('CIS_MSG_MAX');", nargout=0,
                            stderr=err)
-    except BaseException as e:
+    except BaseException:
         matlab_engine.addpath(_top_dir, nargout=0)
         matlab_engine.addpath(_incl_interface, nargout=0)
     matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
