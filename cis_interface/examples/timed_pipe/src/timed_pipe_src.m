@@ -15,8 +15,7 @@ function timed_pipe_src(msg_count, msg_size)
   for i = 1:msg_count
       ret = outq.send(test_msg);
       if (~ret)
-          fprintf('pipe_src(M): SEND ERROR ON MSG %d\n', i);
-          exit(-1);
+          error(sprintf('pipe_src(M): SEND ERROR ON MSG %d\n', i));
       end;
       count = count + 1;
   end;

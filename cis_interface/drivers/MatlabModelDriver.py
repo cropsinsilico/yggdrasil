@@ -2,6 +2,7 @@ import subprocess
 from logging import debug
 from datetime import datetime
 import os
+import warnings
 import weakref
 try:  # pragma: matlab
     import matlab.engine
@@ -11,7 +12,7 @@ except ImportError:  # pragma: no matlab
           + "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface import backwards, tools, platform
+from cis_interface import backwards, tools, platform, config
 from cis_interface.tools import TimeOut, sleep
 from cis_interface.schema import register_component
 
@@ -60,11 +61,12 @@ def locate_matlabroot():  # pragma: matlab
         mtl_proc = subprocess.check_output(mtl_cmd)
     except subprocess.CalledProcessError:  # pragma: no matlab
         raise RuntimeError("Could not run matlab.")
+    mtl_id = backwards.unicode2bytes(mtl_id)
     if mtl_id not in mtl_proc:  # pragma: debug
         print(mtl_proc)
         raise RuntimeError("Could not locate matlab root id (%s) in output." % mtl_id)
     mtl_root = mtl_proc.split(mtl_id)[-2]
-    return mtl_root
+    return backwards.bytes2unicode(mtl_root)
 
 
 def install_matlab_engine():  # pragma: matlab
@@ -77,13 +79,16 @@ def install_matlab_engine():  # pragma: matlab
         print(result)
     
 
-def start_matlab(skip_connect=False):  # pragma: matlab
+def start_matlab(skip_connect=False, timeout=None):  # pragma: matlab
     r"""Start a Matlab shared engine session inside a detached screen
     session.
 
     Args:
         skip_connect (bool, optional): If True, the engine is not connected.
             Defaults to False.
+        timeout (int, optional): Time (in seconds) that should be waited for
+            Matlab to start up. Defaults to None and is set from the config
+            option ('matlab', 'startup_waittime_s').
 
     Returns:
         str: Name of the screen session running matlab.
@@ -94,6 +99,8 @@ def start_matlab(skip_connect=False):  # pragma: matlab
     """
     if not _matlab_installed:  # pragma: no matlab
         raise RuntimeError("Matlab is not installed.")
+    if timeout is None:
+        timeout = float(config.cis_cfg.get('matlab', 'startup_waittime_s', 10))
     old_matlab = set(matlab.engine.find_matlab())
     screen_session = str('cis_matlab' + datetime.today().strftime("%Y%j%H%M%S")
                          + '_%d' % len(old_matlab))
@@ -103,7 +110,7 @@ def start_matlab(skip_connect=False):  # pragma: matlab
                 'matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
                 '-r', '"matlab.engine.shareEngine"']
         subprocess.call(' '.join(args), shell=True)
-        T = TimeOut(10)
+        T = TimeOut(timeout)
         while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0)
                and not T.is_out):
             debug('Waiting for matlab engine to start')
@@ -138,12 +145,15 @@ def connect_matlab(matlab_session, first_connect=False):  # pragma: matlab
     """
     matlab_engine = matlab.engine.connect_matlab(matlab_session)
     matlab_engine.eval('clear classes;', nargout=0)
-    if first_connect:
+    err = backwards.StringIO()
+    try:
+        matlab_engine.eval("CisInterface('CIS_MSG_MAX');", nargout=0,
+                           stderr=err)
+    except BaseException:
         matlab_engine.addpath(_top_dir, nargout=0)
         matlab_engine.addpath(_incl_interface, nargout=0)
-        matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
-    else:
-        matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
+    matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
+    if not first_connect:
         if backwards.PY2:
             matlab_engine.eval("py.reload(os);", nargout=0)
         else:
@@ -391,6 +401,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.mlengine = None
         self.mlsession = None
         self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
+        self.check_exits()
 
     @classmethod
     def is_installed(self):
@@ -443,6 +454,23 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.started_matlab = False
         self.mlengine = None
         super(MatlabModelDriver, self).cleanup()
+
+    def check_exits(self):
+        r"""Check to make sure the program dosn't contain any exits as exits
+        will shut down the Matlab engine as well as the program.
+
+        Raises:
+            RuntimeError: If there are any exit calls in the file.
+
+        """
+        with open(self.args[0], 'r') as fd:
+            for i, line in enumerate(fd):
+                if line.strip().startswith('exit'):
+                    warnings.warn(
+                        "Line %d in '%s' contains an " % (i, self.args[0])
+                        + "'exit' call which will exit the MATLAB engine "
+                        + "such that it cannot be reused. Please replace 'exit' "
+                        + "with a return or error.")
 
     def before_start(self):
         r"""Actions to perform before the run loop."""

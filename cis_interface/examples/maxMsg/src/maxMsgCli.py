@@ -29,13 +29,11 @@ output = rand_str(msg_size)
 # Call RPC server
 ret, input = rpc.rpcCall(output)
 if not ret:
-    print("maxMsgCli(P): RPC ERROR")
-    sys.exit(-1)
+    raise RuntimeError("maxMsgCli(P): RPC ERROR")
 
 # Check to see if response matches
 if (input[0] != output):
-    print("maxMsgCli(P): ERROR: input/output do not match")
-    sys.exit(-1)
+    raise RuntimeError("maxMsgCli(P): ERROR: input/output do not match")
 else:
     print("maxMsgCli(P): CONFIRM")
 

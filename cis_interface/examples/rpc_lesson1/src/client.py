@@ -10,12 +10,8 @@ def main(iterations):
     Args:
         iterations (int): The number of Fibonacci numbers to log.
 
-    Returns:
-        int: Exit code. Negative if an error occurred.
-
     """
 
-    exit_code = 0
     print('Hello from Python client: iterations = %d ' % iterations)
 
     # Set up connections matching yaml
@@ -30,24 +26,18 @@ def main(iterations):
         print('client(Python): Calling fib(%d)' % i)
         ret, result = rpc.call(i)
         if not ret:
-            print('client(Python): RPC CALL ERROR')
-            exit_code = -1
-            break
+            raise RuntimeError('client(Python): RPC CALL ERROR')
         fib = result[0]
         print('client(Python): Response fib(%d) = %d' % (i, fib))
 
         # Log result by sending it to the log connection
         ret = log.send(i, fib)
         if not ret:
-            print('client(Python): SEND ERROR')
-            exit_code = -1
-            break
+            raise RuntimeError('client(Python): SEND ERROR')
 
     print('Goodbye from Python client')
-    return exit_code
 
     
 if __name__ == '__main__':
     # Take number of iterations from the first argument
-    exit_code = main(int(sys.argv[1]))
-    sys.exit(exit_code)
+    main(int(sys.argv[1]))

@@ -32,6 +32,7 @@ script_list = [
     ('make', 'gcc_model'),
     ('cmake', 'gcc_model'),
     ('matlab', 'matlab_model.m'),
+    ('matlab_error', 'matlab_error_model.m'),
     ('python', 'python_model.py'),
     ('error', 'error_model.py'),
     ('lpy', 'lpy_model.lpy')]

@@ -35,6 +35,15 @@ def test_matlab_runner():  # pragma: matlab
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_matlab_exit():  # pragma: matlab
+    r"""Test error when model contains 'exit' call."""
+    MatlabModelDriver.MatlabModelDriver('error', [scripts['matlab_error']])
+    # Re-enable if it becomes necessary to raise an error instead of just a warning
+    # nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, 'error',
+    #                  [scripts['matlab_error']])
+
+
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
 class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
     r"""Test parameters for MatlabModelDriver."""
 

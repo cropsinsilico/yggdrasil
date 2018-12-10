@@ -1,4 +1,3 @@
-import sys
 from cis_interface.interface.CisInterface import CisRpcServer
 
 
@@ -10,7 +9,8 @@ while True:
     if not ret:
         break
     print("maxMsgSrv(P): rpcRecv returned %s, input %.10s..." % (ret, input[0]))
-    rpc.rpcSend(input[0])
+    flag = rpc.rpcSend(input[0])
+    if not flag:
+        raise RuntimeError('maxMsgSrv(P): Error sending reply.')
 
 print("maxMsgSrv(P): Goodbye!")
-sys.exit(0)

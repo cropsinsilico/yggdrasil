@@ -22,10 +22,8 @@ while flag
   % If there is an error, the flag will be False
   flag = out_channel.send(msg);
   if (~flag)
-    disp('Model B: Error sending output.');
+    error('Model B: Error sending output.');
     break;
   end;
   
 end;
-
-exit(0);
