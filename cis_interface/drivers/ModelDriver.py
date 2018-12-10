@@ -77,13 +77,15 @@ class ModelDriver(Driver):
         'strace_flags': {'type': 'array', 'default': [],
                          'items': {'type': 'string'}},
         'with_valgrind': {'type': 'boolean', 'default': False},
-        'valgrind_flags': {'type': 'array', 'default': [],
+        'valgrind_flags': {'type': 'array', 'default': ['--leak-check=full'],  # '-v'
                            'items': {'type': 'string'}}}
 
-    def __init__(self, name, args, is_server=False, client_of=[],
-                 with_strace=False, strace_flags=None,
-                 with_valgrind=False, valgrind_flags=None,
-                 model_index=0, **kwargs):
+    def __init__(self, name, args, model_index=0, **kwargs):
+        for k, v in self._schema_properties.items():
+            if k in ['name', 'language', 'args', 'inputs', 'outputs', 'working_dir']:
+                continue
+            default = v.get('default', None)
+            setattr(self, k, kwargs.pop(k, default))
         super(ModelDriver, self).__init__(name, **kwargs)
         self.debug(str(args))
         if not isinstance(args, list):
@@ -94,23 +96,14 @@ class ModelDriver(Driver):
         self.model_process = None
         self.queue = Queue()
         self.queue_thread = None
-        self.is_server = is_server
-        self.client_of = client_of
         self.event_process_kill_called = Event()
         self.event_process_kill_complete = Event()
         # Strace/valgrind
-        if with_strace and with_valgrind:
+        if self.with_strace and self.with_valgrind:
             raise RuntimeError("Trying to run with strace and valgrind.")
-        if (with_strace or with_valgrind) and platform._is_win:  # pragma: windows
+        if (((self.with_strace or self.with_valgrind)
+             and platform._is_win)):  # pragma: windows
             raise RuntimeError("strace/valgrind options invalid on windows.")
-        self.with_strace = with_strace
-        if strace_flags is None:
-            strace_flags = []
-        self.strace_flags = strace_flags
-        self.with_valgrind = with_valgrind
-        if valgrind_flags is None:
-            valgrind_flags = ['--leak-check=full']  # '-v'
-        self.valgrind_flags = valgrind_flags
         self.model_index = model_index
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = backwards.unicode2bytes('EXIT')

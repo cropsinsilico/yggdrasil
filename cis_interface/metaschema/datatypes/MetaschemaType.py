@@ -506,7 +506,7 @@ class MetaschemaType(object):
         metadata['size'] = len(data)
         metadata.setdefault('id', str(uuid.uuid4()))
         metadata = backwards.unicode2bytes(json.dumps(metadata, sort_keys=True))
-        msg = metadata + CIS_MSG_HEAD + data
+        msg = CIS_MSG_HEAD + metadata + CIS_MSG_HEAD + data
         return msg
     
     def deserialize(self, msg, no_data=False, metadata=None, no_json=False):
@@ -542,7 +542,7 @@ class MetaschemaType(object):
                 if (data != tools.CIS_MSG_EOF) and (self._typedef != {'type': 'bytes'}):
                     raise ValueError("Header marker not in message.")
         if metadata is None:
-            metadata, data = msg.split(CIS_MSG_HEAD, 1)
+            _, metadata, data = msg.split(CIS_MSG_HEAD, 2)
             if len(metadata) == 0:
                 metadata = dict(size=len(data))
             else:

@@ -61,31 +61,23 @@ class MakeModelDriver(ModelDriver):
 
     _language = 'make'
     _schema_properties = inherit_schema(
-        ModelDriver._schema_properties, 'language', _language,
-        make_command={'type': 'string', 'default': _default_make_command},
-        makefile={'type': 'string', 'default': _default_makefile},
-        makedir={'type': 'string'})  # default will depend on makefile
+        ModelDriver._schema_properties,
+        {'make_command': {'type': 'string', 'default': _default_make_command},
+         'makefile': {'type': 'string', 'default': _default_makefile},
+         'makedir': {'type': 'string'}})  # default will depend on makefile
 
-    def __init__(self, name, args, make_command=None, makedir=None,
-                 makefile=None, **kwargs):
+    def __init__(self, name, args, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
         if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.compiled = False
-        if make_command is None:
-            make_command = _default_make_command
         self.target = self.args[0]
-        if makedir is None:
-            if (makefile is not None) and os.path.isabs(makefile):
-                makedir = os.path.dirname(makefile)
+        if self.makedir is None:
+            if os.path.isabs(self.makefile):
+                self.makedir = os.path.dirname(self.makefile)
             else:
-                makedir = self.working_dir
-        if makefile is None:
-            makefile = _default_makefile
-        self.make_command = make_command
-        self.makedir = makedir
-        self.makefile = makefile
+                self.makedir = self.working_dir
         self.target_file = os.path.join(self.makedir, self.target)
         self.args[0] = self.target_file
         # Set environment variables

@@ -238,7 +238,7 @@ def guess_type_from_msg(msg):
     """
     try:
         if CIS_MSG_HEAD in msg:
-            metadata, data = msg.split(CIS_MSG_HEAD, 1)
+            _, metadata, data = msg.split(CIS_MSG_HEAD, 2)
             metadata = json.loads(backwards.bytes2unicode(metadata))
             cls = _type_registry[metadata['type']]
         else:
@@ -358,7 +358,7 @@ def decode(msg):
 
     """
     cls = guess_type_from_msg(msg)
-    metadata = json.loads(backwards.bytes2unicode(msg.split(CIS_MSG_HEAD, 1)[0]))
+    metadata = json.loads(backwards.bytes2unicode(msg.split(CIS_MSG_HEAD, 2)[1]))
     typedef = cls.extract_typedef(metadata)
     cls_inst = cls(**typedef)
     obj = cls_inst.deserialize(msg)[0]

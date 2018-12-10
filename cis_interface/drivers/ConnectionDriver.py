@@ -148,11 +148,16 @@ class ConnectionDriver(Driver):
         comm_kws.setdefault('name', name)
         if not isinstance(comm_kws['comm'], list):
             comm_kws['comm'] = [comm_kws['comm']]
+        for i, x in enumerate(comm_kws['comm']):
+            if x is None:
+                comm_kws['comm'][i] = dict()
+            elif not isinstance(x, dict):
+                comm_kws['comm'][i] = dict(comm=x)
+            comm_kws['comm'][i].setdefault('comm', comm_type)
         any_files = False
         if touches_model:
             comm_kws['no_suffix'] = True
             for x in comm_kws['comm']:
-                x.setdefault('comm', comm_type)
                 if get_comm_class(x['comm']).is_file:
                     any_files = True
                     ikws = s['file'].get_subtype_properties(x['comm'])

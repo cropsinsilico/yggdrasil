@@ -257,15 +257,14 @@ class GCCModelDriver(ModelDriver):
 
     _language = ['c', 'c++', 'cpp']
     _schema_properties = inherit_schema(
-        ModelDriver._schema_properties, 'language', _language,
-        cc={'type': 'string'})  # default will depend on whats being compiled
+        ModelDriver._schema_properties,
+        {'cc': {'type': 'string'}})  # default will depend on whats being compiled
 
-    def __init__(self, name, args, cc=None, **kwargs):
+    def __init__(self, name, args, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)
         if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
-        self.cc = cc
         # Prepare arguments to compile the file
         self.parse_arguments(self.args)
         self.debug("Compiling")

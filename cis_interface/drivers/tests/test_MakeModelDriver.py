@@ -42,7 +42,6 @@ class TestMakeModelParam(parent.TestModelParam):
         self.makedir, self.target = os.path.split(scripts['make'])
         self.makefile = os.path.join(self.makedir, 'Makefile')
         self.args = [self.target]
-        self._inst_kwargs['makedir'] = None
         self._inst_kwargs['makefile'] = self.makefile
         
 
@@ -55,8 +54,7 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
         super(TestMakeModelDriverNoStart, self).__init__(*args, **kwargs)
         # Version specifying makedir via working_dir
         self._inst_kwargs['yml']['working_dir'] = self.makedir
-        self._inst_kwargs['makedir'] = None
-        self._inst_kwargs['makefile'] = None
+        del self._inst_kwargs['makefile']
 
     # Done in driver, but driver not started
     def teardown(self):
