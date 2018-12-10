@@ -10,7 +10,7 @@ class TestAsciiTableInputParam(parent.TestAsciiFileInputParam):
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableInputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiTableInputDriver'
-        self.inst_kwargs['column_names'] = None
+        self.inst_kwargs['field_names'] = None
         self.inst_kwargs['use_astropy'] = False
         self.icomm_name = 'AsciiTableComm'
 
@@ -61,21 +61,21 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableInputDriver_Array, self).__init__(*args, **kwargs)
         self.inst_kwargs['as_array'] = True
-        names = [backwards.bytes2unicode(n) for n in self.field_names]
-        units = [backwards.bytes2unicode(n) for n in self.field_units]
-        self.inst_kwargs['column_names'] = names
-        self.inst_kwargs['column_units'] = units
+        field_names = [backwards.bytes2unicode(n) for n in self.field_names]
+        field_units = [backwards.bytes2unicode(n) for n in self.field_units]
+        self.inst_kwargs['field_names'] = field_names
+        self.inst_kwargs['field_units'] = field_units
         self.inst_kwargs['use_astropy'] = False
 
     @property
     def msg_short(self):  # pragma: debug
         r"""str: Always use file bytes as message."""
-        return self.file_array
+        return self.file_array_units
     
     @property
     def msg_long(self):  # pragma: debug
         r"""str: Always use file bytes as message."""
-        return self.file_array
+        return self.file_array_units
 
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equal."""
@@ -92,7 +92,7 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
         # Array
         flag, data = self.recv_comm.recv_nolimit(self.timeout)
         assert(flag)
-        self.assert_msg_equal(data, self.file_array)
+        self.assert_msg_equal(data, self.msg_short)
         # End of file
         flag, data = self.recv_comm.recv_nolimit(self.timeout)
         assert(not flag)

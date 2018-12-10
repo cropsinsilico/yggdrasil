@@ -2,6 +2,7 @@ import json
 from cis_interface import backwards, serialize
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.metaschema.encoder import JSONReadableEncoder
 
 
 @register_serializer
@@ -48,7 +49,7 @@ class AsciiMapSerialize(DefaultSerialize):
             out += k + self.delimiter
             if isinstance(v, backwards.string_types):
                 v = backwards.bytes2unicode(v)
-            out += json.dumps(v)
+            out += json.dumps(v, cls=JSONReadableEncoder)
             out += self.newline
         return backwards.unicode2bytes(out)
 
@@ -72,7 +73,10 @@ class AsciiMapSerialize(DefaultSerialize):
                 if len(kv) <= 1:
                     continue
                 elif len(kv) == 2:
-                    out[kv[0]] = json.loads(kv[1])
+                    if kv[1].startswith("'") and kv[1].endswith("'"):
+                        out[kv[0]] = kv[1].strip("'")
+                    else:
+                        out[kv[0]] = json.loads(kv[1])
                 else:
                     raise ValueError("Line has more than one delimiter: " + l)
         return out

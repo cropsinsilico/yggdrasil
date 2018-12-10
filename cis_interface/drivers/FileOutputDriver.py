@@ -20,5 +20,4 @@ class FileOutputDriver(ConnectionDriver):
         kwargs.setdefault('ocomm_kws', {})
         kwargs['ocomm_kws']['address'] = args
         super(FileOutputDriver, self).__init__(name, **kwargs)
-        self.env[self.name] = self.icomm.address
         self.debug('(%s)', args)

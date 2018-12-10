@@ -14,10 +14,3 @@ class PlyFileOutputDriver(FileOutputDriver):
     """
 
     _ocomm_type = 'PlyFileComm'
-
-    def __init__(self, name, args, **kwargs):
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws.setdefault('serializer_type', 8)
-        kwargs['icomm_kws'] = icomm_kws
-        super(PlyFileOutputDriver, self).__init__(name, args, **kwargs)
-        self.debug('(%s)', args)

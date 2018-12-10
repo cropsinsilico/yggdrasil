@@ -112,10 +112,9 @@ class AsciiTableSerialize(DefaultSerialize):
             args = self.datatype.coerce_type(args)
             out = serialize.array_to_table(args, self.format_str,
                                            use_astropy=self.use_astropy)
-            out = backwards.unicode2bytes(out)
         else:
             out = serialize.format_message(args, self.format_str)
-        return out
+        return backwards.unicode2bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

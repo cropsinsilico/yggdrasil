@@ -23,7 +23,10 @@ class AsciiTableComm(AsciiFileComm):
     
     _filetype = 'table'
     _schema_properties = inherit_schema(
-        AsciiFileComm._schema_properties, 'filetype', _filetype,
+        AsciiFileComm._schema_properties,
+        {'as_array': {'type': 'boolean', 'default': False},
+         'field_names': {'type': 'array', 'items': {'type': 'string'}},
+         'field_units': {'type': 'array', 'items': {'type': 'string'}}},
         **AsciiTableSerialize._schema_properties)
     _default_serializer = AsciiTableSerialize
     _attr_conv = AsciiFileComm._attr_conv + ['delimiter', 'format_str']

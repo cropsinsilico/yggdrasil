@@ -70,6 +70,21 @@ class MetaschemaType(object):
         raise NotImplementedError("Method must be overridden by the subclass.")
 
     @classmethod
+    def encode_data_readable(cls, obj, typedef):
+        r"""Encode an object's data in a readable format.
+
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        raise NotImplementedError("Method must be overridden by the subclass.")
+
+    @classmethod
     def decode_data(cls, obj, typedef):
         r"""Decode an object.
 
@@ -181,14 +196,15 @@ class MetaschemaType(object):
                                       % cls.name)
         out = copy.deepcopy(kwargs)
         for x in cls.properties:
+            itypedef = typedef.get(x, out.get(x, None))
             if x == 'type':
                 out['type'] = cls.name
             elif x == 'title':
-                if x in typedef:
-                    out[x] = typedef[x]
+                if itypedef is not None:
+                    out[x] = itypedef
             else:
                 prop_cls = metaschema.properties.get_metaschema_property(x)
-                out[x] = prop_cls.encode(obj, typedef=typedef.get(x, None))
+                out[x] = prop_cls.encode(obj, typedef=itypedef)
         return out
 
     @classmethod

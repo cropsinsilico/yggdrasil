@@ -135,7 +135,9 @@ def get_supported_comm():
     from cis_interface import schema
     s = schema.get_schema()
     out = s['comm'].classes
-    out.remove('CommBase')
+    for k in ['CommBase', 'DefaultComm']:
+        if k in out:
+            out.remove(k)
     return list(set(out))
 
 

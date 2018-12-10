@@ -1,4 +1,3 @@
-from cis_interface import serialize
 from cis_interface.drivers.AsciiFileInputDriver import AsciiFileInputDriver
 from cis_interface.schema import register_component
 
@@ -33,9 +32,3 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
     """
 
     _icomm_type = 'AsciiTableComm'
-
-    def update_serializer(self, msg):
-        r"""Update the serializer for the output comm based on input."""
-        sinfo = self.icomm.serializer.serializer_info
-        sinfo['stype'] = 0
-        self.ocomm.serializer = serialize.get_serializer(**sinfo)

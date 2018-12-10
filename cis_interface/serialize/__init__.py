@@ -720,7 +720,7 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
     else:
         fd = backwards.BytesIO()
         for ele in arr1:
-            line = format_message(ele.tolist(), fmt_str)
+            line = format_message(ele.tolist(), backwards.unicode2bytes(fmt_str))
             fd.write(line)
         # fmt = fmt_str.split(info['newline'])[0]
         # np.savetxt(fd, arr1,
@@ -1148,6 +1148,70 @@ def parse_header(header, newline=_default_newline, lineno_format=None,
     return out
 
 
+def dict2list(d, order=None):
+    r"""Covert a dictionary of arrays to a list of arrays.
+
+    Args:
+        d (dict): Dictionary of arrays.
+        order (list, optional): Key order in which values from the dictionary
+            should be add to the list.
+
+    Returns:
+        list: List with contents from the input array.
+
+    """
+    if order is None:
+        order = sorted(list(d.keys()))
+    out = [d[k] for k in order]
+    return out
+
+
+def list2dict(l, names=None):
+    r"""Convert a list of arrays to a dictionary of arrays.
+
+    Args:
+        l (list): List of arrays.
+        names (list, optional): Names to give to the new fields. Defaults to
+            names based on order (e.g. 'f0', 'f1').
+
+    Returns:
+        dict: Dictionary of arrays.
+
+    """
+    if names is None:
+        names = ['f%d' % i for i in range(len(l))]
+    out = {k: x for k, x in zip(names, l)}
+    return out
+
+
+def numpy2list(arr):
+    r"""Covert a numpy structured array to a list of arrays.
+
+    Args:
+        arr (np.ndarray): Array to convert.
+
+    Returns:
+        list: List with contents from the input array.
+
+    """
+    return dict2list(numpy2dict(arr), order=arr.dtype.names)
+
+
+def list2numpy(l, names=None):
+    r"""Convert a list of arrays to a numpy structured array.
+
+    Args:
+        l (list): List of arrays.
+        names (list, optional): Names to give to the new fields. Defaults to
+            names based on order.
+
+    Returns:
+        np.ndarray: Structured numpy array.
+
+    """
+    return dict2numpy(list2dict(l, names=names))
+
+
 def numpy2dict(arr):
     r"""Covert a numpy structured array to a dictionary of arrays.
 
@@ -1240,7 +1304,7 @@ def pandas2numpy(frame, index=False):
 
 
 def dict2pandas(d, order=None):
-    r"""Convert a dictionary of arrays to a numpy structured array.
+    r"""Convert a dictionary of arrays to a Pandas DataFrame.
 
     Args:
         d (dict): Dictionary of arrays.
@@ -1265,6 +1329,34 @@ def pandas2dict(frame):
 
     """
     return numpy2dict(pandas2numpy(frame))
+
+
+def list2pandas(l, names=None):
+    r"""Convert a list of arrays to a Pandas DataFrame.
+
+    Args:
+        l (list): List of arrays.
+        names (list, optional): Names to give to the new fields. Defaults to
+            names based on order (e.g. 'f0', 'f1').
+
+    Returns:
+        pandas.DataFrame: Pandas data frame with contents from the input list.
+
+    """
+    return numpy2pandas(list2numpy(l, names=names))
+
+
+def pandas2list(frame):
+    r"""Convert a Pandas DataFrame to a list of arrays.
+
+    Args:
+        frame (pandas.DataFrame): Frame to convert.
+
+    Returns:
+        list: List with contents from the input frame.
+
+    """
+    return numpy2list(pandas2numpy(frame))
 
 
 import_all_serializers()

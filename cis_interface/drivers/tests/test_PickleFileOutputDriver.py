@@ -14,14 +14,6 @@ class TestPickleFileOutputParam(parent.TestFileOutputParam):
         self.args = self.filepath
         self.ocomm_name = 'PickleFileComm'
 
-    # @property
-    # def send_comm_kwargs(self):
-    #     r"""dict: Keyword arguments for send comm."""
-    #     out = super(TestPickleFileOutputParam, self).send_comm_kwargs
-    #     del out['serializer']
-    #     out['serializer_type'] = 4
-    #     return out
-
 
 class TestPickleFileOutputDriverNoStart(TestPickleFileOutputParam,
                                         parent.TestFileOutputDriverNoStart):

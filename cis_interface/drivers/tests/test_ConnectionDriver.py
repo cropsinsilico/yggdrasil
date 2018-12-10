@@ -45,8 +45,8 @@ class TestConnectionParam(parent.TestParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
-        out['icomm_kws'] = {'comm': {'name': self.icomm_name}}
-        out['ocomm_kws'] = {'comm': {'name': self.ocomm_name}}
+        out['icomm_kws'] = {'name': self.icomm_name}
+        out['ocomm_kws'] = {'name': self.ocomm_name}
         return out
 
     # @property

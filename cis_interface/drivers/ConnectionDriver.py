@@ -1,6 +1,5 @@
 """Module for funneling messages from one comm to another."""
 import os
-import pprint
 import numpy as np
 import threading
 from cis_interface import backwards
@@ -82,8 +81,7 @@ class ConnectionDriver(Driver):
             out = None
         return out
 
-    def __init__(self, name, translator=None, single_use=False,
-                 onexit=None, **kwargs):
+    def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Translator
         if translator is None:
@@ -145,7 +143,7 @@ class ConnectionDriver(Driver):
         comm_kws['direction'] = direction
         comm_kws['dont_open'] = True
         comm_kws['reverse_names'] = True
-        comm_kws.setdefault('comm', comm_type)
+        comm_kws.setdefault('comm', {'comm': comm_type})
         assert(name == self.name)
         comm_kws.setdefault('name', name)
         if not isinstance(comm_kws['comm'], list):
@@ -154,6 +152,7 @@ class ConnectionDriver(Driver):
         if touches_model:
             comm_kws['no_suffix'] = True
             for x in comm_kws['comm']:
+                x.setdefault('comm', comm_type)
                 if get_comm_class(x['comm']).is_file:
                     any_files = True
                     ikws = s['file'].get_subtype_properties(x['comm'])
@@ -161,28 +160,35 @@ class ConnectionDriver(Driver):
                     ikws = s['comm'].get_subtype_properties(x['comm'])
             for k in ikws:
                 if (k not in comm_kws) and (k in kwargs):
-                    comm_kws[k] = kwargs[k]
+                    comm_kws[k] = kwargs.pop(k)
         if any_files and (io == 'input'):
             kwargs.setdefault('timeout_send_1st', 60)
-        print('%s comm_kws' % attr_comm)
-        pprint.pprint(comm_kws)
+        # import pprint
+        # print('%s comm_kws' % attr_comm)
+        # pprint.pprint(comm_kws)
         setattr(self, attr_comm, new_comm(comm_kws.pop('name'), **comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
-        print('%s opp_comms' % attr_comm, getattr(self, attr_comm).opp_comms)
         self.env.update(**getattr(self, attr_comm).opp_comms)
+        return kwargs
 
     def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        self._init_single_comm(name, 'input', icomm_kws, **kwargs)
+        kwargs = self._init_single_comm(name, 'input', icomm_kws, **kwargs)
         try:
-            self._init_single_comm(name, 'output', ocomm_kws, **kwargs)
+            kwargs = self._init_single_comm(name, 'output', ocomm_kws, **kwargs)
         except BaseException:
             self.icomm.close()
             raise
         if self._is_input:
             self.comm_env.update(**self.icomm.opp_comms)
+            self.env[self.name] = self.ocomm.address
+        elif self._is_output:
+            self.env[self.name] = self.icomm.address
         # Apply keywords dependent on comms
-        self.timeout_send_1st = kwargs.get('timeout_send_1st', self.timeout)
+        self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
+        # import pprint
+        # print('remaining kwargs')
+        # pprint.pprint(kwargs)
         
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
@@ -492,11 +498,20 @@ class ConnectionDriver(Driver):
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        if self.ocomm.serializer.serializer_type == 0:
-            old_kwargs = self.ocomm.serializer.serializer_info
-            del old_kwargs['stype']
+        if self.icomm.is_file:
+            # Remove the file information and only pass the type definition
+            sinfo = self.icomm.serializer.typedef
+            sinfo.pop('seritype', None)
+        elif self.ocomm.is_file:
+            # Maintain the default serializer type for the file
+            sinfo = self.ocomm.serializer.serializer_info
+            sinfo.update(self.icomm.serializer.typedef)
+        else:
+            # Copy the serializer and prevent the type from being overwritten
+            sinfo = self.ocomm.serializer.serializer_info
+            sinfo.pop('seritype', None)
             self.ocomm.serializer = self.icomm.serializer
-            self.ocomm.serializer.update_serializer(**old_kwargs)
+        self.ocomm.serializer.update_from_message(msg, **sinfo)
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.

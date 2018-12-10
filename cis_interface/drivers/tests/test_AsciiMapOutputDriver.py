@@ -1,5 +1,6 @@
 import os
 import tempfile
+from cis_interface import backwards
 import cis_interface.drivers.tests.test_FileOutputDriver as parent
 
 
@@ -33,4 +34,8 @@ class TestAsciiMapOutputDriver(TestAsciiMapOutputParam,
     @property
     def contents_to_read(self):
         r"""str: Contents that should be read to the file."""
-        return self.mapfile_contents
+        # The test contents include use of single quote, but json will always
+        # use double
+        single_quote = backwards.unicode2bytes("'")
+        double_quote = backwards.unicode2bytes('"')
+        return self.mapfile_contents.replace(single_quote, double_quote)

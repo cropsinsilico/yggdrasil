@@ -22,9 +22,9 @@ class AsciiFileComm(FileComm):
 
     _filetype = 'ascii'
     _schema_properties = inherit_schema(
-        FileComm._schema_properties, 'filetype', _filetype,
-        comment={'type': 'unicode',
-                 'default': backwards.bytes2unicode(serialize._default_comment)})
+        FileComm._schema_properties,
+        {'comment': {'type': 'unicode',
+                     'default': backwards.bytes2unicode(serialize._default_comment)}})
     _attr_conv = FileComm._attr_conv + ['comment']
 
     def _init_before_open(self, **kwargs):

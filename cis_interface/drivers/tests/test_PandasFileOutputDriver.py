@@ -1,5 +1,4 @@
 import numpy as np
-from cis_interface import serialize
 import cis_interface.drivers.tests.test_FileOutputDriver as parent
 
 
@@ -21,7 +20,6 @@ class TestPandasFileOutputParam(parent.TestFileOutputParam):
                                     'field_names': self.field_names,
                                     'field_units': self.field_units,
                                     'as_array': True}
-        out['send_converter'] = serialize.pandas2numpy
         return out
 
     @property

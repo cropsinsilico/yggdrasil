@@ -33,6 +33,8 @@ _normalize_objects = [
                                    'datatype': {'type': 'bytes'}}],
                        'outputs': [{'name': 'fileA.txt',
                                     'filetype': 'binary',
+                                    'datatype': {'type': 'bytes'},
+                                    'comment': '# ',
                                     'working_dir': os.getcwd(),
                                     'field_names': ['a', 'b'],
                                     'field_units': ['cm', 'g'],

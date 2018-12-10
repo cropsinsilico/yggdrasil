@@ -460,7 +460,7 @@ class IOInfo(object):
         self.file_elements = [('one', np.int32(1), 1.0),
                               ('two', np.int32(2), 2.0),
                               ('three', np.int32(3), 3.0)]
-        self.map_dict = dict(args1=1, args2='2')
+        self.map_dict = dict(args1=np.int64(1), args2='2')
 
     @property
     def header_lines(self):
@@ -497,25 +497,21 @@ class IOInfo(object):
         s = serialize.get_serializer(seritype='pandas',
                                      delimiter=self.delimiter,
                                      write_header=True)
-        out = s.serialize(self.pandas_frame)
+        out = s.serialize(self.pandas_frame, no_metadata=True)
         return out
 
     @property
     def ply_file_contents(self):
         r"""The contents of a file containing the ply data."""
-        from cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType import (
-            _test_value as _ply_test_value)
         serializer = serialize.get_serializer(seritype='ply')
-        out = serializer.serialize(_ply_test_value)
+        out = serializer.serialize(self.ply_dict, no_metadata=True)
         return out
 
     @property
     def obj_file_contents(self):
         r"""The contents of a file containing the obj data."""
-        from cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType import (
-            _test_value as _obj_test_value)
         serializer = serialize.get_serializer(seritype='obj')
-        out = serializer.serialize(_obj_test_value)
+        out = serializer.serialize(self.obj_dict, no_metadata=True)
         return out
 
     @property
@@ -534,6 +530,14 @@ class IOInfo(object):
         out = np.zeros(len(self.file_rows), dtype=self.file_dtype)
         for i, row in enumerate(self.file_elements):
             out[i] = row
+        return out
+
+    @property
+    def file_array_units(self):
+        r"""list: List of arrays of mock file contents with units."""
+        out = self.file_array
+        out = [units.add_units(out[n], backwards.bytes2unicode(u))
+               for n, u in zip(out.dtype.names, self.field_units)]
         return out
 
     # def to_bytes(self, arr):
@@ -562,6 +566,26 @@ class IOInfo(object):
         if not hasattr(self, '_pandas_frame'):
             self._pandas_frame = pandas.DataFrame(self.file_array)
         return self._pandas_frame
+
+    @property
+    def ply_dict(self):
+        r"""dict: Ply dictionary."""
+        if not hasattr(self, '_ply_dict'):
+            from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
+            from cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType import (
+                _test_value)
+            self._ply_dict = PlyDict(**_test_value)
+        return self._ply_dict
+
+    @property
+    def obj_dict(self):
+        r"""dict: Obj dictionary."""
+        if not hasattr(self, '_obj_dict'):
+            from cis_interface.metaschema.datatypes.ObjMetaschemaType import ObjDict
+            from cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType import (
+                _test_value)
+            self._obj_dict = ObjDict(**_test_value)
+        return self._obj_dict
 
     @property
     def data_dict(self):
@@ -677,6 +701,9 @@ class IOInfo(object):
     @property
     def mapfile_contents(self):
         r"""bytes: The contents of the test ASCII map file."""
+        # serializer = serialize.get_serializer(seritype='map')
+        # out = serializer.serialize(self.map_dict, no_metadata=True)
+        # return out
         out = ''
         order = sorted([k for k in self.map_dict.keys()])
         for k in order:
@@ -713,7 +740,7 @@ class IOInfo(object):
         r"""Write the pandas data frame out to a file.
 
         Args:
-            fname (str): Full path to the file that the pickle should be
+            fname (str): Full path to the file that the pandas data should be
                 written to.
 
         """
@@ -721,10 +748,10 @@ class IOInfo(object):
             fd.write(self.pandas_file_contents)
 
     def write_ply(self, fname):
-        r"""Write the ply data out to a file.
+        r"""Write the ply data frame out to a file.
 
         Args:
-            fname (str): Full path to the file that the ply should be
+            fname (str): Full path to the file that the ply data should be
                 written to.
 
         """
@@ -732,10 +759,10 @@ class IOInfo(object):
             fd.write(self.ply_file_contents)
 
     def write_obj(self, fname):
-        r"""Write the obj data out to a file.
+        r"""Write the obj data frame out to a file.
 
         Args:
-            fname (str): Full path to the file that the obj should be
+            fname (str): Full path to the file that the obj data should be
                 written to.
 
         """

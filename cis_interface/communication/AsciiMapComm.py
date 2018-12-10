@@ -1,5 +1,5 @@
 from cis_interface.communication import FileComm
-from cis_interface.schema import register_component
+from cis_interface.schema import register_component, inherit_schema
 from cis_interface.serialize.AsciiMapSerialize import AsciiMapSerialize
 
 
@@ -14,4 +14,8 @@ class AsciiMapComm(FileComm.FileComm):
     """
 
     _filetype = 'map'
+    _schema_properties = inherit_schema(
+        FileComm.FileComm._schema_properties,
+        **AsciiMapSerialize._schema_properties)
     _default_serializer = AsciiMapSerialize
+    _attr_conv = FileComm.FileComm._attr_conv + ['delimiter']

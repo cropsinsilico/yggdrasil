@@ -21,7 +21,7 @@ class TestPandasFileInputParam(parent.TestFileInputParam):
     def recv_comm_kwargs(self):
         r"""dict: Keyword arguments for recv comm."""
         out = super(TestPandasFileInputParam, self).recv_comm_kwargs
-        out['recv_converter'] = serialize.numpy2pandas
+        out['recv_converter'] = serialize.list2pandas
         return out
 
     @property
@@ -53,6 +53,7 @@ class TestPandasFileInputDriver(TestPandasFileInputParam,
         r"""Assertions to make before stopping the driver instance."""
         super(parent.TestFileInputDriver, self).assert_before_stop(
             check_open=False)
+        assert(self.send_comm.is_file)
         T = self.instance.start_timeout()
         while self.recv_comm.n_msg == 0 and (not T.is_out):
             self.instance.sleep()  # pragma: debug

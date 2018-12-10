@@ -15,11 +15,10 @@ class TestPickleFileInputParam(parent.TestFileInputParam):
         self.args = self.filepath
         self.icomm_name = 'PickleFileComm'
 
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        self.write_pickle(self.filepath)
-        # Skip writing text file by jumping up two classes
-        super(parent.TestFileInputParam, self).setup()
+    @property
+    def contents_to_write(self):
+        r"""Contents that should be written to the file."""
+        return self.pickled_data
 
 
 class TestPickleFileInputDriverNoStart(TestPickleFileInputParam,

@@ -11,48 +11,6 @@ from cis_interface.metaschema.datatypes.ScalarMetaschemaType import ScalarMetasc
 _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
 
 
-def oldstyle2datatype(format_str=None, field_names=None, field_units=None,
-                      as_array=False, **kwargs):
-    r"""Convert old, table-style serialization spec to a a data type definition.
-
-    Args:
-        format_str (str, optional): If provided, this string will be used to
-            determine the data types of elements. Defaults to None and is
-            ignored. If this is None, the other old table-style spec keywords
-            will also be ignored.
-        field_names (list, optional): The names of fields in the format string.
-            Defaults to None and is ignored.
-        field_units (list, optional): The units of fields in the format string.
-            Defaults to None and is ignored.
-        as_array (bool, optional): If True, each of the arguments being
-            serialized/deserialized will be arrays. Otherwise each argument
-            should be a scalar. Defaults to False.
-        **kwargs: Additional keyword arguments are treated as part of the type
-            definition and will override keys set from the old style spec.
-
-    Returns:
-        tuple(dict, dict): Type definition and extra keywords.
-
-    """
-    if format_str is None:
-        return {}, kwargs
-    typedef = {'type': 'array', 'items': []}
-    for i, fmt in enumerate(serialize.extract_formats(format_str)):
-        nptype = serialize.cformat2nptype(fmt)
-        itype = ScalarMetaschemaType.encode_type(np.ones(1, nptype)[0])
-        itype = ScalarMetaschemaType.extract_typedef(itype)
-        if as_array:
-            itype['type'] = '1darray'
-        else:
-            itype['type'] = itype.pop('subtype')
-        if field_names is not None:
-            itype['title'] = backwards.bytes2unicode(field_names[i])
-        if field_units is not None:
-            itype['units'] = backwards.bytes2unicode(field_units[i])
-        typedef['items'].append(itype)
-    return typedef, kwargs
-
-
 @register_serializer
 class DefaultSerialize(object):
     r"""Default class for serializing/deserializing a python object into/from
@@ -112,6 +70,53 @@ class DefaultSerialize(object):
         if 'format_str' not in self._schema_properties:
             self.format_str = None
 
+    def oldstyle2datatype(self, format_str=None, **kwargs):
+        r"""Convert old, table-style serialization spec to a a data type definition.
+
+        Args:
+            format_str (str, optional): If provided, this string will be used to
+                determine the data types of elements. Defaults to None and is
+                ignored. If this is None, the other old table-style spec keywords
+                will also be ignored.
+            field_names (list, optional): The names of fields in the format string.
+                Defaults to None and is ignored.
+            field_units (list, optional): The units of fields in the format string.
+                Defaults to None and is ignored.
+            as_array (bool, optional): If True, each of the arguments being
+                serialized/deserialized will be arrays. Otherwise each argument
+                should be a scalar. Defaults to False.
+            **kwargs: Additional keyword arguments are treated as part of the type
+                definition and will override keys set from the old style spec.
+
+        Returns:
+            tuple(dict, dict): Type definition and extra keywords.
+
+        """
+        if format_str is None:
+            for k in _oldstyle_kws:
+                v = kwargs.pop(k, None)
+                if getattr(self, k, None) is None:
+                    setattr(self, '_%s' % k, v)
+            return {}, kwargs
+        typedef = {'type': 'array', 'items': []}
+        field_names = kwargs.pop('field_names', self.field_names)
+        field_units = kwargs.pop('field_units', self.field_units)
+        as_array = kwargs.pop('as_array', self.as_array)
+        for i, fmt in enumerate(serialize.extract_formats(format_str)):
+            nptype = serialize.cformat2nptype(fmt)
+            itype = ScalarMetaschemaType.encode_type(np.ones(1, nptype)[0])
+            itype = ScalarMetaschemaType.extract_typedef(itype)
+            if as_array:
+                itype['type'] = '1darray'
+            else:
+                itype['type'] = itype.pop('subtype')
+            if field_names is not None:
+                itype['title'] = backwards.bytes2unicode(field_names[i])
+            if field_units is not None:
+                itype['units'] = backwards.bytes2unicode(field_units[i])
+            typedef['items'].append(itype)
+        return typedef, kwargs
+
     @property
     def typedef(self):
         r"""dict: Type definition."""
@@ -166,7 +171,12 @@ class DefaultSerialize(object):
     @property
     def nfields(self):
         r"""int: Number of fields in the format string."""
-        return len(self.field_formats)
+        if self.format_str is not None:
+            return len(self.field_formats)
+        if (((self.typedef['type'] == 'array') and ('items' in self.typedef)
+             and isinstance(self.typedef['items'], list))):
+            return len(self.typedef['items'])
+        return 0
 
     @property
     def field_names(self):
@@ -182,7 +192,7 @@ class DefaultSerialize(object):
             if not any_names:
                 out = None
         else:
-            out = None
+            out = getattr(self, '_field_names', None)
         return out
 
     @property
@@ -199,7 +209,7 @@ class DefaultSerialize(object):
             if not any_units:
                 out = None
         else:
-            out = None
+            out = getattr(self, '_field_units', None)
         return out
 
     @property
@@ -213,7 +223,7 @@ class DefaultSerialize(object):
                     out = False
                     break
         else:
-            out = None
+            out = getattr(self, '_as_array', None)
         return out
 
     @property
@@ -275,10 +285,9 @@ class DefaultSerialize(object):
         for k in self._schema_properties.keys():
             if k in kwargs:
                 setattr(self, k, kwargs.pop(k))
-        for k in _oldstyle_kws:
-            if (k not in kwargs) and hasattr(self, k):
-                kwargs[k] = getattr(self, k)
-        typedef, kwargs = oldstyle2datatype(**kwargs)
+                if k in _oldstyle_kws:
+                    kwargs[k] = getattr(self, k)
+        typedef, kwargs = self.oldstyle2datatype(**kwargs)
         for k in _metaschema['properties'].keys():
             if k in kwargs:
                 typedef[k] = kwargs.pop(k)

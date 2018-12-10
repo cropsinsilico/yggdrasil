@@ -14,10 +14,3 @@ class AsciiMapOutputDriver(FileOutputDriver):
     """
 
     _ocomm_type = 'AsciiMapComm'
-
-    def __init__(self, name, args, **kwargs):
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws.setdefault('serializer_type', 7)
-        kwargs['icomm_kws'] = icomm_kws
-        super(AsciiMapOutputDriver, self).__init__(name, args, **kwargs)
-        self.debug('(%s)', args)

@@ -8,7 +8,7 @@ class TestAsciiTableOutputParam(parent.TestAsciiFileOutputParam):
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiTableOutputDriver'
-        self.inst_kwargs['column'] = '\t'
+        self.inst_kwargs['delimiter'] = '\t'
         self.inst_kwargs['format_str'] = self.fmt_str
         self.ocomm_name = 'AsciiTableComm'
 
@@ -49,8 +49,8 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
         self.inst_kwargs['as_array'] = True
         names = [backwards.bytes2unicode(n) for n in self.field_names]
         units = [backwards.bytes2unicode(n) for n in self.field_units]
-        self.inst_kwargs['column_names'] = names
-        self.inst_kwargs['column_units'] = units
+        self.inst_kwargs['field_names'] = names
+        self.inst_kwargs['field_units'] = units
         self.inst_kwargs['use_astropy'] = False
 
     @property
@@ -62,5 +62,5 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
 
     def send_file_contents(self):
         r"""Send file contents to driver."""
-        self.send_comm.send_nolimit(self.file_array)
+        self.send_comm.send_nolimit(self.file_array_units)
         self.send_comm.send_nolimit_eof()

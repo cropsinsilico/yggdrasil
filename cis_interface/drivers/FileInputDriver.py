@@ -20,5 +20,4 @@ class FileInputDriver(ConnectionDriver):
         kwargs.setdefault('icomm_kws', {})
         kwargs['icomm_kws']['address'] = args
         super(FileInputDriver, self).__init__(name, **kwargs)
-        self.env[self.name] = self.ocomm.address
         self.debug('(%s)', args)

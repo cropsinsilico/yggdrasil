@@ -1,5 +1,5 @@
 from cis_interface.metaschema.datatypes import (
-    get_type_class, complete_typedef, encode_data)
+    get_type_class, complete_typedef, encode_data, encode_data_readable)
 from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -100,6 +100,29 @@ class ContainerMetaschemaType(MetaschemaType):
             else:
                 vtypedef = None
             vbytes = encode_data(v, typedef=vtypedef)
+            cls._assign(container, k, vbytes)
+        return container
+
+    @classmethod
+    def encode_data_readable(cls, obj, typedef):
+        r"""Encode an object's data in a readable format.
+
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        container = cls._container_type()
+        for k, v in cls._iterate(obj):
+            if cls._json_property in typedef:
+                vtypedef = cls._get_element(typedef[cls._json_property], k, None)
+            else:
+                vtypedef = None
+            vbytes = encode_data_readable(v, typedef=vtypedef)
             cls._assign(container, k, vbytes)
         return container
 

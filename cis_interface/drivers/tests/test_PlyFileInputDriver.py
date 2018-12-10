@@ -15,11 +15,10 @@ class TestPlyFileInputParam(parent.TestFileInputParam):
         self.args = self.filepath
         self.icomm_name = 'PlyFileComm'
 
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        self.write_ply(self.filepath)
-        # Skip writing text file by jumping up two classes
-        super(parent.TestFileInputParam, self).setup()
+    @property
+    def contents_to_write(self):
+        r"""Contents that should be written to the file."""
+        return self.ply_file_contents
 
 
 class TestPlyFileInputDriverNoStart(TestPlyFileInputParam,

@@ -14,10 +14,3 @@ class ObjFileOutputDriver(FileOutputDriver):
     """
 
     _ocomm_type = 'ObjFileComm'
-
-    def __init__(self, name, args, **kwargs):
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws.setdefault('serializer_type', 9)
-        kwargs['icomm_kws'] = icomm_kws
-        super(ObjFileOutputDriver, self).__init__(name, args, **kwargs)
-        self.debug('(%s)', args)

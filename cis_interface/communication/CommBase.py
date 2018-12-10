@@ -299,7 +299,9 @@ class CommBase(tools.CisClass):
     _schema_properties = {'name': {'type': 'string'},
                           'commtype': {'type': 'string', 'default': _commtype},
                           'datatype': {'type': 'schema',
-                                       'default': {'type': 'bytes'}}}
+                                       'default': {'type': 'bytes'}},
+                          'recv_converter': {'type': 'function'},
+                          'send_converter': {'type': 'function'}}
     _default_serializer = DefaultSerialize
     is_file = False
 
@@ -309,7 +311,6 @@ class CommBase(tools.CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 recv_converter=None, send_converter=None,
                  comm=None, matlab=False, **kwargs):
         self._comm_class = None
         if comm is not None:
@@ -335,8 +336,6 @@ class CommBase(tools.CisClass):
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
         self.matlab = matlab
-        self.recv_converter = recv_converter
-        self.send_converter = send_converter
         self._server = None
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
@@ -388,6 +387,7 @@ class CommBase(tools.CisClass):
     def _init_before_open(self, serializer=None, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
+        kwargs.update(kwargs.pop('serializer_kwargs', {}))
         # Transfer keywords form the schema
         for k, v in self._schema_properties.items():
             if k in ['name']:

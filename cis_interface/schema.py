@@ -26,14 +26,16 @@ def register_component(component_class):
     return component_class
 
 
-def inherit_schema(orig, key, value, **kwargs):
+def inherit_schema(orig, new_values=None, remove_keys=None, **kwargs):
     r"""Create an inherited schema, adding new value to accepted ones for
     dependencies.
     
     Args:
         orig (dict): Schema that will be inherited.
-        key (str): Field that other fields are dependent on.
-        value (str): New value for key that dependent fields should accept.
+        new_values (dict, optional): Dictionary of new values to add. Defaults
+            to None and is ignored.
+        remove_keys (list, optional): Keys that should be removed form orig before
+            adding the new keys. Defaults to empty list.
         **kwargs: Additional keyword arguments will be added to the schema
             with dependency on the provided key/value pair.
 
@@ -41,7 +43,14 @@ def inherit_schema(orig, key, value, **kwargs):
         dict: New schema.
 
     """
+    if remove_keys is None:
+        remove_keys = []
     out = copy.deepcopy(orig)
+    for k in remove_keys:
+        if k in out:
+            out.pop(k)
+    if new_values is not None:
+        out.update(new_values)
     out.update(**kwargs)
     return out
 
@@ -299,6 +308,8 @@ class ComponentSchema(object):
         """
         assert(comp_cls._schema_type == self.schema_type)
         name = comp_cls.__name__
+        if name == 'CommBase':
+            name = 'DefaultComm'
         # Append subtype
         subtype = {k: getattr(comp_cls, '_%s' % k, None) for k in self.subtype_keys}
         for k, v in subtype.items():

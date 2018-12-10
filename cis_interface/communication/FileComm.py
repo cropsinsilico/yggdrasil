@@ -1,8 +1,8 @@
 import os
 import tempfile
-from cis_interface import backwards, platform, serialize
+from cis_interface import backwards, platform
 from cis_interface.communication import CommBase
-from cis_interface.schema import register_component
+from cis_interface.schema import register_component, inherit_schema
 from cis_interface.serialize.DirectSerialize import DirectSerialize
 
 
@@ -52,17 +52,14 @@ class FileComm(CommBase.CommBase):
     _filetype = 'binary'
     _schema_type = 'file'
     _schema_required = ['name', 'filetype', 'working_dir']
-    _schema_properties = {'name': {'type': 'string'},
-                          'working_dir': {'type': 'string'},
-                          'filetype': {'type': 'string', 'default': _filetype},
-                          'datatype': {'type': 'schema',
-                                       'default': {'type': 'bytes'}},
-                          'append': {'type': 'boolean', 'default': False},
-                          'in_temp': {'type': 'boolean', 'default': False},
-                          'newline': {'type': 'unicode',
-                                      'default': backwards.bytes2unicode(
-                                          serialize._default_newline)},
-                          'is_series': {'type': 'boolean', 'default': False}}
+    _schema_properties = inherit_schema(
+        CommBase.CommBase._schema_properties,
+        {'working_dir': {'type': 'string'},
+         'filetype': {'type': 'string', 'default': _filetype},
+         'append': {'type': 'boolean', 'default': False},
+         'in_temp': {'type': 'boolean', 'default': False},
+         'is_series': {'type': 'boolean', 'default': False}},
+        remove_keys=['commtype'], **DirectSerialize._schema_properties)
     _default_serializer = DirectSerialize
     _attr_conv = ['newline', 'platform_newline']
     is_file = True

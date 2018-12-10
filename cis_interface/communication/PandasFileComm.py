@@ -1,6 +1,6 @@
 from cis_interface import backwards, serialize
 from cis_interface.communication.AsciiTableComm import AsciiTableComm
-from cis_interface.schema import register_component, inherit_schema
+from cis_interface.schema import register_component
 from cis_interface.serialize.PandasSerialize import PandasSerialize
 
 
@@ -18,12 +18,12 @@ class PandasFileComm(AsciiTableComm):
     """
 
     _filetype = 'pandas'
-    _schema_properties = inherit_schema(
-        AsciiTableComm._schema_properties, 'filetype', _filetype)
     _default_serializer = PandasSerialize
 
     def _init_before_open(self, **kwargs):
         r"""Set up dataio and attributes."""
+        kwargs.setdefault('send_converter', serialize.list2pandas)
+        kwargs.setdefault('recv_converter', serialize.pandas2list)
         super(PandasFileComm, self)._init_before_open(**kwargs)
         self.read_meth = 'read'
         if self.append:
