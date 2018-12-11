@@ -25,5 +25,4 @@ while True:
     # If there is an error, the flag will be False
     flag = out_channel.send(frame)
     if not flag:
-        print("Model B: Error sending output.")
-        break
+        raise RuntimeError("Model B: Error sending output.")

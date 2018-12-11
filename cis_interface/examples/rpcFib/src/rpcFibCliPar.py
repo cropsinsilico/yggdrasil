@@ -17,19 +17,16 @@ def fibClient(args):
         print('rpcFibCliPar(P): fib(->%-2d) ::: ' % i)
         ret = rpc.rpcSend(i)
         if not ret:
-            print('rpcFibCliPar(P): SEND FAILED')
-            sys.exit(-1)
+            raise RuntimeError('rpcFibCliPar(P): SEND FAILED')
 
     # Receive responses for all requests that were sent
     for i in range(1, iterations + 1):
         ret, fib = rpc.rpcRecv()
         if not ret:
-            print('rpcFibCliPar(P): RECV FAILED')
-            break
+            raise RuntimeError('rpcFibCliPar(P): RECV FAILED')
         print('rpcFibCliPar(P): fib(%2d<-) = %-2d<-' % fib)
 
     print('Goodbye from Python rpcFibCliPar')
-    sys.exit(0)
 
     
 if __name__ == '__main__':

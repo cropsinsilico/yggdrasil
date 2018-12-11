@@ -2,6 +2,7 @@ import subprocess
 from logging import debug
 from datetime import datetime
 import os
+import warnings
 import weakref
 try:  # pragma: matlab
     import matlab.engine
@@ -144,12 +145,15 @@ def connect_matlab(matlab_session, first_connect=False):  # pragma: matlab
     """
     matlab_engine = matlab.engine.connect_matlab(matlab_session)
     matlab_engine.eval('clear classes;', nargout=0)
-    if first_connect:
+    err = backwards.StringIO()
+    try:
+        matlab_engine.eval("CisInterface('CIS_MSG_MAX');", nargout=0,
+                           stderr=err)
+    except BaseException:
         matlab_engine.addpath(_top_dir, nargout=0)
         matlab_engine.addpath(_incl_interface, nargout=0)
-        matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
-    else:
-        matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
+    matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
+    if not first_connect:
         if backwards.PY2:
             matlab_engine.eval("py.reload(os);", nargout=0)
         else:
@@ -397,6 +401,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.mlengine = None
         self.mlsession = None
         self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
+        self.check_exits()
 
     @classmethod
     def is_installed(self):
@@ -449,6 +454,23 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.started_matlab = False
         self.mlengine = None
         super(MatlabModelDriver, self).cleanup()
+
+    def check_exits(self):
+        r"""Check to make sure the program dosn't contain any exits as exits
+        will shut down the Matlab engine as well as the program.
+
+        Raises:
+            RuntimeError: If there are any exit calls in the file.
+
+        """
+        with open(self.args[0], 'r') as fd:
+            for i, line in enumerate(fd):
+                if line.strip().startswith('exit'):
+                    warnings.warn(
+                        "Line %d in '%s' contains an " % (i, self.args[0])
+                        + "'exit' call which will exit the MATLAB engine "
+                        + "such that it cannot be reused. Please replace 'exit' "
+                        + "with a return or error.")
 
     def before_start(self):
         r"""Actions to perform before the run loop."""

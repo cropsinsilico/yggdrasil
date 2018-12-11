@@ -3,7 +3,6 @@ function client(iterations, client_index)
   
   iterations = str2num(iterations);
   client_index = str2num(client_index);
-  exit_code = 0;
   fprintf('Hello from Matlab client%d: iterations = %d\n', ...
           client_index, iterations);
 
@@ -21,9 +20,7 @@ function client(iterations, client_index)
     fprintf('client%d(Matlab): Calling fib(%d)\n', client_index, i);
     [ret, result] = rpc.call(i);
     if (~ret);
-      fprintf('client%d(Matlab): RPC CALL ERROR\n', client_index);
-      exit_code = -1;
-      break;
+      error(sprintf('client%d(Matlab): RPC CALL ERROR\n', client_index));
     end;
     fib = result{1};
     fprintf('client%d(Matlab): Response fib(%d) = %d\n', client_index, ...
@@ -32,14 +29,11 @@ function client(iterations, client_index)
     % Log result by sending it to the log connection
     ret = log.send(i, fib);
     if (~ret);
-      fprintf('client%d(Matlab): SEND ERROR\n', client_index);
-      exit_code = -1;
-      break;
+      error(sprintf('client%d(Matlab): SEND ERROR\n', client_index));
     end;
   end;
 
   fprintf('Goodbye from Matlab client%d\n', client_index);
-  exit(exit_code);
   
 end
 
