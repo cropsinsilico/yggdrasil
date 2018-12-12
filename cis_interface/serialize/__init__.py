@@ -484,8 +484,18 @@ def combine_eles(arrs, dtype=None):
     """
     neles = len(arrs)
     # Check types of arrays
+    any_arrays = False
+    all_arrays = True
     for i, a in enumerate(arrs):
-        if not isinstance(a, (np.ndarray, np.void, list, tuple)):
+        if isinstance(a, (np.ndarray, np.void, list, tuple)):
+            any_arrays = True
+        else:
+            all_arrays = False
+    if not all_arrays:
+        if not any_arrays:
+            arrs = [arrs]
+            neles = 1
+        else:
             raise TypeError("Elements must be arrays, lists or tuples. "
                             + "Element %d has type %s." % (i, type(a)))
     # Check that there are enough elements for each data type
