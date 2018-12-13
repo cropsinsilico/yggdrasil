@@ -287,8 +287,10 @@ class ModelDriver(Driver):
             if self.queue_thread is not None:
                 if not self.was_break:  # pragma: debug
                     # Wait for messages to be printed
+                    self.debug("Waiting for queue_thread to finish up.")
                     self.queue_thread.wait(self.timeout)
                 if self.queue_thread.is_alive():  # pragma: debug
+                    self.debug("Setting break flag for queue_thread to finish up.")
                     self.queue_thread.set_break_flag()
                     self.queue_thread.wait(self.timeout)
                     try:
