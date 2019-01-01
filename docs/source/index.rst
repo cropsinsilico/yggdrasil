@@ -21,6 +21,7 @@ Welcome to cis_interface's documentation!
    c_format_strings
    io_drivers
    model_drivers
+   model_interface
    code
    examples/examples_toc
    release
