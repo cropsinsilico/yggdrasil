@@ -23,7 +23,7 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'maxMsg': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'timed_pipe': ('python', 'matlab', 'c', 'cpp'),
            'fakeplant': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'paper': ('python', 'c', 'all', 'all_nomatlab')}
+           'root_to_shoot': ('python', 'c', 'all', 'all_nomatlab')}
 ext_map = {'python': '.py',
            'matlab': '.m',
            'c': '.c',
@@ -83,9 +83,9 @@ for k, lang in ex_dict.items():
             yml_names = ['server_python.yml',
                          'client_%s.yml' % ilang]
             src_names = ['server.py', 'client%s' % ext_map[ilang]]
-        elif k == 'paper':
+        elif k == 'root_to_shoot':
             if ilang.startswith('all'):
-                yml_names = ['root.yml', 'shoot.yml', 'paper.yml']
+                yml_names = ['root.yml', 'shoot.yml', 'root_to_shoot.yml']
                 src_names = ['root.c', 'shoot.py']
             elif ilang == 'python':
                 yml_names = ['shoot.yml', 'shoot_files.yml']

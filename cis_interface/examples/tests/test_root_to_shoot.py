@@ -2,12 +2,12 @@ import os
 from cis_interface.examples.tests import TestExample
 
 
-class TestExamplePaper(TestExample):
-    r"""Test the Paper example."""
+class TestExampleRootToShoot(TestExample):
+    r"""Test the Root to Shoot example."""
 
     def __init__(self, *args, **kwargs):
-        super(TestExamplePaper, self).__init__(*args, **kwargs)
-        self._name = 'paper'
+        super(TestExampleRootToShoot, self).__init__(*args, **kwargs)
+        self._name = 'root_to_shoot'
 
     @property
     def output_dir(self):
@@ -34,4 +34,4 @@ class TestExamplePaper(TestExample):
         if self.output_dir is not None:
             if not os.path.isdir(self.output_dir):
                 os.mkdir(self.output_dir)
-        super(TestExamplePaper, self).run_example()
+        super(TestExampleRootToShoot, self).run_example()

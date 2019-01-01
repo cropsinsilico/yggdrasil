@@ -48,7 +48,7 @@
 	\ifieee
 		\documentclass[peerreview]{IEEEtran}
 	\else
-		\documentclass[preprint]{aastex}
+		\documentclass[preprint]{aastex6}
 	\fi
 \fi
 
@@ -58,6 +58,10 @@
 \usepackage{graphicx}
 \usepackage{enumerate}
 \usepackage{listings}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+%\usepackage[noend]{algpseudocode}
 \ifdraft
 	\ifieee
 		\usepackage[numbers]{natbib}
@@ -103,7 +107,59 @@
 \newcommand{\addref}{{\color{red}(ref. needed)}}
 \newcommand{\Msol}{\,M$_{\odot}$}
 \newcommand{\TB}{\,Tbytes}
-\newcommand{\cis}{{\tt cis\_interface}{}}
+\newcommand{\pkg}{{\tt \todo{cis\_interface}}{}}
+\newcommand{\pkgrun}{{\tt \todo{cisrun}}}
+\newcommand{\A}{Appendix{ }}
+
+%---------------------------------------------------------------------------------
+% SOURCE CODE
+\newcommand{\rootsrc}{\lstinputlisting[language=C,label={lst:src:root},caption={root.h: Source code for root model in C.}]{../../cis_interface/examples/root_to_shoot/src/root.h}}
+\newcommand{\shootsrc}{\lstinputlisting[language=Python,label={lst:src:shoot},caption={shoot.py: Source code for shoot model in Python.}]{../../cis_interface/examples/root_to_shoot/src/shoot.py}}
+
+%---------------------------------------------------------------------------------
+% WRAPPER CODE
+\newcommand{\rootwrap}{\lstinputlisting[language=C,label={lst:wrap:root},caption={root\_wrapper.c: Wrapper source code for root model in C.}]{../../cis_interface/examples/root_to_shoot/src/root_wrapper.c}}
+\newcommand{\shootwrap}{\lstinputlisting[language=Python,label={lst:wrap:shoot},caption={shoot\_wrapper.py: Wrapper source code for shoot model in Python}]{../../cis_interface/examples/root_to_shoot/src/shoot_wrapper.py}}
+
+%---------------------------------------------------------------------------------
+% YAML FILES
+\newcommand{\rootyml}{\lstinputlisting[label={lst:yml:root},caption={root.yml: Model YAML specification file for root model.}]{../../cis_interface/examples/root_to_shoot/root.yml}}
+\newcommand{\shootyml}{\lstinputlisting[label={lst:yml:shoot},caption={shoot.yml: Model YAML specification file for shoot model.}]{../../cis_interface/examples/root_to_shoot/shoot.yml}}
+\newcommand{\rootymlfiles}{\lstinputlisting[label={lst:yml:root_files},caption={root\_files.yml: Connection YAML specification file for running the root model in isolation.}]{../../cis_interface/examples/root_to_shoot/root_files.yml}}
+\newcommand{\shootymlfiles}{\lstinputlisting[label={lst:yml:shoot_files},caption={shoot\_files.yml: Model YAML specification file for running the shoot model in isolation.}]{../../cis_interface/examples/root_to_shoot/shoot_files.yml}}
+\newcommand{\intyml}{\lstinputlisting[label={lst:yml:int},caption={root\_to\_shoot.yml: Connection YAML specification file for the root/shoot integration.}]{../../cis_interface/examples/root_to_shoot/root_to_shoot.yml}}
+
+%---------------------------------------------------------------------------------
+% CODE STYLE
+\usepackage{color}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{1,1,1}
+%\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
 
 %---------------------------------------------------------------------------------
 % MANUSCRIPT INFO
@@ -111,10 +167,10 @@
 
 \ifieee
 \else
-	\shorttitle{{\cis}}
+	\shorttitle{{\pkg}}
 \fi
 
-\title{{\cis}: A Python Package for Integrating Computational Models Across Languages and Scales}
+\title{{\pkg}: A Python Package for Integrating Computational Models Across Languages and Scales}
 
 \ifieee
 	\author{Meagan~Lang%
@@ -133,7 +189,7 @@
 %---------------------------------------------------------------------------------
 % ABSTRACT (145 words)
 \begin{abstract}
-Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\cis}, a Python package for running integration networks with connections between models across languages and scales. {\cis} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OS, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\cis} is designed to be user-friendly and can be accessed at {\tt https://github.com/cropsinsilico/cis\_interface}.
+Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\pkg}, a Python package for running integration networks with connections between models across languages and scales. {\pkg} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OS, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\pkg} is designed to be user-friendly and can be accessed at {\tt https://github.com/cropsinsilico/cis\_interface}.
 \end{abstract}
 
 \ifieee
@@ -163,41 +219,48 @@ Plant biologists have produced a wealth of computational models to describe the 
 %was able to identify gene candidates for regulating photosynthesis under elevated CO$_{2}$. 
 With advances in computational power, it should be possible to link biologically-related models to create complex integration networks capable of capturing the response of entire plants, fields, or regions. However, independently developed computational models often have compatibility issues resulting from differences in programming language or data format that make such collaborations difficult. 
 
-Consider the task of integrating a root growth model with a shoot growth model. The root growth model is written in C and can be expressed as
+Consider the task of integrating a root growth model with a shoot growth model. The root growth model is written in C (see Listing \ref{lst:src:root}) and can be expressed as
 \begin{equation}
-R_{t+1} = R_{t} \times r_{r} + R_{t}.
+R_{t+1} = R_{t} \times r_{r} \times dt + R_{t}.
 \end{equation}
 The inputs to the root growth model are
 \begin{itemize}
 	\item $R_{t}$: the root mass at time $t$
 	\item $r_{r}$: the relative root growth rate
+	\item $dt$: the time step
 \end{itemize}
 and the output of the root growth model is $R_{t+1}$, the root mass at the next time step. 
 %
-The shoot growth model is written in Python and can be expressed as
+The shoot growth model is written in Python (see Listing \ref{lst:src:shoot}) and can be expressed as
 \begin{equation}
-S_{t+1} = S_{t} \times r_{s} + S_{t} - (R_{t+1} - R_{t}).
+S_{t+1} = S_{t} \times r_{s} \times dt + S_{t} - (R_{t+1} - R_{t}).
 \end{equation}
 The inputs to the shoot model are 
 \begin{itemize}
 	\item $S_{t}$: the shoot mass at time $t$
 	\item $r_{s}$: the relative shoot growth rate
+	\item $dt$: the time step
 	\item $R_{t}$: the root mass at time $t$ 
 	\item $R_{t+1}$: the root mass at time $t+1$ 
 \end{itemize}
 and the output of the shoot growth model is $S_{t+1}$, the shoot mass at the next time step.
 %
-While it is possible to run both models in isolation if all of the appropriate input variables are provided, the value of $R_{t+1}$ calculated by the root growth model could be used as input to the shoot growth model. However, because the two models are written in different languages, the two models cannot be directly integrated.
-% without translating one of the models into the language of the other. Although translating one or both of these simple toy models is relatively straight forward, actual plant models are much more complex. In the case of real plant models, model translation is time consuming and results in unnecessary replication of model algorithms.
+While it is possible to run both models in isolation if all of the appropriate input variables are provided, the value of $R_{t+1}$ calculated by the root growth model could be used as input to the shoot growth model. However, because the two models are written in different languages, the two models cannot be directly integrated. To integrate the models a scientist must either "manually" integrate them by running one model and then the other or translate one of the models into the language of the other so that it can be called directly. For a tightly coupled set of models such as these where one model depends directly on the result from the other at the current time step, manual integration is very inefficient for more than a handful of time steps even when done using a script. Although translating one or both of these simple toy models would be relatively straight forward, actual plant models are much more complex and could contain thousands of lines of code that would be time consuming to translate and result in unnecessary replication of model algorithms.
 
-We present an Open Source Python package, {\cis}, for creating and running integration networks by connecting existing computational models written in different programming language. {\cis} is available on Github\footnote{{\tt https://github.com/cropsinsilico/cis\_interface}} with full documentation\footnote{{\tt https://cropsinsilico.github.io/cis\_interface/}} and can be installed from PyPI\footnote{{\tt https://pypi.org/project/cis\_interface/}} via {\tt pip install {\cis}} or conda-forge\footnote{{\tt https://github.com/conda-forge/cis\_interface-feedstock}} via {\tt conda -c conda-forge install {\cis}}. Although developed for the purpose of integrating plant biology models, {\cis} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\cis} package to integrate models, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} summarizes the features of the {\cis} package, describes a few use cases, and outlines areas for future development.
+We present an Open Source Python package, {\pkg}, for creating and running integration networks by connecting existing computational models written in different programming languages. {\pkg} was developed as part of the Crops \emph{in Silico} \citep{Marshall-Colon2017} initiative to build a complete crop \emph{in silico} from the level of the genes to the level of the field. {\pkg} is available on Github\footnote{{\tt https://github.com/cropsinsilico/cis\_interface}} with full documentation\footnote{{\tt https://cropsinsilico.github.io/cis\_interface/}} and can be installed from PyPI\footnote{{\tt https://pypi.org/project/cis\_interface/}} via {\tt pip install {\pkg}} or conda-forge\footnote{{\tt https://github.com/conda-forge/cis\_interface-feedstock}} via {\tt conda -c conda-forge install {\pkg}}. Although developed for the purpose of integrating plant biology models, {\pkg} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\pkg} package to integrate models, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} summarizes the features of the {\pkg} package, describes a few use cases, and outlines areas of ongoing and future development.
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
 % BACKGROUND
 \section{Background}\label{S:background}
 %
-Computational plant models are usually written with a very specific research question in mind. The resulting programs are highly tuned for one purpose and written specifically for scientists within an isolated group of collaborators. Scientists will generally write programs in the language they are most familiar with and, given that there is no consensus on one programming language as ideal for all scientific applications, the language will often vary between research groups, if not between members within the groups themselves. The same can be said of data formats which can be highly tailored to the target question and may or may not include metadata such as the data types, field names, or units. To integrate two biological models like the root and shoot models from \S\ref{S:intro}, the following questions must be addressed:
+Computational plant models are usually written with a very specific research question in mind \citep[e.g. describing a specific metabolic pathway in C4 photosynthesis,][]{Wang2014}. The resulting model codes are often highly tuned for this one purpose and are written specifically for scientists within an isolated group of collaborators. As a result, it is unlikely that models produced by two independent groups will be directly compatible in terms of language, data format, or units \citep{Marshall-Colon2017}. 
+
+There are models written in Matlab \citep{ZHU2013, Wang2014}, Python \citep{Pradal2009}, C++ \citep{Merks2011, Postma2017}, Microsoft Excel \citep{Sharkey2016}, VisualBasic \citep{Humphries1995, HALL2013}, R \citep{WANG2015}, Java \citep{Song2013, Kappas2013}, Fortran \citep{Goudriaan1994}, and several domain specific languages \citep[e.g. SBML,][]{Hucka2003}. The variety of data formats used by these codes is just as diverse. While some specific subfields have settled on standards for things like microarray gene expression data \citep[e.g. MINiML,][]{GEO2017}, many models use unique data formats that may or may not include metadata such as the data types, field names, or units. 
+%For example, OpenAlea \citep{Pradal2008} defines its own Multiscale Tree Graph (MTG) tree structure for describing plant topology at different scales that is an extension to the MTG format used by AMAPmod \citep{Godin1998}. 
+For example, while LPy \citep{Boudon2012} and Houdini FX \citep{HoudiniFX} both allow users to specify plant structures via L-systems, they differ slightly in their syntax and so are not directly compatible. Or, as another example, 3D canopy structures can be generated in any unit and standard 3D geometry formats like Ply \citep{ply} and Obj \citep{obj} do not include units in their metadata. As a result, if an LPy model produces a canopy in Ply format with units of centimeters, the photosynthetic photon flux density (PPFD) output by a ray tracer like fastTracer \citep{Song2013} (which expects a geometry in units of meters) would be incorrect. 
+
+As a result, integrating two biological models like the root and shoot models from \S\ref{S:intro} requires that the following questions be addressed first:
 %
 \begin{enumerate}
 	\item Orchestration: How will models be executed?
@@ -205,7 +268,7 @@ Computational plant models are usually written with a very specific research que
 	\item Translation: How will data output by one model be translated into a format understood by the next model?
 \end{enumerate}
 
-These three questions can be addressed through manual integration (e.g. running the root model, converting the output root mass into the units expected by the shoot model, and then running the shoot model). However, manual integration is 1) computationally inefficient when many iterations are necessary, such as during parameter searches or steady state convergence tests, 2) unique to every integration, requiring the production of new scripts, and 3) complex when more than $>3$ models are being integrated. Within both computational biology and the larger scientific computing community, groups have developed around different solutions to the problem of connecting models.
+These three questions can be addressed through manual integration (e.g. running the root model, converting the output root mass into the units expected by the shoot model, and then running the shoot model). However, manual integration is 1) computationally inefficient when many iterations are necessary, such as during parameter searches or steady state convergence tests, 2) unique to every integration, requiring the production of new scripts, and 3) complex when more than three models are being integrated. Within both computational biology and the larger scientific computing community, groups have developed around different solutions to the problem of connecting models. These solutions can generally be grouped into two categories: domain specific languages and frameworks.
 
 %---------------------------------------------------------------------------------
 % DOMAIN SPECIFIC LANGUAGE
@@ -221,7 +284,7 @@ Another approach is a workflow/data flow/framework tool for models that are writ
 
 There are also domain specific frameworks for connecting biological models. For example, OpenAlea \citep{Pradal2015} allows users to compose networks from different components including plant models, analysis tools, and visualization tools. Domain specific frameworks are more intuitive and ultimately more flexible than DSLs in the types of operations they allow models to perform since they have access to the full power of a programming language. However, they are stricter in several respects: 1) the model must be written in (or exposable to), the language of the framework and 2) the model must be written in a way that is aware of the framework and/or the format of models with which it will interact. Like DSLs, frameworks also provided limited support for models written without the framework in mind. 
 
-{\cis} interface is an example of a framework that overcomes these issues by exposing simple and easily accessible interfaces in the language of the model (See \S\ref{SSS:interface}) that permit messages to be passed between the model processes as they run in parallel (See \S\ref{SS:communication}). As a result, models writers only need knowledge of the language in which their model is written.
+{\pkg} is an example of a framework that overcomes these issues by exposing simple and easily accessible interfaces in the language of the model (See \S\ref{SSS:interface}) that permit messages to be passed between the model processes as they run in parallel (See \S\ref{SS:communication}). As a result, models writers only need knowledge of the language in which their model is written.
 
 %---------------------------------------------------------------------------------
 % MESSAGE PASSING TOOLS
@@ -234,7 +297,7 @@ There are also domain specific frameworks for connecting biological models. For 
 % METHODS
 \section{Methods}\label{S:methods}
 
-{\cis} was designed to address the questions from \S\ref{S:background} while being:
+{\pkg} was designed to address the questions from \S\ref{S:background} while being:
 
 \begin{itemize}
 	\item {\bf Easy to use.} Require as little modification to the model source code as possible and only in the language of the model itself.
@@ -242,15 +305,15 @@ There are also domain specific frameworks for connecting biological models. For 
 	\item {\bf Flexible.} Provide the same interface to the user, regardless of the communication mechanism being used or the platform the model is being executed on.
 \end{itemize}
 
-{\cis} currently support models written in Python, Matlab, C, and C++ with 
+{\pkg} currently support models written in Python, Matlab, C, and C++ with 
 additional Domain Specific Language (DSL) support for LPy models \citep{Boudon2012}. Support for additional languages is planned for future development (See \S\ref{SS:langsupport}).
 
 %---------------------------------------------------------------------------------
 % ORCHESTRATION
 \subsection{Orchestration}\label{SS:orchestration}
 %
-{\cis} is executed via a command line interface (CLI), {\tt cisrun} with specification files (\S\ref{SSS:yaml}) as input. Based on the information contained in the specification files, {\cis} establishes a network of asynchronous communication channels (\S\ref{SS:communication}), and launches the models on new processes (\S\ref{SS:model_execution}).
-%At execution, {\cis} launches models on new processes based on information contained in a YAML specification file (See \S\ref{SSS:yaml} below) and establishes 
+{\pkg} is executed via a command line interface (CLI), {\pkgrun} with specification files (\S\ref{SSS:yaml}) as input. Based on the information contained in the specification files, {\pkg} establishes a network of asynchronous communication channels (\S\ref{SS:communication}), and launches the models on new processes (\S\ref{SS:model_execution}).
+%At execution, {\pkg} launches models on new processes based on information contained in a YAML specification file (See \S\ref{SSS:yaml} below) and establishes 
 
 %---------------------------------------------------------------------------------
 % YAML
@@ -271,29 +334,23 @@ Model YAMLs include information about the location of the
 model source code, the language the model is written in, how the model should 
 be run, and any input or output variables including their data type and units. 
 %
-\ifcode
-For example, Listings \ref{lst:rootYAML} and \ref{lst:shootYAML} are the model YAMLs for the example root and shoot growth models from \S\ref{S:intro}. These model YAMLs could be used in any integration without being modified because the model input and output variable will not change.
+%For example, Listings \ref{lst:yml:root} and \ref{lst:yml:shoot} from \A\ref{A:yml} are the model YAMLs for the example root and shoot growth models from \S\ref{S:intro}. These model YAMLs could be used in any integration without being modified because the model inputs and outputs will not change.
 %
-\lstinputlisting[caption={Model YAML for root model},label={lst:rootYAML}]{../../cis_interface/examples/paper/root.yml}
+%\rootyml
 %
-\lstinputlisting[caption={Model YAML for shoot model},label={lst:shootYAML}]{../../cis_interface/examples/paper/shoot.yml}
-%
-\fi
+%\shootyml
 %
 Integration networks are specified by declaring the connections 
 between models and connections are declared by pairing an output variable from 
-one model with the input variable of another model. The {\cis} 
+one model with the input variable of another model. The {\pkg} 
 CLI sets up the necessary communication mechanisms to 
 then direct data from one model to the next in the specified pattern. Models 
 can have as many input and/or output variables as is desired and connections between models are specified by references to the 
 input/output variables associated with each model. In addition, input and output variables can also be connected to files.
 %
-\ifcode
-For example, in the connection YAML for integrating the root and shoot models (Listing \ref{lst:connYAML}), the first two connections link the {\tt root\_input} and {\tt shoot\_input} input channels from the root and shoot model YAML's to input files. The third connection links the {\tt next\_root\_mass} output variable from the root model YAML (Listing \ref{lst:rootYAML}) to the {\tt next\_root\_mass} input variable from the shoot model YAML (Listing \ref{lst:shootYAML}). The forth connection links the {\tt next\_shoot\_mass} to an output file.
+%For example, in the connection YAML for integrating the root and shoot models (Listing \ref{lst:yml:int} from \A\ref{A:yml}), the first two connections link the {\tt root\_input} and {\tt shoot\_input} input channels from the root and shoot model YAML's to input files. The third connection links the {\tt next\_root\_mass} output variable from the root model YAML (Listing \ref{lst:yml:root}) to the {\tt next\_root\_mass} input variable from the shoot model YAML (Listing \ref{lst:yml:shoot}). The forth connection links the {\tt next\_shoot\_mass} to an output file.
 %
-\lstinputlisting[caption={Connection YAML for integration of root and shoot models},label={lst:connYAML}]{../../cis_interface/examples/paper/paper.yml}
-%
-\fi
+%\intyml
 %
 This format allows users the 
 flexibility to create complex integration networks and test models in isolation before running the entire integration network.
@@ -303,7 +360,7 @@ flexibility to create complex integration networks and test models in isolation 
 % MODEL EXECUTION
 \subsubsection{Model Execution}\label{SS:model_execution}
 %
-{\cis} launches each model in an integration on its own process, allowing models to complete independent operations in parallel and complete tasks more quickly. For example, the root and shoot growth models from \S\ref{S:intro} require 2.42\,s and 4.06\,s respectively to run for 100 time steps in isolation. If these two models were manually integrated in serial via the command line, the integration would require a total of 6.48\,s. However, the same integration requires only 4.52\,s using {\cis}, a speed-up of 1.43. The exact speedup provided by parallel integration using {\cis} depends on how independent the models are and how equally distributed the work is between the models. If the models are fully independent, the speedup is limited by the time required to execute the slowest model. In the example, this would be the shoot growth model which required almost twice the time to execute as the root model. If the models are dependent on one-another, the models will have to wait for messages to be passed and the speedup will not be a great.
+{\pkg} launches each model in an integration on its own process, allowing models to complete independent operations in parallel and complete tasks more quickly. For example, the root and shoot growth models from \S\ref{S:intro} require 2.42\,s and 4.06\,s respectively to run for 100 time steps in isolation. If these two models were manually integrated in serial via the command line, the integration would require a total of 6.48\,s. However, the same integration requires only 4.52\,s using {\pkg}, a speed-up of 1.43. The exact speedup provided by parallel integration using {\pkg} depends on how independent the models are and how equally distributed the work is between the models. If the models are fully independent, the speedup is limited by the time required to execute the slowest model. In the example, this would be the shoot growth model which required almost twice the time to execute as the root model. If the models are dependent on one-another, the models will have to wait for messages to be passed and the speedup will not be as great.
 
 While every model is executed on a new process, how the model is handled depends 
 on the language it is written in. Models written in 
@@ -317,15 +374,15 @@ reused.
 
 For the compiled languages (C and C++) there are a few options. The user can 
 compile the model themselves, provided they link against the appropriate 
-{\cis} header library. Alternatively, users can provide the location of 
-the model source code and let {\cis} handle the compilation, including 
-linking against the appropriate {\cis} interface library. {\cis} 
+{\pkg} header library. Alternatively, users can provide the location of 
+the model source code and let {\pkg} handle the compilation, including 
+linking against the appropriate {\pkg} interface library. {\pkg} 
 also has support for compiling models using Make \citep{Stallman2004} and 
 CMake \citep{Martin2006} for 
 models that already have a Makefile or CMakeLists.txt. To use these tools to compile a model, 
-lines are added to the recipe in order to allow linking against {\cis}.
+lines are added to the recipe in order to allow linking against {\pkg}.
 
-Once the models are running, {\cis} uses threads on the master process to monitor the progress of the model and report back model output (e.g. log messages printed to stdout or stderr) and any status changes. If a model issues any errors, the master process will shut down any model processes that are still running and close any connections, discarding any unprocessed messages. If a model completes without any errors, the master process will cleanup any connections that are no longer required after waiting for all messages to be processed. The master process will only complete once an error is encountered or all model processes have completed.
+Once the models are running, {\pkg} uses threads on the master process to monitor the progress of the model and report back model output (e.g. log messages printed to stdout or stderr) and any status changes. If a model issues any errors, the master process will shut down any model processes that are still running and close any connections, discarding any unprocessed messages. If a model completes without any errors, the master process will cleanup any connections that are no longer required after waiting for all messages to be processed. The master process will only complete once an error is encountered or all model processes have completed.
 
 
 %---------------------------------------------------------------------------------
@@ -333,18 +390,18 @@ Once the models are running, {\cis} uses threads on the master process to monito
 \subsection{Communication}\label{SS:communication}
 %
 In order for integrations to be possible, models must be able to send and receive information to and from other models written in different languages via some communication mechanism. 
-Communication within {\cis} integration networks was designed to be flexible in terms of the 
-languages, platforms, and data types available. To accomplish this, {\cis} leverages 
-three tools different tools for communication, 
+Communication within {\pkg} integration networks was designed to be flexible in terms of the 
+languages, platforms, and data types available. To accomplish this, {\pkg} leverages 
+three different tools for communication, 
 System V IPC Queues (\S\ref{SSS:ipc}), ZeroMQ (\S\ref{SSS:zmq}), and RabbitMQ (\S\ref{SSS:rmq}), 
 which each have their own strengths and weaknesses. The 
-particular communication mechanism used by {\cis} is determined by the platform, available libraries, and integration strategy. However, regardless of the communication mechanisms, the user will always use the same interface in the language of their model (See \S\ref{SSS:interface}). 
+particular communication mechanism used by {\pkg} is determined by the platform, available libraries, and integration strategy. However, regardless of the communication mechanisms, the user will always use the same interface in the language of their model (See \S\ref{SSS:interface}). 
 
 %---------------------------------------------------------------------------------
 % SYSTEM V IPC
 \subsubsection{System V IPC Queues}\label{SSS:ipc}
 %
-The first communication mechanism used by {\cis} was System V interprocess 
+The first communication mechanism used by {\pkg} was System V interprocess 
 communication (IPC) message queues \citep{Rusling1999} on Posix (Linux and Mac OS X) systems. 
 IPC message queues allow messages to be passed between models running on separate 
 processes on the same machine. While IPC message queues are simple, fast 
@@ -360,23 +417,23 @@ This can be handled by splitting large messages into multiple smaller messages
 message it must be broken into (See \S\ref{SS:results_commtype}). These limits make sending large messages 
 relatively inefficient when compared with other communications mechanisms. 
 As a result, IPC queues are used by 
-{\cis} as a fallback on Posix systems if none of the other supported communication libraries have 
+{\pkg} as a fallback on Posix systems if none of the other supported communication libraries have 
 not been installed.
 
 %---------------------------------------------------------------------------------
 % ZEROMQ
 \subsubsection{ZeroMQ}\label{SSS:zmq}
 %
-The preferred communication mechanism used by {\cis} are ZeroMQ sockets 
+The preferred communication mechanism used by {\pkg} are ZeroMQ sockets 
 \citep[ZMQ][]{Akgul2013}. ZMQ 
 provides broker-less communication via a number of protocols and patterns with 
 bindings in a wide variety of languages that can be installed on Posix and Windows 
-operating systems. ZMQ was adopted by {\cis} in order to allow support 
+operating systems. ZMQ was adopted by {\pkg} in order to allow support 
 on Windows and for future target languages (See \S\ref{SS:future}) that could not be 
 accomplished using IPC queues. In addition, while ZMQ allows 
 interprocess communication via IPC, ZMQ also 
 supports protocols for distributed communication via an Internet Protocol (IP) 
-network. While {\cis} does not currently support using these protocols 
+network. While {\pkg} does not currently support using these protocols 
 for distributed integration networks, this is a future development plan that has been prepared for.
 
 %---------------------------------------------------------------------------------
@@ -387,18 +444,18 @@ While broker-less communication like ZMQ is light weight and fast, it is not as 
 tolerant as brokered messaging systems that confirm message delivery and can resend 
 dropped messages. Resilience to dropped messages, while not as necessary for integrations 
 running entirely on a local machine, will be more important for integrations running on 
-distributed resources with less reliable connections. As a result, {\cis} includes support 
+distributed resources with less reliable connections. As a result, {\pkg} includes support 
 for brokered communication via RabbitMQ \citep[RMQ][]{RMQ} that will be used during future 
 development to allow integrations to run on distributed resources or include remote models 
 run as services (\S\ref{SS:distributed}). Due to the slower message speed, 
-{\cis} does not currently use RMQ for communication unless explicitly specified by the user in their 
+{\pkg} does not currently use RMQ for communication unless explicitly specified by the user in their 
 integration network YAML. 
 
 %---------------------------------------------------------------------------------
 % ASYNCHRONOUS MESSAGE MASSING
 \subsubsection{Asynchronous Message Passing}\label{SSS:async}
 %
-The same asynchronous communication strategy is used with each of the communication mechanisms supported by {\cis}. 
+The same asynchronous communication strategy is used with each of the communication mechanisms supported by {\pkg}. 
 Models do not block on sending messages to 
 output channels; the model is free to continue working on its task while 
 an \emph{output driver} waits for the message to be routed and received on a separate master process thread. Similarly, 
@@ -434,15 +491,15 @@ As a result, models in complex integration networks are not affected by the rate
 % SENDING/RECEIVING LARGE MESSAGES
 \subsubsection{Sending/Receiving Large Messages}\label{SSS:large}
 %
-All of the communication tools leveraged by {\cis} have intrinsic limits 
+All of the communication tools leveraged by {\pkg} have intrinsic limits 
 on the allowed size for a single message. Some of these limits can be quite large 
 ($2^{20}$ bytes for ZMQ and RMQ), while others are very limiting 
 (2048 bytes on Mac OS X for IPC queues). Although messages consisting of a few scalars are unlikely to 
 exceed these limits, biological inputs and outputs are often much more complex. 
 For example, structural data represented as a 3D mesh can easily exceed these 
 limits. To handle messages that are larger than the limit of the communication 
-mechanism being used, {\cis} splits the message up into multiple smaller 
-messages. In addition, for large messages, {\cis} creates new, temporary 
+mechanism being used, {\pkg} splits the message up into multiple smaller 
+messages. In addition, for large messages, {\pkg} creates new, temporary 
 communication channels that are used exclusively for a single message and 
 then destroyed. The address associated with the temporary channel is sent in 
 header information as a message on the main channel along with metadata about 
@@ -456,7 +513,7 @@ working in parallel.
 % INTERFACE
 \subsubsection{Interface}\label{SSS:interface}
 %
-{\cis} provides interface functions/classes for communication that are 
+{\pkg} provides interface functions/classes for communication that are 
 written in each of the supported languages. Language specific interfaces 
 allow users to program in the 
 language(s) with which they are already familiar. The Python interface provides 
@@ -478,7 +535,7 @@ to more complex data types and communication patterns.
 %
 %\subsubsection{Data Formats}\label{SSS:dataformats}
 %
-Messages are passed as raw bytes. In order to understand the messages begin passed, parallel processes that communicate must agree upon the format used to do so. Without community standards, different models will often use very different data formats for their input and output. Differences between data formats can include, but are not limited to, type, precision, fields, or units. While some data formats are self-descriptive and include these types of information as meta data, this is not true of all data formats. To combat this, {\cis} requires models to explicitly specify the format of input and output expected by a model in the model YAML. {\cis} can then handle a number of conversions between models without prompting as well as serialization/deserialization to the correct type in each of the supported languages. Data formats currently supported by {\cis} include:
+Messages are passed as raw bytes. In order to understand the messages begin passed, parallel processes that communicate must agree upon the format used to do so. Without community standards, different models will often use very different data formats for their input and output. Differences between data formats can include, but are not limited to, type, precision, fields, or units. While some data formats are self-descriptive and include these types of information as meta data, this is not true of all data formats. To combat this, {\pkg} requires models to explicitly specify the format of input and output expected by a model in the model YAML. {\pkg} can then handle a number of conversions between models without prompting as well as serialization/deserialization to the correct type in each of the supported languages. Data formats currently supported by {\pkg} include:
 %
 \begin{itemize}
 	\item Scalars (e.g. integers, decimals)
@@ -490,14 +547,195 @@ Messages are passed as raw bytes. In order to understand the messages begin pass
 
 %\subsubsection{Units}\label{SSS:units}
 %
-In addition, {\cis} offers the option to specify units for scalars, arrays, tabular data, and pandas data frames. Units are tracked using the {\tt unyt} package \citep{Goldbaum2018}, which allows physical units to be associated with scalars and arrays. If two models use different units (and both are specified), {\cis} will automatically perform the necessary conversions before passing data from one model to the next.
+In addition, {\pkg} offers the option to specify units for scalars, arrays, tabular data, and pandas data frames. Units are tracked using the {\tt unyt} package \citep{Goldbaum2018}, which allows physical units to be associated with scalars and arrays. If two models use different units (and both are specified), {\pkg} will automatically perform the necessary conversions before passing data from one model to the next.
+
+%---------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------
+% WORKED EXAMPLE
+\section{Worked Example}\label{S:example}
+%
+In order to illustrate how {\pkg} is intended to be used by model writers, the following walks through the integration of the two examples models from \S\ref{S:intro}. All of the source code and YAML files discussed in this section are available in the {\pkg} GitHub repository and will be included with future releases on PyPI and conda-forge. This example assumes that the user starts with the following existing model source code:
+%
+\rootsrc
+%
+\shootsrc
+%
+The root source code in Listing \ref{lst:src:root} is a standalone C header library containing a single function {\tt calc\_root\_mass} that calculates and returns the root mass at the next time step (a double precision floating point number) from input of the relative root growth rate ({\tt r\_r}, double), the time step ({\tt dt}, double), and the root mass as the current time step ({\tt R\_t}, double).
+%
+The shoot source code in Listing \ref{lst:src:shoot} is a standalone Python module containing a single function {\tt calc\_shoot\_mass} that calculates and returns the shoot mass at the next time step from input of the relative shoot growth rate ({\tt r\_s}), the time step ({\tt dt}, double), the shoot mass at the current time step ({\tt S\_t}), the root mass at the current time step ({\tt R\_t}), and the root mass at the next time step ({\tt R\_tp1}).
+
+Both of the example models used here start out in the form of the function. If possible, model writers should try to pose or wrap their model as a function prior to starting the integration process. This format makes the integration process easier and allows for the model to be used in a larger number of integration patterns.
+
+%---------------------------------------------------------------------------------
+% MODEL YAML
+\subsection{Model YAMLs}\label{SS:model_yaml}
+%
+The first step in the integration process is to create model YAML files describing the models including the location of the source code and the input/output variables. This step only has to be completed once per model and the model YAML can then be reused to include the model in any integration. The model YAMLs for the example root and shoot models are shown in Listings \ref{lst:yml:root} and \ref{lst:yml:shoot} respectively.
+%
+\rootyml
+%
+\shootyml
+%
+Each model yaml must include, at minimum, a name that is unique within the set of models being integrated, the language that the model is written in, and the location of the model source code (this can be a list/sequence if the model is split between multiple files). If the path to the source files is not absolute, as in the case of Listings \ref{lst:yml:root} and \ref{lst:yml:shoot}, the path is interpreted as being relative to the directory containing the model YAML. In this case, the source code for each model is a wrapper (described in \S\ref{SS:wrapper}) that calls the model code such that no modification needs to be done to the original model code in order to integrate it.
+
+In additional to the basic required fields, each model should have an entry for each of its input/output variables in the appropriate {\tt "inputs"} or {\tt "outputs"} section. At a minimum, input/output entries should include a name that will be used to identify a communication channel connected to the model. It is also highly recommended that the units of each variable also be specified (if applicable) so that {\pkg} can handle any necessary conversions.
+
+There are other optional model and input/output keywords for more advanced cases (e.g. compilation flags or data types), but they are beyond the scope of this limited introduction. Additional examples and descriptions of these options can be found in the documentation \footnote{{\tt https://cropsinsilico.github.io/cis\_interface/yaml.html}}.
+
+It should also be noted that it is possible to pass multiple variables as a single input/output. However, unless the variables will \emph{always} be coupled in the model, it is advised that every variable be specified separately for clarity and to allow flexibility in the way other models can integrate with it. In addition, if brevity is a concern because a model has a large number of input variables, there are features currently under active development (see \S\ref{SS:datagg}) that will allow fields to be aggregated within connection YAMLs and simplify the send and receive calls in such cases.
+
+%---------------------------------------------------------------------------------
+% WRAPPER
+\subsection{Wrapper}\label{SS:wrapper}
+%
+Once the model YAMLs are complete, the next step is to write a wrapper for each model that will make the necessary calls to the {\pkg} API to set up channels and send/receive messages. Writing the wrapper is the most involved step in any integration as it requires the most thought about how one model should interact with others, but this wrapper is written in the same language as the model and so should be a comfortable process for the model author since it is a language they are already familiar with. There is work in progress to add features which will allow {\pkg} to perform this step automatically based on YAML options for simple cases such as single loops or if statements (see \S\ref{SS:control}), but these will not cover all potential cases and it is instructive to walk through the process and understand how the wrapper acts as an intermediary between {\pkg} and the actual model function.
+
+\subsubsection{Integration Pattern}
+%
+To write the wrapper, a integration pattern must first be selected. For the root/shoot model integration, the obvious pattern is to loop over time steps, outputting the evolution of the root and shoot masses over time. Although this is the pattern adopted for this example, you could imagine another pattern in which the loop is performed over the growth rates in a parameter sweep that would require a slightly different wrapper.
+
+Once an integration pattern is selected, the wrappers can be flushed out in pseudocode independently by assuming that all input is received from a file and all output is sent to a file (i.e. the models are independent). The pseudocode for the root and shoot model wrappers is shown in Algorithms \ref{alg:root} and \ref{alg:shoot} respectively.
+%
+\begin{algorithm}[H]
+    \caption{Root wrapper}
+    \label{alg:root}
+    \begin{algorithmic}[1] 
+    \State \textbf{Receive} $r_r, R_t$
+    \State \textbf{Send} $R_{t}$ \Comment{So that there is a complete record.}
+    \While{true}
+        \If {$dt$ available}
+        		\State \textbf{Receive} $dt$
+	\Else
+		\State \textbf{Break}
+	\EndIf
+    	\State $R_{t+1} \gets {\tt calc\_root\_mass}(r_r, dt, R_t)$
+	\State $R_t \gets R_{t+1}$
+	\State \textbf{Send} $R_{t}$
+    \EndWhile
+    \end{algorithmic}
+\end{algorithm}
+%
+\begin{algorithm}[H]
+    \caption{Shoot wrapper}
+    \label{alg:shoot}
+    \begin{algorithmic}[1] 
+    \State \textbf{Receive} $r_s, S_t, R_t$
+    \State \textbf{Send} $S_{t}$ \Comment{So that there is a complete record.}
+    \While{true}
+        \If {$dt$ available}
+        		\State \textbf{Receive} $dt$
+	\Else
+		\State \textbf{Break}
+	\EndIf
+	\State \textbf{Receive} $R_{t+1}$
+	\State $S_{t+1} \gets {\tt calc\_shoot\_mass}(r_s, dt, S_t, R_t, R_{t+1})$
+	\State $S_t \gets S_{t+1}$
+	\State $R_t \gets R_{t+1}$
+	\State \textbf{Send} $S_{t}$
+    \EndWhile
+    \end{algorithmic}
+\end{algorithm}
+%
+Both models follow a similar pattern. They first receive static variables that will not change over the course of the run and then send the initial mass to output so that the output record is a complete history of the mass. Then both entire a while loop that is only broken when there is not a new time step available. When a new time step is available, it is received along with the next root mass in the case of the shoot model. Next, both model wrappers make the call to the actual model function. Finally, the models advance the time step by setting the masses to those calculated for the next time step and output the calculated mass.
+
+\subsubsection{Wrapper Code}
+%
+With some translation into the appropriate language and the addition of calls to the appropriate {\pkg} model interface to establish input and output channels, the code for the root and shoot model wrappers can then be written as Listings \ref{lst:wrap:root} and \ref{lst:wrap:shoot} respectively. In the syntax of the target language, the wrapper should be executable. For Python/Matlab this might be a script, while for C/C++ this should be compilable as an executable with a {\tt main} function.
+%
+\rootwrap
+%
+\shootwrap
+%
+Prior to any calls, both model wrappers must first locate the necessary {\pkg} and model code that they will call on via directives. In the C root model wrapper, this takes the form of {\tt \#include} statements on lines 3-6. In the Python shoot model wrapper, this takes the form of {\tt import} statements. {\pkg} takes care of the paths at compile/runtime so that the appropriate API library can be located while it is expected that the model source code is in the same directory as the wrapper and automatically discovered.
+
+The first step in each model wrapper is to connect to the appropriate channels via the {\pkg} interface. This step occurs on lines 14-17 in the root model wrapper (Listing \ref{lst:wrap:root}) and lines 8-13 in the shoot model wrapper (Listing \ref{lst:wrap:shoot}). Regardless of the language, each has a similar call signature. Inputs require a single input that is a string specifying the name of the model input from the model YAML that the returned object should access. Outputs are similar in that their first argument is a string specifying the name of the model output from the mode YAML that the returned object should access. In addition, outputs can also be provided with a format string that tells {\pkg} interface what data type to expect how the output should be formatted if it is sent to a file. Additional information about how these strings are processed can be found in the ``C-Style Format Strings" section of the documentation\footnote{{\tt https://cropsinsilico.github.io/cis\_interface/c\_format\_strings.html}}.
+
+The next step in each model wrapper is to receive the static input variables (those that are not being looped over). This step occurs on lines 19-33 in the root model wrapper (Listing \ref{lst:wrap:root}) and lines 15-34 in the shoot model wrapper (Listing \ref{lst:wrap:shoot}). Next, each model wrapper sends the initial mass to the output so that the output will contain the entire mass history. This occurs on lines 58-63 in the root model wrapper and lines 36-39 in the shoot model wrapper. The majority of these lines are devoted to error handling and print statements. The syntax for sending/receiving messages differs slightly from language to language, but each will return a flag indicating if the send/receive was successful or not. If an input channel is still open, a receive call will block until the channel is closed or a message is received. If the input channel is closed (either because of an error or because it was closed by the source), the flag will indicate this and the received message should not be used. If an output channel is open, a send call will return immediately while a worker thread handles asynchronous completion of the send request. If an output channel is closed, a send call will return immediately with a flag indicating failure. Additional information about the interface calls for sending and receiving can be found in the ``Model Interface" section of the documentation\footnote{{\tt \todo{link}}}.
+
+Once the static variables have been received and the initial masses have been sent to output, both model wrappers enter their while loop. The flag returned by the receive call for the new time step is then used to decide if the loop should be broken (lines 46-52 in the root model wrapper and lines 45-51 in the shoot model wrapper). In the case of the shoot model wrapper, a failure to also receive the root mass for the next time step results in an error as it is required that there be a new root mass for each new time step (lines 53-59). Finally, both model wrappers make calls to the appropriate model functions, send the result to the output, and advance the masses to the next time step.
+
+While it is valid to include these calls in the model code itself, this is not advised for several reasons. First, reproducibility is important. If there is a model that has been used to produce past scientific results, it is important that the model is preserved (in the form it was in during production of the results) so that other scientists can reproduce that result if need be. The use of a wrapper allows the original model code to be preserved while still adding the necessary API calls for integration via {\pkg}. Second, although the original model code could be duplicated and then altered to preserve the original code, this duplication results in redundancy and complicates the process of incorporating changes that may occur in the original model code due to bug fixes or added features. Third, it is possible that a model may be used in several different integration patterns. If the model code is altered directly, it will be difficult to add new integration patterns and there will again be redundant copies of the model.
+
+%---------------------------------------------------------------------------------
+% CONNECTION YAMLS
+\subsection{Connection YAMLS}
+%
+Once the wrappers are complete, it is time to write the connection YAML. Connection YAMLs contain information about how inputs and outputs should be connected between models and files. 
+
+\subsubsection{Isolated Models}
+%
+Before connecting the models to each other, it is useful to first write a connection YAML that connects all of a model's inputs and outputs to files so that it can be run (and tested) in isolation. In addition, much of the connection YAML for an isolated model can be reused in connection YAMLs for the model in an integration. The connection YAMLs for running the root and shoot models in isolation with file input/output are show in Listings \ref{lst:yml:root_files} and \ref{lst:yml:shoot_files} respectively.
+%
+\rootymlfiles
+%
+\shootymlfiles
+%
+Each model's connection YAML contains one item under {\tt connections} for each input/output listed in the model's model YAML. Here they have been grouped by input and output, but they can be in any order. Every model input/output must have a connection for an integration to be valid. If there were a model input/output without a connection, whether to a file or a model, an error would be raised at run time. 
+
+Every connection has, at a minimum, an input and and output. Connection inputs can be model outputs, files, or a set of multiple model outputs or files. Connection outputs can be model inputs, files, or a set of multiple model inputs or files. An error will be raised if a connection just connects two files. In the connection YAMLs shown in Listings \ref{lst:yml:root_files} and \ref{lst:yml:shoot_files}, all of the connections include a file as the input or output. Therefore, these connection YAMLs are closed systems. For connections including files, there is also the option of specifying a {\tt filetype} that will determine how {\pkg} reads the file. All of the files used in this example have {\tt filetype} of {\tt table}, indicating that the files are ASCII tables with some number of columns and rows, assumed to be tab-delimited by default. By default, {\pkg} will read a table row by row, splitting each row up into its constituent column elements. The output connections in Listings \ref{lst:yml:root_files} and \ref{lst:yml:shoot_files} also include a {\tt field\_names} entry. This instructs {\pkg} to add the designated field names as a header line in the output table that is produced.
+
+There are many file formats that {\pkg} supports which have additional YAML options.
+Information about these file formats and their YAML options can be found in the ``Connection Options" subsection of the ``YAML Files" section of the documentation\footnote{{\tt https://cropsinsilico.github.io/cis\_interface/yaml.html\#connection-options}}.
+
+\subsubsection{Integrated Models}
+%
+The connection YAML for integrating the two models is shown in Listing \ref{lst:yml:int} and should look very similar to the connection YAMLs for running the models in isolation from Listings \ref{lst:yml:root_files} and \ref{lst:yml:shoot_files}. 
+%
+\intyml
+%
+The connections on lines 3-11 in Listing \ref{lst:yml:int} are identical to lines 3-11 in Listing \ref{lst:yml:root_files}. Similarly, lines 18-29 and 32-35 in Listing \ref{lst:yml:int} are identical to lines 3-14 and 20-23 respectively in Listing \ref{lst:yml:shoot_files}. This duplication results because there is only one connection between the two models. All of the remaining model inputs and outputs are still connected to files. As a result, the only new connection in Listing \ref{lst:yml:int} is on lines 14-15. This connection between the two models occupies the {\tt next\_root\_mass} output from the root model and the {\tt next\_root\_mass} input to the shoot model, thereby eliminating the need for the output connection on lines 14-17 of Listing \ref{lst:yml:root_files} and the input connection on lines 15-17 of Listing \ref{lst:yml:shoot_files}. Although the model output and input being connected in this example have the same name ({\tt next\_root\_mass}), this is not a requirement.
+
+A careful observer would note that there is a discrepancy between the units of these two models. For one, both models are receiving their time steps from the same file, but, as designated in their model YAMLs, the root model expects its time steps to have units of hours and the shoot model expects its time steps to have units of days. In addition, the root model outputs masses in units of grams, while the shoot model expects the root masses to have units of kilograms. However, there is no need to do any conversions within the models themselves. Because the units are specified in the model YAMLs and the headers of the input tables, {\pkg} is able to perform the appropriate conversions during the asynchronous transfer of data from one model to the next using the {\tt unyt} package \citep{Goldbaum2018}. 
+
+In addition to units transformations, {\pkg} is also capable of handling basic transformations between compatible data types (e.g. int to float or obj to ply) and inferring data types from sent/received messages in dynamically typed programming languages (i.e. Python \& Matlab). For more advanced transformations, users can instruct {\pkg} to use any arbitrary Python function to transform data by passing the module import path as a connection field.
+
+%---------------------------------------------------------------------------------
+% RUNNING THE INTEGRATION
+\subsection{Running the Integration}
+%
+Integrations are run by calling the command line utility {\pkgrun}. {\pkgrun} takes as input one or more paths to YAML files describing the integration. These files can be passed in any order.
+
+\subsubsection{Isolated Models}
+%
+To run the models in isolation, the user would pass {\pkgrun} the model YAML and the connection YAML specifying connections to files. For the root model this would be 
+%
+\begin{quote}
+{\tt {\pkgrun} root.yml root\_files.yml} 
+\end{quote}
+%
+and for the shoot model this would be 
+%
+\begin{quote}
+{\tt {\pkgrun} shoot.yml shoot\_files.yml}. 
+\end{quote}
+
+\subsubsection{Integrated Models}
+%
+To run the integrated models, the suer would pass {\pkgrun} both model YAMLs and the connection YAML specifying the complete integration. For the example, this would be 
+\begin{quote}
+{\tt {\pkgrun} root.yml shoot.yml root\_to\_shoot.yml}
+\end{quote}
+and the output to {\tt stdout} would include interleaved messages from both models as well as log messages from {\pkg}.
+
+%---------------------------------------------------------------------------------
+% ADVANCED TOPICS
+\subsection{Advanced Integration Topics}
+%
+The example integration used here was simplified in several respects which we would like to address for those who would use the package for more complex integrations.
+\begin{description}
+\item[Model Complexity] Both of the example models has a limited and homogenous set of scalar inputs. More realistic models are unlikely to have data limited to such cases. {\pkg} also has support for sending more complex data types like those discussed in \S\ref{SS:transformation}. In addition, work is underway to add generic support for any data type that can be expressed as a JSON object (see \S\ref{SS:json}). Examples using these different data types can be found in the ``Formatted I/O" section of the documentation\footnote{{\tt https://cropsinsilico.github.io/cis\_interface/formatted\_io.html}}.
+\item[Time Step Synchronization] The example models used here both took the same time step as input. This is an unlikely case in actual models, particularly for those that are capturing processes at different physical scales (e.g. cellular vs. field). Without strict constraints on the problem formulation and model relationships, it is not possible for {\pkg} to determine how two time steps should be reconciled. Therefore, the current version of {\pkg} requires the user to handle this part of the integration. There are plans for new features which allow automated creation and integration of models that can be described symbolically as Ordinary Differential Equations (ODEs, see \S\ref{SS:ODE}). For two coupled ODE models, {\pkg} may be able to determine the correct time step for synchronization, but, as an incorrect time step could drastically impact the results of an integration, it will still be recommend that users play an active roll in determining or evaluating the correct time step for a given integration.
+\item[Intermediate Output] In the integrated example presented, the output from the root model is passed to the shoot model without being output to a file. However, in real integrations, it is likely that users would want to know the value of this output as well. In order to output to both a model and a file, users must be able to direction connections to multiple channels (i.e. a model input and a file for output). While the current version of {\pkg} has limited support for ``forking" connections, full support for this feature is under way as part of the data aggregation feature (see \S\ref{SS:dataagg}) and will be a part of the version 1.0 release.
+\end{description}
+
+
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
 % RESULTS
 \section{Results \& Discussion}\label{S:results}
 %
-In order to evaluate {\cis}, performance tests were run on machines with Linux, Mac OS X, and Windows operating systems for different communication mechanisms, Python versions, and language combinations. During each run, $N_{msg}$ messages of size $S_{msg}$ were sent from a source model (in one language) to a destination model (in another language) which then sends the messages to an output file for verification. These are test models that do not perform any operations outside of passing the messages in order to accurately gauge the performance of the {\cis} machinery on its own. Performance tests were run using the perf package \citep{Stinner2018}. Each run was repeated 10 times with warm-up runs in between to mitigate fluctuations due to external loads on the test machines.
+In order to evaluate {\pkg}, performance tests were run on machines with Linux, Mac OS X, and Windows operating systems for different communication mechanisms, Python versions, and language combinations. During each run, $N_{msg}$ messages of size $S_{msg}$ were sent from a source model (in one language) to a destination model (in another language) which then sends the messages to an output file for verification. These are test models that do not perform any operations outside of passing the messages in order to accurately gauge the performance of the {\pkg} machinery on its own. Performance tests were run using the perf package \citep{Stinner2018}. Each run was repeated 10 times with warm-up runs in between to mitigate fluctuations due to external loads on the test machines.
 
 % COMMTYPE
 \subsection{Communication Mechanism}\label{SS:results_commtype}
@@ -619,9 +857,9 @@ Except for Matlab models, the time required per message is not affected by the l
 
 Language also plays a role for messages larger than the maximum ($2^{20}$ bytes), when messages must be broken into smaller pieces. In particular, integrations that include a C or C++ receiving model scale more strongly than for those that have a Python receiving model because, in addition to the input/output connection drivers, the Python interface itself is asynchronous while the C/C++ interface is not. This means that while Python receiving models have concurrent operations to receive, backlog, and confirm messages, C/C++ models will block on each receive until the input connection driver completes the confirmation handshake. In addition, because C/C++ models are not continuously receiving and backlogging messages, the channel will become saturated. Once it reaches its maximum, the input connection driver can no longer pass along messages and must wait for the model to receive the next message. One remedy that is being explored for future releases, is to make the C/C++ interface asynchronous as well. However, this is a low priority as only models with very rapid and high volume input (such as the test models) are affected.
 
-The largest difference between the different test cases is in in the overhead. Every model language entails some overhead. For interpreted languages (e.g. Python and Matlab), the majority of the overhead comes from starting the interpreter. For Matlab, this is particularly time consuming ($>10$ s). Although this is only a one-time cost required at the start of an integration, {\cis} does offer ways to alleviate this if multiple runs are necessary by starting a Matlab engine prior to the first integration that can be used by subsequent runs. When Matlab is started in advance (the dashed-dotted orange line in Figure \ref{fig:language_matlab}), the overhead for Matlab models drops to 1.25\,s, less than Python (2.86\,s) but slightly more than C (1.11\,s).
+The largest difference between the different test cases is in in the overhead. Every model language entails some overhead. For interpreted languages (e.g. Python and Matlab), the majority of the overhead comes from starting the interpreter. For Matlab, this is particularly time consuming ($>10$ s). Although this is only a one-time cost required at the start of an integration, {\pkg} does offer ways to alleviate this if multiple runs are necessary by starting a Matlab engine prior to the first integration that can be used by subsequent runs. When Matlab is started in advance (the dashed-dotted orange line in Figure \ref{fig:language_matlab}), the overhead for Matlab models drops to 1.25\,s, less than Python (2.86\,s) but slightly more than C (1.11\,s).
 
-For compiled languages (C and C++), the overhead comes from compiling the source code which is done in serial. The time required for compilation will depend on the compiler used and the complexity of the model code. For command line compiled models, {\cis} forces the model to be recompiled every time to ensure any changes to the source code are propagated. However, for models that use Make and CMake, overhead due to compile time can be reduced by using existing builds.
+For compiled languages (C and C++), the overhead comes from compiling the source code which is done in serial. The time required for compilation will depend on the compiler used and the complexity of the model code. For command line compiled models, {\pkg} forces the model to be recompiled every time to ensure any changes to the source code are propagated. However, for models that use Make and CMake, overhead due to compile time can be reduced by using existing builds.
 
 Interestingly, the recorded overheads were not symmetric or additive. For example, the Python-to-C integrations required more overhead than the C-to-Python integrations. This is because the models are started in parallel, but do not require the same amount of time to start and being execution. C models, while requiring compilation, start much faster than Python models. In a Python-to-C integration, the C model must wait for the Python model to finish its much slower startup and begin sending message, while in a C-to-Python integration, the C model can immediately begin sending messages that will be received by the Python model once it finishes starting up. In addition, the Python-to-Python integrations required less time than any of the other integrations that included Python because, although Python models take longer to start up, the start up is done in parallel while the compilation for the C and C++ models is done in serial. This source of overhead could be ameliorated by compiling models in parallel or in advanced, but is usually not significant enough to effect overall performance.
 
@@ -687,7 +925,13 @@ Windows			& 0.029				& 3.73			\\\hline
 \label{tab:platform}
 \end{table}%
 %
-Both the time per message and overhead changed between operating systems with the Linux machine performing the most consistently and fastest and Windows offering the slowest speeds. Because the Linux test machine was very different from the test machine for both Mac OS X and Windows, it cannot be determined that operating system alone contributed to the observed differences. The same can be said of comparing the Mac OS X and Windows tests given that operating systems are often optimized for their intended hardware. However, the tests do show that {\cis} performed consistently on each of the supported operating systems.
+Both the time per message and overhead changed between operating systems with the Linux machine performing the most consistently and fastest and Windows offering the slowest speeds. Because the Linux test machine was very different from the test machine for both Mac OS X and Windows, it cannot be determined that operating system alone contributed to the observed differences. The same can be said of comparing the Mac OS X and Windows tests given that operating systems are often optimized for their intended hardware. However, the tests do show that {\pkg} performed consistently on each of the supported operating systems.
+
+%---------------------------------------------------------------------------------
+% SPEEDUP
+\subsection{Speedup}\label{SS:speedup}
+%
+\todo{Write this!}
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
@@ -698,37 +942,47 @@ Both the time per message and overhead changed between operating systems with th
 % CURRENT STATUS
 \subsection{Current Status}\label{SS:current}
 %
-{\cis} is an open-source Python package for connecting computational models across programming languages and scales to form integration networks. Models are run in parallel with asynchronous message passing handled under-the-hood via threading and one of three communication mechanisms. {\cis} works on Linux, Mac OS X, and Windows operating systems with Python 2.7, 3.4, 3.5, 3.6 and 3.7. {\cis} currently supports running models written in Python, C, C++, and Matlab with additional support for compiling models C/C++ using Make \citep{Stallman2004} or CMake \citep{Martin2006} and running models written in the LPy \citep{Boudon2012} DSL.
+{\pkg} is an open-source Python package for connecting computational models across programming languages and scales to form integration networks. Models are run in parallel with asynchronous message passing handled under-the-hood via threading and one of three communication mechanisms. {\pkg} works on Linux, Mac OS X, and Windows operating systems with Python 2.7, 3.4, 3.5, 3.6 and 3.7. {\pkg} currently supports running models written in Python, C, C++, and Matlab with additional support for compiling models C/C++ using Make \citep{Stallman2004} or CMake \citep{Martin2006} and running models written in the LPy \citep{Boudon2012} DSL.
 
-{\cis} has already been used to integrate several plant models within the Crops in Silico organization with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. 
+%is unique as a framework in several respects:
+%\begin{itemize}
+%	\item Asynchronous communication via 3 different communication mechanisms. 
+%	\item Create and coordination of asynchrnous communication networks that 
+%\end{itemize}
+
+Integration via {\pkg} requires minimal modification of the existing model source code yet greatly increases the model's potential by allowing it to be reused in combination with other models. {\pkg} has already been used to integrate several plant models within the Crops in Silico organization \citep{Marshall-Colon2017} with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. 
 %
 \ifinclfig
  	\begin{figure}[htbp]
 	\begin{center}
 	\includegraphics[width=\columnwidth,keepaspectratio]{./images/CiS-Languages.png}
-	\caption{Progress towards full Crops in Silico integration network. Each square represents a model and the color of the square indicates the language in which the model is written. Arrows between models represent connections being made between the models using {\cis}. Solid lines are connections that have already been made, dashed lines are in-progress connections, and dotted lines are planned connections.}
+	\caption{Progress towards full Crops in Silico integration network. Each square represents a model and the color of the square indicates the language in which the model is written. Arrows between models represent connections being made between the models using {\pkg}. Solid lines are connections that have already been made, dashed lines are in-progress connections, and dotted lines are planned connections.}
 	\label{fig:network}
 	\end{center}
 	\end{figure}
 \fi
 %
-Each square is a model, color indicates the programming language that the model is written in, and lines between the models represent connections where information is exchanged. Solid lines are connections that have already been implemented, dashed lines are connections currently being implemented, and dotted lines are connections planned for the future. When complete, the integration network will include 9 models of molecular, genetic, cellular, organ, and plant level processes in 4 different programming languages, produced by $>10$ researchers at 4 different institutions. Although not yet complete, partial integrations from this network are already yielding new insights. For example, by integrating a metabolic flux model  with gene expression data from soybean (\emph{Glycine max}) plants grown under ambient (380\,$\mu$mol/mol) and elevated (550\,$\mu$mol/mol) carbon dioxide (CO2), 
+Each square is a model, color indicates the programming language that the model is written in, and lines between the models represent connections where information is exchanged. Solid lines are connections that have already been implemented, dashed lines are connections currently being implemented, and dotted lines are connections planned for the future. When complete, the integration network will include 9 models of molecular, genetic, cellular, organ, and plant level processes in 4 different programming languages, produced by $>10$ researchers at 4 different institutions. 
+
+Although not yet complete, partial integrations from this network are already yielding new insights. For example, by integrating a metabolic flux model  with gene expression data from soybean (\emph{Glycine max}) plants grown under ambient (380\,$\mu$mol/mol) and elevated (550\,$\mu$mol/mol) carbon dioxide (CO$_2$), 
 %
 \ifieee
-	\citep{integration_prep}. 
+	\citep{integration_prep} 
 \else
-	\citet{integration_prep}. 
+	\citet{integration_prep} 
 \fi
 %
 simulated the increased carbon assimilation rate observed in field studies \citep{Bernacchi2005}. The integrated modeling also identified gene candidates predicted to regulate enzymes involved in the light and dark reactions of photosynthesis under elevated CO$_2$.
+
+In addition to allowing scientists to reuse existing models in new integrations, {\pkg} has the potential to significantly increase a model's accessibility. {\pkg} could be used a method of running models without knowledge of the model's implementation. At publication, model code could be released along with a wrapper and YAML specification file for use with {\pkg}. These additional materials would be particularly powerful when considered alongside the interactive features being developed for use with {\pkg} (see \S\ref{SS:gui} and \S\ref{SS:function}).
 
 %---------------------------------------------------------------------------------
 % FUTURE WORK
 \subsection{Current/Future Improvements}\label{SS:future}
 %
-{\cis} is being actively developed to expand the number of models 
+{\pkg} is being actively developed to expand the number of models 
 that can be used in integration networks and the complexity of integration 
-networks that can be executed. Several improvements are already in progress/planned for {\cis}.
+networks that can be executed. Several improvements are already in progress/planned for {\pkg}.
 
 % LANGUAGE SUPPORT
 \subsubsection{Language Support}\label{SS:langsupport}
@@ -739,7 +993,7 @@ covers many of the most popular languages among plant biologists,
 additional languages must be added to unlock the full set of potential integrations. 
 Surveys of the plant modeling community have helped identify the core languages 
 that models have been written in. Based on these results, we plan to expand 
-{\cis} to support models written in R, Fortran, Java, and the SBML \citep{Hucka2003} DSL.
+{\pkg} to support models written in R, Fortran, Java, and the SBML \citep{Hucka2003} DSL.
 
 We also plan to add support for running Matlab models using Octave \citep{Eaton2002}. Matlab 
 models require a Matlab license to run. Given that plant modelers do not all 
@@ -754,9 +1008,9 @@ license.
 %
 High performance computing (HPC) and cloud compute resources are powerful 
 tools in the current computing ecosystem that could be used for running 
-complex integration networks. To this end, we plan to expand {\cis} 
+complex integration networks. To this end, we plan to expand {\pkg} 
 support for running integration networks on distributed compute resources. 
-{\cis} already uses communication tools that can be adapted for use 
+{\pkg} already uses communication tools that can be adapted for use 
 in a distributed pattern. We will leverage tools like the libsubmit package from the 
 Parsl project \citep{babuji18} for 
 automating the submission process to HPC and compute resources. In addition, 
@@ -769,42 +1023,55 @@ permit access to these models within integration networks.
 Currently, modelers must explicitly specify how a model should process input 
 within the model code including things like which input variables are static 
 and received once versus which variables change and should be looped over. 
-We plan on adding options to {\cis} for dynamically generating model code 
+We plan on adding options to {\pkg} for dynamically generating model code 
 based a user provided function call and list of static/variable input channels. 
 This will allow better reusability of model code such as during parameter studies.
+Control flow will be part of the {\pkg} 1.0 release.
+
+% ODE
+\subsubsection{Symbolic ODE Models}\label{SS:ODE}
+%
+Many biological models can be posed as a series of coupled ordinary differential equations \citep[ODEs, ][]{WANG2015}. The equations describing such models can be easily formulated into symbolic representations \citep[e.g. SymPy][]{Meurer2017} with well defined inputs and outputs that can be solved by existing tools designed specifically for that task \citep[e.g. scipy.integrate.ode][]{Jones2001, Hairer1993}. Using these tools, we will add features to {\pkg} that allow ODE models to be constructed directly from symbolic representation provided in YAML specification files.
 
 % DATA AGGREGATIOIN
 \subsubsection{Data Aggregation}\label{SS:dataagg}
 %
-Much of the original version of {\cis} centered around the use of 
+Much of the original version of {\pkg} centered around the use of 
 tabular input data. While tabular data is used heavily by plant models, it 
 presents several barriers for constructing integration networks. Tabular input 
 data only works when one model outputs the same columns that are expected as 
 input by another model. However, this is unlikely to be the case if two models 
-are developed independently. Future improvements to {\cis} will allow 
+are developed independently. Future improvements to {\pkg} will allow 
 tabular input to models to be composed by aggregating output data from more than 
-one model and/or file.
+one model and/or file. Data aggregation will be part of the {\pkg} 1.0 release.
 
 % JSON DATA TYPE SPECIFICATION
 \subsubsection{JSON Data Type Specification}\label{SS:json}
 %
-While {\cis} supports serialization of several data types/formats, we 
+While {\pkg} supports serialization of several data types/formats, we 
 would like to make serialization as flexible as possible. To this end, 
-{\cis} will be adapted to read JSON schema \citep{jsonschema} for user defined types that 
+{\pkg} will be adapted to read JSON schema \citep{jsonschema} for user defined types that 
 can be used to automatically create the appropriate data structures alongside
-methods for parsing and serializing them.
+methods for parsing and serializing them. JSON serialization will be part of the {\pkg} 1.0 release.
 
 % GUI
 \subsubsection{Graphical User Interface}\label{SS:gui}
 %
-In an effort to make {\cis} as user friendly as possible, we have also begun work on a graphical user interface (GUI) for entering model information, composing integration networks from an existing palette of models, and displaying basic output from an integration run. The current prototype of the GUI can only handle model ingestion and network composition; model execution must be done locally. However, our ultimate goal with the GUI is to provide a service where users can register their model, compose and run integration networks on dedicated cloud compute resources, and view output in real time all from the web browser. 
+In an effort to make {\pkg} as user friendly as possible, we have also begun work on a graphical user interface (GUI) for entering model information, composing integration networks from an existing palette of models, and displaying basic output from an integration run. The current prototype of the GUI can only handle model ingestion and network composition; model execution must be done locally. However, our ultimate goal with the GUI is to provide a service where users can register their model, compose and run integration networks on dedicated cloud compute resources, and view output in real time all from the web browser. This GUI for model integration and execution will also greatly increase the accessibility of models as standalone scientific products. Once complete, users will be able to use the GUI to graphically run models and adjust parameters without any knowledge of the underlying algorithms, programming language, and/or data formats. Such a workflow could be a powerful tool for both the peer review process and collaboration.
 %\todo{Provide \href{https://hackathon.cis.ndslabs.org/}{link?}}
+
+
+% NOTEBOOK
+\subsubsection{Models as Functions}\label{SS:function}
+%
+In addition to a dedicated GUI, tools are also being developed for using {\pkg} to call integrated models as Python functions, allowing users to interactively explore and visualize a model. This feature is particularly powerful when combined with Jupyter notebooks \citep{Kluyver2016}, which allow code to be presented alongside text and/or images describing what the code does. Model developers could publish a Jupyter notebook exposing their model as a function via {\pkg} that can be used by those unfamiliar with modeling or the model's particular programming language to explore the model's behavior. This workflow would be particularly well suited to examining models during the peer review process and allowing on-the-fly parameter adjustment/estimation by experimentalists. Widgets can make these notebooks even more user friendly, allowing code to be replaced with graphical interfaces (sliders, toggles, etc.) for modifying model parameters and allowing even those unfamiliar with Python to explore the model. In addition, tools like Binder, BinderHub, and mybinder.org \citep{Jupyter2018} make it possible for those interested in a model to launch such notebooks stored in public repositories from their browser in custom environments deployed on cloud resources without the need to install {\pkg} or any of the model code on their machine. They can then interact with the model using either widgets or the full set of Python libraries.
+Model execution as Python functions will be part of the {\pkg} 1.0 release.
 
 %---------------------------------------------------------------------------------
 % CODE
 \section*{Code}\label{S:code}
-The {\cis} package is available publicly on \href{https://github.com/cropsinsilico/cis_interface}{Github} and can be 
-installed using {\tt pip} or {\tt conda}. To ensure code health, {\cis} boasts 100\% code coverage with automated testing on Linux, Mac OS X, and Windows for Python version 2.7, 3.4, 3.5, 3.6, and 3.7 via continuous integration with TravisCI \citep{travisci} and Appveyor \citep{appveyor}. Full documentation for {\cis} can be found \href{https://cropsinsilico.github.io/cis_interface/}{here} including step-by-step directions from the tutorial conducted during the \href{https://cropsinsilico.github.io/cis_interface/hackathon2018/index.html}{2018 Crops in Silico Hackathon}.
+The {\pkg} package is available publicly on \href{https://github.com/cropsinsilico/cis_interface}{Github} and can be 
+installed using {\tt pip} or {\tt conda}. To ensure code health, {\pkg} boasts 100\% code coverage with automated testing on Linux, Mac OS X, and Windows for Python version 2.7, 3.4, 3.5, 3.6, and 3.7 via continuous integration with TravisCI \citep{travisci} and Appveyor \citep{appveyor}. Full documentation for {\pkg} can be found \href{https://cropsinsilico.github.io/cis_interface/}{here} including step-by-step directions from the tutorial conducted during the \href{https://cropsinsilico.github.io/cis_interface/hackathon2018/index.html}{2018 Crops in Silico Hackathon}.
 
 %---------------------------------------------------------------------------------
 % TODO
@@ -833,7 +1100,7 @@ installed using {\tt pip} or {\tt conda}. To ensure code health, {\cis} boasts 1
 %
 This work was supported by funding from the Foundation for Food and Agriculture Research (FFAR) through Grant 515760 and Cost Share C2252 with the Institute for Sustainability, Energy, and Environment (iSEE) and the National Center for Supercomputing Applications (NCSA) at the University of Illinois at Urbana-Champaign (UIUC), as well as the Gordon and Betty Moore Foundation's Data-Driven Discovery Initiative through Grant GBMF4561 to Matthew Turk. 
 %
-The authors would like to thank Mike Lambert and Craig Willis for their ongoing work on a graphical user interface for visually composing and running integration networks for {\cis} as well as David Raila for his work on the original integration code that {\cis} was based on.
+The authors would like to thank Mike Lambert and Craig Willis for their ongoing work on a graphical user interface for visually composing and running integration networks for {\pkg} as well as David Raila for his work on the original integration code that {\pkg} was based on.
 
 %---------------------------------------------------------------------------------
 % REFERENCES
@@ -845,22 +1112,63 @@ The authors would like to thank Mike Lambert and Craig Willis for their ongoing 
 
 %---------------------------------------------------------------------------------
 % FIGURES
-\ifplacefig
-\else
-% put figures here if figures go after
-\fi
+%\ifplacefig
+%\else
+%% put figures here if figures go after
+%\fi
+
+%%---------------------------------------------------------------------------------
+%%---------------------------------------------------------------------------------
+%% APPENDICES
+%\appendix
+%
+%%---------------------------------------------------------------------------------
+%% SOURCE CODE
+%\section{Example Source Code}\label{A:src}
+%
+%\subsection{Root Model}\label{A:src:root}
+%\rootsrc
+%
+%\subsection{Shoot Model}\label{A:src:shoot}
+%\shootsrc
+%
+%%---------------------------------------------------------------------------------
+%% YAML FILES
+%\section{Example YAML Specification Files}\label{A:yml}
+%
+%\subsection{Root Model}\label{A:yml:root}
+%\rootyml
+%
+%\subsection{Shoot Model}\label{A:yml:shoot}
+%\shootyml
+%
+%\subsection{Integrated Models}\label{A:yml:integration}
+%\intyml
+%
+%%---------------------------------------------------------------------------------
+%% WRAPPER CODE
+%\section{Wrapper Source Code}\label{A:wrap}
+%
+%\subsection{Root Model}\label{A:wrap:root}
+%\rootwrap
+%
+%\subsection{Shoot Model}\label{A:wrap:shoot}
+%\shootwrap
 
 %---------------------------------------------------------------------------------
 % COMMENTS
-%\newpage
-%\todo{To do:
-%\begin{itemize}
-%\item Improve conclusion
-%\item Non-uniform test data set?
-%\item Performance of runs on cosmology dataset?
-%\item Move figures to the end for submission
-%\item iPython notebook for running tests
-%\end{itemize}
-% }
+\newpage
+\todo{To do:
+\begin{itemize}
+\item Replace links with those referencing new package name
+\item Forking example
+\item Transformation example
+\item Add JSON to documentation
+\item Add forking to documentation
+\item Add transformation to documentation
+\item Add schema to documentation
+\item Regenerate documentation
+\end{itemize}
+}
 
 \end{document}

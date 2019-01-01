@@ -1,0 +1,17 @@
+connections:
+  # Input connections
+  - input: ./Input/root_growth_rate.txt
+    output: root_growth_rate
+    filetype: table
+  - input: ./Input/init_root_mass.txt
+    output: init_root_mass
+    filetype: table
+  - input: ./Input/timesteps.txt
+    output: root_time_step
+    filetype: table
+
+  # Output connections
+  - input: next_root_mass
+    output: ./Output/root_output.txt
+    filetype: table
+    field_names: root_mass

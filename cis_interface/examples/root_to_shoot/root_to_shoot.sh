@@ -12,6 +12,6 @@ case $1 in
 	;;
     * )
 	echo "Running Integration"
-	cisrun root.yml shoot.yml paper.yml
+	cisrun root.yml shoot.yml root_to_shoot.yml
 	;;
 esac

@@ -1,0 +1,4 @@
+# shoot_growth_rate
+# %lf
+# kg/day
+0.15
