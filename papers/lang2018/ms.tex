@@ -62,6 +62,27 @@
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 %\usepackage[noend]{algpseudocode}
+\usepackage{caption}
+\algblockdefx[Try]{Try}{EndTry}%
+	{\textbf{try}}%
+	{\textbf{end try}}
+\algcblockdefx[TryExcept]{Try}{Except}{EndTry}%
+	{\textbf{except}}%
+	{\textbf{end try}}
+\algblockdefx[class]{Class}{EndClass}%
+	[2]{\textbf{class} {\sc #1}(#2)}%
+	{\textbf{end class}}
+\algblockdefx[classmethod]{ClassMethod}{EndClassMethod}%
+	[2]{\textbf{method} {\sc #1}(#2)}%
+	{\textbf{end method}}
+	
+%\DeclareCaptionFormat{algor}{%
+%  \hrulefill\par\offinterlineskip\vskip1pt%
+%    \textbf{#1#2}#3\offinterlineskip\hrulefill}
+%\DeclareCaptionStyle{algori}{singlelinecheck=off,format=algor,labelsep=space}
+%\captionsetup[algorithm]{style=algori}
+	
+	
 \ifdraft
 	\ifieee
 		\usepackage[numbers]{natbib}
@@ -384,7 +405,148 @@ lines are added to the recipe in order to allow linking against {\pkg}.
 
 Once the models are running, {\pkg} uses threads on the master process to monitor the progress of the model and report back model output (e.g. log messages printed to stdout or stderr) and any status changes. If a model issues any errors, the master process will shut down any model processes that are still running and close any connections, discarding any unprocessed messages. If a model completes without any errors, the master process will cleanup any connections that are no longer required after waiting for all messages to be processed. The master process will only complete once an error is encountered or all model processes have completed.
 
-\todo{algorithm}
+The algorithms for a generic model driver and the master thread can be found in Algorithms \ref{alg:model} \& \ref{alg:master} respectively.
+% MODEL DRIVER
+\begin{algorithm}[H]
+    \caption{Generic model driver class. This algorithm does not represent the actual implementation of any one of the languages supported by {\pkg}. Each of the language-specific drivers will have slightly different methods for compilation (turning the source code into an executable), launching the model process, and monitoring the model's status via output and error codes. However, this algorithm does provided the general behavior pattern upon which every model driver is based.}
+    \label{alg:model}
+    \begin{algorithmic}[1]
+    \Class{ModelDriver}{$name, args, yml$}
+    	\State $errors \gets []$
+    	\State $executable \gets$ \Call{Compile}{args}
+	\State $process \gets$ \Call{ModelProcess}{} on a new process
+	\State $thread \gets$ \Call{ModelThread}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{ModelProcess}{}
+		\State \Call{Executable}{}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{ModelThread}{}
+		\While{\Call{IsAlive}{{\sc ModelProcess}}}
+			\If{\Call{HasOutput}{{\sc ModelProcess}}}
+				\State \textbf{Print} \Call{GetOutput}{{\sc ModelProcess}}
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+		\EndWhile
+		\If{\Call{HasErrors}{{\sc ModelProcess}}}
+			\State $errors \gets$ \Call{GetErrors}{{\sc ModelProcess}}
+		\EndIf
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Terminate}{}
+		\State \Call{Kill}{{\sc ModelProcess}}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Stop}{}
+		\While{not $errors$}
+			\State \textbf{Sleep}
+		\EndWhile
+		\State \Call{Terminate}{}
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+
+%
+% MASTER THREAD
+%\begin{center}
+\begin{algorithm}[H]
+	\caption{Basic steps executed on the master thread to create, start, and monitor model \& connection drivers. This pseudocode is not an exhaustive reproduction of the entire implementation, but represents the broad strokes needed to understand the purpose and behavior of the master thread. The algorithm for the {\sc ModelDriver} and {\sc ConnectionDriver} can be found in Algorithms \ref{alg:model} \& \ref{alg:conn} respectively.}
+	\label{alg:master}
+	\begin{algorithmic}[1]
+	\State $models$ $\gets$ \textbf{Parse} YAML files
+	\State $inputChannels \gets Map()$
+	\State $outputChannels \gets Map()$
+	% CREATE DRIVERS
+	\item[] \Comment Create Drivers
+	\ForAll{$m in models$}
+		\ForAll{$i in m.inputs$}
+			\If{not $i.isFile$}
+				\State $inputAddress \gets i.address$
+			\Else
+				\State $inputAddress \gets `generate'$
+			\EndIf
+			\State $i.driver \gets$ \Call{ConnectionDriver}{$inputAddress, `generate', i$}
+			\State $inputChannels[i.name] = i$
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+	\algstore{alg:master}
+	\end{algorithmic}
+\end{algorithm}
+% PAGE BREAK
+\begin{algorithm}[H]
+	\caption{Continuation of Algorithm \ref{alg:master}}
+	\begin{algorithmic}[1]
+	\algrestore{alg:master}
+		\ForAll{$o \in m.outputs$}
+			\If{$o.isFile$}
+				\State $outputAddress \gets o.address$
+			\Else
+				\If{$o.args \in inpurChannels$}
+					\State $outputAddress \gets inputChannels[o.args]$
+				\Else
+					\State \Call{Error}{}
+				\EndIf
+			\EndIf
+			\State $o.driver \gets$ \Call{ConnectionDriver}{$`generate', outputAddress, o$}
+			\State $outputChannels[o.name] = o$
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+		\State $m.driver \gets$ \Call{ModelDriver}{$m.name, m.args, m$}
+	\EndFor
+	% START DRIVERS
+	\item[] \Comment Start Drivers	
+	\ForAll{$m in models$}
+		\ForAll{$i in m.inputs$}
+			\State $i.driver.$\Call{Start}{}
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+		\ForAll{$o \in m.outputs$}
+			\State $o.driver.$\Call{Start}{}
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+		\State $m.driver.$\Call{Start}{}
+	\EndFor
+	% MONITOR DRIVERS
+	\item[] \Comment Monitor Drivers
+	\State $errorFlag \gets false$
+	\While{not $errorFlag$}
+		\ForAll{$m in models$}
+			\If{$m.driver.errors$}
+				\State $errorFlag \gets true$
+				\State \textbf{break}
+			\EndIf
+		\EndFor
+	\EndWhile
+	% STOP DRIVER
+	\item[] \Comment Stop Drivers
+	\If{$errorFlag$}
+		\State $allErrors \gets []$
+		\ForAll{$m in models$}
+			\State $m.$\Call{Terminate}{}
+			\State \textbf{Append} $allErrors$, $m.errors$
+		\EndFor
+		\State \Call{Error}{$allErrors$}
+	\Else
+		\ForAll{$m in models$}
+			\State $m.$\Call{Stop}{}
+		\EndFor
+	\EndIf
+	\end{algorithmic}
+\end{algorithm}
+%\end{center}
+%
+\todo{make sure this is split correctly across pages}
 
 %---------------------------------------------------------------------------------
 % COMMUNICATION
@@ -465,7 +627,7 @@ an \emph{output driver} waits for the message to be routed and received on a sep
 an \emph{input driver} continuously pings input channels on another thread, moving received messages into a 
 buffer queue so that they are ready and waiting for the receiving model 
 when it asks for input. These drivers work together to move message along from one model to the next like a conveyor belt. 
-As a result, models in complex integration networks are not affected by the rate at which dependent model consume their output and the speedup offered by running the models in parallel is improved. Figure \ref{fig:async} describes the general flow of messages.
+As a result, models in complex integration networks are not affected by the rate at which dependent model consume their output and the speedup offered by running the models in parallel is improved. Figure \ref{fig:async} describes the general flow of messages, Algorithms \ref{alg:async_send} \& \ref{alg:async_recv} describe the asynchronous output \& input channel procedures, and Algorithm \ref{alg:conn} describes the procedure followed by input \& output connection drivers.
 %
 \ifinclfig
  	\begin{figure}[htbp]
@@ -484,7 +646,147 @@ As a result, models in complex integration networks are not affected by the rate
 	\item The receiving model receives the message in the form of an analogous native data object. Interface receive calls can be either blocking or non-blocking, but are blocking by default.
 \end{enumerate}
 
-\todo{algorithm}
+% SENDER
+\begin{algorithm}[H]
+    \caption{Asynchronous communication class for sending messages to an output channel. The procedures {\sc Open, Close, Send, \& IsOpen} are procedures that are implemented by external communication packages and different slightly from one communication mechanism to the next.}
+    \label{alg:async_send}
+    \begin{algorithmic}[1]
+    % SENDER
+    \Class{AsyncSender}{$address$}
+    	\State $backlog \gets []$
+	\State $x \gets$ \Call{Open}{$address$}
+	\State \textbf{Run} \Call{BacklogThread}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{BacklogThread}{}
+		\While{\Call{IsOpen}{$x$}}
+    			\If{$length(backlog) > 0$}
+				\State $flag \gets$ \Call{Send}{$x$, $backlog[0]$}
+				\If{$flag$}
+					\State \textbf{Remove} $backlog[0]$
+				\Else
+					\State \Call{Close}{$x$}
+				\EndIf
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+    		\EndWhile
+    	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{SendBacklog}{$msg$}
+		\If{\Call{IsOpen}{$x$}}
+			\State \textbf{Append} $backlog$, $msg$
+		\EndIf
+		\State \textbf{Return} \Call{IsOpen}{$x$}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Close}{}
+		\State \Call{Close}{$x$}
+		\State $backlog \gets []$
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+
+% RECEIVER
+\begin{algorithm}[H]
+    \caption{Asynchronous communication class for receiving messages from an input channel. The procedures {\sc Open, Close, Recv, IsOpen, \& IsMessageWaiting} are procedures that are implemented by external communication packages and different slightly from one communication mechanism to the next.}
+    \label{alg:async_recv}
+    \begin{algorithmic}[1]
+    \item[]
+    \Class{AsyncReceiver}{$address$}
+    	\State $backlog \gets []$
+	\State $x \gets$ \Call{Open}{$address$}
+	\State $thread \gets$ \Call{BacklogThread}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{BacklogThread}{}
+		\While{\Call{IsOpen}{$x$}}
+    			\If{\Call{IsMessageWaiting}{$x$}}
+				\State $flag, msg \gets$ \Call{Recv}{$x$}
+				\If{$flag$}
+					\State \textbf{Append} $backlog$, $msg$
+				\Else
+					\State \Call{Close}{$x$}
+				\EndIf
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+		\EndWhile
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{RecvBacklog}{$msg$}
+		\If{$length(backlog) > 0$}
+			\State $msg \gets backlog[0]$
+			\State \textbf{Remove} $backlog[0]$
+			\State \textbf{Return} true, $msg$
+		\Else
+			\State \textbf{Return} \Call{IsOpen}{$x$}, ''
+		\EndIf
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Close}{}
+		\State \Call{Close}{$x$}
+		\State $backlog \gets []$
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+%
+
+%
+\begin{algorithm}[H]
+    \caption{Connection Driver}
+    \label{alg:conn}
+    \begin{algorithmic}[1]
+    \Class{ConnectionDriver}{$inputAddress, outputAddress, yml$}
+    	\State $input \gets$ \Call{AsyncReceiver}{$inputAddress$}
+    	\State $output \gets$ \Call{AsyncSender}{$outputAddress$}
+	\State $thread \gets$ \Call{ConnectionThread}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{ConnectionThread}{}
+		\While{true}
+			\State $flag, msg \gets$ $input.$\Call{RecvBacklog}{}
+			\If{not $flag$} \State \textbf{break} \EndIf
+			\If{$msg$}
+				\State \textbf{Transform} $msg$ based on units and expected data format
+				\State $flag \gets$ $output.$\Call{SendBacklog}{$msg$}
+				\If{not $flag$} \State \textbf{break} \EndIf
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+		\EndWhile
+		%
+		\State $input.$\Call{CloseAsync}{}
+		\State $output.$\Call{CloseAsync}{}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Terminate}{}
+		\State $input.$\Call{CloseAsync}{}
+		\State $output.$\Call{CloseAsync}{}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Stop}{}
+		\While{\Call{IsOpen}{$input.x$} and \Call{IsOpen}{$output.x$}}
+			\State \textbf{Sleep}
+		\EndWhile
+		\State \Call{Terminate}{}
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+
+\todo{discuss algorithm}
 
 %In addition to communication between two models, users can also specify that a 
 %model should receive/send input/output from/to a file. This is specified in 
@@ -513,6 +815,13 @@ Temporary channels are used for large messages to prevent mistakenly combining
 the pieces from two different large messages that were received at the same time 
 such as in the case that a model is receiving input from two different models 
 working in parallel.
+
+%\begin{algorithm}[H]
+%    \caption{Large Messages}
+%    \label{alg:large}
+%    \begin{algorithmic}[1] 
+%    \end{algorithmic}
+%\end{algorithm}
 
 \todo{algorithm}
 
@@ -556,7 +865,6 @@ Messages are passed as raw bytes. In order to understand the messages begin pass
 %
 In addition, {\pkg} offers the option to specify units for scalars, arrays, tabular data, and pandas data frames. Units are tracked using the {\tt unyt} package \citep{Goldbaum2018}, which allows physical units to be associated with scalars and arrays. If two models use different units (and both are specified), {\pkg} will automatically perform the necessary conversions before passing data from one model to the next.
 
-\todo{algorithm?}
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
