@@ -305,8 +305,8 @@ There are also domain specific frameworks for connecting biological models. For 
 	\item {\bf Flexible.} Provide the same interface to the user, regardless of the communication mechanism being used or the platform the model is being executed on.
 \end{itemize}
 
-{\pkg} currently support models written in Python, Matlab, C, and C++ with 
-additional Domain Specific Language (DSL) support for LPy models \citep{Boudon2012}. Support for additional languages is planned for future development (See \S\ref{SS:langsupport}).
+To accomplish these objectives, {\pkg} is built upon several well-established open-source software packages along with tools developed explicitly for {\pkg}. {\pkg} currently support models written in Python, Matlab, C, and C++ with 
+additional Domain Specific Language (DSL) support for LPy models \citep{Boudon2012}. Support for additional languages is planned for future development (See \S\ref{SS:langsupport}). \todo{Statement on novelty}
 
 %---------------------------------------------------------------------------------
 % ORCHESTRATION
@@ -360,7 +360,7 @@ flexibility to create complex integration networks and test models in isolation 
 % MODEL EXECUTION
 \subsubsection{Model Execution}\label{SS:model_execution}
 %
-{\pkg} launches each model in an integration on its own process, allowing models to complete independent operations in parallel and complete tasks more quickly. For example, the root and shoot growth models from \S\ref{S:intro} require 2.42\,s and 4.06\,s respectively to run for 100 time steps in isolation. If these two models were manually integrated in serial via the command line, the integration would require a total of 6.48\,s. However, the same integration requires only 4.52\,s using {\pkg}, a speed-up of 1.43. The exact speedup provided by parallel integration using {\pkg} depends on how independent the models are and how equally distributed the work is between the models. If the models are fully independent, the speedup is limited by the time required to execute the slowest model. In the example, this would be the shoot growth model which required almost twice the time to execute as the root model. If the models are dependent on one-another, the models will have to wait for messages to be passed and the speedup will not be as great.
+{\pkg} launches each model in an integration on its own process, allowing models to complete independent operations in parallel and complete tasks more quickly. For example, the root and shoot growth models from \S\ref{S:intro} require 2.42\,s and 4.06\,s respectively to run for 100 time steps in isolation. If these two models were manually integrated in serial via the command line, the integration would require a total of 6.48\,s. However, the same integration requires only 4.52\,s using {\pkg}, a speed-up of 1.43. The exact speedup provided by parallel integration using {\pkg} depends on how independent the models are and how equally distributed the work is between the models. If the models are fully independent, the speedup is limited by the time required to execute the slowest model. In the example, this would be the shoot growth model which required almost twice the time to execute as the root model. If the models are dependent on one-another, the models will have to wait for messages to be passed and the speedup will not be as great (see \S\ref{S:speedup} for additional discussion of parallelism and the speedups achievable using {\pkg}). \todo{Fix these numbers for most recent version of the code}.
 
 While every model is executed on a new process, how the model is handled depends 
 on the language it is written in. Models written in 
@@ -375,7 +375,7 @@ reused.
 For the compiled languages (C and C++) there are a few options. The user can 
 compile the model themselves, provided they link against the appropriate 
 {\pkg} header library. Alternatively, users can provide the location of 
-the model source code and let {\pkg} handle the compilation, including 
+the model source code and let one of several {\pkg} drivers handle the compilation, including 
 linking against the appropriate {\pkg} interface library. {\pkg} 
 also has support for compiling models using Make \citep{Stallman2004} and 
 CMake \citep{Martin2006} for 
@@ -384,6 +384,7 @@ lines are added to the recipe in order to allow linking against {\pkg}.
 
 Once the models are running, {\pkg} uses threads on the master process to monitor the progress of the model and report back model output (e.g. log messages printed to stdout or stderr) and any status changes. If a model issues any errors, the master process will shut down any model processes that are still running and close any connections, discarding any unprocessed messages. If a model completes without any errors, the master process will cleanup any connections that are no longer required after waiting for all messages to be processed. The master process will only complete once an error is encountered or all model processes have completed.
 
+\todo{algorithm}
 
 %---------------------------------------------------------------------------------
 % COMMUNICATION
@@ -395,7 +396,9 @@ languages, platforms, and data types available. To accomplish this, {\pkg} lever
 three different tools for communication, 
 System V IPC Queues (\S\ref{SSS:ipc}), ZeroMQ (\S\ref{SSS:zmq}), and RabbitMQ (\S\ref{SSS:rmq}), 
 which each have their own strengths and weaknesses. The 
-particular communication mechanism used by {\pkg} is determined by the platform, available libraries, and integration strategy. However, regardless of the communication mechanisms, the user will always use the same interface in the language of their model (See \S\ref{SSS:interface}). 
+particular communication mechanism used by {\pkg} is determined by the platform, available libraries, and integration strategy. However, regardless of the communication mechanisms, the user will always use the same interface in the language of their model (See \S\ref{SSS:interface}).
+
+{\pkg} includes its own implementation of asynchronous communication via each of the communication mechanisms that are supported. While there are existing tools for asynchronous communication using each of these tools, using a tool developed specifically for {\pkg} allows for a more uniform treatment of the different communication mechanisms, greater control over how threads are managed (e.g. killing a thread when messages cannot be interpreted), and a more seamless coordination with other {\pkg} processes (e.g. enforcing dependencies on other model and connection threads).
 
 %---------------------------------------------------------------------------------
 % SYSTEM V IPC
@@ -481,6 +484,8 @@ As a result, models in complex integration networks are not affected by the rate
 	\item The receiving model receives the message in the form of an analogous native data object. Interface receive calls can be either blocking or non-blocking, but are blocking by default.
 \end{enumerate}
 
+\todo{algorithm}
+
 %In addition to communication between two models, users can also specify that a 
 %model should receive/send input/output from/to a file. This is specified in 
 %the integration network YAML and does not impact the way the model will 
@@ -508,6 +513,8 @@ Temporary channels are used for large messages to prevent mistakenly combining
 the pieces from two different large messages that were received at the same time 
 such as in the case that a model is receiving input from two different models 
 working in parallel.
+
+\todo{algorithm}
 
 %---------------------------------------------------------------------------------
 % INTERFACE
@@ -548,6 +555,8 @@ Messages are passed as raw bytes. In order to understand the messages begin pass
 %\subsubsection{Units}\label{SSS:units}
 %
 In addition, {\pkg} offers the option to specify units for scalars, arrays, tabular data, and pandas data frames. Units are tracked using the {\tt unyt} package \citep{Goldbaum2018}, which allows physical units to be associated with scalars and arrays. If two models use different units (and both are specified), {\pkg} will automatically perform the necessary conversions before passing data from one model to the next.
+
+\todo{algorithm?}
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
@@ -723,11 +732,11 @@ and the output to {\tt stdout} would include interleaved messages from both mode
 %
 The example integration used here was simplified in several respects which we would like to address for those who would use the package for more complex integrations.
 \begin{description}
-\item[Model Complexity] Both of the example models has a limited and homogenous set of scalar inputs. More realistic models are unlikely to have data limited to such cases. {\pkg} also has support for sending more complex data types like those discussed in \S\ref{SS:transformation}. In addition, work is underway to add generic support for any data type that can be expressed as a JSON object (see \S\ref{SS:json}). Examples using these different data types can be found in the ``Formatted I/O" section of the documentation\footnote{{\tt https://cropsinsilico.github.io/cis\_interface/formatted\_io.html}}.
+\item[Model Input/Output Complexity] Both of the example models has a limited and homogenous set of scalar inputs. More realistic models are unlikely to have data limited to such cases. {\pkg} also has support for sending more complex data types like those discussed in \S\ref{SS:transformation}. In addition, work is underway to add generic support for any data type that can be expressed as a JSON object (see \S\ref{SS:json}). Examples using these different data types can be found in the ``Formatted I/O" section of the documentation\footnote{{\tt https://cropsinsilico.github.io/cis\_interface/formatted\_io.html}}.
+\item[Model Networks] It is possible to build up complex integration networks using {\pkg} one connection at a time. While not show here, integrations with more than two models are constructed in much the same way, one connection at a time. Tools are currently under development for composing integration networks visually from a palette of models (see \S\ref{SS:gui}) that will assist in this step. With or without such tools, it is recommended that users start with integrating models in isolation with input/output from/to files, then being testing each individual connection in isolation, and then slowly add the connections together to form a complete network.
 \item[Time Step Synchronization] The example models used here both took the same time step as input. This is an unlikely case in actual models, particularly for those that are capturing processes at different physical scales (e.g. cellular vs. field). Without strict constraints on the problem formulation and model relationships, it is not possible for {\pkg} to determine how two time steps should be reconciled. Therefore, the current version of {\pkg} requires the user to handle this part of the integration. There are plans for new features which allow automated creation and integration of models that can be described symbolically as Ordinary Differential Equations (ODEs, see \S\ref{SS:ODE}). For two coupled ODE models, {\pkg} may be able to determine the correct time step for synchronization, but, as an incorrect time step could drastically impact the results of an integration, it will still be recommend that users play an active roll in determining or evaluating the correct time step for a given integration.
 \item[Intermediate Output] In the integrated example presented, the output from the root model is passed to the shoot model without being output to a file. However, in real integrations, it is likely that users would want to know the value of this output as well. In order to output to both a model and a file, users must be able to direction connections to multiple channels (i.e. a model input and a file for output). While the current version of {\pkg} has limited support for ``forking" connections, full support for this feature is under way as part of the data aggregation feature (see \S\ref{SS:dataagg}) and will be a part of the version 1.0 release.
 \end{description}
-
 
 
 %---------------------------------------------------------------------------------
@@ -929,9 +938,184 @@ Both the time per message and overhead changed between operating systems with th
 
 %---------------------------------------------------------------------------------
 % SPEEDUP
-\subsection{Speedup}\label{SS:speedup}
+\subsection{Speedup from Parallelism}\label{SS:speedup}
 %
-\todo{Write this!}
+While efforts have been made to limit the overhead introduced by {\pkg} in the startup and communication steps of the integration, {\pkg} cannot outperform a direct integration of two models if they are tightly coupled and must run sequentially. For example, consider an alternate version of the shoot model from \S\ref{S:example} where the shoot model itself calculates the current root mass, sends the root mass to the root model, and then waits for the response. While the root model is performing the calculation, the shoot model will be idle, waiting for the response and, while the shoot model is calculating the root mass or handling the response, the root model will be idle, waiting for the next input. As a result, such a system will essentially execute in serial, incurring the overhead from using {\pkg} to run the models and coordinate communication without the advantage of parallel execution. Because native language variable passing will always be faster, a direct integration of the two models by translating one into the language of the other will always be faster than the {\pkg} integration in such cases. However, if the two models are not as tightly coupled and have calculations that can occur simultaneously, {\pkg} can offer a significant speedup via parallelism.
+
+Speedup, in the case of parallelism, is defined as the ratio of the serial execution time to the parallel execution time.
+%
+\begin{equation}
+S = \frac{T_{serial}}{T_{parallel}}
+\end{equation}
+%
+For the example presented above, the speedup offered by {\pkg} through parallelism can be parameterized in terms of the durations of calculations for each model (designated model A \& B for brevity) performed in the different phases of the process (See Figure \ref{fig:empty_parallel}). 
+%
+\ifinclfig
+ 	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[width=\columnwidth,keepaspectratio]{./images/Parallelism-Empty.png}
+	\caption{Diagram of phases in parallel execution of models A (top) and B(bottom). Each model performs some setup actions in the initial phase, enters a loop that contains two communication (first from model A to model B, then from model B to model A), and then performs some teardown actions in the final phase.}
+	\label{fig:empty_parallel}
+	\end{center}
+	\end{figure}
+\fi
+%
+During the initial phase ($t_{init,A}$ \& $t_{init,B}$), both models perform setup tasks before immediately entering the loop. On entering the loop at Phase 1 ($t_{1,A}$ \& $t_{1,B}$), both models perform calculations in preparation for the first communication where Model A sends a message to Model B. In Phase 2 ($t_{2,A}$ \& $t_{2,B}$), Model B processes the message it received and Model A performs actions in preparation for receiving a response during the second communication. In Phase 3 ($t_{3,A}$ \& $t_{3,B}$), Model A analyzes the response and Model B performs any additional calculations needed before the end of the current loop. Following completion of Phase 3 tasks, the models will immediately either enter another loop or enter the final phase ($t_{final,A}$ \& $t_{final,B}$) to complete any necessary cleanup and teardown actions. 
+%
+If the models in the toy example were run in serial (without {\pkg}), the total execution time would be 
+%
+\begin{equation}
+T_{serial} = t_{init,A} + t_{init,B} + N_{loop}\left[\sum_{i=1}^{3}\left(t_{i,A} + t_{i,B}\right)\right] + t_{final, A} + t_{final, B},
+\end{equation}
+%
+where $N_{loop}$ is the number of loops executed and $t_{x,A}$ and $t_{x,B}$ are the execution times of each phase of the process for models A and B respectively.
+%
+In order to calculate the parallel execution time, we must consider the effect of asynchronous communication. For every asynchronous call, the receiving model is limited by the sending model, but the sending model is not limited by the receiving model. For a single asynchronous communication between two parallel processes, the execution time will be
+%
+\begin{eqnarray}
+%t_{wait} & = & \max(0, t_{before,sender} - t_{before,receiver}) \\
+T_{async} & = & \max\left\{\left[t_{before,send} + t_{after,send}\right], \left[\max(t_{before,send}, t_{before,recv}) + t_{after,recv}\right]\right\},
+\end{eqnarray}
+%
+where $t_{before,send}$ and $t_{after,send}$ are the time the sending model spends in the phases before and after sending the message respectively and $t_{before,recv}$ and $t_{after,recv}$ are the same times, but for the receiving model. The parallel execution time for the example which includes a loop around two asynchronous communications is then a recursive relationship where the execution time for one loop depends upon the relative execution times of the two models for the previous loop. This relationship can be written as a recursive formula
+%
+\begin{equation}
+T_{parallel} = T_{overhead} + \max(T_{A,N_{loop}}, T_{B,N_{loop}}),
+\end{equation}
+\begin{equation}
+\begin{cases}
+T_{A, 0} = t_{init,A} + t_{final,A} \\
+T_{A, n} = \max\left[(T_{A, n-1} + t_{comm} + t_{1,A} + t_{2,A} - t_{final,A}), (T_{B, n} - t_{3,B} - t_{final,B})\right] + t_{3,A} + t_{final,A}\\
+T_{B, 0} = t_{init,B} + t_{final,B}\\
+T_{B, n} = \max\left[(T_{B, n-1} + t_{comm} + t_{1,B} - t_{final,B}), (T_{A, n-1} + t_{1,A} - t_{final,A})\right] + t_{2,B} + t_{3,B} + t_{final,B}\\
+%3x + 5y + z \\ 7x ? 2y + 4z \\ -6x + 3y + 2z 
+\end{cases}
+\end{equation}
+%
+where $T_{overhead}$ is the overhead incurred by using {\pkg} to run the models and setup the communication network, $t_{comm}$ is the time required to complete the exchanges via each {\pkg} asynchronous communication, $n$ is the number of loops, and $T_{A,n}$ and $T_{B,n}$ are the times required by each model to complete their individual task in parallel for the given number of loops. While $T_{overhead}$ and $t_{comm}$ can be determined from the previous results sections for a given set of languages, the other variables are entirely dependent on the speed of the code occupying each phase. This relationship can also be written more intuitively as an algorithm (See Algorithm \ref{alg:tpara}) 
+%
+% tA = tinitA
+% tB = tinitB
+% iloop = 0
+%
+% WHILE (iloop < nloop)
+%	tA += t1A
+%	tB += t1B
+%	# FIRST LOCK
+% 	IF tB <= tA: B waits for A at Lock 1 and they are synchronized
+%		tB = tA
+%	tA += t2A
+%	tB += t2B
+%	# SECOND LOCK
+%	IF tA <= tB: A waits for B at Lock2 and they are synchronized
+%		tA = tB
+%	tA += t3A
+%	tB += t3B
+%	iloop++
+% tA += tfinalA
+% tB += tfinalB
+% Tpara = max(tA, tB)
+%
+\begin{algorithm}[H]
+    \caption{Parallel Execution Time}
+    \label{alg:tpara}
+    \begin{algorithmic}[1] 
+    \State $T_{A} \gets t_{init,A}$
+    \State $T_{B} \gets t_{init,B}$
+    \State $iloop \gets 0$
+    \While{$iloop <= N_{loop}$}
+    	\State $T_{A} += t_{1,A}$
+	\State $T_{B} += t_{1,B}$
+	\State $T_{B} = \max(T_{A}, T_{B} + t_{comm})$ \Comment{Model B blocking on receive.}
+	\State $T_{A} += t_{2,A}$
+	\State $T_{B} += t_{2,B}$
+	\State $T_{A} = \max(T_{A} + t_{comm}, T_{B})$ \Comment{Model A blocking on receive.}
+	\State $T_{A} += t_{3,A}$
+	\State $T_{B} += t_{3,B}$
+	\State $iloop += 1$
+    \EndWhile
+    \State $T_{A} += t_{final,A}$
+    \State $T_{B} += t_{final,B}$
+    \State $T_{parallel} = \max(T_{A}, T_{B})$
+    \end{algorithmic}
+\end{algorithm}
+%
+If the models are completely dependent on one another such that neither has any calculations to perform while the other is working, the situation would be that shown in Figure \ref{fig:serial}. 
+%
+\ifinclfig
+ 	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[width=\columnwidth,keepaspectratio]{./images/Parallelism-Serial.png}
+	\caption{Diagram of parallelism for a fully coupled set of models. The shaded arrows represent active calculation by models A (top) and B(bottom). Absence of an arrow indicates idle time where the model process is not performing any calculations.}
+	\label{fig:serial}
+	\end{center}
+	\end{figure}
+\fi
+%
+Assuming that $t_{init,B} < (t_{init,A} + t_{1,A})$, this integration would have a parallel execution time and speedup of
+%
+\begin{eqnarray}
+T_{parallel} & = & T_{overhead} + N_{loop}(t_{comm} + t_{1,A} + t_{2,B} + t_{3,A}) + \max\left[(t_{init,A} + t_{final,A}), (t_{init,B} + t_{final,B})\right] \\
+S & = & \frac{t_{init,A} + t_{init,B} + N_{loop}(t_{1,A} + t_{2,B} + t_{3,A}) + t_{final, A} + t_{final, B}}{T_{overhead} + N_{loop}(t_{comm} + t_{1,A} + t_{2,B} + t_{3,A}) + \max\left[(t_{init,A} + t_{final,A}), (t_{init,B} + t_{final,B})\right]}
+\end{eqnarray} 
+%
+If the initial and final phases require an insignificant amount of time in comparison with the time spent in the loop, this will approach a speedup of 1, indicating that there was no change in the execution time. However, due to the required overhead ($T_{overhead}$) and communication times ($t_{comm}$) incurred by a {\pkg} integration, it is more likely that the speedup will be below 1 in such a case unless the calculations have a long enough duration to render these costs inconsequential. For example, if we consider two Python models ($t_{comm} = 0.02$\,s/msg and $T_{overhead} = 2.86$\,s) where $t_{1,A}$, $t_{2,B}$, and $t_{3,A}$ are all 1\,s with initial and final phases that are 0.1\,s for both models, the speedup will be 0.92 for 10 loops and 0.99 for 100 loops.
+
+If the models are perfectly matched in that each spends exactly the same amount of time in each phase ($t_{init,A}=t_{init,B}$, $t_{1,A}=t_{1,B}$, etc.) as in Figure \ref{fig:parallel},
+%
+\ifinclfig
+ 	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[width=\columnwidth,keepaspectratio]{./images/Parallelism-FullyParallel.png}
+	\caption{Diagram of parallelism for a set of perfectly matched models.}
+	\label{fig:parallel}
+	\end{center}
+	\end{figure}
+\fi
+%
+the parallel execution time and speedup of the integration would be
+%
+\begin{eqnarray}
+T_{parallel} & = & T_{overhead} + t_{init,A} + N_{loop}\left(t_{comm} + \sum_{i=1}^{3}t_{i,A}\right) + t_{final, A} \\
+S & = & \frac{2\left[t_{init,A} + N_{loop}\left(\sum_{i=1}^{3}t_{i,A}\right) + t_{final, A}\right]}{T_{overhead} + t_{init,A} + N_{loop}\left(t_{comm} + \sum_{i=1}^{3}t_{i,A}\right) + t_{final, A}}.
+\end{eqnarray} 
+%
+If the runtime is sufficiently long such that contributions from $T_{overhead}$ and $t_{comm}$ become insignificant, the speedup will approach 2, the maximum for two processes. For example, if we consider two Python models ($t_{comm} = 0.02$\,s/msg and $T_{overhead} = 2.86$\,s) where both models have Phases 1-3 of 1\,s in duration and initial and final phases of 0.1\,s in duration, the speedup will be 1.82 for 10 loops and 1.97 for 100 loops.
+
+However, the situations shows in Figures \ref{fig:serial} and \ref{fig:parallel} are rarely the case for actual models. Figure \ref{fig:partial} shows a more realistic case in which the models have some overlapping operations, but are not perfectly aligned. 
+%
+\ifinclfig
+ 	\begin{figure}[htbp]
+	\begin{center}
+	\includegraphics[width=\columnwidth,keepaspectratio]{./images/Parallelism-PartiallyParallel.png}
+	\caption{Diagram of partial parallelism for a set of imperfectly matched models.}
+	\label{fig:partial}
+	\end{center}
+	\end{figure}
+\fi
+%
+Speedups in such cases would be between 1 and 2. For example given the parameters shown in Table \ref{tab:partial} for two Python models ($t_{comm} = 0.02$\,s/msg and $T_{overhead} = 2.86$\,s), the speedup will be 1.38 for 10 loops and 1.49 for 100 loops.
+%
+\begin{table}[h]
+\caption{Speedup calculation example parameters for a set of imperfectly matched models.}
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+Phase 	& Duration in Model A (s) & Duration in Model B (s) \\\hline
+initial		& 0.1 	& 0.2 \\
+1		& 1.0		& 0.3 \\
+2		& 1.2		& 2.0 \\
+3		& 0.1		& 0.05 \\
+final		& 0.1		& 0.1 \\
+\hline
+\end{tabular}
+\end{center}
+\label{tab:partial}
+\end{table}%
+%
+
+For more complex integration involving more than 2 models or more than 2 communications per loop, speedup calculations will be more complex. In general, the maximum possible speedup will be greater for integrations of models that are more independent, but wrappers can be adjusted to deliberately perform tasks during periods where a model would be waiting for a message in order to get greater performance boosts.
+
 
 %---------------------------------------------------------------------------------
 %---------------------------------------------------------------------------------
@@ -974,7 +1158,14 @@ Although not yet complete, partial integrations from this network are already yi
 %
 simulated the increased carbon assimilation rate observed in field studies \citep{Bernacchi2005}. The integrated modeling also identified gene candidates predicted to regulate enzymes involved in the light and dark reactions of photosynthesis under elevated CO$_2$.
 
+%---------------------------------------------------------------------------------
+% USE CASES AND LIMITATION
+%
+\subsection{Use Cases \& Limitations}\label{SS:uses}
+%
 In addition to allowing scientists to reuse existing models in new integrations, {\pkg} has the potential to significantly increase a model's accessibility. {\pkg} could be used a method of running models without knowledge of the model's implementation. At publication, model code could be released along with a wrapper and YAML specification file for use with {\pkg}. These additional materials would be particularly powerful when considered alongside the interactive features being developed for use with {\pkg} (see \S\ref{SS:gui} and \S\ref{SS:function}).
+%
+\todo{Add discussion of limitations}
 
 %---------------------------------------------------------------------------------
 % FUTURE WORK
