@@ -75,6 +75,7 @@
 \algblockdefx[classmethod]{ClassMethod}{EndClassMethod}%
 	[2]{\textbf{method} {\sc #1}(#2)}%
 	{\textbf{end method}}
+\usepackage[toc,page]{appendix}
 	
 %\DeclareCaptionFormat{algor}{%
 %  \hrulefill\par\offinterlineskip\vskip1pt%
@@ -210,7 +211,7 @@
 %---------------------------------------------------------------------------------
 % ABSTRACT (145 words)
 \begin{abstract}
-Thousands of computational models have been created within the plant biology community in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\pkg}, a Python package for running integration networks with connections between models across languages and scales. {\pkg} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OS, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\pkg} is designed to be user-friendly and can be accessed at {\tt https://github.com/cropsinsilico/cis\_interface}.
+Thousands of computational models have been created within the plant biology community and broader scientific communities in the past two decades that have the potential to be combined into complex integration networks capable of capturing more complex biological processes than possible with isolated models. However, the technological barriers introduced by differences in language and data formats has slowed this progress. We present \href{https://github.com/cropsinsilico/cis_interface}{\pkg}, a Python package for running integration networks with connections between models across languages and scales. {\pkg} coordinates parallel execution of models in Python, C, C++, and Matlab on Linux, Mac OS, and Windows operating systems, and handles communication in a number of data formats common to computational plant modeling. {\pkg} is designed to be user-friendly and can be accessed at {\tt https://github.com/cropsinsilico/cis\_interface}. Although originally developed for plant models, {\pkg} can be used to connect computational models from any domain.
 \end{abstract}
 
 \ifieee
@@ -293,7 +294,7 @@ These three questions can be addressed through manual integration (e.g. running 
 
 %---------------------------------------------------------------------------------
 % DOMAIN SPECIFIC LANGUAGE
-\subsection{Domain Specific Language (DSL)}\label{SS:dsl}
+\subsection{Domain Specific Languages (DSLs)}\label{SS:dsl}
 %
 One solution is to agree upon a language. The questions of orchestration, communication, and translation become trivial when models are all written in the same language. Beyond selecting a single programming language, many communities have  developed dedicated domain specific languages (DSLs) for model representation. For example, the Systems Biology Markup Language \citep[SBML][]{Hucka2003} is an XML-based format for representing models of biological processes. Scientists can compose their models using SBML markup and then run their model using software designed to parse SBML files. Other DSLs for biological models include LPy \citep{Boudon2012}, CellML \citep{Cuellar2003}, FLAME \citep{Coakley2012}, and BioPAX \citep{Demir2010}. Dedicated model DSLs improve the reusability of models written in the DSL and have the advantage of often implicitly handling data transformation. However, they provide no help for existing models that are not written in the DSL or those that cannot be expressed within the constraints of the DSL. Furthermore, learning a new DSL, in addition to a programming language, can be daunting.
 
@@ -303,7 +304,7 @@ One solution is to agree upon a language. The questions of orchestration, commun
 %
 Another approach is a workflow/data flow/framework tool for models that are written in the same programming language or can be wrapped using an intermediary \citep[e.g. Cython, ][]{Behnel2011a}. For example, there are many generic tools in Python for coordinating the execution of tasks in parallel or serial \citep[e.g.][]{babuji18, celery, luigi}. While these tools are powerful for organizing complex work flows, it is the user's onus to make sure that the components they connect are compatible and handle any data transformation that might be necessary, e.g. unit conversion or field selection.
 
-There are also domain specific frameworks for connecting biological models. For example, OpenAlea \citep{Pradal2015} allows users to compose networks from different components including plant models, analysis tools, and visualization tools. Domain specific frameworks are more intuitive and ultimately more flexible than DSLs in the types of operations they allow models to perform since they have access to the full power of a programming language. However, they are stricter in several respects: 1) the model must be written in (or exposable to), the language of the framework and 2) the model must be written in a way that is aware of the framework and/or the format of models with which it will interact. Like DSLs, frameworks also provided limited support for models written without the framework in mind. 
+There are also domain specific frameworks for connecting biological models. For example, OpenAlea \citep{Pradal2015} allows users to compose networks from different components including plant models, analysis tools, and visualization tools. Domain specific frameworks are more intuitive and ultimately more flexible than DSLs in the types of operations they allow models to perform since they have access to the full power of a programming language. However, they are stricter in several respects: 1) the model must be written in (or exposable to), the language of the framework and 2) the model must be written in a way that is aware of the framework and/or the format of models with which it will interact. Like DSLs, frameworks also often provided limited support for models written without the framework in mind. 
 
 {\pkg} is an example of a framework that overcomes these issues by exposing simple and easily accessible interfaces in the language of the model (See \S\ref{SSS:interface}) that permit messages to be passed between the model processes as they run in parallel (See \S\ref{SS:communication}). As a result, models writers only need knowledge of the language in which their model is written.
 
@@ -318,7 +319,7 @@ There are also domain specific frameworks for connecting biological models. For 
 % METHODS
 \section{Methods}\label{S:methods}
 
-{\pkg} was designed to address the questions from \S\ref{S:background} while being:
+{\pkg} was designed to transform models into building blocks that can be easily combined with other blocks to build complex structures, thus promoting model reuse and collaboration between scientists with varying degrees of overlapping expertise. {\pkg} does so by addressing the questions from \S\ref{S:background} while being:
 
 \begin{itemize}
 	\item {\bf Easy to use.} Require as little modification to the model source code as possible and only in the language of the model itself.
@@ -326,14 +327,13 @@ There are also domain specific frameworks for connecting biological models. For 
 	\item {\bf Flexible.} Provide the same interface to the user, regardless of the communication mechanism being used or the platform the model is being executed on.
 \end{itemize}
 
-To accomplish these objectives, {\pkg} is built upon several well-established open-source software packages along with tools developed explicitly for {\pkg}. {\pkg} currently support models written in Python, Matlab, C, and C++ with 
-additional Domain Specific Language (DSL) support for LPy models \citep{Boudon2012}. Support for additional languages is planned for future development (See \S\ref{SS:langsupport}). \todo{Statement on novelty}
+{\pkg} is built upon several well-established open-source software packages(see below) along with new tools developed explicitly for {\pkg} including utilities for running and monitoring models written in other languages from Python, dynamically creating and managing communication networks, data type conversions between languages, and asynchronous message passing with variable underlying communication mechanisms. {\pkg} currently support models written in Python, Matlab, C, and C++ with additional Domain Specific Language (DSL) support for LPy models \citep{Boudon2012}. Support for additional languages is planned for future development (See \S\ref{SS:langsupport}).
 
 %---------------------------------------------------------------------------------
 % ORCHESTRATION
 \subsection{Orchestration}\label{SS:orchestration}
 %
-{\pkg} is executed via a command line interface (CLI), {\pkgrun} with specification files (\S\ref{SSS:yaml}) as input. Based on the information contained in the specification files, {\pkg} establishes a network of asynchronous communication channels (\S\ref{SS:communication}), and launches the models on new processes (\S\ref{SS:model_execution}).
+{\pkg} is executed via a command line interface (CLI), {\pkgrun} with specification files (\S\ref{SSS:yaml}) as input. Based on the information contained in the specification files, {\pkg} dynamically establishes a network of asynchronous communication channels (\S\ref{SS:communication}), and launches the models on new processes (\S\ref{SS:model_execution}). Although written in Python, {\pkg} was written such that users need not have any knowledge of the Python language and can interact with {\pkg} solely through the CLI.
 %At execution, {\pkg} launches models on new processes based on information contained in a YAML specification file (See \S\ref{SSS:yaml} below) and establishes 
 
 %---------------------------------------------------------------------------------
@@ -381,10 +381,10 @@ flexibility to create complex integration networks and test models in isolation 
 % MODEL EXECUTION
 \subsubsection{Model Execution}\label{SS:model_execution}
 %
-{\pkg} launches each model in an integration on its own process, allowing models to complete independent operations in parallel and complete tasks more quickly. For example, the root and shoot growth models from \S\ref{S:intro} require 2.42\,s and 4.06\,s respectively to run for 100 time steps in isolation. If these two models were manually integrated in serial via the command line, the integration would require a total of 6.48\,s. However, the same integration requires only 4.52\,s using {\pkg}, a speed-up of 1.43. The exact speedup provided by parallel integration using {\pkg} depends on how independent the models are and how equally distributed the work is between the models. If the models are fully independent, the speedup is limited by the time required to execute the slowest model. In the example, this would be the shoot growth model which required almost twice the time to execute as the root model. If the models are dependent on one-another, the models will have to wait for messages to be passed and the speedup will not be as great (see \S\ref{S:speedup} for additional discussion of parallelism and the speedups achievable using {\pkg}). \todo{Fix these numbers for most recent version of the code}.
+{\pkg} launches each model in an integration on its own process, allowing models to complete independent operations in parallel and complete tasks more quickly. For example, the root and shoot growth models from \S\ref{S:intro} require 2.42\,s and 4.06\,s respectively to run for 100 time steps in isolation. If these two models were manually integrated in serial via the command line, the integration would require a total of 6.48\,s. However, the same integration requires only 4.52\,s using {\pkg}, a speed-up of 1.43. The exact speedup provided by parallel integration using {\pkg} depends on how independent the models are and how equally distributed the work is between the models. If the models are fully independent, the speedup is limited by the time required to execute the slowest model. In the example, this would be the shoot growth model which required almost twice the time to execute as the root model. If the models are dependent on one-another, the models will have to wait for messages to be passed and the speedup will not be as great (see \S\ref{SS:speedup} for additional discussion of parallelism and the speedups achievable using {\pkg}). \todo{Fix these numbers for most recent version of the code}.
 
 While every model is executed on a new process, how the model is handled depends 
-on the language it is written in. Models written in 
+on the language it is written in. {\pkg} has a dedicated driver for each of the supported languages with utilities that allow {\pkg} to launch and monitor executables written in that language from Python. Models written in 
 interpreted languages (Python and Matlab) are executed on the command line 
 with the interpreter. In the case of Matlab, where a significant amount of time is required to start 
 the Matlab interpreter (See \S\ref{SS:results_language}), Matlab shared engines are used 
@@ -405,148 +405,7 @@ lines are added to the recipe in order to allow linking against {\pkg}.
 
 Once the models are running, {\pkg} uses threads on the master process to monitor the progress of the model and report back model output (e.g. log messages printed to stdout or stderr) and any status changes. If a model issues any errors, the master process will shut down any model processes that are still running and close any connections, discarding any unprocessed messages. If a model completes without any errors, the master process will cleanup any connections that are no longer required after waiting for all messages to be processed. The master process will only complete once an error is encountered or all model processes have completed.
 
-The algorithms for a generic model driver and the master thread can be found in Algorithms \ref{alg:model} \& \ref{alg:master} respectively.
-% MODEL DRIVER
-\begin{algorithm}[H]
-    \caption{Generic model driver class. This algorithm does not represent the actual implementation of any one of the languages supported by {\pkg}. Each of the language-specific drivers will have slightly different methods for compilation (turning the source code into an executable), launching the model process, and monitoring the model's status via output and error codes. However, this algorithm does provided the general behavior pattern upon which every model driver is based.}
-    \label{alg:model}
-    \begin{algorithmic}[1]
-    \Class{ModelDriver}{$name, args, yml$}
-    	\State $errors \gets []$
-    	\State $executable \gets$ \Call{Compile}{args}
-	\State $process \gets$ \Call{ModelProcess}{} on a new process
-	\State $thread \gets$ \Call{ModelThread}{} on a new thread
-	\item[]
-	%
-	\ClassMethod{ModelProcess}{}
-		\State \Call{Executable}{}
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{ModelThread}{}
-		\While{\Call{IsAlive}{{\sc ModelProcess}}}
-			\If{\Call{HasOutput}{{\sc ModelProcess}}}
-				\State \textbf{Print} \Call{GetOutput}{{\sc ModelProcess}}
-			\Else
-				\State \textbf{Sleep}
-			\EndIf
-		\EndWhile
-		\If{\Call{HasErrors}{{\sc ModelProcess}}}
-			\State $errors \gets$ \Call{GetErrors}{{\sc ModelProcess}}
-		\EndIf
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{Terminate}{}
-		\State \Call{Kill}{{\sc ModelProcess}}
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{Stop}{}
-		\While{not $errors$}
-			\State \textbf{Sleep}
-		\EndWhile
-		\State \Call{Terminate}{}
-	\EndClassMethod
-	\item[]
-    \EndClass
-    \end{algorithmic}
-\end{algorithm}
-
-%
-% MASTER THREAD
-%\begin{center}
-\begin{algorithm}[H]
-	\caption{Basic steps executed on the master thread to create, start, and monitor model \& connection drivers. This pseudocode is not an exhaustive reproduction of the entire implementation, but represents the broad strokes needed to understand the purpose and behavior of the master thread. The algorithm for the {\sc ModelDriver} and {\sc ConnectionDriver} can be found in Algorithms \ref{alg:model} \& \ref{alg:conn} respectively.}
-	\label{alg:master}
-	\begin{algorithmic}[1]
-	\State $models$ $\gets$ \textbf{Parse} YAML files
-	\State $inputChannels \gets Map()$
-	\State $outputChannels \gets Map()$
-	% CREATE DRIVERS
-	\item[] \Comment Create Drivers
-	\ForAll{$m in models$}
-		\ForAll{$i in m.inputs$}
-			\If{not $i.isFile$}
-				\State $inputAddress \gets i.address$
-			\Else
-				\State $inputAddress \gets `generate'$
-			\EndIf
-			\State $i.driver \gets$ \Call{ConnectionDriver}{$inputAddress, `generate', i$}
-			\State $inputChannels[i.name] = i$
-		\EndFor
-	\EndFor
-	\ForAll{$m in models$}
-	\algstore{alg:master}
-	\end{algorithmic}
-\end{algorithm}
-% PAGE BREAK
-\begin{algorithm}[H]
-	\caption{Continuation of Algorithm \ref{alg:master}}
-	\begin{algorithmic}[1]
-	\algrestore{alg:master}
-		\ForAll{$o \in m.outputs$}
-			\If{$o.isFile$}
-				\State $outputAddress \gets o.address$
-			\Else
-				\If{$o.args \in inpurChannels$}
-					\State $outputAddress \gets inputChannels[o.args]$
-				\Else
-					\State \Call{Error}{}
-				\EndIf
-			\EndIf
-			\State $o.driver \gets$ \Call{ConnectionDriver}{$`generate', outputAddress, o$}
-			\State $outputChannels[o.name] = o$
-		\EndFor
-	\EndFor
-	\ForAll{$m in models$}
-		\State $m.driver \gets$ \Call{ModelDriver}{$m.name, m.args, m$}
-	\EndFor
-	% START DRIVERS
-	\item[] \Comment Start Drivers	
-	\ForAll{$m in models$}
-		\ForAll{$i in m.inputs$}
-			\State $i.driver.$\Call{Start}{}
-		\EndFor
-	\EndFor
-	\ForAll{$m in models$}
-		\ForAll{$o \in m.outputs$}
-			\State $o.driver.$\Call{Start}{}
-		\EndFor
-	\EndFor
-	\ForAll{$m in models$}
-		\State $m.driver.$\Call{Start}{}
-	\EndFor
-	% MONITOR DRIVERS
-	\item[] \Comment Monitor Drivers
-	\State $errorFlag \gets false$
-	\While{not $errorFlag$}
-		\ForAll{$m in models$}
-			\If{$m.driver.errors$}
-				\State $errorFlag \gets true$
-				\State \textbf{break}
-			\EndIf
-		\EndFor
-	\EndWhile
-	% STOP DRIVER
-	\item[] \Comment Stop Drivers
-	\If{$errorFlag$}
-		\State $allErrors \gets []$
-		\ForAll{$m in models$}
-			\State $m.$\Call{Terminate}{}
-			\State \textbf{Append} $allErrors$, $m.errors$
-		\EndFor
-		\State \Call{Error}{$allErrors$}
-	\Else
-		\ForAll{$m in models$}
-			\State $m.$\Call{Stop}{}
-		\EndFor
-	\EndIf
-	\end{algorithmic}
-\end{algorithm}
-%\end{center}
-%
-\todo{make sure this is split correctly across pages}
+The algorithms for a generic model driver and the master thread can be found in Algorithms \ref{alg:model} \& \ref{alg:master} respectively in \A\ref{A:algorithms}.
 
 %---------------------------------------------------------------------------------
 % COMMUNICATION
@@ -560,7 +419,7 @@ System V IPC Queues (\S\ref{SSS:ipc}), ZeroMQ (\S\ref{SSS:zmq}), and RabbitMQ (\
 which each have their own strengths and weaknesses. The 
 particular communication mechanism used by {\pkg} is determined by the platform, available libraries, and integration strategy. However, regardless of the communication mechanisms, the user will always use the same interface in the language of their model (See \S\ref{SSS:interface}).
 
-{\pkg} includes its own implementation of asynchronous communication via each of the communication mechanisms that are supported. While there are existing tools for asynchronous communication using each of these tools, using a tool developed specifically for {\pkg} allows for a more uniform treatment of the different communication mechanisms, greater control over how threads are managed (e.g. killing a thread when messages cannot be interpreted), and a more seamless coordination with other {\pkg} processes (e.g. enforcing dependencies on other model and connection threads).
+{\pkg} includes its own implementation of asynchronous communication via each of the communication mechanisms that are supported. While there are existing tools for asynchronous communication using each of these communication mechanisms, using a tool developed specifically for {\pkg} allows for a more uniform treatment of the different communication mechanisms, greater control over how threads are managed (e.g. killing a thread when messages cannot be interpreted), and a more seamless coordination with other {\pkg} processes (e.g. enforcing dependencies on other model and connection threads).
 
 %---------------------------------------------------------------------------------
 % SYSTEM V IPC
@@ -601,6 +460,9 @@ supports protocols for distributed communication via an Internet Protocol (IP)
 network. While {\pkg} does not currently support using these protocols 
 for distributed integration networks, this is a future development plan that has been prepared for.
 
+In addition to using the default ZMQ libraries, {\pkg} also includes supporting routines for allowing received messages to be confirmed. Because ZMQ is broker-less, a socket has no way of knowing if the message it sent was successfully received. This lack of confirmation makes it harder to determine if there is was error somewhere along the network. {\pkg} overcomes this by generating two ZMQ sockets for every connection: one for sending the messages and one for confirming them. Each time a message is received, the receiving socket confirmation thread will send a confirmation including a unique ID for the received message and then wait for a reply to that confirmation. The sending socket confirmation thread will continuously check the confirmation sockets for messages indicating that sent messages were received. Once a confirmation message is received, it will send a reply to the receiving confirmation socket and record the ID of the message that was confirmed. This handshake operation ensures that all messages are accounted for so {\pkg} knows if a message is lost and where it was lost.
+
+
 %---------------------------------------------------------------------------------
 % RABBITMQ
 \subsubsection{RabbitMQ}\label{SSS:rmq}
@@ -627,7 +489,7 @@ an \emph{output driver} waits for the message to be routed and received on a sep
 an \emph{input driver} continuously pings input channels on another thread, moving received messages into a 
 buffer queue so that they are ready and waiting for the receiving model 
 when it asks for input. These drivers work together to move message along from one model to the next like a conveyor belt. 
-As a result, models in complex integration networks are not affected by the rate at which dependent model consume their output and the speedup offered by running the models in parallel is improved. Figure \ref{fig:async} describes the general flow of messages, Algorithms \ref{alg:async_send} \& \ref{alg:async_recv} describe the asynchronous output \& input channel procedures, and Algorithm \ref{alg:conn} describes the procedure followed by input \& output connection drivers.
+As a result, models in complex integration networks are not affected by the rate at which dependent model consume their output and the speedup offered by running the models in parallel is improved. Figure \ref{fig:async} describes the general flow of messages, Algorithms \ref{alg:async_send} \& \ref{alg:async_recv} in \A\ref{A:algorithms} describe the asynchronous output \& input channel procedures, and Algorithm \ref{alg:conn} describes the procedure followed by input \& output connection drivers.
 %
 \ifinclfig
  	\begin{figure}[htbp]
@@ -646,147 +508,6 @@ As a result, models in complex integration networks are not affected by the rate
 	\item The receiving model receives the message in the form of an analogous native data object. Interface receive calls can be either blocking or non-blocking, but are blocking by default.
 \end{enumerate}
 
-% SENDER
-\begin{algorithm}[H]
-    \caption{Asynchronous communication class for sending messages to an output channel. The procedures {\sc Open, Close, Send, \& IsOpen} are procedures that are implemented by external communication packages and different slightly from one communication mechanism to the next.}
-    \label{alg:async_send}
-    \begin{algorithmic}[1]
-    % SENDER
-    \Class{AsyncSender}{$address$}
-    	\State $backlog \gets []$
-	\State $x \gets$ \Call{Open}{$address$}
-	\State \textbf{Run} \Call{BacklogThread}{} on a new thread
-	\item[]
-	%
-	\ClassMethod{BacklogThread}{}
-		\While{\Call{IsOpen}{$x$}}
-    			\If{$length(backlog) > 0$}
-				\State $flag \gets$ \Call{Send}{$x$, $backlog[0]$}
-				\If{$flag$}
-					\State \textbf{Remove} $backlog[0]$
-				\Else
-					\State \Call{Close}{$x$}
-				\EndIf
-			\Else
-				\State \textbf{Sleep}
-			\EndIf
-    		\EndWhile
-    	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{SendBacklog}{$msg$}
-		\If{\Call{IsOpen}{$x$}}
-			\State \textbf{Append} $backlog$, $msg$
-		\EndIf
-		\State \textbf{Return} \Call{IsOpen}{$x$}
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{Close}{}
-		\State \Call{Close}{$x$}
-		\State $backlog \gets []$
-	\EndClassMethod
-	\item[]
-    \EndClass
-    \end{algorithmic}
-\end{algorithm}
-
-% RECEIVER
-\begin{algorithm}[H]
-    \caption{Asynchronous communication class for receiving messages from an input channel. The procedures {\sc Open, Close, Recv, IsOpen, \& IsMessageWaiting} are procedures that are implemented by external communication packages and different slightly from one communication mechanism to the next.}
-    \label{alg:async_recv}
-    \begin{algorithmic}[1]
-    \item[]
-    \Class{AsyncReceiver}{$address$}
-    	\State $backlog \gets []$
-	\State $x \gets$ \Call{Open}{$address$}
-	\State $thread \gets$ \Call{BacklogThread}{} on a new thread
-	\item[]
-	%
-	\ClassMethod{BacklogThread}{}
-		\While{\Call{IsOpen}{$x$}}
-    			\If{\Call{IsMessageWaiting}{$x$}}
-				\State $flag, msg \gets$ \Call{Recv}{$x$}
-				\If{$flag$}
-					\State \textbf{Append} $backlog$, $msg$
-				\Else
-					\State \Call{Close}{$x$}
-				\EndIf
-			\Else
-				\State \textbf{Sleep}
-			\EndIf
-		\EndWhile
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{RecvBacklog}{$msg$}
-		\If{$length(backlog) > 0$}
-			\State $msg \gets backlog[0]$
-			\State \textbf{Remove} $backlog[0]$
-			\State \textbf{Return} true, $msg$
-		\Else
-			\State \textbf{Return} \Call{IsOpen}{$x$}, ''
-		\EndIf
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{Close}{}
-		\State \Call{Close}{$x$}
-		\State $backlog \gets []$
-	\EndClassMethod
-	\item[]
-    \EndClass
-    \end{algorithmic}
-\end{algorithm}
-%
-
-%
-\begin{algorithm}[H]
-    \caption{Connection Driver}
-    \label{alg:conn}
-    \begin{algorithmic}[1]
-    \Class{ConnectionDriver}{$inputAddress, outputAddress, yml$}
-    	\State $input \gets$ \Call{AsyncReceiver}{$inputAddress$}
-    	\State $output \gets$ \Call{AsyncSender}{$outputAddress$}
-	\State $thread \gets$ \Call{ConnectionThread}{} on a new thread
-	\item[]
-	%
-	\ClassMethod{ConnectionThread}{}
-		\While{true}
-			\State $flag, msg \gets$ $input.$\Call{RecvBacklog}{}
-			\If{not $flag$} \State \textbf{break} \EndIf
-			\If{$msg$}
-				\State \textbf{Transform} $msg$ based on units and expected data format
-				\State $flag \gets$ $output.$\Call{SendBacklog}{$msg$}
-				\If{not $flag$} \State \textbf{break} \EndIf
-			\Else
-				\State \textbf{Sleep}
-			\EndIf
-		\EndWhile
-		%
-		\State $input.$\Call{CloseAsync}{}
-		\State $output.$\Call{CloseAsync}{}
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{Terminate}{}
-		\State $input.$\Call{CloseAsync}{}
-		\State $output.$\Call{CloseAsync}{}
-	\EndClassMethod
-	\item[]
-	%
-	\ClassMethod{Stop}{}
-		\While{\Call{IsOpen}{$input.x$} and \Call{IsOpen}{$output.x$}}
-			\State \textbf{Sleep}
-		\EndWhile
-		\State \Call{Terminate}{}
-	\EndClassMethod
-	\item[]
-    \EndClass
-    \end{algorithmic}
-\end{algorithm}
-
-\todo{discuss algorithm}
 
 %In addition to communication between two models, users can also specify that a 
 %model should receive/send input/output from/to a file. This is specified in 
@@ -814,16 +535,8 @@ the message that will be sent through the temporary channel like size and data t
 Temporary channels are used for large messages to prevent mistakenly combining 
 the pieces from two different large messages that were received at the same time 
 such as in the case that a model is receiving input from two different models 
-working in parallel.
+working in parallel. The procedures for creating and using temporary channels for sending large messages can be seen in the {\sc Send} and {\sc Recv} methods from Algorithms \ref{alg:async_send} \& \ref{alg:async_recv} respectively in \A\ref{A:algorithms}.
 
-%\begin{algorithm}[H]
-%    \caption{Large Messages}
-%    \label{alg:large}
-%    \begin{algorithmic}[1] 
-%    \end{algorithmic}
-%\end{algorithm}
-
-\todo{algorithm}
 
 %---------------------------------------------------------------------------------
 % INTERFACE
@@ -841,7 +554,7 @@ communication channels and sending/receiving messages. The C++ interface
 provides classes that wrap the C structures with functions called as methods.
 
 In addition to basic input and output, each interface also provides access 
-to more complex data types and communication patterns.
+to more complex data types and communication patterns. Pseudocode describing the asynchronous communication classes and functions underlying the interfaces is provided by Algorithms \ref{alg:async_send} \& \ref{alg:async_recv} in \A\ref{A:algorithms}.
 
 
 %---------------------------------------------------------------------------------
@@ -899,7 +612,7 @@ In additional to the basic required fields, each model should have an entry for 
 
 There are other optional model and input/output keywords for more advanced cases (e.g. compilation flags or data types), but they are beyond the scope of this limited introduction. Additional examples and descriptions of these options can be found in the documentation \footnote{{\tt https://cropsinsilico.github.io/cis\_interface/yaml.html}}.
 
-It should also be noted that it is possible to pass multiple variables as a single input/output. However, unless the variables will \emph{always} be coupled in the model, it is advised that every variable be specified separately for clarity and to allow flexibility in the way other models can integrate with it. In addition, if brevity is a concern because a model has a large number of input variables, there are features currently under active development (see \S\ref{SS:datagg}) that will allow fields to be aggregated within connection YAMLs and simplify the send and receive calls in such cases.
+It should also be noted that it is possible to pass multiple variables as a single input/output. However, unless the variables will \emph{always} be coupled in the model, it is advised that every variable be specified separately for clarity and to allow flexibility in the way other models can integrate with it. In addition, if brevity is a concern because a model has a large number of input variables, there are features currently under active development (see \S\ref{SS:dataagg}) that will allow fields to be aggregated within connection YAMLs and simplify the send and receive calls in such cases.
 
 %---------------------------------------------------------------------------------
 % WRAPPER
@@ -1442,7 +1155,11 @@ For more complex integration involving more than 2 models or more than 2 communi
 %	\item Create and coordination of asynchrnous communication networks that 
 %\end{itemize}
 
-Integration via {\pkg} requires minimal modification of the existing model source code yet greatly increases the model's potential by allowing it to be reused in combination with other models. {\pkg} has already been used to integrate several plant models within the Crops in Silico organization \citep{Marshall-Colon2017} with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. 
+{\pkg} is designed to make models as reusable as possible. Once integrated via {\pkg}, models can be combined with any other models that also have a {\pkg} wrapper and YAML specification file with minimal, if any, modification. This "plug-and-play" approach to models encourages model writers to make their codes public in a reusable form, generating citations and reuse of their work, while also growing a community of models and model writers capable of probing areas otherwise unreachable. 
+%Generic workflow, parallelization, and communication tools can be used to expose/connect models, but without a standard for making connections, every new integration will require a great deal of hands on attention and new code. Domain specific frameworks like OpenAlea \citep{Pradal2008} are better for improving the reusability for some models in that they can impose a standard for how models interact with each other, however none of the existing frameworks offer the same flexibility as {\pkg} in terms of languages with native support and model form.
+%Integration via {\pkg} requires minimal modification of the existing model source code yet greatly increases the model's potential by allowing it to be reused in combination with other models. 
+%
+{\pkg} has already been used to integrate several plant models within the Crops in Silico organization \citep{Marshall-Colon2017} with ongoing work to add additional models to the integration network. Figure \ref{fig:network} shows the progress so far. 
 %
 \ifinclfig
  	\begin{figure}[htbp]
@@ -1466,14 +1183,32 @@ Although not yet complete, partial integrations from this network are already yi
 %
 simulated the increased carbon assimilation rate observed in field studies \citep{Bernacchi2005}. The integrated modeling also identified gene candidates predicted to regulate enzymes involved in the light and dark reactions of photosynthesis under elevated CO$_2$.
 
+In addition to allowing scientists to reuse existing models in new integrations and make new connections, {\pkg} has the potential to significantly increase a model's accessibility and promote reuse. {\pkg} could be used as a method of running models without knowledge of the model's implementation. At publication, model code could be released along with a wrapper and YAML specification file for use with {\pkg}. These additional materials would be particularly powerful when considered alongside the interactive features being developed for use with {\pkg} (see \S\ref{SS:gui} and \S\ref{SS:function}). Potential collaborators could use {\pkg} to run and explore models without the need to be familiar with the inner workings of the model implementation or even implementation language.
+
 %---------------------------------------------------------------------------------
 % USE CASES AND LIMITATION
 %
-\subsection{Use Cases \& Limitations}\label{SS:uses}
+\subsection{Advantages \& Limitations}\label{SS:uses}
 %
-In addition to allowing scientists to reuse existing models in new integrations, {\pkg} has the potential to significantly increase a model's accessibility. {\pkg} could be used a method of running models without knowledge of the model's implementation. At publication, model code could be released along with a wrapper and YAML specification file for use with {\pkg}. These additional materials would be particularly powerful when considered alongside the interactive features being developed for use with {\pkg} (see \S\ref{SS:gui} and \S\ref{SS:function}).
+\subsubsection{Advantages}\label{SS:advantages}
 %
-\todo{Add discussion of limitations}
+{\pkg} offers several advantages over manual integrations or other existing tools.
+%
+\begin{description}
+	\item[Dynamic Communication Network] While there are many existing tools for communication that have implementations in multiple languages \citep[some of which {\pkg} uses, e.g.][ZMQ, RabbitMQ, OpenMPI]{ZMQ, RMQ, Gabriel2004}, these tools require that the communication pattern be well established such that it can be hard coded into the model (or model wrapper) itself (e.g. using specific ports or queues). The use of hard coded values greatly restricts the reusability of a model. For every integration a model is used in, the hard coded values for every connection must be updated between the models on either end so that they match. {\pkg} is unique in that it dynamically establishes and manages the networks of communication resources (e.g. queues, channels, sockets) that are required for integrations to run so that models do not need to have these hard coded value and can be reused in multiple integrations, unmodified. This process includes creating new resources, connecting to existing resources, passing the appropriate resource addresses to the model environment, error handling/propagation, and resource cleanup. 
+	\item[Hands-off Parallelism \& Asynchronous Communication] In addition to inter-language communication, {\pkg} users benefit from speedups due to parallelism and concurrency without any additional work. From the specified model connections, {\pkg} manages the parallel execution of models and asynchronous message passing under-the-hood so that the user doesn't have to think about it. Existing tools for asynchronous communication between unmanaged parallel tasks \citep[e.g. Jack2,][]{Magoules2018} requires explicit definition of the communication pattern in advance, prohibiting dynamic communication networks as discussed above. Work/data flow tools like Parsl \citep{babuji18} allow dynamic execution of processes along a dependency chain in parallel, but usually require addition code, are limited to passing data as files or data object native to the tool's implementation language, and are ill suited to models with persistent internal states or intermediate outputs. {\pkg} is unique in that it offers users asynchronous communication and parallelism that is flexible enough to support any communication pattern, implicitly handles conversion between native data types in the supported languages, and does not require any additional time investment on the part of the user.
+	\item[No New Language] Unlike DSLs or language specific frameworks, {\pkg} doesn't require a model to be written in one specific language. In addition to expanding the possible number of model combinations, this eases the burden on model writers for whom learning an additional programming language or DSL might be a significant obstacle. {\pkg} is designed such that model writers only need to be familiar with the language that the model is written in to being with. Although {\pkg} is a Python package, users do not even need to be familiar with the Python language and can interact with {\pkg} solely through the command line. While users do need to be able to compose YAML specification files in addition to their model code, these files have a very limited syntax and will be GUI composable in future releases.
+\end{description}
+
+\subsubsection{Limitations}\label{SS:limitations}
+%
+While {\pkg} is a powerful tool for integrating scientific models and opening up new avenues for collaboration, it is not applicable to every scenario.
+%
+\begin{description}
+	\item[Single Language Integrations] For models written in the same language, it is usually much more computationally efficient to either integrate the models directly (i.e. by calling one from the other) or use a language specific tools for parallel execution and passing data \citep[e.g. Parsl in Python][]{babuji18} than to use {\pkg}. This performance advantage will be particularly pronounced for models that finish quickly or tightly coupled integrations where models make a large number of exchanges in rapid succession (e.g. a set of coupled ODEs). Although the constituent models will still benefit from integration via {\pkg} in regards to reusability, {\pkg} may not be the best choice in such cases if execution time is a concern.
+	\item[Easily Translatable Models] For relatively simple models ($<100$ lines of code), it may be more efficient for a scientist to translate the model into the language of the model(s) it will be integrated with. {\pkg} is still useful as a tool more making the model accessible and more likely to be reused, but the performance advantage of running codes in the same language may be of greater importance in certain situations as discussed above.
+	\item[Unsupported Languages] While {\pkg} currently supports models written in Python, Matlab, C, \& C++, models are written in many other languages. There are plans to expand support for {\pkg} to other languages (see \S\ref{SS:langsupport}), but in the meantime {\pkg} will not be particularly useful for models that are not written in one of the languages already supported.
+\end{description}
 
 %---------------------------------------------------------------------------------
 % FUTURE WORK
@@ -1482,6 +1217,7 @@ In addition to allowing scientists to reuse existing models in new integrations,
 {\pkg} is being actively developed to expand the number of models 
 that can be used in integration networks and the complexity of integration 
 networks that can be executed. Several improvements are already in progress/planned for {\pkg}.
+\todo{expand?}
 
 % LANGUAGE SUPPORT
 \subsubsection{Language Support}\label{SS:langsupport}
@@ -1619,8 +1355,406 @@ The authors would like to thank Mike Lambert and Craig Willis for their ongoing 
 %%---------------------------------------------------------------------------------
 %%---------------------------------------------------------------------------------
 %% APPENDICES
+\newpage
 %\appendix
 %
+\begin{appendices}
+
+%---------------------------------------------------------------------------------
+% ALGORITHMS
+\section{Algorithms}\label{A:algorithms}
+
+% MODEL DRIVER
+\begin{algorithm}[H]
+    \caption{Generic model driver class. This algorithm does not represent the actual implementation of any one of the languages supported by {\pkg}. Each of the language-specific drivers will have slightly different methods for compilation (turning the source code into an executable), launching the model process, and monitoring the model's status via output and error codes. However, this algorithm does provided the general behavior pattern upon which every model driver is based.}
+    \label{alg:model}
+    \begin{algorithmic}[1]
+    \Class{ModelDriver}{$name, args, yml$}
+    	\State $errors \gets []$
+    	\State $executable \gets$ \Call{Compile}{args}
+	\State $process \gets$ \Call{ModelProcess}{} on a new process
+	\State $thread \gets$ \Call{ModelThread}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{ModelProcess}{}
+		\State \Call{Executable}{}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{ModelThread}{}
+		\While{\Call{IsAlive}{{\sc ModelProcess}}}
+			\If{\Call{HasOutput}{{\sc ModelProcess}}}
+				\State \textbf{Print} \Call{GetOutput}{{\sc ModelProcess}}
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+		\EndWhile
+		\If{\Call{HasErrors}{{\sc ModelProcess}}}
+			\State $errors \gets$ \Call{GetErrors}{{\sc ModelProcess}}
+		\EndIf
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Terminate}{}
+		\State \Call{Kill}{{\sc ModelProcess}}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Stop}{}
+		\While{not $errors$}
+			\State \textbf{Sleep}
+		\EndWhile
+		\State \Call{Terminate}{}
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+
+%
+% MASTER THREAD
+%\begin{center}
+\begin{algorithm}[H]
+	\caption{Basic steps executed on the master thread to create, start, and monitor model \& connection drivers. This pseudocode is not an exhaustive reproduction of the entire implementation, but represents the broad strokes needed to understand the purpose and behavior of the master thread. The algorithm for the {\sc ModelDriver} and {\sc ConnectionDriver} can be found in Algorithms \ref{alg:model} \& \ref{alg:conn} respectively.}
+	\label{alg:master}
+	\begin{algorithmic}[1]
+	\State $models$ $\gets$ \textbf{Parse} YAML files
+	\State $inputChannels \gets Map()$
+	\State $outputChannels \gets Map()$
+	% CREATE DRIVERS
+	\item[] \Comment Create Drivers
+	\ForAll{$m in models$}
+		\ForAll{$i in m.inputs$}
+			\If{not $i.isFile$}
+				\State $inputAddress \gets i.address$
+			\Else
+				\State $inputAddress \gets $`generate'
+			\EndIf
+			\State $i.driver \gets$ \Call{ConnectionDriver}{$inputAddress$, `generate', $i$}
+			\State $inputChannels[i.name] = i$
+	% PAGE BREAK
+	\algstore{alg:master}
+	\end{algorithmic}
+\end{algorithm}
+\addtocounter{algorithm}{-1}
+\begin{algorithm}[H]
+	\caption{Continued}
+	\begin{algorithmic}[1]
+	\algrestore{alg:master}
+	% PAGE BREAK
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+		\ForAll{$o \in m.outputs$}
+			\If{$o.isFile$}
+				\State $outputAddress \gets o.address$
+			\Else
+				\If{$o.args \in inpurChannels$}
+					\State $outputAddress \gets inputChannels[o.args]$
+				\Else
+					\State \Call{Error}{}
+				\EndIf
+			\EndIf
+			\State $o.driver \gets$ \Call{ConnectionDriver}{`generate', $outputAddress$, $o$}
+			\State $outputChannels[o.name] = o$
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+		\State $m.driver \gets$ \Call{ModelDriver}{$m.name$, $m.args$, $m$}
+	\EndFor
+	% START DRIVERS
+	\item[] \Comment Start Drivers	
+	\ForAll{$m in models$}
+		\ForAll{$i in m.inputs$}
+			\State $i.driver.$\Call{Start}{}
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+		\ForAll{$o \in m.outputs$}
+			\State $o.driver.$\Call{Start}{}
+		\EndFor
+	\EndFor
+	\ForAll{$m in models$}
+		\State $m.driver.$\Call{Start}{}
+	\EndFor
+	% MONITOR DRIVERS
+	\item[] \Comment Monitor Drivers
+	\State $errorFlag \gets false$
+	\While{not $errorFlag$}
+		\ForAll{$m in models$}
+			\If{$m.driver.errors$}
+				\State $errorFlag \gets true$
+				\State \textbf{break}
+			\EndIf
+		\EndFor
+	\EndWhile
+	% STOP DRIVER
+	\item[] \Comment Stop Drivers
+	\If{$errorFlag$}
+		\State $allErrors \gets []$
+		\ForAll{$m in models$}
+			\State $m.$\Call{Terminate}{}
+			\State \textbf{Append} $allErrors$, $m.errors$
+		\EndFor
+		\State \Call{Error}{$allErrors$}
+	\Else
+		\ForAll{$m in models$}
+			\State $m.$\Call{Stop}{}
+		\EndFor
+	\EndIf
+	\end{algorithmic}
+\end{algorithm}
+
+
+% SENDER
+\begin{algorithm}[H]
+    \caption{Asynchronous communication class for sending messages to an output channel. $x$ is a communication object implemented by an external communication package (one of the three supported by {\pkg}). The package must have at minimum methods {\sc NewAddress, Open, Close, Send, \& IsOpen} for interacting with the object $x$. {\sc Encode} is dependent on the message type and will use an extended version of JSON encoding in the future (see \S\ref{SS:json}).}
+    \label{alg:async_send}
+    \begin{algorithmic}[1]
+    % SENDER
+    \Class{AsyncSender}{$address$}
+    	\State $backlog \gets []$
+	\State $temp \gets []$
+	\If{$address==$`generate'}
+		\State $address \gets$ \Call{NewAddress}{}
+	\EndIf
+	\State $x \gets$ \Call{Open}{$address$}
+	\State \textbf{Run} \Call{BacklogLoop}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{BacklogLoop}{}
+		\While{$x.$\Call{IsOpen}{}}
+    			\If{$length(backlog) > 0$}
+				\State $flag \gets$ $x.$\Call{Send}{$backlog[0]$}
+				\If{$flag$}
+					\State \textbf{Remove} $backlog[0]$
+				\Else
+					\State $x.$\Call{Close}{}
+				\EndIf
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+    		\EndWhile
+    	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{SendBacklog}{$msg$}
+		\If{$x.$\Call{IsOpen}{}}
+			\State \textbf{Append} $msg$ to the end of $backlog$
+		\EndIf
+		\State \textbf{Return} $x.$\Call{IsOpen}{}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{SendMultipart}{$msg$}
+		\State $currPos \gets 0$
+		\While{$currPos < length(msg)$}
+			\State $ilength \gets \min(x.maxMsgSize, length(msg) - currPos)$
+			\State \Call{Send}{$msg[currPos:(currPos + ilength)]$}
+			\State $currPos += ilength$
+		\EndWhile
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Send}{$msg$}
+		\State $header \gets Map()$ \Comment{Additional information will be added to the header based on communication mechanism and encoding.}
+		\State $totalMsg \gets $\Call{Encode}{$msg, header$}
+		\If{$length(totalMsg) > x.maxMsgSize$}
+			\State $newTemp \gets$ \Call{AsyncSender}{`generate'}
+			\State \textbf{Append} $newTemp$ to the end of $temp$
+			\State $header[$`workerAddress'$] \gets newTemp.address$
+			\State $totalMsg \gets $\Call{Encode}{$msg, header$}
+			\If{not \Call{SendBacklog}{$totalMsg[:x.maxMsgSize]$}}
+				\State \textbf{Return} false
+			\EndIf
+			\If{not $newTemp.$\Call{SendMultipart}{$totalMsg[x.maxMsgSize:]$}}
+				\State \textbf{Return} false
+			\EndIf
+			\State \textbf{Return} true
+		\Else
+			\State \textbf{Return} \Call{SendBacklog}{$totalMsg$}
+		\EndIf
+	\EndClassMethod
+	\item[]
+	% PAGE BREAK
+	\algstore{alg:master}
+	\end{algorithmic}
+\end{algorithm}
+\addtocounter{algorithm}{-1}
+\begin{algorithm}[H]
+	\caption{Continued}
+	\begin{algorithmic}[1]
+	\algrestore{alg:master}
+	% PAGE BREAK
+	%
+	\ClassMethod{Close}{$dontWaitForRecv=false$}
+		\If{$x.$\Call{IsOpen}{}}
+			\State \Call{Send}{$EOF$}
+		\EndIf
+		\If{not $dontWaitForRecv$}
+			\While{$x.$\Call{IsOpen}{} and $((length(backlog) > 0)$ or $x.$\Call{IsMessageWaiting}{}$)$}
+				\State \textbf{Sleep}
+			\EndWhile
+		\EndIf
+		\State $x.$\Call{Close}{}
+		\State $backlog \gets []$
+		\ForAll{$t \in temp$}
+			\State $t.$\Call{Close}{$dontWaitForRecv$}
+		\EndFor
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+
+% RECEIVER
+\begin{algorithm}[H]
+    \caption{Asynchronous communication class for receiving messages from an input channel. $x$ is a communication object implemented by an external communication package (one of the three supported by {\pkg}). The package must have at minimum methods {\sc NewAddress, Open, Close, Recv, IsOpen, \& IsMessageWaiting} for interacting with the object $x$. {\sc Decode} is dependent on the message type and will use an extended version of JSON decoding in the future (see \S\ref{SS:json}).}
+    \label{alg:async_recv}
+    \begin{algorithmic}[1]
+    \item[]
+    \Class{AsyncReceiver}{$address$}
+    	\State $backlog \gets []$
+	\State $temp \gets []$
+	\If{$address==$`generate'}
+		\State $address \gets$ \Call{NewAddress}{}
+	\EndIf
+	\State $x \gets$ \Call{Open}{$address$}
+	\State $thread \gets$ \Call{BacklogLoop}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{BacklogLoop}{}
+		\While{$x$.\Call{IsOpen}{}}
+    			\If{$x$.\Call{IsMessageWaiting}{}}
+				\State $flag, msg \gets$ $x$.\Call{Recv}{}
+				\If{$flag$}
+					\State \textbf{Append} $msg$ to the end of $backlog$
+				\Else
+					\State $x$.\Call{Close}{}
+				\EndIf
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+		\EndWhile
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{RecvBacklog}{$msg$}
+		\If{$length(backlog) > 0$}
+			\State $msg \gets backlog[0]$
+			\State \textbf{Remove} $backlog[0]$
+			\State \textbf{Return} true, $msg$
+		\Else
+			\State \textbf{Return} $x.$\Call{IsOpen}{}, `'
+		\EndIf
+	\EndClassMethod
+	\item[]
+	% PAGE BREAK
+	\algstore{alg:master}
+	\end{algorithmic}
+\end{algorithm}
+\addtocounter{algorithm}{-1}
+\begin{algorithm}[H]
+	\caption{Continued}
+	\begin{algorithmic}[1]
+	\algrestore{alg:master}
+	% PAGE BREAK
+	%
+	\ClassMethod{RecvMultipart}{$msgSize$}
+		\State $msg \gets$ `'
+		\While{$length(msg) < msgSize$}
+			\State $flag, msgPart \gets$ \Call{Recv}{}
+			\If{not $flag$}
+				\State \textbf{Return} $flag, msg$
+			\EndIf
+			\State $msg \gets msg + msgPart$
+		\EndWhile
+		\State \textbf{Return} $true, msg$
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Recv}{}
+		\State $flag, msgStart \gets $\Call{RecvBacklog}{}
+		\If{not $flag$}
+			\State \textbf{Return} $flag$, `'
+		\EndIf
+		\State $header \gets $\Call{DecodeHeader}{$msgStart$}
+		\If{`workerAddress' $\in header$}
+			\State $newTemp \gets$ \Call{AsyncReceiver}{$header[$`workerAddress'$]$}
+			\State \textbf{Append} $newTemp$ to the end of $temp$
+			\State $flag, msgRemain \gets newTemp.$\Call{RecvMultipart}{}
+			\If{not $flag$}
+				\State \textbf{Return} $flag$, `'
+			\EndIf
+			\State $header, msg \gets $\Call{Decode}{$msgStart + msgRemain$}
+		\Else
+			\State $header, msg \gets $\Call{Decode}{$msgStart$}
+		\EndIf
+		\State \textbf{Return} $true, msg$
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Close}{}
+		\State $x.$\Call{Close}{}
+		\State $backlog \gets []$
+		\ForAll{$t \in temp$}
+			\State $t.$\Call{Close}{}
+		\EndFor
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+%
+
+% CONNECTION DRIVER
+\begin{algorithm}[H]
+    \caption{Connection Driver}
+    \label{alg:conn}
+    \begin{algorithmic}[1]
+    \Class{ConnectionDriver}{$inputAddress, outputAddress, yml$}
+    	\State $input \gets$ \Call{AsyncReceiver}{$inputAddress$}
+    	\State $output \gets$ \Call{AsyncSender}{$outputAddress$}
+	\State $thread \gets$ \Call{ConnectionLoop}{} on a new thread
+	\item[]
+	%
+	\ClassMethod{ConnectionLoop}{}
+		\While{true}
+			\State $flag, msg \gets$ $input.$\Call{RecvBacklog}{}
+			\If{not $flag$} \State \textbf{break} \EndIf
+			\If{$msg$}
+				\State \textbf{Transform} $msg$ based on units and expected data format
+				\State $flag \gets$ $output.$\Call{SendBacklog}{$msg$}
+				\If{not $flag$} \State \textbf{break} \EndIf
+			\Else
+				\State \textbf{Sleep}
+			\EndIf
+		\EndWhile
+		%
+		\State $input.$\Call{Close}{}
+		\State $output.$\Call{Close}{}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Terminate}{}
+		\State $input.$\Call{Close}{}
+		\State $output.$\Call{Close}{$dontWaitForRecv=true$}
+	\EndClassMethod
+	\item[]
+	%
+	\ClassMethod{Stop}{}
+		\While{$input.x.$\Call{IsOpen}{} and $output.x.$\Call{IsOpen}{}}
+			\State \textbf{Sleep}
+		\EndWhile
+		\State \Call{Terminate}{}
+	\EndClassMethod
+	\item[]
+    \EndClass
+    \end{algorithmic}
+\end{algorithm}
+
+\end{appendices}
+
 %%---------------------------------------------------------------------------------
 %% SOURCE CODE
 %\section{Example Source Code}\label{A:src}
@@ -1668,6 +1802,7 @@ The authors would like to thank Mike Lambert and Craig Willis for their ongoing 
 \item Add schema to documentation
 \item Regenerate documentation
 \item Fix matlab autodocs for interface
+\item Check that final version of algorithms is split between pages correctly
 \end{itemize}
 }
 
