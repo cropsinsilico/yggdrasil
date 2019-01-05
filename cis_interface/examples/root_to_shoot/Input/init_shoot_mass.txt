@@ -1,4 +1,4 @@
 # init_shoot_mass
 # %lf
 # kg
-1
+0.1

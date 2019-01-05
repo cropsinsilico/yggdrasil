@@ -1,4 +1,4 @@
 # shoot_growth_rate
 # %lf
-# kg/day
-0.15
+# d**-1
+0.048

@@ -21,9 +21,6 @@ connections:
   - input: ./Input/init_shoot_mass.txt
     output: init_shoot_mass
     filetype: table
-  - input: ./Input/init_root_mass.txt
-    output: init_root_mass_shoot
-    filetype: table
   - input: ./Input/timesteps.txt
     output: shoot_time_step
     filetype: table

@@ -1,3 +1,6 @@
+import time
+
+
 def calc_shoot_mass(r_s, dt, S_t, R_t, R_tp1):
     r"""Calculate the shoot mass.
 
@@ -12,4 +15,5 @@ def calc_shoot_mass(r_s, dt, S_t, R_t, R_tp1):
         float: Shoot mass at the next timestep.
 
     """
+    time.sleep(0.1)  # To simulate a longer calculation
     return (S_t * r_s * dt) + S_t - (R_tp1 - R_t)

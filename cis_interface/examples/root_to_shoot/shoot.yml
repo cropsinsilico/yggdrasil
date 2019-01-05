@@ -7,8 +7,6 @@ model:
       units: d**-1
     - name: init_shoot_mass
       units: kg
-    - name: init_root_mass_shoot
-      units: kg
     - name: shoot_time_step
       units: d
     - name: next_root_mass

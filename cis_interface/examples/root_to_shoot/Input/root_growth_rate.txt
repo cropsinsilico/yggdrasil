@@ -1,4 +1,4 @@
 # root_growth_rate
 # %lf
-# g/hr
-3.125
+# hr**-1
+0.001

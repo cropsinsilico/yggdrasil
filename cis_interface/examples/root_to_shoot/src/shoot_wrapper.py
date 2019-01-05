@@ -7,7 +7,6 @@ from shoot import calc_shoot_mass
 # Create input/output channels
 ShootGrowthRate = CisInput('shoot_growth_rate')
 InitShootMass = CisInput('init_shoot_mass')
-InitRootMass = CisInput('init_root_mass_shoot')
 TimeStep = CisInput('shoot_time_step')
 NextRootMass = CisInput('next_root_mass')
 NextShootMass = CisOutput('next_shoot_mass', '%lf\n')
@@ -27,7 +26,7 @@ S_t = input[0]
 print('shoot: Received initial shoot mass: %f' % S_t)
 
 # Receive inital root mass
-flag, input = InitRootMass.recv()
+flag, input = NextRootMass.recv()
 if not flag:
     raise RuntimeError('shoot: Error receiving initial root mass.')
 R_t = input[0]
