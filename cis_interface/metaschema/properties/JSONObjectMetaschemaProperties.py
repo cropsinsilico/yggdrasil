@@ -21,13 +21,13 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
         return {k: encode_type(v, typedef=typedef[k]) for k, v in instance.items()}
 
     @classmethod
-    def compare(cls, prop1, prop2):
+    def compare(cls, prop1, prop2, root1=None, root2=None):
         r"""Comparison method for 'properties' container property."""
         for k in prop2.keys():
             if k not in prop1:
                 yield "Missing property '%s'" % k
                 continue
-            for e in compare_schema(prop1[k], prop2[k]):
+            for e in compare_schema(prop1[k], prop2[k], root1=root1, root2=root2):
                 yield e
 
     @classmethod

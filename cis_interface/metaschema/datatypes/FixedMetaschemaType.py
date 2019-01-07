@@ -1,6 +1,6 @@
 import jsonschema
 import copy
-from cis_interface.metaschema.datatypes import register_type
+from cis_interface.metaschema.datatypes import register_type, compare_schema
 from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
@@ -83,13 +83,21 @@ class FixedMetaschemaType(MetaschemaType):
             dict: Copy of type definition with fixed properties removed.
 
         """
+
         out = copy.deepcopy(typedef)
         # if cls.base().is_fixed:
         #     out = cls.base().typedef_base2fixed(out)
         if out.get('type', None) == cls.base().name:
+            typedef_base = copy.deepcopy(typedef)
+            typedef_base.update(cls.fixed_properties)
+            errors = [e for e in compare_schema(typedef, typedef_base)]
+            if errors:  # pragma: debug
+                print("Error(s) in comparison with fixed properties.")
+                for e in errors:
+                    print('\t%s' % e)
+                raise Exception
             for k, v in cls.fixed_properties.items():
                 if k in out:
-                    assert(out[k] == v)
                     del out[k]
             out['type'] = cls.name
         return out
@@ -173,11 +181,14 @@ class FixedMetaschemaType(MetaschemaType):
         return True
 
     @classmethod
-    def encode_type(cls, obj, **kwargs):
+    def encode_type(cls, obj, typedef=None, **kwargs):
         r"""Encode an object's type definition.
 
         Args:
             obj (object): Object to encode.
+            typedef (dict, optional): Type properties that should be used to
+                initialize the encoded type definition in certain cases.
+                Defaults to None and is ignored.
             **kwargs: Additional keyword arguments are treated as additional
                 schema properties.
 
@@ -188,7 +199,22 @@ class FixedMetaschemaType(MetaschemaType):
             dict: Encoded type definition.
 
         """
-        out = super(FixedMetaschemaType, cls).encode_type(obj, **kwargs)
+        type_from_base = False
+        if typedef is None:
+            typedef = {}
+        for k, v in cls.fixed_properties.items():
+            if (k == 'type'):
+                continue
+            elif (typedef.get(k, v) != v) or (kwargs.get(k, v) != v):
+                type_from_base = True
+                break
+        if not type_from_base:
+            return super(FixedMetaschemaType, cls).encode_type(
+                obj, typedef=typedef, **kwargs)
+        if isinstance(typedef, dict):
+            typedef = cls.typedef_fixed2base(typedef)
+        kwargs = cls.typedef_fixed2base(kwargs)
+        out = cls.base().encode_type(obj, typedef=typedef, **kwargs)
         out = cls.typedef_base2fixed(out)
         return out
 

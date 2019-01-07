@@ -317,9 +317,6 @@ class CisRunner(CisClass):
         if yml['args'] in self._inputchannels:
             yml.setdefault('comm_env', {})
             yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
-            # yml['kwargs'].setdefault('comm_env', {})
-            # yml['kwargs']['comm_env'] = self._inputchannels[
-            #     yml['args']]['instance'].comm_env
         if yml['args'] not in self._inputchannels:
             for x in yml['ocomm_kws']['comm']:
                 if 'filetype' not in x:

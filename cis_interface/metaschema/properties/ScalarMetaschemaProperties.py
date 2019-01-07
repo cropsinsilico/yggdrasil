@@ -130,7 +130,7 @@ class PrecisionMetaschemaProperty(MetaschemaProperty):
         return out
 
     @classmethod
-    def compare(cls, prop1, prop2):
+    def compare(cls, prop1, prop2, root1=None, root2=None):
         r"""Comparison for the 'precision' scalar property."""
         if (prop1 > prop2):
             yield '%s is greater than %s' % (prop1, prop2)
@@ -153,7 +153,7 @@ class UnitsMetaschemaProperty(MetaschemaProperty):
         return out
 
     @classmethod
-    def compare(cls, prop1, prop2):
+    def compare(cls, prop1, prop2, root1=None, root2=None):
         r"""Comparision for the 'units' scalar property."""
         if not units.are_compatible(prop1, prop2):
             yield "Unit '%s' is not compatible with unit '%s'" % (prop1, prop2)

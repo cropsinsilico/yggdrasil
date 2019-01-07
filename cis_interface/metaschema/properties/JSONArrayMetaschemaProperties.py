@@ -23,20 +23,20 @@ class ItemsMetaschemaProperty(MetaschemaProperty):
         return [encode_type(v, typedef=t) for v, t in zip(instance, typedef_list)]
 
     @classmethod
-    def compare(cls, prop1, prop2):
+    def compare(cls, prop1, prop2, root1=None, root2=None):
         r"""Comparison method for 'items' container property."""
         if isinstance(prop1, dict) and isinstance(prop2, dict):
-            for e in compare_schema(prop1, prop2):
+            for e in compare_schema(prop1, prop2, root1=root1, root2=root2):
                 yield e
             return
         elif isinstance(prop1, dict) and isinstance(prop2, cls.python_types):
             for p2 in prop2:
-                for e in compare_schema(prop1, p2):
+                for e in compare_schema(prop1, p2, root1=root1, root2=root2):
                     yield e
             return
         elif isinstance(prop1, cls.python_types) and isinstance(prop2, dict):
             for p1 in prop1:
-                for e in compare_schema(p1, prop2):
+                for e in compare_schema(p1, prop2, root1=root1, root2=root2):
                     yield e
             return
         elif not (isinstance(prop1, cls.python_types)
@@ -46,5 +46,5 @@ class ItemsMetaschemaProperty(MetaschemaProperty):
         if len(prop1) != len(prop2):
             yield 'Unequal number of elements. %d vs. %d' % (len(prop1), len(prop2))
         for p1, p2 in zip(prop1, prop2):
-            for e in compare_schema(p1, p2):
+            for e in compare_schema(p1, p2, root1=root1, root2=root2):
                 yield e

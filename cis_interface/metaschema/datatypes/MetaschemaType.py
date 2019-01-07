@@ -368,7 +368,7 @@ class MetaschemaType(object):
         """
         try:
             cls.validate_metadata(metadata)
-        except jsonschema.exceptions.ValidationError as e:
+        except jsonschema.exceptions.ValidationError:
             return False
         if typedef is not None:
             try:
@@ -462,7 +462,9 @@ class MetaschemaType(object):
             if (typedef == {'type': 'bytes'}) and ('type' in metadata):
                 new_cls = get_type_class(metadata['type'])
                 return new_cls.decode(metadata, data)
+            print('metadata:')
             pprint.pprint(metadata)
+            print('typedef:')
             pprint.pprint(typedef)
             raise ValueError("Metadata does not match type definition.")
         out = cls.decode_data(data, metadata)
@@ -557,7 +559,7 @@ class MetaschemaType(object):
         elif (data == tools.CIS_MSG_EOF):
             obj = data
             metadata['eof'] = True
-        elif no_json:
+        elif no_json or (metadata.get('type', None) == 'direct'):
             obj = data
         else:
             data = json.loads(backwards.bytes2unicode(data))

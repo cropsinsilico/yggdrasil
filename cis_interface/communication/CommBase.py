@@ -293,6 +293,7 @@ class CommBase(tools.CisClass):
 
     """
 
+    # TODO: Add serializer to comm schema
     _commtype = 'default'
     _schema_type = 'comm'
     _schema_required = ['name', 'commtype', 'datatype']
@@ -301,7 +302,10 @@ class CommBase(tools.CisClass):
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
                           'recv_converter': {'type': 'function'},
-                          'send_converter': {'type': 'function'}}
+                          'send_converter': {'type': 'function'},
+                          'field_names': {'type': 'array', 'items': {'type': 'string'}},
+                          'field_units': {'type': 'array', 'items': {'type': 'string'}},
+                          'as_array': {'type': 'boolean', 'default': False}}
     _default_serializer = DefaultSerialize
     is_file = False
 
@@ -1155,7 +1159,7 @@ class CommBase(tools.CisClass):
                 msg_ = msg
             # Guess at serializer if not yet set
             if add_sinfo:
-                self.serializer.update_from_message(msg_)
+                self.serializer.initialize_from_message(msg_)
                 self.debug('Sending sinfo: %s', self.serializer.serializer_info)
             # Serialize
             msg_s = self.serialize(msg_, header_kwargs=header_kwargs,

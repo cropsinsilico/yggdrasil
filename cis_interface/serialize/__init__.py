@@ -409,6 +409,11 @@ def process_message(msg, fmt_str):
         nargs = 0
     else:
         nargs = len(args)
+        if len(args) > 1:
+            dtype = cformat2nptype(fmt_str)
+            dtype_list = [dtype[i] for i in range(nargs)]
+            args = tuple([np.array([a], idtype)[0] for
+                          a, idtype in zip(args, dtype_list)])
     if nargs != nfmt:
         raise ValueError("%d arguments were extracted, " % nargs
                          + "but format string expected %d." % nfmt)
@@ -983,7 +988,7 @@ def format_header(format_str=None, dtype=None,
     # Create lines
     out = []
     for x in [field_names, field_units, fmts]:
-        if (x is None):
+        if (x is None) or (len(max(x, key=len)) == 0):
             continue
         # if (len(x) == 0) or (x[0] == 'None'):
         #     continue
@@ -1037,37 +1042,43 @@ def discover_header(fd, serializer, newline=_default_newline,
                           lineno_format=lineno_format,
                           lineno_names=lineno_names,
                           lineno_units=lineno_units)
-    serializer.update_serializer(as_array=serializer.as_array, **header)
+    # Override header with information set explicitly in serializer
+    for k in serializer._oldstyle_kws:
+        v = getattr(serializer, k, None)
+        if v is not None:
+            header[k] = v
     if (delimiter is None) or ('format_str' in header):
         delimiter = header['delimiter']
     # Try to determine format from array without header
     str_fmt = backwards.unicode2bytes('%s')
-    if (((serializer.format_str is None)
-         or (str_fmt in serializer.format_str))):
+    if ((header['format_str'] is None) or (str_fmt in header['format_str'])):
         fd.seek(prev_pos + header_size)
         all_contents = fd.read()
         if len(all_contents) == 0:  # pragma: debug
             return  # In case the file has not been written
         arr = table_to_array(all_contents,
-                             names=serializer.field_names,
+                             names=header.get('field_names', None),
                              comment=comment,
                              delimiter=delimiter,
                              use_astropy=use_astropy)
-        field_names = arr.dtype.names
-        if serializer.format_str is None:
-            format_str = table2format(
+        header['field_names'] = arr.dtype.names
+        # Get format from array
+        if header['format_str'] is None:
+            header['format_str'] = table2format(
                 arr.dtype, delimiter=delimiter,
                 comment=backwards.unicode2bytes(''),
                 newline=header['newline'])
-        else:
-            format_str = serializer.format_str
-        serializer.update_serializer(format_str=format_str, field_names=field_names)
-        while str_fmt in serializer.format_str:
-            ifld = serializer.field_formats.index(str_fmt)
-            max_len = len(max(arr[serializer.field_names[ifld]], key=len))
+        # Determine maximum size of string field
+        while str_fmt in header['format_str']:
+            field_formats = extract_formats(header['format_str'])
+            ifld = backwards.bytes2unicode(
+                header['field_names'][field_formats.index(str_fmt)])
+            max_len = len(max(arr[ifld], key=len))
             new_str_fmt = backwards.unicode2bytes('%' + str(max_len) + 's')
-            serializer.format_str = serializer.format_str.replace(
+            header['format_str'] = header['format_str'].replace(
                 str_fmt, new_str_fmt, 1)
+    # Update serializer
+    serializer.initialize_serializer(header)
     # Seek to just after the header
     fd.seek(prev_pos + header_size)
 

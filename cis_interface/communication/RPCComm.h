@@ -4,7 +4,6 @@
 
 #include <CommBase.h>
 #include <DefaultComm.h>
-#include <comm_header.h>
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -42,14 +41,12 @@ int init_rpc_comm(comm_t *comm) {
   }
   comm->info = (void*)info;
   // Output comm
-  char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
+  void *seri_out = (void*)get_format_type(comm->direction, 0);
   if (seri_out == NULL) {
-    cislog_error("init_rpc_comm(%s): Failed to malloc seri_out.");
+    cislog_error("init_rpc_comm(%s): Failed to create seri_out.");
     return -1;
   }
-  strcpy(seri_out, comm->direction);
-  comm_t *handle = init_comm_base(comm->name, "send", _default_comm,
-				  (void*)seri_out);
+  comm_t *handle = init_comm_base(comm->name, "send", _default_comm, seri_out);
   ret = init_default_comm(handle);
   if (ret < 0) {
     cislog_error("init_rpc_comm(%s): Failed to initialize output comm", comm->name);
@@ -58,7 +55,6 @@ int init_rpc_comm(comm_t *comm) {
   comm->handle = (void*)handle;
   // Clean up
   strcpy(comm->direction, "send");
-  free(seri_out);
   return ret;
 };
 

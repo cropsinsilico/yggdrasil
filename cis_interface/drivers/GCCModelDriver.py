@@ -186,6 +186,10 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
                 cc = 'gcc'
             else:
                 cc = 'g++'
+    if platform._is_win:  # pragma: windows
+        ccpp = 'cl'
+    else:
+        ccpp = 'g++'
     # Create/fix executable
     if out is None:
         if platform._is_win:  # pragma: windows
@@ -204,17 +208,46 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
                 break
         if std_flag is None:
             ccflags.append('-std=c++11')
-    # Construct compile arguments
-    compile_args = [cc]
+
+    # Compile C++ wrapper
+    fname_lib_base = os.path.normpath(
+        os.path.join(os.path.dirname(__file__), "../metaschema/datatypes/datatypes"))
+    compile_lib_args = [ccpp, "-c"] + ccflags0 + [fname_lib_base + '.cpp']
     if not platform._is_win:
-        compile_args += ["-o", out]
-    compile_args += src + ccflags0 + ccflags
+        fname_lib_out = fname_lib_base + '.o'
+        compile_lib_args += ["-o", fname_lib_out]
+    else:
+        fname_lib_out = fname_lib_base + '.obj'
+        compile_lib_args += [fname_lib_out]
+    if os.path.isfile(fname_lib_out):
+        os.remove(fname_lib_out)
+    comp_process = tools.popen_nobuffer(compile_lib_args)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(' '.join(compile_lib_args))
+        tools.print_encoded(output, end="")
+        raise RuntimeError("Compilation of C++ wrapper failed with code %d." % exit_code)
+    assert(os.path.isfile(fname_lib_out))
+
+    # Construct compile arguments
+    if not platform._is_win:
+        fname_src_obj = src_base + '.o'
+    else:
+        fname_src_obj = src_base + '.obj'
+    compile_args = [cc, '-c'] + ccflags0 + ccflags
+    link_args = [ccpp, fname_src_obj, fname_lib_out] + ldflags0 + ldflags
+    if not platform._is_win:
+        compile_args += ["-o", fname_src_obj]
+        link_args += ["-o", out]
+    compile_args += src
     if platform._is_win:  # pragma: windows
-        compile_args += ['/link', '/out:%s' % out]
-    compile_args += ldflags0 + ldflags
-    if os.path.isfile(out):
-        os.remove(out)
+        compile_args += [fname_src_obj]
+        link_args += ['/out:%s' % out]
+
     # Compile
+    if os.path.isfile(fname_src_obj):
+        os.remove(fname_src_obj)
     comp_process = tools.popen_nobuffer(compile_args)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
@@ -222,6 +255,18 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
         print(' '.join(compile_args))
         tools.print_encoded(output, end="")
         raise RuntimeError("Compilation failed with code %d." % exit_code)
+    # assert(os.path.isfile(out))
+
+    # Link
+    if os.path.isfile(out):
+        os.remove(out)
+    link_process = tools.popen_nobuffer(link_args)
+    output, err = link_process.communicate()
+    exit_code = link_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(' '.join(link_args))
+        tools.print_encoded(output, end="")
+        raise RuntimeError("Linking failed with code %d." % exit_code)
     assert(os.path.isfile(out))
     return out
 

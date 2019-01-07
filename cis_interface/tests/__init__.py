@@ -8,6 +8,7 @@ import numpy as np
 import threading
 import psutil
 import pandas
+import copy
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
@@ -450,6 +451,19 @@ class IOInfo(object):
         self.file_dtype = np.dtype(
             {'names': self.field_names,
              'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+        self.file_schema_scalar = {
+            'type': 'array',
+            'items': [{'type': 'bytes', 'precision': 40},
+                      {'type': 'int', 'precision': 32},
+                      {'type': 'float', 'precision': 64}]}
+        for n, u, x in zip(self.field_names, self.field_units,
+                           self.file_schema_scalar['items']):
+            x['title'] = n
+            x['units'] = u
+        self.file_schema_array = copy.deepcopy(self.file_schema_scalar)
+        for x in self.file_schema_array['items']:
+            x['subtype'] = x['type']
+            x['type'] = '1darray'
         self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
         self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
         self.field_names_line = (self.comment

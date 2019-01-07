@@ -1,9 +1,6 @@
-import copy
 from cis_interface import backwards, serialize, units
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.metaschema.datatypes import (
-    guess_type_from_obj)
 from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype)
 
@@ -51,6 +48,9 @@ class AsciiTableSerialize(DefaultSerialize):
     _schema_properties = dict(
         DefaultSerialize._schema_properties,
         format_str={'type': 'string'},
+        field_names={'type': 'array', 'items': {'type': 'string'}},
+        field_units={'type': 'array', 'items': {'type': 'string'}},
+        as_array={'type': 'boolean', 'default': False},
         delimiter={'type': 'unicode',
                    'default': backwards.bytes2unicode(serialize._default_delimiter)},
         newline={'type': 'unicode',
@@ -58,42 +58,71 @@ class AsciiTableSerialize(DefaultSerialize):
         comment={'type': 'unicode',
                  'default': backwards.bytes2unicode(serialize._default_comment)},
         use_astropy={'type': 'boolean', 'default': False})
-    _default_type = {'type': 'array'}
 
-    def update_from_message(self, msg, **kwargs):
-        r"""Update serializer information based on the message.
+    def update_serializer(self, *args, **kwargs):
+        out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
+        if self.typedef['type'] == 'array':
+            self.update_format_str()
+            self.update_field_names()
+            self.update_field_units()
+        return out
 
-        Args:
-            msg (obj): Python object being sent as a message.
-            **kwargs: Additional keyword arguments are assumed to be typedef
-                options and are passed to update_serializer.
-
-        """
-        # Update typedef with the full definition
-        out = copy.deepcopy(self.typedef)
-        out.update(kwargs)
-        cls = guess_type_from_obj(msg)
-        typedef = cls.encode_type(msg, **out)
-        self.update_serializer(extract=False, **typedef)
+    def update_format_str(self):
+        r"""Update the format string based on the type definition."""
         # Get format information from precision etc.
         assert(self.typedef['type'] == 'array')
         if self.format_str is None:
             fmts = []
-            if isinstance(self.typedef['items'], dict):
+            if isinstance(self.typedef['items'], dict):  # pragma: debug
                 idtype = definition2dtype(self.typedef['items'])
                 ifmt = serialize.nptype2cformat(idtype, asbytes=True)
-                fmts = [ifmt for x in msg]
+                # fmts = [ifmt for x in msg]
+                raise Exception("Variable number of items not yet supported.")
             elif isinstance(self.typedef['items'], list):
                 for x in self.typedef['items']:
                     idtype = definition2dtype(x)
-                    fmts.append(serialize.nptype2cformat(idtype, asbytes=True))
+                    ifmt = serialize.nptype2cformat(idtype, asbytes=True)
+                    fmts.append(ifmt)
             if fmts:
-                self.format_str = serialize.table2format(
+                self._format_str = serialize.table2format(
                     fmts=fmts,
                     delimiter=backwards.unicode2bytes(self.delimiter),
                     newline=backwards.unicode2bytes(self.newline),
                     comment=backwards.unicode2bytes(''))
-        super(AsciiTableSerialize, self).update_from_message(msg, **kwargs)
+
+    def update_field_names(self):
+        r"""list: Names for each field in the data type."""
+        assert(self.typedef['type'] == 'array')
+        if self.field_names is None:
+            if isinstance(self.typedef['items'], dict):  # pragma: debug
+                raise Exception("Variable number of items not yet supported.")
+            elif isinstance(self.typedef['items'], list):
+                out = []
+                any_names = False
+                for i, x in enumerate(self.typedef['items']):
+                    out.append(backwards.unicode2bytes(x.get('title', 'f%d' % i)))
+                    if 'title' in x:
+                        any_names = True
+                # Don't use field names if they are all defaults
+                if any_names:
+                    self.field_names = out
+
+    def update_field_units(self):
+        r"""list: Units for each field in the data type."""
+        assert(self.typedef['type'] == 'array')
+        if self.field_units is None:
+            if isinstance(self.typedef['items'], dict):  # pragma: debug
+                raise Exception("Variable number of items not yet supported.")
+            elif isinstance(self.typedef['items'], list):
+                out = []
+                any_units = False
+                for i, x in enumerate(self.typedef['items']):
+                    out.append(backwards.unicode2bytes(x.get('units', '')))
+                    if len(x.get('units', '')) > 0:
+                        any_units = True
+                # Don't use field units if they are all defaults
+                if any_units:
+                    self.field_units = out
 
     def func_serialize(self, args):
         r"""Serialize a message.

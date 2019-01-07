@@ -3,6 +3,7 @@
 #define CISCOMMBASE_H_
 
 #include <../tools.h>
+#include <../metaschema/datatypes/datatypes.h>
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -82,8 +83,8 @@ comm_t empty_comm_base() {
   @returns comm_t* Address of comm structure.
 */
 static inline
-comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
-		      const void *seri_info) {
+comm_t* new_comm_base(char *address, const char *direction,
+		      const comm_type t, void *seri_info) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
   if (ret == NULL) {
     cislog_error("new_comm_base: Failed to malloc comm.");
@@ -99,7 +100,7 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
   } else {
     strcpy(ret->direction, direction);
   }
-  ret->serializer = init_serializer(-1, seri_info);
+  ret->serializer = init_serializer("", seri_info);
   ret->maxMsgSize = CIS_MSG_MAX;
   ret->last_send = (time_t*)malloc(sizeof(time_t));
   ret->last_send[0] = 0;
@@ -126,7 +127,7 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
  */
 static inline
 comm_t* init_comm_base(const char *name, const char *direction,
-		       const comm_type t, const void *seri_info) {
+		       const comm_type t, void *seri_info) {
   char full_name[COMM_NAME_SIZE];
   char *address = NULL;
   if (name != NULL) {

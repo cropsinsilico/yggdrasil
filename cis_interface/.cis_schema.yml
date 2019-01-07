@@ -10,13 +10,16 @@ definitions:
       properties:
         args:
           type: string
+        as_array:
+          default: false
+          type: boolean
         commtype:
           default: default
           enum:
-          - zmq
+          - ipc
           - rmq
           - default
-          - ipc
+          - zmq
           type: string
         datatype:
           default:
@@ -24,6 +27,14 @@ definitions:
           type: schema
         driver:
           type: string
+        field_names:
+          items:
+            type: string
+          type: array
+        field_units:
+          items:
+            type: string
+          type: array
         name:
           type: string
         recv_converter:
@@ -70,23 +81,23 @@ definitions:
           type: string
         direction:
           enum:
-          - input
           - output
+          - input
           - null
         driver:
           type: string
         icomm_type:
           enum:
-          - RMQComm
           - ObjFileComm
-          - FileComm
           - DefaultComm
-          - AsciiTableComm
+          - FileComm
           - PandasFileComm
+          - RMQComm
           - AsciiFileComm
-          - AsciiMapComm
-          - PlyFileComm
           - PickleFileComm
+          - AsciiTableComm
+          - PlyFileComm
+          - AsciiMapComm
         inputs:
           items:
             anyOf:
@@ -96,16 +107,16 @@ definitions:
           type: array
         ocomm_type:
           enum:
-          - RMQComm
           - ObjFileComm
-          - FileComm
           - DefaultComm
-          - AsciiTableComm
+          - FileComm
           - PandasFileComm
+          - RMQComm
           - AsciiFileComm
-          - AsciiMapComm
-          - PlyFileComm
           - PickleFileComm
+          - AsciiTableComm
+          - PlyFileComm
+          - AsciiMapComm
         onexit:
           type: string
         outputs:
@@ -370,7 +381,7 @@ definitions:
           type: boolean
         args:
           type: string
-        as_array: &id002
+        as_array:
           default: false
           type: boolean
         comment:
@@ -385,27 +396,27 @@ definitions:
           type: unicode
         driver:
           type: string
-        field_names: &id003
+        field_names:
           items:
             type: string
           type: array
-        field_units: &id004
+        field_units:
           items:
             type: string
           type: array
         filetype:
           default: binary
           enum:
-          - obj
           - table
+          - ply
+          - pandas
+          - binary
           - pickle
           - ascii
-          - ply
-          - binary
-          - pandas
+          - obj
           - map
           type: string
-        format_str: &id005
+        format_str: &id002
           type: string
         in_temp:
           default: false
@@ -424,7 +435,7 @@ definitions:
           type: function
         send_converter:
           type: function
-        use_astropy: &id006
+        use_astropy: &id003
           default: false
           type: boolean
         working_dir:
@@ -457,33 +468,19 @@ definitions:
             - ascii
         title: AsciiFileComm
       - properties:
-          as_array: *id002
           delimiter:
             default: "\t"
             type: unicode
-          field_names: *id003
-          field_units: *id004
           filetype:
             enum:
             - table
-          format_str: *id005
-          use_astropy: *id006
+          format_str: *id002
+          use_astropy: *id003
         title: AsciiTableComm
       - properties:
-          as_array:
-            default: false
-            type: boolean
           delimiter:
             default: "\t"
             type: unicode
-          field_names:
-            items:
-              type: string
-            type: array
-          field_units:
-            items:
-              type: string
-            type: array
           filetype:
             enum:
             - pandas
@@ -517,16 +514,16 @@ definitions:
           items:
             type: string
           type: array
-        builddir: &id011
+        builddir: &id008
           type: string
-        cc: &id007
+        cc: &id004
           type: string
         client_of:
           default: []
           items:
             type: string
           type: array
-        cmakeargs: &id012
+        cmakeargs: &id009
           default: []
           items:
             type: string
@@ -544,21 +541,21 @@ definitions:
         language:
           enum:
           - executable
+          - lpy
           - cmake
           - c
-          - make
-          - matlab
           - c++
-          - lpy
-          - python
+          - make
           - cpp
+          - matlab
+          - python
           type: string
-        make_command: &id008
+        make_command: &id005
           default: make
           type: string
-        makedir: &id009
+        makedir: &id006
           type: string
-        makefile: &id010
+        makefile: &id007
           default: Makefile
           type: string
         name:
@@ -568,7 +565,7 @@ definitions:
           items:
             $ref: '#/definitions/comm'
           type: array
-        sourcedir: &id013
+        sourcedir: &id010
           type: string
         strace_flags:
           default: []
@@ -576,7 +573,8 @@ definitions:
             type: string
           type: array
         valgrind_flags:
-          default: []
+          default:
+          - --leak-check=full
           items:
             type: string
           type: array
@@ -601,7 +599,7 @@ definitions:
             - executable
         title: ModelDriver
       - properties:
-          cc: *id007
+          cc: *id004
           language:
             enum:
             - c
@@ -612,9 +610,9 @@ definitions:
           language:
             enum:
             - make
-          make_command: *id008
-          makedir: *id009
-          makefile: *id010
+          make_command: *id005
+          makedir: *id006
+          makefile: *id007
         title: MakeModelDriver
       - properties:
           language:
@@ -627,12 +625,12 @@ definitions:
             - matlab
         title: MatlabModelDriver
       - properties:
-          builddir: *id011
-          cmakeargs: *id012
+          builddir: *id008
+          cmakeargs: *id009
           language:
             enum:
             - cmake
-          sourcedir: *id013
+          sourcedir: *id010
         title: CMakeModelDriver
       - properties:
           language:

@@ -138,7 +138,7 @@ class ScalarMetaschemaType(MetaschemaType):
         arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
-        return cls.from_array(arr, unit_str=typedef['units'], dtype=dtype)
+        return cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)
 
     @classmethod
     def transform_type(cls, obj, typedef=None):
@@ -160,8 +160,8 @@ class ScalarMetaschemaType(MetaschemaType):
         typedef1.update(**typedef)
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef1)
         arr = cls.to_array(obj).astype(dtype)
-        out = cls.from_array(arr, unit_str=typedef0['units'], dtype=dtype)
-        return units.convert_to(out, typedef1['units'])
+        out = cls.from_array(arr, unit_str=typedef0.get('units', None), dtype=dtype)
+        return units.convert_to(out, typedef1.get('units', None))
 
     @classmethod
     def to_array(cls, obj):
@@ -222,7 +222,9 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         out = super(ScalarMetaschemaType, cls).get_extract_properties(metadata)
         dtype = metadata.get('subtype', metadata['type'])
-        if dtype in ScalarMetaschemaProperties._flexible_types:
+        if (((dtype in ScalarMetaschemaProperties._flexible_types)
+             and (metadata['type'] not in ['1darray', 'ndarray'])
+             and (not metadata.get('fixed_precision', False)))):
             out.remove('precision')
         if len(metadata.get('units', '')) == 0:
             out.remove('units')

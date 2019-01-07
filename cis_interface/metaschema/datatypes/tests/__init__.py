@@ -68,11 +68,15 @@ def test_compare_schema():
         ({'type': 'int'}, {'type': 'int'}),
         ({'type': 'int'}, {'type': 'scalar', 'subtype': 'int'}),
         ({'type': 'scalar', 'subtype': 'int'}, {'type': 'int'}),
-        ({'type': 'int', 'unnamed': 0}, {'type': 'int', 'unnamed': 0})]
+        ({'type': 'int', 'unnamed': 0}, {'type': 'int', 'unnamed': 1}),
+        ({'type': 'int', 'unnamed': 0}, {'type': 'int'}),
+        ({'type': 'object', 'definitions': {'a': {'type': 'int'}},
+          'properties': {'x': {'$ref': '#/definitions/a'}}},
+         {'type': 'object', 'definitions': {'b': {'type': 'int'}},
+          'properties': {'x': {'$ref': '#/definitions/b'}}})]
     invalid = [
         ({'type': 'int'}, {}), ({}, {'type': 'int'}),
-        ({'type': 'int'}, {'type': 'int', 'precision': 4}),
-        ({'type': 'int', 'unnamed': 0}, {'type': 'int', 'unnamed': 1})]
+        ({'type': 'int'}, {'type': 'int', 'precision': 4})]
     for x in valid:
         errors = list(datatypes.compare_schema(*x))
         assert(not errors)

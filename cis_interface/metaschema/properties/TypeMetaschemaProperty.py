@@ -39,7 +39,7 @@ class TypeMetaschemaProperty(MetaschemaProperty):
             % type(instance))
 
     @classmethod
-    def compare(cls, prop1, prop2):
+    def compare(cls, prop1, prop2, root1=None, root2=None):
         r"""Method to determine compatiblity of one property value with another.
         This method is not necessarily symmetric in that the second value may
         not be compatible with the first even if the first is compatible with

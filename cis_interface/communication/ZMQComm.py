@@ -957,7 +957,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         """
         flag, msg_s = super(ZMQComm, self).on_send_eof()
         header_kwargs = dict(zmq_reply=self.set_reply_socket_send())
-        out = self.serializer.serialize(msg_s, header_kwargs=header_kwargs)
+        out = self.serialize(msg_s, header_kwargs=header_kwargs)
         return flag, out
         
     def on_send(self, msg, header_kwargs=None):

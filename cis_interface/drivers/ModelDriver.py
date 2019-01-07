@@ -1,6 +1,7 @@
 import os
 import sys
 import copy
+import warnings
 from pprint import pformat
 from cis_interface import backwards, platform, tools
 from cis_interface.drivers.Driver import Driver
@@ -175,7 +176,10 @@ class ModelDriver(Driver):
             except BaseException:  # pragma: debug
                 pass
         else:
-            self.queue.put(line.decode('utf-8'))
+            try:
+                self.queue.put(line.decode('utf-8'))
+            except BaseException as e:
+                warnings.warn("Error in printing output: %s" % e)
 
     def before_loop(self):
         r"""Actions before loop."""

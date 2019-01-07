@@ -22,7 +22,6 @@ class PandasSerialize(AsciiTableSerialize):
     _schema_properties = dict(
         AsciiTableSerialize._schema_properties,
         write_header={'type': 'bool', 'default': True})
-    _default_type = {'type': 'array'}
 
     def func_serialize(self, args):
         r"""Serialize a message.

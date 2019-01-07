@@ -21,14 +21,16 @@ _normalize_objects = [
                   'language': 'c',
                   'args': ['model.c'],
                   'inputs': [], 'outputs': [{'name': 'outputA',
+                                             'as_array': False,
                                              'commtype': 'default',
                                              'datatype': {'type': 'bytes'}}],
                   'working_dir': os.getcwd(),
                   'client_of': [],
                   'is_server': False,
-                  'strace_flags': [], 'valgrind_flags': [],
+                  'strace_flags': [], 'valgrind_flags': ['--leak-check=full'],
                   'with_strace': False, 'with_valgrind': False}],
       'connections': [{'inputs': [{'name': 'outputA',
+                                   'as_array': False,
                                    'commtype': 'default',
                                    'datatype': {'type': 'bytes'}}],
                        'outputs': [{'name': 'fileA.txt',
@@ -43,9 +45,9 @@ _normalize_objects = [
                                     'as_array': False,
                                     'in_temp': False,
                                     'is_series': False,
-                                    'newline': '\n',
-                                    'use_astropy': False}]}]})]
-
+                                    # 'use_astropy': False,
+                                    'newline': '\n'}]}]})]
+                                    
 
 def test_SchemaRegistry():
     r"""Test schema registry."""

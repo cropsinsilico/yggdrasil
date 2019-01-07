@@ -59,11 +59,13 @@ def get_registered_properties():
     return _metaschema_properties
 
 
-def get_metaschema_property(property_name):
+def get_metaschema_property(property_name, skip_generic=False):
     r"""Get the property class associated with a metaschema property.
 
     Args:
         property_name (str): Name of property to get class for.
+        skip_generic (bool, optional): If True and the property dosn't have a
+            class, None is returned. Defaults to False.
 
     Returns:
         MetaschemaProperty: Associated property class.
@@ -72,7 +74,10 @@ def get_metaschema_property(property_name):
     if property_name in _metaschema_properties:
         return _metaschema_properties[property_name]
     else:
-        return MetaschemaProperty.MetaschemaProperty
+        if skip_generic:
+            return None
+        else:
+            return MetaschemaProperty.MetaschemaProperty
 
 
 def import_all_properties():

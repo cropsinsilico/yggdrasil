@@ -76,15 +76,30 @@ public:
     indicate success.
    */
   int recv(const int nargs, ...) {
-    // if (nargs != _pi._nfmt) {
-    //   cislog_error("CisInput(%s).recv: %d args provided, but format expects %d.\n",
-    // 		   _pi._name, nargs, _pi._nfmt);
-    //   return -1;
-    // }
-    va_list va;
-    va_start(va, nargs);
-    int ret = vcisRecv(_pi, va);
-    va_end(va);
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vcommRecv(_pi, 0, nargs_copy, va);
+    va_end(va.va);
+    return ret;
+  }
+
+  /*!
+    @brief Receive and parse a message from the input queue, allowing destination
+    variables to be reallocated. The pointers passed must be on heap.
+    @param[in] nargs int Number of arguments being passed.
+    @param[out] ... mixed arguments that should be assigned parameters extracted
+    using the format string. Since these will be assigned, they should be
+    pointers to memory that has already been allocated.
+    @return integer specifying if the receive was succesful. Values >= 0
+    indicate success.
+   */
+  int recvRealloc(const int nargs, ...) {
+    size_t nargs_copy = (size_t)nargs;
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vcommRecv(_pi, 1, nargs_copy, va);
+    va_end(va.va);
     return ret;
   }
   
@@ -103,7 +118,7 @@ public:
   
   /*!
     @brief Receive and parse a message larger than CIS_MSG_MAX from the input
-    queue. See cisRecv_nolimit from CisInterface.h for details.
+    queue. See cisRecv from CisInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[out] ... mixed arguments that should be assigned parameters extracted
     using the format string. Since these will be assigned, they should be
@@ -112,15 +127,10 @@ public:
     indicate success.
    */
   int recv_nolimit(const int nargs, ...) {
-    // if (nargs != _pi._nfmt) {
-    //   cislog_error("CisInput(%s).recv: %d args provided, but format expects %d.\n",
-    // 		   _pi._name, nargs, _pi._nfmt);
-    //   return -1;
-    // }
-    va_list va;
-    va_start(va, nargs);
-    int ret = vcisRecv_nolimit(_pi, va);
-    va_end(va);
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vcisRecv(_pi, 0, nargs, va);
+    va_end(va.va);
     return ret;
   }
   
@@ -197,15 +207,10 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    // if (nargs != _pi._nfmt) {
-    //   cislog_error("CisOutput(%s).send: %d args provided, but format expects %d.\n",
-    // 		   _pi._name, nargs, _pi._nfmt);
-    //   return -1;
-    // }
-    va_list va;
-    va_start(va, nargs);
-    int ret = vcisSend(_pi, va);
-    va_end(va);
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vcisSend(_pi, nargs, va);
+    va_end(va.va);
     return ret;
   }
 
@@ -229,15 +234,10 @@ public:
     success.
   */
   int send_nolimit(const int nargs, ...) {
-    // if (nargs != _pi._nfmt) {
-    //   cislog_error("CisOutput(%s).send: %d args provided, but format expects %d.\n",
-    // 		   _pi._name, nargs, _pi._nfmt);
-    //   return -1;
-    // }
-    va_list va;
-    va_start(va, nargs);
-    int ret = vcisSend_nolimit(_pi, va);
-    va_end(va);
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vcisSend(_pi, nargs, va);
+    va_end(va.va);
     return ret;
   }
 
@@ -303,10 +303,10 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    va_list va;
-    va_start(va, nargs);
-    int ret = vrpcSend(_pi, va);
-    va_end(va);
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vrpcSend(_pi, nargs, va);
+    va_end(va.va);
     return ret;
   }
 
@@ -321,10 +321,10 @@ public:
     indicate success.
    */
   int recv(const int nargs, ...) {
-    va_list va;
-    va_start(va, nargs);
-    int ret = vrpcRecv(_pi, va);
-    va_end(va);
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vrpcRecv(_pi, nargs, va);
+    va_end(va.va);
     return ret;
   }
 };
@@ -403,10 +403,10 @@ public:
   */
   int call(const int nargs, ...) {
     cisRpc_t _cpi = pi();
-    va_list va;
-    va_start(va, nargs);
-    int ret = vrpcCall(_cpi, va);
-    va_end(va);
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vrpcCall(_cpi, nargs, va);
+    va_end(va.va);
     return ret;
   }
   

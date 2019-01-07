@@ -1,14 +1,15 @@
 import copy
+import pprint
 import numpy as np
 from cis_interface import backwards, tools, serialize
 from cis_interface.serialize import register_serializer
 from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class)
-from cis_interface.metaschema.datatypes.ScalarMetaschemaType import ScalarMetaschemaType
-
-
-_oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
+from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
+    definition2dtype)
+from cis_interface.metaschema.datatypes.ArrayMetaschemaType import (
+    OneDArrayMetaschemaType)
 
 
 @register_serializer
@@ -37,8 +38,9 @@ class DefaultSerialize(object):
     _seritype = 'default'
     _schema_type = 'serializer'
     _schema_requried = []
-    _schema_properties = {'format_str': {'type': 'string'}}
+    _schema_properties = {}
     _default_type = {'type': 'bytes'}
+    _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
 
     def __init__(self, func_serialize=None, func_deserialize=None, **kwargs):
         self._alias = None
@@ -67,64 +69,13 @@ class DefaultSerialize(object):
         self.str_datatype = get_type_from_def({'type': 'bytes'})
         self.update_serializer(**kwargs)
         self._initialized = (self.typedef != self._default_type)
-        if 'format_str' not in self._schema_properties:
-            self.format_str = None
-
-    def oldstyle2datatype(self, format_str=None, **kwargs):
-        r"""Convert old, table-style serialization spec to a a data type definition.
-
-        Args:
-            format_str (str, optional): If provided, this string will be used to
-                determine the data types of elements. Defaults to None and is
-                ignored. If this is None, the other old table-style spec keywords
-                will also be ignored.
-            field_names (list, optional): The names of fields in the format string.
-                Defaults to None and is ignored.
-            field_units (list, optional): The units of fields in the format string.
-                Defaults to None and is ignored.
-            as_array (bool, optional): If True, each of the arguments being
-                serialized/deserialized will be arrays. Otherwise each argument
-                should be a scalar. Defaults to False.
-            **kwargs: Additional keyword arguments are treated as part of the type
-                definition and will override keys set from the old style spec.
-
-        Returns:
-            tuple(dict, dict): Type definition and extra keywords.
-
-        """
-        if format_str is None:
-            for k in _oldstyle_kws:
-                v = kwargs.pop(k, None)
-                if getattr(self, k, None) is None:
-                    setattr(self, '_%s' % k, v)
-            return {}, kwargs
-        typedef = {'type': 'array', 'items': []}
-        field_names = kwargs.pop('field_names', self.field_names)
-        field_units = kwargs.pop('field_units', self.field_units)
-        as_array = kwargs.pop('as_array', self.as_array)
-        for i, fmt in enumerate(serialize.extract_formats(format_str)):
-            nptype = serialize.cformat2nptype(fmt)
-            itype = ScalarMetaschemaType.encode_type(np.ones(1, nptype)[0])
-            itype = ScalarMetaschemaType.extract_typedef(itype)
-            if as_array:
-                itype['type'] = '1darray'
-            else:
-                itype['type'] = itype.pop('subtype')
-            if field_names is not None:
-                itype['title'] = backwards.bytes2unicode(field_names[i])
-            if field_units is not None:
-                itype['units'] = backwards.bytes2unicode(field_units[i])
-            typedef['items'].append(itype)
-        return typedef, kwargs
 
     @property
     def typedef(self):
         r"""dict: Type definition."""
         if self.is_user_defined:
-            return self.str_datatype._typedef
-        # raise RuntimeError("Cannot get type def for user "
-        #                        + "defined functions.")
-        return self.datatype._typedef
+            return copy.deepcopy(self.str_datatype._typedef)
+        return copy.deepcopy(self.datatype._typedef)
 
     def __getattribute__(self, name):
         r"""Return alias result if there is one."""
@@ -141,15 +92,26 @@ class DefaultSerialize(object):
         if self.is_user_defined:
             raise RuntimeError("Cannot define serializer information for user "
                                + "supplied functions.")
-        out = {}  # copy.deepcopy(self.typedef)
+        # out = copy.deepcopy(self.typedef)
+        out = copy.deepcopy(self.extra_kwargs)
         out['seritype'] = self._seritype
         for k in self._schema_properties.keys():
             v = getattr(self, k, None)
             if v is not None:
-                if isinstance(v, backwards.bytes_type):
-                    out[k] = backwards.bytes2unicode(v)
-                else:
-                    out[k] = v
+                out[k] = copy.deepcopy(v)
+        for k in out.keys():
+            v = out[k]
+            if isinstance(v, backwards.bytes_type):
+                out[k] = backwards.bytes2unicode(v)
+            elif isinstance(v, (list, tuple)):
+                out[k] = []
+                for x in v:
+                    if isinstance(x, backwards.bytes_type):
+                        out[k].append(backwards.bytes2unicode(x))
+                    else:
+                        out[k].append(x)
+            else:
+                out[k] = v
         return out
 
     @property
@@ -162,84 +124,43 @@ class DefaultSerialize(object):
         return out
 
     @property
-    def field_formats(self):
-        r"""list: Format codes for each field in the format string."""
-        if self.format_str is None:
-            return []
-        return serialize.extract_formats(self.format_str)
-
-    @property
-    def nfields(self):
-        r"""int: Number of fields in the format string."""
-        if self.format_str is not None:
-            return len(self.field_formats)
-        if (((self.typedef['type'] == 'array') and ('items' in self.typedef)
-             and isinstance(self.typedef['items'], list))):
-            return len(self.typedef['items'])
-        return 0
-
-    @property
-    def field_names(self):
-        r"""list: Names for each field in the data type."""
-        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
-            out = []
-            any_names = False
-            for i, t in enumerate(self.typedef['items']):
-                if 'title' in t:
-                    any_names = True
-                out.append(backwards.unicode2bytes(t.get('title', 'f%d' % i)))
-            assert(len(out) == self.nfields)
-            if not any_names:
-                out = None
-        else:
-            out = getattr(self, '_field_names', None)
-        return out
-
-    @property
-    def field_units(self):
-        r"""list: Units for each field in the data type."""
-        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
-            out = []
-            any_units = False
-            for i, t in enumerate(self.typedef['items']):
-                if 'units' in t:
-                    any_units = True
-                out.append(backwards.unicode2bytes(t.get('units', '')))
-            assert(len(out) == self.nfields)
-            if not any_units:
-                out = None
-        else:
-            out = getattr(self, '_field_units', None)
-        return out
-
-    @property
-    def as_array(self):
-        r"""bool: True if the entire table columns are sent/received, False
-        otherwise."""
-        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
-            out = True
-            for t in self.typedef['items']:
-                if t['type'] != '1darray':
-                    out = False
-                    break
-        else:
-            out = getattr(self, '_as_array', None)
-        return out
-
-    @property
     def numpy_dtype(self):
-        r"""np.dtype: Data type associated with the format string."""
-        if self.format_str is None:
-            return None
-        return serialize.cformat2nptype(self.format_str, names=self.field_names)
+        r"""np.dtype: Corresponding structured data type. Will be None unless the
+        type is an array of 1darrays."""
+        out = None
+        if (self.typedef['type'] == 'array') and ('items' in self.typedef):
+            if isinstance(self.typedef['items'], dict):
+                as_array = (self.typedef['items']['type'] in ['1darray', 'ndarray'])
+                if as_array:
+                    out = definition2dtype(self.typedef['items'])
+            elif isinstance(self.typedef['items'], (list, tuple)):
+                as_array = True
+                dtype_list = []
+                field_names = []
+                for i, x in enumerate(self.typedef['items']):
+                    if x['type'] != '1darray':
+                        as_array = False
+                        break
+                    dtype_list.append(definition2dtype(x))
+                    field_names.append(x.get('title', 'f%d' % i))
+                if as_array:
+                    out = np.dtype(dict(names=field_names, formats=dtype_list))
+        return out
 
-    @property
-    def scanf_format_str(self):
-        r"""str: Simplified format string for scanf."""
-        if self.format_str is None:
-            return None
-        return serialize.cformat2pyscanf(self.format_str)
-        
+    def initialize_serializer(self, metadata, extract=False):
+        r"""Initialize a serializer based on received metadata."""
+        if self._initialized:
+            return
+        self.update_serializer(extract=extract, **metadata)
+        self._initialized = (self.typedef != self._default_type)
+
+    def initialize_from_message(self, msg):
+        r"""Initialize the serializer based on recieved message."""
+        cls = guess_type_from_obj(msg)
+        typedef = cls.encode_type(msg)
+        typedef = cls.extract_typedef(typedef)
+        self.initialize_serializer(typedef)
+
     def update_from_message(self, msg, **kwargs):
         r"""Update serializer information based on the message.
 
@@ -253,6 +174,7 @@ class DefaultSerialize(object):
         out.update(kwargs)
         cls = guess_type_from_obj(msg)
         typedef = cls.encode_type(msg, **out)
+        typedef.update(**kwargs)
         self.update_serializer(extract=True, **typedef)
 
     def update_serializer(self, extract=False, **kwargs):
@@ -279,29 +201,106 @@ class DefaultSerialize(object):
             self._alias = serialize.get_serializer(**kwargs)
             assert(self._seritype == seritype)
             return
+        # Remove metadata keywords unrelated to serialization
+        # TODO: Find a better way of tracking these
+        _remove_kws = ['size', 'id', 'incomplete', 'commtype', 'filetype',
+                       'append', 'in_temp', 'is_series', 'working_dir', 'fmts',
+                       'model_driver', 'env', 'send_converter', 'recv_converter']
+        kws = list(kwargs.keys())
+        for k in kws:
+            if (k in _remove_kws) or k.startswith('zmq'):
+                kwargs.pop(k)
         # Set attributes and remove unused metadata keys
-        for k in ['size', 'id']:
-            kwargs.pop(k, None)
         for k in self._schema_properties.keys():
             if k in kwargs:
                 setattr(self, k, kwargs.pop(k))
-                if k in _oldstyle_kws:
-                    kwargs[k] = getattr(self, k)
-        typedef, kwargs = self.oldstyle2datatype(**kwargs)
+        # Create preliminary typedef
+        typedef = {}
         for k in _metaschema['properties'].keys():
             if k in kwargs:
                 typedef[k] = kwargs.pop(k)
+        # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-            # pprint.pprint(kwargs)
+            print('extras:')
+            pprint.pprint(kwargs)
             # raise RuntimeError("There were unprocessed keyword arguments.")
+        # Update typedef from oldstyle keywords in extra_kwargs
+        typedef = self.update_typedef_from_oldstyle(typedef)
         if typedef.get('type', None):
-            self.datatype = get_type_class(typedef['type'])()
-            # if typedef['type'] != self.typedef['type']:
-            #     self.datatype = get_type_class(typedef['type'])()
-            if extract:
-                typedef = self.datatype.extract_typedef(typedef)
-            self.datatype.update_typedef(**typedef)
+            if extract:  # pragma: debug
+                cls = get_type_class(typedef['type'])
+                typedef = cls.extract_typedef(typedef)
+            self.datatype = get_type_from_def(typedef)
+
+    def update_typedef_from_oldstyle(self, typedef):
+        r"""Update a given typedef using an old, table-style serialization spec.
+        Existing typedef values are not overwritten and warnings are raised if the
+        provided serialization spec is not compatible with the type definition.
+
+        Args:
+            typedef (dict): Type definition to update.
+
+        Returns:
+            dict: Updated typedef.
+
+        """
+        for k in self._oldstyle_kws:
+            used = []
+            v = self.extra_kwargs.get(k, getattr(self, k, None))
+            if v is None:
+                continue
+            # Check status
+            if ((k != 'format_str') and (typedef.get('type', None) != 'array')):
+                continue
+            # Key specific changes to type
+            if k == 'format_str':
+                fmts = serialize.extract_formats(v)
+                if 'type' in typedef:
+                    # print('update format_str for existing type?', typedef)
+                    if (typedef.get('type', None) == 'array'):
+                        if len(typedef.get('items', [])) != len(fmts):
+                            warnings.warn(("Number of items in typedef (%d) doesn't"
+                                           + "match the number of formats (%d).")
+                                          % (len(typedef.get('items', [])), len(fmts)))
+                    continue
+                as_array = self.extra_kwargs.get('as_array',
+                                                 getattr(self, 'as_array', False))
+                typedef.update(type='array', items=[])
+                for i, fmt in enumerate(fmts):
+                    nptype = serialize.cformat2nptype(fmt)
+                    itype = OneDArrayMetaschemaType.encode_type(np.ones(1, nptype))
+                    itype = OneDArrayMetaschemaType.extract_typedef(itype)
+                    if as_array:
+                        itype['type'] = '1darray'
+                    else:
+                        itype['type'] = itype.pop('subtype')
+                    typedef['items'].append(itype)
+                used.append('as_array')
+            elif k == 'as_array':
+                # Can only be used in conjunction with format_str
+                pass
+            elif k in ['field_names', 'field_units']:
+                if k == 'field_names':
+                    tk = 'title'
+                else:
+                    tk = 'units'
+                if isinstance(typedef['items'], dict):
+                    typedef['items'] = [copy.deepcopy(typedef['items'])
+                                        for _ in range(len(v))]
+                if len(v) != len(typedef.get('items', [])):
+                    warnings.warn('%d %ss provided, but only %d items in typedef.'
+                                  % (len(v), k, len(typedef.get('items', []))))
+                    continue
+                for iv, itype in zip(v, typedef.get('items', [])):
+                    itype[tk] = backwards.bytes2unicode(iv)
+                used.append(k)
+            else:  # pragma: debug
+                raise ValueError("Unrecognized table-style specification keyword: '%s'." % k)
+            for rk in used:
+                if rk in self.extra_kwargs:
+                    del self.extra_kwargs[rk]
+        return typedef
 
     def serialize(self, args, header_kwargs=None, add_serializer_info=False,
                   no_metadata=False):
@@ -328,11 +327,11 @@ class DefaultSerialize(object):
         if isinstance(args, backwards.bytes_type) and (args == tools.CIS_MSG_EOF):
             is_eof = True
         if not (self._initialized or is_eof):
-            self.update_from_message(args)
-            self._initialized = True
+            self.initialize_from_message(args)
         metadata = {'no_metadata': no_metadata}
         if add_serializer_info:
             metadata.update(self.serializer_info)
+            metadata['typedef'] = self.typedef
         if header_kwargs is not None:
             metadata.update(header_kwargs)
         if hasattr(self, 'func_serialize'):
@@ -387,12 +386,16 @@ class DefaultSerialize(object):
         else:
             out, metadata = self.datatype.deserialize(msg, **kwargs)
         # Update serializer
-        if not (self._initialized
-                or (metadata.get('size', 0) == 0)
+        typedef_base = metadata.pop('typedef', {})
+        typedef = copy.deepcopy(metadata)
+        typedef.update(typedef_base)
+        if not ((metadata.get('size', 0) == 0)
                 or metadata.get('eof', False)
                 or metadata.get('incomplete', False)):
-            self.update_from_message(out, **metadata)
-            self._initialized = True
+            self.initialize_serializer(typedef)
+            np_dtype = self.numpy_dtype
+            if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
+                out = serialize.consolidate_array(out, dtype=self.numpy_dtype)
         return out, metadata
 
     # def format_header(self, header_info):

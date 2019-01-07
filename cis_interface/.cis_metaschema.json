@@ -38,12 +38,12 @@
 				"complex",
 				"bytes",
 				"unicode",
+				"1darray",
+				"ndarray",
 				"ply",
 				"obj",
 				"schema",
-				"function",
-				"1darray",
-				"ndarray"
+				"function"
 			]
 		},
 		"stringArray": {

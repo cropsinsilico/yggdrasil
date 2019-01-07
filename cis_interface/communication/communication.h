@@ -3,8 +3,8 @@
 #define CISCOMMUNICATION_H_
 
 #include <../tools.h>
+#include <../metaschema/datatypes/datatypes.h>
 #include <../serialize/serialize.h>
-#include <comm_header.h>
 #include <CommBase.h>
 #include <IPCComm.h>
 #include <ZMQComm.h>
@@ -226,8 +226,8 @@ int init_comm_type(comm_t *x) {
   @returns comm_t Comm structure.
  */
 static
-comm_t new_comm(char *address, const char *direction, const comm_type t,
-		void *seri_info) {
+comm_t new_comm(char *address, const char *direction,
+		const comm_type t, void *seri_info) {
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
   if (ret == NULL) {
     cislog_error("new_comm: Could not initialize base.");
@@ -268,13 +268,16 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
   @returns comm_t Comm structure.
  */
 static
-comm_t init_comm(const char *name, const char *direction, const comm_type t,
-		 const void *seri_info) {
+comm_t init_comm(const char *name, const char *direction,
+		 const comm_type t, void *seri_info) {
   cislog_debug("init_comm: Initializing comm.");
 #ifdef _WIN32
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
+  if ((seri_info == NULL) && (strcmp(direction, "send") == 0)) {
+    seri_info = (void*)get_scalar_type("bytes", 0, "");
+  }
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   if (ret == NULL) {
     cislog_error("init_comm(%s): Could not initialize base.", name);
@@ -294,6 +297,43 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
   cislog_debug("init_comm(%s): Initialized comm.", name);
   return ret[0];
 };
+
+/*!
+  @brief Initialize a generic communicator using a format string to determine
+  the type.
+  The name is used to locate the comm address stored in the associated
+  environment variable.
+  @param[in] name Name of environment variable that the queue address is
+  stored in.
+  @param[in] direction Direction that messages will go through the comm.
+  Values include "recv" and "send".
+  @param[in] t comm_type Type of comm that should be created.
+  @param[in] format_str char* Format string.
+  @param[in] as_array int If 1, inputs/outputs are processed as arrays.
+  @returns comm_t Comm structure.
+ */
+static
+comm_t init_comm_format(const char *name, const char *direction,
+			const comm_type t, const char *format_str,
+			const int as_array) {
+  void *seri_info = NULL;
+  if (format_str == NULL) {
+    if (strcmp(direction, "recv") == 0) {
+      seri_info = NULL; // It will be set on receiving a message
+    } else {
+      seri_info = NULL;
+    }
+  } else {
+    seri_info = (void*)get_format_type(format_str, as_array);
+  }
+  comm_t out = init_comm(name, direction, t, seri_info);
+  if ((format_str != NULL) && (seri_info == NULL)) {
+    cislog_error("init_comm_format: Failed to create type from format_str.");
+    out.valid = 0;
+  }
+  return out;
+};
+
 
 /*!
   @brief Get number of messages in the comm.
@@ -339,6 +379,7 @@ int comm_nmsg(const comm_t x) {
  */
 static
 int comm_send_single(const comm_t x, const char *data, const size_t len) {
+  cislog_debug("Sending %d bytes: '%s'\n", len, data);
   int ret = -1;
   if (x.valid == 0) {
     cislog_error("comm_send_single: Invalid comm");
@@ -388,7 +429,8 @@ comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
   head.multipart = 1;
   head.valid = 1;
   // Add serializer information to header on first send
-  if ((x.used[0] == 0) && (x.is_file == 0)) {
+  //if ((x.used[0] == 0) && (x.is_file == 0)) {
+  if (x.is_file == 0) {
     seri_t *serializer;
     if (x.type == CLIENT_COMM) {
       comm_t *req_comm = (comm_t*)(x.handle);
@@ -396,29 +438,8 @@ comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
     } else {
       serializer = x.serializer;
     }
-    if (serializer->type == DIRECT_SERI) {
-      head.serializer_type = 0;
-    } else if (serializer->type == FORMAT_SERI) {
-      head.serializer_type = 1;
-      strcpy(head.format_str, (char*)(serializer->info));
-    } else if (serializer->type == ARRAY_SERI) {
-      head.serializer_type = 2;
-      strcpy(head.format_str, (char*)(serializer->info));
-      head.as_array = 1;
-    } else if (serializer->type == ASCII_TABLE_SERI) {
-      head.serializer_type = 1;
-      asciiTable_t *table = (asciiTable_t*)(serializer->info);
-      strcpy(head.format_str, table->format_str);
-    } else if (serializer->type == ASCII_TABLE_ARRAY_SERI) {
-      head.serializer_type = 2;
-      asciiTable_t *table = (asciiTable_t*)(serializer->info);
-      strcpy(head.format_str, table->format_str);
-      head.as_array = 1;
-    } else if (serializer->type == PLY_SERI) {
-      head.serializer_type = 8;
-    } else if (serializer->type == OBJ_SERI) {
-      head.serializer_type = 9;
-    }
+    strcpy(head.type, serializer->type);
+    head.serializer_info = serializer->info;
   }
   const comm_t *x0;
   if (x.type == SERVER_COMM) {
@@ -449,6 +470,7 @@ comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
       return head;
     }
     strcpy(head.zmq_reply, reply_address);
+    cislog_debug("reply_address = %s\n", head.zmq_reply);
   }
   return head;
 };
@@ -482,6 +504,8 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     return -1;
   }
   // Try to send body in header
+  // printf("sending\n");
+  // display_from_void(x.serializer->type, x.serializer->info);
   if (len < (x.maxMsgSize - x.msgBufSize)) {
     headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
@@ -526,6 +550,8 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
 	return -1;
       }
       strcpy(head.zmq_reply_worker, reply_address);
+      cislog_debug("comm_send_multipart: zmq worker reply address is '%s'",
+		   head.zmq_reply_worker);
     }
     headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
@@ -614,7 +640,9 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
     }
   }
   if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
-      (((x.always_send_header) || (x.used[0] == 0)))) { // && (!(is_eof(data))))) {
+      (((x.always_send_header) || (x.used[0] == 0)))) {
+    cislog_debug("comm_send(%s): Sending as one or more messages with a header.",
+		 x.name);
     ret = comm_send_multipart(x, data, len);
   } else {
     cislog_debug("comm_send(%s): Sending as single message without a header.",
@@ -707,70 +735,38 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
     cislog_error("comm_recv_multipart(%s): Error parsing header.", x.name);
     ret = -1;
   } else {
+    // Move body to front of data and return if EOF
+    memmove(*data, *data + head.bodybeg, head.bodysiz);
+    (*data)[head.bodysiz] = '\0';
+    if (is_eof(*data)) {
+      cislog_debug("comm_recv_multipart(%s): EOF received.", x.name);
+      x.recv_eof[0] = 1;
+      return -2;
+    }
     // Get serializer information from header on first recv
-    if ((x.used[0] == 0) && (x.is_file == 0) && (x.serializer->type == 0)) {
-      int new_type = -1;
-      void *new_info = (void*)(head.format_str);
-      cislog_debug("comm_recv_multipart(%s): Updating serializer type to %d",
-		   x.name, head.serializer_type);
-      if (head.serializer_type == 0) {
-        new_type = DIRECT_SERI;
-      } else if (head.serializer_type == 1) {
-        new_type = FORMAT_SERI;
-      } else if (head.serializer_type == 2) {
-        new_type = ASCII_TABLE_ARRAY_SERI;
-      // TODO: Treat this as a separate class
-      // new_type = ARRAY_SERI;
-      } else if (head.serializer_type == 3) {
-        if (head.as_array == 0) {
-          new_type = ASCII_TABLE_SERI;
-        } else {
-          new_type = ASCII_TABLE_ARRAY_SERI;
-        }
-      } else if (head.serializer_type == 8) {
-	new_type = PLY_SERI;
-      } else if (head.serializer_type == 9) {
-	new_type = OBJ_SERI;
+    if ((x.used[0] == 0) && (x.is_file == 0) && (x.serializer->info == NULL)) {
+      cislog_debug("comm_recv_multipart(%s): Updating serializer type to '%s'",
+		   x.name, head.type);
+      ret = update_serializer(x.serializer, head.type, head.serializer_info);
+      if (ret != 0) {
+	cislog_error("comm_recv_multipart(%s): Error updating serializer.", x.name);
+	return -1;
       }
-      if (new_type >= 0) {
-        ret = update_serializer(x.serializer, new_type, new_info);
-        if (ret != 0) {
-          cislog_error("comm_recv_multipart(%s): Error updating serializer.", x.name);
-          return -1;
-        }
+    } else if ((x.is_file == 0) && (strlen(head.type) > 0) && (head.serializer_info != NULL)) {
+      if (strcmp(head.type, x.serializer->type) != 0) {
+	cislog_error("comm_recv_multipart(%s): Current type ('%s') dosn't match header type ('%s')",
+		     head.type, x.serializer->type);
+	return -1;
       }
-      // Set name for debug info & simplify formats
-      if ((new_type == ASCII_TABLE_SERI) || (new_type == ASCII_TABLE_ARRAY_SERI)) {
-        asciiTable_t *table = (asciiTable_t*)(x.serializer->info);
-        ret = at_update(table, x.name, "0");
-        if (ret != 0) {
-          cislog_error("comm_recv_multipart(%s): Failed to update asciiTable address.",
-                       x.name);
-          return -1;
-        }
-        ret = simplify_formats(table->format_str, CIS_MSG_MAX);
-        if (ret < 0) {
-          cislog_error("comm_recv_multipart(%s): Failed to simplify recvd table format.", x.name);
-          return -1;
-        }
-      } else if (new_type == FORMAT_SERI) {
-        char * format_str = (char*)(x.serializer->info);
-        ret = simplify_formats(format_str, x.serializer->size_info);
-        if (ret < 0) {
-          cislog_error("comm_recv_multipart(%s): Failed to simplify recvd format.", x.name);
-          return -1;
-        }
+      ret = update_serializer(x.serializer, head.type, head.serializer_info);
+      if (ret != 0) {
+	cislog_error("comm_recv_multipart(%s): Error updating existing serializer.", x.name);
+	return -1;
       }
     }
+    // printf("receiving\n");
+    // display_from_void(x.serializer->type, x.serializer->info);
     if (head.multipart) {
-      // Move part of message after header to front of data
-      memmove(*data, *data + head.bodybeg, head.bodysiz);
-      (*data)[head.bodysiz] = '\0';
-      if (is_eof(*data)) {
-	cislog_debug("comm_recv_multipart(%s): EOF received.", x.name);
-	x.recv_eof[0] = 1;
-	return -2;
-      }
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
         x.used[0] = 1;
@@ -835,7 +831,7 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       }
       free_comm(&xmulti);
     } else {
-      ret = (int)headlen;
+      ret = (int)(head.bodysiz);
     }
   }
   if (ret >= 0)
@@ -955,12 +951,14 @@ int comm_recv_nolimit(const comm_t x, char **data, const size_t len) {
   is then sent to the specified output comm. If the message is larger than
   CIS_MSG_MAX or cannot be encoded, it will not be sent.  
   @param[in] x comm_t structure for comm that message should be sent to.
+  @param[in] nargs size_t Number of arguments in the variable argument list.
   @param[in] ap va_list arguments to be formatted into a message using sprintf.
   @returns int Number of arguments formatted if send succesfull, -1 if send
   unsuccessful.
  */
 static
-int vcommSend(const comm_t x, va_list ap) {
+int vcommSend(const comm_t x, size_t nargs, va_list_t ap) {
+  cislog_debug("vcommSend: Formatting %lu arguments.", nargs);
   int ret = -1;
   if (x.valid == 0) {
     cislog_error("vcommSend: Invalid comm");
@@ -978,28 +976,53 @@ int vcommSend(const comm_t x, va_list ap) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
-  int args_used = 0;
-  ret = serialize(*serializer, &buf, buf_siz, 1, &args_used, ap);
+  size_t nargs_orig = nargs;
+  ret = serialize(*serializer, &buf, &buf_siz, 1, &nargs, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
     return -1;
   }
   ret = comm_send(x, buf, ret);
-  cislog_debug("vcommSend(%s): comm_send returns %d", x.name, ret);
+  cislog_debug("vcommSend(%s): comm_send returns %d, nargs (remaining) = %d",
+	       x.name, ret, nargs);
   free(buf);
   if (ret < 0) {
     return ret;
   } else {
-    return args_used;
+    return (int)(nargs_orig - nargs);
   }
 };
+
+/*!
+  @brief Send arguments as a formatted message to an output comm.
+  Use the format string to create a message from the input arguments that
+  is then sent to the specified output comm.
+  @param[in] x comm_t structure for comm that message should be sent to.
+  @param[in] ... Arguments to be formatted into a message using sprintf.
+  @returns int Number of arguments formatted if send succesfull, -1 if send
+  unsuccessful.
+*/
+static
+int ncommSend(const comm_t x, size_t nargs, ...) {
+  va_list_t ap;
+  va_start(ap.va, nargs);
+  int ret = vcommSend(x, nargs, ap);
+  va_end(ap.va);
+  return ret;
+};
+#define commSend(x, ...) ncommSend(x, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
 
 /*!
   @brief Assign arguments by receiving and parsing a message from an input comm.
   Receive a message smaller than CIS_MSG_MAX bytes from an input comm and parse
   it using the associated format string.
   @param[in] x comm_t structure for comm that message should be sent to.
+  @param[in] allow_realloc int If 1, variables being filled are assumed to be
+  pointers to pointers for heap memory. If 0, variables are assumed to be pointers
+  to stack memory. If allow_realloc is set to 1, but stack variables are passed,
+  a segfault can occur.
+  @param[in] nargs size_t Number of arguments in the variable argument list.
   @param[out] ap va_list arguments that should be assigned by parsing the
   received message using sscanf. As these are being assigned, they should be
   pointers to memory that has already been allocated.
@@ -1008,8 +1031,9 @@ int vcommSend(const comm_t x, va_list ap) {
   returned if EOF is received.
  */
 static
-int vcommRecv(const comm_t x, va_list ap) {
+int vcommRecv(const comm_t x, const int allow_realloc, size_t nargs, va_list_t ap) {
   int ret = -1;
+  cislog_debug("vcommRecv: Parsing %lu arguments.", nargs);
   if (x.valid == 0) {
     cislog_error("vcommRecv: Invalid comm");
     return ret;
@@ -1019,7 +1043,7 @@ int vcommRecv(const comm_t x, va_list ap) {
   /* char *buf = NULL; */
   char *buf = (char*)malloc(buf_siz);
   if (buf == NULL) {
-    cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
+    cislog_error("vcommRecv(%s): Failed to alloc buffer", x.name);
     return -1;
   }
   ret = comm_recv_nolimit(x, &buf, buf_siz);
@@ -1035,7 +1059,7 @@ int vcommRecv(const comm_t x, va_list ap) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
-  ret = deserialize(*serializer, buf, ret, ap);
+  ret = deserialize(*serializer, buf, ret, allow_realloc, &nargs, ap);
   if (ret < 0) {
     cislog_error("vcommRecv(%s): error deserializing message (ret=%d)",
 		 x.name, ret);
@@ -1046,6 +1070,35 @@ int vcommRecv(const comm_t x, va_list ap) {
   free(buf);
   return ret;
 };
+
+/*!
+  @brief Assign arguments by receiving and parsing a message from an input comm.
+  Receive a message from an input comm and parse it using the associated type.
+  @param[in] x comm_t structure for comm that message should be sent to.
+  @param[in] allow_realloc int If 1, variables being filled are assumed to be
+  pointers to pointers for heap memory. If 0, variables are assumed to be pointers
+  to stack memory. If allow_realloc is set to 1, but stack variables are passed,
+  a segfault can occur.
+  @param[out] ... arguments that should be assigned by parsing the
+  received message using sscanf. As these are being assigned, they should be
+  pointers to memory that has already been allocated.
+  @returns int -1 if message could not be received or could not be parsed.
+  Length of the received message if message was received and parsed. -2 is
+  returned if EOF is received.
+ */
+static
+int ncommRecv(const comm_t x, const int allow_realloc, size_t nargs, ...) {
+  va_list_t ap;
+  va_start(ap.va, nargs);
+  int ret = vcommRecv(x, allow_realloc, nargs, ap);
+  va_end(ap.va);
+  return ret;
+};
+#define commRecvStack(x, ...) ncommRecv(x, 0, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
+#define commRecvHeap(x, ...) ncommRecv(x, 1, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
+#define commRecv commRecvStack
+#define commRecvRealloc commRecvHeap
+
 
 #define vcommSend_nolimit vcommSend
 #define vcommRecv_nolimit vcommRecv

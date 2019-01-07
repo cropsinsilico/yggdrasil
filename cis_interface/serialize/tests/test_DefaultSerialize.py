@@ -17,10 +17,7 @@ class TestDefaultSerialize(CisTestClassInfo):
         self._empty_obj = backwards.unicode2bytes('')
         self._header_info = dict(arg1='1', arg2='two')
         self._objects = self.file_lines
-        self.attr_list += ['datatype', 'typedef',
-                           'format_str', 'as_array', 'field_names',
-                           'field_units', 'nfields', 'field_formats',
-                           'numpy_dtype', 'scanf_format_str']
+        self.attr_list += ['datatype', 'typedef', 'numpy_dtype']
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
@@ -44,14 +41,10 @@ class TestDefaultSerialize(CisTestClassInfo):
 
     def test_field_specs(self):
         r"""Test field specifiers."""
-        nt.assert_equal(self.instance.format_str, None)
-        nt.assert_equal(self.instance.nfields, 0)
-        nt.assert_equal(self.instance.field_names, None)
-        nt.assert_equal(self.instance.field_units, None)
-        nt.assert_equal(self.instance.field_formats, [])
-        nt.assert_equal(self.instance.numpy_dtype, None)
-        nt.assert_equal(self.instance.scanf_format_str, None)
         nt.assert_equal(self.instance.is_user_defined, False)
+        nt.assert_equal(self.instance.numpy_dtype, None)
+        nt.assert_equal(self.instance.typedef, self.instance._default_type)
+        nt.assert_equal(self.instance.extra_kwargs, {})
         
     def test_serialize(self):
         r"""Test serialize/deserialize."""
@@ -144,14 +137,10 @@ class TestDefaultSerialize_format(TestDefaultSerialize):
 
     def test_field_specs(self):
         r"""Test field specifiers."""
-        nt.assert_equal(self.instance.format_str, self.fmt_str)
-        nt.assert_equal(self.instance.nfields, self.nfields)
-        nt.assert_equal(self.instance.field_names, self.field_names)
-        nt.assert_equal(self.instance.field_units, self.field_units)
-        nt.assert_equal(self.instance.field_formats, self.field_formats)
-        nt.assert_equal(self.instance.numpy_dtype, self.file_dtype)
-        scanf_fmt = backwards.unicode2bytes('%s\t%d\t%f\n')
-        nt.assert_equal(self.instance.scanf_format_str, scanf_fmt)
+        nt.assert_equal(self.instance.is_user_defined, False)
+        nt.assert_equal(self.instance.numpy_dtype, None)
+        nt.assert_equal(self.instance.typedef, self.file_schema_scalar)
+        nt.assert_equal(self.instance.extra_kwargs, {'format_str': self.fmt_str})
 
 
 class TestDefaultSerialize_array(TestDefaultSerialize_format):
@@ -163,13 +152,16 @@ class TestDefaultSerialize_array(TestDefaultSerialize_format):
         self._empty_obj = []
         self._objects = [self.file_array]
 
-    def map_sent2recv(self, obj):
-        r"""Convert a sent object into a received one."""
-        return [obj[n] for n in obj.dtype.names]
-
     def assert_result_equal(self, x, y):
         r"""Assert that serialized/deserialized objects equal."""
         np.testing.assert_array_equal(x, y)
+
+    def test_field_specs(self):
+        r"""Test field specifiers."""
+        nt.assert_equal(self.instance.is_user_defined, False)
+        nt.assert_equal(self.instance.numpy_dtype, self.file_dtype)
+        nt.assert_equal(self.instance.typedef, self.file_schema_array)
+        nt.assert_equal(self.instance.extra_kwargs, {'format_str': self.fmt_str})
 
 
 class TestDefaultSerialize_func(TestDefaultSerialize):
@@ -196,14 +188,10 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
 
     def test_field_specs(self):
         r"""Test field specifiers."""
-        nt.assert_equal(self.instance.format_str, None)
-        nt.assert_equal(self.instance.nfields, 0)
-        nt.assert_equal(self.instance.field_names, None)
-        nt.assert_equal(self.instance.field_units, None)
-        nt.assert_equal(self.instance.field_formats, [])
-        nt.assert_equal(self.instance.numpy_dtype, None)
-        nt.assert_equal(self.instance.scanf_format_str, None)
         nt.assert_equal(self.instance.is_user_defined, True)
+        nt.assert_equal(self.instance.numpy_dtype, None)
+        nt.assert_equal(self.instance.typedef, {'type': 'bytes'})
+        nt.assert_equal(self.instance.extra_kwargs, {})
         
     def test_serialize_sinfo(self):
         r"""Test error on serialize with serializer info for function."""
@@ -271,14 +259,10 @@ class TestDefaultSerialize_type(TestDefaultSerialize):
 
     def test_field_specs(self):
         r"""Test field specifiers."""
-        nt.assert_equal(self.instance.format_str, None)
-        nt.assert_equal(self.instance.nfields, 0)
-        nt.assert_equal(self.instance.field_names, None)
-        nt.assert_equal(self.instance.field_units, None)
-        nt.assert_equal(self.instance.field_formats, [])
-        nt.assert_equal(self.instance.numpy_dtype, None)
-        nt.assert_equal(self.instance.scanf_format_str, None)
         nt.assert_equal(self.instance.is_user_defined, False)
+        nt.assert_equal(self.instance.numpy_dtype, None)
+        nt.assert_equal(self.instance.typedef, self._inst_kwargs)
+        nt.assert_equal(self.instance.extra_kwargs, {})
 
 
 class TestDefaultSerialize_func_error(TestDefaultSerialize_func):

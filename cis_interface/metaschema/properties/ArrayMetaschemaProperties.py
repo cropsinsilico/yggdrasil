@@ -34,7 +34,7 @@ class ShapeMetaschemaProperty(MetaschemaProperty):
         return list(instance.shape)
 
     @classmethod
-    def compare(cls, prop1, prop2):
+    def compare(cls, prop1, prop2, root1=None, root2=None):
         r"""Comparison method for the 'shape' ndarray property."""
         if len(prop1) != len(prop2):
             yield '%d dimensions not compatible with %d dimensions' % (

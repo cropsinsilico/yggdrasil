@@ -3,7 +3,7 @@
 #define CISZMQCOMM_H_
 
 #include <CommBase.h>
-#include "comm_header.h"
+#include "../metaschema/datatypes/datatypes.h"
 
 #ifdef ZMQINSTALLED
 #include <czmq.h>
@@ -304,7 +304,7 @@ char *set_reply_send(const comm_t *comm) {
     sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
     int port = zsock_bind(zrep->sockets[0], "%s", address);
     if (port == -1) {
-      cislog_error("check_reply_send(%s): Could not bind socket to address = %s",
+      cislog_error("set_reply_send(%s): Could not bind socket to address = %s",
 		   comm->name, address);
       return out;
     }
@@ -313,7 +313,7 @@ char *set_reply_send(const comm_t *comm) {
     zrep->addresses = (char**)malloc(sizeof(char*));
     zrep->addresses[0] = (char*)malloc((strlen(address) + 1)*sizeof(char));
     strcpy(zrep->addresses[0], address);
-    cislog_debug("check_reply_send(%s): New reply socket: %s", comm->name, address);
+    cislog_debug("set_reply_send(%s): New reply socket: %s", comm->name, address);
   }
   out = zrep->addresses[0];
   return out;
