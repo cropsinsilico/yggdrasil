@@ -62,8 +62,8 @@ class AsciiTableComm(AsciiFileComm):
             return
         header_msg = serialize.format_header(
             format_str=self.serializer.format_str,
-            field_names=self.serializer.field_names,
-            field_units=self.serializer.field_units,
+            field_names=self.serializer.get_field_names(as_bytes=True),
+            field_units=self.serializer.get_field_units(as_bytes=True),
             comment=self.comment, newline=self.newline,
             delimiter=self.delimiter)
         self.fd.write(header_msg)

@@ -65,6 +65,10 @@ class AsciiTableSerialize(DefaultSerialize):
             self.update_format_str()
             self.update_field_names()
             self.update_field_units()
+        for k in ['format_str', 'delimiter', 'newline', 'comment']:
+            v = getattr(self, k, None)
+            if isinstance(v, backwards.unicode_type):
+                setattr(self, k, backwards.unicode2bytes(v))
         return out
 
     def update_format_str(self):
@@ -85,44 +89,20 @@ class AsciiTableSerialize(DefaultSerialize):
                     fmts.append(ifmt)
             if fmts:
                 self._format_str = serialize.table2format(
-                    fmts=fmts,
-                    delimiter=backwards.unicode2bytes(self.delimiter),
-                    newline=backwards.unicode2bytes(self.newline),
+                    fmts=fmts, delimiter=self.delimiter, newline=self.newline,
                     comment=backwards.unicode2bytes(''))
 
     def update_field_names(self):
         r"""list: Names for each field in the data type."""
         assert(self.typedef['type'] == 'array')
         if self.field_names is None:
-            if isinstance(self.typedef['items'], dict):  # pragma: debug
-                raise Exception("Variable number of items not yet supported.")
-            elif isinstance(self.typedef['items'], list):
-                out = []
-                any_names = False
-                for i, x in enumerate(self.typedef['items']):
-                    out.append(backwards.unicode2bytes(x.get('title', 'f%d' % i)))
-                    if 'title' in x:
-                        any_names = True
-                # Don't use field names if they are all defaults
-                if any_names:
-                    self.field_names = out
+            self.field_names = self.get_field_names()
 
     def update_field_units(self):
         r"""list: Units for each field in the data type."""
         assert(self.typedef['type'] == 'array')
         if self.field_units is None:
-            if isinstance(self.typedef['items'], dict):  # pragma: debug
-                raise Exception("Variable number of items not yet supported.")
-            elif isinstance(self.typedef['items'], list):
-                out = []
-                any_units = False
-                for i, x in enumerate(self.typedef['items']):
-                    out.append(backwards.unicode2bytes(x.get('units', '')))
-                    if len(x.get('units', '')) > 0:
-                        any_units = True
-                # Don't use field units if they are all defaults
-                if any_units:
-                    self.field_units = out
+            self.field_units = self.get_field_units()
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -137,8 +117,9 @@ class AsciiTableSerialize(DefaultSerialize):
         """
         if self.format_str is None:
             raise RuntimeError("Format string is not defined.")
+        args = self.datatype.coerce_type(args,
+                                         key_order=self.get_field_names())
         if self.as_array:
-            args = self.datatype.coerce_type(args)
             out = serialize.array_to_table(args, self.format_str,
                                            use_astropy=self.use_astropy)
         else:
@@ -160,11 +141,11 @@ class AsciiTableSerialize(DefaultSerialize):
         if self.as_array:
             out = serialize.table_to_array(msg, self.format_str,
                                            use_astropy=self.use_astropy,
-                                           names=self.field_names)
+                                           names=self.get_field_names(as_bytes=True))
             out = self.datatype.coerce_type(out)
         else:
             out = list(serialize.process_message(msg, self.format_str))
-        if self.field_units is not None:
-            out = [units.add_units(x, backwards.bytes2unicode(u))
-                   for x, u in zip(out, self.field_units)]
+        field_units = self.get_field_units()
+        if field_units is not None:
+            out = [units.add_units(x, u) for x, u in zip(out, field_units)]
         return out

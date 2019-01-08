@@ -1,7 +1,46 @@
-from cis_interface import backwards, serialize
+import numpy as np
+from cis_interface import serialize
 from cis_interface.communication.AsciiTableComm import AsciiTableComm
 from cis_interface.schema import register_component
 from cis_interface.serialize.PandasSerialize import PandasSerialize
+
+
+def pandas_send_converter(obj):
+    r"""Performs conversion from a limited set of objects to a Pandas data frame
+    for sending to a file via PandasFileComm. Currently supports converting from
+    structured numpy arrays, lists/tuples of numpy arrays, and dictionaries.
+
+    Args:
+        obj (object): Object to convert.
+
+    Returns:
+        pandas.DataFrame: Converted data frame (or unmodified input if conversion
+            could not be completed.
+
+    """
+    if isinstance(obj, (list, tuple)):
+        obj = serialize.list2pandas(obj)
+    elif isinstance(obj, np.ndarray):
+        obj = serialize.numpy2pandas(obj)
+    elif isinstance(obj, dict):
+        obj = serialize.dict2pandas(obj)
+    return obj
+
+
+def pandas_recv_converter(obj):
+    r"""Performs conversion to a limited set of objects from a Pandas data frame
+    for receiving from a file via PandasFileComm. Currently supports converting to
+    lists/tuples of numpy arrays.
+
+    Args:
+        obj (pandas.DataFrame): Data frame to convert.
+
+    Returns:
+        list: pandas.DataFrame: Converted data frame (or unmodified input if conversion
+            could not be completed.
+
+    """
+    return serialize.pandas2list(obj)
 
 
 @register_component
@@ -22,8 +61,8 @@ class PandasFileComm(AsciiTableComm):
 
     def _init_before_open(self, **kwargs):
         r"""Set up dataio and attributes."""
-        kwargs.setdefault('send_converter', serialize.list2pandas)
-        kwargs.setdefault('recv_converter', serialize.pandas2list)
+        kwargs.setdefault('send_converter', pandas_send_converter)
+        kwargs.setdefault('recv_converter', pandas_recv_converter)
         super(PandasFileComm, self)._init_before_open(**kwargs)
         self.read_meth = 'read'
         if self.append:
@@ -36,32 +75,3 @@ class PandasFileComm(AsciiTableComm):
     def write_header(self):
         r"""Write header lines to the file based on the serializer info."""
         return
-
-    def send_dict(self, args_dict, field_order=None, **kwargs):
-        r"""Send a message with fields specified in the input dictionary.
-
-        Args:
-            args_dict (dict): Dictionary with fields specifying output fields.
-            field_order (list, optional): List of fields in the order they
-                should be passed to send. If not provided, the fields from
-                the serializer are used. If the serializer dosn't have
-                field names an error will be raised.
-            **kwargs: Additiona keyword arguments are passed to send.
-
-        Returns:
-            bool: Success/failure of send.
-
-        Raises:
-            RuntimeError: If the field order can not be determined.
-
-        """
-        if field_order is None:
-            if self.serializer.field_names is not None:
-                field_order = [
-                    backwards.bytes2unicode(n) for n in self.serializer.field_names]
-            elif len(args_dict) <= 1:
-                field_order = [k for k in args_dict.keys()]
-            else:  # pragma: debug
-                raise RuntimeError("Could not determine the field order.")
-        args = (serialize.dict2pandas(args_dict, order=field_order), )
-        return self.send(*args, **kwargs)

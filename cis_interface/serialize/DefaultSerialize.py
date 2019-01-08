@@ -1,6 +1,6 @@
 import copy
-import pprint
 import numpy as np
+import warnings
 from cis_interface import backwards, tools, serialize
 from cis_interface.serialize import register_serializer
 from cis_interface.metaschema import get_metaschema
@@ -123,6 +123,76 @@ class DefaultSerialize(object):
             out = self.datatype._empty_msg
         return out
 
+    def get_field_names(self, as_bytes=False):
+        r"""Get the field names for an array of fields.
+
+        Args:
+            as_bytes (bool, optional): If True, the field names will be returned
+                as bytes. If False the field names will be returned as unicode.
+                Defaults to False.
+
+        Returns:
+            list: Names for each field in the data type.
+
+        """
+        if self.typedef['type'] != 'array':
+            return None
+        if getattr(self, 'field_names', None) is not None:
+            out = self.field_names
+        elif isinstance(self.typedef['items'], dict):  # pragma: debug
+            raise Exception("Variable number of items not yet supported.")
+        elif isinstance(self.typedef['items'], list):
+            out = []
+            any_names = False
+            for i, x in enumerate(self.typedef['items']):
+                out.append(x.get('title', 'f%d' % i))
+                if len(x.get('title', '')) > 0:
+                    any_names = True
+            # Don't use field names if they are all defaults
+            if not any_names:
+                out = None
+        if (out is not None):
+            if as_bytes:
+                out = [backwards.unicode2bytes(x) for x in out]
+            else:
+                out = [backwards.bytes2unicode(x) for x in out]
+        return out
+
+    def get_field_units(self, as_bytes=False):
+        r"""Get the field units for an array of fields.
+
+        Args:
+            as_bytes (bool, optional): If True, the field units will be returned
+                as bytes. If False the field units will be returned as unicode.
+                Defaults to False.
+
+        Returns:
+            list: Units for each field in the data type.
+
+        """
+        if self.typedef['type'] != 'array':
+            return None
+        if getattr(self, 'field_units', None) is not None:
+            out = self.field_units
+        elif isinstance(self.typedef['items'], dict):  # pragma: debug
+            raise Exception("Variable number of items not yet supported.")
+        elif isinstance(self.typedef['items'], list):
+            out = []
+            any_units = False
+            for i, x in enumerate(self.typedef['items']):
+                out.append(x.get('units', ''))
+                if len(x.get('units', '')) > 0:
+                    any_units = True
+            # Don't use field units if they are all defaults
+            if not any_units:
+                out = None
+        if (out is not None):
+            if as_bytes:
+                out = [backwards.unicode2bytes(x) for x in out]
+            else:
+                out = [backwards.bytes2unicode(x) for x in out]
+        return out
+
     @property
     def numpy_dtype(self):
         r"""np.dtype: Corresponding structured data type. Will be None unless the
@@ -147,19 +217,37 @@ class DefaultSerialize(object):
                     out = np.dtype(dict(names=field_names, formats=dtype_list))
         return out
 
+    def initialize_from_message(self, msg, **metadata):
+        r"""Initialize the serializer based on recieved message.
+
+        Args:
+            msg (object): Message that serializer should be initialized from.
+            **kwargs: Additional keyword arguments are treated as metadata that
+                may contain additional information for initializing the serializer.
+
+        """
+        cls = guess_type_from_obj(msg)
+        typedef = cls.encode_type(msg)
+        typedef = cls.extract_typedef(typedef)
+        metadata.update(typedef)
+        self.initialize_serializer(metadata)
+
     def initialize_serializer(self, metadata, extract=False):
-        r"""Initialize a serializer based on received metadata."""
+        r"""Initialize a serializer based on received metadata. This method will
+        exit early if the serializer has already been intialized.
+
+        Args:
+            metadata (dict): Header information including type info that should be
+                used to initialize the serializer class.
+            extract (bool, optional): If True, the type will be defined using a
+                subset of the type information in metadata. If False, all of the
+                type information will be used. Defaults to False.
+
+        """
         if self._initialized:
             return
         self.update_serializer(extract=extract, **metadata)
         self._initialized = (self.typedef != self._default_type)
-
-    def initialize_from_message(self, msg):
-        r"""Initialize the serializer based on recieved message."""
-        cls = guess_type_from_obj(msg)
-        typedef = cls.encode_type(msg)
-        typedef = cls.extract_typedef(typedef)
-        self.initialize_serializer(typedef)
 
     def update_from_message(self, msg, **kwargs):
         r"""Update serializer information based on the message.
@@ -222,8 +310,8 @@ class DefaultSerialize(object):
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-            print('extras:')
-            pprint.pprint(kwargs)
+            # print('extras:')
+            # pprint.pprint(kwargs)
             # raise RuntimeError("There were unprocessed keyword arguments.")
         # Update typedef from oldstyle keywords in extra_kwargs
         typedef = self.update_typedef_from_oldstyle(typedef)
@@ -247,6 +335,7 @@ class DefaultSerialize(object):
         """
         for k in self._oldstyle_kws:
             used = []
+            updated = []
             v = self.extra_kwargs.get(k, getattr(self, k, None))
             if v is None:
                 continue
@@ -255,6 +344,7 @@ class DefaultSerialize(object):
                 continue
             # Key specific changes to type
             if k == 'format_str':
+                v = backwards.bytes2unicode(v)
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
                     # print('update format_str for existing type?', typedef)
@@ -277,10 +367,12 @@ class DefaultSerialize(object):
                         itype['type'] = itype.pop('subtype')
                     typedef['items'].append(itype)
                 used.append('as_array')
+                updated.append('format_str')
             elif k == 'as_array':
                 # Can only be used in conjunction with format_str
                 pass
             elif k in ['field_names', 'field_units']:
+                v = [backwards.bytes2unicode(x) for x in v]
                 if k == 'field_names':
                     tk = 'title'
                 else:
@@ -293,13 +385,20 @@ class DefaultSerialize(object):
                                   % (len(v), k, len(typedef.get('items', []))))
                     continue
                 for iv, itype in zip(v, typedef.get('items', [])):
-                    itype[tk] = backwards.bytes2unicode(iv)
+                    itype[tk] = iv
                 used.append(k)
+                updated.append(k)  # Won't change anything unless its an attribute
             else:  # pragma: debug
-                raise ValueError("Unrecognized table-style specification keyword: '%s'." % k)
+                raise ValueError(
+                    "Unrecognized table-style specification keyword: '%s'." % k)
             for rk in used:
                 if rk in self.extra_kwargs:
                     del self.extra_kwargs[rk]
+            for rk in updated:
+                if rk in self.extra_kwargs:
+                    self.extra_kwargs[rk] = v
+                elif hasattr(self, rk):
+                    setattr(self, rk, v)
         return typedef
 
     def serialize(self, args, header_kwargs=None, add_serializer_info=False,
@@ -323,15 +422,17 @@ class DefaultSerialize(object):
 
 
         """
+        if header_kwargs is None:
+            header_kwargs = {}
         is_eof = False
         if isinstance(args, backwards.bytes_type) and (args == tools.CIS_MSG_EOF):
             is_eof = True
         if not (self._initialized or is_eof):
-            self.initialize_from_message(args)
+            self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata}
         if add_serializer_info:
             metadata.update(self.serializer_info)
-            metadata['typedef'] = self.typedef
+            # metadata['typedef_base'] = self.typedef
         if header_kwargs is not None:
             metadata.update(header_kwargs)
         if hasattr(self, 'func_serialize'):
@@ -386,7 +487,7 @@ class DefaultSerialize(object):
         else:
             out, metadata = self.datatype.deserialize(msg, **kwargs)
         # Update serializer
-        typedef_base = metadata.pop('typedef', {})
+        typedef_base = metadata.pop('typedef_base', {})
         typedef = copy.deepcopy(metadata)
         typedef.update(typedef_base)
         if not ((metadata.get('size', 0) == 0)
@@ -395,7 +496,7 @@ class DefaultSerialize(object):
             self.initialize_serializer(typedef)
             np_dtype = self.numpy_dtype
             if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
-                out = serialize.consolidate_array(out, dtype=self.numpy_dtype)
+                out = serialize.consolidate_array(out, dtype=np_dtype)
         return out, metadata
 
     # def format_header(self, header_info):

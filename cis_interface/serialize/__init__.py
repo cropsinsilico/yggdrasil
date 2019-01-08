@@ -1047,6 +1047,7 @@ def discover_header(fd, serializer, newline=_default_newline,
         v = getattr(serializer, k, None)
         if v is not None:
             header[k] = v
+    header.setdefault('format_str', None)
     if (delimiter is None) or ('format_str' in header):
         delimiter = header['delimiter']
     # Try to determine format from array without header
@@ -1171,6 +1172,8 @@ def dict2list(d, order=None):
         list: List with contents from the input array.
 
     """
+    if not isinstance(d, dict):
+        raise TypeError("d must be a dictionary, not %s." % type(d))
     if order is None:
         order = sorted(list(d.keys()))
     out = [d[k] for k in order]
@@ -1189,6 +1192,8 @@ def list2dict(l, names=None):
         dict: Dictionary of arrays.
 
     """
+    if not isinstance(l, (list, tuple)):
+        raise TypeError("l must be a list or tuple, not %s." % type(l))
     if names is None:
         names = ['f%d' % i for i in range(len(l))]
     out = {k: x for k, x in zip(names, l)}
@@ -1205,6 +1210,8 @@ def numpy2list(arr):
         list: List with contents from the input array.
 
     """
+    if not isinstance(arr, np.ndarray):
+        raise TypeError("arr must be a numpy array, not %s." % type(arr))
     return dict2list(numpy2dict(arr), order=arr.dtype.names)
 
 
@@ -1233,6 +1240,8 @@ def numpy2dict(arr):
         dict: Dictionary with contents from the input array.
 
     """
+    if not isinstance(arr, np.ndarray):
+        raise TypeError("arr must be a numpy array, not %s." % type(arr))
     out = dict()
     if arr.dtype.names is None:
         out['0'] = arr
@@ -1254,6 +1263,8 @@ def dict2numpy(d, order=None):
         np.ndarray: Structured numpy array.
 
     """
+    if not isinstance(d, dict):
+        raise TypeError("d must be a dictionary, not %s." % type(d))
     if order is None:
         order = sorted([k for k in d.keys()])
     dtypes = [d[k].dtype for k in order]
@@ -1275,6 +1286,8 @@ def numpy2pandas(arr):
         pandas.DataFrame: Pandas data frame with contents from the input array.
 
     """
+    if not isinstance(arr, np.ndarray):
+        raise TypeError("arr must be a numpy array, not %s." % type(arr))
     return pandas.DataFrame(arr)
 
 
@@ -1290,6 +1303,10 @@ def pandas2numpy(frame, index=False):
         np.ndarray: Structured numpy array.
 
     """
+    if not isinstance(frame, pandas.DataFrame):
+        raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
+    if frame.empty:
+        return np.array([])
     arr = frame.to_records(index=index)
     # Covert object type to string
     old_dtype = arr.dtype
@@ -1339,6 +1356,10 @@ def pandas2dict(frame):
         dict: Dictionary with contents from the input frame.
 
     """
+    if not isinstance(frame, pandas.DataFrame):
+        raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
+    if frame.empty:
+        return {}
     return numpy2dict(pandas2numpy(frame))
 
 
@@ -1367,6 +1388,8 @@ def pandas2list(frame):
         list: List with contents from the input frame.
 
     """
+    if frame.empty:
+        return []
     return numpy2list(pandas2numpy(frame))
 
 

@@ -1,16 +1,19 @@
 import os
+import copy
 import uuid
 import atexit
 import threading
-import numpy as np
-import pandas as pd
 from logging import info
-from cis_interface import backwards, tools, serialize
+from cis_interface import backwards, tools
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
 from cis_interface.schema import register_component
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.metaschema.datatypes.JSONArrayMetaschemaType import (
+    JSONArrayMetaschemaType)
+from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
+    JSONObjectMetaschemaType)
 
 
 _registered_servers = dict()
@@ -1151,17 +1154,15 @@ class CommBase(tools.CisClass):
             flag, msg_s = self.on_send_eof()
         else:
             flag = True
-            add_sinfo = (self._send_serializer and (not self.is_file))
             # Covert object
             if self.send_converter is not None:
                 msg_ = self.send_converter(msg)
             else:
                 msg_ = msg
-            # Guess at serializer if not yet set
-            if add_sinfo:
-                self.serializer.initialize_from_message(msg_)
-                self.debug('Sending sinfo: %s', self.serializer.serializer_info)
             # Serialize
+            add_sinfo = (self._send_serializer and (not self.is_file))
+            if add_sinfo:
+                self.debug('Sending sinfo: %s', self.serializer.serializer_info)
             msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
                                    add_serializer_info=add_sinfo)
             # Create work comm if message too large to be sent all at once
@@ -1487,15 +1488,11 @@ class CommBase(tools.CisClass):
         self._last_recv = None
 
     # Send/recv dictionary of fields
-    def send_dict(self, args_dict, field_order=None, **kwargs):
+    def send_dict(self, args_dict, **kwargs):
         r"""Send a message with fields specified in the input dictionary.
 
         Args:
-            args_dict (dict): Dictionary with fields specifying output fields.
-            field_order (list, optional): List of fields in the order they
-                should be passed to send. If not provided, the fields from
-                the serializer are used. If the serializer dosn't have
-                field names an error will be raised.
+            args_dict (dict): Dictionary of arguments to send.
             **kwargs: Additiona keyword arguments are passed to send.
 
         Returns:
@@ -1505,23 +1502,23 @@ class CommBase(tools.CisClass):
             RuntimeError: If the field order can not be determined.
 
         """
-        if field_order is None:
-            if self.serializer.field_names is not None:
-                field_order = [
-                    backwards.bytes2unicode(n) for n in self.serializer.field_names]
-            elif len(args_dict) <= 1:
-                field_order = [k for k in args_dict.keys()]
-            else:  # pragma: debug
-                raise RuntimeError("Could not determine the field order.")
-        as_array = True
-        for v in args_dict.values():
-            if not isinstance(v, np.ndarray):
-                as_array = False
-                break
-        if as_array:
-            args = (serialize.dict2numpy(args_dict, order=field_order), )
-        else:
-            args = tuple([args_dict[k] for k in field_order])
+        metadata = kwargs.get('header_kwargs', {})
+        if 'field_order' in kwargs:
+            metadata['key_order'] = kwargs.pop('field_order')
+        if 'key_order' in kwargs:
+            metadata['key_order'] = kwargs['key_order']
+        metadata.setdefault('key_order', self.serializer.get_field_names())
+        if (((metadata['key_order'] is None)
+             and isinstance(args_dict, dict)
+             and (len(args_dict) <= 1))):
+            metadata['key_order'] = [k for k in args_dict.keys()]
+        if not self.serializer._initialized:
+            if (metadata['key_order'] is None) and isinstance(args_dict, dict):
+                metadata['key_order'] = sorted(list(args_dict.keys()))
+            metadata['field_names'] = metadata['key_order']
+        args = JSONArrayMetaschemaType.coerce_type(args_dict, **metadata)
+        # Add field order to kwargs so it can be reconstructed
+        kwargs['header_kwargs'] = metadata
         return self.send(*args, **kwargs)
 
     def recv_dict(self, *args, **kwargs):
@@ -1541,18 +1538,15 @@ class CommBase(tools.CisClass):
 
         """
         flag, msg = self.recv(*args, **kwargs)
-        if flag and not self.is_eof(msg):
-            if isinstance(msg, np.ndarray):
-                msg_dict = serialize.numpy2dict(msg)
-            elif isinstance(msg, pd.DataFrame):
-                msg_dict = serialize.pandas2dict(msg)
-            elif isinstance(msg, (tuple, list)):
-                if self.serializer.field_names is None:  # pragma: debug
-                    field_names = ['f%d' % i for i in range(len(msg))]
-                else:
-                    field_names = [
-                        backwards.bytes2unicode(n) for n in self.serializer.field_names]
-                msg_dict = {k: v for k, v in zip(field_names, msg)}
+        if flag and (not self.is_eof(msg)):
+            if self.serializer.typedef['type'] == 'array':
+                metadata = copy.deepcopy(self._last_header)
+                if metadata is None:
+                    metadata = {}
+                if 'key_order' in kwargs:
+                    metadata['key_order'] = kwargs['key_order']
+                metadata.setdefault('key_order', self.serializer.get_field_names())
+                msg_dict = JSONObjectMetaschemaType.coerce_type(msg, **metadata)
             else:
                 msg_dict = {'f0': msg}
         else:

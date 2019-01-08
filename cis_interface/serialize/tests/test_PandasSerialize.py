@@ -1,3 +1,4 @@
+import pandas
 import numpy as np
 from cis_interface.serialize.tests import test_AsciiTableSerialize as parent
 
@@ -9,6 +10,7 @@ class TestPandasSerialize(parent.TestAsciiTableSerialize):
         super(TestPandasSerialize, self).__init__(*args, **kwargs)
         self._cls = 'PandasSerialize'
         self._objects = [self.pandas_frame]
+        self._empty_obj = pandas.DataFrame()
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""

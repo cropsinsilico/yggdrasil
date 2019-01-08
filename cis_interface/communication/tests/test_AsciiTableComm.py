@@ -131,16 +131,7 @@ class TestAsciiTableComm_AsArray(TestAsciiTableComm):
             obj: Merged message.
 
         """
-        tot_list = [np.hstack([x[i] for x in msg_list])
-                    for i in range(len(self.field_names))]
-        order = [backwards.bytes2unicode(n) for n in self.field_names]
-        dtypes = [x.dtype for x in tot_list]
-        shape = tot_list[0].shape
-        dtype = np.dtype(dict(names=order, formats=dtypes))
-        out = np.empty(shape, dtype)
-        for i, n in enumerate(order):
-            out[n] = tot_list[i]
-        return out
+        return msg_list[0]
 
     def test_send_recv_dict(self):
         r"""Test send/recv numpy array as dict."""

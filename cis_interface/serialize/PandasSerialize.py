@@ -1,6 +1,7 @@
 import pandas
 import copy
 import numpy as np
+import warnings
 from cis_interface import backwards, platform
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
@@ -23,6 +24,55 @@ class PandasSerialize(AsciiTableSerialize):
         AsciiTableSerialize._schema_properties,
         write_header={'type': 'bool', 'default': True})
 
+    @property
+    def empty_msg(self):
+        r"""obj: Object indicating empty message."""
+        return pandas.DataFrame()
+
+    def apply_field_names(self, frame):
+        r"""Apply field names as columns to a frame, first checking for a mapping.
+        If there is a direct mapping, the columns are reordered to match the order
+        of the field names. If there is not an overlap in the field names and
+        columns, a one-to-one mapping is assumed, but a warning is issued. If there
+        is a partial overlap, an error is raised.
+
+        Args:
+            frame (pandas.DataFrame): Frame to apply field names to as columns.
+
+        Returns:
+            pandas.DataFrame: Frame with updated field names.
+
+        Raises:
+            RuntimeError: If there is a partial overlap between the field names
+                and columns.
+
+        """
+        if self.field_names is None:
+            return frame
+        cols = frame.columns.tolist()
+        if len(self.field_names) != len(cols):
+            raise RuntimeError(("Number of field names (%d) doesn't match "
+                                + "number of columns in data frame (%d).")
+                               % (len(self.field_names), len(cols)))
+        # Check for missing fields
+        fmiss = []
+        for f in self.field_names[0]:
+            if f not in cols:
+                fmiss.append(f)
+        if fmiss:
+            if len(fmiss) == len(self.field_names[0]):
+                warnings.warn("Assuming direct mapping of field names to columns. "
+                              + "This may not be correct.")
+                frame.columns = self.field_names
+            else:
+                # Partial overlap
+                raise RuntimeError("%d fields missing from frame: %s"
+                                   % (len(fmiss), str(fmiss)))
+        else:
+            # Reorder columns
+            frame = frame[self.field_names]
+        return frame
+
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -33,6 +83,9 @@ class PandasSerialize(AsciiTableSerialize):
             bytes, str: Serialized message.
 
         """
+        if not isinstance(args, pandas.DataFrame):
+            raise TypeError(("Pandas DataFrame required. Invalid type "
+                             + "of '%s' provided.") % type(args))
         fd = backwards.StringIO()
         if backwards.PY2:  # pragma: Python 2
             args_ = args
@@ -42,8 +95,7 @@ class PandasSerialize(AsciiTableSerialize):
             for c in args.columns:
                 if isinstance(args_[c][0], backwards.bytes_type):
                     args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
-        if self.field_names is not None:
-            args_.columns = [backwards.bytes2unicode(n) for n in self.field_names]
+        args_ = self.apply_field_names(args_)
         args_.to_csv(fd, index=False, sep=backwards.bytes2unicode(self.delimiter),
                      mode='wb', encoding='utf8', header=self.write_header)
         out = fd.getvalue()
@@ -80,6 +132,10 @@ class PandasSerialize(AsciiTableSerialize):
                     else:
                         new_dtypes[c] = d
                 out = out.astype(new_dtypes, copy=False)
+        # Reorder if necessary
+        out = self.apply_field_names(out)
+        if self.field_names is None:
+            self.field_names = out.columns.tolist()
         # for c, d in zip(out.columns, out.dtypes):
         #     if d == object:
         #         out[c] = out[c].apply(lambda s: s.strip())

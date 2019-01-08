@@ -120,7 +120,7 @@ class TestDefaultSerialize(CisTestClassInfo):
     def test_deserialize_empty(self):
         r"""Test call for empty string."""
         out, head = self.instance.deserialize(self._empty_msg)
-        nt.assert_equal(out, self._empty_obj)
+        self.assert_result_equal(out, self._empty_obj)
         nt.assert_equal(head, self.empty_head(self._empty_msg))
 
 

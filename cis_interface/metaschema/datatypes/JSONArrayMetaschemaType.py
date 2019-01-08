@@ -56,20 +56,32 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         return obj
 
     @classmethod
-    def coerce_type(cls, obj):
+    def coerce_type(cls, obj, key_order=None, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
             obj (object): Object to be coerced.
+            key_order (list, optional): Order that keys from a dictionary should
+                be used to compose an array. Defaults to None.
+            **kwargs: Additional keyword arguments are metadata entries that may
+                aid in coercing the type.
 
         Returns:
             object: Coerced object.
 
+        Raises:
+            RuntimeError: If obj is a dictionary, but key_order is not provided.
+
         """
         if isinstance(obj, pd.DataFrame):
-            obj = serialize.pandas2numpy(obj)
-        if isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
-            return [obj[n] for n in obj.dtype.names]
+            obj = serialize.pandas2list(obj)
+        elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
+            obj = serialize.numpy2list(obj)
+            # return [obj[n] for n in obj.dtype.names]
+        elif isinstance(obj, dict):
+            if (key_order is None) and (len(obj) > 1):
+                raise RuntimeError("Key order must be provided to coerce dictionary.")
+            obj = serialize.dict2list(obj, order=key_order)
         return obj
 
     @classmethod

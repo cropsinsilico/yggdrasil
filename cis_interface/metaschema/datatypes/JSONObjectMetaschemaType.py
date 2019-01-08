@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+from cis_interface import serialize
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -20,6 +23,36 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
     _json_type = 'object'
     _json_property = 'properties'
     _empty_msg = {}
+
+    @classmethod
+    def coerce_type(cls, obj, key_order=None, **kwargs):
+        r"""Coerce objects of specific types to match the data type.
+
+        Args:
+            obj (object): Object to be coerced.
+            key_order (list, optional): Order or keys correpsonding to elements in
+                a provided list or tuple. Defaults to None.
+            **kwargs: Additional keyword arguments are metadata entries that may
+                aid in coercing the type.
+
+        Returns:
+            object: Coerced object.
+
+        Raises:
+            RuntimeError: If obj is a list or tuple, but key_order is not provided.
+
+        """
+        if isinstance(obj, pd.DataFrame):
+            obj = serialize.pandas2dict(obj)
+        elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
+            obj = serialize.numpy2dict(obj)
+        elif isinstance(obj, (list, tuple)):
+            if key_order is None:
+                # key_order = ['f%d' % i for i in range(len(obj))]
+                raise RuntimeError("Key order must be provided to coerce %s."
+                                   % type(obj))
+            obj = serialize.list2dict(obj, names=key_order)
+        return obj
 
     @classmethod
     def _iterate(cls, container):

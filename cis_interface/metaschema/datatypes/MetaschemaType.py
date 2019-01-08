@@ -115,11 +115,13 @@ class MetaschemaType(object):
         return obj
 
     @classmethod
-    def coerce_type(cls, obj):
+    def coerce_type(cls, obj, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
             obj (object): Object to be coerced.
+            **kwargs: Additional keyword arguments are metadata entries that may
+                aid in coercing the type.
 
         Returns:
             object: Coerced object.
@@ -407,7 +409,7 @@ class MetaschemaType(object):
         return True
 
     @classmethod
-    def encode(cls, obj, typedef=None):
+    def encode(cls, obj, typedef=None, **kwargs):
         r"""Encode an object.
 
         Args:
@@ -416,6 +418,7 @@ class MetaschemaType(object):
                 be tested against. Defaults to None and object may have
                 any values for the type properties (so long as they match
                 the schema.
+            **kwargs: Additional keyword arguments are added to the metadata.
 
         Returns:
             tuple(dict, bytes): Encoded object with type definition and data
@@ -428,7 +431,7 @@ class MetaschemaType(object):
             TypeError: If the encoded data is not of bytes type.
 
         """
-        obj = cls.coerce_type(obj)
+        obj = cls.coerce_type(obj, **kwargs)
         # This is slightly redundent, maybe pass None
         if not cls.check_decoded(obj, typedef):
             raise ValueError("Object is not correct type for encoding.")
@@ -437,6 +440,16 @@ class MetaschemaType(object):
         data = cls.encode_data(obj_t, metadata)
         if not cls.check_encoded(metadata, typedef):
             raise ValueError("Object was not encoded correctly.")
+        # Add extra keyword arguments to metadata, ensuring type not overwritten
+        for k, v in kwargs.items():
+            if (k in metadata) and (v != metadata[k]):
+                print(k)
+                print('User defined value:')
+                pprint.pprint(v)
+                print('Type encoder defined value:')
+                pprint.pprint(metadata[k])
+                raise RuntimeError("Key '%s' set by the type encoder." % k)
+            metadata[k] = v
         return metadata, data
 
     @classmethod
@@ -480,27 +493,22 @@ class MetaschemaType(object):
             obj (object): Python object to be formatted.
             no_metadata (bool, optional): If True, no metadata will be added to
                 the serialized message. Defaults to False.
+            **kwargs: Additional keyword arguments are added to the metadata.
 
         Returns:
             bytes, str: Serialized message.
 
         """
         if isinstance(obj, backwards.bytes_type) and (obj == tools.CIS_MSG_EOF):
-            metadata = {}
+            metadata = kwargs
             data = obj
             is_eof = True
         else:
-            metadata, data = self.encode(obj, self._typedef)
+            metadata, data = self.encode(obj, typedef=self._typedef, **kwargs)
             is_eof = False
-        for k, v in kwargs.items():
-            if (k in metadata) and (v != metadata[k]):
-                print(k)
-                pprint.pprint(v)
-                pprint.pprint(metadata[k])
-                raise RuntimeError("Key '%s' set by the type encoder." % k)
-            metadata[k] = v
-        if 'data' in metadata:
-            raise RuntimeError("Data is a reserved keyword in the metadata.")
+        for k in ['size', 'data']:
+            if k in metadata:
+                raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
         if not is_eof:
             data = backwards.unicode2bytes(json.dumps(data, sort_keys=True))
         if no_metadata:
