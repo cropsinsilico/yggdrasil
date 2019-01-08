@@ -140,7 +140,8 @@ class TestDefaultSerialize_format(TestDefaultSerialize):
         nt.assert_equal(self.instance.is_user_defined, False)
         nt.assert_equal(self.instance.numpy_dtype, None)
         nt.assert_equal(self.instance.typedef, self.file_schema_scalar)
-        nt.assert_equal(self.instance.extra_kwargs, {'format_str': self.fmt_str})
+        nt.assert_equal(self.instance.extra_kwargs,
+                        {'format_str': backwards.bytes2unicode(self.fmt_str)})
 
 
 class TestDefaultSerialize_array(TestDefaultSerialize_format):
@@ -161,7 +162,8 @@ class TestDefaultSerialize_array(TestDefaultSerialize_format):
         nt.assert_equal(self.instance.is_user_defined, False)
         nt.assert_equal(self.instance.numpy_dtype, self.file_dtype)
         nt.assert_equal(self.instance.typedef, self.file_schema_array)
-        nt.assert_equal(self.instance.extra_kwargs, {'format_str': self.fmt_str})
+        nt.assert_equal(self.instance.extra_kwargs,
+                        {'format_str': backwards.bytes2unicode(self.fmt_str)})
 
 
 class TestDefaultSerialize_func(TestDefaultSerialize):

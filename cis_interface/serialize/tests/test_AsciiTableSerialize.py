@@ -46,8 +46,10 @@ class TestAsciiTableSerialize(parent.TestDefaultSerialize):
         nt.assert_equal(self.instance.extra_kwargs, {})
         # Specific to this class
         nt.assert_equal(self.instance.format_str, self.fmt_str)
-        nt.assert_equal(self.instance.field_names, self.field_names)
-        nt.assert_equal(self.instance.field_units, self.field_units)
+        nt.assert_equal(self.instance.field_names,
+                        [backwards.bytes2unicode(x) for x in self.field_names])
+        nt.assert_equal(self.instance.field_units,
+                        [backwards.bytes2unicode(x) for x in self.field_units])
 
 
 class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
@@ -98,5 +100,7 @@ class TestAsciiTableSerialize_asarray(TestAsciiTableSerialize):
         nt.assert_equal(self.instance.extra_kwargs, {})
         # Specific to this class
         nt.assert_equal(self.instance.format_str, self.fmt_str)
-        nt.assert_equal(self.instance.field_names, self.field_names)
-        nt.assert_equal(self.instance.field_units, self.field_units)
+        nt.assert_equal(self.instance.field_names,
+                        [backwards.bytes2unicode(x) for x in self.field_names])
+        nt.assert_equal(self.instance.field_units,
+                        [backwards.bytes2unicode(x) for x in self.field_units])

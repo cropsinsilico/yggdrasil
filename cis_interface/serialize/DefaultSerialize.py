@@ -432,7 +432,7 @@ class DefaultSerialize(object):
         metadata = {'no_metadata': no_metadata}
         if add_serializer_info:
             metadata.update(self.serializer_info)
-            # metadata['typedef_base'] = self.typedef
+            metadata['typedef_base'] = self.typedef
         if header_kwargs is not None:
             metadata.update(header_kwargs)
         if hasattr(self, 'func_serialize'):

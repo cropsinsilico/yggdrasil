@@ -61,14 +61,14 @@ class AsciiTableSerialize(DefaultSerialize):
 
     def update_serializer(self, *args, **kwargs):
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
-        if self.typedef['type'] == 'array':
-            self.update_format_str()
-            self.update_field_names()
-            self.update_field_units()
         for k in ['format_str', 'delimiter', 'newline', 'comment']:
             v = getattr(self, k, None)
             if isinstance(v, backwards.unicode_type):
                 setattr(self, k, backwards.unicode2bytes(v))
+        if self.typedef['type'] == 'array':
+            self.update_format_str()
+            self.update_field_names()
+            self.update_field_units()
         return out
 
     def update_format_str(self):
