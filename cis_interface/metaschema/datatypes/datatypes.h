@@ -2,6 +2,8 @@
 #define DATATYPES_H_
 
 #include "../../tools.h"
+#include "PlyDict.h"
+#include "ObjDict.h"
 
 #define MSG_HEAD_SEP "CIS_MSG_HEAD"
 #define COMMBUFFSIZ 2000

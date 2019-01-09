@@ -50,6 +50,7 @@ class FileComm(CommBase.CommBase):
     """
 
     _filetype = 'binary'
+    _datatype = {'type': 'bytes'}
     _schema_type = 'file'
     _schema_required = ['name', 'filetype', 'working_dir']
     _schema_properties = inherit_schema(
@@ -59,7 +60,7 @@ class FileComm(CommBase.CommBase):
          'append': {'type': 'boolean', 'default': False},
          'in_temp': {'type': 'boolean', 'default': False},
          'is_series': {'type': 'boolean', 'default': False}},
-        remove_keys=['commtype'], **DirectSerialize._schema_properties)
+        remove_keys=['commtype', 'datatype'], **DirectSerialize._schema_properties)
     _default_serializer = DirectSerialize
     _attr_conv = ['newline', 'platform_newline']
     is_file = True

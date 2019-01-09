@@ -394,22 +394,26 @@ class CommBase(tools.CisClass):
     def _init_before_open(self, serializer=None, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
-        kwargs.update(kwargs.pop('serializer_kwargs', {}))
+        datatype = kwargs.get('datatype', None)
+        if datatype is None:
+            datatype = {}
+        datatype.update(kwargs.pop('serializer_kwargs', {}))
+        if serializer is not None:
+            self.serializer = serializer
+        else:
+            cls = kwargs.pop('serializer_class', self._default_serializer)
+            for k in cls.seri_kws():
+                if k in kwargs:
+                    # TODO: Change to pop once old seri keywords not in comm
+                    # schema directly
+                    datatype[k] = kwargs[k]
+            self.serializer = cls(**datatype)
         # Transfer keywords form the schema
         for k, v in self._schema_properties.items():
             if k in ['name']:
                 continue
             default = v.get('default', None)
             setattr(self, k, kwargs.get(k, default))
-        if serializer is not None:
-            self.serializer = serializer
-        else:
-            cls = kwargs.pop('serializer_class', self._default_serializer)
-            datatype = kwargs.pop('datatype', None)
-            if datatype is None:
-                datatype = {}
-            datatype.update(kwargs)
-            self.serializer = cls(**datatype)
 
     def printStatus(self, nindent=0):
         r"""Print status of the communicator."""

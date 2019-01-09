@@ -5,7 +5,7 @@ import pprint
 import jsonschema
 from cis_interface import backwards, metaschema, tools
 from cis_interface.metaschema.datatypes import (
-    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class)
+    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class, conversions)
 
 
 class MetaschemaType(object):
@@ -404,7 +404,7 @@ class MetaschemaType(object):
             return True
         try:
             cls.validate_instance(obj, typedef)
-        except jsonschema.exceptions.ValidationError:
+        except jsonschema.exceptions.ValidationError as e:
             return False
         return True
 
@@ -434,7 +434,8 @@ class MetaschemaType(object):
         obj = cls.coerce_type(obj, **kwargs)
         # This is slightly redundent, maybe pass None
         if not cls.check_decoded(obj, typedef):
-            raise ValueError("Object is not correct type for encoding.")
+            raise ValueError(("Object (type = '%s') is not correct type for "
+                              + "encoding as '%s'.") % (type(obj), str(typedef)))
         obj_t = cls.transform_type(obj, typedef)
         metadata = cls.encode_type(obj_t, typedef=typedef)
         data = cls.encode_data(obj_t, metadata)
@@ -471,16 +472,24 @@ class MetaschemaType(object):
             ValueError: If the decoded object does not match type definition.
 
         """
+        conv_func = None
         if not cls.check_encoded(metadata, typedef):
-            if (typedef == {'type': 'bytes'}) and ('type' in metadata):
+            if ('type' in metadata) and (typedef == {'type': 'bytes'}):
                 new_cls = get_type_class(metadata['type'])
                 return new_cls.decode(metadata, data)
-            print('metadata:')
-            pprint.pprint(metadata)
-            print('typedef:')
-            pprint.pprint(typedef)
-            raise ValueError("Metadata does not match type definition.")
-        out = cls.decode_data(data, metadata)
+            conv_func = conversions.get_conversion(metadata.get('type', None),
+                                                   cls.name)
+            if not conv_func:
+                print('metadata:')
+                pprint.pprint(metadata)
+                print('typedef:')
+                pprint.pprint(typedef)
+                raise ValueError("Metadata does not match type definition.")
+        if conv_func:
+            new_cls = get_type_class(metadata['type'])
+            out = conv_func(new_cls.decode(data, metadata))
+        else:
+            out = cls.decode_data(data, metadata)
         if not cls.check_decoded(out, typedef):
             raise ValueError("Object was not decoded correctly.")
         out = cls.transform_type(out, typedef)

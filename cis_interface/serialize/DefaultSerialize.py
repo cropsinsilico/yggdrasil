@@ -70,6 +70,11 @@ class DefaultSerialize(object):
         self.update_serializer(**kwargs)
         self._initialized = (self.typedef != self._default_type)
 
+    @classmethod
+    def seri_kws(cls):
+        r"""Get a list of valid keyword arguments."""
+        return list(set(list(cls._schema_properties.keys()) + cls._oldstyle_kws))
+
     @property
     def typedef(self):
         r"""dict: Type definition."""

@@ -8,6 +8,8 @@ def register_conversion(from_type, to_type):
     r"""Register a conversion function for going between types.
 
     Args:
+        from_type (str): Name of type being converted from.
+        to_type (str): Name of type being converted to.
 
     Returns:
         function: Decorator that will register the conversion.
@@ -23,6 +25,22 @@ def register_conversion(from_type, to_type):
         return function
 
     return decorator
+
+
+def get_conversion(from_type, to_type):
+    r"""Get a conversion function for moving from one type to the other.
+
+    Args:
+        from_type (str): Name of type being converted from.
+        to_type (str): Name of type being converted to.
+
+    Returns:
+         function: Method for performing the conversion. If there is no known
+             conversion between the specified types, None will be returned.
+
+    """
+    key = (from_type, to_type)
+    return _conversion_registry.get(key, None)
 
 
 @register_conversion('ply', 'obj')

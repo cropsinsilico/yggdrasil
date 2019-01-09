@@ -20,12 +20,15 @@ while flag
   fprintf('  Vertices:\n');
   for i = 1:int64(ply.nvert)
     fprintf('   %f, %f, %f\n', ...
-            ply{'vertices'}{i}{1}, ply{'vertices'}{i}{2}, ply{'vertices'}{i}{3});
+            ply{'vertices'}{i}{'x'}, ply{'vertices'}{i}{'y'}, ply{'vertices'}{i}{'z'});
   end;
   fprintf('  Faces:\n');
   for i = 1:int64(ply.nface)
-    fprintf('   %d, %d, %d\n', ...
-            ply{'faces'}{i}{1}, ply{'faces'}{i}{2}, ply{'faces'}{i}{3});
+    fprintf('   %d', ply{'faces'}{i}{'vertex_index'}{1});
+    for j = 2:size(ply{'faces'}{i}{'vertex_index'})
+      fprintf(', %d', ply{'faces'}{i}{'vertex_index'}{j});
+    end;
+    fprintf('\n');
   end;
 
   % Send output to output channel

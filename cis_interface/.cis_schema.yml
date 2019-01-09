@@ -16,9 +16,9 @@ definitions:
         commtype:
           default: default
           enum:
-          - ipc
-          - rmq
           - default
+          - rmq
+          - ipc
           - zmq
           type: string
         datatype:
@@ -81,22 +81,22 @@ definitions:
           type: string
         direction:
           enum:
-          - output
           - input
+          - output
           - null
         driver:
           type: string
         icomm_type:
           enum:
-          - ObjFileComm
-          - DefaultComm
+          - PlyFileComm
           - FileComm
           - PandasFileComm
-          - RMQComm
-          - AsciiFileComm
-          - PickleFileComm
           - AsciiTableComm
-          - PlyFileComm
+          - RMQComm
+          - DefaultComm
+          - AsciiFileComm
+          - ObjFileComm
+          - PickleFileComm
           - AsciiMapComm
         inputs:
           items:
@@ -107,15 +107,15 @@ definitions:
           type: array
         ocomm_type:
           enum:
-          - ObjFileComm
-          - DefaultComm
-          - FileComm
+          - PlyFileComm
           - PandasFileComm
+          - FileComm
+          - AsciiTableComm
           - RMQComm
+          - DefaultComm
           - AsciiFileComm
           - PickleFileComm
-          - AsciiTableComm
-          - PlyFileComm
+          - ObjFileComm
           - AsciiMapComm
         onexit:
           type: string
@@ -387,10 +387,6 @@ definitions:
         comment:
           default: '# '
           type: unicode
-        datatype:
-          default:
-            type: bytes
-          type: schema
         delimiter: &id001
           default: "\t"
           type: unicode
@@ -407,14 +403,14 @@ definitions:
         filetype:
           default: binary
           enum:
-          - table
           - ply
           - pandas
           - binary
-          - pickle
           - ascii
           - obj
           - map
+          - pickle
+          - table
           type: string
         format_str: &id002
           type: string
@@ -541,14 +537,14 @@ definitions:
         language:
           enum:
           - executable
-          - lpy
           - cmake
-          - c
+          - matlab
+          - lpy
+          - python
+          - cpp
           - c++
           - make
-          - cpp
-          - matlab
-          - python
+          - c
           type: string
         make_command: &id005
           default: make
@@ -599,6 +595,11 @@ definitions:
             - executable
         title: ModelDriver
       - properties:
+          language:
+            enum:
+            - matlab
+        title: MatlabModelDriver
+      - properties:
           cc: *id004
           language:
             enum:
@@ -619,11 +620,6 @@ definitions:
             enum:
             - lpy
         title: LPyModelDriver
-      - properties:
-          language:
-            enum:
-            - matlab
-        title: MatlabModelDriver
       - properties:
           builddir: *id008
           cmakeargs: *id009

@@ -207,239 +207,54 @@ def translate_py2ply(py_obj):
     return _map_py2ply[type_np]
 
 
-# The base class could be anything since it is discarded during registration,
-# but is set to JSONObjectMetaschemaType here for transparancy since this is
-# what the base class is determined to be on loading the schema
-@register_type_from_file(_schema_file)
-class PlyMetaschemaType(JSONObjectMetaschemaType):
-    r"""Ply 3D structure map."""
+def singular2plural(e_sing):
+    r"""Get the plural version of a singular element name. If the singular
+    version ends with the suffix 'ex' it is replaced with the plural suffix
+    'ices'. Otherwise, an 's' is appended to the singular name to make it
+    plural.
 
-    _empty_msg = {'vertices': [], 'faces': []}
+    Args:
+        e_sing (str): Singular version of an element name.
 
-    @classmethod
-    def encode_data(cls, obj, typedef, element_order=None, property_order=None,
-                    default_rgb=[0, 0, 0], comments=[], newline='\n',
-                    plyformat='ascii 1.0'):
-        r"""Encode an object's data.
+    Returns:
+        str: Plural version of the singular element name e_sing.
 
-        Args:
-            obj (object): Object to encode.
-            typedef (dict): Type definition that should be used to encode the
-                object.
-            element_order (list, optional): Order that elements should be written
-                to the file. If not provided, the order is determined based on
-                typical ply files with remaining elements output in sorted order.
-            property_order (dict, optional): Dictionary of property order for
-                each element determining the order that they properties should
-                be written to the file. If not provided, the orders are determined
-                based on typical ply files with remaining elements output in sorted
-                order.
-            default_rgb (list, optional): Default color in RGB that should be
-                used for missing colors. Defaults to [0, 0, 0].
-            comments (list, optional): List of comments that should be included in
-                the file header. Defaults to lines describing the automated origin
-                of the file.
-            newline (str, optional): String that should be used to delineated end
-                of lines. Defaults to '\n'.
-            plyformat (str, optional): String describing the ply format and version.
-                Defaults to 'ascii 1.0'.
+    """
+    if e_sing.endswith('ex'):
+        e_plur = e_sing.rsplit('ex', 1)[0]
+        e_plur += 'ices'
+    else:
+        e_plur = e_sing + 's'
+    return e_plur
 
-        Returns:
-            bytes, str: Serialized message.
 
-        """
-        # Default order to allow user definited elements
-        if element_order is None:
-            element_order = []
-            for k in _default_element_order:
-                if (k in obj):
-                    element_order.append(k)
-            for k in sorted(obj.keys()):
-                if k not in element_order:
-                    element_order.append(k)
-        if property_order is None:
-            property_order = {}
-            for e in element_order:
-                if e == 'material':
-                    continue
-                assert(isinstance(obj[e], (list, tuple)))
-                if len(obj[e]) == 0:
-                    continue
-                property_order[e] = []
-                if e in _default_property_order:
-                    for k in _default_property_order[e]:
-                        if k in obj[e][0]:
-                            property_order[e].append(k)
-                for k in sorted(obj[e][0].keys()):
-                    if k not in property_order[e]:
-                        property_order[e].append(k)
-        # Get information needed
-        size_map = {}
-        type_map = {}
-        for e in element_order:
-            if e == 'material':
-                continue
-            assert(isinstance(obj[e], (list, tuple)))
-            type_map[e] = {}
-            size_map[e] = len(obj[e])
-            if len(obj[e]) == 0:
-                continue
-            for p in property_order[e]:
-                if isinstance(obj[e][0][p], list):
-                    subtype = translate_py2ply(obj[e][0][p][0])
-                    type_map[e][p] = 'list uchar %s' % subtype
-                else:
-                    type_map[e][p] = translate_py2ply(obj[e][0][p])
-        # Encode header
-        header = ['ply', 'format %s' % plyformat]
-        header += ['comment ' + c for c in comments]
-        for e in element_order:
-            if e == 'material':
-                header += ['comment material: %s' % obj[e]]
-            else:
-                header.append('element %s %d' % (e, size_map[e]))
-                if size_map[e] > 0:
-                    for p in property_order[e]:
-                        header.append('property %s %s' % (type_map[e][p], p))
-        header.append('end_header')
-        # Encode body
-        body = []
-        for e in element_order:
-            if (e not in obj) or (e == 'material'):
-                continue
-            for x in obj[e]:
-                iline = ''
-                for p in property_order[e]:
-                    if type_map[e][p].startswith('list'):
-                        vars = type_map[e][p].split()
-                        ientry = x[p]
-                        ifmt = translate_ply2fmt(vars[2])
-                        iline += translate_ply2fmt(vars[1]) % len(ientry)
-                        for ix in ientry:
-                            iline += ifmt % ix
-                    else:
-                        # if p not in x:
-                        #     if p in ['red', 'green', 'blue']:
-                        #         rgb_index = ['red', 'green', 'blue'].index(p)
-                        #         x[p] = default_rgb[rgb_index]
-                        iline += translate_ply2fmt(type_map[e][p]) % x[p]
-                body.append(iline.strip())  # Ensure trailing spaces are removed
-        return newline.join(header + body)
+def plural2singular(e_plur):
+    r"""Get the singular version of a plural element name. If the plural version
+    ends with the suffix 'ices', it is replaced with the singular suffix 'ex'.
+    If the plural version ends with an 's', it is removed.
 
-    @classmethod
-    def decode_data(cls, msg, typedef):
-        r"""Decode an object.
+    Args:
+        e_plur (str): Plural version of an element name.
 
-        Args:
-            msg (string): Encoded object to decode.
-            typedef (dict): Type definition that should be used to decode the
-                object.
+    Returns:
+        str: Singular version of the plural element name e_plur.
 
-        Returns:
-            object: Decoded object.
+    Raises:
+        ValueError: If a singular version cannot be determined.
 
-        """
-        lines = backwards.bytes2unicode(msg).splitlines()
-        metadata = {'comments': [], 'element_order': [], 'property_order': {}}
-        if lines[0] != 'ply':
-            raise ValueError("The first line must be 'ply'")
-        # Parse header
-        e = None
-        p = None
-        type_map = {}
-        size_map = {}
-        obj = {}
-        for i, line in enumerate(lines):
-            if line.startswith('format'):
-                metadata['plyformat'] = line.split(maxsplit=1)
-            elif line.startswith('comment'):
-                out = line.split(maxsplit=1)[-1]
-                if out.startswith('material:'):
-                    metadata['element_order'].append('material')
-                    obj['material'] = out.split(maxsplit=1)[-1]
-                metadata['comments'].append(out)
-            elif line.startswith('element'):
-                vars = line.split()
-                e = vars[1]
-                size_map[e] = int(float(vars[2]))
-                type_map[e] = {}
-                metadata['element_order'].append(e)
-                metadata['property_order'][e] = []
-                obj[e] = []
-            elif line.startswith('property'):
-                vars = line.split()
-                p = vars[-1]
-                type_map[e][p] = ' '.join(vars[1:-1])
-                metadata['property_order'][e].append(p)
-            elif 'end_header' in line:
-                headline = i + 1
-                break
-        # Parse body
-        i = headline
-        for e in metadata['element_order']:
-            if e == 'material':
-                continue
-            for ie in range(size_map[e]):
-                vars = lines[i].split()
-                iv = 0
-                new = {}
-                for p in metadata['property_order'][e]:
-                    if type_map[e][p].startswith('list'):
-                        type_vars = type_map[e][p].split()
-                        count_type = translate_ply2py(type_vars[1])
-                        plist_type = translate_ply2py(type_vars[2])
-                        count = count_type(vars[iv])
-                        plist = []
-                        iv += 1
-                        for ip in range(count):
-                            plist.append(plist_type(vars[iv]))
-                            iv += 1
-                        new[p] = plist
-                    else:
-                        prop_type = translate_ply2py(type_map[e][p])
-                        new[p] = prop_type(vars[iv])
-                        iv += 1
-                assert(iv == len(vars))
-                obj[e].append(new)
-                i += 1
-        # Check that all properties filled in
-        for e in metadata['element_order']:
-            if e not in metadata['property_order']:
-                continue
-            for p in metadata['property_order'][e]:
-                assert(len(obj[e]) == size_map[e])
-        # Return
-        return obj
-
-    @classmethod
-    def updated_fixed_properties(cls, obj):
-        r"""Get a version of the fixed properties schema that includes information
-        from the object.
-
-        Args:
-            obj (object): Object to use to put constraints on the fixed properties
-                schema.
-
-        Returns:
-            dict: Fixed properties schema with object dependent constraints.
-
-        """
-        out = super(PlyMetaschemaType, cls).updated_fixed_properties(obj)
-        # Constrain indices on number of elements they refer to
-        if isinstance(obj, dict) and ('vertices' in obj):
-            nvert = len(obj['vertices'])
-            out['definitions']['face']['properties']['vertex_index']['items'][
-                'maximum'] = nvert - 1
-            for k in ['vertex1', 'vertex2']:
-                out['definitions']['edge']['properties'][k][
-                    'maximum'] = nvert - 1
-        return out
+    """
+    if e_plur.endswith('ices'):
+        e_sing = e_plur.rsplit('ices', 1)[0]
+        e_sing += 'ex'
+    elif e_plur.endswith('s'):
+        e_sing = e_plur[:-1]
+    else:
+        raise ValueError("Cannot determine singular version of '%s'." % e_plur)
+    return e_sing
 
 
 class PlyDict(dict):
     r"""Enhanced dictionary class for storing Ply information."""
-
-    _type_class = PlyMetaschemaType
 
     def __init__(self, *args, **kwargs):
         super(PlyDict, self).__init__(*args, **kwargs)
@@ -455,9 +270,22 @@ class PlyDict(dict):
             int: Number of the provided element.
 
         """
-        if element_name not in self:
+        if element_name in self:
+            return len(self[element_name])
+        elif singular2plural(element_name) in self:
+            return len(self[singular2plural(element_name)])
+        else:
             raise ValueError("'%s' is not a valid property." % element_name)
-        return len(self[element_name])
+
+    @property
+    def nvert(self):
+        r"""int: Number of vertices."""
+        return self.count_elements('vertices')
+
+    @property
+    def nface(self):
+        r"""int: Number of faces."""
+        return self.count_elements('faces')
 
     @property
     def mesh(self):
@@ -776,3 +604,243 @@ class PlyDict(dict):
             for j, k in enumerate(['red', 'green', 'blue']):
                 out['vertices'][i][k] = c[j]
         return out
+
+   
+# The base class could be anything since it is discarded during registration,
+# but is set to JSONObjectMetaschemaType here for transparancy since this is
+# what the base class is determined to be on loading the schema
+@register_type_from_file(_schema_file)
+class PlyMetaschemaType(JSONObjectMetaschemaType):
+    r"""Ply 3D structure map."""
+
+    _empty_msg = {'vertices': [], 'faces': []}
+    python_types = (dict, PlyDict)
+
+    @classmethod
+    def encode_data(cls, obj, typedef, element_order=None, property_order=None,
+                    default_rgb=[0, 0, 0], comments=[], newline='\n',
+                    plyformat='ascii 1.0'):
+        r"""Encode an object's data.
+
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+            element_order (list, optional): Order that elements should be written
+                to the file. If not provided, the order is determined based on
+                typical ply files with remaining elements output in sorted order.
+            property_order (dict, optional): Dictionary of property order for
+                each element determining the order that they properties should
+                be written to the file. If not provided, the orders are determined
+                based on typical ply files with remaining elements output in sorted
+                order.
+            default_rgb (list, optional): Default color in RGB that should be
+                used for missing colors. Defaults to [0, 0, 0].
+            comments (list, optional): List of comments that should be included in
+                the file header. Defaults to lines describing the automated origin
+                of the file.
+            newline (str, optional): String that should be used to delineated end
+                of lines. Defaults to '\n'.
+            plyformat (str, optional): String describing the ply format and version.
+                Defaults to 'ascii 1.0'.
+
+        Returns:
+            bytes, str: Serialized message.
+
+        """
+        # Add comments to identify generated files
+        default_comments = ['author cis_auto', 'File generated by cis_interface']
+        for c in default_comments:
+            if c not in comments:
+                comments.append(c)
+        # Default order to allow user definited elements
+        if element_order is None:
+            element_order = []
+            for k in _default_element_order:
+                if (k in obj):
+                    element_order.append(k)
+            for k in sorted(obj.keys()):
+                if k not in element_order:
+                    element_order.append(k)
+        if property_order is None:
+            property_order = {}
+            for e in element_order:
+                if e == 'material':
+                    continue
+                assert(isinstance(obj[e], (list, tuple)))
+                if len(obj[e]) == 0:
+                    continue
+                property_order[e] = []
+                if e in _default_property_order:
+                    for k in _default_property_order[e]:
+                        if k in obj[e][0]:
+                            property_order[e].append(k)
+                for k in sorted(obj[e][0].keys()):
+                    if k not in property_order[e]:
+                        property_order[e].append(k)
+        # Get information needed
+        size_map = {}
+        type_map = {}
+        for e in element_order:
+            if e == 'material':
+                continue
+            assert(isinstance(obj[e], (list, tuple)))
+            type_map[e] = {}
+            size_map[e] = len(obj[e])
+            if len(obj[e]) == 0:
+                continue
+            for p in property_order[e]:
+                if isinstance(obj[e][0][p], list):
+                    subtype = translate_py2ply(obj[e][0][p][0])
+                    type_map[e][p] = 'list uchar %s' % subtype
+                else:
+                    type_map[e][p] = translate_py2ply(obj[e][0][p])
+        # Encode header
+        header = ['ply', 'format %s' % plyformat]
+        header += ['comment ' + c for c in comments]
+        for e in element_order:
+            if e == 'material':
+                header += ['comment material: %s' % obj[e]]
+            else:
+                e_sing = plural2singular(e)
+                header.append('element %s %d' % (e_sing, size_map[e]))
+                if size_map[e] > 0:
+                    for p in property_order[e]:
+                        header.append('property %s %s' % (type_map[e][p], p))
+        header.append('end_header')
+        # Encode body
+        body = []
+        for e in element_order:
+            if (e not in obj) or (e == 'material'):
+                continue
+            for x in obj[e]:
+                iline = ''
+                for p in property_order[e]:
+                    if type_map[e][p].startswith('list'):
+                        vars = type_map[e][p].split()
+                        ientry = x[p]
+                        ifmt = translate_ply2fmt(vars[2])
+                        iline += translate_ply2fmt(vars[1]) % len(ientry)
+                        for ix in ientry:
+                            iline += ifmt % ix
+                    else:
+                        # if p not in x:
+                        #     if p in ['red', 'green', 'blue']:
+                        #         rgb_index = ['red', 'green', 'blue'].index(p)
+                        #         x[p] = default_rgb[rgb_index]
+                        iline += translate_ply2fmt(type_map[e][p]) % x[p]
+                body.append(iline.strip())  # Ensure trailing spaces are removed
+        return newline.join(header + body) + newline
+
+    @classmethod
+    def decode_data(cls, msg, typedef):
+        r"""Decode an object.
+
+        Args:
+            msg (string): Encoded object to decode.
+            typedef (dict): Type definition that should be used to decode the
+                object.
+
+        Returns:
+            object: Decoded object.
+
+        """
+        lines = backwards.bytes2unicode(msg).splitlines()
+        metadata = {'comments': [], 'element_order': [], 'property_order': {}}
+        if lines[0] != 'ply':
+            raise ValueError("The first line must be 'ply'")
+        # Parse header
+        e = None
+        p = None
+        type_map = {}
+        size_map = {}
+        obj = {}
+        for i, line in enumerate(lines):
+            if line.startswith('format'):
+                metadata['plyformat'] = line.split(maxsplit=1)
+            elif line.startswith('comment'):
+                out = line.split(maxsplit=1)[-1]
+                if out.startswith('material:'):
+                    metadata['element_order'].append('material')
+                    obj['material'] = out.split(maxsplit=1)[-1]
+                metadata['comments'].append(out)
+            elif line.startswith('element'):
+                vars = line.split()
+                e_sing = vars[1]
+                e = singular2plural(e_sing)
+                size_map[e] = int(float(vars[2]))
+                type_map[e] = {}
+                metadata['element_order'].append(e)
+                metadata['property_order'][e] = []
+                obj[e] = []
+            elif line.startswith('property'):
+                vars = line.split()
+                p = vars[-1]
+                type_map[e][p] = ' '.join(vars[1:-1])
+                metadata['property_order'][e].append(p)
+            elif 'end_header' in line:
+                headline = i + 1
+                break
+        # Parse body
+        i = headline
+        for e in metadata['element_order']:
+            if e == 'material':
+                continue
+            for ie in range(size_map[e]):
+                vars = lines[i].split()
+                iv = 0
+                new = {}
+                for p in metadata['property_order'][e]:
+                    if type_map[e][p].startswith('list'):
+                        type_vars = type_map[e][p].split()
+                        count_type = translate_ply2py(type_vars[1])
+                        plist_type = translate_ply2py(type_vars[2])
+                        count = count_type(vars[iv])
+                        plist = []
+                        iv += 1
+                        for ip in range(count):
+                            plist.append(plist_type(vars[iv]))
+                            iv += 1
+                        new[p] = plist
+                    else:
+                        prop_type = translate_ply2py(type_map[e][p])
+                        new[p] = prop_type(vars[iv])
+                        iv += 1
+                assert(iv == len(vars))
+                obj[e].append(new)
+                i += 1
+        # Check that all properties filled in
+        for e in metadata['element_order']:
+            if e not in metadata['property_order']:
+                continue
+            for p in metadata['property_order'][e]:
+                assert(len(obj[e]) == size_map[e])
+        # Return
+        return PlyDict(obj)
+
+    @classmethod
+    def updated_fixed_properties(cls, obj):
+        r"""Get a version of the fixed properties schema that includes information
+        from the object.
+
+        Args:
+            obj (object): Object to use to put constraints on the fixed properties
+                schema.
+
+        Returns:
+            dict: Fixed properties schema with object dependent constraints.
+
+        """
+        out = super(PlyMetaschemaType, cls).updated_fixed_properties(obj)
+        # Constrain indices on number of elements they refer to
+        if isinstance(obj, dict) and ('vertices' in obj):
+            nvert = len(obj['vertices'])
+            out['definitions']['face']['properties']['vertex_index']['items'][
+                'maximum'] = nvert - 1
+            for k in ['vertex1', 'vertex2']:
+                out['definitions']['edge']['properties'][k][
+                    'maximum'] = nvert - 1
+        return out
+
+
+PlyDict._type_class = PlyMetaschemaType

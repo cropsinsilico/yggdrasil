@@ -40,7 +40,8 @@ class PlySerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
-        return backwards.unicode2bytes(self.datatype.encode_data(args, self.typedef))
+        return backwards.unicode2bytes(self.datatype.encode_data(args,
+                                                                 self.typedef))
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
