@@ -128,7 +128,6 @@ public:
       }
       msg_len = msg_len + ilen;
     }
-    cislog_info("writing:\n%s",buf);
     buf[msg_len] = '\0';
     writer->String(buf, msg_len);
     return true;

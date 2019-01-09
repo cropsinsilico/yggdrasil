@@ -59,7 +59,7 @@ public:
 	  cislog_error("ObjMetaschemaType::encode_data: Error formatting vertex %d.", i);
 	  return false;
 	} else if (ilen >= (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen;
+	  buf_size = buf_size + ilen + 1;
 	  buf = (char*)realloc(buf, buf_size);
 	} else {
 	  break;
@@ -76,7 +76,7 @@ public:
 	  cislog_error("ObjMetaschemaType::encode_data: Error formatting texcoord %d.", i);
 	  return false;
 	} else if (ilen >= (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen;
+	  buf_size = buf_size + ilen + 1;
 	  buf = (char*)realloc(buf, buf_size);
 	} else {
 	  break;
@@ -93,7 +93,7 @@ public:
 	  cislog_error("ObjMetaschemaType::encode_data: Error formatting normal %d.", i);
 	  return false;
 	} else if (ilen >= (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen;
+	  buf_size = buf_size + ilen + 1;
 	  buf = (char*)realloc(buf, buf_size);
 	} else {
 	  break;
@@ -124,8 +124,8 @@ public:
 	if (ilen < 0) {
 	  cislog_error("ObjMetaschemaType::encode_data: Error formatting line face %d.", i);
 	  return false;
-	} else if (ilen > (buf_size - msg_len)) {
-	  buf_size = buf_size + ilen;
+	} else if (ilen >= (buf_size - msg_len)) {
+	  buf_size = buf_size + ilen + 1;
 	  buf = (char*)realloc(buf, buf_size);
 	} else {
 	  break;
@@ -133,7 +133,9 @@ public:
       }
       msg_len = msg_len + ilen;
     }
-    writer->String(buf, buf_size);
+    cislog_info("writing:\n%s",buf);
+    buf[msg_len] = '\0';
+    writer->String(buf, msg_len);
     return true;
   }
 

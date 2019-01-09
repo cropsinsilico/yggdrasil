@@ -20,12 +20,15 @@ while flag
   fprintf('  Vertices:\n');
   for i = 1:int64(obj.nvert)
     fprintf('   %f, %f, %f\n', ...
-	    obj{'vertices'}{i}{1}, obj{'vertices'}{i}{2}, obj{'vertices'}{i}{3});
+	    obj{'vertices'}{i}{'x'}, obj{'vertices'}{i}{'y'}, obj{'vertices'}{i}{'z'});
   end;
   fprintf('  Faces:\n');
   for i = 1:int64(obj.nface)
-    fprintf('   %d, %d, %d\n', ...
-	    obj{'faces'}{i}{1}, obj{'faces'}{i}{2}, obj{'faces'}{i}{3});
+    fprintf('   %d', int64(py.int(obj{'faces'}{i}{1}{'vertex_index'})));
+    for j = 2:size(obj{'faces'}{i})
+      fprintf(', %d', int64(py.int(obj{'faces'}{i}{j}{'vertex_index'})));
+    end;
+    fprintf('\n');
   end;
 
   % Send output to output channel
