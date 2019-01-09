@@ -26,7 +26,7 @@ class DirectSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
-        return args
+        return backwards.unicode2bytes(args)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
