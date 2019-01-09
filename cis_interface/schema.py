@@ -819,12 +819,18 @@ def _normalize_connio_base(normalizer, value, instance, schema):
         for k, v in iodict['input_drivers']:
             iyml = iodict['inputs'][v]
             fyml = dict(name=k, filetype=cdriver2filetype(iyml['driver']))
+            if iyml.get('as_array', False):
+                # TODO: This should not be an exception
+                fyml['as_array'] = True
             conn = dict(input=fyml, output=v)
             new_connections.append(([iyml], conn))
         # File output
         for k, v in iodict['output_drivers']:
             oyml = iodict['outputs'][v]
             fyml = dict(name=k, filetype=cdriver2filetype(oyml['driver']))
+            if oyml.get('as_array', False):
+                # TODO: This should not be an exception
+                fyml['as_array'] = True
             conn = dict(output=fyml, input=v)
             new_connections.append(([oyml], conn))
         # Transfer keyword arguments from input/output to connection

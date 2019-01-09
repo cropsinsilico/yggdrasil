@@ -35,26 +35,29 @@ class TestExampleAsciiIO(TestExample):
     def output_file(self):
         r"""str: Output file for the run."""
         for o, yml in self.runner.outputdrivers.items():
-            if yml['driver'] == 'AsciiFileOutputDriver':
-                return os.path.join(self.tempdir, yml['args'])
+            if yml['ocomm_kws']['comm'][0].get('filetype', None) == 'ascii':
+                return os.path.join(self.tempdir,
+                                    yml['ocomm_kws']['comm'][0]['address'])
         raise Exception('Could not locate output file in yaml.')  # pragma: debug
 
     @property
     def output_table(self):
         r"""str: Output table for the run."""
         for o, yml in self.runner.outputdrivers.items():
-            if (((yml['driver'] == 'AsciiTableOutputDriver')
-                 and (not yml.get('as_array', False)))):
-                return os.path.join(self.tempdir, yml['args'])
+            if (((yml['ocomm_kws']['comm'][0].get('filetype', None) == 'table')
+                 and (not yml['ocomm_kws']['comm'][0].get('as_array', False)))):
+                return os.path.join(self.tempdir,
+                                    yml['ocomm_kws']['comm'][0]['address'])
         raise Exception('Could not locate output table in yaml.')  # pragma: debug
 
     @property
     def output_array(self):
         r"""str: Output array for the run."""
         for o, yml in self.runner.outputdrivers.items():
-            if (((yml['driver'] == 'AsciiTableOutputDriver')
-                 and (yml.get('as_array', False)))):
-                return os.path.join(self.tempdir, yml['args'])
+            if (((yml['ocomm_kws']['comm'][0].get('filetype', None) == 'table')
+                 and (yml['ocomm_kws']['comm'][0].get('as_array', False)))):
+                return os.path.join(self.tempdir,
+                                    yml['ocomm_kws']['comm'][0]['address'])
         raise Exception('Could not locate output array in yaml.')  # pragma: debug
 
     @property

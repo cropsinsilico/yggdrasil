@@ -50,7 +50,7 @@ if __name__ == '__main__':
         if ret:
             # If the receive was succesful, send the values to output.
             # Formatting is taken care of on the output driver side.
-            print_encoded("Table: %s, %d, %3.1f, %s" % line)
+            print_encoded("Table: %s, %d, %3.1f, %s" % tuple(line))
             # print("Table: %s, %d, %3.1f, %s" % line)
             ret = out_table.send_row(*line)
             if not ret:
