@@ -1,0 +1,9 @@
+
+1.0
+===
+
+* Changes to C and C++ interface calls that make string sizes explicit.
+* Creation of schemas for validating YAMLs and metaschema for validating datatype schemas.
+* Addition of datatype option in YAML.
+* Support user defined data types via JSON schema.
+* Changes to the internal structure of Ply and Obj data structures.
