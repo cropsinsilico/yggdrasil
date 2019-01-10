@@ -744,21 +744,28 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       return -2;
     }
     // Get serializer information from header on first recv
-    if ((x.used[0] == 0) && (x.is_file == 0) && (x.serializer->info == NULL)) {
+    seri_t *upseri;
+    if (x.type == SERVER_COMM) {
+      comm_t *handle = (comm_t*)(x.handle);
+      upseri = handle->serializer;
+    } else {
+      upseri = x.serializer;
+    }
+    if ((x.used[0] == 0) && (x.is_file == 0) && (upseri->info == NULL)) {
       cislog_debug("comm_recv_multipart(%s): Updating serializer type to '%s'",
 		   x.name, head.type);
-      ret = update_serializer(x.serializer, head.type, head.serializer_info);
+      ret = update_serializer(upseri, head.type, head.serializer_info);
       if (ret != 0) {
 	cislog_error("comm_recv_multipart(%s): Error updating serializer.", x.name);
 	return -1;
       }
     } else if ((x.is_file == 0) && (strlen(head.type) > 0) && (head.serializer_info != NULL)) {
-      if (strcmp(head.type, x.serializer->type) != 0) {
+      if (strcmp(head.type, upseri->type) != 0) {
 	cislog_error("comm_recv_multipart(%s): Current type ('%s') dosn't match header type ('%s')",
-		     head.type, x.serializer->type);
+		     head.type, upseri->type);
 	return -1;
       }
-      ret = update_serializer(x.serializer, head.type, head.serializer_info);
+      ret = update_serializer(upseri, head.type, head.serializer_info);
       if (ret != 0) {
 	cislog_error("comm_recv_multipart(%s): Error updating existing serializer.", x.name);
 	return -1;
@@ -976,6 +983,8 @@ int vcommSend(const comm_t x, size_t nargs, va_list_t ap) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
+  /* cislog_info("name = %s\n", x.name); */
+  /* display_from_void(serializer->type, serializer->info); */
   size_t nargs_orig = nargs;
   ret = serialize(*serializer, &buf, &buf_siz, 1, &nargs, ap);
   if (ret < 0) {
