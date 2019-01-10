@@ -1,6 +1,8 @@
 #ifndef SCALAR_METASCHEMA_TYPE_H_
 #define SCALAR_METASCHEMA_TYPE_H_
 
+#define STRBUFF 100
+
 #include <vector>
 #include <cstring>
 #include <complex.h>
@@ -17,17 +19,18 @@ class ScalarMetaschemaType : public MetaschemaType {
 public:
   ScalarMetaschemaType(const char *subtype, const size_t precision,
 		       const char *units="") :
-    MetaschemaType("scalar"), subtype_((const char*)malloc(100)), subtype_code_(-1),
-    precision_(precision), units_(units) {
+    MetaschemaType("scalar"), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
+    precision_(precision), units_((const char*)malloc(STRBUFF)) {
     if (precision_ == 0)
       _variable_precision = true;
     else
       _variable_precision = false;
     update_subtype(subtype);
+    update_units(units);
   }
   ScalarMetaschemaType(const rapidjson::Value &type_doc) :
-    MetaschemaType(type_doc), subtype_((const char*)malloc(100)), subtype_code_(-1),
-    precision_(0), units_("") {
+    MetaschemaType(type_doc), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
+    precision_(0), units_((const char*)malloc(STRBUFF)) {
     switch (type_code()) {
     case T_1DARRAY:
     case T_NDARRAY:
@@ -56,7 +59,9 @@ public:
     if (type_doc.HasMember("units")) {
       if (not type_doc["units"].IsString())
 	cislog_throw_error("ScalarMetaschemaType: Units must be a string.");
-      units_ = type_doc["units"].GetString();
+      update_units(type_doc["units"].GetString());
+    } else {
+      update_units("");
     }
     // Set variable
     if (precision_ == 0)
@@ -66,6 +71,7 @@ public:
   }
   ~ScalarMetaschemaType() {
     free((char*)subtype_);
+    free((char*)units_);
   }
   ScalarMetaschemaType* copy() { return (new ScalarMetaschemaType(subtype_, precision_, units_)); }
   void display() {
@@ -105,6 +111,10 @@ public:
     int* subtype_code_modifier = const_cast<int*>(&subtype_code_);
     *subtype_code_modifier = check_subtype();
   }
+  void update_units(const char* new_units) {
+    char **units_modifier = const_cast<char**>(&units_);
+    strcpy(*units_modifier, new_units);
+  }
   void set_precision(const size_t new_precision) {
     if ((strcmp(subtype_, "bytes") != 0) and (strcmp(subtype_, "unicode") != 0)) {
       cislog_throw_error("ScalarMetaschemaType::set_precision: Variable precision only allowed for bytes and unicode, not '%s'.", subtype_);
@@ -131,11 +141,13 @@ public:
     writer->String(subtype_, strlen(subtype_));
     writer->Key("precision");
     writer->Int(precision_);
-    // This will require making units optional
-    //if (strlen(units_) > 0) {
-    writer->Key("units");
-    writer->String(units_, strlen(units_));
-    //}
+    if (strlen(units_) == 0) {
+      writer->Key("units");
+      writer->String("");
+    } else {
+      writer->Key("units");
+      writer->String(units_, strlen(units_));
+    }
     return true;
   }
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
@@ -305,7 +317,7 @@ public:
     unsigned char* decoded_bytes = base64_decode(encoded_bytes, encoded_len,
 						 &decoded_len);
     size_t nbytes_expected = nbytes();
-    if (nbytes_expected != decoded_len) {
+    if ((not _variable_precision) and (nbytes_expected != decoded_len)) {
 	cislog_error("ScalarMetaschemaType::decode_data: %lu bytes were expected, but %lu were decoded.",
 		     nbytes_expected, decoded_len);
       return false;
@@ -317,7 +329,7 @@ public:
       size_t temp_siz = 0;
       int allow_realloc0 = 1; // Always assumed to be pointers to buffers
       bool skip_terminal = true;
-      int ret = copy_to_buffer((char*)decoded_bytes, nbytes_expected, temp, temp_siz,
+      int ret = copy_to_buffer((char*)decoded_bytes, decoded_len, temp, temp_siz,
 			       allow_realloc0, skip_terminal);
       if (ret < 0) {
 	cislog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for array.");
@@ -344,8 +356,7 @@ public:
 	size_t * const arg_siz = va_arg(ap.va, size_t*);
 	(*nargs)--;
 	skip_terminal = false;
-	//printf("before arg_siz = %lu, &arg_siz = %lu, nbytes_expected = %lu\n", *arg_siz, arg_siz, nbytes_expected);
-	int ret = copy_to_buffer((char*)decoded_bytes, nbytes_expected,
+	int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 				 p, arg_siz[0], allow_realloc, skip_terminal);
 	if (ret < 0) {
 	  cislog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
@@ -356,13 +367,11 @@ public:
 	arg_siz[0] = (size_t)ret;
 	// if (_variable_precision) {
 	//   set_precision(8 * strlen(decoded_bytes));
-	//   nbytes_expected = nbytes();
 	// }
-	//printf("after arg_siz = %lu, &arg_siz = %lu, nbytes_expected = %lu\n", *arg_siz, arg_siz, nbytes_expected);
       } else {
 	size_t *arg_siz = &nbytes_expected;
 	skip_terminal = true;
-	int ret = copy_to_buffer((char*)decoded_bytes, nbytes_expected,
+	int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 				 p, *arg_siz, allow_realloc, skip_terminal);
 	if (ret < 0) {
 	  cislog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
