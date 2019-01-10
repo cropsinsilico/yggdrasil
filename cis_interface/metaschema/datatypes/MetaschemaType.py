@@ -404,7 +404,7 @@ class MetaschemaType(object):
             return True
         try:
             cls.validate_instance(obj, typedef)
-        except jsonschema.exceptions.ValidationError as e:
+        except jsonschema.exceptions.ValidationError:
             return False
         return True
 

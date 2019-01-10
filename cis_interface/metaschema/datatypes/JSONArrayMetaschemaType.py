@@ -85,6 +85,15 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         return obj
 
     @classmethod
+    def encode(cls, obj, typedef=None, **kwargs):
+        r"""Encode an object first checking if it should be encapsulated."""
+        if isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
+            if cls.check_decoded([obj], typedef):
+                obj = [obj]
+        return super(JSONArrayMetaschemaType, cls).encode(obj, typedef=typedef,
+                                                          **kwargs)
+
+    @classmethod
     def _iterate(cls, container):
         r"""Iterate over the contents of the container. Each element returned
         should be a tuple including an index and a value.
