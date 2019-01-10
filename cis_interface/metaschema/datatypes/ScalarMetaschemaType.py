@@ -226,7 +226,7 @@ class ScalarMetaschemaType(MetaschemaType):
              and (metadata['type'] not in ['1darray', 'ndarray'])
              and (not metadata.get('fixed_precision', False)))):
             out.remove('precision')
-        if len(metadata.get('units', '')) == 0:
+        if units.is_null_unit(metadata.get('units', '')):
             out.remove('units')
         return out
 

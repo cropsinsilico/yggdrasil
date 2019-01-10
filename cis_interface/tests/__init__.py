@@ -453,7 +453,7 @@ class IOInfo(object):
              'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
         self.file_schema_scalar = {
             'type': 'array',
-            'items': [{'type': 'bytes', 'precision': 40},
+            'items': [{'type': 'bytes'},
                       {'type': 'int', 'precision': 32},
                       {'type': 'float', 'precision': 64}]}
         for n, u, x in zip(self.field_names, self.field_units,
@@ -464,6 +464,8 @@ class IOInfo(object):
         for x in self.file_schema_array['items']:
             x['subtype'] = x['type']
             x['type'] = '1darray'
+            if x['title'] == 'name':
+                x['precision'] = 40
         self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
         self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
         self.field_names_line = (self.comment
