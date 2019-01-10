@@ -1,6 +1,6 @@
 import numpy as np
 import nose.tools as nt
-from cis_interface import backwards
+from cis_interface import backwards, units
 import cis_interface.drivers.tests.test_AsciiFileInputDriver as parent
 import cis_interface.drivers.tests.test_FileInputDriver as super_parent
 
@@ -79,7 +79,16 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
 
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equal."""
-        np.testing.assert_array_equal(x, y)
+        if isinstance(x, np.ndarray):
+            x = [x[n] for n in x.dtype.names]
+        if isinstance(y, np.ndarray):
+            y = [y[n] for n in y.dtype.names]
+        assert(isinstance(x, (list, tuple)))
+        assert(isinstance(y, (list, tuple)))
+        nt.assert_equal(len(x), len(y))
+        for ix, iy in zip(x, y):
+            np.testing.assert_array_equal(units.get_data(ix),
+                                          units.get_data(iy))
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""

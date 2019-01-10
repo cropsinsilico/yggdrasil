@@ -1,6 +1,5 @@
 """Module for funneling messages from one comm to another."""
 import os
-import copy
 import numpy as np
 import threading
 from cis_interface import backwards
