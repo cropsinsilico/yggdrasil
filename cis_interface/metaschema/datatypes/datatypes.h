@@ -401,6 +401,14 @@ int serialize_from_void(const char* name, const void* info,
 void display_from_void(const char* name, const void* info);
 
 
+/*!
+  @brief Wrapper for determining how many arguments a data type expects.
+  @param[in] name char* Name of the type.
+  @param[in] info void* Pointer to type class.
+*/
+size_t nargs_exp_from_void(const char* name, const void* info);
+
+
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

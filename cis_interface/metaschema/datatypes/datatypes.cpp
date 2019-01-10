@@ -298,7 +298,9 @@ extern "C" {
       size_t sind, eind, beg = 0, end;
       char ifmt[FMT_LEN];
       char re_fmt[FMT_LEN];
+      char re_fmt_eof[FMT_LEN];
       sprintf(re_fmt, "%%[^%s%s]+[%s%s]", "\t", "\n", "\t", "\n");
+      sprintf(re_fmt_eof, "%%[^%s%s]+", "\t", "\n");
       size_t iprecision = 0;
       while (beg < strlen(format_str)) {
 	char isubtype[FMT_LEN] = "";
@@ -306,8 +308,12 @@ extern "C" {
 	if (mres < 0) {
 	  cislog_throw_error("get_format_type: find_match returned %d", mres);
 	} else if (mres == 0) {
-	  beg++;
-	  continue;
+	  // Make sure its not just a format string with no newline
+	  mres = find_match(re_fmt_eof, format_str + beg, &sind, &eind);
+	  if (mres <= 0) {
+	    beg++;
+	    continue;
+	  }
 	}
 	beg += sind;
 	end = beg + (eind - sind);
@@ -505,7 +511,8 @@ extern "C" {
       int ret = snprintf(buf, buf_siz, "%s%s%s",
 			 MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
       if (ret > buf_siz) {
-	cislog_error("format_comm_header: Header exceeds buffer size.");
+	cislog_error("format_comm_header: Header exceeds buffer size: '%s%s%s'.",
+		     MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
 	return -1;
       }
       cislog_debug("format_comm_header: Header = '%s'", buf);
@@ -699,6 +706,20 @@ extern "C" {
     }
   }
 
+  size_t nargs_exp_from_void(const char* name, const void* info) {
+    try {
+      MetaschemaType* type = type_from_void(name, info);
+      if (type == NULL) {
+	cislog_error("nargs_exp_from_void: Failed to get type from void.");
+	return 0;
+      }
+      return type->nargs_exp();
+    } catch(...) {
+      cislog_error("nargs_exp_from_void: C++ exception thrown.");
+    }
+    return 0;
+  }
+  
 }
 
 // Local Variables:

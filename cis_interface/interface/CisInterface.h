@@ -389,6 +389,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   success.
 */
 #define vrpcRecv(rpc, nargs, ap) vcommRecv(rpc, 0, nargs, ap)
+#define vrpcRecvRealloc(rpc, nargs, ap) vcommRecv(rpc, 1, nargs, ap)
 
 /*!
   @brief Format and send a message to an RPC output queue.
@@ -416,6 +417,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   success.
 */
 #define rpcRecv commRecv
+#define rpcRecvRealloc commRecvRealloc
 
 /*!
   @brief Send request to an RPC server from the client and wait for a response.
@@ -431,7 +433,8 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   success.
  */
 static inline
-int vrpcCall(const cisRpc_t rpc, size_t nargs, va_list_t ap) {
+int vrpcCallBase(const cisRpc_t rpc, const int allow_realloc,
+		 size_t nargs, va_list_t ap) {
   int sret, rret;
   rret = 0;
 
@@ -440,7 +443,10 @@ int vrpcCall(const cisRpc_t rpc, size_t nargs, va_list_t ap) {
   va_copy(op.va, ap.va);
   
   // pack the args and call
-  sret = vcommSend(rpc, nargs, ap);
+  comm_t *send_comm = (comm_t*)(rpc.handle);
+  size_t send_nargs = nargs_exp_from_void(send_comm->serializer->type,
+					  send_comm->serializer->info);
+  sret = vcommSend(rpc, send_nargs, ap);
   if (sret < 0) {
     cislog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
     return -1;
@@ -457,11 +463,13 @@ int vrpcCall(const cisRpc_t rpc, size_t nargs, va_list_t ap) {
   // unpack the messages into the remaining variable arguments
   // va_list_t op;
   // va_copy(op.va, ap.va);
-  rret = vcommRecv(rpc, 0, nargs, op);
+  rret = vcommRecv(rpc, allow_realloc, nargs, op);
   va_end(op.va);
   
   return rret;
 };
+#define vrpcCall(rpc, nargs, ap) vrpcCallBase(rpc, 0, nargs, ap)
+#define vrpcCallRealloc(rpc, nargs, ap) vrpcCallBase(rpc, 1, nargs, ap)
 
 /*!
   @brief Send request to an RPC server from the client and wait for a response.
@@ -477,15 +485,16 @@ int vrpcCall(const cisRpc_t rpc, size_t nargs, va_list_t ap) {
   success.
  */
 static inline
-int nrpcCall(const cisRpc_t rpc, size_t nargs, ...){
+int nrpcCallBase(const cisRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
   va_list_t ap;
   va_start(ap.va, nargs);
-  ret = vrpcCall(rpc, nargs, ap);
+  ret = vrpcCallBase(rpc, allow_realloc, nargs, ap);
   va_end(ap.va);
   return ret;
 };
-#define rpcCall(rpc, ...) nrpcCall(rpc, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
+#define rpcCall(rpc, ...) nrpcCallBase(rpc, 0, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
+#define rpcCallRealloc(rpc, ...) nrpcCallBase(rpc, 1, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
 
 
 //==============================================================================
