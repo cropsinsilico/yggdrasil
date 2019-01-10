@@ -44,18 +44,19 @@ int main(int argc,char *argv[]) {
   }
 
   // Loop over canopy structures
-  int npatch = 0;
+  size_t npatch = 0;
   double light_intensity = 0.0;
   ret = 0;
   while (1) {
-    npatch = cisRecv(StructInput, &x1[0], &x1[1], &x1[2],
-		     &x2[0], &x2[1], &x2[2],
-		     &x3[0], &x3[1], &x3[2]);
-    if (npatch < 0) {
+    ret = cisRecv(StructInput, &npatch,
+		  &x1[0], &x1[1], &x1[2],
+		  &x2[0], &x2[1], &x2[2],
+		  &x3[0], &x3[1], &x3[2]);
+    if (ret < 0) {
       printf("light: End of input.\n");
       break;
     }
-    for (i = 0; i < npatch; i++) {
+    for (i = 0; i < (int)npatch; i++) {
       light_intensity = calc_light_intensity(ambient_light,
 					     x1[0][i], x1[1][i], x1[2][i],
 					     x2[0][i], x2[1][i], x2[2][i],
