@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import numpy as np
 from cis_interface.interface.CisInterface import (
     CisRpcClient, CisInput, CisOutput)
 from cis_interface import backwards
@@ -27,12 +28,12 @@ def fibClient(args):
         
         # Call the server and receive response
         print('rpcFibCli(P): fib(->%-2d) ::: ' % i, end='')
-        ret, fib = rpc.rpcCall(i)
+        ret, fib = rpc.rpcCall(np.int32(i))
         if not ret:
             raise RuntimeError('rpcFibCli(P): RPC CALL ERROR')
 
         # Log result by sending it to the log connection
-        s = 'fib(%2d<-) = %-2d<-\n' % fib
+        s = 'fib(%2d<-) = %-2d<-\n' % tuple(fib)
         print(s, end='')
         ret = log.send(s)
         if not ret:

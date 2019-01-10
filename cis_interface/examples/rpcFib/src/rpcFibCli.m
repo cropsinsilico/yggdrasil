@@ -22,7 +22,7 @@ function rpcFibCli(iterations)
     
     % Call the server and receive response
     fprintf('rpcFibCli(M):  fib(->%-2d) ::: ', i);
-    [ret, fib] = rpc.call(i);
+    [ret, fib] = rpc.call(int32(i));
     if (~ret);
       error('rpcFibCli(M): RPC CALL ERROR');
     end

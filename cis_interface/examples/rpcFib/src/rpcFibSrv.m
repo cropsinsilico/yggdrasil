@@ -32,7 +32,7 @@ function rpcFibSrv(sleeptime)
 
     % Sleep and then send response back
     pause(sleeptime);
-    flag = rpc.send(input{1}, result);
+    flag = rpc.send(input{1}, int32(result));
     if (~flag);
       error('rpcFibSrv(M): ERROR sending');
     end

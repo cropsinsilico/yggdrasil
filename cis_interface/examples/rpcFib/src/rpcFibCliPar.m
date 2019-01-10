@@ -11,7 +11,7 @@ function rpcFibCliPar(iterations)
   % Send all of the requests to the server
   for i = 1:iterations
     fprintf('rpcFibCliPar(M): fib(->%-2d) ::: \n', i);
-    ret = rpc.send(i);
+    ret = rpc.send(int32(i));
     if (~ret);
       error('rpcFibCliPar(M): SEND FAILED');
     end
