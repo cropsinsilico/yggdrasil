@@ -576,8 +576,8 @@ class MetaschemaType(object):
             return metadata
         elif len(data) == 0:
             return self._empty_msg, metadata
-        elif (metadata['incomplete'] or (metadata.get('raw', False) or no_json
-               or (metadata.get('type', None) == 'direct'))):
+        elif (metadata['incomplete'] or metadata.get('raw', False) or no_json
+              or (metadata.get('type', None) == 'direct')):
             return data, metadata
         else:
             data = json.loads(backwards.bytes2unicode(data))
