@@ -3,6 +3,7 @@
 ===
 
 * Changes to C and C++ interface calls that make string sizes explicit.
+* Stricter enforcement of direct type mapping (e.g. Python int is not compatible with int32 because default is int64 and precision could be lost).
 * Creation of schemas for validating YAMLs and metaschema for validating datatype schemas.
 * Addition of datatype option in YAML.
 * Support user defined data types via JSON schema.
