@@ -327,6 +327,26 @@ public:
     va_end(va.va);
     return ret;
   }
+
+  /*!
+    @brief Receive and parse a message from an RPC input queue, allowing
+    destination memory to be reallocated as necessary.
+    See rpcRecv from CisInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
+    @param[out] ... mixed arguments that should be assigned parameters extracted
+    using the format string. Since these will be assigned and reallocated if
+    they are not large enough, they should be references to pointer for heap
+    memory that may or may not have already been allocated.
+    @return integer specifying if the receive was succesful. Values >= 0
+    indicate success.
+   */
+  int recvRealloc(const int nargs, ...) {
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vrpcRecvRealloc(_pi, nargs, va);
+    va_end(va.va);
+    return ret;
+  }
 };
 
 
@@ -391,7 +411,8 @@ public:
   
   /*!
     @brief Send request to an RPC server from the client and wait for a
-    response.
+    response, preserving the current sizes of memory at the provided output
+    variable references.
     See rpcCall in CisInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[in,out] ... mixed arguments that include those that should be
@@ -406,6 +427,30 @@ public:
     va_list_t va;
     va_start(va.va, nargs);
     int ret = vrpcCall(_cpi, nargs, va);
+    va_end(va.va);
+    return ret;
+  }
+  
+  /*!
+    @brief Send request to an RPC server from the client and wait for a
+    response, allowing the memory pointed to by the pointers that the output
+    variables reference to be reallocated.
+    See rpcCall in CisInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
+    @param[in,out] ... mixed arguments that include those that should be
+    formatted using the output format string, followed by those that should be
+    assigned parameters extracted using the input format string. These that will
+    be assigned should be references to pointers for heap memory that may or may
+    not have already been allocated. These will be reallocated if they are not
+    large enough to receive data from the incoming message.
+    @return integer specifying if the receive was succesful. Values >= 0
+    indicate success.
+  */
+  int callRealloc(const int nargs, ...) {
+    cisRpc_t _cpi = pi();
+    va_list_t va;
+    va_start(va.va, nargs);
+    int ret = vrpcCallRealloc(_cpi, nargs, va);
     va_end(va.va);
     return ret;
   }
