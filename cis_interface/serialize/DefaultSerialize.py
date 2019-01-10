@@ -1,13 +1,14 @@
 import copy
+import pprint
 import numpy as np
 import warnings
 from cis_interface import backwards, tools, serialize
 from cis_interface.serialize import register_serializer
 from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.datatypes import (
-    guess_type_from_obj, get_type_from_def, get_type_class)
+    guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
 from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
-    definition2dtype)
+    definition2dtype, _flexible_types)
 from cis_interface.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
 
@@ -65,6 +66,7 @@ class DefaultSerialize(object):
         for k, v in self._schema_properties.items():
             setattr(self, k, v.get('default', None))
         # Update typedef
+        self._initialized = False
         self.datatype = get_type_from_def(self._default_type)
         self.str_datatype = get_type_from_def({'type': 'bytes'})
         self.update_serializer(**kwargs)
@@ -231,6 +233,9 @@ class DefaultSerialize(object):
                 may contain additional information for initializing the serializer.
 
         """
+        if ((self._initialized or metadata.get('raw', False)
+             or metadata.get('incomplete', False))):
+            return
         cls = guess_type_from_obj(msg)
         typedef = cls.encode_type(msg)
         typedef = cls.extract_typedef(typedef)
@@ -249,10 +254,12 @@ class DefaultSerialize(object):
                 type information will be used. Defaults to False.
 
         """
-        if self._initialized:
+        if ((self._initialized or metadata.get('raw', False)
+             or metadata.get('incomplete', False))):
             return
         self.update_serializer(extract=extract, **metadata)
         self._initialized = (self.typedef != self._default_type)
+        # self._initialized = True
 
     def update_from_message(self, msg, **kwargs):
         r"""Update serializer information based on the message.
@@ -286,6 +293,9 @@ class DefaultSerialize(object):
                 keywords (currect or old-style).
 
         """
+        old_datatype = None
+        if self._initialized:
+            old_datatype = copy.deepcopy(self.datatype)
         _metaschema = get_metaschema()
         # Create alias if another seritype is needed
         seritype = kwargs.pop('seritype', self._seritype)
@@ -296,7 +306,7 @@ class DefaultSerialize(object):
             return
         # Remove metadata keywords unrelated to serialization
         # TODO: Find a better way of tracking these
-        _remove_kws = ['size', 'id', 'incomplete', 'commtype', 'filetype',
+        _remove_kws = ['size', 'id', 'incomplete', 'raw', 'commtype', 'filetype',
                        'append', 'in_temp', 'is_series', 'working_dir', 'fmts',
                        'model_driver', 'env', 'send_converter', 'recv_converter']
         kws = list(kwargs.keys())
@@ -315,16 +325,21 @@ class DefaultSerialize(object):
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-            # print('extras:')
-            # pprint.pprint(kwargs)
-            # raise RuntimeError("There were unprocessed keyword arguments.")
         # Update typedef from oldstyle keywords in extra_kwargs
         typedef = self.update_typedef_from_oldstyle(typedef)
         if typedef.get('type', None):
-            if extract:  # pragma: debug
+            if extract:
                 cls = get_type_class(typedef['type'])
                 typedef = cls.extract_typedef(typedef)
             self.datatype = get_type_from_def(typedef)
+        # Check to see if new datatype is compatible with new one
+        if old_datatype is not None:
+            if not compare_schema(self.typedef, old_datatype._typedef):
+                raise RuntimeError(
+                    ("Updated datatype is not compatible with the existing one."
+                     + "    New:\n%s\nOld:\n%s\n") % (
+                         pprint.pformat(self.typedef),
+                         pprint.pformat(old_datatype._typedef)))
 
     def update_typedef_from_oldstyle(self, typedef):
         r"""Update a given typedef using an old, table-style serialization spec.
@@ -352,7 +367,6 @@ class DefaultSerialize(object):
                 v = backwards.bytes2unicode(v)
                 fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
-                    # print('update format_str for existing type?', typedef)
                     if (typedef.get('type', None) == 'array'):
                         if len(typedef.get('items', [])) != len(fmts):
                             warnings.warn(("Number of items in typedef (%d) doesn't"
@@ -366,10 +380,15 @@ class DefaultSerialize(object):
                     nptype = serialize.cformat2nptype(fmt)
                     itype = OneDArrayMetaschemaType.encode_type(np.ones(1, nptype))
                     itype = OneDArrayMetaschemaType.extract_typedef(itype)
+                    if (fmt == '%s') and ('precision' in itype):
+                        del itype['precision']
                     if as_array:
                         itype['type'] = '1darray'
                     else:
                         itype['type'] = itype.pop('subtype')
+                        if (((itype['type'] in _flexible_types)
+                             and ('precision' in itype))):
+                            del itype['precision']
                     typedef['items'].append(itype)
                 used.append('as_array')
                 updated.append('format_str')
@@ -429,11 +448,9 @@ class DefaultSerialize(object):
         """
         if header_kwargs is None:
             header_kwargs = {}
-        is_eof = False
         if isinstance(args, backwards.bytes_type) and (args == tools.CIS_MSG_EOF):
-            is_eof = True
-        if not (self._initialized or is_eof):
-            self.initialize_from_message(args, **header_kwargs)
+            header_kwargs['raw'] = True
+        self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata}
         if add_serializer_info:
             metadata.update(self.serializer_info)
@@ -441,7 +458,7 @@ class DefaultSerialize(object):
         if header_kwargs is not None:
             metadata.update(header_kwargs)
         if hasattr(self, 'func_serialize'):
-            if is_eof:
+            if header_kwargs.get('raw', False):
                 data = args
                 if no_metadata:
                     return data
@@ -480,7 +497,7 @@ class DefaultSerialize(object):
             if metadata['size'] == 0:
                 out = self.empty_msg
             elif not (metadata.get('incomplete', False)
-                      or metadata.get('eof', False)):
+                      or metadata.get('raw', False)):
                 if 'metadata' in metadata:
                     for k, v in metadata.items():
                         if k not in ['type', 'precision', 'units', 'metadata']:
@@ -496,9 +513,9 @@ class DefaultSerialize(object):
         typedef = copy.deepcopy(metadata)
         typedef.update(typedef_base)
         if not ((metadata.get('size', 0) == 0)
-                or metadata.get('eof', False)
-                or metadata.get('incomplete', False)):
-            self.initialize_serializer(typedef)
+                or metadata.get('incomplete', False)
+                or metadata.get('raw', False)):
+            self.initialize_serializer(typedef, extract=True)
             np_dtype = self.numpy_dtype
             if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
                 out = serialize.consolidate_array(out, dtype=np_dtype)

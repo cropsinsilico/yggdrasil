@@ -115,7 +115,7 @@ class TestDefaultSerialize(CisTestClassInfo):
                 iout, ihead = self.instance.deserialize(msg)
                 self.assert_result_equal(iout, self.map_sent2recv(iobj))
                 # nt.assert_equal(ihead, self._header_info)
-            nt.assert_raises(Exception, self.instance.serialize, ['msg', 0])
+            # nt.assert_raises(Exception, self.instance.serialize, ['msg', 0])
         
     def test_deserialize_empty(self):
         r"""Test call for empty string."""

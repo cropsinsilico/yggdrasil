@@ -1199,7 +1199,8 @@ class CommBase(tools.CisClass):
             ret = self.send_multipart(args, **kwargs)
             if ret:
                 self._used = True
-                self._send_serializer = False
+                if self.serializer._initialized:
+                    self._send_serializer = False
         except BaseException:
             self.exception('Failed to send.')
             return False
@@ -1442,7 +1443,7 @@ class CommBase(tools.CisClass):
         # Parse message
         flag, msg, header = self.on_recv(s_msg)
         if not flag:
-            if not header.get('eof', False):  # pragma: debug
+            if not header.get('raw', False):  # pragma: debug
                 self.debug("Failed to receive message header.")
             return flag, msg
         # Receive remainder of message that was not received

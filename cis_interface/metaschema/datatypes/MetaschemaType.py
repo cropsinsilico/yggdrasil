@@ -379,9 +379,10 @@ class MetaschemaType(object):
                 return False
             errors = [e for e in compare_schema(metadata, typedef)]
             if errors:
-                # print("Error(s) in comparison")
+                # error_msg = "Error(s) in comparison:"
                 # for e in errors:
-                #     print('\t%s' % e)
+                #     error_msg += ('\t%s' % e)
+                # print(error_msg)
                 return False
         return True
 
@@ -444,12 +445,11 @@ class MetaschemaType(object):
         # Add extra keyword arguments to metadata, ensuring type not overwritten
         for k, v in kwargs.items():
             if (k in metadata) and (v != metadata[k]):
-                print(k)
-                print('User defined value:')
-                pprint.pprint(v)
-                print('Type encoder defined value:')
-                pprint.pprint(metadata[k])
-                raise RuntimeError("Key '%s' set by the type encoder." % k)
+                error_str = ("Key '%s' set by the type encoder.\n"
+                             + " User defined value:\n%s\n"
+                             + "Type encoder defined value:\n%s\n") % (
+                                 k, pprint.pformat(v), pprint.pformat(metadata[k]))
+                raise RuntimeError(error_str)
             metadata[k] = v
         return metadata, data
 
@@ -480,11 +480,10 @@ class MetaschemaType(object):
             conv_func = conversions.get_conversion(metadata.get('type', None),
                                                    cls.name)
             if not conv_func:
-                print('metadata:')
-                pprint.pprint(metadata)
-                print('typedef:')
-                pprint.pprint(typedef)
-                raise ValueError("Metadata does not match type definition.")
+                error_str = ("Metadata does not match type definition\n."
+                             + "metadata:\n%s\ntypedef:\n%s\n") % (
+                                 pprint.pformat(metadata), pprint.pformat(typedef))
+                raise ValueError(error_str)
         if conv_func:
             new_cls = get_type_class(metadata['type'])
             out = conv_func(new_cls.decode(data, metadata))
@@ -508,17 +507,18 @@ class MetaschemaType(object):
             bytes, str: Serialized message.
 
         """
-        if isinstance(obj, backwards.bytes_type) and (obj == tools.CIS_MSG_EOF):
+        if ((isinstance(obj, backwards.bytes_type)
+             and ((obj == tools.CIS_MSG_EOF) or kwargs.get('raw', False)))):
             metadata = kwargs
             data = obj
-            is_eof = True
+            is_raw = True
         else:
             metadata, data = self.encode(obj, typedef=self._typedef, **kwargs)
-            is_eof = False
+            is_raw = False
         for k in ['size', 'data']:
             if k in metadata:
                 raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
-        if not is_eof:
+        if not is_raw:
             data = backwards.unicode2bytes(json.dumps(data, sort_keys=True))
         if no_metadata:
             return data
@@ -551,33 +551,34 @@ class MetaschemaType(object):
         """
         if not isinstance(msg, backwards.bytes_type):
             raise TypeError("Message to be deserialized is not bytes type.")
-        if len(msg) == 0:
-            data = msg
-            metadata = dict(size=0)
-        elif CIS_MSG_HEAD not in msg:
-            data = msg
-            if metadata is None:
-                metadata = dict(size=len(msg))
-                if (data != tools.CIS_MSG_EOF) and (self._typedef != {'type': 'bytes'}):
-                    raise ValueError("Header marker not in message.")
-        if metadata is None:
+        # Check for header
+        if CIS_MSG_HEAD in msg:
+            if metadata is not None:
+                raise ValueError("Metadata in header and provided by keyword.")
             _, metadata, data = msg.split(CIS_MSG_HEAD, 2)
             if len(metadata) == 0:
                 metadata = dict(size=len(data))
             else:
                 metadata = json.loads(backwards.bytes2unicode(metadata))
+        else:
+            data = msg
+            if metadata is None:
+                metadata = dict(size=len(msg))
+                if (((len(msg) > 0) and (msg != tools.CIS_MSG_EOF)
+                     and (self._typedef != {'type': 'bytes'}))):
+                    raise ValueError("Header marker not in message.")
+        # Set flags based on data
         metadata['incomplete'] = (len(data) < metadata['size'])
+        if (data == tools.CIS_MSG_EOF):
+            metadata['raw'] = True
+        # Return based on flags
         if no_data:
             return metadata
-        if metadata['incomplete']:
+        elif len(data) == 0:
+            return self._empty_msg, metadata
+        elif (metadata['incomplete'] or (metadata.get('raw', False) or no_json
+               or (metadata.get('type', None) == 'direct'))):
             return data, metadata
-        if len(data) == 0:
-            obj = self._empty_msg
-        elif (data == tools.CIS_MSG_EOF):
-            obj = data
-            metadata['eof'] = True
-        elif no_json or (metadata.get('type', None) == 'direct'):
-            obj = data
         else:
             data = json.loads(backwards.bytes2unicode(data))
             obj = self.decode(metadata, data, self._typedef)
