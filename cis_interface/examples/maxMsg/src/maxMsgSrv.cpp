@@ -6,15 +6,17 @@ int main(int argc, char *argv[]) {
 
     printf("maxMsgSrv(CPP): Hello!\n");
     CisRpcServer rpc("maxMsgSrv", "%s", "%s");
-    char *input = (char*)malloc(CIS_MSG_BUF);
+    size_t input_size = CIS_MSG_BUF;
+    char *input = (char*)malloc(input_size);
     //char input[CIS_MSG_MAX];
     
     while (1) {
-      int ret = rpc.recv(1, input);
+      int ret = rpc.recvRealloc(2, &input, &input_size);
       if (ret < 0)
 	break;
-      printf("maxMsgSrv(CPP): rpcRecv returned %d, input %.10s...\n", ret, input);
-      ret = rpc.send(1, input);
+      printf("maxMsgSrv(CPP): rpcRecv returned %d, input (size=%lu) %.10s...\n",
+	     ret, input_size, input);
+      ret = rpc.send(2, input, input_size);
       if (ret < 0) {
         printf("maxMsgSrv(CPP): SEND ERROR");
         break;
