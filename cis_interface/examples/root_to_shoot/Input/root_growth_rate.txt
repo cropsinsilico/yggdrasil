@@ -1,0 +1,4 @@
+# root_growth_rate
+# %lf
+# hr**-1
+0.001

@@ -1,0 +1,14 @@
+model:
+  name: RootModel
+  language: c
+  args: ./src/root_wrapper.c
+  inputs:
+    - name: root_growth_rate
+      units: hr**-1
+    - name: init_root_mass
+      units: g
+    - name: root_time_step
+      units: hr
+  outputs:
+    - name: next_root_mass
+      units: g

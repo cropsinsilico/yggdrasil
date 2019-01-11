@@ -1,0 +1,4 @@
+# shoot_growth_rate
+# %lf
+# d**-1
+0.048

@@ -1,0 +1,4 @@
+# nstep	shoot_growth_rate	init_shoot_mass
+# %d	%lf			%lf
+# n/a	kg/day			kg
+100	0.15			1

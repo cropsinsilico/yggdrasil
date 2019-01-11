@@ -1,0 +1,4 @@
+# init_root_mass
+# %lf
+# g
+100
