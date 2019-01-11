@@ -1,3 +1,4 @@
+import numpy as np
 from cis_interface.interface.CisInterface import CisRpcServer
 
 
@@ -48,7 +49,7 @@ def main():
         print('server: Sending response for Fibonacci number %d: %d' % (n, result))
 
         # Send response back
-        flag = rpc.send(result)
+        flag = rpc.send(np.int32(result))
         if not flag:
             raise RuntimeError('server: ERROR sending')
 

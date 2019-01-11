@@ -14,7 +14,7 @@ function client(iterations)
     
     % Call the server and receive response
     fprintf('client(Matlab): Calling fib(%d)\n', i);
-    [ret, result] = rpc.call(i);
+    [ret, result] = rpc.call(int32(i));
     if (~ret);
       error('client(Matlab): RPC CALL ERROR');
     end;
@@ -22,7 +22,7 @@ function client(iterations)
     fprintf('client(Matlab): Response fib(%d) = %d\n', i, fib);
 
     % Log result by sending it to the log connection
-    ret = log.send(i, fib);
+    ret = log.send(int32(i), fib);
     if (~ret);
       error('client(Matlab): SEND ERROR');
     end;
