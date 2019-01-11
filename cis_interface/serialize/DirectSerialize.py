@@ -26,6 +26,9 @@ class DirectSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
+        if (((self.extra_kwargs.get('format_str', None) is not None)
+             and isinstance(args, list))):
+            args = serialize.format_message(args, self.extra_kwargs['format_str'])
         return backwards.unicode2bytes(args)
 
     def func_deserialize(self, msg):
