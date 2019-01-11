@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 from cis_interface.interface.CisInterface import (
     CisRpcClient, CisOutput)
 
@@ -26,14 +27,14 @@ def main(iterations, client_index):
         
         # Call the server and receive response
         print('client%d(Python): Calling fib(%d)' % (client_index, i))
-        ret, result = rpc.call(i)
+        ret, result = rpc.call(np.int32(i))
         if not ret:
             raise RuntimeError('client%d(Python): RPC CALL ERROR' % client_index)
         fib = result[0]
         print('client%d(Python): Response fib(%d) = %d' % (client_index, i, fib))
 
         # Log result by sending it to the log connection
-        ret = log.send(i, fib)
+        ret = log.send(np.int32(i), fib)
         if not ret:
             raise RuntimeError('client%d(Python): SEND ERROR' % client_index)
 
