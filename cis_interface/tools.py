@@ -2,6 +2,7 @@
 from __future__ import print_function
 import threading
 import logging
+import pprint
 import os
 import sys
 import inspect
@@ -595,6 +596,25 @@ class CisClass(logging.LoggerAdapter):
             cis_cfg.set('debug', 'cis', self._old_loglevel)
             cfg_logging()
             self._old_loglevel = None
+
+    def pprint(self, obj, block_indent=0, indent_str='    ', **kwargs):
+        r"""Use pprint to represent an object as a string.
+
+        Args:
+            obj (object): Python object to represent.
+            block_indent (int, optional): Number of indents that should be
+                placed in front of the entire block. Defaults to 0.
+            indent_str (str, optional): String that should be used to indent.
+                Defaults to 4 spaces.
+            **kwargs: Additional keyword arguments are passed to pprint.pformat.
+
+        Returns:
+            str: String representation of object using pprint.
+
+        """
+        sblock = block_indent * indent_str
+        out = sblock + pprint.pformat(obj, **kwargs).replace('\n', '\n' + sblock)
+        return out
 
     def as_str(self, obj):
         r"""Return str version of object if it is not already a string.
