@@ -81,11 +81,11 @@ def definition2dtype(props):
         if typename is None:
             raise KeyError('Could not find type in dictionary')
     if typename == 'unicode':
-        out = np.dtype((_valid_types[typename], props['precision'] // 32))
+        out = np.dtype((_valid_types[typename], int(props['precision'] // 32)))
     elif typename in _flexible_types:
-        out = np.dtype((_valid_types[typename], props['precision'] // 8))
+        out = np.dtype((_valid_types[typename], int(props['precision'] // 8)))
     else:
-        out = np.dtype('%s%d' % (_valid_types[typename], props['precision']))
+        out = np.dtype('%s%d' % (_valid_types[typename], int(props['precision'])))
     return out
 
 
@@ -112,6 +112,15 @@ class SubtypeMetaschemaProperty(MetaschemaProperty):
                                       % dtype)
         return out
 
+    @classmethod
+    def normalize_in_schema(cls, schema):
+        r"""Normalization for the 'subtype' scalar property in a schema."""
+        if cls.name in schema:
+            return schema
+        if not units.is_null_unit(schema.get('units', '')):
+            schema.setdefault(cls.name, 'float')
+        return schema
+    
 
 @register_metaschema_property
 class PrecisionMetaschemaProperty(MetaschemaProperty):
@@ -135,6 +144,18 @@ class PrecisionMetaschemaProperty(MetaschemaProperty):
         if (prop1 > prop2):
             yield '%s is greater than %s' % (prop1, prop2)
 
+    @classmethod
+    def normalize_in_schema(cls, schema):
+        r"""Normalization for the 'precision' scalar property in a schema."""
+        if cls.name in schema:
+            return schema
+        subtype = schema.get('subtype', None)
+        if subtype in ['float', 'int', 'uint']:
+            schema.setdefault(cls.name, int(64))
+        elif subtype in ['complex']:
+            schema.setdefault(cls.name, int(128))
+        return schema
+            
 
 @register_metaschema_property
 class UnitsMetaschemaProperty(MetaschemaProperty):

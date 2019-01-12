@@ -69,7 +69,9 @@ _normalize_objects = [
     ({'type': 'array', 'items': {'type': 'int'}}, None, None),
     ({'type': 'function'}, '%s:test_func' % __name__, test_func),
     ({'type': 'function'}, '%s:invalid_func' % __name__,
-     '%s:invalid_func' % __name__)]
+     '%s:invalid_func' % __name__),
+    ({'type': 'schema'}, {'units': 'g'},
+     {'type': 'scalar', 'units': 'g', 'subtype': 'float', 'precision': int(64)})]
 
 
 def test_create_metaschema():

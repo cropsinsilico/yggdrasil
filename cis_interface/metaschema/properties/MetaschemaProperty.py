@@ -136,6 +136,19 @@ class MetaschemaProperty(object):
         return instance
 
     @classmethod
+    def normalize_in_schema(cls, schema):
+        r"""Method to normalize the entry for this property in a schema.
+
+        Args:
+            schema (dict): Schema to normalize.
+
+        Returns:
+            dict: Normalized schema.
+
+        """
+        return schema
+
+    @classmethod
     def post_validate(cls, validator, value, instance, schema):
         r"""Actions performed after validation if normalizing."""
         pass

@@ -92,10 +92,10 @@ class FixedMetaschemaType(MetaschemaType):
             typedef_base.update(cls.fixed_properties)
             errors = [e for e in compare_schema(typedef, typedef_base)]
             if errors:  # pragma: debug
-                print("Error(s) in comparison with fixed properties.")
+                error_msg = "Error(s) in comparison with fixed properties.\n"
                 for e in errors:
-                    print('\t%s' % e)
-                raise Exception
+                    error_msg += '\t%s\n' % e
+                raise Exception(error_msg)
             for k, v in cls.fixed_properties.items():
                 if k in out:
                     del out[k]
@@ -235,7 +235,10 @@ class FixedMetaschemaType(MetaschemaType):
                 otherwise.
 
         """
-        out = cls.typedef_base2fixed(metadata)
+        try:
+            out = cls.typedef_base2fixed(metadata)
+        except Exception:
+            return False
         return super(FixedMetaschemaType, cls).check_encoded(out, typedef=typedef)
 
     @classmethod

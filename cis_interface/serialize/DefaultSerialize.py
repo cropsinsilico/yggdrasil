@@ -277,7 +277,7 @@ class DefaultSerialize(object):
         typedef.update(**kwargs)
         self.update_serializer(extract=True, **typedef)
 
-    def update_serializer(self, extract=False, **kwargs):
+    def update_serializer(self, extract=False, skip_type=False, **kwargs):
         r"""Update serializer with provided information.
 
         Args:
@@ -285,6 +285,8 @@ class DefaultSerialize(object):
                 the bare minimum as extracted from total set of provided
                 keywords, otherwise the entire set will be sued. Defaults to
                 False.
+            skip_type (bool, optional): If True, everything is updated except
+                the data type. Defaults to False.
             **kwargs: Additional keyword arguments are processed as part of
                 they type definition and are parsed for old-style keywords.
 
@@ -299,7 +301,7 @@ class DefaultSerialize(object):
         _metaschema = get_metaschema()
         # Create alias if another seritype is needed
         seritype = kwargs.pop('seritype', self._seritype)
-        if seritype != self._seritype:
+        if (seritype != self._seritype) and (seritype != 'default'):
             kwargs.update(extract=extract, seritype=seritype)
             self._alias = serialize.get_serializer(**kwargs)
             assert(self._seritype == seritype)
@@ -325,21 +327,23 @@ class DefaultSerialize(object):
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-        # Update typedef from oldstyle keywords in extra_kwargs
-        typedef = self.update_typedef_from_oldstyle(typedef)
-        if typedef.get('type', None):
-            if extract:
-                cls = get_type_class(typedef['type'])
-                typedef = cls.extract_typedef(typedef)
-            self.datatype = get_type_from_def(typedef)
-        # Check to see if new datatype is compatible with new one
-        if old_datatype is not None:
-            if not compare_schema(self.typedef, old_datatype._typedef):
-                raise RuntimeError(
-                    ("Updated datatype is not compatible with the existing one."
-                     + "    New:\n%s\nOld:\n%s\n") % (
-                         pprint.pformat(self.typedef),
-                         pprint.pformat(old_datatype._typedef)))
+        # Update type
+        if not skip_type:
+            # Update typedef from oldstyle keywords in extra_kwargs
+            typedef = self.update_typedef_from_oldstyle(typedef)
+            if typedef.get('type', None):
+                if extract:
+                    cls = get_type_class(typedef['type'])
+                    typedef = cls.extract_typedef(typedef)
+                self.datatype = get_type_from_def(typedef)
+            # Check to see if new datatype is compatible with new one
+            if old_datatype is not None:
+                if not compare_schema(self.typedef, old_datatype._typedef):
+                    raise RuntimeError(
+                        ("Updated datatype is not compatible with the existing one."
+                         + "    New:\n%s\nOld:\n%s\n") % (
+                             pprint.pformat(self.typedef),
+                             pprint.pformat(old_datatype._typedef)))
 
     def update_typedef_from_oldstyle(self, typedef):
         r"""Update a given typedef using an old, table-style serialization spec.
@@ -408,9 +412,13 @@ class DefaultSerialize(object):
                     warnings.warn('%d %ss provided, but only %d items in typedef.'
                                   % (len(v), k, len(typedef.get('items', []))))
                     continue
+                all_updated = True
                 for iv, itype in zip(v, typedef.get('items', [])):
-                    itype[tk] = iv
-                used.append(k)
+                    if tk in itype:
+                        all_updated = False
+                    itype.setdefault(tk, iv)
+                if all_updated:
+                    used.append(k)
                 updated.append(k)  # Won't change anything unless its an attribute
             else:  # pragma: debug
                 raise ValueError(

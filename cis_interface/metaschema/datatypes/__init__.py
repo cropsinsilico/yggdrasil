@@ -175,19 +175,11 @@ def complete_typedef(typedef):
         TypeError: If typedef is not a valid type.
 
     """
-    if isinstance(typedef, str):
-        out = {'type': typedef}
-    elif isinstance(typedef, dict):
-        if 'type' in typedef:
-            out = copy.deepcopy(typedef)
-        else:
-            contents = {k: complete_typedef(v) for k, v in typedef.items()}
-            out = {'type': 'object', 'properties': contents}
-    elif isinstance(typedef, (list, tuple)):
-        contents = [complete_typedef(v) for v in typedef]
-        out = {'type': 'array', 'items': contents}
-    else:
-        raise TypeError("Cannot parse type '%s' as type definition." % type(typedef))
+    schema_type = get_type_class('schema')
+    out = schema_type.normalize(typedef)
+    if not isinstance(out, dict) or ('type' not in out):
+        raise TypeError("Cannot parse '%s' (type=%s) as type definition." % (
+            typedef, type(typedef)))
     return out
 
 

@@ -645,6 +645,10 @@ def cdriver2filetype(driver):
         str: The corresponding file type for the driver.
 
     """
+    # _legacy = {'AsciiMapInputDriver': 'AsciiMapComm',
+    #            'AsciiMapOutputDriver': 'AsciiMapComm'}
+    # if driver in _legacy:
+    #     return _legacy[driver]
     schema = get_schema()
     conntypes = schema['connection'].class2subtype
     filetypes = schema['file'].class2subtype
@@ -775,6 +779,10 @@ def _normalize_modelio_elements(normalizer, value, instance, schema):
                 extra_keys = {}
                 migrate_keys(instance, [extra_keys], comm_keys + type_keys)
                 iodict['%s_extra' % io][instance['name']] = extra_keys
+                type_dict = {}
+                migrate_keys(instance, [type_dict], comm_keys)
+                instance.setdefault('datatype', {})
+                instance['datatype'].update(type_dict)
         # Add driver to list
         if ('driver' in instance) and ('args' in instance):
             opp_map = {'inputs': 'output', 'outputs': 'input'}
@@ -905,9 +913,16 @@ def _normalize_connio_elements_comm(normalizer, value, instance, schema):
         iodict = getattr(normalizer, 'iodict', None)
         opp_map = {'inputs': 'outputs', 'outputs': 'inputs'}
         if iodict is not None:
-            if (((instance['name'] in iodict[opp_map[io]])
-                 and ('commtype' not in instance))):
-                instance['commtype'] = schema['properties']['commtype']['default']
+            if (instance['name'] in iodict[opp_map[io]]):
+                opp_comm = iodict[opp_map[io]][instance['name']]
+                s = getattr(normalizer, 'schema_registry', None)
+                if s is not None:
+                    comm_keys = s.get_component_keys('comm')
+                    for k in comm_keys:
+                        if k in opp_comm:
+                            instance.setdefault(k, opp_comm[k])
+                if ('commtype' not in instance):
+                    instance['commtype'] = schema['properties']['commtype']['default']
     return instance
 
 
@@ -939,10 +954,9 @@ def _normalize_connio_last(normalizer, value, instance, schema):
                 all = [s.is_valid_component('file', x) for x in instance[io]]
                 is_file[io] = (sum(all) == len(all))
             if is_file['inputs'] and is_file['outputs']:
-                print('connection')
-                pprint.pprint(instance)
                 raise RuntimeError(("Both the input and output for this connection "
-                                    + "appear to be files."))
+                                    + "appear to be files:\n%s"
+                                    % pprint.pformat(instance)))
         # Copy file keys from partner comm(s) to the file comm(s)
         comm_keys = s.get_component_keys('comm')
         opp_map = {'inputs': 'outputs', 'outputs': 'inputs'}

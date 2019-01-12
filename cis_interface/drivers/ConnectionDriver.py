@@ -8,6 +8,12 @@ from cis_interface.drivers.Driver import Driver
 from cis_interface.schema import register_component, get_schema
 
 
+def _translate_list2element(arr):
+    if not isinstance(arr, (list, tuple)):
+        raise Exception("List of field required.")
+    return arr[0]
+
+
 @register_component
 class ConnectionDriver(Driver):
     r"""Class that continuously passes messages from one comm to another.
@@ -113,15 +119,14 @@ class ConnectionDriver(Driver):
         self.close_state = ''
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
-        self.debug('')
-        self.debug(80 * '=')
-        self.debug('class = %s', self.__class__)
         # self.debug('    env: %s', str(self.env))
-        self.debug('    input: name = %s, address = %s',
-                   self.icomm.name, self.icomm.address)
-        self.debug('    output: name = %s, address = %s',
+        self.debug('\n' + 80 * '=' + '\n',
+                   'class = %s\n',
+                   '    input: name = %s, address = %s\n' +
+                   '    output: name = %s, address = %s\n' +
+                   80 * '=', self.__class__,
+                   self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
-        self.debug(80 * '=')
 
     def _init_single_comm(self, name, io, comm_kws, **kwargs):
         r"""Parse keyword arguments for input/output comm."""
@@ -174,9 +179,7 @@ class ConnectionDriver(Driver):
                 comm_kws['env'] = kwargs.pop('comm_env')
         if any_files and (io == 'input'):
             kwargs.setdefault('timeout_send_1st', 60)
-        # import pprint
-        # print('%s comm_kws' % attr_comm)
-        # pprint.pprint(comm_kws)
+        self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
         setattr(self, attr_comm, new_comm(comm_kws.pop('name'), **comm_kws))
         setattr(self, '%s_kws' % attr_comm, comm_kws)
         if touches_model:
@@ -195,9 +198,7 @@ class ConnectionDriver(Driver):
             raise
         # Apply keywords dependent on comms
         self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
-        # import pprint
-        # print('final env for %s' % self.name)
-        # pprint.pprint(self.env)
+        self.debug('Final env:\n%s', self.pprint(self.env, 1))
         
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
@@ -507,31 +508,54 @@ class ConnectionDriver(Driver):
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        inter_model = False
-        if self.icomm.is_file:
-            # Remove the file information and only pass the type definition
-            sinfo = self.icomm.serializer.typedef
-            sinfo.pop('seritype', None)
-        elif self.ocomm.is_file:
-            # Maintain the default serializer type for the file
-            sinfo = self.icomm.serializer.serializer_info
-            sinfo.pop('seritype')
-            sinfo.update(self.ocomm.serializer.serializer_info)
-            sinfo.update(self.icomm.serializer.typedef)
-        else:
-            # Copy the serializer and prevent the type from being overwritten
-            # TODO: icomm is probably initialized so the serializer info
-            # from the output comm won't be used.
-            sinfo = self.ocomm.serializer.serializer_info
-            sinfo.pop('seritype', None)
-            self.ocomm.serializer = self.icomm.serializer
-            inter_model = True
-        if (not inter_model) and self.ocomm.serializer._initialized:  # pragma: debug
-            self.ocomm.serializer.update_serializer(**sinfo)
-        else:
-            self.ocomm.serializer.initialize_serializer(sinfo)
-        self.debug('icomm sinfo: %s', str(self.icomm.serializer.serializer_info))
-        self.debug('ocomm sinfo: %s', str(self.ocomm.serializer.serializer_info))
+        sinfo = self.icomm.serializer.typedef
+        sinfo.update(self.icomm.serializer.serializer_info)
+        sinfo.pop('seritype', None)
+        self.debug('Before update:\n' +
+                   '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n' +
+                   '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
+                   self.pprint(self.icomm.serializer.serializer_info, 2),
+                   self.pprint(self.icomm.serializer.typedef, 2),
+                   self.pprint(self.ocomm.serializer.serializer_info, 2),
+                   self.pprint(self.ocomm.serializer.typedef, 2))
+        self.ocomm.serializer.initialize_serializer(sinfo)
+        self.ocomm.serializer.update_serializer(skip_type=True,
+                                                **self.icomm._last_header)
+        if (((self.icomm.serializer.typedef['type'] == 'array')
+             and (self.ocomm.serializer.typedef['type'] != 'array')
+             and (len(self.icomm.serializer.typedef['items']) == 1))):
+            self.translator.insert(0, _translate_list2element)
+        # inter_model = False
+        # if self.icomm.is_file:
+        #     # Remove the file information and only pass the type definition
+        #     typedef_in = self.icomm.serializer.typedef
+        #     sinfo = self.icomm.serializer.typedef
+        #     sinfo.pop('seritype', None)
+        # elif self.ocomm.is_file:
+        #     # Maintain the default serializer type for the file
+        #     sinfo = self.icomm.serializer.serializer_info
+        #     sinfo.pop('seritype')
+        #     sinfo.update(self.ocomm.serializer.serializer_info)
+        #     sinfo.update(self.icomm.serializer.typedef)
+        # else:
+        #     # Copy the serializer and prevent the type from being overwritten
+        #     # TODO: icomm is probably initialized so the serializer info
+        #     # from the output comm won't be used.
+        #     sinfo = self.ocomm.serializer.serializer_info
+        #     sinfo.pop('seritype', None)
+        #     self.ocomm.serializer = self.icomm.serializer
+        #     inter_model = True
+        # if (not inter_model) and self.ocomm.serializer._initialized:  # pragma: debug
+        #     self.ocomm.serializer.update_serializer(**sinfo)
+        # else:
+        #     self.ocomm.serializer.initialize_serializer(sinfo)
+        self.debug('After update:\n' +
+                   '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n' +
+                   '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
+                   self.pprint(self.icomm.serializer.serializer_info, 2),
+                   self.pprint(self.icomm.serializer.typedef, 2),
+                   self.pprint(self.ocomm.serializer.serializer_info, 2),
+                   self.pprint(self.ocomm.serializer.typedef, 2))
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.
@@ -660,8 +684,6 @@ class ConnectionDriver(Driver):
         if not self.is_valid:
             self.debug("Breaking loop")
             self.set_close_state('invalid')
-            # self.info("%s: breaking loop, input=%s, output=%s", self.name,
-            #           self.icomm.is_open, self.ocomm.is_open)
             self.set_break_flag()
             return
         # Receive a message

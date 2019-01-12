@@ -8,6 +8,10 @@ from cis_interface.metaschema.datatypes import (
     MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class, conversions)
 
 
+def _get_single_array_element(arr):
+    return arr[0]
+
+
 class MetaschemaType(object):
     r"""Base type that should be subclassed by user defined types. Attributes
     should be overwritten to match the type.
@@ -325,6 +329,11 @@ class MetaschemaType(object):
             obj (string): Encoded object to validate.
 
         """
+        if ((isinstance(obj, dict) and ('type' in obj)
+             and (obj['type'] != cls.name))):
+            type_cls = get_type_class(obj['type'])
+            if type_cls.is_fixed and type_cls.issubtype(cls.name):
+                obj = type_cls.typedef_fixed2base(obj)
         jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
         jsonschema.validate(obj, cls.metadata_schema(), cls=cls.validator())
 
@@ -350,6 +359,23 @@ class MetaschemaType(object):
         """
         cls.validate_definition(typedef)
         jsonschema.validate(obj, typedef, cls=cls.validator())
+
+    @classmethod
+    def normalize_definition(cls, obj):
+        r"""Normalizes a type definition.
+
+        Args:
+            obj (object): Type definition to normalize.
+
+        Returns:
+            object: Normalized type definition.
+
+        """
+        for x in cls.properties:
+            if x not in obj:
+                prop_cls = metaschema.properties.get_metaschema_property(x)
+                obj = prop_cls.normalize_in_schema(obj)
+        return obj
 
     @classmethod
     def check_encoded(cls, metadata, typedef=None):
@@ -477,8 +503,13 @@ class MetaschemaType(object):
             if ('type' in metadata) and (typedef == {'type': 'bytes'}):
                 new_cls = get_type_class(metadata['type'])
                 return new_cls.decode(metadata, data)
-            conv_func = conversions.get_conversion(metadata.get('type', None),
-                                                   cls.name)
+            if ((isinstance(metadata, dict)
+                 and (len(metadata.get('items', [])) == 1)
+                 and cls.check_encoded(metadata['items'][0], typedef))):
+                conv_func = _get_single_array_element
+            else:
+                conv_func = conversions.get_conversion(metadata.get('type', None),
+                                                       cls.name)
             if not conv_func:
                 error_str = ("Metadata does not match type definition\n."
                              + "metadata:\n%s\ntypedef:\n%s\n") % (
@@ -486,7 +517,7 @@ class MetaschemaType(object):
                 raise ValueError(error_str)
         if conv_func:
             new_cls = get_type_class(metadata['type'])
-            out = conv_func(new_cls.decode(data, metadata))
+            out = conv_func(new_cls.decode(metadata, data))
         else:
             out = cls.decode_data(data, metadata)
         if not cls.check_decoded(out, typedef):

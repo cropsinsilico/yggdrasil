@@ -1,6 +1,7 @@
 from cis_interface import backwards, serialize, units
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype)
 
@@ -60,22 +61,30 @@ class AsciiTableSerialize(DefaultSerialize):
         use_astropy={'type': 'boolean', 'default': False})
 
     def update_serializer(self, *args, **kwargs):
+        # Transform scalar into array for table
+        if kwargs.get('type', 'array') != 'array':
+            old_typedef = {}
+            _metaschema = get_metaschema()
+            for k in _metaschema['properties'].keys():
+                if k in kwargs:
+                    old_typedef[k] = kwargs.pop(k)
+            new_typedef = {'type': 'array', 'items': [old_typedef]}
+            kwargs.update(new_typedef)
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
         for k in ['format_str', 'delimiter', 'newline', 'comment']:
             v = getattr(self, k, None)
             if isinstance(v, backwards.unicode_type):
                 setattr(self, k, backwards.unicode2bytes(v))
-        if self.typedef['type'] == 'array':
-            self.update_format_str()
-            self.update_field_names()
-            self.update_field_units()
+        self.update_format_str()
+        self.update_field_names()
+        self.update_field_units()
         return out
 
     def update_format_str(self):
         r"""Update the format string based on the type definition."""
         # Get format information from precision etc.
-        assert(self.typedef['type'] == 'array')
-        if self.format_str is None:
+        if (self.format_str is None) and self._initialized:
+            assert(self.typedef['type'] == 'array')
             fmts = []
             if isinstance(self.typedef['items'], dict):  # pragma: debug
                 idtype = definition2dtype(self.typedef['items'])
@@ -94,14 +103,14 @@ class AsciiTableSerialize(DefaultSerialize):
 
     def update_field_names(self):
         r"""list: Names for each field in the data type."""
-        assert(self.typedef['type'] == 'array')
-        if self.field_names is None:
+        if (self.field_names is None) and self._initialized:
+            assert(self.typedef['type'] == 'array')
             self.field_names = self.get_field_names()
 
     def update_field_units(self):
         r"""list: Units for each field in the data type."""
-        assert(self.typedef['type'] == 'array')
-        if self.field_units is None:
+        if (self.field_units is None) and self._initialized:
+            assert(self.typedef['type'] == 'array')
             self.field_units = self.get_field_units()
 
     def func_serialize(self, args):
