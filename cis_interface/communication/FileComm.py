@@ -10,6 +10,16 @@ from cis_interface.serialize.DirectSerialize import DirectSerialize
 class FileComm(CommBase.CommBase):
     r"""Class for handling I/O from/to a file on disk.
 
+    >>> x = FileComm('test_send', address='test_file.txt', direction='send')
+    >>> x.send('Test message')
+    True
+    >>> with open('test_file.txt', 'r') as fd:
+    ...     print(fd.read())
+    Test message
+    >>> x = FileComm('test_recv', address='test_file.txt', direction='recv')
+    >>> x.recv()
+    (True, b'Test message')
+
     Args:
         name (str): The environment variable where communication address is
             stored.
