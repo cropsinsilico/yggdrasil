@@ -10,100 +10,32 @@ class TestPandasFileComm(parent.TestAsciiTableComm):
         super(TestPandasFileComm, self).__init__(*args, **kwargs)
         self.comm = 'PandasFileComm'
 
+
+class TestPandasFileComm_nonames(TestPandasFileComm):
+    r"""Test for PandasFileComm communication class without field names sent."""
+
     @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestPandasFileComm, self).send_inst_kwargs
-        out['format_str'] = None
-        out['field_names'] = None
-        out['field_units'] = None
-        out['delimiter'] = self.delimiter
+    def testing_options(self):
+        r"""dict: Testing options."""
+        out = super(TestPandasFileComm_nonames, self).testing_options
+        for i, k in enumerate(out['kwargs']['field_names']):
+            out['contents'] = out['contents'].replace(
+                k, backwards.unicode2bytes('f%d' % i))
+        del out['kwargs']['field_names']
         return out
-
-    @property
-    def msg_short(self):
-        r"""pandas.DataFrame: Pandas data frame."""
-        return serialize.pandas2list(self.pandas_frame)
-    
-    @property
-    def msg_long(self):
-        r"""pandas.DataFrame: Pandas data frame."""
-        return self.msg_short
-
-    @property
-    def double_msg(self):
-        r"""list: Messages that should result from writing two test messages."""
-        return pd.concat([self.pandas_frame, self.pandas_frame])
-
-    def assert_msg_equal(self, x, y):
-        r"""Assert that two messages are equivalent."""
-        np.testing.assert_array_equal(x, y)
-
-    def merge_messages(self, msg_list):
-        r"""Merge multiple messages to produce the expected total message.
-
-        Args:
-            msg_list (list): Messages to be merged.
-
-        Returns:
-            obj: Merged message.
-
-        """
-        return serialize.list2pandas(msg_list[0])
-
-    def test_send_recv_dict(self):
-        r"""Test send/recv Pandas data frame as dict."""
-        msg_send = serialize.pandas2dict(self.pandas_frame)
-        names = [backwards.bytes2unicode(n) for n in self.field_names]
-        flag = self.send_instance.send_dict(msg_send, field_order=names)
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv_dict()
-        assert(flag)
-        msg_recv = serialize.dict2pandas(msg_recv, order=names)
-        self.assert_msg_equal(msg_recv, self.pandas_frame)
-
-
-class TestPandasFileComm_names(TestPandasFileComm):
-    r"""Test for PandasFileComm communication class with field names sent."""
-
-    @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestPandasFileComm_names, self).send_inst_kwargs
-        out['field_names'] = self.field_names
-        return out
-
-    def test_send_recv_dict(self):
-        r"""Test send/recv Pandas data frame as dict."""
-        msg_send = serialize.pandas2dict(self.pandas_frame)
-        names = [backwards.bytes2unicode(n) for n in self.field_names]
-        flag = self.send_instance.send_dict(msg_send)
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv_dict()
-        assert(flag)
-        msg_recv = serialize.dict2pandas(msg_recv, order=names)
-        self.assert_msg_equal(msg_recv, self.pandas_frame)
 
 
 class TestPandasFileComm_single(TestPandasFileComm):
     r"""Test for PandasFileComm communication class with field names sent."""
 
     @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestPandasFileComm_single, self).send_inst_kwargs
-        out['format_str'] = None
-        out['field_names'] = None
-        out['field_units'] = None
+    def testing_options(self):
+        r"""dict: Testing options."""
+        nele = 5
+        out = {'kwargs': {},
+               'contents': (b'f0\n' + 2 * nele * b'0.0\n'),
+               'send': [[np.zeros((nele, ))], [np.zeros((nele, ))]],
+               'recv': [[np.zeros((2 * nele, ))]],
+               'dict': {'f0': np.zeros((nele, ))}}
+        out['msg'] = out['send'][0]
         return out
-
-    def test_send_recv_dict(self):
-        r"""Test send/recv Pandas data frame as dict."""
-        msg_send = dict(name=np.zeros((5, )))
-        flag = self.send_instance.send_dict(msg_send)
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv_dict()
-        assert(flag)
-        assert(isinstance(msg_recv, dict))
-        assert('name' in msg_recv)
-        self.assert_msg_equal(msg_recv['name'], msg_send['name'])

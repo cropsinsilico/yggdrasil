@@ -407,6 +407,7 @@ class CommBase(tools.CisClass):
                     # TODO: Change to pop once old seri keywords not in comm
                     # schema directly
                     datatype[k] = kwargs[k]
+            self.debug('datatype = %s', str(datatype))
             self.serializer = cls(**datatype)
         # Transfer keywords form the schema
         for k, v in self._schema_properties.items():
@@ -576,6 +577,8 @@ class CommBase(tools.CisClass):
             kwargs['direction'] = 'recv'
         else:
             kwargs['direction'] = 'send'
+        for k in self.serializer._schema_properties.keys():
+            kwargs[k] = getattr(self.serializer, k)
         return kwargs
 
     def bind(self):

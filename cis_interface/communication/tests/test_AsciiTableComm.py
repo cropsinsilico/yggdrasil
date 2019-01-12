@@ -35,111 +35,19 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableComm, self).__init__(*args, **kwargs)
         self.comm = 'AsciiTableComm'
-
-    @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestAsciiTableComm, self).send_inst_kwargs
-        out['format_str'] = self.fmt_str
-        out['field_names'] = self.field_names
-        out['field_units'] = self.field_units
-        return out
-
-    @property
-    def msg_short(self):
-        r"""str: Always use file lines as message."""
-        return self.file_rows[0]
-    
-    @property
-    def msg_long(self):
-        r"""str: Always use file lines as message."""
-        return self.file_rows[0]
-
-    @property
-    def double_msg(self):
-        r"""str: Message that should result from writing two test messages."""
-        return [self.file_rows[0], self.file_rows[0]]
-
-    def merge_messages(self, msg_list):
-        r"""Merge multiple messages to produce the expected total message.
-
-        Args:
-            msg_list (list): Messages to be merged.
-
-        Returns:
-            obj: Merged message.
-
-        """
-        return msg_list
+        self.field_names = [backwards.bytes2unicode(x) for
+                            x in self.send_inst_kwargs.get('field_names', [])]
 
     def test_send_recv_comment(self):
         r"""Disabled: Test send/recv with commented message."""
         pass
-
-    def test_send_recv_dict(self):
-        r"""Test send/recv numpy array as dict."""
-        msg_send = {backwards.bytes2unicode(k): v for k, v in zip(self.field_names,
-                                                                  self.msg_short)}
-        flag = self.send_instance.send_dict(msg_send)
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv_dict()
-        assert(flag)
-        nt.assert_equal(msg_recv, msg_send)
 
 
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""
 
     @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestAsciiTableComm_AsArray, self).send_inst_kwargs
-        out['as_array'] = True
+    def testing_options(self):
+        r"""dict: Testing options."""
+        out = self.import_cls.get_testing_options(as_array=True)
         return out
-
-    @property
-    def msg_short(self):
-        r"""str: Always use file bytes as message."""
-        return self.file_array
-    
-    @property
-    def msg_long(self):
-        r"""str: Always use file bytes as message."""
-        return self.file_array
-
-    def assert_msg_equal(self, x, y):
-        r"""Assert that two messages are equivalent."""
-        if isinstance(x, list):
-            order = [backwards.bytes2unicode(n) for n in self.field_names]
-            xdict = {k: ix for k, ix in zip(order, x)}
-            x = serialize.dict2numpy(xdict, order=order)
-        np.testing.assert_array_equal(x, y)
-
-    @property
-    def double_msg(self):
-        r"""str: Message that should result from writing two test messages."""
-        darr = np.hstack([self.file_array, self.file_array])
-        return darr
-
-    def merge_messages(self, msg_list):
-        r"""Merge multiple messages to produce the expected total message.
-
-        Args:
-            msg_list (list): Messages to be merged.
-
-        Returns:
-            obj: Merged message.
-
-        """
-        return msg_list[0]
-
-    def test_send_recv_dict(self):
-        r"""Test send/recv numpy array as dict."""
-        msg_send = serialize.numpy2dict(self.msg_short)
-        names = [backwards.bytes2unicode(n) for n in self.field_names]
-        flag = self.send_instance.send_dict(msg_send, field_order=names)
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv_dict()
-        assert(flag)
-        msg_recv = serialize.dict2numpy(msg_recv, order=names)
-        self.assert_msg_equal(msg_recv, self.msg_short)

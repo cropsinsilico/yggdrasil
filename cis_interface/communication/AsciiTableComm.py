@@ -1,4 +1,5 @@
-from cis_interface import serialize
+import numpy as np
+from cis_interface import serialize, backwards
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
 from cis_interface.schema import register_component, inherit_schema
 from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
@@ -43,6 +44,54 @@ class AsciiTableComm(AsciiFileComm):
         if self.append:
             self.header_was_written = True
         
+    @classmethod
+    def get_testing_options(cls, as_array=False):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = {'kwargs': {'format_str': b'%5s\t%d\t%f\n',
+                          'field_names': [b'name', b'count', b'size'],
+                          'field_units': [b'n/a', b'umol', b'cm']},
+               'contents': (b'# name\tcount\tsize\n' +
+                            b'# n/a\tumol\tcm\n' +
+                            b'# %5s\t%d\t%f\n' +
+                            b'  one\t1\t1.000000\n' +
+                            b'  two\t2\t2.000000\n' +
+                            b'three\t3\t3.000000\n' +
+                            b'  one\t1\t1.000000\n' +
+                            b'  two\t2\t2.000000\n' +
+                            b'three\t3\t3.000000\n')}
+        field_names = [backwards.bytes2unicode(x) for
+                       x in out['kwargs']['field_names']]
+        rows = [(b'one', np.int32(1), 1.0),
+                (b'two', np.int32(2), 2.0),
+                (b'three', np.int32(3), 3.0)]
+        if as_array:
+            dtype = np.dtype(
+                {'names': field_names,
+                 'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+            arr = np.array(rows, dtype=dtype)
+            out['kwargs']['as_array'] = as_array
+            out['send'] = [arr, arr]
+            out['recv'] = [np.hstack(out['send'])]
+            out['dict'] = {k: arr[k] for k in field_names}
+        else:
+            out['send'] = 2 * rows
+            out['recv'] = out['send']
+            out['dict'] = {k: v for k, v in zip(field_names, rows[0])}
+        out['msg'] = out['send'][0]
+        return out
+    
     def read_header(self):
         r"""Read header lines from the file and update serializer info."""
         if self.header_was_read:

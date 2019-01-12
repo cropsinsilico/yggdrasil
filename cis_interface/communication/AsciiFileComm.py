@@ -32,6 +32,30 @@ class AsciiFileComm(FileComm):
         kwargs.setdefault('read_meth', 'readline')
         super(AsciiFileComm, self)._init_before_open(**kwargs)
 
+    @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        comment = backwards.unicode2bytes(
+            cls._schema_properties['comment']['default'] + 'Comment\n')
+        out = {'kwargs':{}, 'msg': b'Test message\n'}
+        out['send'] = [out['msg'], b'Test message 2\n', comment]
+        out['contents'] = b''.join(out['send'])
+        out['recv'] = out['send'][:-1]
+        out['dict'] = {'f0': out['msg']}
+        return out
+    
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.

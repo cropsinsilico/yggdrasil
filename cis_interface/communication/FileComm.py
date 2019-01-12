@@ -105,6 +105,28 @@ class FileComm(CommBase.CommBase):
                 setattr(self, k, func_conv(v))
 
     @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = {'kwargs': {}, 'msg': b'Test message\n'}
+        out['send'] = [out['msg'], b'Test message 2\n']
+        out['contents'] = b''.join(out['send'])
+        out['recv'] = [out['contents']]
+        out['dict'] = {'f0': out['msg']}
+        return out
+
+    @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this
         communication class.

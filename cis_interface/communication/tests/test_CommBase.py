@@ -1,7 +1,10 @@
 import os
 import uuid
+import numpy as np
+import pandas as pd
 import nose.tools as nt
 from cis_interface.tests import CisTestClassInfo
+from cis_interface import units
 from cis_interface.communication import new_comm, get_comm, CommBase
 
 
@@ -261,12 +264,31 @@ class TestCommBase(CisTestClassInfo):
         r"""Convert a sent object into a received one."""
         return obj
 
-    def assert_msg_equal(self, x, y):
+    def assert_msg_equal(self, x, y, recurse=False):
         r"""Assert that two messages are equivalent."""
-        if y == self.send_instance.eof_msg:
-            nt.assert_equal(x, y)
+        if not (recurse or (isinstance(y, type(self.send_instance.eof_msg))
+                            and (y == self.send_instance.eof_msg))):
+            y = self.map_sent2recv(y)
+        if isinstance(y, (list, tuple)):
+            assert(isinstance(x, (list, tuple)))
+            nt.assert_equal(len(x), len(y))
+            for ix, iy in zip(x, y):
+                self.assert_msg_equal(ix, iy, recurse=True)
+        elif isinstance(y, dict):
+            nt.assert_equal(type(x), type(y))
+            nt.assert_equal(len(x), len(y))
+            for k, iy in y.items():
+                ix = x[k]
+                self.assert_msg_equal(ix, iy, recurse=True)
+        elif isinstance(y, (np.ndarray, pd.DataFrame)):
+            np.testing.assert_array_equal(x, y)
         else:
-            nt.assert_equal(x, self.map_sent2recv(y))
+            if units.has_units(y) and (not units.has_units(x)):
+                nt.assert_equal(x, units.get_data(y))
+            elif (not units.has_units(y)) and units.has_units(x):
+                nt.assert_equal(units.get_data(x), y)
+            else:
+                nt.assert_equal(x, y)
 
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
@@ -396,8 +418,7 @@ class TestCommBase(CisTestClassInfo):
 
     def test_send_recv_nolimit(self):
         r"""Test send/recv of a large message."""
-        if self.comm != 'AsciiTableComm':
-            assert(len(self.msg_long) > self.maxMsgSize)
+        assert(len(self.msg_long) > self.maxMsgSize)
         self.do_send_recv('send_nolimit', 'recv_nolimit', self.msg_long)
 
     def test_send_recv_line(self):
@@ -430,7 +451,7 @@ class TestCommBase(CisTestClassInfo):
         nt.assert_equal(self.recv_instance.n_msg, 0)
         # Purge recv while open
         if self.comm not in ['CommBase', 'AsyncComm']:
-            flag = self.send_instance.send(self.msg_short)
+            flag = self.send_instance.send(self.test_msg)
             assert(flag)
             T = self.recv_instance.start_timeout()
             while ((not T.is_out) and (self.recv_instance.n_msg

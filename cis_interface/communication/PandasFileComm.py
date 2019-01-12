@@ -68,6 +68,39 @@ class PandasFileComm(AsciiTableComm):
         if self.append:
             self.serializer.write_header = False
 
+    @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = super(PandasFileComm, cls).get_testing_options(as_array=True)
+        order = out['recv'][0].dtype.names
+        arr = out['send'][0]
+        lst = [arr[n] for n in order]
+        out['send'] = [lst, lst]
+        out['recv'] = [[out['recv'][0][n] for n in order]]
+        out['msg'] = out['send'][0]
+        for k in ['format_str', 'as_array']:
+            del out['kwargs'][k]
+        out['contents'] = (b'name\tcount\tsize\n' +
+                           b'one\t1\t1.0\n' +
+                           b'two\t2\t2.0\n' +
+                           b'three\t3\t3.0\n' +
+                           b'one\t1\t1.0\n' +
+                           b'two\t2\t2.0\n' +
+                           b'three\t3\t3.0\n')
+        return out
+        
     def read_header(self):
         r"""Read header lines from the file and update serializer info."""
         return
