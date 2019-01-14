@@ -107,4 +107,6 @@ class PandasFileComm(AsciiTableComm):
 
     def write_header(self):
         r"""Write header lines to the file based on the serializer info."""
+        # This will result in header only being sent for first message
+        self.serializer.write_header = False
         return
