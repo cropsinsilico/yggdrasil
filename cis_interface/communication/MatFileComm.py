@@ -44,11 +44,12 @@ class MatFileComm(FileComm.FileComm):
         out = {'kwargs': {},
                'msg': {'a': np.array([[int(1)]]), 'b': np.array([[float(1)]])}}
         out['send'] = [out['msg'], out['msg']]
-        out['contents'] = None
+        out['contents'] = MatSerialize().func_serialize(out['msg'])
         # Appending the same message only results in the same message because
         # it is updated as a dictionary
         out['recv'] = [out['msg']]
         out['dict'] = {'f0': out['msg']}
+        out['exact_contents'] = False
         return out
 
     def _send(self, msg):

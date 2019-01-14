@@ -11,11 +11,5 @@ class MatOutputDriver(FileOutputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
-    def __init__(self, name, args, **kwargs):
-        icomm_kws = kwargs.get('icomm_kws', {})
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        icomm_kws.setdefault('serializer', PickleSerialize.PickleSerialize())
-        ocomm_kws.setdefault('serializer', MatSerialize.MatSerialize())
-        kwargs['icomm_kws'] = icomm_kws
-        kwargs['ocomm_kws'] = ocomm_kws
-        super(MatOutputDriver, self).__init__(name, args, **kwargs)
+
+    _ocomm_type = 'MatFileComm'

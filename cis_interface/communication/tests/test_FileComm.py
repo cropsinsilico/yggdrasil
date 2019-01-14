@@ -87,7 +87,7 @@ class TestFileComm(parent.TestCommBase):
         for x, y in zip(msg_list, recv_objects):
             self.assert_msg_equal(x, y)
         # Check file contents
-        if self.testing_options['contents'] is not None:
+        if self.testing_options.get('exact_contents', True):
             with open(self.send_instance.address, 'rb') as fd:
                 contents = fd.read()
             nt.assert_equal(contents, self.testing_options['contents'])

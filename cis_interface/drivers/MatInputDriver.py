@@ -12,14 +12,5 @@ class MatInputDriver(FileInputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
-    def __init__(self, name, args, **kwargs):
-        icomm_kws = kwargs.get('icomm_kws', {})
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        icomm_kws.setdefault('serializer', MatSerialize.MatSerialize())
-        ocomm_kws.setdefault('serializer', PickleSerialize.PickleSerialize())
-        kwargs['icomm_kws'] = icomm_kws
-        kwargs['ocomm_kws'] = ocomm_kws
-        super(MatInputDriver, self).__init__(name, args, **kwargs)
-        # if self.fd.tell() == (os.fstat(self.fd.fileno()).st_size - 1):
-        # self.debug(':file_read: eof')
-        # return self.eof_msg
+
+    _icomm_type = 'MatFileComm'
