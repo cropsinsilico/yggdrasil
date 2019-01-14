@@ -11,19 +11,38 @@ class TestFileOutputParam(parent.TestConnectionParam):
 
     """
 
+    ocomm_name = 'FileComm'
+    testing_option_kws = {}
+
     def __init__(self, *args, **kwargs):
         super(TestFileOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'FileOutputDriver'
-        self.filepath = os.path.abspath('%s_input.txt' % self.name)
+        self.filepath = os.path.abspath('%s_input%s' %
+                                        (self.name,
+                                         self.ocomm_import_cls._default_extension))
         self.args = self.filepath
         self.timeout = 5.0
-        self.ocomm_name = 'FileComm'
 
     @property
     def recv_comm_kwargs(self):
         r"""Keyword arguments for receive comm."""
         return {'comm': 'CommBase'}
         
+    @property
+    def ocomm_kws(self):
+        r"""dict: Keyword arguments for connection output comm."""
+        out = super(TestFileOutputParam, self).ocomm_kws
+        out.update(self.testing_options['kwargs'])
+        return out
+        
+    @property
+    def testing_options(self):
+        r"""dict: Testing options."""
+        if getattr(self, '_testing_options', None) is None:
+            self._testing_options = self.ocomm_import_cls.get_testing_options(
+                   **self.testing_option_kws)
+        return self._testing_options
+    
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileOutputParam, self).teardown()
@@ -52,8 +71,11 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
 
     def send_file_contents(self):
         r"""Send file contents to driver."""
-        self.send_comm.send(self.file_contents)
-        self.send_comm.send_eof()
+        for x in self.testing_options['send']:
+            flag = self.send_comm.send(x)
+            assert(flag)
+        flag = self.send_comm.send_eof()
+        assert(flag)
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
@@ -76,7 +98,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     @property
     def contents_to_read(self):
         r"""str: Contents that should be read to the file."""
-        return self.file_contents
+        return self.testing_options['contents']
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
@@ -87,9 +109,10 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         r"""Assertions to make after stopping the driver instance."""
         super(TestFileOutputDriver, self).assert_after_stop()
         assert(os.path.isfile(self.filepath))
-        with open(self.filepath, 'rb') as fd:
-            data = fd.read()
-        nt.assert_equal(data, self.contents_to_read)
+        if self.testing_options.get('exact_contents', True):
+            with open(self.filepath, 'rb') as fd:
+                data = fd.read()
+            nt.assert_equal(data, self.contents_to_read)
 
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""
@@ -109,3 +132,6 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     def test_send_recv_nolimit(self):
         r"""Disabled: Test sending/receiving large message."""
         pass
+
+
+# Dynamically create tests based on registered file classes

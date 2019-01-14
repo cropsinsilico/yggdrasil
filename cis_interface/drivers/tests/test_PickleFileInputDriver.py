@@ -7,18 +7,7 @@ import cis_interface.drivers.tests.test_FileInputDriver as parent
 class TestPickleFileInputParam(parent.TestFileInputParam):
     r"""Test parameters for PickleFileInputDriver."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestPickleFileInputParam, self).__init__(*args, **kwargs)
-        self.driver = 'PickleFileInputDriver'
-        self.filepath = os.path.join(tempfile.gettempdir(),
-                                     '%s_input.dat' % self.name)
-        self.args = self.filepath
-        self.icomm_name = 'PickleFileComm'
-
-    @property
-    def contents_to_write(self):
-        r"""Contents that should be written to the file."""
-        return self.pickled_data
+    icomm_name = 'PickleFileComm'
 
 
 class TestPickleFileInputDriverNoStart(TestPickleFileInputParam,
@@ -30,17 +19,4 @@ class TestPickleFileInputDriverNoStart(TestPickleFileInputParam,
 class TestPickleFileInputDriver(TestPickleFileInputParam,
                                 parent.TestFileInputDriver):
     r"""Test runner for PickleFileInputDriver."""
-
-    def assert_before_stop(self):
-        r"""Assertions to make before stopping the driver instance."""
-        super(parent.TestFileInputDriver, self).assert_before_stop(
-            check_open=False)
-        self.instance.sleep()
-        # File contents
-        flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
-        assert(flag)
-        self.assert_equal_data_dict(msg_recv)
-        # EOF
-        flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_comm.eof_msg)
+    pass

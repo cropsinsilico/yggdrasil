@@ -7,13 +7,7 @@ import cis_interface.drivers.tests.test_FileOutputDriver as parent
 class TestAsciiMapOutputParam(parent.TestFileOutputParam):
     r"""Test parameters for AsciiMapOutputDriver."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestAsciiMapOutputParam, self).__init__(*args, **kwargs)
-        self.driver = 'AsciiMapOutputDriver'
-        self.filepath = os.path.join(tempfile.gettempdir(),
-                                     '%s_output.txt' % self.name)
-        self.args = self.filepath
-        self.ocomm_name = 'AsciiMapComm'
+    ocomm_name = 'AsciiMapComm'
 
 
 class TestAsciiMapOutputDriverNoStart(TestAsciiMapOutputParam,
@@ -25,17 +19,4 @@ class TestAsciiMapOutputDriverNoStart(TestAsciiMapOutputParam,
 class TestAsciiMapOutputDriver(TestAsciiMapOutputParam,
                                parent.TestFileOutputDriver):
     r"""Test runner for AsciiMapOutputDriver."""
-
-    def send_file_contents(self):
-        r"""Send file contents to driver."""
-        self.send_comm.send(self.map_dict)
-        self.send_comm.send_eof()
-
-    @property
-    def contents_to_read(self):
-        r"""str: Contents that should be read to the file."""
-        # The test contents include use of single quote, but json will always
-        # use double
-        single_quote = backwards.unicode2bytes("'")
-        double_quote = backwards.unicode2bytes('"')
-        return self.mapfile_contents.replace(single_quote, double_quote)
+    pass
