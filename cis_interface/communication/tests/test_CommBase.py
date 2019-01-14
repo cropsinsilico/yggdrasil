@@ -271,7 +271,8 @@ class TestCommBase(CisTestClassInfo):
             y = self.map_sent2recv(y)
         assert_msg_equal(x, y)
 
-    def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
+    def do_send_recv(self, send_meth='send', recv_meth='recv',
+                     msg_send=None, msg_recv=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
                      n_send=1, n_recv=1,
@@ -284,6 +285,8 @@ class TestCommBase(CisTestClassInfo):
                 msg_send = self.send_instance.eof_msg
             else:
                 msg_send = self.test_msg
+        if msg_recv is None:
+            msg_recv = msg_send
         if send_kwargs is None:
             send_kwargs = dict()
         if recv_kwargs is None:
@@ -316,7 +319,7 @@ class TestCommBase(CisTestClassInfo):
         if self.comm in ['CommBase', 'AsyncComm']:
             flag = fsend_meth(*send_args, **send_kwargs)
             assert(not flag)
-            flag, msg_recv = frecv_meth(**recv_kwargs)
+            flag, msg_recv0 = frecv_meth(**recv_kwargs)
             assert(not flag)
             if self.comm == 'CommBase':
                 nt.assert_raises(NotImplementedError, self.recv_instance._send,
@@ -338,13 +341,13 @@ class TestCommBase(CisTestClassInfo):
                     assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
                     # IPC nolimit sends multiple messages
                     # nt.assert_equal(recv_instance.n_msg_recv, 1)
-                flag, msg_recv = frecv_meth(timeout=self.timeout, **recv_kwargs)
+                flag, msg_recv0 = frecv_meth(timeout=self.timeout, **recv_kwargs)
                 if is_eof and close_on_recv_eof:
                     assert(not flag)
                     assert(recv_instance.is_closed)
                 else:
                     assert(flag)
-                self.assert_msg_equal(msg_recv, msg_send)
+                self.assert_msg_equal(msg_recv0, msg_recv)
             # Wait for send to close
             if is_eof and close_on_send_eof:
                 T = send_instance.start_timeout(self.timeout, key_suffix=tkey)

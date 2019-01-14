@@ -17,6 +17,7 @@ class ObjFileComm(PlyFileComm):
 
     _filetype = 'obj'
     _default_serializer = ObjSerialize
+    _default_extension = '.obj'
 
     @classmethod
     def get_testing_options(cls):

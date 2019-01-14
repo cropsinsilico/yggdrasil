@@ -17,6 +17,7 @@ class PlyFileComm(FileComm):
 
     _filetype = 'ply'
     _default_serializer = PlySerialize
+    _default_extension = '.ply'
 
     def _init_before_open(self, **kwargs):
         super(PlyFileComm, self)._init_before_open(**kwargs)

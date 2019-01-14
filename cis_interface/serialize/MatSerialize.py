@@ -46,7 +46,7 @@ class MatSerialize(DefaultSerialize):
 
         """
         fd = backwards.BytesIO(msg)
-        out = loadmat(fd, squeeze_me=False)
+        out = loadmat(fd, matlab_compatible=True)
         mat_keys = ['__header__', '__globals__', '__version__']
         for k in mat_keys:
             del out[k]
