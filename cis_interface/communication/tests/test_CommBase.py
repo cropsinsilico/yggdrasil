@@ -33,9 +33,11 @@ class TestCommBase(CisTestClassInfo):
             pair.
 
     """
+
+    comm = 'CommBase'
+    
     def __init__(self, *args, **kwargs):
         super(TestCommBase, self).__init__(*args, **kwargs)
-        self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction',
                            'serializer', 'recv_timeout',
                            'close_on_eof_recv', 'opp_address', 'opp_comms',

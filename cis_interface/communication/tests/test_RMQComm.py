@@ -8,9 +8,11 @@ from cis_interface.communication.tests import test_AsyncComm
 @unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
 class TestRMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for RMQComm communication class."""
+
+    comm = 'RMQComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestRMQComm, self).__init__(*args, **kwargs)
-        self.comm = 'RMQComm'
         self.attr_list += ['connection', 'channel']
         self.timeout = 10.0
 

@@ -32,9 +32,11 @@ def test_AsciiTableComm_nofmt():
 
 class TestAsciiTableComm(parent.TestAsciiFileComm):
     r"""Test for AsciiTableComm communication class."""
+
+    comm = 'AsciiTableComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableComm, self).__init__(*args, **kwargs)
-        self.comm = 'AsciiTableComm'
         self.field_names = [backwards.bytes2unicode(x) for
                             x in self.send_inst_kwargs.get('field_names', [])]
 

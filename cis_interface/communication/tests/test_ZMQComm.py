@@ -61,9 +61,11 @@ def test_error_on_send_open_twice():
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
 class TestZMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for ZMQComm communication class."""
+
+    comm = 'ZMQComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestZMQComm, self).__init__(*args, **kwargs)
-        self.comm = 'ZMQComm'
         self.protocol = None
         self.socket_type = None
         self.attr_list += ['context', 'socket', 'socket_type_name',

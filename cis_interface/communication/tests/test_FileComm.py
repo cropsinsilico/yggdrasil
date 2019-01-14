@@ -1,4 +1,5 @@
 import os
+import unittest
 import nose.tools as nt
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
@@ -6,9 +7,11 @@ from cis_interface.communication.tests import test_CommBase as parent
 
 class TestFileComm(parent.TestCommBase):
     r"""Test for FileComm communication class."""
+
+    comm = 'FileComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestFileComm, self).__init__(*args, **kwargs)
-        self.comm = 'FileComm'
         self.attr_list += ['fd', 'read_meth', 'append', 'in_temp',
                            'open_as_binary', 'newline', 'is_series',
                            'platform_newline']
@@ -27,11 +30,15 @@ class TestFileComm(parent.TestCommBase):
         out.update(self.testing_options['kwargs'])
         return out
 
+    def get_testing_options(self):
+        r"""Get testing options."""
+        return self.import_cls.get_testing_options()
+
     @property
     def testing_options(self):
         r"""dict: Testing options."""
         if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.import_cls.get_testing_options()
+            self._testing_options = self.get_testing_options()
         return self._testing_options
 
     @property
@@ -39,10 +46,12 @@ class TestFileComm(parent.TestCommBase):
         r"""str: Test message that should be used for any send/recv tests."""
         return self.testing_options['msg']
 
+    @unittest.skipIf(True, 'File comm')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test send/recv of a large message."""
         pass
-    
+
+    @unittest.skipIf(True, 'File comm')
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
         pass

@@ -5,9 +5,11 @@ import uuid
 
 class TestForkComm(parent.TestCommBase):
     r"""Tests for ForkComm communication class."""
+
+    comm = 'ForkComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestForkComm, self).__init__(*args, **kwargs)
-        self.comm = 'ForkComm'
         self.attr_list += ['comm_list', 'curr_comm_index']
         self.ncomm = 2
 

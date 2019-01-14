@@ -4,9 +4,11 @@ from cis_interface.communication.tests import test_CommBase
 
 class TestRPCComm(test_CommBase.TestCommBase):
     r"""Tests for RPCComm communication class."""
+
+    comm = 'RPCComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestRPCComm, self).__init__(*args, **kwargs)
-        self.comm = 'RPCComm'
         self.attr_list += ['icomm', 'ocomm']
 
     def test_error_send(self):

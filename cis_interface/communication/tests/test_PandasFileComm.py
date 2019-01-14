@@ -6,18 +6,16 @@ from cis_interface.communication.tests import test_AsciiTableComm as parent
 
 class TestPandasFileComm(parent.TestAsciiTableComm):
     r"""Test for PandasFileComm communication class."""
-    def __init__(self, *args, **kwargs):
-        super(TestPandasFileComm, self).__init__(*args, **kwargs)
-        self.comm = 'PandasFileComm'
+
+    comm = 'PandasFileComm'
 
 
 class TestPandasFileComm_nonames(TestPandasFileComm):
     r"""Test for PandasFileComm communication class without field names sent."""
 
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        out = super(TestPandasFileComm_nonames, self).testing_options
+    def get_testing_options(self):
+        r"""Get testing options."""
+        out = super(TestPandasFileComm_nonames, self).get_testing_options()
         for i, k in enumerate(out['kwargs']['field_names']):
             out['contents'] = out['contents'].replace(
                 k, backwards.unicode2bytes('f%d' % i))
@@ -28,9 +26,8 @@ class TestPandasFileComm_nonames(TestPandasFileComm):
 class TestPandasFileComm_single(TestPandasFileComm):
     r"""Test for PandasFileComm communication class with field names sent."""
 
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
+    def get_testing_options(self):
+        r"""Get testing options."""
         nele = 5
         out = {'kwargs': {},
                'contents': (b'f0\n' + 2 * nele * b'0.0\n'),
