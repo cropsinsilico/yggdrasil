@@ -138,7 +138,10 @@ class ScalarMetaschemaType(MetaschemaType):
         arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
-        return cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)
+        out = cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)
+        # Cast numpy type to native python type if they are equivalent
+        out = cls.as_python_type(out, typedef)
+        return out
 
     @classmethod
     def transform_type(cls, obj, typedef=None):
@@ -161,6 +164,7 @@ class ScalarMetaschemaType(MetaschemaType):
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef1)
         arr = cls.to_array(obj).astype(dtype)
         out = cls.from_array(arr, unit_str=typedef0.get('units', None), dtype=dtype)
+        out = cls.as_python_type(out, typedef)
         return units.convert_to(out, typedef1.get('units', None))
 
     @classmethod
@@ -229,6 +233,26 @@ class ScalarMetaschemaType(MetaschemaType):
         if units.is_null_unit(metadata.get('units', '')):
             out.remove('units')
         return out
+
+    @classmethod
+    def as_python_type(cls, obj, typedef):
+        r"""Convert a possible numpy type into a native Python type if possible.
+
+        Args:
+            obj (object): Object to convert.
+            typedef (dict): Type definition for the object.
+
+        Returns:
+            object: Native Python version of input object if conversion possible.
+
+        """
+        if ((isinstance(typedef, dict)
+             and (typedef.get('type', '1darray') not in ['1darray', 'ndarray']))):
+            stype = typedef.get('subtype', typedef.get('type', None))
+            py_type = ScalarMetaschemaProperties._python_scalars[stype][0]
+            if np.dtype(py_type) == type(obj):
+                obj = py_type(obj)
+        return obj
 
 
 # Dynamically create explicity scalar classes for shorthand
