@@ -1,35 +1,74 @@
 import uuid
+import importlib
 import nose.tools as nt
 from cis_interface import tools
-from cis_interface.tests import MagicTestError
+from cis_interface.tests import MagicTestError, assert_msg_equal
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.communication import new_comm
 
+
+_default_comm = tools.get_default_comm()
+
             
 class TestConnectionParam(parent.TestParam):
     r"""Test parameters for the ConnectionDriver class."""
+
+    comm_name = _default_comm
+    icomm_name = _default_comm
+    ocomm_name = _default_comm
+    
     def __init__(self, *args, **kwargs):
         super(TestConnectionParam, self).__init__(*args, **kwargs)
         self.driver = 'ConnectionDriver'
-        self.comm_name = tools.get_default_comm()
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',
                            'nrecv', 'nproc', 'nsent', 'state', 'translator']
         # self.timeout = 1.0
-        self.icomm_name = self.comm_name
-        self.ocomm_name = self.comm_name
         self._extra_instances = []
 
+    @property
+    def description_prefix(self):
+        r"""String prefix to prepend docstr test message with."""
+        out = super(TestConnectionParam, self).description_prefix
+        return '%s(%s, %s)' % (out, self.icomm_name, self.ocomm_name)
+        
     def assert_msg_equal(self, x, y):
-        r"""Assert that two messages are equal."""
-        nt.assert_equal(x, y)
-    
+        r"""Assert that two messages are equivalent."""
+        # if not (isinstance(y, type(self.send_instance.eof_msg))
+        #         and (y == self.send_instance.eof_msg)):
+        #     y = self.map_sent2recv(y)
+        assert_msg_equal(x, y)
+
     @property
     def cleanup_comm_classes(self):
         r"""list: Comm classes that should be cleaned up following the test."""
         comms = set([self.comm_name, self.icomm_name, self.ocomm_name])
         return comms
+
+    @property
+    def icomm_kws(self):
+        r"""dict: Keyword arguments for connection input comm."""
+        return {'name': self.icomm_name, 'comm': self.icomm_name}
+
+    @property
+    def ocomm_kws(self):
+        r"""dict: Keyword arguments for connection output comm."""
+        return {'name': self.ocomm_name, 'comm': self.ocomm_name}
+
+    @property
+    def icomm_import_cls(self):
+        r"""class: Class used for connection input comm."""
+        mod = importlib.import_module('cis_interface.communication.%s'
+                                      % self.icomm_name)
+        return getattr(mod, self.icomm_name)
+
+    @property
+    def ocomm_import_cls(self):
+        r"""class: Class used for connection output comm."""
+        mod = importlib.import_module('cis_interface.communication.%s'
+                                      % self.ocomm_name)
+        return getattr(mod, self.ocomm_name)
 
     @property
     def send_comm_kwargs(self):
@@ -45,8 +84,8 @@ class TestConnectionParam(parent.TestParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
-        out['icomm_kws'] = {'name': self.icomm_name}
-        out['ocomm_kws'] = {'name': self.ocomm_name}
+        out['icomm_kws'] = self.icomm_kws
+        out['ocomm_kws'] = self.ocomm_kws
         return out
 
     # @property

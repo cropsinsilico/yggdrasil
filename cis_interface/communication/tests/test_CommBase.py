@@ -3,7 +3,7 @@ import uuid
 import numpy as np
 import pandas as pd
 import nose.tools as nt
-from cis_interface.tests import CisTestClassInfo
+from cis_interface.tests import CisTestClassInfo, assert_msg_equal
 from cis_interface import units
 from cis_interface.communication import new_comm, get_comm, CommBase
 
@@ -264,31 +264,12 @@ class TestCommBase(CisTestClassInfo):
         r"""Convert a sent object into a received one."""
         return obj
 
-    def assert_msg_equal(self, x, y, recurse=False):
+    def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
-        if not (recurse or (isinstance(y, type(self.send_instance.eof_msg))
-                            and (y == self.send_instance.eof_msg))):
+        if not (isinstance(y, type(self.send_instance.eof_msg))
+                and (y == self.send_instance.eof_msg)):
             y = self.map_sent2recv(y)
-        if isinstance(y, (list, tuple)):
-            assert(isinstance(x, (list, tuple)))
-            nt.assert_equal(len(x), len(y))
-            for ix, iy in zip(x, y):
-                self.assert_msg_equal(ix, iy, recurse=True)
-        elif isinstance(y, dict):
-            nt.assert_equal(type(x), type(y))
-            nt.assert_equal(len(x), len(y))
-            for k, iy in y.items():
-                ix = x[k]
-                self.assert_msg_equal(ix, iy, recurse=True)
-        elif isinstance(y, (np.ndarray, pd.DataFrame)):
-            np.testing.assert_array_equal(x, y)
-        else:
-            if units.has_units(y) and (not units.has_units(x)):
-                nt.assert_equal(x, units.get_data(y))
-            elif (not units.has_units(y)) and units.has_units(x):
-                nt.assert_equal(units.get_data(x), y)
-            else:
-                nt.assert_equal(x, y)
+        assert_msg_equal(x, y)
 
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',

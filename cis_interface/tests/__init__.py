@@ -5,6 +5,7 @@ import uuid
 import importlib
 import unittest
 import numpy as np
+import pandas as pd
 import threading
 import psutil
 import pandas
@@ -64,6 +65,39 @@ if platform._is_win:  # pragma: windows
 else:
     makefile0 = os.path.join(script_dir, "Makefile_linux")
 shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
+
+
+def assert_msg_equal(x, y):
+    r"""Assert that two messages are equivalent.
+
+    Args:
+        x (object): Python object to compare against y.
+        y (object): Python object to compare against x.
+
+    Raises:
+        AssertionError: If the two messages are not equivalent.
+
+    """
+    if isinstance(y, (list, tuple)):
+        assert(isinstance(x, (list, tuple)))
+        nt.assert_equal(len(x), len(y))
+        for ix, iy in zip(x, y):
+            assert_msg_equal(ix, iy)
+    elif isinstance(y, dict):
+        nt.assert_equal(type(x), type(y))
+        nt.assert_equal(len(x), len(y))
+        for k, iy in y.items():
+            ix = x[k]
+            assert_msg_equal(ix, iy)
+    elif isinstance(y, (np.ndarray, pd.DataFrame)):
+        np.testing.assert_array_equal(x, y)
+    else:
+        if units.has_units(y) and (not units.has_units(x)):
+            nt.assert_equal(x, units.get_data(y))
+        elif (not units.has_units(y)) and units.has_units(x):
+            nt.assert_equal(units.get_data(x), y)
+        else:
+            nt.assert_equal(x, y)
 
 
 class CisTestBase(unittest.TestCase):

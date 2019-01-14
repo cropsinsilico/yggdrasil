@@ -36,8 +36,9 @@ class AsciiMapComm(FileComm.FileComm):
 
         """
         out = {'kwargs': {},
-               'send': [{'args1': int(1), 'args2': 'this'},
-                        {'args3': float(1), 'args4': [int(1), int(2)]}],
+               'send': [{'args1': int(1), 'args2': 'this',
+                         # Should these be separate messages, allowing append
+                         'args3': float(1), 'args4': [int(1), int(2)]}],
                'recv': [{'args1': int(1), 'args2': 'this',
                          'args3': float(1), 'args4': [int(1), int(2)]}],
                'contents': (b'args1\t1\n'
