@@ -1,6 +1,8 @@
 import os
 import tempfile
+import unittest
 import nose.tools as nt
+from cis_interface.schema import get_schema
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
 
@@ -102,14 +104,28 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
         r"""Commands to run while the instance is running, before terminate."""
         # Don't send any messages to the file
         pass
-    
+
+    @unittest.skipIf(True, 'File driver')
     def test_send_recv(self):
         r"""Disabled: Test sending/receiving small message."""
         pass
 
+    @unittest.skipIf(True, 'File driver')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test sending/receiving large message."""
         pass
 
 
 # Dynamically create tests based on registered file classes
+s = get_schema()
+file_types = list(s['file'].schema_subtypes.keys())
+for k in file_types:
+    cls_exp = type('Test%sInputDriver' % k,
+                   (TestFileInputDriver, ), {'icomm_name': k})
+    globals()[cls_exp.__name__] = cls_exp
+    if k == 'AsciiTableComm':
+        cls_exp2 = type('Test%sArrayInputDriver' % k,
+                       (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+        globals()[cls_exp2.__name__] = cls_exp2
+        del cls_exp2
+    del cls_exp
