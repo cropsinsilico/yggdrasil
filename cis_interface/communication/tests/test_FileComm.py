@@ -12,6 +12,7 @@ class TestFileComm(parent.TestCommBase):
         self.attr_list += ['fd', 'read_meth', 'append', 'in_temp',
                            'open_as_binary', 'newline', 'is_series',
                            'platform_newline']
+        self._testing_options = None
 
     def teardown(self):
         r"""Remove the file."""
@@ -29,7 +30,9 @@ class TestFileComm(parent.TestCommBase):
     @property
     def testing_options(self):
         r"""dict: Testing options."""
-        return self.import_cls.get_testing_options()
+        if getattr(self, '_testing_options', None) is None:
+            self._testing_options = self.import_cls.get_testing_options()
+        return self._testing_options
 
     @property
     def test_msg(self):
@@ -58,8 +61,6 @@ class TestFileComm(parent.TestCommBase):
         
     def test_append(self):
         r"""Test open of file comm with append."""
-        print('recv', self.inst_kwargs)
-        print('send', self.send_inst_kwargs)
         send_objects = self.testing_options['send']
         recv_objects = self.testing_options['recv']
         # Write to file
@@ -82,7 +83,6 @@ class TestFileComm(parent.TestCommBase):
                 msg_list.append(msg_recv)
             else:
                 nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
-        print(self.send_inst_kwargs, self.inst_kwargs)
         nt.assert_equal(len(msg_list), len(recv_objects))
         for x, y in zip(msg_list, recv_objects):
             self.assert_msg_equal(x, y)

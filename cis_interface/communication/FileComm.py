@@ -73,6 +73,7 @@ class FileComm(CommBase.CommBase):
         remove_keys=['commtype', 'datatype'], **DirectSerialize._schema_properties)
     _default_serializer = DirectSerialize
     _attr_conv = ['newline', 'platform_newline']
+    _default_extension = '.txt'
     is_file = True
 
     def __init__(self, *args, **kwargs):
