@@ -1,4 +1,3 @@
-import nose.tools as nt
 from cis_interface.serialize.tests import test_DefaultSerialize as parent
 
 
@@ -11,4 +10,4 @@ class TestMatSerialize(parent.TestDefaultSerialize):
 
     def test_serialize_errors(self):
         r"""Test serialize errors."""
-        nt.assert_raises(TypeError, self.instance.serialize, ['blah', 'blah'])
+        self.assert_raises(TypeError, self.instance.serialize, ['blah', 'blah'])

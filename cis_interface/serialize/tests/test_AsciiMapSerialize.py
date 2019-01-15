@@ -1,4 +1,3 @@
-import nose.tools as nt
 from cis_interface import backwards
 from cis_interface.serialize.tests import test_DefaultSerialize as parent
 
@@ -14,9 +13,9 @@ class TestAsciiMapSerialize(parent.TestDefaultSerialize):
         r"""Test error for message with too many delimiters on a line."""
         msg = backwards.unicode2bytes(self.instance.delimiter.join(
             ['args1', 'val1', 'args2', 'val2']))
-        nt.assert_raises(ValueError, self.instance.deserialize, msg)
+        self.assert_raises(ValueError, self.instance.deserialize, msg)
 
     def test_error_nonstrval(self):
         r"""Test error on serializing dictionary with non-string values."""
         obj = {1: 'here'}
-        nt.assert_raises(ValueError, self.instance.serialize, obj)
+        self.assert_raises(ValueError, self.instance.serialize, obj)
