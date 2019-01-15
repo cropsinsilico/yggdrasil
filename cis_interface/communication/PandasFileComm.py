@@ -65,8 +65,23 @@ class PandasFileComm(AsciiTableComm):
         kwargs.setdefault('recv_converter', pandas_recv_converter)
         super(PandasFileComm, self)._init_before_open(**kwargs)
         self.read_meth = 'read'
-        if self.append:
-            self.serializer.write_header = False
+
+    @property
+    def header_was_written(self):
+        r"""bool: True if head has been written to the current file."""
+        return getattr(self, '_header_was_written', False)
+
+    @header_was_written.setter
+    def header_was_written(self, header_was_written):
+        r"""Set for header_was_written property."""
+        if getattr(self, 'serializer', None) is not None:
+            if not header_was_written:
+                self.serializer.write_header = True
+            else:
+                self.serializer.write_header = False
+        elif header_was_written:  # pragma: debug
+            raise Exception("header_was_written set before serializer created")
+        self._header_was_written = header_was_written
 
     @classmethod
     def get_testing_options(cls):
@@ -84,12 +99,6 @@ class PandasFileComm(AsciiTableComm):
 
         """
         out = super(PandasFileComm, cls).get_testing_options(as_array=True)
-        order = out['recv'][0].dtype.names
-        arr = out['send'][0]
-        lst = [arr[n] for n in order]
-        out['send'] = [lst, lst]
-        out['recv'] = [[out['recv'][0][n] for n in order]]
-        out['msg'] = out['send'][0]
         for k in ['format_str', 'as_array']:
             del out['kwargs'][k]
         out['contents'] = (b'name\tcount\tsize\n' +
@@ -108,5 +117,6 @@ class PandasFileComm(AsciiTableComm):
     def write_header(self):
         r"""Write header lines to the file based on the serializer info."""
         # This will result in header only being sent for first message
-        self.serializer.write_header = False
+        if not self.header_was_written:
+            self.header_was_written = True
         return

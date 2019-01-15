@@ -1,5 +1,5 @@
 import numpy as np
-from cis_interface import serialize, backwards
+from cis_interface import serialize, backwards, units
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
 from cis_interface.schema import register_component, inherit_schema
 from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
@@ -73,18 +73,23 @@ class AsciiTableComm(AsciiFileComm):
                             b'three\t3\t3.000000\n')}
         field_names = [backwards.bytes2unicode(x) for
                        x in out['kwargs']['field_names']]
+        field_units = [backwards.bytes2unicode(x) for
+                       x in out['kwargs']['field_units']]
         rows = [(b'one', np.int32(1), 1.0),
                 (b'two', np.int32(2), 2.0),
                 (b'three', np.int32(3), 3.0)]
         if as_array:
+            out['kwargs']['as_array'] = as_array
             dtype = np.dtype(
                 {'names': field_names,
                  'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
             arr = np.array(rows, dtype=dtype)
-            out['kwargs']['as_array'] = as_array
-            out['send'] = [arr, arr]
-            out['recv'] = [np.hstack(out['send'])]
-            out['dict'] = {k: arr[k] for k in field_names}
+            lst = [units.add_units(arr[n], u) for n, u
+                   in zip(field_names, field_units)]
+            out['send'] = [lst, lst]
+            out['recv'] = [[units.add_units(np.hstack([arr, arr])[n], u) for
+                            n, u in zip(field_names, field_units)]]
+            out['dict'] = {k: l for k, l in zip(field_names, lst)}
         else:
             out['send'] = 2 * rows
             out['recv'] = out['send']
