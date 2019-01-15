@@ -4,7 +4,7 @@ import uuid
 import atexit
 import threading
 from logging import info
-from cis_interface import backwards, tools
+from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
@@ -799,13 +799,36 @@ class CommBase(tools.CisClass):
         """
         out = (isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg))
         return out
-    
+
+    def apply_recv_converter(self, msg_in):
+        r"""Apply recv_converter.
+
+        Args:
+            msg_in (object): Message to convert.
+        
+        Returns:
+            object: Converted message.
+ 
+        """
+        if (self.recv_converter is None):
+            return msg_in
+        elif isinstance(self.recv_converter, str):
+            if self.recv_converter in ['array', 'pandas']:
+                msg_out = self.serializer.consolidate_array(msg_in)
+                if self.recv_converter == 'pandas':
+                    msg_out = serialize.numpy2pandas(msg_out)
+                return msg_out
+            else:  # pragma: debug
+                raise RuntimeError("Unrecognized recv_converter string: '%s'" %
+                                   self.recv_converter)
+        else:
+            return self.recv_converter(msg_in)
+        
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
         emsg, _ = self.deserialize(self.empty_msg)
-        if (self.recv_converter is not None):
-            emsg = self.recv_converter(emsg)
+        emsg = self.apply_recv_converter(emsg)
         return emsg
 
     def is_empty_recv(self, msg):
@@ -1386,7 +1409,7 @@ class CommBase(tools.CisClass):
         elif ((self.recv_converter is not None)
               and (not header.get('incomplete', False))):
             self.debug("Converting message")
-            msg = self.recv_converter(msg_)
+            msg = self.apply_recv_converter(msg_)
         else:
             msg = msg_
         if not second_pass:

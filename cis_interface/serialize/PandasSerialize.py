@@ -3,6 +3,8 @@ import copy
 import numpy as np
 import warnings
 from cis_interface import backwards, platform, serialize
+from cis_interface.metaschema.datatypes.ArrayMetaschemaType import (
+    OneDArrayMetaschemaType)
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
 
@@ -47,30 +49,31 @@ class PandasSerialize(AsciiTableSerialize):
                 and columns.
 
         """
-        if self.field_names is None:
+        field_names = self.get_field_names()
+        if field_names is None:
             return frame
         cols = frame.columns.tolist()
-        if len(self.field_names) != len(cols):
+        if len(field_names) != len(cols):
             raise RuntimeError(("Number of field names (%d) doesn't match "
                                 + "number of columns in data frame (%d).")
-                               % (len(self.field_names), len(cols)))
+                               % (len(field_names), len(cols)))
         # Check for missing fields
         fmiss = []
-        for f in self.field_names[0]:
+        for f in field_names:
             if f not in cols:
                 fmiss.append(f)
         if fmiss:
-            if len(fmiss) == len(self.field_names[0]):
+            if len(fmiss) == len(field_names):
                 warnings.warn("Assuming direct mapping of field names to columns. "
                               + "This may not be correct.")
-                frame.columns = self.field_names
+                frame.columns = field_names
             else:
                 # Partial overlap
                 raise RuntimeError("%d fields missing from frame: %s"
                                    % (len(fmiss), str(fmiss)))
         else:
             # Reorder columns
-            frame = frame[self.field_names]
+            frame = frame[field_names]
         return frame
 
     def func_serialize(self, args):
@@ -139,6 +142,13 @@ class PandasSerialize(AsciiTableSerialize):
         # for c, d in zip(out.columns, out.dtypes):
         #     if d == object:
         #         out[c] = out[c].apply(lambda s: s.strip())
+        if not self._initialized:
+            typedef = {'type': 'array', 'items': []}
+            np_out = serialize.pandas2numpy(out)
+            for n in self.get_field_names():
+                typedef['items'].append(OneDArrayMetaschemaType.encode_type(
+                    np_out[n], title=n))
+            self.update_serializer(extract=True, **typedef)
         return out
 
     @classmethod

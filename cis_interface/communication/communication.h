@@ -8,7 +8,6 @@
 #include <CommBase.h>
 #include <IPCComm.h>
 #include <ZMQComm.h>
-#include <RPCComm.h>
 #include <ServerComm.h>
 #include <ClientComm.h>
 #include <AsciiFileComm.h>
@@ -44,8 +43,6 @@ int free_comm_type(comm_t *x) {
     ret = free_ipc_comm(x);
   else if (t == ZMQ_COMM)
     ret = free_zmq_comm(x);
-  else if (t == RPC_COMM)
-    ret = free_rpc_comm(x);
   else if (t == SERVER_COMM)
     ret = free_server_comm(x);
   else if (t == CLIENT_COMM)
@@ -162,8 +159,6 @@ int new_comm_type(comm_t *x) {
     flag = new_ipc_address(x);
   else if (t == ZMQ_COMM)
     flag = new_zmq_address(x);
-  else if (t == RPC_COMM)
-    flag = new_rpc_address(x);
   else if (t == SERVER_COMM)
     flag = new_server_address(x);
   else if (t == CLIENT_COMM)
@@ -195,8 +190,6 @@ int init_comm_type(comm_t *x) {
     flag = init_ipc_comm(x);
   else if (t == ZMQ_COMM)
     flag = init_zmq_comm(x);
-  else if (t == RPC_COMM)
-    flag = init_rpc_comm(x);
   else if (t == SERVER_COMM)
     flag = init_server_comm(x);
   else if (t == CLIENT_COMM)
@@ -352,8 +345,6 @@ int comm_nmsg(const comm_t x) {
     ret = ipc_comm_nmsg(x);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_nmsg(x);
-  else if (t == RPC_COMM)
-    ret = rpc_comm_nmsg(x);
   else if (t == SERVER_COMM)
     ret = server_comm_nmsg(x);
   else if (t == CLIENT_COMM)
@@ -390,8 +381,6 @@ int comm_send_single(const comm_t x, const char *data, const size_t len) {
     ret = ipc_comm_send(x, data, len);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_send(x, data, len);
-  else if (t == RPC_COMM)
-    ret = rpc_comm_send(x, data, len);
   else if (t == SERVER_COMM)
     ret = server_comm_send(x, data, len);
   else if (t == CLIENT_COMM)
@@ -695,8 +684,6 @@ int comm_recv_single(const comm_t x, char **data, const size_t len,
     ret = ipc_comm_recv(x, data, len, allow_realloc);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_recv(x, data, len, allow_realloc);
-  else if (t == RPC_COMM)
-    ret = rpc_comm_recv(x, data, len, allow_realloc);
   else if (t == SERVER_COMM)
     ret = server_comm_recv(x, data, len, allow_realloc);
   else if (t == CLIENT_COMM)

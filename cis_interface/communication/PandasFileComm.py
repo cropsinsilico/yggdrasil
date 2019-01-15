@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from cis_interface import serialize
 from cis_interface.communication.AsciiTableComm import AsciiTableComm
 from cis_interface.schema import register_component
@@ -67,7 +68,7 @@ class PandasFileComm(AsciiTableComm):
         self.read_meth = 'read'
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, as_frames=False):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -81,13 +82,18 @@ class PandasFileComm(AsciiTableComm):
                     the messages in 'send'.
 
         """
-        # out = super(PandasFileComm, cls).get_testing_options()
-        # Jump out to AsciiTableComm to avoid pandas data frames
-        out = AsciiTableComm.get_testing_options(as_array=True)
+        out = super(PandasFileComm, cls).get_testing_options()
+        if as_frames:
+            out['recv'] = [pd.concat(out['recv'], ignore_index=True)]
+        else:
+            seri_out = out
+            # Jump out to AsciiTableComm to avoid pandas data frames
+            out = AsciiTableComm.get_testing_options(as_array=True)
+            out['extra_kwargs'] = {}
+            out['contents'] = seri_out['contents']
         for k in ['format_str', 'as_array']:
-            del out['kwargs'][k]
-        out['extra_kwargs'] = {}
-        out['contents'] = super(PandasFileComm, cls).get_testing_options()['contents']
+            if k in out['kwargs']:
+                del out['kwargs'][k]
         return out
         
     @property

@@ -11,7 +11,7 @@ extern "C" {
 
 /*! @brief Communicator types. */
 enum comm_enum { NULL_COMM, IPC_COMM, ZMQ_COMM,
-		 RPC_COMM, SERVER_COMM, CLIENT_COMM,
+		 SERVER_COMM, CLIENT_COMM,
 		 ASCII_FILE_COMM, ASCII_TABLE_COMM, ASCII_TABLE_ARRAY_COMM };
 typedef enum comm_enum comm_type;
 #define COMM_NAME_SIZE 100
@@ -132,13 +132,11 @@ comm_t* init_comm_base(const char *name, const char *direction,
   char *address = NULL;
   if (name != NULL) {
     strcpy(full_name, name);
-    if (t != RPC_COMM) {
-      if ((direction != NULL) && (strlen(direction) > 0)) {
-        if (is_send(direction))
-          strcat(full_name, "_OUT");
-        else if (is_recv(direction))
-          strcat(full_name, "_IN");
-      }
+    if ((direction != NULL) && (strlen(direction) > 0)) {
+      if (is_send(direction))
+	strcat(full_name, "_OUT");
+      else if (is_recv(direction))
+	strcat(full_name, "_IN");
     }
     address = getenv(full_name);
   }

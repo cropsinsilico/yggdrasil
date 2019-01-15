@@ -97,7 +97,7 @@ class AsciiTableSerialize(DefaultSerialize):
                     ifmt = serialize.nptype2cformat(idtype, asbytes=True)
                     fmts.append(ifmt)
             if fmts:
-                self._format_str = serialize.table2format(
+                self.format_str = serialize.table2format(
                     fmts=fmts, delimiter=self.delimiter, newline=self.newline,
                     comment=backwards.unicode2bytes(''))
 

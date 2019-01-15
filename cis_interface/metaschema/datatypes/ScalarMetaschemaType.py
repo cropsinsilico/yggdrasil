@@ -93,7 +93,7 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         arr = cls.to_array(obj)
         bytes = arr.tobytes()
-        out = base64.encodestring(bytes).decode('ascii')
+        out = base64.encodebytes(bytes).decode('ascii')
         return out
 
     @classmethod
@@ -133,9 +133,10 @@ class ScalarMetaschemaType(MetaschemaType):
             object: Decoded object.
 
         """
-        bytes = base64.decodestring(obj.encode('ascii'))
+        bytes = base64.decodebytes(obj.encode('ascii'))
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
-        arr = np.fromstring(bytes, dtype=dtype)
+        arr = np.frombuffer(bytes, dtype=dtype)
+        # arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
         out = cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)

@@ -1227,7 +1227,7 @@ def list2numpy(l, names=None):
         np.ndarray: Structured numpy array.
 
     """
-    return dict2numpy(list2dict(l, names=names))
+    return dict2numpy(list2dict(l, names=names), order=names)
 
 
 def numpy2dict(arr):
@@ -1288,7 +1288,8 @@ def numpy2pandas(arr):
     """
     if not isinstance(arr, np.ndarray):
         raise TypeError("arr must be a numpy array, not %s." % type(arr))
-    return pandas.DataFrame(arr)
+    out = pandas.DataFrame(arr)
+    return out
 
 
 def pandas2numpy(frame, index=False):

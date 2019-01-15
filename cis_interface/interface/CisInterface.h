@@ -319,21 +319,6 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
 #define cisRpc_t comm_t
 
 /*!
-  @brief Constructor for RPC structure.
-  Creates an instance of cisRpc_t with provided information.
-  @param[in] name constant character pointer name of the output queue.
-  @param[in] outFormat character pointer to format that should be used for
-  formatting output.
-  @param[in] inFormat character pointer to format that should be used for
-  parsing input.
-  @return cisRpc_t structure with provided info.
- */
-static inline 
-cisRpc_t cisRpc(const char *name, const char *outFormat, const char *inFormat) {
-  return init_comm_format(name, outFormat, RPC_COMM, inFormat, 0);
-};
-
-/*!
   @brief Constructor for client side RPC structure.
   Creates an instance of cisRpc_t with provided information.  
   @param[in] name constant character pointer to name for queues.

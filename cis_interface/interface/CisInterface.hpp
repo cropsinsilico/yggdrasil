@@ -261,17 +261,6 @@ class CisRpc {
   cisRpc_t _pi;
 public:
 
-  /*!
-    @brief Constructor for CisRpc.
-    @param[in] name constant character pointer name of the output queue.
-    @param[in] outFormat character pointer to format that should be used for
-    formatting output.
-    @param[in] inFormat character pointer to format that should be used for
-    parsing input.
-   */
-  CisRpc(const char *name, const char *outFormat, const char *inFormat) :
-    _pi(cisRpc(name, outFormat, inFormat)) {}
-
   /*! @brief Empty constructor for inheritance. */
   CisRpc(cisRpc_t x) : _pi(x) {}
   

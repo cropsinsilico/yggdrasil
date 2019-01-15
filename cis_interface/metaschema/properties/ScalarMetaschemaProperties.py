@@ -80,7 +80,12 @@ def definition2dtype(props):
         typename = props.get('type', None)
         if typename is None:
             raise KeyError('Could not find type in dictionary')
-    if typename == 'unicode':
+    if ('precision' not in props):
+        if typename in _flexible_types:
+            out = np.dtype((_valid_types[typename]))
+        else:
+            raise RuntimeError("Precision required for type: '%s'" % typename)
+    elif typename == 'unicode':
         out = np.dtype((_valid_types[typename], int(props['precision'] // 32)))
     elif typename in _flexible_types:
         out = np.dtype((_valid_types[typename], int(props['precision'] // 8)))

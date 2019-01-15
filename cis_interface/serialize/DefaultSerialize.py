@@ -2,8 +2,10 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from cis_interface import backwards, tools, serialize, units
-from cis_interface.serialize import register_serializer
+from cis_interface import backwards, tools, units
+from cis_interface.serialize import (
+    register_serializer, get_serializer, extract_formats, cformat2nptype,
+    consolidate_array)
 from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
@@ -217,10 +219,10 @@ class DefaultSerialize(object):
             list: Names for each field in the data type.
 
         """
-        if self.typedef['type'] != 'array':
-            return None
         if getattr(self, 'field_names', None) is not None:
             out = self.field_names
+        elif self.typedef['type'] != 'array':
+            out = None
         elif isinstance(self.typedef['items'], dict):  # pragma: debug
             raise Exception("Variable number of items not yet supported.")
         elif isinstance(self.typedef['items'], list):
@@ -378,7 +380,7 @@ class DefaultSerialize(object):
         seritype = kwargs.pop('seritype', self._seritype)
         if (seritype != self._seritype) and (seritype != 'default'):
             kwargs.update(extract=extract, seritype=seritype)
-            self._alias = serialize.get_serializer(**kwargs)
+            self._alias = get_serializer(**kwargs)
             assert(self._seritype == seritype)
             return
         # Remove metadata keywords unrelated to serialization
@@ -444,7 +446,7 @@ class DefaultSerialize(object):
             # Key specific changes to type
             if k == 'format_str':
                 v = backwards.bytes2unicode(v)
-                fmts = serialize.extract_formats(v)
+                fmts = extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
                         if len(typedef.get('items', [])) != len(fmts):
@@ -456,7 +458,7 @@ class DefaultSerialize(object):
                                                  getattr(self, 'as_array', False))
                 typedef.update(type='array', items=[])
                 for i, fmt in enumerate(fmts):
-                    nptype = serialize.cformat2nptype(fmt)
+                    nptype = cformat2nptype(fmt)
                     itype = OneDArrayMetaschemaType.encode_type(np.ones(1, nptype))
                     itype = OneDArrayMetaschemaType.extract_typedef(itype)
                     if (fmt == '%s') and ('precision' in itype):
@@ -617,7 +619,7 @@ class DefaultSerialize(object):
         """
         np_dtype = self.numpy_dtype
         if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
-            out = serialize.consolidate_array(out, dtype=np_dtype)
+            out = consolidate_array(out, dtype=np_dtype)
         else:
             raise ValueError(("Cannot consolidate message into a structured "
                               + "numpy array: %s") % str(out))
