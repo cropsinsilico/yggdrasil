@@ -54,8 +54,8 @@ def import_all_drivers():
 __all__ = ['import_driver', 'create_driver', 'Driver',
            'ModelDriver', 'PythonModelDriver', 'GCCModelDriver',
            'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',
-           'IODriver', 'FileInputDriver', 'FileOutputDriver',
-           'AsciiFileInputDriver', 'AsciiFileOutputDriver',
-           'AsciiTableInputDriver', 'AsciiTableOutputDriver',
-           'RPCDriver', 'RMQDriver', 'RMQInputDriver', 'RMQOutputDriver',
+           'ConnectionDriver', 'InputDriver', 'OutputDriver',
+           'FileInputDriver', 'FileOutputDriver',
+           'ClientDriver', 'ServerDriver',
+           'RMQInputDriver', 'RMQOutputDriver',
            'RMQClientDriver', 'RMQServerDriver']

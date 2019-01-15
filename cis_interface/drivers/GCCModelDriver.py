@@ -137,6 +137,87 @@ if platform._is_win and (not os.path.isfile(_regex_win32_lib)):  # pragma: windo
     build_regex_win32()
 
 
+def call_compile(cc, src, flags=[], overwrite=False):
+    r"""Compile a source file, checking for errors.
+
+    Args:
+        cc (str): Compiler command line interface.
+        src (str): Full path to source file.
+        flags (list, optional): Compilation flags. Defaults to [].
+        overwrite (bool, optional): If True, the existing compile file will be
+            overwritten. Otherwise, it will be kept and this function will
+            return without recompiling the source file.
+
+    Returns:
+        str: Full path to compiled source.
+
+    """
+    # Construct arguments
+    src_base = os.path.splitext(src)[0]
+    args = [cc, "-c"] + flags + [src]
+    if not platform._is_win:
+        src_out = src_base + '.o'
+        args += ["-o", src_out]
+    else:  # pragma: windows
+        src_out = src_base + '.obj'
+        args += [src_out]
+    # Check for file
+    if os.path.isfile(src_out):
+        if overwrite:
+            os.remove(src_out)
+        else:
+            return src_out
+    # Call compiler
+    comp_process = tools.popen_nobuffer(args)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(' '.join(args))
+        tools.print_encoded(output, end="")
+        raise RuntimeError("Compilation failed with code %d." % exit_code)
+    assert(os.path.isfile(src_out))
+    return src_out
+
+
+def call_link(cc, obj, out, flags=[], overwrite=False):
+    r"""Compile a source file, checking for errors.
+
+    Args:
+        cc (str): Compiler command line interface.
+        src (str): Full path to source file.
+        flags (list, optional): Compilation flags. Defaults to [].
+        overwrite (bool, optional): If True, the existing compile file will be
+            overwritten. Otherwise, it will be kept and this function will
+            return without recompiling the source file.
+
+    Returns:
+        str: Full path to compiled source.
+
+    """
+    # Check for file
+    if os.path.isfile(out):
+        if overwrite:
+            os.remove(out)
+        else:
+            return out
+    # Construct arguments
+    args = [cc] + obj + flags
+    if not platform._is_win:
+        args += ["-o", out]
+    else:  # pragma: windows
+        args += ['/out:%s' % out]
+    # Call linker
+    comp_process = tools.popen_nobuffer(args)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(' '.join(args))
+        tools.print_encoded(output, end="")
+        raise RuntimeError("Linking failed with code %d." % exit_code)
+    assert(os.path.isfile(out))
+    return out
+
+
 def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
                working_dir=None):
     r"""Compile a C/C++ program with necessary interface libraries.
@@ -208,66 +289,22 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
                 break
         if std_flag is None:
             ccflags.append('-std=c++11')
-
     # Compile C++ wrapper
     fname_lib_base = os.path.normpath(
-        os.path.join(os.path.dirname(__file__), "../metaschema/datatypes/datatypes"))
-    compile_lib_args = [ccpp, "-c"] + ccflags0 + [fname_lib_base + '.cpp']
-    if not platform._is_win:
-        fname_lib_out = fname_lib_base + '.o'
-        compile_lib_args += ["-o", fname_lib_out]
-    else:
-        fname_lib_out = fname_lib_base + '.obj'
-        compile_lib_args += [fname_lib_out]
-    if os.path.isfile(fname_lib_out):
-        os.remove(fname_lib_out)
-    comp_process = tools.popen_nobuffer(compile_lib_args)
-    output, err = comp_process.communicate()
-    exit_code = comp_process.returncode
-    if exit_code != 0:  # pragma: debug
-        print(' '.join(compile_lib_args))
-        tools.print_encoded(output, end="")
-        raise RuntimeError("Compilation of C++ wrapper failed with code %d." % exit_code)
-    assert(os.path.isfile(fname_lib_out))
-
-    # Construct compile arguments
-    if not platform._is_win:
-        fname_src_obj = src_base + '.o'
-    else:
-        fname_src_obj = src_base + '.obj'
-    compile_args = [cc, '-c'] + ccflags0 + ccflags
-    link_args = [ccpp, fname_src_obj, fname_lib_out] + ldflags0 + ldflags
-    if not platform._is_win:
-        compile_args += ["-o", fname_src_obj]
-        link_args += ["-o", out]
-    compile_args += src
-    if platform._is_win:  # pragma: windows
-        compile_args += [fname_src_obj]
-        link_args += ['/out:%s' % out]
-
-    # Compile
-    if os.path.isfile(fname_src_obj):
-        os.remove(fname_src_obj)
-    comp_process = tools.popen_nobuffer(compile_args)
-    output, err = comp_process.communicate()
-    exit_code = comp_process.returncode
-    if exit_code != 0:  # pragma: debug
-        print(' '.join(compile_args))
-        tools.print_encoded(output, end="")
-        raise RuntimeError("Compilation failed with code %d." % exit_code)
-    # assert(os.path.isfile(out))
-
-    # Link
-    if os.path.isfile(out):
-        os.remove(out)
-    link_process = tools.popen_nobuffer(link_args)
-    output, err = link_process.communicate()
-    exit_code = link_process.returncode
-    if exit_code != 0:  # pragma: debug
-        print(' '.join(link_args))
-        tools.print_encoded(output, end="")
-        raise RuntimeError("Linking failed with code %d." % exit_code)
-    assert(os.path.isfile(out))
+        os.path.join(os.path.dirname(__file__),
+                     "../metaschema/datatypes/datatypes.cpp"))
+    fname_lib_out = call_compile(ccpp, fname_lib_base,
+                                 flags=ccflags0, overwrite=False)
+    # Compile each source file
+    fname_src_obj = []
+    for isrc in src:
+        fname_src_obj.append(call_compile(cc, isrc,
+                                          flags=(ccflags0 + ccflags),
+                                          overwrite=True))
+    # Link compile objects
+    out = call_link(ccpp, fname_src_obj + [fname_lib_out], out,
+                    flags=(ldflags0 + ldflags),
+                    overwrite=True)
     return out
 
 
