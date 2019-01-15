@@ -60,7 +60,7 @@ end;
 % Read entire array from ASCII table into an array
 flag = true;
 while flag
-  [flag, arr] = in_array.recv();
+  [flag, arr] = in_array.recv_array();
   if flag
     nr = size(arr, 1);
     fprintf('Array: (%d rows)\n', nr);
@@ -71,7 +71,7 @@ while flag
               real(arr{i,4}), imag(arr{i,4}));
     end;
     % Send the array to output. Formatting is handled on the output driver side.
-    ret = out_array.send(arr);
+    ret = out_array.send_array(arr);
     if (~ret);
       error('ascii_io(M): ERROR SENDING ARRAY');
       break;

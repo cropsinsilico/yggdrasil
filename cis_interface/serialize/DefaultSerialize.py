@@ -599,10 +599,29 @@ class DefaultSerialize(object):
                 or metadata.get('incomplete', False)
                 or metadata.get('raw', False)):
             self.initialize_serializer(typedef, extract=True)
-            # np_dtype = self.numpy_dtype
-            # if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
-            #     out = serialize.consolidate_array(out, dtype=np_dtype)
         return out, metadata
+
+    def consolidate_array(self, out):
+        r"""Consolidate message into a structure numpy array if possible.
+
+        Args:
+            out (list, tuple, np.ndarray): Object to consolidate into a
+                structured numpy array.
+
+        Returns:
+            np.ndarray: Structured numpy array containing consolidated message.
+
+        Raises:
+            ValueError: If the array cannot be consolidated.
+
+        """
+        np_dtype = self.numpy_dtype
+        if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
+            out = serialize.consolidate_array(out, dtype=np_dtype)
+        else:
+            raise ValueError(("Cannot consolidate message into a structured "
+                              + "numpy array: %s") % str(out))
+        return out
 
     # def format_header(self, header_info):
     #     r"""Format header info to form a string that should prepend a message.

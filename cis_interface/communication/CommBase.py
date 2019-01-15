@@ -1612,8 +1612,12 @@ class CommBase(tools.CisClass):
 
     def send_array(self, *args, **kwargs):
         r"""Alias for send."""
+        # TODO: Maybe explicitly handle transformation from array
         return self.send(*args, **kwargs)
 
     def recv_array(self, *args, **kwargs):
         r"""Alias for recv."""
-        return self.recv(*args, **kwargs)
+        flag, out = self.recv(*args, **kwargs)
+        if flag:
+            out = self.serializer.consolidate_array(out)
+        return flag, out
