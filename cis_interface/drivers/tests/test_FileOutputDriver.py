@@ -1,6 +1,5 @@
 import os
 import unittest
-import nose.tools as nt
 from cis_interface.schema import get_schema
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
@@ -114,7 +113,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         if self.testing_options.get('exact_contents', True):
             with open(self.filepath, 'rb') as fd:
                 data = fd.read()
-            nt.assert_equal(data, self.contents_to_read)
+            self.assert_equal(data, self.contents_to_read)
 
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""

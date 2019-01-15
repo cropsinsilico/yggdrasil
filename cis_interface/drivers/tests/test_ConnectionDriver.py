@@ -1,8 +1,7 @@
 import uuid
 import importlib
-import nose.tools as nt
 from cis_interface import tools
-from cis_interface.tests import MagicTestError, assert_msg_equal
+from cis_interface.tests import MagicTestError
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
@@ -35,10 +34,7 @@ class TestConnectionParam(parent.TestParam):
         
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
-        # if not (isinstance(y, type(self.send_instance.eof_msg))
-        #         and (y == self.send_instance.eof_msg)):
-        #     y = self.map_sent2recv(y)
-        assert_msg_equal(x, y)
+        self.assert_equal(x, y)
 
     @property
     def cleanup_comm_classes(self):
@@ -135,13 +131,13 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         assert(not flag)
         flag, ret = self.recv_comm.recv()
         assert(not flag)
-        nt.assert_equal(ret, None)
+        self.assert_equal(ret, None)
         # Long
         flag = self.send_comm.send_nolimit(self.msg_short)
         assert(not flag)
         flag, ret = self.recv_comm.recv_nolimit()
         assert(not flag)
-        nt.assert_equal(ret, None)
+        self.assert_equal(ret, None)
 
     def get_fresh_name(self):
         r"""Get a fresh name for a new instance that won't overlap with the base."""
@@ -166,7 +162,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
                 error_on_init=error_on_init)
         driver_class = import_driver(self.driver)
         if error_on_init:
-            nt.assert_raises(MagicTestError, driver_class, *args, **kwargs)
+            self.assert_raises(MagicTestError, driver_class, *args, **kwargs)
         else:
             inst = driver_class(*args, **kwargs)
             inst.icomm._first_send_done = True
@@ -181,7 +177,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         r"""Test fowarding of error from open of icomm."""
         inst = self.get_fresh_error_instance('icomm')
         inst.icomm.error_replace('open')
-        nt.assert_raises(MagicTestError, inst.open_comm)
+        self.assert_raises(MagicTestError, inst.open_comm)
         assert(inst.icomm.is_closed)
         inst.icomm.restore_all()
 
@@ -190,7 +186,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         inst = self.get_fresh_error_instance('icomm')
         inst.open_comm()
         inst.icomm.error_replace('close')
-        nt.assert_raises(MagicTestError, inst.close_comm)
+        self.assert_raises(MagicTestError, inst.close_comm)
         assert(inst.ocomm.is_closed)
         inst.icomm.restore_all()
         inst.icomm.close()
@@ -201,7 +197,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         inst = self.get_fresh_error_instance('ocomm')
         inst.open_comm()
         inst.ocomm.error_replace('close')
-        nt.assert_raises(MagicTestError, inst.close_comm)
+        self.assert_raises(MagicTestError, inst.close_comm)
         assert(inst.icomm.is_closed)
         inst.ocomm.restore_all()
         inst.ocomm.close()
@@ -214,7 +210,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         inst.icomm.empty_replace('open')
         inst.ocomm.empty_replace('open')
         inst.timeout = inst.sleeptime / 2.0
-        nt.assert_raises(Exception, inst.start)
+        self.assert_raises(Exception, inst.start)
         inst.timeout = old_timeout
         inst.icomm.restore_all()
         inst.ocomm.restore_all()
@@ -248,14 +244,14 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             assert(flag)
         # self.instance.sleep()
         # if self.comm_name != 'CommBase':
-        #     nt.assert_equal(self.recv_comm.n_msg, 1)
+        #     self.assert_equal(self.recv_comm.n_msg, 1)
         for i in range(self.nmsg_recv):
             flag, msg_recv = self.recv_comm.recv(self.timeout)
             if self.comm_name != 'CommBase':
                 assert(flag)
                 self.assert_msg_equal(msg_recv, self.msg_short)
         if self.comm_name != 'CommBase':
-            nt.assert_equal(self.instance.n_msg, 0)
+            self.assert_equal(self.instance.n_msg, 0)
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
@@ -327,12 +323,12 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
 
 def test_ConnectionDriverOnexit_errors():
     r"""Test that errors are raised for invalid onexit."""
-    nt.assert_raises(ValueError, ConnectionDriver, 'test',
-                     onexit='invalid')
+    self.assert_raises(ValueError, ConnectionDriver, 'test',
+                       onexit='invalid')
 
 
 def test_ConnectionDriverTranslate_errors():
     r"""Test that errors are raised for invalid translators."""
     assert(not hasattr(invalid_translate, '__call__'))
-    nt.assert_raises(ValueError, ConnectionDriver, 'test',
-                     translator=invalid_translate)
+    self.assert_raises(ValueError, ConnectionDriver, 'test',
+                       translator=invalid_translate)

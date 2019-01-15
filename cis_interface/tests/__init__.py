@@ -67,7 +67,7 @@ else:
 shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 
-def assert_msg_equal(x, y):
+def assert_equal(x, y):
     r"""Assert that two messages are equivalent.
 
     Args:
@@ -82,22 +82,25 @@ def assert_msg_equal(x, y):
         assert(isinstance(x, (list, tuple)))
         nt.assert_equal(len(x), len(y))
         for ix, iy in zip(x, y):
-            assert_msg_equal(ix, iy)
+            assert_equal(ix, iy)
     elif isinstance(y, dict):
         nt.assert_equal(type(x), type(y))
         nt.assert_equal(len(x), len(y))
         for k, iy in y.items():
             ix = x[k]
-            assert_msg_equal(ix, iy)
+            assert_equal(ix, iy)
     elif isinstance(y, (np.ndarray, pd.DataFrame)):
+        if units.has_units(y) and (not units.has_units(x)):
+            y = units.get_data(y)
+        elif (not units.has_units(y)) and units.has_units(x):
+            x = units.get_data(x)
         np.testing.assert_array_equal(x, y)
     else:
         if units.has_units(y) and (not units.has_units(x)):
-            nt.assert_equal(x, units.get_data(y))
+            y = units.get_data(y)
         elif (not units.has_units(y)) and units.has_units(x):
-            nt.assert_equal(units.get_data(x), y)
-        else:
-            nt.assert_equal(x, y)
+            x = units.get_data(x)
+        nt.assert_equal(x, y)
 
 
 class CisTestBase(unittest.TestCase):
@@ -136,6 +139,22 @@ class CisTestBase(unittest.TestCase):
         skip_unittest = kwargs.pop('skip_unittest', False)
         if not skip_unittest:
             super(CisTestBase, self).__init__(*args, **kwargs)
+
+    def assert_equal(self, x, y):
+        r"""Assert that two values are equal."""
+        return assert_equal(x, y)
+
+    def assert_less_equal(self, x, y):
+        r"""Assert that one value is less than or equal to another."""
+        nt.assert_less_equal(x, y)
+
+    def assert_greater(self, x, y):
+        r"""Assert that one value is greater than another."""
+        nt.assert_greater(x, y)
+
+    def assert_raises(self, *args, **kwargs):
+        r"""Assert that a function raises an error."""
+        nt.assert_raises(*args, **kwargs)
 
     @property
     def comm_count(self):
@@ -263,7 +282,7 @@ class CisTestBase(unittest.TestCase):
                 x.sleep()
             x.stop_timeout()
             ncurr_comm = self.comm_count
-        nt.assert_less_equal(ncurr_comm, self.nprev_comm)
+        self.assert_less_equal(ncurr_comm, self.nprev_comm)
         # Give threads time to close
         if ncurr_thread is None:
             Tout = x.start_timeout()
@@ -272,7 +291,7 @@ class CisTestBase(unittest.TestCase):
                 x.sleep()
             x.stop_timeout()
             ncurr_thread = self.thread_count
-        nt.assert_less_equal(ncurr_thread, self.nprev_thread)
+        self.assert_less_equal(ncurr_thread, self.nprev_thread)
         # Give files time to close
         self.cleanup_comms()
         if ncurr_fd is None:
@@ -286,7 +305,7 @@ class CisTestBase(unittest.TestCase):
         fds_created = ncurr_fd - self.nprev_fd
         # print("FDS CREATED: %d" % fds_created)
         if not self._first_test:
-            nt.assert_equal(fds_created, 0)
+            self.assert_equal(fds_created, 0)
         # Reset the log, encoding, and default comm
         self.reset_log()
         self.reset_encoding()
@@ -343,7 +362,7 @@ class CisTestBase(unittest.TestCase):
                and (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
-        nt.assert_equal(os.stat(fname).st_size, fsize)
+        self.assert_equal(os.stat(fname).st_size, fsize)
 
     def check_file_contents(self, fname, result):
         r"""Check that the contents of a file are correct.
@@ -355,7 +374,7 @@ class CisTestBase(unittest.TestCase):
         """
         with open(fname, 'r') as fd:
             ocont = fd.read()
-        nt.assert_equal(ocont, result)
+        self.assert_equal(ocont, result)
 
     def check_file(self, fname, result):
         r"""Check that a file exists, is the correct size, and has the correct
@@ -692,7 +711,7 @@ class IOInfo(object):
                     x = pickle.load(fd)
         # elif isinstance(x, backwards.bytes_type):
         #     x = pickle.loads(x)
-        nt.assert_equal(type(x), type(y))
+        self.assert_equal(type(x), type(y))
         for k in y:
             if k not in x:  # pragma: debug
                 raise AssertionError("Key %s expected, but not in result." % k)

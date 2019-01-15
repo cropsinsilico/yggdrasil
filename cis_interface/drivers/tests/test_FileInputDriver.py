@@ -1,7 +1,6 @@
 import os
 import tempfile
 import unittest
-import nose.tools as nt
 from cis_interface.schema import get_schema
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
@@ -88,9 +87,9 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
             if flag:
                 msg_list.append(msg_recv)
             else:
-                nt.assert_equal(msg_recv, self.recv_comm.eof_msg)
+                self.assert_equal(msg_recv, self.recv_comm.eof_msg)
         recv_objects = self.testing_options['recv']
-        nt.assert_equal(len(msg_list), len(recv_objects))
+        self.assert_equal(len(msg_list), len(recv_objects))
         for x, y in zip(msg_list, recv_objects):
             self.assert_msg_equal(x, y)
 

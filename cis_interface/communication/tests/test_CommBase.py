@@ -2,8 +2,7 @@ import os
 import uuid
 import numpy as np
 import pandas as pd
-import nose.tools as nt
-from cis_interface.tests import CisTestClassInfo, assert_msg_equal
+from cis_interface.tests import CisTestClassInfo, assert_equal
 from cis_interface import units
 from cis_interface.communication import new_comm, get_comm, CommBase
 
@@ -15,8 +14,8 @@ def test_registry():
     value = None
     assert(not CommBase.is_registered(comm_class, key))
     assert(not CommBase.unregister_comm(comm_class, key))
-    nt.assert_equal(CommBase.get_comm_registry(None), {})
-    nt.assert_equal(CommBase.get_comm_registry(comm_class), {})
+    assert_equal(CommBase.get_comm_registry(None), {})
+    assert_equal(CommBase.get_comm_registry(comm_class), {})
     CommBase.register_comm(comm_class, key, value)
     assert(key in CommBase.get_comm_registry(comm_class))
     assert(CommBase.is_registered(comm_class, key))
@@ -168,7 +167,7 @@ class TestCommBase(CisTestClassInfo):
 
     def test_error_name(self):
         r"""Test error on missing address."""
-        nt.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
+        self.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
 
     def test_error_send(self):
         r"""Test error on send."""
@@ -223,8 +222,8 @@ class TestCommBase(CisTestClassInfo):
         r"""Check that error raised for invalid direction."""
         kwargs = self.send_inst_kwargs
         kwargs['direction'] = 'invalid'
-        nt.assert_raises(ValueError, new_comm, self.name + "_" + self.uuid,
-                         **kwargs)
+        self.assert_raises(ValueError, new_comm, self.name + "_" + self.uuid,
+                           **kwargs)
 
     def test_opp_comm_kwargs(self):
         r"""Test getting keyword arguments for the opposite comm."""
@@ -233,7 +232,7 @@ class TestCommBase(CisTestClassInfo):
     def test_work_comm(self):
         r"""Test creating/removing a work comm."""
         wc_send = self.instance.create_work_comm()
-        nt.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
+        self.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
         # Create recv instance in way that tests new_comm
         header_recv = dict(id=self.uuid + '1', address=wc_send.address)
         recv_kwargs = self.instance.get_work_comm_kwargs
@@ -252,10 +251,10 @@ class TestCommBase(CisTestClassInfo):
             assert(flag)
             flag, msg_recv = wc_recv.recv(self.timeout)
             assert(flag)
-            nt.assert_equal(msg_recv, self.test_msg)
+            self.assert_equal(msg_recv, self.test_msg)
             # Assert errors on second attempt
-            # nt.assert_raises(RuntimeError, wc_send.send, self.test_msg)
-            nt.assert_raises(RuntimeError, wc_recv.recv)
+            # self.assert_raises(RuntimeError, wc_send.send, self.test_msg)
+            self.assert_raises(RuntimeError, wc_recv.recv)
         self.instance.remove_work_comm(wc_send.uuid)
         self.instance.remove_work_comm(wc_recv.uuid)
         self.instance.remove_work_comm(wc_recv.uuid)
@@ -271,7 +270,7 @@ class TestCommBase(CisTestClassInfo):
         if not (isinstance(y, type(self.send_instance.eof_msg))
                 and (y == self.send_instance.eof_msg)):
             y = self.map_sent2recv(y)
-        assert_msg_equal(x, y)
+        self.assert_equal(x, y)
 
     def do_send_recv(self, send_meth='send', recv_meth='recv',
                      msg_send=None, msg_recv=None,
@@ -297,8 +296,8 @@ class TestCommBase(CisTestClassInfo):
             send_args = tuple()
         else:
             send_args = (msg_send,)
-        nt.assert_equal(getattr(self.send_instance, n_msg_send_meth), 0)
-        nt.assert_equal(getattr(self.recv_instance, n_msg_recv_meth), 0)
+        self.assert_equal(getattr(self.send_instance, n_msg_send_meth), 0)
+        self.assert_equal(getattr(self.recv_instance, n_msg_recv_meth), 0)
         if reverse_comms:
             send_instance = self.recv_instance
             recv_instance = self.send_instance
@@ -324,9 +323,9 @@ class TestCommBase(CisTestClassInfo):
             flag, msg_recv0 = frecv_meth(**recv_kwargs)
             assert(not flag)
             if self.comm == 'CommBase':
-                nt.assert_raises(NotImplementedError, self.recv_instance._send,
-                                 self.test_msg)
-                nt.assert_raises(NotImplementedError, self.recv_instance._recv)
+                self.assert_raises(NotImplementedError, self.recv_instance._send,
+                                   self.test_msg)
+                self.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
             for i in range(n_send):
                 flag = fsend_meth(*send_args, **send_kwargs)
@@ -342,7 +341,7 @@ class TestCommBase(CisTestClassInfo):
                     recv_instance.stop_timeout(key_suffix=tkey)
                     assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
                     # IPC nolimit sends multiple messages
-                    # nt.assert_equal(recv_instance.n_msg_recv, 1)
+                    # self.assert_equal(recv_instance.n_msg_recv, 1)
                 flag, msg_recv0 = frecv_meth(timeout=self.timeout, **recv_kwargs)
                 if is_eof and close_on_recv_eof:
                     assert(not flag)
@@ -374,20 +373,20 @@ class TestCommBase(CisTestClassInfo):
             assert(recv_instance.is_confirmed)
             send_instance.confirm(noblock=True)
             recv_instance.confirm(noblock=True)
-        nt.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
-        nt.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
+        self.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
+        self.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
 
     def test_drain_messages(self):
         r"""Test waiting for messages to drain."""
         self.send_instance.drain_messages(timeout=self.timeout)
-        nt.assert_equal(self.send_instance.n_msg_send_drain, 0)
+        self.assert_equal(self.send_instance.n_msg_send_drain, 0)
         if not self.recv_instance.is_file:
             self.recv_instance.drain_messages(timeout=self.timeout)
-            nt.assert_equal(self.recv_instance.n_msg_recv_drain, 0)
-        nt.assert_raises(ValueError, self.send_instance.drain_messages,
-                         variable='n_msg_invalid')
-        nt.assert_raises(ValueError, self.recv_instance.drain_messages,
-                         variable='n_msg_invalid')
+            self.assert_equal(self.recv_instance.n_msg_recv_drain, 0)
+        self.assert_raises(ValueError, self.send_instance.drain_messages,
+                           variable='n_msg_invalid')
+        self.assert_raises(ValueError, self.recv_instance.drain_messages,
+                           variable='n_msg_invalid')
 
     def test_recv_nomsg(self):
         r"""Test recieve when there is no waiting message."""
@@ -433,8 +432,8 @@ class TestCommBase(CisTestClassInfo):
 
     def test_purge(self, nrecv=1):
         r"""Test purging messages from the comm."""
-        nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
+        self.assert_equal(self.send_instance.n_msg, 0)
+        self.assert_equal(self.recv_instance.n_msg, 0)
         # Purge recv while open
         if self.comm not in ['CommBase', 'AsyncComm']:
             flag = self.send_instance.send(self.test_msg)
@@ -444,11 +443,11 @@ class TestCommBase(CisTestClassInfo):
                                        != nrecv)):  # pragma: debug
                 self.recv_instance.sleep()
             self.recv_instance.stop_timeout()
-            nt.assert_greater(self.recv_instance.n_msg, 0)
+            self.assert_greater(self.recv_instance.n_msg, 0)
         self.recv_instance.purge()
         # Uni-directional comms can't know about messages sent
-        # nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
+        # self.assert_equal(self.send_instance.n_msg, 0)
+        self.assert_equal(self.recv_instance.n_msg, 0)
         # Purge recv while closed
         self.recv_instance.close()
         self.recv_instance.purge()
