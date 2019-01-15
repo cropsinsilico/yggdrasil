@@ -645,22 +645,22 @@ def cdriver2filetype(driver):
         str: The corresponding file type for the driver.
 
     """
-    _legacy = {'AsciiMapInputDriver': 'AsciiMapComm',
-               'AsciiMapOutputDriver': 'AsciiMapComm',
-               'AsciiFileInputDriver': 'AsciiFileComm',
-               'AsciiFileOutputDriver': 'AsciiFileComm',
-               'AsciiTableInputDriver': 'AsciiTableComm',
-               'AsciiTableOutputDriver': 'AsciiTableComm',
-               'PandasFileInputDriver': 'PandasFileComm',
-               'PandasFileOutputDriver': 'PandasFileComm',
-               'PickleFileInputDriver': 'PickleFileComm',
-               'PickleFileOutputDriver': 'PickleFileComm',
-               'PlyFileInputDriver': 'PlyFileComm',
-               'PlyFileOutputDriver': 'PlyFileComm',
-               'ObjFileInputDriver': 'ObjFileComm',
-               'ObjFileOutputDriver': 'ObjFileComm',
-               'MatInputDriver': 'MatFileComm',
-               'MatOutputDriver': 'MatFileComm'}
+    _legacy = {'AsciiMapInputDriver': 'map',
+               'AsciiMapOutputDriver': 'map',
+               'AsciiFileInputDriver': 'ascii',
+               'AsciiFileOutputDriver': 'ascii',
+               'AsciiTableInputDriver': 'table',
+               'AsciiTableOutputDriver': 'table',
+               'PandasFileInputDriver': 'pandas',
+               'PandasFileOutputDriver': 'pandas',
+               'PickleFileInputDriver': 'pickle',
+               'PickleFileOutputDriver': 'pickle',
+               'PlyFileInputDriver': 'ply',
+               'PlyFileOutputDriver': 'ply',
+               'ObjFileInputDriver': 'obj',
+               'ObjFileOutputDriver': 'obj',
+               'MatInputDriver': 'mat',
+               'MatOutputDriver': 'mat'}
     if driver in _legacy:
         return _legacy[driver]
     schema = get_schema()
