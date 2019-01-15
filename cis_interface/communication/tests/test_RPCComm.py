@@ -1,4 +1,4 @@
-import nose.tools as nt
+import unittest
 from cis_interface.communication.tests import test_CommBase
 
 
@@ -11,14 +11,17 @@ class TestRPCComm(test_CommBase.TestCommBase):
         super(TestRPCComm, self).__init__(*args, **kwargs)
         self.attr_list += ['icomm', 'ocomm']
 
+    @unittest.skipIf(True, 'RPC')
     def test_error_send(self):
         r"""Disabled: Test error on send."""
         pass
     
+    @unittest.skipIf(True, 'RPC')
     def test_error_recv(self):
         r"""Disabled: Test error on recv."""
         pass
     
+    @unittest.skipIf(True, 'RPC')
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
         pass
@@ -54,10 +57,10 @@ class TestRPCComm(test_CommBase.TestCommBase):
         flag, msg_recv = self.recv_instance.call(self.msg_short,
                                                  timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
         flag, msg_recv = self.send_instance.recv(timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
         self.recv_instance.close()
         flag, msg_recv = self.recv_instance.call(self.msg_short)
         assert(not flag)
@@ -68,9 +71,9 @@ class TestRPCComm(test_CommBase.TestCommBase):
                                       args=[self.msg_short])
         flag, msg_recv = self.recv_instance.rpcCall(self.msg_short,
                                                     timeout=self.timeout)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
         flag, msg_recv = self.send_instance.rpcRecv(timeout=self.timeout)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
 
     def test_call_nolimit(self):
         r"""Test RPC nolimit call."""
@@ -78,6 +81,6 @@ class TestRPCComm(test_CommBase.TestCommBase):
                                       args=[self.msg_long])
         flag, msg_recv = self.recv_instance.call_nolimit(self.msg_long,
                                                          timeout=self.timeout)
-        nt.assert_equal(msg_recv, self.msg_long)
+        self.assert_equal(msg_recv, self.msg_long)
         flag, msg_recv = self.send_instance.recv_nolimit(timeout=self.timeout)
-        nt.assert_equal(msg_recv, self.msg_long)
+        self.assert_equal(msg_recv, self.msg_long)

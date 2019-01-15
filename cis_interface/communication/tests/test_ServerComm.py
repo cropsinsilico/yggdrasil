@@ -1,4 +1,4 @@
-import nose.tools as nt
+import unittest
 import uuid
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase
@@ -18,18 +18,22 @@ class TestServerComm(test_CommBase.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         return {'comm': 'ClientComm'}
     
+    @unittest.skipIf(True, 'Server')
     def test_error_send(self):
         r"""Disabled: Test error on send."""
         pass
         
+    @unittest.skipIf(True, 'Server')
     def test_error_recv(self):
         r"""Disabled: Test error on recv."""
         pass
         
+    @unittest.skipIf(True, 'Server')
     def test_invalid_direction(self):
         r"""Disabled: Test of error on incorrect direction."""
         pass
     
+    @unittest.skipIf(True, 'Server')
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
         pass
@@ -51,7 +55,7 @@ class TestServerComm(test_CommBase.TestCommBase):
                                       args=[self.msg_short], store_output=True)
         flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
         flag = self.recv_instance.rpcSend(msg_recv)
         assert(flag)
         T = self.recv_instance.start_timeout()
@@ -60,7 +64,7 @@ class TestServerComm(test_CommBase.TestCommBase):
         self.recv_instance.stop_timeout()
         flag, msg_recv = self.send_instance.sched_out
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
 
     def test_call_alias(self):
         r"""Test RPC call aliases."""
@@ -78,12 +82,12 @@ class TestServerComm(test_CommBase.TestCommBase):
         flag, msg_recv = self.recv_instance.sched_out
         # flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
         flag = self.recv_instance.rpcSend(msg_recv)
         assert(flag)
         flag, msg_recv = self.send_instance.rpcRecv(timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.msg_short)
 
     def test_call_nolimit(self):
         r"""Test RPC nolimit call."""
@@ -91,7 +95,7 @@ class TestServerComm(test_CommBase.TestCommBase):
                                       args=[self.msg_long], store_output=True)
         flag, msg_recv = self.recv_instance.recv_nolimit(timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_long)
+        self.assert_equal(msg_recv, self.msg_long)
         flag = self.recv_instance.send_nolimit(msg_recv)
         assert(flag)
         T = self.recv_instance.start_timeout()
@@ -100,7 +104,7 @@ class TestServerComm(test_CommBase.TestCommBase):
         self.recv_instance.stop_timeout()
         flag, msg_recv = self.send_instance.sched_out
         assert(flag)
-        nt.assert_equal(msg_recv, self.msg_long)
+        self.assert_equal(msg_recv, self.msg_long)
 
     def test_close_in_thread(self):
         r"""Test close of comm in thread."""
@@ -118,10 +122,10 @@ class TestServerComm(test_CommBase.TestCommBase):
     #         while (not T.is_out) and (self.recv_instance.n_msg == 0):  # pragma: debug
     #             self.recv_instance.sleep()
     #         self.recv_instance.stop_timeout()
-    #         nt.assert_equal(self.recv_instance.n_msg, 1)
+    #         self.assert_equal(self.recv_instance.n_msg, 1)
     #     self.send_instance.purge()
-    #     nt.assert_equal(self.send_instance.n_msg, 0)
-    #     nt.assert_equal(self.recv_instance.n_msg, 0)
+    #     self.assert_equal(self.send_instance.n_msg, 0)
+    #     self.assert_equal(self.recv_instance.n_msg, 0)
     #     # Purge send while closed
     #     self.send_instance.close()
     #     self.send_instance.purge()
