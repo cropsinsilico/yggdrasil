@@ -2,7 +2,7 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from cis_interface import backwards, tools, serialize
+from cis_interface import backwards, tools, serialize, units
 from cis_interface.serialize import register_serializer
 from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.datatypes import (
@@ -72,6 +72,71 @@ class DefaultSerialize(object):
         self.update_serializer(**kwargs)
         self._initialized = (self.typedef != self._default_type)
 
+    @classmethod
+    def get_testing_options(cls, as_format=False, as_array=False):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                empty (object): Object produced from deserializing an empty
+                    message.
+                objects (list): List of objects to be serialized/deserialized.
+                extra_kwargs (dict): Extra keyword arguments not used to
+                    construct type definition.
+                typedef (dict): Type definition resulting from the supplied
+                    kwargs.
+                dtype (np.dtype): Numpy data types that is consistent with the
+                    determined type definition.
+
+        """
+        if as_array:
+            as_format = True
+        if as_format:
+            out = {'kwargs': {'format_str': b'%5s\t%d\t%f\n',
+                              'field_names': [b'name', b'count', b'size'],
+                              'field_units': [b'n/a', b'umol', b'cm']},
+                   'empty': [], 'dtype': None,
+                   'extra_kwargs': {'format_str': '%5s\t%d\t%f\n'},
+                   'typedef': {'type': 'array',
+                               'items': [{'type': 'bytes',
+                                          'units': 'n/a', 'title': 'name'},
+                                         {'type': 'int', 'precision': 32,
+                                          'units': 'umol', 'title': 'count'},
+                                         {'type': 'float', 'precision': 64,
+                                          'units': 'cm', 'title': 'size'}]}}
+            field_names = [backwards.bytes2unicode(x) for
+                           x in out['kwargs']['field_names']]
+            field_units = [backwards.bytes2unicode(x) for
+                           x in out['kwargs']['field_units']]
+            rows = [(b'one', np.int32(1), 1.0),
+                    (b'two', np.int32(2), 2.0),
+                    (b'three', np.int32(3), 3.0)]
+            if as_array:
+                out['kwargs']['as_array'] = as_array
+                dtype = np.dtype(
+                    {'names': field_names,
+                     'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+                out['dtype'] = dtype
+                arr = np.array(rows, dtype=dtype)
+                lst = [units.add_units(arr[n], u) for n, u
+                       in zip(field_names, field_units)]
+                out['objects'] = [lst, lst]
+                for x in out['typedef']['items']:
+                    x['subtype'] = x['type']
+                    x['type'] = '1darray'
+                    if x['title'] == 'name':
+                        x['precision'] = 40
+            else:
+                out['objects'] = 2 * rows
+        else:
+            out = {'kwargs': {}, 'empty': b'', 'dtype': None,
+                   'typedef': {'type': 'bytes'},
+                   'extra_kwargs': {}}
+            out['objects'] = [b'Test message\n', b'Test message 2\n']
+        return out
+        
     @classmethod
     def seri_kws(cls):
         r"""Get a list of valid keyword arguments."""
@@ -524,9 +589,9 @@ class DefaultSerialize(object):
                 or metadata.get('incomplete', False)
                 or metadata.get('raw', False)):
             self.initialize_serializer(typedef, extract=True)
-            np_dtype = self.numpy_dtype
-            if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
-                out = serialize.consolidate_array(out, dtype=np_dtype)
+            # np_dtype = self.numpy_dtype
+            # if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
+            #     out = serialize.consolidate_array(out, dtype=np_dtype)
         return out, metadata
 
     # def format_header(self, header_info):

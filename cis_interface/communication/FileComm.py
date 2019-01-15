@@ -120,8 +120,10 @@ class FileComm(CommBase.CommBase):
                     the messages in 'send'.
 
         """
-        out = {'kwargs': {}, 'msg': b'Test message\n'}
-        out['send'] = [out['msg'], b'Test message 2\n']
+        out = cls._default_serializer.get_testing_options()
+        out = {'kwargs': out['kwargs'],
+               'send': out['objects'],
+               'msg': out['objects'][0]}
         out['contents'] = b''.join(out['send'])
         out['recv'] = [out['contents']]
         out['dict'] = {'f0': out['msg']}
