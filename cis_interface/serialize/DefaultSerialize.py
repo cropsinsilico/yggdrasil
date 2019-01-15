@@ -105,7 +105,16 @@ class DefaultSerialize(object):
                                          {'type': 'int', 'precision': 32,
                                           'units': 'umol', 'title': 'count'},
                                          {'type': 'float', 'precision': 64,
-                                          'units': 'cm', 'title': 'size'}]}}
+                                          'units': 'cm', 'title': 'size'}]},
+                   'contents': (b'# name\tcount\tsize\n' +
+                                b'# n/a\tumol\tcm\n' +
+                                b'# %5s\t%d\t%f\n' +
+                                b'  one\t1\t1.000000\n' +
+                                b'  two\t2\t2.000000\n' +
+                                b'three\t3\t3.000000\n' +
+                                b'  one\t1\t1.000000\n' +
+                                b'  two\t2\t2.000000\n' +
+                                b'three\t3\t3.000000\n')}
             field_names = [backwards.bytes2unicode(x) for
                            x in out['kwargs']['field_names']]
             field_units = [backwards.bytes2unicode(x) for
@@ -135,6 +144,7 @@ class DefaultSerialize(object):
                    'typedef': cls._default_type,
                    'extra_kwargs': {}}
             out['objects'] = [b'Test message\n', b'Test message 2\n']
+            out['contents'] = b''.join(out['objects'])
         return out
         
     @classmethod

@@ -37,3 +37,27 @@ class PickleSerialize(DefaultSerialize):
         """
         out = backwards.pickle.loads(msg)
         return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                empty (object): Object produced from deserializing an empty
+                    message.
+                objects (list): List of objects to be serialized/deserialized.
+                extra_kwargs (dict): Extra keyword arguments not used to
+                    construct type definition.
+                typedef (dict): Type definition resulting from the supplied
+                    kwargs.
+                dtype (np.dtype): Numpy data types that is consistent with the
+                    determined type definition.
+
+        """
+        out = super(PickleSerialize, cls).get_testing_options()
+        out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
+                           + b'\x80\x03C\x0fTest message 2\nq\x00.')
+        return out

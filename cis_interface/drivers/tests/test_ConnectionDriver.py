@@ -1,5 +1,6 @@
 import uuid
 import importlib
+import nose.tools as nt
 from cis_interface import tools
 from cis_interface.tests import MagicTestError
 from cis_interface.drivers import import_driver
@@ -323,12 +324,12 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
 
 def test_ConnectionDriverOnexit_errors():
     r"""Test that errors are raised for invalid onexit."""
-    self.assert_raises(ValueError, ConnectionDriver, 'test',
-                       onexit='invalid')
+    nt.assert_raises(ValueError, ConnectionDriver, 'test',
+                     onexit='invalid')
 
 
 def test_ConnectionDriverTranslate_errors():
     r"""Test that errors are raised for invalid translators."""
     assert(not hasattr(invalid_translate, '__call__'))
-    self.assert_raises(ValueError, ConnectionDriver, 'test',
-                       translator=invalid_translate)
+    nt.assert_raises(ValueError, ConnectionDriver, 'test',
+                     translator=invalid_translate)

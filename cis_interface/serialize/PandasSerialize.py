@@ -2,7 +2,7 @@ import pandas
 import copy
 import numpy as np
 import warnings
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, serialize
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
 
@@ -139,4 +139,42 @@ class PandasSerialize(AsciiTableSerialize):
         # for c, d in zip(out.columns, out.dtypes):
         #     if d == object:
         #         out[c] = out[c].apply(lambda s: s.strip())
+        return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                empty (object): Object produced from deserializing an empty
+                    message.
+                objects (list): List of objects to be serialized/deserialized.
+                extra_kwargs (dict): Extra keyword arguments not used to
+                    construct type definition.
+                typedef (dict): Type definition resulting from the supplied
+                    kwargs.
+                dtype (np.dtype): Numpy data types that is consistent with the
+                    determined type definition.
+
+        """
+        out = super(PandasSerialize, cls).get_testing_options(as_array=True)
+        for k in ['as_array']:
+            del out['kwargs'][k]
+        out['extra_kwargs'] = {}
+        out['empty'] = pandas.DataFrame()
+        field_names = [backwards.bytes2unicode(x) for
+                       x in out['kwargs']['field_names']]
+        out['objects'] = [serialize.list2pandas(x, names=field_names)
+                          for x in out['objects']]
+        out['contents'] = (b'name\tcount\tsize\n' +
+                           b'one\t1\t1.0\n' +
+                           b'two\t2\t2.0\n' +
+                           b'three\t3\t3.0\n' +
+                           b'one\t1\t1.0\n' +
+                           b'two\t2\t2.0\n' +
+                           b'three\t3\t3.0\n')
+        out['kwargs'].update(out['typedef'])
         return out

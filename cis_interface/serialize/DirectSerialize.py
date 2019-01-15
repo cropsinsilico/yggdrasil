@@ -63,4 +63,4 @@ class DirectSerialize(DefaultSerialize):
 
         """
         # Ensure that bytes returned
-        return super(DirectSerialize, self).get_testing_options()
+        return super(DirectSerialize, cls).get_testing_options()

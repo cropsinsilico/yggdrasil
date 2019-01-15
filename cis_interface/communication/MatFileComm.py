@@ -1,6 +1,3 @@
-import numpy as np
-import scipy
-from cis_interface import backwards
 from cis_interface.communication import FileComm
 from cis_interface.schema import register_component
 from cis_interface.serialize.MatSerialize import MatSerialize
@@ -42,8 +39,7 @@ class MatFileComm(FileComm.FileComm):
 
         """
         out = super(MatFileComm, cls).get_testing_options()
-        out['contents'] = MatSerialize().func_serialize(out['msg'])
-        out['exact_contents'] = False
+        out['exact_contents'] = False  # Contains a time stamp
         # Appending the same message only results in the same message because
         # it is updated as a dictionary
         out['recv'] = [out['msg']]

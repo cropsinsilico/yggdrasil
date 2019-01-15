@@ -37,9 +37,4 @@ class AsciiMapComm(FileComm.FileComm):
         """
         out = super(AsciiMapComm, cls).get_testing_options()
         out['recv'] = out['send']
-        out['contents'] = (b'args1\t1\n'
-                           + b'args2\t"this"\n'
-                           + b'args3\t1.0\n'
-                           + b'args4\t[1, 2]\n')
         return out
-

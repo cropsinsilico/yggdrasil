@@ -1,9 +1,6 @@
 import os
 import uuid
-import numpy as np
-import pandas as pd
 from cis_interface.tests import CisTestClassInfo, assert_equal
-from cis_interface import units
 from cis_interface.communication import new_comm, get_comm, CommBase
 
 

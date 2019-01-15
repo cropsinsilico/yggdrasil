@@ -60,15 +60,6 @@ class AsciiTableComm(AsciiFileComm):
 
         """
         out = super(AsciiFileComm, cls).get_testing_options(as_array=as_array)
-        out['contents'] = (b'# name\tcount\tsize\n' +
-                           b'# n/a\tumol\tcm\n' +
-                           b'# %5s\t%d\t%f\n' +
-                           b'  one\t1\t1.000000\n' +
-                           b'  two\t2\t2.000000\n' +
-                           b'three\t3\t3.000000\n' +
-                           b'  one\t1\t1.000000\n' +
-                           b'  two\t2\t2.000000\n' +
-                           b'three\t3\t3.000000\n')
         field_names = [backwards.bytes2unicode(x) for
                        x in out['kwargs']['field_names']]
         field_units = [backwards.bytes2unicode(x) for

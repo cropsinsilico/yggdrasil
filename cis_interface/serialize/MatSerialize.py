@@ -77,4 +77,5 @@ class MatSerialize(DefaultSerialize):
         out = super(MatSerialize, cls).get_testing_options()
         out['objects'] = [msg, msg]
         out['empty'] = dict()
+        out['contents'] = cls().func_serialize(msg)
         return out

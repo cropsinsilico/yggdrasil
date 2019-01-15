@@ -60,30 +60,6 @@ class AsciiTableSerialize(DefaultSerialize):
                  'default': backwards.bytes2unicode(serialize._default_comment)},
         use_astropy={'type': 'boolean', 'default': False})
 
-    @classmethod
-    def get_testing_options(cls, as_array=False):
-        r"""Method to return a dictionary of testing options for this class.
-
-        Returns:
-            dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                empty (object): Object produced from deserializing an empty
-                    message.
-                objects (list): List of objects to be serialized/deserialized.
-                extra_kwargs (dict): Extra keyword arguments not used to
-                    construct type definition.
-                typedef (dict): Type definition resulting from the supplied
-                    kwargs.
-                dtype (np.dtype): Numpy data types that is consistent with the
-                    determined type definition.
-
-        """
-        out = super(AsciiTableSerialize, cls).get_testing_options(
-            as_format=True, as_array=as_array)
-        out['extra_kwargs'] = {}
-        return out
-        
     def update_serializer(self, *args, **kwargs):
         # Transform scalar into array for table
         if kwargs.get('type', 'array') != 'array':
@@ -181,4 +157,28 @@ class AsciiTableSerialize(DefaultSerialize):
         field_units = self.get_field_units()
         if field_units is not None:
             out = [units.add_units(x, u) for x, u in zip(out, field_units)]
+        return out
+
+    @classmethod
+    def get_testing_options(cls, as_array=False):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                empty (object): Object produced from deserializing an empty
+                    message.
+                objects (list): List of objects to be serialized/deserialized.
+                extra_kwargs (dict): Extra keyword arguments not used to
+                    construct type definition.
+                typedef (dict): Type definition resulting from the supplied
+                    kwargs.
+                dtype (np.dtype): Numpy data types that is consistent with the
+                    determined type definition.
+
+        """
+        out = super(AsciiTableSerialize, cls).get_testing_options(
+            as_format=True, as_array=as_array)
+        out['extra_kwargs'] = {}
         return out

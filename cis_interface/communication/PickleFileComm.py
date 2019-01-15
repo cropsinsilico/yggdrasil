@@ -38,8 +38,6 @@ class PickleFileComm(FileComm.FileComm):
         """
         out = super(PickleFileComm, cls).get_testing_options()
         out['recv'] = out['send']
-        out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
-                           + b'\x80\x03C\x0fTest message 2\nq\x00.')
         return out
         
     def _recv(self, timeout=0):

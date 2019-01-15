@@ -1,7 +1,6 @@
 import os
-import numpy as np
 import nose.tools as nt
-from cis_interface import backwards, serialize
+from cis_interface import backwards
 from cis_interface.communication import AsciiTableComm
 from cis_interface.communication.tests import test_AsciiFileComm as parent
 

@@ -44,7 +44,7 @@ class TestFileInputParam(parent.TestConnectionParam):
         r"""dict: Testing options."""
         if getattr(self, '_testing_options', None) is None:
             self._testing_options = self.icomm_import_cls.get_testing_options(
-                   **self.testing_option_kws)
+                **self.testing_option_kws)
         return self._testing_options
     
     @property
@@ -124,7 +124,7 @@ for k in file_types:
     globals()[cls_exp.__name__] = cls_exp
     if k == 'AsciiTableComm':
         cls_exp2 = type('Test%sArrayInputDriver' % k,
-                       (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
         globals()[cls_exp2.__name__] = cls_exp2
         del cls_exp2
     del cls_exp

@@ -123,10 +123,12 @@ class FileComm(CommBase.CommBase):
         out = cls._default_serializer.get_testing_options(**kwargs)
         out = {'kwargs': out['kwargs'],
                'send': out['objects'],
-               'msg': out['objects'][0]}
+               'msg': out['objects'][0],
+               'contents': out['contents']}
         if isinstance(out['send'][0], bytes):
-            out['contents'] = b''.join(out['send'])
             out['recv'] = [out['contents']]
+        else:
+            out['recv'] = out['send']
         out['dict'] = {'f0': out['msg']}
         return out
 

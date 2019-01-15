@@ -1,6 +1,5 @@
-import pandas as pd
 import numpy as np
-from cis_interface import serialize, backwards
+from cis_interface import backwards
 from cis_interface.communication.tests import test_AsciiTableComm as parent
 
 

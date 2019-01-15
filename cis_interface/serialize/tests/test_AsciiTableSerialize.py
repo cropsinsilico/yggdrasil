@@ -29,17 +29,9 @@ class TestAsciiTableSerialize(parent.TestDefaultSerialize):
         self._cls = 'AsciiTableSerialize'
         self.attr_list += ['format_str', 'field_names', 'field_units', 'as_array']
 
-    # def map_sent2recv(self, obj):
-    #     r"""Convert a sent object into a received one."""
-    #     return list(obj)
-
     def test_field_specs(self):
         r"""Test field specifiers."""
         super(TestAsciiTableSerialize, self).test_field_specs()
-        # nt.assert_equal(self.instance.is_user_defined, False)
-        # nt.assert_equal(self.instance.numpy_dtype, None)
-        # nt.assert_equal(self.instance.typedef, self.file_schema_scalar)
-        # nt.assert_equal(self.instance.extra_kwargs, {})
         # Specific to this class
         self.assert_equal(self.instance.format_str,
                           self.testing_options['kwargs']['format_str'])
@@ -74,44 +66,9 @@ class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
                'dtype': None,
                'is_user_defined': False}
         return out
-    
-    # def map_sent2recv(self, obj):
-    #     r"""Convert a sent object into a received one."""
-    #     return list(obj)
-
-    # def test_field_specs(self):
-    #     r"""Test field specifiers."""
-    #     # nt.assert_equal(self.instance.is_user_defined, False)
-    #     # nt.assert_equal(self.instance.numpy_dtype, None)
-    #     # nt.assert_equal(self.instance.typedef,
-    #     #                 {'type': 'array',
-    #     #                  'items': [{'type': 'int', 'precision': 32}]})
-    #     # nt.assert_equal(self.instance.extra_kwargs, {})
-    #     # Specific to this class
-    #     nt.assert_equal(self.instance.format_str, self._inst_kwargs['format_str'])
-    #     nt.assert_equal(self.instance.field_names, None)
-    #     nt.assert_equal(self.instance.field_units, None)
 
 
 class TestAsciiTableSerialize_asarray(TestAsciiTableSerialize):
     r"""Test class for AsciiTableSerialize class with as_array."""
 
     testing_option_kws = {'as_array': True}
-    
-    # def __init__(self, *args, **kwargs):
-    #     super(TestAsciiTableSerialize_asarray, self).__init__(*args, **kwargs)
-    #     self._inst_kwargs['as_array'] = True
-    #     self._objects = [self.file_array]
-
-    # def test_field_specs(self):
-    #     r"""Test field specifiers."""
-    #     nt.assert_equal(self.instance.is_user_defined, False)
-    #     nt.assert_equal(self.instance.numpy_dtype, self.file_dtype)
-    #     nt.assert_equal(self.instance.typedef, self.file_schema_array)
-    #     nt.assert_equal(self.instance.extra_kwargs, {})
-    #     # Specific to this class
-    #     nt.assert_equal(self.instance.format_str, self.fmt_str)
-    #     nt.assert_equal(self.instance.field_names,
-    #                     [backwards.bytes2unicode(x) for x in self.field_names])
-    #     nt.assert_equal(self.instance.field_units,
-    #                     [backwards.bytes2unicode(x) for x in self.field_units])

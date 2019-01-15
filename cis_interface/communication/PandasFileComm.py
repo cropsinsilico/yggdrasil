@@ -66,6 +66,30 @@ class PandasFileComm(AsciiTableComm):
         super(PandasFileComm, self)._init_before_open(**kwargs)
         self.read_meth = 'read'
 
+    @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        # out = super(PandasFileComm, cls).get_testing_options()
+        # Jump out to AsciiTableComm to avoid pandas data frames
+        out = AsciiTableComm.get_testing_options(as_array=True)
+        for k in ['format_str', 'as_array']:
+            del out['kwargs'][k]
+        out['extra_kwargs'] = {}
+        out['contents'] = super(PandasFileComm, cls).get_testing_options()['contents']
+        return out
+        
     @property
     def header_was_written(self):
         r"""bool: True if head has been written to the current file."""
@@ -83,33 +107,6 @@ class PandasFileComm(AsciiTableComm):
             raise Exception("header_was_written set before serializer created")
         self._header_was_written = header_was_written
 
-    @classmethod
-    def get_testing_options(cls):
-        r"""Method to return a dictionary of testing options for this class.
-
-        Returns:
-            dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                send (list): List of objects to send to test file.
-                recv (list): List of objects that will be received from a test
-                    file that was sent the messages in 'send'.
-                contents (bytes): Bytes contents of test file created by sending
-                    the messages in 'send'.
-
-        """
-        out = super(PandasFileComm, cls).get_testing_options(as_array=True)
-        for k in ['format_str', 'as_array']:
-            del out['kwargs'][k]
-        out['contents'] = (b'name\tcount\tsize\n' +
-                           b'one\t1\t1.0\n' +
-                           b'two\t2\t2.0\n' +
-                           b'three\t3\t3.0\n' +
-                           b'one\t1\t1.0\n' +
-                           b'two\t2\t2.0\n' +
-                           b'three\t3\t3.0\n')
-        return out
-        
     def read_header(self):
         r"""Read header lines from the file and update serializer info."""
         return

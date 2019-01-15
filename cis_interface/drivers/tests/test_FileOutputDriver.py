@@ -41,7 +41,7 @@ class TestFileOutputParam(parent.TestConnectionParam):
         r"""dict: Testing options."""
         if getattr(self, '_testing_options', None) is None:
             self._testing_options = self.ocomm_import_cls.get_testing_options(
-                   **self.testing_option_kws)
+                **self.testing_option_kws)
         return self._testing_options
     
     def teardown(self):
@@ -142,11 +142,11 @@ s = get_schema()
 file_types = list(s['file'].schema_subtypes.keys())
 for k in file_types:
     cls_exp = type('Test%sOutputDriver' % k,
-                              (TestFileOutputDriver, ), {'ocomm_name': k})
+                   (TestFileOutputDriver, ), {'ocomm_name': k})
     globals()[cls_exp.__name__] = cls_exp
     if k == 'AsciiTableComm':
         cls_exp2 = type('Test%sArrayOutputDriver' % k,
-                       (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
         globals()[cls_exp2.__name__] = cls_exp2
         del cls_exp2
     del cls_exp
