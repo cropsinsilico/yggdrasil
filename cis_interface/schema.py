@@ -645,10 +645,24 @@ def cdriver2filetype(driver):
         str: The corresponding file type for the driver.
 
     """
-    # _legacy = {'AsciiMapInputDriver': 'AsciiMapComm',
-    #            'AsciiMapOutputDriver': 'AsciiMapComm'}
-    # if driver in _legacy:
-    #     return _legacy[driver]
+    _legacy = {'AsciiMapInputDriver': 'AsciiMapComm',
+               'AsciiMapOutputDriver': 'AsciiMapComm',
+               'AsciiFileInputDriver': 'AsciiFileComm',
+               'AsciiFileOutputDriver': 'AsciiFileComm',
+               'AsciiTableInputDriver': 'AsciiTableComm',
+               'AsciiTableOutputDriver': 'AsciiTableComm',
+               'PandasFileInputDriver': 'PandasFileComm',
+               'PandasFileOutputDriver': 'PandasFileComm',
+               'PickleFileInputDriver': 'PickleFileComm',
+               'PickleFileOutputDriver': 'PickleFileComm',
+               'PlyFileInputDriver': 'PlyFileComm',
+               'PlyFileOutputDriver': 'PlyFileComm',
+               'ObjFileInputDriver': 'ObjFileComm',
+               'ObjFileOutputDriver': 'ObjFileComm',
+               'MatInputDriver': 'MatFileComm',
+               'MatOutputDriver': 'MatFileComm'}
+    if driver in _legacy:
+        return _legacy[driver]
     schema = get_schema()
     conntypes = schema['connection'].class2subtype
     filetypes = schema['file'].class2subtype
@@ -779,10 +793,10 @@ def _normalize_modelio_elements(normalizer, value, instance, schema):
                 extra_keys = {}
                 migrate_keys(instance, [extra_keys], comm_keys + type_keys)
                 iodict['%s_extra' % io][instance['name']] = extra_keys
-                type_dict = {}
-                migrate_keys(instance, [type_dict], comm_keys)
-                instance.setdefault('datatype', {})
-                instance['datatype'].update(type_dict)
+                # type_dict = {}
+                # migrate_keys(instance, [type_dict], comm_keys)
+                # instance.setdefault('datatype', {})
+                # instance['datatype'].update(type_dict)
         # Add driver to list
         if ('driver' in instance) and ('args' in instance):
             opp_map = {'inputs': 'output', 'outputs': 'input'}

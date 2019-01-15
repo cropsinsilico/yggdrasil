@@ -17,9 +17,9 @@ definitions:
           default: default
           enum:
           - ipc
-          - default
-          - zmq
           - rmq
+          - zmq
+          - default
           type: string
         datatype:
           default:
@@ -81,23 +81,16 @@ definitions:
           type: string
         direction:
           enum:
-          - input
           - output
+          - input
           - null
         driver:
           type: string
         icomm_type:
           enum:
-          - AsciiFileComm
-          - DefaultComm
-          - ObjFileComm
-          - AsciiTableComm
-          - PickleFileComm
-          - AsciiMapComm
-          - FileComm
           - RMQComm
-          - PandasFileComm
-          - PlyFileComm
+          - FileComm
+          - DefaultComm
         inputs:
           items:
             anyOf:
@@ -107,16 +100,9 @@ definitions:
           type: array
         ocomm_type:
           enum:
-          - AsciiFileComm
-          - DefaultComm
-          - PickleFileComm
-          - AsciiTableComm
-          - ObjFileComm
-          - AsciiMapComm
-          - FileComm
           - RMQComm
-          - PandasFileComm
-          - PlyFileComm
+          - FileComm
+          - DefaultComm
         onexit:
           type: string
         outputs:
@@ -166,116 +152,6 @@ definitions:
             - DefaultComm
           ocomm_type:
             enum:
-            - PandasFileComm
-        title: PandasFileOutputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - AsciiMapComm
-        title: AsciiMapOutputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - FileComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: FileInputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - ObjFileComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: ObjFileInputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - PickleFileComm
-        title: PickleFileOutputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - AsciiMapComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: AsciiMapInputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - AsciiFileComm
-        title: AsciiFileOutputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - AsciiTableComm
-        title: AsciiTableOutputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - AsciiFileComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: AsciiFileInputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - AsciiTableComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: AsciiTableInputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
             - DefaultComm
         title: OutputDriver
       - properties:
@@ -289,17 +165,6 @@ definitions:
             enum:
             - RMQComm
         title: RMQOutputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - PlyFileComm
-        title: PlyFileOutputDriver
       - properties:
           direction:
             enum:
@@ -328,44 +193,11 @@ definitions:
             - input
           icomm_type:
             enum:
-            - PlyFileComm
+            - FileComm
           ocomm_type:
             enum:
             - DefaultComm
-        title: PlyFileInputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - ObjFileComm
-        title: ObjFileOutputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - PickleFileComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: PickleFileInputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - PandasFileComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: PandasFileInputDriver
+        title: FileInputDriver
     description: Schema for connection components.
     title: connection
   file:
@@ -403,15 +235,15 @@ definitions:
         filetype:
           default: binary
           enum:
-          - binary
+          - map
           - pandas
           - mat
-          - pickle
+          - binary
           - table
-          - map
           - ascii
-          - obj
+          - pickle
           - ply
+          - obj
           type: string
         format_str: &id002
           type: string
@@ -542,15 +374,15 @@ definitions:
           type: boolean
         language:
           enum:
-          - c++
-          - matlab
-          - python
-          - c
-          - cmake
-          - lpy
-          - make
-          - executable
           - cpp
+          - make
+          - c++
+          - cmake
+          - python
+          - lpy
+          - c
+          - matlab
+          - executable
           type: string
         make_command: &id005
           default: make

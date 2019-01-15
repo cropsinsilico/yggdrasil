@@ -31,11 +31,11 @@ _normalize_objects = [
                   'with_strace': False, 'with_valgrind': False}],
       'connections': [{'inputs': [{'name': 'outputA',
                                    'as_array': False,
-                                   'commtype': 'default',
-                                   'datatype': {'type': 'bytes'}}],
+                                   'datatype': {'type': 'bytes'},
+                                   'commtype': 'default'}],
                        'outputs': [{'name': 'fileA.txt',
                                     'filetype': 'binary',
-                                    'datatype': {'type': 'bytes'},
+                                    # 'datatype': {'type': 'bytes'},
                                     'comment': '# ',
                                     'working_dir': os.getcwd(),
                                     'field_names': ['a', 'b'],
@@ -121,6 +121,9 @@ def test_normalize():
     s = schema.get_schema()
     for x, y in _normalize_objects:
         a = s.normalize(x, backwards_compat=True)
-        pprint.pprint(y)
-        pprint.pprint(a)
-        nt.assert_equal(a, y)
+        try:
+            nt.assert_equal(a, y)
+        except BaseException:  # pragma: debug
+            pprint.pprint(a)
+            pprint.pprint(y)
+            raise
