@@ -401,7 +401,7 @@ class MetaschemaType(object):
         if typedef is not None:
             try:
                 cls.validate_definition(typedef)
-            except jsonschema.exceptions.ValidationError as e:
+            except jsonschema.exceptions.ValidationError:
                 return False
             errors = [e for e in compare_schema(metadata, typedef)]
             if errors:

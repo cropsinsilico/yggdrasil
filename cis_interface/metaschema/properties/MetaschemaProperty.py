@@ -115,7 +115,9 @@ class MetaschemaProperty(object):
 
         """
         if cls._compare is not None:
-            return cls._compare(cls, prop1, prop2)
+            errors = cls._compare(cls, prop1, prop2)
+            for e in errors:
+                yield e
         if (prop1 != prop2):
             yield '%s is not equal to %s' % (prop1, prop2)
 

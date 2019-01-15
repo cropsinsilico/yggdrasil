@@ -122,9 +122,9 @@ class ConnectionDriver(Driver):
         # self.debug('    env: %s', str(self.env))
         self.debug('\n' + 80 * '=' + '\n',
                    'class = %s\n',
-                   '    input: name = %s, address = %s\n' +
-                   '    output: name = %s, address = %s\n' +
-                   80 * '=', self.__class__,
+                   '    input: name = %s, address = %s\n'
+                   + '    output: name = %s, address = %s\n'
+                   + (80 * '='), self.__class__,
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 
@@ -511,9 +511,9 @@ class ConnectionDriver(Driver):
         sinfo = self.icomm.serializer.typedef
         sinfo.update(self.icomm.serializer.serializer_info)
         sinfo.pop('seritype', None)
-        self.debug('Before update:\n' +
-                   '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n' +
-                   '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
+        self.debug('Before update:\n'
+                   + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
+                   + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
                    self.pprint(self.icomm.serializer.serializer_info, 2),
                    self.pprint(self.icomm.serializer.typedef, 2),
                    self.pprint(self.ocomm.serializer.serializer_info, 2),
@@ -549,9 +549,9 @@ class ConnectionDriver(Driver):
         #     self.ocomm.serializer.update_serializer(**sinfo)
         # else:
         #     self.ocomm.serializer.initialize_serializer(sinfo)
-        self.debug('After update:\n' +
-                   '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n' +
-                   '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
+        self.debug('After update:\n'
+                   + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
+                   + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
                    self.pprint(self.icomm.serializer.serializer_info, 2),
                    self.pprint(self.icomm.serializer.typedef, 2),
                    self.pprint(self.ocomm.serializer.serializer_info, 2),

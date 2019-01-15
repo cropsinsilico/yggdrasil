@@ -169,12 +169,12 @@ class PandasSerialize(AsciiTableSerialize):
                        x in out['kwargs']['field_names']]
         out['objects'] = [serialize.list2pandas(x, names=field_names)
                           for x in out['objects']]
-        out['contents'] = (b'name\tcount\tsize\n' +
-                           b'one\t1\t1.0\n' +
-                           b'two\t2\t2.0\n' +
-                           b'three\t3\t3.0\n' +
-                           b'one\t1\t1.0\n' +
-                           b'two\t2\t2.0\n' +
-                           b'three\t3\t3.0\n')
+        out['contents'] = (b'name\tcount\tsize\n'
+                           + b'one\t1\t1.0\n'
+                           + b'two\t2\t2.0\n'
+                           + b'three\t3\t3.0\n'
+                           + b'one\t1\t1.0\n'
+                           + b'two\t2\t2.0\n'
+                           + b'three\t3\t3.0\n')
         out['kwargs'].update(out['typedef'])
         return out
