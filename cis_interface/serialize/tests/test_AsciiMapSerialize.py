@@ -9,8 +9,6 @@ class TestAsciiMapSerialize(parent.TestDefaultSerialize):
     def __init__(self, *args, **kwargs):
         super(TestAsciiMapSerialize, self).__init__(*args, **kwargs)
         self._cls = 'AsciiMapSerialize'
-        self._objects = [self.map_dict]
-        self._empty_obj = dict()
 
     def test_error_delim(self):
         r"""Test error for message with too many delimiters on a line."""

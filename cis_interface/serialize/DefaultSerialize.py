@@ -132,7 +132,7 @@ class DefaultSerialize(object):
                 out['objects'] = 2 * rows
         else:
             out = {'kwargs': {}, 'empty': b'', 'dtype': None,
-                   'typedef': {'type': 'bytes'},
+                   'typedef': cls._default_type,
                    'extra_kwargs': {}}
             out['objects'] = [b'Test message\n', b'Test message 2\n']
         return out
