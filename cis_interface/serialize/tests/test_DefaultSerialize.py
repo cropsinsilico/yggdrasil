@@ -88,7 +88,7 @@ class TestDefaultSerialize(CisTestClassInfo):
                                add_serializer_info=True)
         else:
             hout = copy.deepcopy(self._header_info)
-            hout.update(**self.instance.serializer_info)
+            hout.update(self.instance.serializer_info)
             temp_seri = serialize.get_serializer(
                 seritype=self.instance.serializer_info['seritype'])
             for iobj in self.testing_options['objects']:

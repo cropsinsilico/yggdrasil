@@ -33,7 +33,7 @@ class AsciiFileComm(FileComm):
         super(AsciiFileComm, self)._init_before_open(**kwargs)
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -47,10 +47,10 @@ class AsciiFileComm(FileComm):
                     the messages in 'send'.
 
         """
+        out = super(AsciiFileComm, cls).get_testing_options(**kwargs)
         comment = backwards.unicode2bytes(
             cls._schema_properties['comment']['default'] + 'Comment\n')
-        out = {'kwargs':{}, 'msg': b'Test message\n'}
-        out['send'] = [out['msg'], b'Test message 2\n', comment]
+        out['send'].append(comment)
         out['contents'] = b''.join(out['send'])
         out['recv'] = out['send'][:-1]
         out['dict'] = {'f0': out['msg']}

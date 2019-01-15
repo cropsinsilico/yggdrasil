@@ -59,42 +59,28 @@ class AsciiTableComm(AsciiFileComm):
                     the messages in 'send'.
 
         """
-        out = {'kwargs': {'format_str': b'%5s\t%d\t%f\n',
-                          'field_names': [b'name', b'count', b'size'],
-                          'field_units': [b'n/a', b'umol', b'cm']},
-               'contents': (b'# name\tcount\tsize\n' +
-                            b'# n/a\tumol\tcm\n' +
-                            b'# %5s\t%d\t%f\n' +
-                            b'  one\t1\t1.000000\n' +
-                            b'  two\t2\t2.000000\n' +
-                            b'three\t3\t3.000000\n' +
-                            b'  one\t1\t1.000000\n' +
-                            b'  two\t2\t2.000000\n' +
-                            b'three\t3\t3.000000\n')}
+        out = super(AsciiFileComm, cls).get_testing_options(as_array=as_array)
+        out['contents'] = (b'# name\tcount\tsize\n' +
+                           b'# n/a\tumol\tcm\n' +
+                           b'# %5s\t%d\t%f\n' +
+                           b'  one\t1\t1.000000\n' +
+                           b'  two\t2\t2.000000\n' +
+                           b'three\t3\t3.000000\n' +
+                           b'  one\t1\t1.000000\n' +
+                           b'  two\t2\t2.000000\n' +
+                           b'three\t3\t3.000000\n')
         field_names = [backwards.bytes2unicode(x) for
                        x in out['kwargs']['field_names']]
         field_units = [backwards.bytes2unicode(x) for
                        x in out['kwargs']['field_units']]
-        rows = [(b'one', np.int32(1), 1.0),
-                (b'two', np.int32(2), 2.0),
-                (b'three', np.int32(3), 3.0)]
         if as_array:
-            out['kwargs']['as_array'] = as_array
-            dtype = np.dtype(
-                {'names': field_names,
-                 'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
-            arr = np.array(rows, dtype=dtype)
-            lst = [units.add_units(arr[n], u) for n, u
-                   in zip(field_names, field_units)]
-            out['send'] = [lst, lst]
-            out['recv'] = [[units.add_units(np.hstack([arr, arr])[n], u) for
-                            n, u in zip(field_names, field_units)]]
+            lst = out['send'][0]
+            out['recv'] = [[units.add_units(np.hstack([x[i] for x in out['send']]), u)
+                            for i, (n, u) in enumerate(zip(field_names, field_units))]]
             out['dict'] = {k: l for k, l in zip(field_names, lst)}
         else:
-            out['send'] = 2 * rows
             out['recv'] = out['send']
-            out['dict'] = {k: v for k, v in zip(field_names, rows[0])}
-        out['msg'] = out['send'][0]
+            out['dict'] = {k: v for k, v in zip(field_names, out['send'][0])}
         return out
     
     def read_header(self):

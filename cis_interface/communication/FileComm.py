@@ -106,7 +106,7 @@ class FileComm(CommBase.CommBase):
                 setattr(self, k, func_conv(v))
 
     @classmethod
-    def get_testing_options(cls):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -120,12 +120,13 @@ class FileComm(CommBase.CommBase):
                     the messages in 'send'.
 
         """
-        out = cls._default_serializer.get_testing_options()
+        out = cls._default_serializer.get_testing_options(**kwargs)
         out = {'kwargs': out['kwargs'],
                'send': out['objects'],
                'msg': out['objects'][0]}
-        out['contents'] = b''.join(out['send'])
-        out['recv'] = [out['contents']]
+        if isinstance(out['send'][0], bytes):
+            out['contents'] = b''.join(out['send'])
+            out['recv'] = [out['contents']]
         out['dict'] = {'f0': out['msg']}
         return out
 
