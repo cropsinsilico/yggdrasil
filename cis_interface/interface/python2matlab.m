@@ -1,6 +1,8 @@
 function x_ml = python2matlab(x_py)
   [version, executable, isloaded] = pyversion;
-  if isa(x_py, 'py.float')
+  if isa(x_py, 'py.None')
+    x_ml = NaN;
+  elseif isa(x_py, 'py.float')
     x_ml = float(x_py);
   elseif isa(x_py, 'py.double')
     x_ml = double(x_py);

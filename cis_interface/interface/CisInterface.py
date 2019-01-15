@@ -428,11 +428,13 @@ def CisPandasInput(name, src_type=1, matlab=False, **kwargs):
         base = PandasFileComm.PandasFileComm
         kwargs.setdefault('address', name)
         if matlab:  # pragma: matlab
-            kwargs['recv_converter'] = serialize.pandas2numpy
+            kwargs['recv_converter'] = serialize.list2numpy
     else:
         base = DefaultComm
-        if not matlab:
-            kwargs['recv_converter'] = serialize.numpy2pandas
+        if matlab:  # pragma: matlab
+            kwargs['recv_converter'] = serialize.list2numpy
+        else:
+            kwargs['recv_converter'] = serialize.list2pandas
     kwargs.setdefault('direction', 'recv')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
@@ -465,7 +467,7 @@ def CisPandasOutput(name, dst_type=1, matlab=False, **kwargs):
         if matlab:  # pragma: matlab
             kwargs['send_converter'] = serialize.consolidate_array
         else:
-            kwargs['send_converter'] = serialize.pandas2numpy
+            kwargs['send_converter'] = serialize.pandas2list
     kwargs.setdefault('direction', 'send')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
