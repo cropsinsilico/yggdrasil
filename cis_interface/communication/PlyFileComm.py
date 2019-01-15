@@ -43,7 +43,7 @@ class PlyFileComm(FileComm):
         obj = out['send'][0]
         for x in out['send'][1:]:
             obj = obj.merge(x)
-        out['recv'] = obj
+        out['recv'] = [obj]
         return out
     
     def _send(self, msg):
