@@ -9,3 +9,5 @@
 * Support user defined data types via JSON schema.
 * Changes to the internal structure of Ply and Obj data structures.
 * Tables are no longer automatically consolidated into structure numpy arrays in Python/Matlab on recv. Instead, use 'recv_array' to do so.
+* Removed generic RPComm. Instead use the ServerComm or ClientComm
+* Removed deprecated functions beginning with "Psi"

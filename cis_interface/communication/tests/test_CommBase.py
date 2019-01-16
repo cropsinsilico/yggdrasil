@@ -413,7 +413,8 @@ class TestCommBase(CisTestClassInfo):
         
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""
-        self.do_send_recv('send_array', 'recv_array')
+        msg_send = getattr(self, 'test_msg_array', None)
+        self.do_send_recv('send_array', 'recv_array', msg_send=msg_send)
 
     def test_eof(self):
         r"""Test send/recv of EOF message."""

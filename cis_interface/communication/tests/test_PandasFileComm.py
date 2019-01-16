@@ -1,5 +1,4 @@
 import numpy as np
-from cis_interface import backwards
 from cis_interface.communication.tests import test_AsciiTableComm as parent
 
 
@@ -12,14 +11,7 @@ class TestPandasFileComm(parent.TestAsciiTableComm):
 class TestPandasFileComm_nonames(TestPandasFileComm):
     r"""Test for PandasFileComm communication class without field names sent."""
 
-    def get_testing_options(self):
-        r"""Get testing options."""
-        out = super(TestPandasFileComm_nonames, self).get_testing_options()
-        for i, k in enumerate(out['kwargs']['field_names']):
-            out['contents'] = out['contents'].replace(
-                k, backwards.unicode2bytes('f%d' % i))
-        del out['kwargs']['field_names']
-        return out
+    testing_option_kws = {'no_names': True}
 
 
 class TestPandasFileComm_single(TestPandasFileComm):
@@ -28,10 +20,13 @@ class TestPandasFileComm_single(TestPandasFileComm):
     def get_testing_options(self):
         r"""Get testing options."""
         nele = 5
+        dtype = np.dtype(dict(formats=['float'], names=['f0']))
+        arr = np.zeros((nele, ), dtype)
         out = {'kwargs': {},
                'contents': (b'f0\n' + 2 * nele * b'0.0\n'),
-               'send': [[np.zeros((nele, ))], [np.zeros((nele, ))]],
-               'recv': [[np.zeros((2 * nele, ))]],
-               'dict': {'f0': np.zeros((nele, ))}}
+               'send': [[arr['f0']], [arr['f0']]],
+               'recv': [[np.hstack([arr, arr])['f0']]],
+               'dict': {'f0': arr['f0']}}
         out['msg'] = out['send'][0]
+        out['msg_array'] = arr
         return out

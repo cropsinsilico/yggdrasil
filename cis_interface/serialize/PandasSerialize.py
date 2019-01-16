@@ -152,8 +152,12 @@ class PandasSerialize(AsciiTableSerialize):
         return out
 
     @classmethod
-    def get_testing_options(cls, **kwargs):
+    def get_testing_options(cls, no_names=False, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            no_names (bool, optional): If True, an example is returned where the
+                names are not provided to the deserializer. Defaults to False.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -175,16 +179,28 @@ class PandasSerialize(AsciiTableSerialize):
             del out['kwargs'][k]
         out['extra_kwargs'] = {}
         out['empty'] = pandas.DataFrame()
-        field_names = [backwards.bytes2unicode(x) for
-                       x in out['kwargs']['field_names']]
-        out['objects'] = [serialize.list2pandas(x, names=field_names)
-                          for x in out['objects']]
-        out['contents'] = (b'name\tcount\tsize\n'
-                           + b'one\t1\t1.0\n'
-                           + b'two\t2\t2.0\n'
-                           + b'three\t3\t3.0\n'
-                           + b'one\t1\t1.0\n'
-                           + b'two\t2\t2.0\n'
-                           + b'three\t3\t3.0\n')
+        if no_names:
+            del out['kwargs']['field_names']
+            out['objects'] = [serialize.list2pandas(x)
+                              for x in out['objects']]
+            out['contents'] = (b'f0\tf1\tf2\n'
+                               + b'one\t1\t1.0\n'
+                               + b'two\t2\t2.0\n'
+                               + b'three\t3\t3.0\n'
+                               + b'one\t1\t1.0\n'
+                               + b'two\t2\t2.0\n'
+                               + b'three\t3\t3.0\n')
+        else:
+            field_names = [backwards.bytes2unicode(x) for
+                           x in out['kwargs']['field_names']]
+            out['objects'] = [serialize.list2pandas(x, names=field_names)
+                              for x in out['objects']]
+            out['contents'] = (b'name\tcount\tsize\n'
+                               + b'one\t1\t1.0\n'
+                               + b'two\t2\t2.0\n'
+                               + b'three\t3\t3.0\n'
+                               + b'one\t1\t1.0\n'
+                               + b'two\t2\t2.0\n'
+                               + b'three\t3\t3.0\n')
         out['kwargs'].update(out['typedef'])
         return out

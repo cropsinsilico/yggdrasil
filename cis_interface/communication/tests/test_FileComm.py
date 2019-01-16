@@ -9,6 +9,7 @@ class TestFileComm(parent.TestCommBase):
     r"""Test for FileComm communication class."""
 
     comm = 'FileComm'
+    testing_option_kws = {}
     
     def __init__(self, *args, **kwargs):
         super(TestFileComm, self).__init__(*args, **kwargs)
@@ -32,7 +33,7 @@ class TestFileComm(parent.TestCommBase):
 
     def get_testing_options(self):
         r"""Get testing options."""
-        return self.import_cls.get_testing_options()
+        return self.import_cls.get_testing_options(**self.testing_option_kws)
 
     @property
     def testing_options(self):
@@ -46,6 +47,11 @@ class TestFileComm(parent.TestCommBase):
         r"""str: Test message that should be used for any send/recv tests."""
         return self.testing_options['msg']
 
+    @property
+    def test_msg_array(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return self.testing_options.get('msg_array', None)
+    
     @unittest.skipIf(True, 'File comm')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test send/recv of a large message."""

@@ -68,8 +68,14 @@ class PandasFileComm(AsciiTableComm):
         self.read_meth = 'read'
 
     @classmethod
-    def get_testing_options(cls, as_frames=False):
+    def get_testing_options(cls, as_frames=False, no_names=False):
         r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            as_frames (bool, optional): If True, the test objects will be Pandas
+                data frames. Defaults to False.
+            no_names (bool, optional): If True, an example is returned where the
+                names are not provided to the deserializer. Defaults to False.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -82,15 +88,17 @@ class PandasFileComm(AsciiTableComm):
                     the messages in 'send'.
 
         """
-        out = super(PandasFileComm, cls).get_testing_options()
-        if as_frames:
-            out['recv'] = [pd.concat(out['recv'], ignore_index=True)]
-        else:
-            seri_out = out
-            # Jump out to AsciiTableComm to avoid pandas data frames
-            out = AsciiTableComm.get_testing_options(as_array=True)
-            out['extra_kwargs'] = {}
-            out['contents'] = seri_out['contents']
+        out_seri = PandasSerialize.get_testing_options(no_names=no_names)
+        out = {'kwargs': out_seri['kwargs'],
+               'send': out_seri['objects'],
+               'recv': [pd.concat(out_seri['objects'], ignore_index=True)],
+               'dict': serialize.pandas2dict(out_seri['objects'][0]),
+               'contents': out_seri['contents'],
+               'msg_array': serialize.pandas2numpy(out_seri['objects'][0])}
+        if not as_frames:
+            out['recv'] = [serialize.pandas2list(x) for x in out['recv']]
+            out['send'] = [serialize.pandas2list(x) for x in out['send']]
+        out['msg'] = out['send'][0]
         for k in ['format_str', 'as_array']:
             if k in out['kwargs']:
                 del out['kwargs'][k]

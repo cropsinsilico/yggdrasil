@@ -1,4 +1,5 @@
 import os
+import unittest
 import nose.tools as nt
 from cis_interface import backwards
 from cis_interface.communication import AsciiTableComm
@@ -34,11 +35,7 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
 
     comm = 'AsciiTableComm'
     
-    def __init__(self, *args, **kwargs):
-        super(TestAsciiTableComm, self).__init__(*args, **kwargs)
-        self.field_names = [backwards.bytes2unicode(x) for
-                            x in self.send_inst_kwargs.get('field_names', [])]
-
+    @unittest.skipIf(True, 'Table comm')
     def test_send_recv_comment(self):
         r"""Disabled: Test send/recv with commented message."""
         pass
@@ -47,8 +44,4 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""
 
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        out = self.import_cls.get_testing_options(as_array=True)
-        return out
+    testing_option_kws = {'as_array': True}

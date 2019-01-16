@@ -621,8 +621,8 @@ class DefaultSerialize(object):
         if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
             out = consolidate_array(out, dtype=np_dtype)
         else:
-            raise ValueError(("Cannot consolidate message into a structured "
-                              + "numpy array: %s") % str(out))
+            warnings.warn(("Cannot consolidate message into a structured "
+                           + "numpy array: %s") % str(out))
         return out
 
     # def format_header(self, header_info):

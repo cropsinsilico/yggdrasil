@@ -45,7 +45,7 @@ class AsciiTableComm(AsciiFileComm):
             self.header_was_written = True
         
     @classmethod
-    def get_testing_options(cls, as_array=False):
+    def get_testing_options(cls, as_array=False, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -59,7 +59,8 @@ class AsciiTableComm(AsciiFileComm):
                     the messages in 'send'.
 
         """
-        out = super(AsciiFileComm, cls).get_testing_options(as_array=as_array)
+        out = super(AsciiFileComm, cls).get_testing_options(as_array=as_array,
+                                                            **kwargs)
         field_names = [backwards.bytes2unicode(x) for
                        x in out['kwargs']['field_names']]
         field_units = [backwards.bytes2unicode(x) for
@@ -69,6 +70,7 @@ class AsciiTableComm(AsciiFileComm):
             out['recv'] = [[units.add_units(np.hstack([x[i] for x in out['send']]), u)
                             for i, (n, u) in enumerate(zip(field_names, field_units))]]
             out['dict'] = {k: l for k, l in zip(field_names, lst)}
+            out['msg_array'] = serialize.list2numpy(lst, names=field_names)
         else:
             out['recv'] = out['send']
             out['dict'] = {k: v for k, v in zip(field_names, out['send'][0])}
