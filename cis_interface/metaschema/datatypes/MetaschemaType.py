@@ -249,7 +249,6 @@ class MetaschemaType(object):
         for k in keylist:
             if k not in reqkeys:
                 del out[k]
-        cls.validate_definition(out)
         return out
 
     def update_typedef(self, **kwargs):
@@ -334,7 +333,7 @@ class MetaschemaType(object):
             type_cls = get_type_class(obj['type'])
             if type_cls.is_fixed and type_cls.issubtype(cls.name):
                 obj = type_cls.typedef_fixed2base(obj)
-        jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
+        # jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
         jsonschema.validate(obj, cls.metadata_schema(), cls=cls.validator())
 
     @classmethod
@@ -345,7 +344,7 @@ class MetaschemaType(object):
             obj (object): Type definition to validate.
 
         """
-        jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
+        # jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
         jsonschema.validate(obj, cls.definition_schema(), cls=cls.validator())
 
     @classmethod
@@ -357,7 +356,7 @@ class MetaschemaType(object):
             typedef (dict): Type definition to validate against.
 
         """
-        cls.validate_definition(typedef)
+        # cls.validate_definition(typedef)
         jsonschema.validate(obj, typedef, cls=cls.validator())
 
     @classmethod
@@ -466,8 +465,8 @@ class MetaschemaType(object):
         obj_t = cls.transform_type(obj, typedef)
         metadata = cls.encode_type(obj_t, typedef=typedef)
         data = cls.encode_data(obj_t, metadata)
-        if not cls.check_encoded(metadata, typedef):
-            raise ValueError("Object was not encoded correctly.")
+        # if not cls.check_encoded(metadata, typedef):
+        #     raise ValueError("Object was not encoded correctly.")
         # Add extra keyword arguments to metadata, ensuring type not overwritten
         for k, v in kwargs.items():
             if (k in metadata) and (v != metadata[k]):
@@ -520,8 +519,8 @@ class MetaschemaType(object):
             out = conv_func(new_cls.decode(metadata, data))
         else:
             out = cls.decode_data(data, metadata)
-        if not cls.check_decoded(out, typedef):
-            raise ValueError("Object was not decoded correctly.")
+        # if not cls.check_decoded(out, typedef):
+        #     raise ValueError("Object was not decoded correctly.")
         out = cls.transform_type(out, typedef)
         return out
 

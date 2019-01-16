@@ -69,8 +69,10 @@ class DefaultSerialize(object):
             setattr(self, k, v.get('default', None))
         # Update typedef
         self._initialized = False
-        self.datatype = get_type_from_def(self._default_type)
-        self.str_datatype = get_type_from_def({'type': 'bytes'})
+        self.datatype = get_type_from_def(self._default_type,
+                                          dont_complete=True)
+        self.str_datatype = get_type_from_def({'type': 'bytes'},
+                                              dont_complete=True)
         self.update_serializer(**kwargs)
         self._initialized = (self.typedef != self._default_type)
 

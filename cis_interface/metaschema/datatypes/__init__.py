@@ -198,19 +198,23 @@ def get_type_class(type_name):
     return _type_registry[type_name]
 
 
-def get_type_from_def(typedef):
+def get_type_from_def(typedef, dont_complete=False):
     r"""Return the type instance based on the provided type definition.
 
     Args:
         typedef (obj): This can be the name of a type, a dictionary containing a
             type definition (the 'typename' keyword must be specified), or a
             complex type (a list or dictionary containing types).
+        dont_complete (bool, optional): If True, the type definition will be
+            used as-is. Otherwise it will be completed using normalization which
+            can be time consuming. Defaults to False.
 
     Returns:
         MetaschemaType: Instance of the appropriate type class.
 
     """
-    typedef = complete_typedef(typedef)
+    if not dont_complete:
+        typedef = complete_typedef(typedef)
     out = get_type_class(typedef['type'])(**typedef)
     return out
 
