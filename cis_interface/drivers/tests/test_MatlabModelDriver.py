@@ -20,9 +20,10 @@ def test_is_matlab_running():
 
 @unittest.skipIf(MatlabModelDriver._matlab_installed, "Matlab installed.")
 def test_matlab_not_installed():  # pragma: no matlab
-    r"""Assert that errors are raise when Matlab is not installed."""
+    r"""Assert that errors are raised when Matlab is not installed."""
     nt.assert_raises(RuntimeError, MatlabModelDriver.start_matlab)
-    nt.assert_raises(RuntimeError, MatlabModelDriver.stop_matlab, None, None, None)
+    nt.assert_raises(RuntimeError, MatlabModelDriver.stop_matlab,
+                     None, None, None, None)
     nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabProcess, None, None)
     nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, None, None)
 
