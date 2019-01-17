@@ -6,6 +6,7 @@ This module imports the configuration for cis_interface.
 
 """
 import os
+import sys
 import shutil
 import warnings
 import logging
@@ -225,15 +226,25 @@ def cfg_logging(cfg=None):
             environment. Defaults to :data:`cis_interface.config.cis_cfg`.
 
     """
+    is_model = (os.environ.get('CIS_SUBPROCESS', "False") == "True")
     if cfg is None:
         cfg = cis_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
     logLevelCIS = eval('logging.%s' % cfg.get('debug', 'cis', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
-    logging.getLogger("cis_interface").setLevel(level=logLevelCIS)
-    logging.getLogger("pika").setLevel(level=logLevelRMQ)
-        
+    cis_logger = logging.getLogger("cis_interface")
+    rmq_logger = logging.getLogger("pika")
+    cis_logger.setLevel(level=logLevelCIS)
+    rmq_logger.setLevel(level=logLevelRMQ)
+    # For models, route the loggs to stdout so that they are displayed by the
+    # model driver.
+    if is_model:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(logLevelCIS)
+        cis_logger.addHandler(handler)
+        rmq_logger.addHandler(handler)
+
 
 def cfg_environment(env=None, cfg=None):
     r"""Set environment variables based on config options.

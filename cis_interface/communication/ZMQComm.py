@@ -736,8 +736,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             return False
         out = self.reply_socket_send.poll(timeout=1, flags=zmq.POLLIN)
         if out == 0:
-            if (self.loop_count % 100) == 0:
-                self.debug('No reply handshake waiting')
+            self.periodic_debug('_reply_handshake_send', period=1000)(
+                'No reply handshake waiting')
             return False
         msg = self.reply_socket_send.recv(flags=zmq.NOBLOCK)
         if msg == self.eof_msg:  # pragma: debug
@@ -757,8 +757,8 @@ class ZMQComm(AsyncComm.AsyncComm):
                 return False
             out = socket.poll(timeout=1, flags=zmq.POLLOUT)
             if out == 0:  # pragma: debug
-                if (self.loop_count % 100) == 0:
-                    self.debug('Cannot initiate reply handshake')
+                self.periodic_debug('_reply_handshake_recv', period=1000)(
+                    'Cannot initiate reply handshake')
                 return False
             socket.send(msg_send, flags=zmq.NOBLOCK)
             if msg_send == self.eof_msg:  # pragma: debug
@@ -1031,11 +1031,11 @@ class ZMQComm(AsyncComm.AsyncComm):
                 if self.socket.closed:  # pragma: debug
                     self.error("Socket closed")
                     return False
-                self.debug("Sending %d bytes to %s", len(total_msg), self.address)
+                self.special_debug("Sending %d bytes to %s", len(total_msg), self.address)
                 if self.socket_type_name == 'ROUTER':
                     self.socket.send(identity, zmq.SNDMORE)
                 self.socket.send(total_msg, **kwargs)
-                self.debug("Sent %d bytes to %s", len(total_msg), self.address)
+                self.special_debug("Sent %d bytes to %s", len(total_msg), self.address)
                 self._n_zmq_sent += 1
             except zmq.ZMQError as e:  # pragma: debug
                 if e.errno == zmq.EAGAIN:

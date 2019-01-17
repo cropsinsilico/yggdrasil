@@ -563,6 +563,7 @@ class CisClass(logging.LoggerAdapter):
         self.extra_kwargs = kwargs
         self.sched_out = None
         self.suppress_special_debug = False
+        self._periodic_logs = {}
         # self.logger = logging.getLogger(self.__module__)
         # self.logger.basicConfig(
         #     format=("%(levelname)s:%(module)s" +
@@ -658,6 +659,27 @@ class CisClass(logging.LoggerAdapter):
     def dummy_log(self, *args, **kwargs):
         r"""Dummy log function that dosn't do anything."""
         pass
+
+    def periodic_debug(self, key, period=10):
+        r"""Log that should occur periodically rather than with every call.
+
+        Arguments:
+            key (str): Key that should be used to identify the debug message.
+            period (int, optional): Period (in number of messages) that messages
+                should be logged at. Defaults to 10.
+
+        Returns:
+            method: Logging method to be used.
+
+        """
+        if key in self._periodic_logs:
+            self._periodic_logs[key] += 1
+        else:
+            self._periodic_logs[key] = 0
+        if (self._periodic_logs[key] % period) == 0:
+            return self.debug
+        else:
+            return self.dummy_log
 
     @property
     def special_debug(self):
