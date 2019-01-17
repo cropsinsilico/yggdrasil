@@ -1,6 +1,5 @@
 import numpy as np
 import copy
-import base64
 from cis_interface import units, backwards
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -24,17 +23,20 @@ class ScalarMetaschemaType(MetaschemaType):
     python_types = ScalarMetaschemaProperties._all_python_scalars
 
     @classmethod
-    def validate(cls, obj):
+    def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 
         Args:
             obj (object): Object to validate.
+            raise_errors (bool, optional): If True, errors will be raised when
+                the object fails to be validated. Defaults to False.
 
         Returns:
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if super(ScalarMetaschemaType, cls).validate(obj):
+        if super(ScalarMetaschemaType, cls).validate(obj,
+                                                     raise_errors=raise_errors):
             dtype = ScalarMetaschemaProperties.data2dtype(obj)
             if cls.is_fixed and ('subtype' in cls.fixed_properties):
                 type_list = [
@@ -45,6 +47,11 @@ class ScalarMetaschemaType(MetaschemaType):
             for k in type_list:
                 if dtype.name.startswith(k):
                     return True
+            else:
+                if raise_errors:
+                    raise ValueError(("dtype %s dosn't corresponding with any "
+                                      + "of the accepted types: %s") %
+                                     (str(dtype), str(type_list)))
         return False
         
     @classmethod
@@ -93,7 +100,7 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         arr = cls.to_array(obj)
         bytes = arr.tobytes()
-        out = base64.encodebytes(bytes).decode('ascii')
+        out = backwards.base64_encode(bytes).decode('ascii')
         return out
 
     @classmethod
@@ -133,7 +140,7 @@ class ScalarMetaschemaType(MetaschemaType):
             object: Decoded object.
 
         """
-        bytes = base64.decodebytes(obj.encode('ascii'))
+        bytes = backwards.base64_decode(obj.encode('ascii'))
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
         arr = np.frombuffer(bytes, dtype=dtype)
         # arr = np.fromstring(bytes, dtype=dtype)

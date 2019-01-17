@@ -321,7 +321,10 @@
 		},
 		"material": {
 			"description": "Name of the material to use.",
-			"type": "unicode"
+			"type": [
+				"unicode",
+				"string"
+			]
 		},
 		"normals": {
 			"description": "Array of normals.",

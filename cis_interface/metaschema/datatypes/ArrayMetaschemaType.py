@@ -15,19 +15,24 @@ class OneDArrayMetaschemaType(ScalarMetaschemaType):
     python_types = (np.ndarray, )
 
     @classmethod
-    def validate(cls, obj):
+    def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 
         Args:
             obj (object): Object to validate.
+            raise_errors (bool, optional): If True, errors will be raised when
+                the object fails to be validated. Defaults to False.
 
         Returns:
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if not super(OneDArrayMetaschemaType, cls).validate(obj):
+        if not super(OneDArrayMetaschemaType, cls).validate(obj,
+                                                            raise_errors=raise_errors):
             return False
         if obj.ndim != 1:
+            if raise_errors:
+                raise ValueError("The array has more than one dimension.")
             return False
         return True
 
@@ -43,18 +48,23 @@ class NDArrayMetaschemaType(ScalarMetaschemaType):
     python_types = (np.ndarray, )
 
     @classmethod
-    def validate(cls, obj):
+    def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 
         Args:
             obj (object): Object to validate.
+            raise_errors (bool, optional): If True, errors will be raised when
+                the object fails to be validated. Defaults to False.
 
         Returns:
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if not super(NDArrayMetaschemaType, cls).validate(obj):
+        if not super(NDArrayMetaschemaType, cls).validate(obj,
+                                                          raise_errors=raise_errors):
             return False
         if obj.ndim <= 1:
+            if raise_errors:
+                raise ValueError("The array does not have more than one dimension.")
             return False
         return True

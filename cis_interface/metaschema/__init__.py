@@ -4,7 +4,6 @@ import pprint
 import json
 import jsonschema
 import cis_interface
-from cis_interface.metaschema import normalizer
 from cis_interface.metaschema.properties import (
     get_registered_properties, import_all_properties)
 from cis_interface.metaschema.datatypes import (
@@ -102,6 +101,7 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
         jsonschema.IValidator: JSON schema validator.
 
     """
+    from cis_interface.metaschema import normalizer
     global _validator
     if (_validator is None) or overwrite:
         metaschema = get_metaschema()

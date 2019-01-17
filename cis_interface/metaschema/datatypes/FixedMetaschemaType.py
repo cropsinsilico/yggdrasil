@@ -37,7 +37,7 @@ def create_fixed_type_class(name, description, base, fixed_properties,
                 continue
             if x in iattr[k]:
                 iattr[k].remove(x)
-    new_cls = register_type(type('%sMetaschemaType' % name.title(),
+    new_cls = register_type(type(str('%sMetaschemaType' % name.title()),
                                  (FixedMetaschemaType, base, ), iattr))
     if target_globals is not None:
         target_globals[new_cls.__name__] = new_cls
@@ -161,22 +161,27 @@ class FixedMetaschemaType(MetaschemaType):
         return copy.deepcopy(cls.fixed_properties)
 
     @classmethod
-    def validate(cls, obj):
+    def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 
         Args:
             obj (object): Object to validate.
+            raise_errors (bool, optional): If True, errors will be raised when
+                the object fails to be validated. Defaults to False.
 
         Returns:
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if not super(FixedMetaschemaType, cls).validate(obj):
+        if not super(FixedMetaschemaType, cls).validate(obj,
+                                                        raise_errors=raise_errors):
             return False
         try:
             jsonschema.validate(obj, cls.updated_fixed_properties(obj),
                                 cls=cls.validator())
         except jsonschema.exceptions.ValidationError:
+            if raise_errors:
+                raise
             return False
         return True
 
@@ -219,7 +224,7 @@ class FixedMetaschemaType(MetaschemaType):
         return out
 
     @classmethod
-    def check_encoded(cls, metadata, typedef=None):
+    def check_encoded(cls, metadata, typedef=None, raise_errors=False, **kwargs):
         r"""Checks if the metadata for an encoded object matches the type
         definition.
 
@@ -229,6 +234,10 @@ class FixedMetaschemaType(MetaschemaType):
                 be tested against. Defaults to None and object may have
                 any values for the type properties (so long as they match
                 the schema.
+            raise_errors (bool, optional): If True, any errors determining that
+                encoded object is not of this type will be raised. Defaults to
+                False.
+            **kwargs: Additional keyword arguments are passed to the parent class.
 
         Returns:
             bool: True if the metadata matches the type definition, False
@@ -237,9 +246,12 @@ class FixedMetaschemaType(MetaschemaType):
         """
         try:
             out = cls.typedef_base2fixed(metadata)
-        except Exception:
+        except Exception as e:
+            if raise_errors:
+                raise e
             return False
-        return super(FixedMetaschemaType, cls).check_encoded(out, typedef=typedef)
+        return super(FixedMetaschemaType, cls).check_encoded(
+            out, typedef=typedef, raise_errors=raise_errors, **kwargs)
 
     @classmethod
     def extract_typedef(cls, metadata):

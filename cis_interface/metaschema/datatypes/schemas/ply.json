@@ -142,7 +142,10 @@
 		},
 		"material": {
 			"description": "Name of the material to use.",
-			"type": "unicode"
+			"type": [
+				"unicode",
+				"string"
+			]
 		},
 		"vertices": {
 			"description": "Array of vertices.",

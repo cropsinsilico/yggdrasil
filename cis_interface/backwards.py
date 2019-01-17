@@ -1,6 +1,7 @@
 r"""This module allows for backward compatibility."""
 import sys
 import time
+import base64
 from cis_interface.scanf import scanf
 _python_version = '%d.%d' % (sys.version_info[0], sys.version_info[1])
 PY2 = (sys.version_info[0] == 2)
@@ -15,10 +16,12 @@ if PY2:  # pragma: Python 2
     StringIO = sio.StringIO
     file_type = types.FileType
     bytes_type = str
-    unicode_type = str
+    unicode_type = unicode
     string_type = str
     np_dtype_str = 'S'
     string_types = (str, unicode)
+    base64_encode = base64.encodestring
+    base64_decode = base64.decodestring
 else:  # pragma: Python 3
     import pickle
     import configparser
@@ -32,6 +35,8 @@ else:  # pragma: Python 3
     unicode = None
     np_dtype_str = 'S'
     string_types = (bytes, str)
+    base64_encode = base64.encodebytes
+    base64_decode = base64.decodebytes
 if sys.version_info >= (3, 3):
     clock_time = time.perf_counter
 else:

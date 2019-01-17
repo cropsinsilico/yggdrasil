@@ -2,24 +2,23 @@ import nose.tools as nt
 from cis_interface.tests import CisTestClassInfo
 from cis_interface.metaschema import get_validator, get_metaschema
 from cis_interface.metaschema.datatypes import MetaschemaTypeError
-from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
+from cis_interface.metaschema.properties.MetaschemaProperty import (
+    create_property)
 
 
 def test_dynamic():
     r"""Test dynamic creation of property."""
 
-    def encode(cls, instance, typedef=None):
+    def encode(instance, typedef=None):
         return None
 
-    def validate(cls, validator, value, instance, schema):
+    def validate(validator, value, instance, schema):
         return
 
-    def compare(cls, prop1, prop2):
+    def compare(prop1, prop2):
         return
 
-    new_prop = type('TestProperty', (MetaschemaProperty, ),
-                    {'name': 'invalid', '_encode': encode,
-                     '_validate': validate, '_compare': compare})
+    new_prop = create_property('invalid', None, encode, validate, compare)
     nt.assert_equal(new_prop.encode('hello'), None)
     nt.assert_equal(list(new_prop.validate(None, None, None, None)), [])
     nt.assert_equal(list(new_prop.compare(True, False)), [])
@@ -48,12 +47,7 @@ class TestMetaschemaProperty(CisTestClassInfo):
     @property
     def inst_args(self):
         r"""dict: Keyword arguments for creating a class instance."""
-        # schema = get_metaschema()
-        schema = self.import_cls.schema
-        # if schema is None:
-        #     metaschema = get_metaschema()
-        #     schema = metaschema['properties'][self.import_cls.name]
-        return (self.import_cls.name, schema, None)
+        return tuple()
 
     def test_encode(self):
         r"""Test encode method for the class."""

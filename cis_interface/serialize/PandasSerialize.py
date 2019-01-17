@@ -2,10 +2,11 @@ import pandas
 import copy
 import numpy as np
 import warnings
-from cis_interface import backwards, platform, serialize
+from cis_interface import backwards, platform
 from cis_interface.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
-from cis_interface.serialize import register_serializer
+from cis_interface.serialize import (
+    register_serializer, pandas2numpy, list2pandas)
 from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
@@ -144,7 +145,7 @@ class PandasSerialize(AsciiTableSerialize):
         #         out[c] = out[c].apply(lambda s: s.strip())
         if not self._initialized:
             typedef = {'type': 'array', 'items': []}
-            np_out = serialize.pandas2numpy(out)
+            np_out = pandas2numpy(out)
             for n in self.get_field_names():
                 typedef['items'].append(OneDArrayMetaschemaType.encode_type(
                     np_out[n], title=n))
@@ -181,8 +182,7 @@ class PandasSerialize(AsciiTableSerialize):
         out['empty'] = pandas.DataFrame()
         if no_names:
             del out['kwargs']['field_names']
-            out['objects'] = [serialize.list2pandas(x)
-                              for x in out['objects']]
+            out['objects'] = [list2pandas(x) for x in out['objects']]
             out['contents'] = (b'f0\tf1\tf2\n'
                                + b'one\t1\t1.0\n'
                                + b'two\t2\t2.0\n'
@@ -193,7 +193,7 @@ class PandasSerialize(AsciiTableSerialize):
         else:
             field_names = [backwards.bytes2unicode(x) for
                            x in out['kwargs']['field_names']]
-            out['objects'] = [serialize.list2pandas(x, names=field_names)
+            out['objects'] = [list2pandas(x, names=field_names)
                               for x in out['objects']]
             out['contents'] = (b'name\tcount\tsize\n'
                                + b'one\t1\t1.0\n'

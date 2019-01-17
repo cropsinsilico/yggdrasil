@@ -1,5 +1,6 @@
-from cis_interface import backwards, serialize
-from cis_interface.serialize import register_serializer
+from cis_interface import backwards
+from cis_interface.serialize import (
+    register_serializer, _default_newline, _default_comment, format_message)
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
@@ -10,9 +11,9 @@ class DirectSerialize(DefaultSerialize):
     _seritype = 'direct'
     _schema_properties = {
         'newline': {'type': 'unicode',
-                    'default': backwards.bytes2unicode(serialize._default_newline)},
+                    'default': backwards.bytes2unicode(_default_newline)},
         'comment': {'type': 'unicode',
-                    'default': backwards.bytes2unicode(serialize._default_comment)}}
+                    'default': backwards.bytes2unicode(_default_comment)}}
     _default_type = {'type': 'bytes'}
 
     def func_serialize(self, args):
@@ -28,7 +29,7 @@ class DirectSerialize(DefaultSerialize):
         """
         if (((self.extra_kwargs.get('format_str', None) is not None)
              and isinstance(args, list))):
-            args = serialize.format_message(args, self.extra_kwargs['format_str'])
+            args = format_message(args, self.extra_kwargs['format_str'])
         return backwards.unicode2bytes(args)
 
     def func_deserialize(self, msg):

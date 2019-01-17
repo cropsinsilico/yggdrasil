@@ -2,27 +2,7 @@ import jsonschema
 
 
 class MetaschemaProperty(object):
-    r"""Base class for adding properties to the metaschema. Instantiation
-    will register the new class, the instance should not be used directly.
-
-    Args:
-        name (str): Name of the property.
-        schema (dict): JSON schema describing valid values for the property.
-        types (tuple): Types of instances that the property is valid for.
-        encode (function): Function to encode the property based on a provided
-            instance. The function must take an instance as input and return
-            the value of the property for that instance.
-        validate (function, optional): Function to determine if an instance
-            is valid under the contraint of this property. The function must
-            take as input a jsonschema validator, a property value, an
-            instance to evaluate, and the schema. The function must return
-            a boolean: True if the instance is valid, False otherwise. See
-            cls.validate for additional information and default behavior.
-        compare (function, optional): Function to determine if two property
-            values are compatible. The function must take as input two
-            property values and return a boolean: True if the first property
-            is compatible with the second, False otherwise. See cls.compare
-            for additional information and default behavior.
+    r"""Base class for adding properties to the metaschema.
 
     Attributes:
         name (str): Name of the property.
@@ -42,13 +22,6 @@ class MetaschemaProperty(object):
     _compare = None
     _replaces_existing = False
 
-    def __init__(self, name, schema, encode, validate=None, compare=None):
-        self.name = name
-        self.schema = schema
-        self._validate = validate
-        self._encode = encode
-        self._compare = compare
-
     @classmethod
     def encode(cls, instance, typedef=None):
         r"""Method to encode the property given the object.
@@ -64,7 +37,7 @@ class MetaschemaProperty(object):
 
         """
         if cls._encode is not None:
-            return cls._encode(cls, instance, typedef=typedef)
+            return cls._encode(instance, typedef=typedef)
         raise NotImplementedError("Encode method not set.")
     
     @classmethod
@@ -87,7 +60,7 @@ class MetaschemaProperty(object):
         if cls._validate is False:
             return
         elif cls._validate is not None:
-            errors = cls._validate(cls, validator, value, instance, schema) or ()
+            errors = cls._validate(validator, value, instance, schema) or ()
         else:
             for t in cls.types:
                 if validator.is_type(instance, t):
@@ -115,7 +88,7 @@ class MetaschemaProperty(object):
 
         """
         if cls._compare is not None:
-            errors = cls._compare(cls, prop1, prop2) or ()
+            errors = cls._compare(prop1, prop2) or ()
             for e in errors:
                 yield e
         else:
@@ -186,3 +159,34 @@ class MetaschemaProperty(object):
         finally:
             if validator._normalizing and (not failed):
                 cls.post_validate(validator, value, instance, schema)
+
+
+def create_property(name, schema, encode, validate=None, compare=None):
+    r"""Create a new property class.
+
+    Args:
+        name (str): Name of the property.
+        schema (dict): JSON schema describing valid values for the property.
+        encode (function): Function to encode the property based on a provided
+            instance. The function must take an instance as input and return
+            the value of the property for that instance.
+        validate (function, optional): Function to determine if an instance
+            is valid under the contraint of this property. The function must
+            take as input a jsonschema validator, a property value, an
+            instance to evaluate, and the schema. The function must return
+            a boolean: True if the instance is valid, False otherwise. See
+            cls.validate for additional information and default behavior.
+        compare (function, optional): Function to determine if two property
+            values are compatible. The function must take as input two
+            property values and return a boolean: True if the first property
+            is compatible with the second, False otherwise. See cls.compare
+            for additional information and default behavior.
+
+    """
+    attr_dict = {'name': name, 'schema': schema}
+    for k, x in zip(['_encode', '_validate', '_compare'],
+                    [encode, validate, compare]):
+        if x is not None:
+            attr_dict[k] = staticmethod(x)
+    out = type(name, (MetaschemaProperty, ), attr_dict)
+    return out

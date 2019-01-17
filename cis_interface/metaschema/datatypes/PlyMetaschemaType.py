@@ -112,7 +112,7 @@ def create_schema(overwrite=False):
         'properties': {
             'material': {
                 'description': 'Name of the material to use.',
-                'type': 'unicode'},
+                'type': ['unicode', 'string']},
             # 'materials': {
             #     'description': 'Array of materials.',
             #     'type': 'array', 'items': {'$ref': '#/definitions/material'}},
@@ -129,7 +129,10 @@ def create_schema(overwrite=False):
             'edges': ['vertices'],
             'faces': ['vertices']}}
     with open(_schema_file, 'w') as fd:
-        json.dump(schema, fd, sort_keys=True, indent="\t")
+        if backwards.PY2:  # pragma: Python 2
+            json.dump(schema, fd, sort_keys=True, indent=4)
+        else:  # pragma: Python 3
+            json.dump(schema, fd, sort_keys=True, indent="\t")
 
 
 def get_schema():
@@ -757,12 +760,12 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
         obj = {}
         for i, line in enumerate(lines):
             if line.startswith('format'):
-                metadata['plyformat'] = line.split(maxsplit=1)
+                metadata['plyformat'] = line.split(None, 1)[-1]
             elif line.startswith('comment'):
-                out = line.split(maxsplit=1)[-1]
+                out = line.split(None, 1)[-1]
                 if out.startswith('material:'):
                     metadata['element_order'].append('material')
-                    obj['material'] = out.split(maxsplit=1)[-1]
+                    obj['material'] = out.split(None, 1)[-1]
                 metadata['comments'].append(out)
             elif line.startswith('element'):
                 vars = line.split()

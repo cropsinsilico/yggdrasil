@@ -1,5 +1,8 @@
-from cis_interface import backwards, serialize, units
-from cis_interface.serialize import register_serializer
+from cis_interface import backwards, units
+from cis_interface.serialize import (
+    register_serializer, _default_delimiter, _default_newline, _default_comment,
+    nptype2cformat, table2format, array_to_table, table_to_array,
+    format_message, process_message)
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
@@ -53,11 +56,11 @@ class AsciiTableSerialize(DefaultSerialize):
         field_units={'type': 'array', 'items': {'type': 'string'}},
         as_array={'type': 'boolean', 'default': False},
         delimiter={'type': 'unicode',
-                   'default': backwards.bytes2unicode(serialize._default_delimiter)},
+                   'default': backwards.bytes2unicode(_default_delimiter)},
         newline={'type': 'unicode',
-                 'default': backwards.bytes2unicode(serialize._default_newline)},
+                 'default': backwards.bytes2unicode(_default_newline)},
         comment={'type': 'unicode',
-                 'default': backwards.bytes2unicode(serialize._default_comment)},
+                 'default': backwards.bytes2unicode(_default_comment)},
         use_astropy={'type': 'boolean', 'default': False})
 
     def update_serializer(self, *args, **kwargs):
@@ -88,16 +91,16 @@ class AsciiTableSerialize(DefaultSerialize):
             fmts = []
             if isinstance(self.typedef['items'], dict):  # pragma: debug
                 idtype = definition2dtype(self.typedef['items'])
-                ifmt = serialize.nptype2cformat(idtype, asbytes=True)
+                ifmt = nptype2cformat(idtype, asbytes=True)
                 # fmts = [ifmt for x in msg]
                 raise Exception("Variable number of items not yet supported.")
             elif isinstance(self.typedef['items'], list):
                 for x in self.typedef['items']:
                     idtype = definition2dtype(x)
-                    ifmt = serialize.nptype2cformat(idtype, asbytes=True)
+                    ifmt = nptype2cformat(idtype, asbytes=True)
                     fmts.append(ifmt)
             if fmts:
-                self.format_str = serialize.table2format(
+                self.format_str = table2format(
                     fmts=fmts, delimiter=self.delimiter, newline=self.newline,
                     comment=backwards.unicode2bytes(''))
 
@@ -129,10 +132,10 @@ class AsciiTableSerialize(DefaultSerialize):
         args = self.datatype.coerce_type(args,
                                          key_order=self.get_field_names())
         if self.as_array:
-            out = serialize.array_to_table(args, self.format_str,
-                                           use_astropy=self.use_astropy)
+            out = array_to_table(args, self.format_str,
+                                 use_astropy=self.use_astropy)
         else:
-            out = serialize.format_message(args, self.format_str)
+            out = format_message(args, self.format_str)
         return backwards.unicode2bytes(out)
 
     def func_deserialize(self, msg):
@@ -148,12 +151,12 @@ class AsciiTableSerialize(DefaultSerialize):
         if self.format_str is None:
             raise RuntimeError("Format string is not defined.")
         if self.as_array:
-            out = serialize.table_to_array(msg, self.format_str,
-                                           use_astropy=self.use_astropy,
-                                           names=self.get_field_names(as_bytes=True))
+            out = table_to_array(msg, self.format_str,
+                                 use_astropy=self.use_astropy,
+                                 names=self.get_field_names(as_bytes=True))
             out = self.datatype.coerce_type(out)
         else:
-            out = list(serialize.process_message(msg, self.format_str))
+            out = list(process_message(msg, self.format_str))
         field_units = self.get_field_units()
         if field_units is not None:
             out = [units.add_units(x, u) for x, u in zip(out, field_units)]

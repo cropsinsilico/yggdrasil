@@ -48,13 +48,16 @@ def register_type(type_class):
         # Update property class with this type's info
         # TODO: Make sure this actually modifies the class
         # Type strings
-        old = list(prop_class.types)
-        new = tuple(set(copy.deepcopy(old) + [type_name]))
-        prop_class.types = new
+        old = copy.deepcopy(list(prop_class.types))
+        new = [type_name]
+        prop_class.types = tuple(set(old + new))
         # Python types
-        old = list(prop_class.python_types)
-        new = tuple(set(copy.deepcopy(old) + list(type_class.python_types)))
-        prop_class.python_types = new
+        old = copy.deepcopy(list(prop_class.python_types))
+        try:
+            new = list(type_class.python_types)
+        except TypeError:
+            new = [type_class.python_types]
+        prop_class.python_types = tuple(set(old + new))
     # Add to registry
     type_class._datatype = type_name
     type_class._schema_type = 'type'
@@ -407,61 +410,64 @@ def compare_schema(schema1, schema2, root1=None, root2=None):
         str: Comparision failure messages.
 
     """
-    # TODO: Resolve references
-    if root1 is None:
-        root1 = jsonschema.RefResolver.from_schema(schema1)
-    if root2 is None:
-        root2 = jsonschema.RefResolver.from_schema(schema2)
-    if (len(schema2) == 1) and ('$ref' in schema2):
-        with root2.resolving(schema2['$ref']) as resolved_schema2:
-            for e in compare_schema(schema1, resolved_schema2,
-                                    root1=root1, root2=root2):
-                yield e
-    elif (len(schema1) == 1) and ('$ref' in schema1):
-        with root1.resolving(schema1['$ref']) as resolved_schema1:
-            for e in compare_schema(resolved_schema1, schema2,
-                                    root1=root1, root2=root2):
-                yield e
-    elif ('type' not in schema2) or ('type' not in schema1):
-        yield "Type required in both schemas for comparison."
-    elif (schema1 != schema2):
-        # Convert fixed types to base types
-        type_cls1 = get_type_class(schema1['type'])
-        if type_cls1.is_fixed:
-            schema1 = type_cls1.typedef_fixed2base(schema1)
-        if isinstance(schema2['type'], list):
-            type_list = schema2['type']
-        else:
-            type_list = [schema2['type']]
-        all_errors = []
-        for itype in type_list:
-            itype_cls2 = get_type_class(itype)
-            ischema2 = copy.deepcopy(schema2)
-            ischema2['type'] = itype
-            if itype_cls2.is_fixed:
-                ischema2 = itype_cls2.typedef_fixed2base(ischema2)
-            # Compare contents of schema
-            ierrors = []
-            for k, v in ischema2.items():
-                prop_cls = get_metaschema_property(k, skip_generic=True)
-                if (prop_cls is None) or (k in ['title', 'default']):
-                    continue
-                if k not in schema1:
-                    ierrors.append("Missing entry for required key '%s'" % k)
-                    continue
-                if (k == 'properties') and ('required' in ischema2):
-                    vcp = copy.deepcopy(v)
-                    for k2 in list(vcp.keys()):
-                        if (k2 not in schema1[k]) and (k2 not in ischema2['required']):
-                            del vcp[k2]
-                else:
-                    vcp = v
-                ierrors += list(prop_cls.compare(schema1[k], vcp,
-                                                 root1=root1, root2=root2))
-            if len(ierrors) == 0:
-                all_errors = []
-                break
+    try:
+        if root1 is None:
+            root1 = jsonschema.RefResolver.from_schema(schema1)
+        if root2 is None:
+            root2 = jsonschema.RefResolver.from_schema(schema2)
+        if (len(schema2) == 1) and ('$ref' in schema2):
+            with root2.resolving(schema2['$ref']) as resolved_schema2:
+                for e in compare_schema(schema1, resolved_schema2,
+                                        root1=root1, root2=root2):
+                    yield e
+        elif (len(schema1) == 1) and ('$ref' in schema1):
+            with root1.resolving(schema1['$ref']) as resolved_schema1:
+                for e in compare_schema(resolved_schema1, schema2,
+                                        root1=root1, root2=root2):
+                    yield e
+        elif ('type' not in schema2) or ('type' not in schema1):
+            yield "Type required in both schemas for comparison."
+        elif (schema1 != schema2):
+            # Convert fixed types to base types
+            type_cls1 = get_type_class(schema1['type'])
+            if type_cls1.is_fixed:
+                schema1 = type_cls1.typedef_fixed2base(schema1)
+            if isinstance(schema2['type'], list):
+                type_list = schema2['type']
             else:
-                all_errors += ierrors
-        for e in all_errors:
-            yield e
+                type_list = [schema2['type']]
+            all_errors = []
+            for itype in type_list:
+                itype_cls2 = get_type_class(itype)
+                ischema2 = copy.deepcopy(schema2)
+                ischema2['type'] = itype
+                if itype_cls2.is_fixed:
+                    ischema2 = itype_cls2.typedef_fixed2base(ischema2)
+                # Compare contents of schema
+                ierrors = []
+                for k, v in ischema2.items():
+                    prop_cls = get_metaschema_property(k, skip_generic=True)
+                    if (prop_cls is None) or (k in ['title', 'default']):
+                        continue
+                    if k not in schema1:
+                        ierrors.append("Missing entry for required key '%s'" % k)
+                        continue
+                    if (k == 'properties') and ('required' in ischema2):
+                        vcp = copy.deepcopy(v)
+                        for k2 in list(vcp.keys()):
+                            if (((k2 not in schema1[k])
+                                 and (k2 not in ischema2['required']))):
+                                del vcp[k2]
+                    else:
+                        vcp = v
+                    ierrors += list(prop_cls.compare(schema1[k], vcp,
+                                                     root1=root1, root2=root2))
+                if len(ierrors) == 0:
+                    all_errors = []
+                    break
+                else:
+                    all_errors += ierrors
+            for e in all_errors:
+                yield e
+    except BaseException as e:
+        yield e

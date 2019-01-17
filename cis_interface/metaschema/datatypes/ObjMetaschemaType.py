@@ -164,7 +164,7 @@ def create_schema(overwrite=False):
         'properties': {
             'material': {
                 'description': 'Name of the material to use.',
-                'type': 'unicode'},
+                'type': ['unicode', 'string']},
             'vertices': {
                 'description': 'Array of vertices.',
                 'type': 'array', 'items': {'$ref': '#/definitions/vertex'}},
@@ -202,7 +202,10 @@ def create_schema(overwrite=False):
             'curve2Ds': ['params'],
             'surfaces': ['vertices']}}
     with open(_schema_file, 'w') as fd:
-        json.dump(schema, fd, sort_keys=True, indent="\t")
+        if backwards.PY2:  # pragma: Python 2
+            json.dump(schema, fd, sort_keys=True, indent=4)
+        else:  # pragma: Python 3
+            json.dump(schema, fd, sort_keys=True, indent="\t")
 
 
 def get_schema():

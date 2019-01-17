@@ -1,5 +1,5 @@
-from cis_interface import backwards, serialize
-from cis_interface.serialize import register_serializer
+from cis_interface import backwards
+from cis_interface.serialize import register_serializer, _default_newline
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
 
@@ -26,7 +26,7 @@ class PlySerialize(DefaultSerialize):
     _seritype = 'ply'
     _schema_properties = dict(
         newline={'type': 'unicode',
-                 'default': backwards.bytes2unicode(serialize._default_newline)})
+                 'default': backwards.bytes2unicode(_default_newline)})
     _default_type = {'type': 'ply'}
 
     def func_serialize(self, args):

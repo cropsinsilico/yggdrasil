@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from cis_interface import serialize
+from cis_interface.serialize import pandas2list, numpy2list, dict2list
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -25,19 +25,24 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
     _empty_msg = []
 
     @classmethod
-    def validate(cls, obj):
+    def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 
         Args:
             obj (object): Object to validate.
+            raise_errors (bool, optional): If True, errors will be raised when
+                the object fails to be validated. Defaults to False.
 
         Returns:
             bool: True if the object could be of this type, False otherwise.
 
         """
-        out = super(JSONArrayMetaschemaType, cls).validate(obj)
+        out = super(JSONArrayMetaschemaType, cls).validate(obj,
+                                                           raise_errors=raise_errors)
         if out and isinstance(obj, np.ndarray):
             out = (len(obj.dtype) > 0)
+            if (not out) and raise_errors:
+                raise ValueError("Array dosn't have a structured data types.")
         return out
 
     @classmethod
@@ -74,21 +79,23 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
 
         """
         if isinstance(obj, pd.DataFrame):
-            obj = serialize.pandas2list(obj)
+            obj = pandas2list(obj)
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
-            obj = serialize.numpy2list(obj)
+            obj = numpy2list(obj)
             # return [obj[n] for n in obj.dtype.names]
         elif isinstance(obj, dict):
             if (key_order is None) and (len(obj) > 1):
                 raise RuntimeError("Key order must be provided to coerce dictionary.")
-            obj = serialize.dict2list(obj, order=key_order)
+            obj = dict2list(obj, order=key_order)
         return obj
 
     @classmethod
     def encode(cls, obj, typedef=None, **kwargs):
         r"""Encode an object first checking if it should be encapsulated."""
         if isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
-            if cls.check_decoded([obj], typedef):
+            typedef_validated = kwargs.get('typedef_validated', False)
+            if cls.check_decoded([obj], typedef,
+                                 typedef_validated=typedef_validated):
                 obj = [obj]
         return super(JSONArrayMetaschemaType, cls).encode(obj, typedef=typedef,
                                                           **kwargs)

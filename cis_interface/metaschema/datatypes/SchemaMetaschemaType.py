@@ -57,7 +57,7 @@ def _normalize_schema(validator, ref, instance, schema):
         # If inside validation of items as a schema, don't assume a
         # list is a malformed schema. Doing so results in infinite
         # recursion.
-        if not ((len(validator._schema_path_stack) > 2)
+        if not ((len(validator._schema_path_stack) >= 2)
                 and (validator._schema_path_stack[-2:] == ['items', 0])):
             instance = {'type': 'array', 'items': instance}
     if isinstance(instance, dict) and ('type' in instance):
@@ -120,23 +120,28 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
         return obj
 
     @classmethod
-    def validate(cls, obj):
+    def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 
         Args:
             obj (object): Object to validate.
+            raise_errors (bool, optional): If True, errors will be raised when
+                the object fails to be validated. Defaults to False.
 
         Returns:
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if not super(SchemaMetaschemaType, cls).validate(obj):
+        if not super(SchemaMetaschemaType, cls).validate(obj,
+                                                         raise_errors=raise_errors):
             return False
         try:
             x = copy.deepcopy(cls.metaschema())
             x['additionalProperties'] = False
             jsonschema.validate(obj, x, cls=cls.validator())
         except jsonschema.exceptions.ValidationError:
+            if raise_errors:
+                raise
             return False
         return True
 

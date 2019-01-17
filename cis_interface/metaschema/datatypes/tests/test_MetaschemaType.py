@@ -4,7 +4,7 @@ import pprint
 import nose.tools as nt
 import jsonschema
 from cis_interface import backwards
-from cis_interface.metaschema.datatypes import MetaschemaType, MetaschemaTypeError
+from cis_interface.metaschema.datatypes import MetaschemaTypeError
 from cis_interface.tests import CisTestClassInfo
 
 
@@ -203,12 +203,14 @@ class TestMetaschemaType(CisTestClassInfo):
             nt.assert_raises(NotImplementedError, self.import_cls.encode,
                              self._invalid_decoded[0], self.typedef)
         else:
-            nt.assert_raises(ValueError, self.import_cls.encode,
+            nt.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
+                             self.import_cls.encode,
                              self._invalid_decoded[0], self.typedef)
 
     def test_decode_errors(self):
         r"""Test error on decode."""
-        nt.assert_raises(ValueError, self.import_cls.decode,
+        nt.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
+                         self.import_cls.decode,
                          self._invalid_encoded[0], self.typedef)
 
     def test_transform_type(self):
@@ -253,60 +255,3 @@ class TestMetaschemaType(CisTestClassInfo):
             out = self.instance.serialize(self._valid_decoded[0])
             obj, metadata = self.instance.deserialize(out[:-1])
             nt.assert_equal(metadata['incomplete'], True)
-
-
-class CisErrorType(MetaschemaType.MetaschemaType):
-    r"""Class with impropert user defined methods."""
-
-    _check_encoded = True
-    _check_decoded = True
-
-    @classmethod
-    def check_encoded(cls, metadata, typedef=None):
-        r"""Return constant."""
-        return cls._check_encoded
-
-    @classmethod
-    def check_decoded(cls, obj, typedef=None):
-        r"""Return constant."""
-        return cls._check_decoded
-
-    @classmethod
-    def encode_type(cls, obj, typedef=None):
-        r"""Encode type."""
-        return {}
-
-    @classmethod
-    def encode_data(cls, obj, typedef):
-        r"""Encode data."""
-        return obj
-
-    @classmethod
-    def decode_data(cls, obj, typedef):
-        r"""Decode data."""
-        return obj
-
-    @classmethod
-    def transform_type(cls, obj, typedef=None):
-        r"""Transform an object based on type info."""
-        return obj
-
-
-class CisErrorType_encode(CisErrorType):
-    _check_encoded = False
-
-
-class CisErrorType_decode(CisErrorType):
-    _check_decoded = False
-
-
-def test_encode_error_encoded():
-    r"""Test error in encode for failed encode_data."""
-    nt.assert_raises(ValueError, CisErrorType_encode.encode,
-                     backwards.unicode2bytes(''))
-
-
-def test_decode_error_decoded():
-    r"""Test error in decode for failed decode_data."""
-    nt.assert_raises(ValueError, CisErrorType_decode.decode,
-                     {}, backwards.unicode2bytes(''))

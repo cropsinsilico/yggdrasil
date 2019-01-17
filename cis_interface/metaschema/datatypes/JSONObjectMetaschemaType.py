@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from cis_interface import serialize
+from cis_interface.serialize import pandas2dict, numpy2dict, list2dict
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -43,15 +43,15 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
 
         """
         if isinstance(obj, pd.DataFrame):
-            obj = serialize.pandas2dict(obj)
+            obj = pandas2dict(obj)
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
-            obj = serialize.numpy2dict(obj)
+            obj = numpy2dict(obj)
         elif isinstance(obj, (list, tuple)):
             if key_order is None:
                 # key_order = ['f%d' % i for i in range(len(obj))]
                 raise RuntimeError("Key order must be provided to coerce %s."
                                    % type(obj))
-            obj = serialize.list2dict(obj, names=key_order)
+            obj = list2dict(obj, names=key_order)
         return obj
 
     @classmethod

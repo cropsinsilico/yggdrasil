@@ -3,9 +3,12 @@ import json
 import uuid
 import pprint
 import jsonschema
-from cis_interface import backwards, metaschema, tools
+from cis_interface import backwards, tools
+from cis_interface.metaschema import get_metaschema, get_validator
 from cis_interface.metaschema.datatypes import (
-    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class, conversions)
+    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class,
+    conversions)
+from cis_interface.metaschema.properties import get_metaschema_property
 
 
 def _get_single_array_element(arr):
@@ -148,11 +151,13 @@ class MetaschemaType(object):
         return (cls.name == t)
 
     @classmethod
-    def validate(cls, obj):
+    def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 
         Args:
             obj (object): Object to validate.
+            raise_errors (bool, optional): If True, errors will be raised when
+                the object fails to be validated. Defaults to False.
 
         Returns:
             bool: True if the object could be of this type, False otherwise.
@@ -160,7 +165,12 @@ class MetaschemaType(object):
         """
         if not cls.python_types:
             raise NotImplementedError("Attribute 'python_types' must be set.")
-        return isinstance(obj, cls.python_types)
+        out = isinstance(obj, cls.python_types)
+        if (not out) and raise_errors:
+            raise ValueError(("Object of type '%s' is not one of the accepted "
+                              + "Python types (%s) for this type (%s).") %
+                             (type(obj), cls.python_types, cls.name))
+        return out
 
     @classmethod
     def normalize(cls, obj):
@@ -209,7 +219,7 @@ class MetaschemaType(object):
                 if itypedef is not None:
                     out[x] = itypedef
             else:
-                prop_cls = metaschema.properties.get_metaschema_property(x)
+                prop_cls = get_metaschema_property(x)
                 out[x] = prop_cls.encode(obj, typedef=itypedef)
         return out
 
@@ -288,17 +298,15 @@ class MetaschemaType(object):
     @classmethod
     def metaschema(cls):
         r"""JSON meta schema for validating schemas for this type."""
+        out = get_metaschema()
         if cls.name == 'base':  # This is patch to allow tests to run
-            out = copy.deepcopy(metaschema.get_metaschema())
             out['definitions']['simpleTypes']['enum'].append('base')
-        else:
-            out = metaschema.get_metaschema()
         return out
 
     @classmethod
     def validator(cls):
         r"""JSON schema validator for the meta schema that includes added types."""
-        return metaschema.get_validator()
+        return get_validator()
 
     @classmethod
     def definition_schema(cls):
@@ -372,12 +380,13 @@ class MetaschemaType(object):
         """
         for x in cls.properties:
             if x not in obj:
-                prop_cls = metaschema.properties.get_metaschema_property(x)
+                prop_cls = get_metaschema_property(x)
                 obj = prop_cls.normalize_in_schema(obj)
         return obj
 
     @classmethod
-    def check_encoded(cls, metadata, typedef=None):
+    def check_encoded(cls, metadata, typedef=None, raise_errors=False,
+                      typedef_validated=False):
         r"""Checks if the metadata for an encoded object matches the type
         definition.
 
@@ -387,6 +396,12 @@ class MetaschemaType(object):
                 be tested against. Defaults to None and object may have
                 any values for the type properties (so long as they match
                 the schema.
+            raise_errors (bool, optional): If True, any errors determining that
+                encoded object is not of this type will be raised. Defaults to
+                False.
+            typedef_validated (bool, optional): If True, the type definition
+                is taken as already having been validated and will not be
+                validated again during the encoding process. Defaults to False.
 
         Returns:
             bool: True if the metadata matches the type definition, False
@@ -396,46 +411,70 @@ class MetaschemaType(object):
         try:
             cls.validate_metadata(metadata)
         except jsonschema.exceptions.ValidationError:
+            if raise_errors:
+                raise
             return False
         if typedef is not None:
-            try:
-                cls.validate_definition(typedef)
-            except jsonschema.exceptions.ValidationError:
-                return False
+            if not typedef_validated:
+                try:
+                    cls.validate_definition(typedef)
+                except jsonschema.exceptions.ValidationError:
+                    if raise_errors:
+                        raise
+                    return False
             errors = [e for e in compare_schema(metadata, typedef)]
             if errors:
-                # error_msg = "Error(s) in comparison:"
-                # for e in errors:
-                #     error_msg += ('\t%s' % e)
-                # print(error_msg)
+                error_msg = "Error(s) in comparison:"
+                for e in errors:
+                    error_msg += ('\t%s' % e)
+                if raise_errors:
+                    raise ValueError(error_msg)
                 return False
         return True
 
     @classmethod
-    def check_decoded(cls, obj, typedef=None):
+    def check_decoded(cls, obj, typedef=None, raise_errors=False,
+                      typedef_validated=False):
         r"""Checks if an object is of the this type.
 
         Args:
             obj (object): Object to be tested.
             typedef (dict, optional): Type properties that object should be tested
                 against. Defaults to None and is not used.
+            raise_errors (bool, optional): If True, any errors determining that
+                decoded object is not of this type will be raised. Defaults to
+                False.
+            typedef_validated (bool, optional): If True, the type definition
+                is taken as already having been validated and will not be
+                validated again during the encoding process. Defaults to False.
 
         Returns:
             bool: Truth of if the input object is of this type.
 
         """
-        if not cls.validate(obj):
+        if not cls.validate(obj, raise_errors=raise_errors):
             return False
         if typedef is None:
             return True
+        # Validate definition
+        if not typedef_validated:
+            try:
+                cls.validate_definition(typedef)
+            except jsonschema.exceptions.ValidationError:
+                if raise_errors:
+                    raise
+                return False
+        # Validate instance against definition
         try:
             cls.validate_instance(obj, typedef)
         except jsonschema.exceptions.ValidationError:
+            if raise_errors:
+                raise
             return False
         return True
 
     @classmethod
-    def encode(cls, obj, typedef=None, **kwargs):
+    def encode(cls, obj, typedef=None, typedef_validated=False, **kwargs):
         r"""Encode an object.
 
         Args:
@@ -444,6 +483,9 @@ class MetaschemaType(object):
                 be tested against. Defaults to None and object may have
                 any values for the type properties (so long as they match
                 the schema.
+            typedef_validated (bool, optional): If True, the type definition
+                is taken as already having been validated and will not be
+                validated again during the encoding process. Defaults to False.
             **kwargs: Additional keyword arguments are added to the metadata.
 
         Returns:
@@ -457,16 +499,14 @@ class MetaschemaType(object):
             TypeError: If the encoded data is not of bytes type.
 
         """
+        # Coerce, then transform
         obj = cls.coerce_type(obj, **kwargs)
-        # This is slightly redundent, maybe pass None
-        if not cls.check_decoded(obj, typedef):
-            raise ValueError(("Object (type = '%s') is not correct type for "
-                              + "encoding as '%s'.") % (type(obj), str(typedef)))
+        cls.check_decoded(obj, typedef, raise_errors=True,
+                          typedef_validated=typedef_validated)
         obj_t = cls.transform_type(obj, typedef)
+        # Encode
         metadata = cls.encode_type(obj_t, typedef=typedef)
         data = cls.encode_data(obj_t, metadata)
-        # if not cls.check_encoded(metadata, typedef):
-        #     raise ValueError("Object was not encoded correctly.")
         # Add extra keyword arguments to metadata, ensuring type not overwritten
         for k, v in kwargs.items():
             if (k in metadata) and (v != metadata[k]):
@@ -479,7 +519,7 @@ class MetaschemaType(object):
         return metadata, data
 
     @classmethod
-    def decode(cls, metadata, data, typedef=None):
+    def decode(cls, metadata, data, typedef=None, typedef_validated=False):
         r"""Decode an object.
 
         Args:
@@ -488,6 +528,9 @@ class MetaschemaType(object):
             typedef (dict, optional): Type properties that decoded object should
                 be tested against. Defaults to None and object may have any
                 values for the type properties (so long as they match the schema).
+            typedef_validated (bool, optional): If True, the type definition
+                is taken as already having been validated and will not be
+                validated again during the encoding process. Defaults to False.
 
         Returns:
             object: Decoded object.
@@ -498,7 +541,8 @@ class MetaschemaType(object):
 
         """
         conv_func = None
-        if not cls.check_encoded(metadata, typedef):
+        if not cls.check_encoded(metadata, typedef,
+                                 typedef_validated=typedef_validated):
             if ('type' in metadata) and (typedef == {'type': 'bytes'}):
                 new_cls = get_type_class(metadata['type'])
                 return new_cls.decode(metadata, data)
@@ -510,17 +554,13 @@ class MetaschemaType(object):
                 conv_func = conversions.get_conversion(metadata.get('type', None),
                                                        cls.name)
             if not conv_func:
-                error_str = ("Metadata does not match type definition\n."
-                             + "metadata:\n%s\ntypedef:\n%s\n") % (
-                                 pprint.pformat(metadata), pprint.pformat(typedef))
-                raise ValueError(error_str)
+                cls.check_encoded(metadata, typedef, raise_errors=True,
+                                  typedef_validated=typedef_validated)
         if conv_func:
             new_cls = get_type_class(metadata['type'])
             out = conv_func(new_cls.decode(metadata, data))
         else:
             out = cls.decode_data(data, metadata)
-        # if not cls.check_decoded(out, typedef):
-        #     raise ValueError("Object was not decoded correctly.")
         out = cls.transform_type(out, typedef)
         return out
 
@@ -543,7 +583,8 @@ class MetaschemaType(object):
             data = obj
             is_raw = True
         else:
-            metadata, data = self.encode(obj, typedef=self._typedef, **kwargs)
+            metadata, data = self.encode(obj, typedef=self._typedef,
+                                         typedef_validated=True, **kwargs)
             is_raw = False
         for k in ['size', 'data']:
             if k in metadata:
@@ -611,5 +652,6 @@ class MetaschemaType(object):
             return data, metadata
         else:
             data = json.loads(backwards.bytes2unicode(data))
-            obj = self.decode(metadata, data, self._typedef)
+            obj = self.decode(metadata, data, self._typedef,
+                              typedef_validated=True)
         return obj, metadata
