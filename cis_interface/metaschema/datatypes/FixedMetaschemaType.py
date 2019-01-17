@@ -179,7 +179,7 @@ class FixedMetaschemaType(MetaschemaType):
         try:
             jsonschema.validate(obj, cls.updated_fixed_properties(obj),
                                 cls=cls.validator())
-        except jsonschema.exceptions.ValidationError:
+        except (jsonschema.exceptions.ValidationError, AssertionError):
             if raise_errors:
                 raise
             return False

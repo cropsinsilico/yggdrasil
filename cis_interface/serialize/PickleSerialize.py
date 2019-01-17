@@ -58,6 +58,10 @@ class PickleSerialize(DefaultSerialize):
 
         """
         out = super(PickleSerialize, cls).get_testing_options()
-        out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
-                           + b'\x80\x03C\x0fTest message 2\nq\x00.')
+        if backwards.PY2:  # pragma: Python 2
+            out['contents'] = ("S'Test message\\n'\np1\n."
+                               + "S'Test message 2\\n'\np1\n.")
+        else:  # pragma: Python 3
+            out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
+                               + b'\x80\x03C\x0fTest message 2\nq\x00.')
         return out

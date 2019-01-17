@@ -29,6 +29,11 @@ class PlySerialize(DefaultSerialize):
                  'default': backwards.bytes2unicode(_default_newline)})
     _default_type = {'type': 'ply'}
 
+    def __init__(self, *args, **kwargs):
+        r"""Initialize immediately as default is only type."""
+        super(PlySerialize, self).__init__(*args, **kwargs)
+        self._initialized = True
+
     def func_serialize(self, args):
         r"""Serialize a message.
 

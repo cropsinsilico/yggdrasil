@@ -100,7 +100,8 @@ class PandasSerialize(AsciiTableSerialize):
                 if isinstance(args_[c][0], backwards.bytes_type):
                     args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
         args_ = self.apply_field_names(args_)
-        args_.to_csv(fd, index=False, sep=backwards.bytes2unicode(self.delimiter),
+        args_.to_csv(fd, index=False,
+                     sep=str(backwards.bytes2unicode(self.delimiter)),
                      mode='wb', encoding='utf8', header=self.write_header)
         out = fd.getvalue()
         fd.close()
@@ -117,7 +118,8 @@ class PandasSerialize(AsciiTableSerialize):
 
         """
         fd = backwards.BytesIO(msg)
-        out = pandas.read_csv(fd, sep=backwards.bytes2unicode(self.delimiter),
+        out = pandas.read_csv(fd,
+                              sep=str(backwards.bytes2unicode(self.delimiter)),
                               encoding='utf8')
         fd.close()
         if not backwards.PY2:

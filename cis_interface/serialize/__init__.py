@@ -772,14 +772,14 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         names = dtype.names
     fd = backwards.BytesIO(msg)
     if names is not None:
-        names = [backwards.bytes2unicode(n) for n in names]
+        names = [str(backwards.bytes2unicode(n)) for n in names]
     np_kws = dict()
     if info.get('delimiter', None) is not None:
         np_kws['delimiter'] = info['delimiter']
     if info.get('comment', None) is not None:
         np_kws['comments'] = info['comment']
     for k, v in np_kws.items():
-        np_kws[k] = backwards.bytes2unicode(v)
+        np_kws[k] = str(backwards.bytes2unicode(v))
     if use_astropy:
         # fd = backwards.StringIO(backwards.bytes2unicode(msg))
         if 'comments' in np_kws:
