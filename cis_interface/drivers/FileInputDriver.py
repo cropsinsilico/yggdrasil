@@ -1,9 +1,9 @@
-from cis_interface.drivers.ConnectionDriver import ConnectionDriver
+from cis_interface.drivers.InputDriver import InputDriver
 from cis_interface.schema import register_component
 
 
 @register_component
-class FileInputDriver(ConnectionDriver):
+class FileInputDriver(InputDriver):
     r"""Class that sends messages read from a file.
 
     Args:
@@ -15,10 +15,9 @@ class FileInputDriver(ConnectionDriver):
 
     _connection_type = 'file_input'
     _icomm_type = 'FileComm'
-    _direction = 'input'
 
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('icomm_kws', {})
         kwargs['icomm_kws']['address'] = args
-        super(FileInputDriver, self).__init__(name, **kwargs)
+        super(FileInputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)

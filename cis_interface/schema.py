@@ -2,6 +2,7 @@ import os
 import copy
 import pprint
 import yaml
+from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
 from cis_interface import metaschema
 from cis_interface.drivers import import_all_drivers
@@ -15,6 +16,33 @@ _registry = {}
 _registry_complete = False
 
 
+def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
+    class OrderedLoader(Loader):
+        pass
+    
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+    
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping)
+    return yaml.load(stream, OrderedLoader)
+
+
+def ordered_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
+    class OrderedDumper(Dumper):
+        pass
+    
+    def _dict_representer(dumper, data):
+        return dumper.represent_mapping(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            data.items())
+    
+    OrderedDumper.add_representer(OrderedDict, _dict_representer)
+    return yaml.dump(data, stream, OrderedDumper, **kwds)
+
+
 def register_component(component_class):
     r"""Decorator for registering a class as a yaml component."""
     global _registry
@@ -22,7 +50,8 @@ def register_component(component_class):
     if yaml_typ not in _registry:
         _registry[yaml_typ] = []
     if component_class not in _registry[yaml_typ]:
-        _registry[yaml_typ].append(component_class)
+        _registry[yaml_typ].insert(0, component_class)
+        # _registry[yaml_typ].append(component_class)
     return component_class
 
 
@@ -141,7 +170,7 @@ class ComponentSchema(object):
                      'connection': 'connection_type'}
 
     def __init__(self, schema_type, schema_registry=None, schema_subtypes=None):
-        self._storage = {}
+        self._storage = OrderedDict()
         self._base_schema = None
         self.schema_registry = schema_registry
         self.schema_type = schema_type
@@ -166,8 +195,7 @@ class ComponentSchema(object):
             prop_default[subt]['enum'] = []
         # Get list of properties for each subtype and move properties to
         # base for brevity
-        # This might need to be done in order of priority
-        for k in sorted(list(self._storage.keys())):
+        for k in self._storage.keys():
             v0 = self._storage[k]
             v = copy.deepcopy(v0)
             combo['allOf'][1]['anyOf'].append(v)
@@ -381,7 +409,7 @@ class SchemaRegistry(object):
 
     def __init__(self, registry=None, required=None):
         super(SchemaRegistry, self).__init__()
-        self._storage = {}
+        self._storage = OrderedDict()
         if registry is not None:
             if required is None:
                 required = ['comm', 'file', 'model', 'connection']
@@ -412,12 +440,12 @@ class SchemaRegistry(object):
                'definitions': {},
                'required': ['models'],
                'additionalProperties': False,
-               'properties': {
-                   'models': {'type': 'array',
-                              'items': {'$ref': '#/definitions/model'},
-                              'minItems': 1},
-                   'connections': {'type': 'array',
-                                   'items': {'$ref': '#/definitions/connection'}}}}
+               'properties': OrderedDict(
+                   [('models', {'type': 'array',
+                                'items': {'$ref': '#/definitions/model'},
+                                'minItems': 1}),
+                    ('connections', {'type': 'array',
+                                     'items': {'$ref': '#/definitions/connection'}})])}
         for k, v in self._storage.items():
             out['definitions'][k] = v.schema
         for k in required:
@@ -465,7 +493,7 @@ class SchemaRegistry(object):
         """
         with open(fname, 'r') as f:
             contents = f.read()
-            schema = yaml.safe_load(contents)
+            schema = ordered_load(contents, yaml.SafeLoader)
         if schema is None:
             raise Exception("Failed to load schema from %s" % fname)
         # Create components
@@ -484,7 +512,7 @@ class SchemaRegistry(object):
         out = self.schema
         # out['subtypes'] = {k: v._schema_subtypes for k, v in self.items()}
         with open(fname, 'w') as f:
-            yaml.dump(out, f, default_flow_style=False)
+            ordered_dump(out, f, Dumper=yaml.SafeDumper)
 
     def validate(self, obj, **kwargs):
         r"""Validate an object against this schema.
@@ -960,6 +988,8 @@ def _normalize_connio_elements_comm(normalizer, value, instance, schema):
                             instance.setdefault(k, opp_comm[k])
                 if ('commtype' not in instance):
                     instance['commtype'] = schema['properties']['commtype']['default']
+                # if ('commtype' not in opp_comm):
+                #     opp_comm['commtype'] = schema['properties']['commtype']['default']
     return instance
 
 

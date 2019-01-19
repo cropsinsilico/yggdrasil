@@ -61,6 +61,29 @@ def is_matlab_running():
     return out
 
 
+def get_matlab_version():  # pragma: matlab
+    r"""Determine the version of matlab that is installed, if at all.
+
+    Returns:
+        str: Matlab version string.
+    
+    """
+    mtl_id = '=MATLABROOT='
+    cmd = "fprintf('" + mtl_id + "R%s" + mtl_id + "', version('-release')); exit();"
+    mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
+               '-r', '%s' % cmd]
+    try:
+        mtl_proc = subprocess.check_output(mtl_cmd)
+    except subprocess.CalledProcessError:  # pragma: no matlab
+        raise RuntimeError("Could not run matlab.")
+    mtl_id = backwards.unicode2bytes(mtl_id)
+    if mtl_id not in mtl_proc:  # pragma: debug
+        print(mtl_proc)
+        raise RuntimeError("Could not locate matlab root id (%s) in output." % mtl_id)
+    mtl_root = mtl_proc.split(mtl_id)[-2]
+    return backwards.bytes2unicode(mtl_root)
+
+
 def locate_matlabroot():  # pragma: matlab
     r"""Find directory that servers as matlab root.
 

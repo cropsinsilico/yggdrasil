@@ -63,6 +63,18 @@ def create(*args, **kwargs):
                     yield error
                 self._normalized = instance
 
+                # Do defaults for required fields
+                if (((isinstance(_schema.get('required', None), list)
+                      and isinstance(_schema.get('properties', None), dict)
+                      and self.is_type(self._normalized, "object")))):
+                    for k in _schema['required']:
+                        if (((k not in _schema['properties'])
+                             or (k in self._normalized))):
+                            continue
+                        default = _schema['properties'][k].get('default', None)
+                        self._normalized[k] = default
+                    instance = self._normalized
+
                 # Do default and type first so normalization can be validated
                 for k in ['default', 'type']:
                     if (((k != 'default')

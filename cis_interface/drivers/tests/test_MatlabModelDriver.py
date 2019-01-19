@@ -45,6 +45,18 @@ def test_matlab_exit():  # pragma: matlab
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_get_matlab_version():  # pragma: matlab
+    r"""Test get_matlab_version."""
+    MatlabModelDriver.get_matlab_version()
+
+
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_locate_matlabroot():  # pragma: matlab
+    r"""Test locate_matlabroot."""
+    MatlabModelDriver.locate_matlabroot()
+
+
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
 class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
     r"""Test parameters for MatlabModelDriver."""
 
