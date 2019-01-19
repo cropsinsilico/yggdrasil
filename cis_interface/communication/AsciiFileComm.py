@@ -23,8 +23,9 @@ class AsciiFileComm(FileComm):
     _filetype = 'ascii'
     _schema_properties = inherit_schema(
         FileComm._schema_properties,
-        {'comment': {'type': 'unicode',
-                     'default': backwards.bytes2unicode(serialize._default_comment)}})
+        {'comment': {'type': 'string',
+                     'default': str(backwards.bytes2unicode(
+                         serialize._default_comment))}})
     _attr_conv = FileComm._attr_conv + ['comment']
 
     def _init_before_open(self, **kwargs):
@@ -47,12 +48,12 @@ class AsciiFileComm(FileComm):
                     the messages in 'send'.
 
         """
+        kwargs.setdefault('read_meth', 'readline')
         out = super(AsciiFileComm, cls).get_testing_options(**kwargs)
         comment = backwards.unicode2bytes(
             cls._schema_properties['comment']['default'] + 'Comment\n')
         out['send'].append(comment)
         out['contents'] = b''.join(out['send'])
-        out['recv'] = out['send'][:-1]
         out['dict'] = {'f0': out['msg']}
         return out
     
@@ -82,6 +83,6 @@ class AsciiFileComm(FileComm):
         """
         flag, msg = super(AsciiFileComm, self)._recv()
         if self.read_meth == 'readline':
-            while flag and msg.startswith(self.comment):
+            while flag and msg.startswith(backwards.unicode2bytes(self.comment)):
                 flag, msg = super(AsciiFileComm, self)._recv()
         return flag, msg

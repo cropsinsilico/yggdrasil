@@ -15,10 +15,12 @@ class OutputDriver(ConnectionDriver):
 
     """
 
-    _is_output = True
+    _connection_type = 'output'
+    _direction = 'output'
 
     def __init__(self, name, args, **kwargs):
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws['name'] = args
-        kwargs['ocomm_kws'] = ocomm_kws
+        kwargs.setdefault('ocomm_kws', {})
+        kwargs['ocomm_kws']['name'] = args
+        if self._ocomm_type == 'RMQComm':
+            kwargs['ocomm_kws']['queue'] = args
         super(OutputDriver, self).__init__(name, **kwargs)

@@ -13,8 +13,9 @@ class FileOutputDriver(ConnectionDriver):
 
     """
 
+    _connection_type = 'file_output'
     _ocomm_type = 'FileComm'
-    _is_output = True
+    _direction = 'output'
 
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('ocomm_kws', {})

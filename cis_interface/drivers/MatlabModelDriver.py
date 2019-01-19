@@ -39,7 +39,8 @@ def locate_matlab_engine_processes():
 
     """
     out = []
-    for p in psutil.process_iter(attrs=['name', 'pid', 'cmdline']):
+    for p in psutil.process_iter():
+        p.info = p.as_dict(attrs=['name', 'pid', 'cmdline'])
         if (((p.info['name'] == 'MATLAB')
              and ('matlab.engine.shareEngine' in p.info['cmdline']))):
             out.append(p)  # p.info['pid'])

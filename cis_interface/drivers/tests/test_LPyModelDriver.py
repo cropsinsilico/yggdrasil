@@ -15,9 +15,10 @@ def test_LPyModelDriver_nolpy():  # pragma: no lpy
 class TestLPyModelParam(parent.TestModelParam):
     r"""Test parameters for LPyModelDriver class."""
 
+    driver = 'LPyModelDriver'
+    
     def __init__(self, *args, **kwargs):
         super(TestLPyModelParam, self).__init__(*args, **kwargs)
-        self.driver = 'LPyModelDriver'
         self.args = [scripts['lpy']]
 
         

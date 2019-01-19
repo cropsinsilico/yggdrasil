@@ -15,10 +15,12 @@ class InputDriver(ConnectionDriver):
 
     """
 
-    _is_input = True
+    _connection_type = 'input'
+    _direction = 'input'
 
     def __init__(self, name, args, **kwargs):
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws['name'] = args
-        kwargs['icomm_kws'] = icomm_kws
+        kwargs.setdefault('icomm_kws', {})
+        kwargs['icomm_kws']['name'] = args
+        if self._icomm_type == 'RMQComm':
+            kwargs['icomm_kws']['queue'] = args
         super(InputDriver, self).__init__(name, **kwargs)

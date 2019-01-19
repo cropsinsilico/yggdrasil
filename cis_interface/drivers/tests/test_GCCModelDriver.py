@@ -51,9 +51,10 @@ def test_GCCModelDriver_errors():
 class TestGCCModelParam(parent.TestModelParam):
     r"""Test parameters for GCCModelDriver."""
 
+    driver = 'GCCModelDriver'
+    
     def __init__(self, *args, **kwargs):
         super(TestGCCModelParam, self).__init__(*args, **kwargs)
-        self.driver = 'GCCModelDriver'
         self.attr_list += []
         src = scripts['c']
         script_dir = os.path.dirname(src[0])

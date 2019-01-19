@@ -33,21 +33,6 @@ class TestFileInputParam(parent.TestConnectionParam):
         return out
 
     @property
-    def icomm_kws(self):
-        r"""dict: Keyword arguments for connection input comm."""
-        out = super(TestFileInputParam, self).icomm_kws
-        out.update(self.testing_options['kwargs'])
-        return out
-        
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.icomm_import_cls.get_testing_options(
-                **self.testing_option_kws)
-        return self._testing_options
-    
-    @property
     def contents_to_write(self):
         r"""str: Contents that should be written to the file."""
         return self.testing_options['contents']

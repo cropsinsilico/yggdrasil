@@ -55,12 +55,12 @@ class AsciiTableSerialize(DefaultSerialize):
         field_names={'type': 'array', 'items': {'type': 'string'}},
         field_units={'type': 'array', 'items': {'type': 'string'}},
         as_array={'type': 'boolean', 'default': False},
-        delimiter={'type': 'unicode',
-                   'default': backwards.bytes2unicode(_default_delimiter)},
-        newline={'type': 'unicode',
-                 'default': backwards.bytes2unicode(_default_newline)},
-        comment={'type': 'unicode',
-                 'default': backwards.bytes2unicode(_default_comment)},
+        delimiter={'type': 'string',
+                   'default': str(backwards.bytes2unicode(_default_delimiter))},
+        newline={'type': 'string',
+                 'default': str(backwards.bytes2unicode(_default_newline))},
+        comment={'type': 'string',
+                 'default': str(backwards.bytes2unicode(_default_comment))},
         use_astropy={'type': 'boolean', 'default': False})
 
     def update_serializer(self, *args, **kwargs):

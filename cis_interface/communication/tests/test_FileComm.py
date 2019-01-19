@@ -9,14 +9,12 @@ class TestFileComm(parent.TestCommBase):
     r"""Test for FileComm communication class."""
 
     comm = 'FileComm'
-    testing_option_kws = {}
     
     def __init__(self, *args, **kwargs):
         super(TestFileComm, self).__init__(*args, **kwargs)
         self.attr_list += ['fd', 'read_meth', 'append', 'in_temp',
                            'open_as_binary', 'newline', 'is_series',
                            'platform_newline']
-        self._testing_options = None
 
     def teardown(self):
         r"""Remove the file."""
@@ -28,30 +26,8 @@ class TestFileComm(parent.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         out = super(TestFileComm, self).send_inst_kwargs
         out['in_temp'] = True
-        out.update(self.testing_options['kwargs'])
         return out
 
-    def get_testing_options(self):
-        r"""Get testing options."""
-        return self.import_cls.get_testing_options(**self.testing_option_kws)
-
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
-
-    @property
-    def test_msg(self):
-        r"""str: Test message that should be used for any send/recv tests."""
-        return self.testing_options['msg']
-
-    @property
-    def test_msg_array(self):
-        r"""str: Test message that should be used for any send/recv tests."""
-        return self.testing_options.get('msg_array', None)
-    
     @unittest.skipIf(True, 'File comm')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test send/recv of a large message."""
@@ -68,12 +44,6 @@ class TestFileComm(parent.TestCommBase):
         kwargs['read_meth'] = 'invalid'
         nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
-    def test_send_recv_dict(self):
-        r"""Test send/recv message as dict."""
-        msg_send = self.testing_options['dict']
-        self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
-                          msg_send=msg_send)
-        
     def test_append(self):
         r"""Test open of file comm with append."""
         send_objects = self.testing_options['send']

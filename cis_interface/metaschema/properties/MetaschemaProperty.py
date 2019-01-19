@@ -57,18 +57,20 @@ class MetaschemaProperty(object):
             str: Error messages associated with failed validation.
 
         """
+        errors = []
         if cls._validate is False:
-            return
+            pass
         elif cls._validate is not None:
             errors = cls._validate(validator, value, instance, schema) or ()
         else:
+            is_type = False
             for t in cls.types:
                 if validator.is_type(instance, t):
+                    is_type = True
                     break
-            else:
-                return
-            x = cls.encode(instance, typedef=value)
-            errors = cls.compare(x, value) or ()
+            if is_type:
+                x = cls.encode(instance, typedef=value)
+                errors = cls.compare(x, value) or ()
         for e in errors:
             yield e
 
@@ -109,7 +111,7 @@ class MetaschemaProperty(object):
             object: Normalized object.
 
         """
-        return instance
+        return validator._normalized
 
     @classmethod
     def normalize_in_schema(cls, schema):

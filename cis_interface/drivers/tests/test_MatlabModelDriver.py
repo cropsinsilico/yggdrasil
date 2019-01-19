@@ -48,9 +48,10 @@ def test_matlab_exit():  # pragma: matlab
 class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
     r"""Test parameters for MatlabModelDriver."""
 
+    driver = "MatlabModelDriver"
+    
     def __init__(self, *args, **kwargs):
         super(TestMatlabModelParam, self).__init__(*args, **kwargs)
-        self.driver = "MatlabModelDriver"
         self.args = [scripts["matlab"], "test", 1]
         self.attr_list += ['started_matlab', 'mlengine']
 

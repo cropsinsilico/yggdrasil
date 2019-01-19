@@ -11,8 +11,8 @@ _normalize_objects = [
                   'args': 'model.c',
                   'outputs': [{'name': 'outputA',
                                'column_names': ['a', 'b'],
-                               'column_units': ['cm', 'g'],
-                               'column': '\t'}],
+                               'column_units': ['cm', 'g']}],
+                  # 'column': '\t'}],
                   'working_dir': os.getcwd()}],
       'connections': [{'inputs': 'outputA',
                        'outputs': 'fileA.txt',
@@ -35,17 +35,14 @@ _normalize_objects = [
                                    'commtype': 'default'}],
                        'outputs': [{'name': 'fileA.txt',
                                     'filetype': 'binary',
-                                    # 'datatype': {'type': 'bytes'},
                                     'comment': '# ',
                                     'working_dir': os.getcwd(),
                                     'field_names': ['a', 'b'],
                                     'field_units': ['cm', 'g'],
-                                    'delimiter': '\t',
                                     'append': False,
                                     'as_array': False,
                                     'in_temp': False,
                                     'is_series': False,
-                                    # 'use_astropy': False,
                                     'newline': '\n'}]}]})]
                                     
 
@@ -87,7 +84,8 @@ def test_create_schema():
     assert(s0 is not None)
     assert(os.path.isfile(fname))
     s1 = schema.get_schema(fname)
-    nt.assert_equal(s1, s0)
+    nt.assert_equal(s1.schema, s0.schema)
+    # nt.assert_equal(s1, s0)
     os.remove(fname)
     # Test getting schema
     s2 = schema.load_schema(fname)

@@ -19,10 +19,11 @@ class TestParam(CisTestClassInfo):
 
     """
 
+    driver = 'Driver'
+    args = None
+
     def __init__(self, *args, **kwargs):
         super(TestParam, self).__init__(*args, **kwargs)
-        self.driver = 'Driver'
-        self.args = None
         self.namespace = 'TESTING_%s' % self.uuid
         self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout',
                            'yml', 'env', 'namespace', 'rank', 'working_dir',

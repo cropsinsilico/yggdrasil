@@ -16,10 +16,10 @@ definitions:
         commtype:
           default: default
           enum:
+          - default
           - ipc
           - rmq
           - zmq
-          - default
           type: string
         datatype:
           default:
@@ -55,13 +55,13 @@ definitions:
       - properties:
           commtype:
             enum:
-            - rmq
-        title: RMQComm
+            - ipc
+        title: IPCComm
       - properties:
           commtype:
             enum:
-            - ipc
-        title: IPCComm
+            - rmq
+        title: RMQComm
       - properties:
           commtype:
             enum:
@@ -79,18 +79,14 @@ definitions:
       properties:
         args:
           type: string
-        direction:
+        connection_type:
           enum:
-          - output
+          - file_input
+          - file_output
           - input
-          - null
+          - output
         driver:
           type: string
-        icomm_type:
-          enum:
-          - RMQComm
-          - FileComm
-          - DefaultComm
         inputs:
           items:
             anyOf:
@@ -98,11 +94,6 @@ definitions:
             - $ref: '#/definitions/file'
           minItems: 1
           type: array
-        ocomm_type:
-          enum:
-          - RMQComm
-          - FileComm
-          - DefaultComm
         onexit:
           type: string
         outputs:
@@ -122,82 +113,25 @@ definitions:
       type: object
     - anyOf:
       - properties:
-          direction:
+          connection_type:
             enum:
-            - null
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: ConnectionDriver
+            - file_input
+        title: FileInputDriver
       - properties:
-          direction:
+          connection_type:
             enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - FileComm
+            - file_output
         title: FileOutputDriver
       - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: OutputDriver
-      - properties:
-          direction:
-            enum:
-            - output
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - RMQComm
-        title: RMQOutputDriver
-      - properties:
-          direction:
+          connection_type:
             enum:
             - input
-          icomm_type:
-            enum:
-            - DefaultComm
-          ocomm_type:
-            enum:
-            - DefaultComm
         title: InputDriver
       - properties:
-          direction:
+          connection_type:
             enum:
-            - input
-          icomm_type:
-            enum:
-            - RMQComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: RMQInputDriver
-      - properties:
-          direction:
-            enum:
-            - input
-          icomm_type:
-            enum:
-            - FileComm
-          ocomm_type:
-            enum:
-            - DefaultComm
-        title: FileInputDriver
+            - output
+        title: OutputDriver
     description: Schema for connection components.
     title: connection
   file:
@@ -218,10 +152,9 @@ definitions:
           type: boolean
         comment:
           default: '# '
-          type: unicode
+          type: string
         delimiter: &id001
-          default: "\t"
-          type: unicode
+          type: string
         driver:
           type: string
         field_names:
@@ -235,15 +168,15 @@ definitions:
         filetype:
           default: binary
           enum:
-          - map
-          - pandas
-          - mat
-          - binary
-          - table
           - ascii
+          - binary
+          - map
+          - mat
+          - obj
+          - pandas
           - pickle
           - ply
-          - obj
+          - table
           type: string
         format_str: &id002
           type: string
@@ -259,13 +192,12 @@ definitions:
           default: '
 
             '
-          type: unicode
+          type: string
         recv_converter:
           type: function
         send_converter:
           type: function
         use_astropy: &id003
-          default: false
           type: boolean
         working_dir:
           type: string
@@ -278,8 +210,8 @@ definitions:
       - properties:
           filetype:
             enum:
-            - binary
-        title: FileComm
+            - ascii
+        title: AsciiFileComm
       - properties:
           delimiter: *id001
           filetype:
@@ -287,19 +219,8 @@ definitions:
             - map
         title: AsciiMapComm
       - properties:
-          filetype:
-            enum:
-            - ply
-        title: PlyFileComm
-      - properties:
-          filetype:
-            enum:
-            - ascii
-        title: AsciiFileComm
-      - properties:
           delimiter:
-            default: "\t"
-            type: unicode
+            type: string
           filetype:
             enum:
             - table
@@ -309,31 +230,39 @@ definitions:
       - properties:
           filetype:
             enum:
-            - mat
-        title: MatFileComm
+            - binary
+        title: FileComm
       - properties:
-          delimiter:
-            default: "\t"
-            type: unicode
           filetype:
             enum:
-            - pandas
-          format_str:
-            type: string
-          use_astropy:
-            default: false
-            type: boolean
-        title: PandasFileComm
+            - mat
+        title: MatFileComm
       - properties:
           filetype:
             enum:
             - obj
         title: ObjFileComm
       - properties:
+          delimiter:
+            type: string
+          filetype:
+            enum:
+            - pandas
+          format_str:
+            type: string
+          use_astropy:
+            type: boolean
+        title: PandasFileComm
+      - properties:
           filetype:
             enum:
             - pickle
         title: PickleFileComm
+      - properties:
+          filetype:
+            enum:
+            - ply
+        title: PlyFileComm
     description: Schema for file components.
     title: file
   model:
@@ -348,17 +277,16 @@ definitions:
           items:
             type: string
           type: array
-        builddir: &id008
+        builddir: &id004
           type: string
-        cc: &id004
+        cc: &id007
           type: string
         client_of:
           default: []
           items:
             type: string
           type: array
-        cmakeargs: &id009
-          default: []
+        cmakeargs: &id005
           items:
             type: string
           type: array
@@ -374,23 +302,21 @@ definitions:
           type: boolean
         language:
           enum:
-          - cpp
-          - make
+          - c
           - c++
           - cmake
-          - python
-          - lpy
-          - c
-          - matlab
+          - cpp
           - executable
+          - lpy
+          - make
+          - matlab
+          - python
           type: string
-        make_command: &id005
-          default: make
+        make_command: &id008
           type: string
-        makedir: &id006
+        makedir: &id009
           type: string
-        makefile: &id007
-          default: Makefile
+        makefile: &id010
           type: string
         name:
           type: string
@@ -399,7 +325,7 @@ definitions:
           items:
             $ref: '#/definitions/comm'
           type: array
-        sourcedir: &id010
+        sourcedir: &id006
           type: string
         strace_flags:
           default: []
@@ -428,12 +354,15 @@ definitions:
       type: object
     - anyOf:
       - properties:
+          builddir: *id004
+          cmakeargs: *id005
           language:
             enum:
-            - executable
-        title: ModelDriver
+            - cmake
+          sourcedir: *id006
+        title: CMakeModelDriver
       - properties:
-          cc: *id004
+          cc: *id007
           language:
             enum:
             - c
@@ -443,29 +372,26 @@ definitions:
       - properties:
           language:
             enum:
-            - make
-          make_command: *id005
-          makedir: *id006
-          makefile: *id007
-        title: MakeModelDriver
+            - lpy
+        title: LPyModelDriver
       - properties:
           language:
             enum:
-            - lpy
-        title: LPyModelDriver
+            - make
+          make_command: *id008
+          makedir: *id009
+          makefile: *id010
+        title: MakeModelDriver
       - properties:
           language:
             enum:
             - matlab
         title: MatlabModelDriver
       - properties:
-          builddir: *id008
-          cmakeargs: *id009
           language:
             enum:
-            - cmake
-          sourcedir: *id010
-        title: CMakeModelDriver
+            - executable
+        title: ModelDriver
       - properties:
           language:
             enum:

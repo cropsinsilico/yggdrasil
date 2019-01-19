@@ -10,10 +10,10 @@ class DirectSerialize(DefaultSerialize):
 
     _seritype = 'direct'
     _schema_properties = {
-        'newline': {'type': 'unicode',
-                    'default': backwards.bytes2unicode(_default_newline)},
-        'comment': {'type': 'unicode',
-                    'default': backwards.bytes2unicode(_default_comment)}}
+        'newline': {'type': 'string',
+                    'default': str(backwards.bytes2unicode(_default_newline))},
+        'comment': {'type': 'string',
+                    'default': str(backwards.bytes2unicode(_default_comment))}}
     _default_type = {'type': 'bytes'}
 
     def func_serialize(self, args):

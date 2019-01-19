@@ -31,6 +31,7 @@ class TestCommBase(CisTestClassInfo):
     """
 
     comm = 'CommBase'
+    testing_option_kws = {}
     
     def __init__(self, *args, **kwargs):
         super(TestCommBase, self).__init__(*args, **kwargs)
@@ -67,7 +68,9 @@ class TestCommBase(CisTestClassInfo):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        return {'comm': self.comm, 'reverse_names': True, 'direction': 'send'}
+        out = {'comm': self.comm, 'reverse_names': True, 'direction': 'send'}
+        out.update(self.testing_options['kwargs'])
+        return out
 
     @property
     def inst_args(self):
@@ -89,11 +92,27 @@ class TestCommBase(CisTestClassInfo):
         r"""int: Maximum message size."""
         return self.instance.maxMsgSize
 
+    def get_testing_options(self):
+        r"""Get testing options."""
+        return self.import_cls.get_testing_options(**self.testing_option_kws)
+
+    @property
+    def testing_options(self):
+        r"""dict: Testing options."""
+        if getattr(self, '_testing_options', None) is None:
+            self._testing_options = self.get_testing_options()
+        return self._testing_options
+
+    @property
+    def test_msg_array(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return self.testing_options.get('msg_array', None)
+    
     @property
     def test_msg(self):
         r"""str: Test message that should be used for any send/recv tests."""
-        return self.msg_short
-        
+        return self.testing_options['msg']
+
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         assert(self.is_installed)
@@ -171,7 +190,7 @@ class TestCommBase(CisTestClassInfo):
         send_inst, recv_inst = self.get_fresh_error_instance()
         send_inst._first_send_done = True
         send_inst.error_replace('send_multipart')
-        flag = send_inst.send(self.msg_short)
+        flag = send_inst.send(self.test_msg)
         assert(not flag)
         send_inst.restore_all()
         send_inst.close()
@@ -202,7 +221,7 @@ class TestCommBase(CisTestClassInfo):
         self.recv_instance.close()
         assert(self.send_instance.is_closed)
         assert(self.recv_instance.is_closed)
-        flag = self.send_instance.send(self.msg_short)
+        flag = self.send_instance.send(self.test_msg)
         assert(not flag)
         flag, msg_recv = self.recv_instance.recv()
         assert(not flag)
@@ -452,10 +471,10 @@ class TestCommBase(CisTestClassInfo):
 
     def test_send_recv_dict(self):
         r"""Test send/recv message as dict."""
-        msg_send = dict(f0=self.map_sent2recv(self.msg_short))
+        msg_send = self.testing_options['dict']
         self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
                           msg_send=msg_send)
-
+        
     def test_is_installed(self):
         r"""Test class is_installed method."""
         assert(not self.import_cls.is_installed(language='invalid'))

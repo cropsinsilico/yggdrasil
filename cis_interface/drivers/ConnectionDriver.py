@@ -5,7 +5,7 @@ import threading
 from cis_interface import backwards
 from cis_interface.communication import new_comm, get_comm_class
 from cis_interface.drivers.Driver import Driver
-from cis_interface.schema import register_component, get_schema
+from cis_interface.schema import get_schema
 
 
 def _translate_list2element(arr):
@@ -14,7 +14,6 @@ def _translate_list2element(arr):
     return arr[0]
 
 
-@register_component
 class ConnectionDriver(Driver):
     r"""Class that continuously passes messages from one comm to another.
 
@@ -58,9 +57,11 @@ class ConnectionDriver(Driver):
             model exits, but before the driver is shut down.
 
     """
-    
+
+    _connection_type = 'default'
     _icomm_type = 'DefaultComm'
     _ocomm_type = 'DefaultComm'
+    _direction = 'any'
     _schema_type = 'connection'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
@@ -72,20 +73,16 @@ class ConnectionDriver(Driver):
                                         {'$ref': '#/definitions/file'}]}},
         'translator': {'type': 'array', 'items': {'type': 'function'}},
         'onexit': {'type': 'string'}}
-    
-    _is_input = False
-    _is_output = False
 
-    @classmethod
-    def direction(cls):
-        r"""Get direction of connection."""
-        if cls._is_input:
-            out = 'input'
-        elif cls._is_output:
-            out = 'output'
-        else:
-            out = None
-        return out
+    @property
+    def _is_input(self):
+        r"""bool: True if the connection is providing input to a model."""
+        return (self._direction == 'input')
+
+    @property
+    def _is_output(self):
+        r"""bool: True if the connection is retreiving output from a model."""
+        return (self._direction == 'output')
 
     def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)

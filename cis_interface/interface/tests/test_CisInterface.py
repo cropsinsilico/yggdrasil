@@ -76,12 +76,13 @@ class TestBase(CisTestClassInfo):
         self.test_comm_kwargs = {}
         # self._driver_kwargs = {}
         self._inst_args = [self.name]
-        self.messages = [self.msg_short]
 
     @property
     def odriver_class(self):
         r"""class: Output driver class."""
-        if (self.direction == 'output') and self.is_file:
+        if self.direction is None:
+            return None
+        elif (self.direction == 'output') and self.is_file:
             return import_driver('FileOutputDriver')
         elif (self.direction == 'input') and self.is_file:
             return None
@@ -90,7 +91,9 @@ class TestBase(CisTestClassInfo):
     @property
     def idriver_class(self):
         r"""class: Input driver class."""
-        if (self.direction == 'output') and self.is_file:
+        if self.direction is None:
+            return None
+        elif (self.direction == 'output') and self.is_file:
             return None
         elif (self.direction == 'input') and self.is_file:
             return import_driver('FileInputDriver')
@@ -142,6 +145,9 @@ class TestBase(CisTestClassInfo):
             assert(self.filecomm is not None)
             out = get_comm_class(self.filecomm).get_testing_options(
                 **self.testing_option_kws)
+        else:
+            out = get_comm_class().get_testing_options(
+                **self.testing_option_kws)
         return out
 
     @property
@@ -151,16 +157,23 @@ class TestBase(CisTestClassInfo):
             self._testing_options = self.get_testing_options()
         return self._testing_options
 
+    @property
+    def messages(self):
+        r"""list: Messages that should be sent/received."""
+        if getattr(self, '_messages', None) is not None:
+            return self._messages
+        return self.testing_options['send']
+
     def setup(self):
         r"""Start driver and instance."""
+        if self.direction is None:
+            return
         nprev_comm = self.comm_count
         nprev_thread = self.thread_count
         nprev_fd = self.fd_count
         idriver_class = self.idriver_class
         odriver_class = self.odriver_class
         # File
-        if self.is_file:
-            self.messages = None
         if self.is_file and (self.direction == 'input'):
             with open(self.filename, 'wb') as fd:
                 fd.write(self.testing_options['contents'])
@@ -207,6 +220,8 @@ class TestBase(CisTestClassInfo):
             self.test_comm.close()
         if self.is_file and os.path.isfile(self.filename):
             os.remove(self.filename)
+        if self.direction is None:
+            return
         super(TestBase, self).teardown()
         self.cleanup_comms()
 
@@ -298,7 +313,7 @@ class TestCisRpcClient(TestCisOutput):
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ServerComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
-        self.messages = [self.file_rows[0]]
+        self._messages = [self.file_rows[0]]
         
     @property
     def odriver_class(self):
@@ -337,7 +352,7 @@ class TestCisRpcServer(TestCisInput):
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ClientComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
-        self.messages = [self.file_rows[0]]
+        self._messages = [self.file_rows[0]]
         
     @property
     def odriver_class(self):

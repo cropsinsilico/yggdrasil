@@ -2,23 +2,22 @@
 
 model:
   name: hello_c
-  driver: GCCModelDriver
+  language: c
   args: ./src/hello.c  # compile the C code with necessary libraries
 
   inputs:
-    - name: inFile
-      driver: FileInputDriver
-      args: ./Input/input.txt
-    - name: helloQueueIn
-      driver: InputDriver
-      args: helloQueue
-      onexit: printStatus
-  
+    - inFile
+    - helloQueueIn
   outputs:
-    - name: helloQueueOut
-      driver: OutputDriver
-      args: helloQueue
-    - name: outFile
-      driver: FileOutputDriver
-      args: output_hello.txt
-      in_temp: True
+    - helloQueueOut
+    - outFile
+
+connections:
+  - input: ./Input/input.txt
+    output: inFile
+  - input: helloQueueOut
+    output: helloQueueIn
+    onexit: printStatus
+  - input: outFile
+    output: output_hello.txt
+    in_temp: True

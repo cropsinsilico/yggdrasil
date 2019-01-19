@@ -13,8 +13,9 @@ class FileInputDriver(ConnectionDriver):
 
     """
 
+    _connection_type = 'file_input'
     _icomm_type = 'FileComm'
-    _is_input = True
+    _direction = 'input'
 
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('icomm_kws', {})

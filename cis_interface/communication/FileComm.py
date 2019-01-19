@@ -106,7 +106,7 @@ class FileComm(CommBase.CommBase):
                 setattr(self, k, func_conv(v))
 
     @classmethod
-    def get_testing_options(cls, **kwargs):
+    def get_testing_options(cls, read_meth='read', **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -120,18 +120,12 @@ class FileComm(CommBase.CommBase):
                     the messages in 'send'.
 
         """
-        out = cls._default_serializer.get_testing_options(**kwargs)
-        out = {'kwargs': out['kwargs'],
-               'send': out['objects'],
-               'msg': out['objects'][0],
-               'contents': out['contents']}
-        if isinstance(out['send'][0], bytes):
-            out['recv'] = [out['contents']]
-        else:
-            out['recv'] = out['send']
-        out['dict'] = {'f0': out['msg']}
+        out = super(FileComm, cls).get_testing_options(**kwargs)
+        out['kwargs']['read_meth'] = read_meth
+        if read_meth == 'readline':
+            out['recv'] = out['recv'][0].splitlines(True)
         return out
-
+        
     @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this

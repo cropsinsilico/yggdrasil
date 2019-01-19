@@ -29,21 +29,6 @@ class TestFileOutputParam(parent.TestConnectionParam):
         r"""Keyword arguments for receive comm."""
         return {'comm': 'CommBase'}
         
-    @property
-    def ocomm_kws(self):
-        r"""dict: Keyword arguments for connection output comm."""
-        out = super(TestFileOutputParam, self).ocomm_kws
-        out.update(self.testing_options['kwargs'])
-        return out
-        
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.ocomm_import_cls.get_testing_options(
-                **self.testing_option_kws)
-        return self._testing_options
-    
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileOutputParam, self).teardown()

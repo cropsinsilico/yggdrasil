@@ -34,9 +34,10 @@ def test_MakeModelDriver_error_nofile():
 class TestMakeModelParam(parent.TestModelParam):
     r"""Test parameters for MakeModelDriver."""
 
+    driver = 'MakeModelDriver'
+    
     def __init__(self, *args, **kwargs):
         super(TestMakeModelParam, self).__init__(*args, **kwargs)
-        self.driver = 'MakeModelDriver'
         self.attr_list += ['compiled', 'target', 'make_command',
                            'makedir', 'makefile']
         self.makedir, self.target = os.path.split(scripts['make'])

@@ -1,15 +1,19 @@
 import uuid
-import importlib
-import nose.tools as nt
+import unittest
 from cis_interface import tools
-from cis_interface.tests import MagicTestError
+from cis_interface.tests import MagicTestError, assert_raises
+from cis_interface.schema import get_schema
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
-from cis_interface.communication import new_comm
+from cis_interface.communication import (
+    new_comm, ZMQComm, IPCComm, RMQComm, get_comm_class)
 
 
 _default_comm = tools.get_default_comm()
+_zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
+_ipc_installed = IPCComm.IPCComm.is_installed(language='python')
+_rmq_server_running = RMQComm._rmq_server_running
 
             
 class TestConnectionParam(parent.TestParam):
@@ -18,10 +22,11 @@ class TestConnectionParam(parent.TestParam):
     comm_name = _default_comm
     icomm_name = _default_comm
     ocomm_name = _default_comm
+    testing_option_kws = {}
+    driver = 'ConnectionDriver'
     
     def __init__(self, *args, **kwargs):
         super(TestConnectionParam, self).__init__(*args, **kwargs)
-        self.driver = 'ConnectionDriver'
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',
                            'nrecv', 'nproc', 'nsent', 'state', 'translator']
         # self.timeout = 1.0
@@ -32,11 +37,44 @@ class TestConnectionParam(parent.TestParam):
         r"""String prefix to prepend docstr test message with."""
         out = super(TestConnectionParam, self).description_prefix
         return '%s(%s, %s)' % (out, self.icomm_name, self.ocomm_name)
+
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum message size."""
+        return min(self.instance.icomm.maxMsgSize,
+                   self.instance.ocomm.maxMsgSize)
+
+    @property
+    def is_input(self):
+        r"""bool: True if the connection is for input."""
+        return (self.icomm_name != self.comm_name)
+
+    @property
+    def is_output(self):
+        r"""bool: True if the connection is for output."""
+        return (self.ocomm_name != self.comm_name)
         
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
         self.assert_equal(x, y)
 
+    def get_testing_options(self):
+        r"""Get testing options."""
+        if self.is_output:
+            out = self.ocomm_import_cls.get_testing_options(
+                **self.testing_option_kws)
+        else:
+            out = self.icomm_import_cls.get_testing_options(
+                **self.testing_option_kws)
+        return out
+
+    @property
+    def testing_options(self):
+        r"""dict: Testing options."""
+        if getattr(self, '_testing_options', None) is None:
+            self._testing_options = self.get_testing_options()
+        return self._testing_options
+    
     @property
     def cleanup_comm_classes(self):
         r"""list: Comm classes that should be cleaned up following the test."""
@@ -46,26 +84,28 @@ class TestConnectionParam(parent.TestParam):
     @property
     def icomm_kws(self):
         r"""dict: Keyword arguments for connection input comm."""
-        return {'name': self.icomm_name, 'comm': self.icomm_name}
+        out = {'name': self.icomm_name, 'comm': self.icomm_name}
+        if self.is_input:
+            out.update(self.testing_options['kwargs'])
+        return out
 
     @property
     def ocomm_kws(self):
         r"""dict: Keyword arguments for connection output comm."""
-        return {'name': self.ocomm_name, 'comm': self.ocomm_name}
+        out = {'name': self.ocomm_name, 'comm': self.ocomm_name}
+        if self.is_output:
+            out.update(self.testing_options['kwargs'])
+        return out
 
     @property
     def icomm_import_cls(self):
         r"""class: Class used for connection input comm."""
-        mod = importlib.import_module('cis_interface.communication.%s'
-                                      % self.icomm_name)
-        return getattr(mod, self.icomm_name)
+        return get_comm_class(self.icomm_name)
 
     @property
     def ocomm_import_cls(self):
         r"""class: Class used for connection output comm."""
-        mod = importlib.import_module('cis_interface.communication.%s'
-                                      % self.ocomm_name)
-        return getattr(mod, self.ocomm_name)
+        return get_comm_class(self.ocomm_name)
 
     @property
     def send_comm_kwargs(self):
@@ -324,12 +364,48 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
 
 def test_ConnectionDriverOnexit_errors():
     r"""Test that errors are raised for invalid onexit."""
-    nt.assert_raises(ValueError, ConnectionDriver, 'test',
-                     onexit='invalid')
+    assert_raises(ValueError, ConnectionDriver, 'test',
+                  onexit='invalid')
 
 
 def test_ConnectionDriverTranslate_errors():
     r"""Test that errors are raised for invalid translators."""
     assert(not hasattr(invalid_translate, '__call__'))
-    nt.assert_raises(ValueError, ConnectionDriver, 'test',
-                     translator=invalid_translate)
+    assert_raises(ValueError, ConnectionDriver, 'test',
+                  translator=invalid_translate)
+
+    
+# Dynamically create tests based on registered file classes
+s = get_schema()
+comm_types = list(s['comm'].schema_subtypes.keys())
+for k in comm_types:
+    if k == _default_comm:
+        continue
+    # Output
+    ocls = type('Test%sOutputDriver' % k,
+                (TestConnectionDriver, ), {'ocomm_name': k,
+                                           'driver': 'OutputDriver',
+                                           'args': 'test'})
+    # Input
+    icls = type('Test%sInputDriver' % k,
+                (TestConnectionDriver, ), {'icomm_name': k,
+                                           'driver': 'InputDriver',
+                                           'args': 'test'})
+    # Flags
+    flag_func = None
+    if k in ['RMQComm', 'RMQAsyncComm']:
+        flag_func = unittest.skipIf(not _rmq_server_running,
+                                    "RMQ Server not running")
+    elif k in ['ZMQComm']:
+        flag_func = unittest.skipIf(not _zmq_installed,
+                                    "ZMQ library not installed")
+    elif k in ['IPCComm']:
+        flag_func = unittest.skipIf(not _ipc_installed,
+                                    "IPC library not installed")
+    if flag_func is not None:
+        ocls = flag_func(ocls)
+        icls = flag_func(icls)
+    # Add class to globals
+    globals()[ocls.__name__] = ocls
+    globals()[icls.__name__] = icls
+    del ocls, icls

@@ -67,6 +67,22 @@ else:
 shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 
+def assert_raises(exception, callable, *args, **kwargs):
+    r"""Assert that a call raises an exception.
+
+    Args:
+        exception (Exception): Exception class that should be raised.
+        callable (function, class): Callable that should raise the exception.
+        *args: Additional arguments are passed to the callable.
+        **kwargs: Additional keyword arguments are passed to the callable.
+
+    Raises:
+        AssertionError: If the correct exception is not raised.
+
+    """
+    return nt.assert_raises(exception, callable, *args, **kwargs)
+
+
 def assert_equal(x, y):
     r"""Assert that two messages are equivalent.
 
@@ -154,7 +170,7 @@ class CisTestBase(unittest.TestCase):
 
     def assert_raises(self, *args, **kwargs):
         r"""Assert that a function raises an error."""
-        nt.assert_raises(*args, **kwargs)
+        assert_raises(*args, **kwargs)
 
     @property
     def comm_count(self):

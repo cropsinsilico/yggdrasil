@@ -1,6 +1,6 @@
 model:
   name: lpy_model
-  driver: LPyModelDriver
+  language: lpy
   args:
     - ../scripts/lpy_model.lpy
   input: LPy_time

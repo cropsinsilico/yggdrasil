@@ -25,6 +25,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
 
     """
     
+    _commtype = 'rmq_async'
+    
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""
         self.times_connected = 0

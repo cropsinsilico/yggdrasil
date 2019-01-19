@@ -1,6 +1,6 @@
 model:
   name: cmake_model
-  driver: CMakeModelDriver
+  language: cmake
   args:
     - gcc_model
   sourcedir: ../scripts/

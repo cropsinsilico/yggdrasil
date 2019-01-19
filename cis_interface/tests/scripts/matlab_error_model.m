@@ -1,1 +1,1 @@
-exit(0);
+error('Test error');

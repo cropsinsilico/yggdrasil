@@ -416,6 +416,33 @@ class CommBase(tools.CisClass):
             default = v.get('default', None)
             setattr(self, k, kwargs.get(k, default))
 
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = cls._default_serializer.get_testing_options(**kwargs)
+        out = {'kwargs': out['kwargs'],
+               'send': out['objects'],
+               'msg': out['objects'][0],
+               'contents': out['contents']}
+        if isinstance(out['send'][0], bytes):
+            out['recv'] = [out['contents']]
+        else:
+            out['recv'] = out['send']
+        out['dict'] = {'f0': out['msg']}
+        return out
+
     def printStatus(self, nindent=0):
         r"""Print status of the communicator."""
         prefix = nindent * '\t'

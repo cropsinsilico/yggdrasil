@@ -138,7 +138,7 @@ class ComponentSchema(object):
 
     """
     _subtype_keys = {'model': 'language', 'comm': 'commtype', 'file': 'filetype',
-                     'connection': ('icomm_type', 'ocomm_type', 'direction')}
+                     'connection': 'connection_type'}
 
     def __init__(self, schema_type, schema_registry=None, schema_subtypes=None):
         self._storage = {}
@@ -166,7 +166,9 @@ class ComponentSchema(object):
             prop_default[subt]['enum'] = []
         # Get list of properties for each subtype and move properties to
         # base for brevity
-        for k, v0 in self._storage.items():
+        # This might need to be done in order of priority
+        for k in sorted(list(self._storage.keys())):
+            v0 = self._storage[k]
             v = copy.deepcopy(v0)
             combo['allOf'][1]['anyOf'].append(v)
             for p in v['properties'].keys():
@@ -177,7 +179,7 @@ class ComponentSchema(object):
             # for subt in self.subtype_keys:
             #     prop_default[subt]['enum'] += v['properties'][subt]['enum']
         for subt in self.subtype_keys:
-            prop_default[subt]['enum'] = list(set(prop_default[subt]['enum']))
+            prop_default[subt]['enum'] = sorted(list(set(prop_default[subt]['enum'])))
         out.update(**combo)
         return out
 
@@ -216,11 +218,11 @@ class ComponentSchema(object):
         subt_schema = schema['allOf'][1]['anyOf']
         for v in subt_schema:
             out._storage[v['title']] = v
-            if schema_type == 'connection':
-                subtypes = [
-                    tuple([v['properties'][k]['enum'][0] for k in out.subtype_keys])]
-            else:
-                subtypes = v['properties'][out.subtype_keys[0]]['enum']
+            # if schema_type == 'connection':
+            #     subtypes = [
+            #         tuple([v['properties'][k]['enum'][0] for k in out.subtype_keys])]
+            # else:
+            subtypes = v['properties'][out.subtype_keys[0]]['enum']
             out.schema_subtypes[v['title']] = subtypes
         return out
 
@@ -251,7 +253,7 @@ class ComponentSchema(object):
             out = list(self._base_schema['properties'].keys())
         for v in self._storage.values():
             out += list(v['properties'].keys())
-        return list(set(out))
+        return sorted(list(set(out)))
 
     def get_subtype_properties(self, subtype):
         r"""Get the valid properties for a specific subtype.
@@ -267,7 +269,7 @@ class ComponentSchema(object):
         if self._base_schema is not None:
             out = list(self._base_schema['properties'].keys())
         out += list(self._storage[subtype]['properties'].keys())
-        return list(set(out))
+        return sorted(list(set(out)))
 
     @property
     def class2subtype(self):
@@ -289,7 +291,7 @@ class ComponentSchema(object):
         out = []
         for v in self.schema_subtypes.values():
             out += v
-        return list(set(out))
+        return sorted(list(set(out)))
 
     @property
     def classes(self):
@@ -315,11 +317,11 @@ class ComponentSchema(object):
         for k, v in subtype.items():
             if not isinstance(v, list):
                 subtype[k] = [v]
-        if self.schema_type == 'connection':
-            subtype['direction'] = [comp_cls.direction()]
-            subtype_list = [tuple([subtype[ik][0] for ik in self.subtype_keys])]
-        else:
-            subtype_list = subtype[self.subtype_keys[0]]
+        # if self.schema_type == 'connection':
+        #     subtype['direction'] = [comp_cls.direction()]
+        #     subtype_list = [tuple([subtype[ik][0] for ik in self.subtype_keys])]
+        # else:
+        subtype_list = subtype[self.subtype_keys[0]]
         self.schema_subtypes[name] = subtype_list
         # Create base schema
         if self._base_schema is None:
@@ -348,6 +350,8 @@ class ComponentSchema(object):
                 assert(self._base_schema['properties'][k] == v)
             else:
                 new_schema['properties'][k] = copy.deepcopy(v)
+                if 'default' in new_schema['properties'][k]:
+                    del new_schema['properties'][k]['default']
         if not new_schema['required']:
             del new_schema['required']
         for subt in self.subtype_keys:
@@ -635,6 +639,31 @@ def rwmeth2filetype(rw_meth):
     return out
 
 
+def cdriver2commtype(driver):
+    r"""Convert a connection driver to a file type.
+
+    Args:
+        driver (str): The name of the connection driver.
+
+    Returns:
+        str: The corresponding file type for the driver.
+
+    """
+    _legacy = {'InputDriver': 'default',
+               'OutputDriver': 'default',
+               'ZMQInputDriver': 'zmq',
+               'ZMQOutputDriver': 'zmq',
+               'IPCInputDriver': 'ipc',
+               'IPCOutputDriver': 'ipc',
+               'RMQInputDriver': 'rmq',
+               'RMQOutputDriver': 'rmq',
+               'RMQAsyncInputDriver': 'rmq_async',
+               'RMQAsyncOutputDriver': 'rmq_async'}
+    if driver in _legacy:
+        return _legacy[driver]
+    raise ValueError("Unknown driver: '%s'" % driver)
+
+    
 def cdriver2filetype(driver):
     r"""Convert a connection driver to a file type.
 
@@ -645,7 +674,9 @@ def cdriver2filetype(driver):
         str: The corresponding file type for the driver.
 
     """
-    _legacy = {'AsciiMapInputDriver': 'map',
+    _legacy = {'FileInputDriver': 'binary',
+               'FileOutputDriver': 'binary',
+               'AsciiMapInputDriver': 'map',
                'AsciiMapOutputDriver': 'map',
                'AsciiFileInputDriver': 'ascii',
                'AsciiFileOutputDriver': 'ascii',
@@ -663,17 +694,7 @@ def cdriver2filetype(driver):
                'MatOutputDriver': 'mat'}
     if driver in _legacy:
         return _legacy[driver]
-    schema = get_schema()
-    conntypes = schema['connection'].class2subtype
-    filetypes = schema['file'].class2subtype
-    if driver not in conntypes:
-        raise ValueError("%s is not a registered connection driver." % driver)
-    icomm, ocomm, direction = conntypes[driver][0]
-    if direction == 'input':
-        ftype = filetypes[icomm][0]
-    else:
-        ftype = filetypes[ocomm][0]
-    return ftype
+    raise ValueError("%s is not a registered connection driver." % driver)
 
 
 def migrate_keys(from_dict, to_dict, key_list):
@@ -835,6 +856,8 @@ def _normalize_connio_base(normalizer, value, instance, schema):
             iyml = iodict['inputs'][iname]
             conn = dict(input=oname, output=iname)
             new_connections.append(([oyml, iyml], conn))
+            oyml['commtype'] = cdriver2commtype(oyml['driver'])
+            iyml['commtype'] = cdriver2commtype(iyml['driver'])
             oyml.pop('working_dir', None)
             iyml.pop('working_dir', None)
         # File input

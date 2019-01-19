@@ -20,10 +20,10 @@ class AsciiMapSerialize(DefaultSerialize):
     
     _seritype = 'ascii_map'
     _schema_properties = {
-        'delimiter': {'type': 'unicode',
-                      'default': backwards.bytes2unicode(_default_delimiter)},
-        'newline': {'type': 'unicode',
-                    'default': backwards.bytes2unicode(_default_newline)}}
+        'delimiter': {'type': 'string',
+                      'default': str(backwards.bytes2unicode(_default_delimiter))},
+        'newline': {'type': 'string',
+                    'default': str(backwards.bytes2unicode(_default_newline))}}
     _default_type = {'type': 'object'}
 
     @property
@@ -45,11 +45,11 @@ class AsciiMapSerialize(DefaultSerialize):
         order = sorted([k for k in args.keys()])
         for k in order:
             v = args[k]
-            if not isinstance(k, str):
+            if not isinstance(k, backwards.string_types):
                 raise ValueError("Serialization of non-string keys not supported.")
-            out += k + self.delimiter
+            out += str(backwards.bytes2unicode(k)) + self.delimiter
             if isinstance(v, backwards.string_types):
-                v = backwards.bytes2unicode(v)
+                v = str(backwards.bytes2unicode(v))
             out += json.dumps(v, cls=JSONReadableEncoder)
             out += self.newline
         return backwards.unicode2bytes(out)
@@ -68,7 +68,7 @@ class AsciiMapSerialize(DefaultSerialize):
             out = self.empty_msg
         else:
             out = dict()
-            lines = backwards.bytes2unicode(msg).split(self.newline)
+            lines = str(backwards.bytes2unicode(msg)).split(self.newline)
             for l in lines:
                 kv = l.split(self.delimiter)
                 if len(kv) <= 1:

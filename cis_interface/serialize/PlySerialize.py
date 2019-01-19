@@ -25,8 +25,8 @@ class PlySerialize(DefaultSerialize):
     
     _seritype = 'ply'
     _schema_properties = dict(
-        newline={'type': 'unicode',
-                 'default': backwards.bytes2unicode(_default_newline)})
+        newline={'type': 'string',
+                 'default': str(backwards.bytes2unicode(_default_newline))})
     _default_type = {'type': 'ply'}
 
     def __init__(self, *args, **kwargs):
