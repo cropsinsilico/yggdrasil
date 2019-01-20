@@ -163,7 +163,7 @@ def update_config_matlab(config):
             backwards.bytes2unicode(mtl_proc.split(mtl_id)[-3]))
         opts['release'][1] = str(
             backwards.bytes2unicode(mtl_proc.split(mtl_id)[-2]))
-    except subprocess.CalledProcessError:  # pragma: no matlab
+    except (subprocess.CalledProcessError, OSError):  # pragma: no matlab
         pass
     for k in opts.keys():
         if not config.has_option('matlab', k):
