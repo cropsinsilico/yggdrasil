@@ -831,8 +831,11 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         if dtype is not None:
             arr = arr.astype(dtype)
     else:
+        print('dtype', dtype)
         arr = np.genfromtxt(fd, autostrip=True, dtype=None,
-                            names=names, **np_kws)
+                            names=names, encoding='bytes', **np_kws)
+        print('orig', arr.dtype)
+        print('new', dtype)
         if dtype is not None:
             arr = arr.astype(dtype)
     fd.close()
