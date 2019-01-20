@@ -1,12 +1,14 @@
 import threading
 from cis_interface import backwards, tools
 from cis_interface.communication import RMQComm
+from cis_interface.schema import register_component
 if RMQComm._rmq_installed:
     import pika
 else:
     pika = False
 
 
+@register_component
 class RMQAsyncComm(RMQComm.RMQComm):
     r"""Class for handling asynchronous RabbitMQ communications. It is not
     recommended to use this class as it can leave hanging threads if not

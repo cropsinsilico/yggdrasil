@@ -11,7 +11,7 @@ definitions:
         as_array: {default: false, type: boolean}
         commtype:
           default: default
-          enum: [default, ipc, rmq, zmq]
+          enum: [default, ipc, rmq, rmq_async, zmq]
           type: string
         datatype:
           default: {type: bytes}
@@ -37,6 +37,10 @@ definitions:
           commtype:
             enum: [ipc]
         title: IPCComm
+      - properties:
+          commtype:
+            enum: [rmq_async]
+        title: RMQAsyncComm
       - properties:
           commtype:
             enum: [rmq]
@@ -215,6 +219,7 @@ definitions:
           default: []
           items: {$ref: '#/definitions/comm'}
           type: array
+        overwrite: &id011 {type: boolean}
         sourcedir: &id006 {type: string}
         strace_flags:
           default: []
@@ -243,8 +248,8 @@ definitions:
         title: CMakeModelDriver
       - properties:
           language:
-            enum: [lpy]
-        title: LPyModelDriver
+            enum: [matlab]
+        title: MatlabModelDriver
       - properties:
           language:
             enum: [make]
@@ -256,11 +261,12 @@ definitions:
           cc: *id010
           language:
             enum: [c, c++, cpp]
+          overwrite: *id011
         title: GCCModelDriver
       - properties:
           language:
-            enum: [matlab]
-        title: MatlabModelDriver
+            enum: [lpy]
+        title: LPyModelDriver
       - properties:
           language:
             enum: [executable]
