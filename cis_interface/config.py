@@ -126,6 +126,54 @@ def locate_file(fname):
     return first
 
 
+def update_config_matlab(config):
+    r"""Update config options specific to matlab.
+
+    Args:
+        config (CisConfigParser): Config class that options should be set for.
+
+    Returns:
+        list: Section, option, description tuples for options that could not be
+            set.
+
+    """
+    out = []
+    if not config.has_section('matlab'):
+        config.add_section('matlab')
+    opts = {
+        'startup_waittime_s': [('The time allowed for a Matlab engine to start'
+                               + 'before timing out and reporting an error.'),
+                               10],
+        'release': ['The version (release number) of matlab that is installed.',
+                    ''],
+        'matlabroot': ['The path to the default installation of matlab.', '']}
+    mtl_id = '=MATLABROOT='
+    cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
+           + ",matlabroot,version('-release')); exit();")
+    mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
+               '-r', '%s' % cmd]
+    try:  # pragma: matlab
+        mtl_proc = subprocess.check_output(mtl_cmd)
+        mtl_id = backwards.unicode2bytes(mtl_id)
+        if mtl_id not in mtl_proc:  # pragma: debug
+            print(mtl_proc)
+            raise RuntimeError("Could not locate matlab root id (%s) in output."
+                               % mtl_id)
+        opts['matlabroot'][1] = str(
+            backwards.bytes2unicode(mtl_proc.split(mtl_id)[-3]))
+        opts['release'][1] = str(
+            backwards.bytes2unicode(mtl_proc.split(mtl_id)[-2]))
+    except subprocess.CalledProcessError:  # pragma: no matlab
+        pass
+    for k in opts.keys():
+        if not config.has_option('matlab', k):
+            if opts[k][1]:
+                config.set('matlab', k, opts[k][1])
+            else:
+                out.append(('matlab', k, opts[k][0]))
+    return out
+
+
 def update_config_windows(config):  # pragma: windows
     r"""Update config options specific to windows.
 
@@ -141,10 +189,14 @@ def update_config_windows(config):  # pragma: windows
     if not config.has_section('windows'):
         config.add_section('windows')
     # Find paths
-    clibs = [('libzmq_include', 'zmq.h', 'The full path to the zmq.h header file.'),
-             ('libzmq_static', 'zmq.lib', 'The full path to the zmq.lib static library.'),
-             ('czmq_include', 'czmq.h', 'The full path to the czmq.h header file.'),
-             ('czmq_static', 'czmq.lib', 'The full path to the czmq.lib static library.')]
+    clibs = [('libzmq_include', 'zmq.h',
+              'The full path to the zmq.h header file.'),
+             ('libzmq_static', 'zmq.lib',
+              'The full path to the zmq.lib static library.'),
+             ('czmq_include', 'czmq.h',
+              'The full path to the czmq.h header file.'),
+             ('czmq_static', 'czmq.lib',
+              'The full path to the czmq.lib static library.')]
     for opt, fname, desc in clibs:
         if not config.has_option('windows', opt):
             fpath = locate_file(fname)
@@ -177,10 +229,11 @@ def update_config(config_file, config_base=None):
     miss = []
     if platform._is_win:  # pragma: windows
         miss += update_config_windows(cp)
+    miss += update_config_matlab(cp)
     with open(config_file, 'w') as fd:
         cp.write(fd)
     for sect, opt, desc in miss:  # pragma: windows
-        warnings.warn(("Could not locate option %s in section %s."
+        warnings.warn(("Could not set option %s in section %s."
                        + "Please set this in %s to: %s")
                       % (opt, sect, config_file, desc))
 

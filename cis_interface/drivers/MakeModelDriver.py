@@ -39,12 +39,13 @@ class MakeModelDriver(ModelDriver):
             any arguments for the executable.
         make_command (str, optional): Command that should be used for make.
             Defaults to 'make' on Linux/MacOS and 'nmake' on windows.
-        makefile (str, optional): Path to make file either relative to makedir
-            or absolute. Defaults to Makefile.
+        makefile (str, optional): Path to make file either absolute, relative to
+            makedir (if provided), or relative to working_dir. Defaults to
+            Makefile.
         makedir (str, optional): Directory where make should be invoked from
             if it is not the same as the directory containing the makefile.
-            Defaults to directory containing makefile if an absolute path is
-            provided, otherwise self.working_dir.
+            Defaults to directory containing makefile if provided, otherwise
+            self.working_dir.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -73,11 +74,15 @@ class MakeModelDriver(ModelDriver):
         self.debug('')
         self.compiled = False
         self.target = self.args[0]
-        if self.makedir is None:
-            if os.path.isabs(self.makefile):
-                self.makedir = os.path.dirname(self.makefile)
+        if not os.path.isabs(self.makefile):
+            if self.makedir is not None:
+                self.makefile = os.path.normpath(
+                    os.path.join(self.makedir, self.makefile))
             else:
-                self.makedir = self.working_dir
+                self.makefile = os.path.normpath(
+                    os.path.join(self.working_dir, self.makefile))
+        if self.makedir is None:
+            self.makedir = os.path.dirname(self.makefile)
         self.target_file = os.path.join(self.makedir, self.target)
         self.args[0] = self.target_file
         # Set environment variables

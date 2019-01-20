@@ -21,6 +21,11 @@ from cis_interface.schema import register_component
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
+_compat_map = {
+    'R2015b': ['2.7', '3.3', '3.4'],
+    'R2017a': ['2.7', '3.3', '3.4', '3.5'],
+    'R2017b': ['2.7', '3.3', '3.4', '3.5', '3.6'],
+    'R2018b': ['2.7', '3.3', '3.4', '3.5', '3.6']}
 
 
 def kill_all():

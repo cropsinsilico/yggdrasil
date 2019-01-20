@@ -83,7 +83,8 @@ class ModelDriver(Driver):
 
     def __init__(self, name, args, model_index=0, **kwargs):
         for k, v in self._schema_properties.items():
-            if k in ['name', 'language', 'args', 'inputs', 'outputs', 'working_dir']:
+            if k in ['name', 'language', 'args',
+                     'inputs', 'outputs', 'working_dir']:
                 continue
             default = v.get('default', None)
             setattr(self, k, kwargs.pop(k, default))
