@@ -453,7 +453,7 @@ def print_encoded(msg, *args, **kwargs):
     """
     try:
         print(backwards.bytes2unicode(msg), *args, **kwargs)
-    except UnicodeEncodeError:  # pragma: debug
+    except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
         logging.debug("sys.stdout.encoding = %s, cannot print unicode",
                       sys.stdout.encoding)
         kwargs.pop('end', None)

@@ -260,9 +260,10 @@ def stop_matlab(screen_session, matlab_engine, matlab_session, matlab_process,
             debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
-            matlab_process.terminate()
-            error("stop_matlab timed out at %f s. " % T.elapsed
-                  + "Killed Matlab sharedEngine process.")
+            if matlab_process is not None:
+                matlab_process.terminate()
+                error("stop_matlab timed out at %f s. " % T.elapsed
+                      + "Killed Matlab sharedEngine process.")
 
 
 class MatlabProcess(tools.CisClass):  # pragma: matlab
