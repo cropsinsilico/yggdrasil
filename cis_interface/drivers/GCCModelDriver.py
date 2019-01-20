@@ -484,7 +484,7 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
                                           working_dir=working_dir))
     # Link compile objects
     out = call_link(fname_src_obj, out, cpp=True,
-                    flags=copy.deepcopy(ldflags0 + ldflags),
+                    flags=copy.deepcopy(ccflags0 + ccflags + ldflags0 + ldflags),
                     overwrite=overwrite, working_dir=working_dir)
     return [out] + fname_src_obj
 
