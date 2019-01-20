@@ -36,7 +36,7 @@ def kill_all():
         os.system(('pkill -f matlab.engine.shareEngine'))
 
 
-def locate_matlab_engine_processes():
+def locate_matlab_engine_processes():  # pragma: matlab
     r"""Get all of the active matlab sharedEngine processes.
 
     Returns:
