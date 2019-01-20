@@ -763,7 +763,7 @@ class IOInfo(object):
     @property
     def msg_long(self):
         r"""str: Small test message for sending."""
-        return b'Test message' + self.maxMsgSize * '0'
+        return b'Test message' + (self.maxMsgSize * b'0')
 
     def write_table(self, fname):
         r"""Write the table out to a file.
