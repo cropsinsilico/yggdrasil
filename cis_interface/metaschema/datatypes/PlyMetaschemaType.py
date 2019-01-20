@@ -262,6 +262,17 @@ class PlyDict(dict):
     def __init__(self, *args, **kwargs):
         super(PlyDict, self).__init__(*args, **kwargs)
         self._type_class.validate(self)
+
+    @classmethod
+    def from_dict(cls, in_dict):
+        r"""Get a version of the object from a dictionary."""
+        out = cls(**in_dict)
+        return out
+
+    def as_dict(self):
+        r"""Get a version of the object as a pure dictionary."""
+        out = dict(**self)
+        return out
     
     def count_elements(self, element_name):
         r"""Get the count of a certain element in the dictionary.

@@ -3,7 +3,7 @@ function x_ml = python2matlab(x_py)
   if isa(x_py, 'py.None')
     x_ml = NaN;
   elseif isa(x_py, 'py.float')
-    x_ml = float(x_py);
+    x_ml = single(double(x_py));
   elseif isa(x_py, 'py.double')
     x_ml = double(x_py);
   elseif isa(x_py, 'py.int')
@@ -12,6 +12,10 @@ function x_ml = python2matlab(x_py)
     x_ml = int64(py.int(x_py));
   elseif isa(x_py, 'py.numpy.int32')
     x_ml = int32(int64(py.int(x_py)));
+  elseif isa(x_py, 'py.numpy.float64')
+    x_ml = python2matlab(py.double(x_py));
+  elseif isa(x_py, 'py.numpy.float32')
+    x_ml = python2matlab(py.float(x_py));
   elseif isa(x_py, 'py.bytes')
     x_ml = char(x_py.decode('utf-8'));
   elseif isa(x_py, 'py.unicode')
@@ -29,11 +33,11 @@ function x_ml = python2matlab(x_py)
   elseif isa(x_py, ...
              ['py.cis_interface.metaschema.datatypes' ...
               '.PlyMetaschemaType.PlyDict']);
-    x_ml = x_py;
+    x_ml = python2matlab(x_py.as_dict());
   elseif isa(x_py, ...
              ['py.cis_interface.metaschema.datatypes' ...
               '.ObjMetaschemaType.ObjDict']);
-    x_ml = x_py;
+    x_ml = python2matlab(x_py.as_dict());
   elseif isa(x_py, 'py.dict')
     % x_ml = struct(x_py);
     dict_keys = python2matlab(py.list(keys(x_py)));

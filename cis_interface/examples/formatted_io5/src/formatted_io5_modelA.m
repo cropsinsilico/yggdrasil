@@ -16,20 +16,9 @@ while flag
   end;
 
   % Print received message
-  fprintf('Model A: (%d verts, %d faces)\n', ply.nvert, ply.nface);
-  fprintf('  Vertices:\n');
-  for i = 1:int64(ply.nvert)
-    fprintf('   %f, %f, %f\n', ...
-            ply{'vertices'}{i}{'x'}, ply{'vertices'}{i}{'y'}, ply{'vertices'}{i}{'z'});
-  end;
-  fprintf('  Faces:\n');
-  for i = 1:int64(ply.nface)
-    fprintf('   %d', ply{'faces'}{i}{'vertex_index'}{1});
-    for j = 2:size(ply{'faces'}{i}{'vertex_index'})
-      fprintf(', %d', ply{'faces'}{i}{'vertex_index'}{j});
-    end;
-    fprintf('\n');
-  end;
+  fprintf('Model A: (%d verts, %d faces)\n', ...
+          length(ply('vertices')), length(ply('faces')));
+  disp(ply);
 
   % Send output to output channel
   % If there is an error, the flag will be False

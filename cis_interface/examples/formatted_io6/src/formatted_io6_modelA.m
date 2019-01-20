@@ -16,20 +16,9 @@ while flag
   end;
 
   % Print received message
-  fprintf('Model A: (%d verts, %d faces)\n', obj.nvert, obj.nface);
-  fprintf('  Vertices:\n');
-  for i = 1:int64(obj.nvert)
-    fprintf('   %f, %f, %f\n', ...
-	    obj{'vertices'}{i}{'x'}, obj{'vertices'}{i}{'y'}, obj{'vertices'}{i}{'z'});
-  end;
-  fprintf('  Faces:\n');
-  for i = 1:int64(obj.nface)
-    fprintf('   %ld', int64(py.int(obj{'faces'}{i}{1}{'vertex_index'})));
-    for j = 2:size(obj{'faces'}{i})
-      fprintf(', %ld', int64(py.int(obj{'faces'}{i}{j}{'vertex_index'})));
-    end;
-    fprintf('\n');
-  end;
+  fprintf('Model A: (%d verts, %d faces)\n', ...
+          length(obj('vertices')), length(obj('faces')));
+  disp(obj);
 
   % Send output to output channel
   % If there is an error, the flag will be False
