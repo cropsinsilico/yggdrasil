@@ -1,7 +1,8 @@
 import subprocess
-from logging import debug
+from logging import debug, error
 from datetime import datetime
 import os
+import psutil
 import warnings
 import weakref
 try:  # pragma: matlab
@@ -28,6 +29,21 @@ def kill_all():
         os.system(('taskkill /F /IM matlab.engine.shareEngine /T'))
     else:
         os.system(('pkill -f matlab.engine.shareEngine'))
+
+
+def locate_matlab_engine_processes():  # pragma: matlab
+    r"""Get all of the active matlab sharedEngine processes.
+
+    Returns:
+        list: Active matlab sharedEngine processes.
+
+    """
+    out = []
+    for p in psutil.process_iter(attrs=['name', 'pid', 'cmdline']):
+        if (((p.info['name'] == 'MATLAB')
+             and ('matlab.engine.shareEngine' in p.info['cmdline']))):
+            out.append(p)  # p.info['pid'])
+    return out
 
 
 def is_matlab_running():
@@ -91,7 +107,9 @@ def start_matlab(skip_connect=False, timeout=None):  # pragma: matlab
             option ('matlab', 'startup_waittime_s').
 
     Returns:
-        str: Name of the screen session running matlab.
+        tuple: Information on the started session including the name of the
+            screen session running matlab, the created engine object, the name
+            of the matlab session, and the matlab engine process.
 
     Raises:
         RuntimeError: If Matlab is not installed.
@@ -101,6 +119,7 @@ def start_matlab(skip_connect=False, timeout=None):  # pragma: matlab
         raise RuntimeError("Matlab is not installed.")
     if timeout is None:
         timeout = float(config.cis_cfg.get('matlab', 'startup_waittime_s', 10))
+    old_process = set(locate_matlab_engine_processes())
     old_matlab = set(matlab.engine.find_matlab())
     screen_session = str('cis_matlab' + datetime.today().strftime("%Y%j%H%M%S")
                          + '_%d' % len(old_matlab))
@@ -122,11 +141,12 @@ def start_matlab(skip_connect=False, timeout=None):  # pragma: matlab
     if (len(set(matlab.engine.find_matlab()) - old_matlab) == 0):  # pragma: debug
         raise Exception("start_matlab timed out at %f s" % T.elapsed)
     new_matlab = list(set(matlab.engine.find_matlab()) - old_matlab)[0]
+    new_process = list(set(locate_matlab_engine_processes()) - old_process)[0]
     # Connect to the engine
     matlab_engine = None
     if not skip_connect:
         matlab_engine = connect_matlab(new_matlab, first_connect=True)
-    return screen_session, matlab_engine, new_matlab
+    return screen_session, matlab_engine, new_matlab, new_process
 
 
 def connect_matlab(matlab_session, first_connect=False):  # pragma: matlab
@@ -161,7 +181,7 @@ def connect_matlab(matlab_session, first_connect=False):  # pragma: matlab
     return matlab_engine
 
 
-def stop_matlab(screen_session, matlab_engine, matlab_session,
+def stop_matlab(screen_session, matlab_engine, matlab_session, matlab_process,
                 keep_engine=False):  # pragma: matlab
     r"""Stop a Matlab shared engine session running inside a detached screen
     session.
@@ -172,6 +192,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session,
         matlab_engine (MatlabEngine): Matlab engine that should be stopped.
         matlab_session (str): Name of Matlab session that the Matlab engine is
             connected to.
+        matlab_process (psutil.Process): Process running the Matlab shared engine.
         keep_engine (bool, optional): If True, the references to the engine will be
             removed so it is not deleted. Defaults to False.
 
@@ -196,7 +217,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session,
         if matlab_session in matlab.engine.find_matlab():
             try:
                 matlab_engine.eval('exit', nargout=0)
-            except matlab.engine.EngineError:
+            except BaseException:
                 pass
         else:  # pragma: no cover
             matlab_engine.__dict__.pop('_matlab', None)
@@ -210,7 +231,9 @@ def stop_matlab(screen_session, matlab_engine, matlab_session,
             debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
-            raise Exception("stop_matlab timed out at %f s" % T.elapsed)
+            matlab_process.terminate()
+            error("stop_matlab timed out at %f s. " % T.elapsed
+                  + "Killed Matlab sharedEngine process.")
 
 
 class MatlabProcess(tools.CisClass):  # pragma: matlab
@@ -261,6 +284,7 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         self.kwargs['async'] = True  # For python 3.7 where async is reserved
         self.future = None
         self.matlab_engine = matlab_engine
+        self._returncode = None
         super(MatlabProcess, self).__init__(name)
 
     def poll(self, *args, **kwargs):
@@ -341,22 +365,31 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
             else:
                 return 0
         else:
-            return None
+            return self._returncode
 
     def kill(self, *args, **kwargs):
         r"""Cancel the async call."""
         if self.is_alive():
             try:
-                self.future.cancel()
-            except matlab.engine.EngineError:
+                out = self.future.cancel()
+                self.debug("Result of cancelling Matlab call?: %s", out)
+            except matlab.engine.EngineError as e:
+                self.debug('Matlab Engine Error: %s' % e)
                 self.on_matlab_error()
-            except BaseException:
-                pass
+            except BaseException as e:
+                self.debug('Other error on kill: %s' % e)
         self.print_output()
+        if self.is_alive():
+            self.info('Error killing Matlab script.')
+            self.matlab_engine.quit()
+            self.future = None
+            self._returncode = -1
+        assert(not self.is_alive())
 
     def on_matlab_error(self):
         r"""Actions performed on error in Matlab engine."""
         # self.print_output()
+        self.debug('')
         if self.matlab_engine is not None:
             try:
                 self.matlab_engine.eval('exception = MException.last;', nargout=0)
@@ -400,6 +433,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.screen_session = None
         self.mlengine = None
         self.mlsession = None
+        self.mlprocess = None
         self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
         self.check_exits()
 
@@ -417,12 +451,10 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
     def start_matlab(self):
         r"""Start matlab session and connect to it."""
-        # Connect to matlab, start if not running
-        if len(matlab.engine.find_matlab()) == 0:
-            self.debug("Starting a matlab shared engine (none existing)")
-            self.screen_session, self.mlengine, self.mlsession = start_matlab()
-            self.started_matlab = True
-        else:
+        ml_attr = ['screen_session', 'mlengine', 'mlsession', 'mlprocess']
+        attempt_connect = (len(matlab.engine.find_matlab()) != 0)
+        # Connect to matlab if a session exists
+        if attempt_connect:
             for mlsession in matlab.engine.find_matlab():
                 try:
                     self.debug("Trying to connect to session %s", mlsession)
@@ -433,26 +465,34 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                     break
                 except matlab.engine.EngineError:
                     pass
-            if self.mlengine is None:
+        # Start if not running or connect failed
+        if self.mlengine is None:
+            if attempt_connect:
                 self.debug("Starting a matlab shared engine (connect failed)")
-                self.screen_session, self.mlengine, self.mlsession = start_matlab()
-                self.started_matlab = True
+            else:
+                self.debug("Starting a matlab shared engine (none existing)")
+            out = start_matlab()
+            for i, attr in enumerate(ml_attr):
+                setattr(self, attr, out[i])
+            self.started_matlab = True
         # Add things to Matlab environment
         self.mlengine.addpath(self.fdir, nargout=0)
-        self.debug("Connected to matlab")
+        self.debug("Connected to matlab session '%s'" % self.mlsession)
 
     def cleanup(self):
         r"""Close the Matlab session and engine."""
         try:
             stop_matlab(self.screen_session, self.mlengine, self.mlsession,
-                        keep_engine=(not self.started_matlab))
+                        self.mlprocess, keep_engine=(not self.started_matlab))
         except (SystemError, Exception) as e:  # pragma: debug
             self.error('Failed to exit matlab engine')
             self.raise_error(e)
+        self.debug('Stopped Matlab')
         self.screen_session = None
         self.mlsession = None
         self.started_matlab = False
         self.mlengine = None
+        self.mlprocess = None
         super(MatlabModelDriver, self).cleanup()
 
     def check_exits(self):
@@ -510,6 +550,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         self.model_process.print_output()
+        self.periodic_debug('matlab loop', period=100)('Looping')
         if self.model_process.is_done():
             self.model_process.print_output()
             self.set_break_flag()
@@ -527,6 +568,10 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
     def after_loop(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
+        if (self.model_process is not None) and self.model_process.is_alive():
+            self.info("Model process thread still alive")
+            self.kill_process()
+            return
         super(MatlabModelDriver, self).after_loop()
         with self.lock:
             self.cleanup()

@@ -284,6 +284,8 @@ def test_combine_eles():
     else:
         res0_list = res0
         res1_list = res1
+    np.testing.assert_array_equal(serialize.combine_eles([res1[n][0] for n in names1]),
+                                  res0[0])
     np.testing.assert_array_equal(serialize.combine_eles(arrs), res0)
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list), res0_list)
     np.testing.assert_array_equal(serialize.combine_eles(arrs_void), res1)
