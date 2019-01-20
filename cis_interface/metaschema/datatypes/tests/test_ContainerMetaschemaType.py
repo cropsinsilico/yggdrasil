@@ -1,14 +1,12 @@
 import copy
 import numpy as np
 import nose.tools as nt
-from cis_interface import backwards
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
 
 _vallist = [np.float32(1),
-            backwards.unicode2bytes('hello'),
-            backwards.bytes2unicode('hello'),
+            b'hello', u'hello',
             {'nested': np.int64(2)},
             [np.complex128(4), np.uint8(0)]]
 _deflist = [{'type': 'float',

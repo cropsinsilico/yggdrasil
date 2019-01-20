@@ -3,15 +3,15 @@ import numpy as np
 import shutil
 import tempfile
 import nose.tools as nt
-from cis_interface import metaschema, backwards
+from cis_interface import metaschema
 
 
 def test_func():  # pragma: debug
     pass
 
 
-_valid_objects = {'unicode': backwards.bytes2unicode('hello'),
-                  'bytes': backwards.unicode2bytes('hello'),
+_valid_objects = {'unicode': u'hello',
+                  'bytes': b'hello',
                   'float': float(1), 'int': int(1),
                   'uint': np.uint(1), 'complex': complex(1, 1),
                   'object': {'a': 'hello'}, 'array': ['hello', 1],
@@ -35,8 +35,8 @@ _normalize_objects = [
     ({'type': 'number'}, '1.0', 1.0),
     ({'type': 'number'}, 'hello', 'hello'),
     ({'type': 'string'}, 1, '1'),
-    ({'type': 'unicode'}, 1, backwards.bytes2unicode('1')),
-    ({'type': 'bytes'}, 1, backwards.unicode2bytes('1')),
+    ({'type': 'unicode'}, 1, u'1'),
+    ({'type': 'bytes'}, 1, b'1'),
     ({'type': 'float'}, '1', 1.0),
     ({'type': 'float'}, 'hello', 'hello'),
     ({'type': 'int'}, '1', 1),

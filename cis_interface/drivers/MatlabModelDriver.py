@@ -81,12 +81,12 @@ def get_matlab_version():  # pragma: matlab
         mtl_proc = subprocess.check_output(mtl_cmd)
     except subprocess.CalledProcessError:  # pragma: no matlab
         raise RuntimeError("Could not run matlab.")
-    mtl_id = backwards.unicode2bytes(mtl_id)
+    mtl_id = backwards.match_stype(mtl_proc, mtl_id)
     if mtl_id not in mtl_proc:  # pragma: debug
         print(mtl_proc)
         raise RuntimeError("Could not locate matlab root id (%s) in output." % mtl_id)
     mtl_root = mtl_proc.split(mtl_id)[-2]
-    return backwards.bytes2unicode(mtl_root)
+    return backwards.as_str(mtl_root)
 
 
 def locate_matlabroot():  # pragma: matlab
@@ -106,12 +106,12 @@ def locate_matlabroot():  # pragma: matlab
         mtl_proc = subprocess.check_output(mtl_cmd)
     except subprocess.CalledProcessError:  # pragma: no matlab
         raise RuntimeError("Could not run matlab.")
-    mtl_id = backwards.unicode2bytes(mtl_id)
+    mtl_id = backwards.match_stype(mtl_proc, mtl_id)
     if mtl_id not in mtl_proc:  # pragma: debug
         print(mtl_proc)
         raise RuntimeError("Could not locate matlab root id (%s) in output." % mtl_id)
     mtl_root = mtl_proc.split(mtl_id)[-2]
-    return backwards.bytes2unicode(mtl_root)
+    return backwards.as_str(mtl_root)
 
 
 def install_matlab_engine():  # pragma: matlab

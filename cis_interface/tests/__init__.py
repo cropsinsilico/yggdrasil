@@ -509,13 +509,13 @@ class IOInfo(object):
         self.field_names = ['name', 'count', 'size']
         self.field_units = ['n/a', 'umol', 'cm']
         self.nfields = len(self.field_names)
-        self.comment = backwards.unicode2bytes('# ')
-        self.delimiter = backwards.unicode2bytes('\t')
-        self.newline = backwards.unicode2bytes('\n')
-        self.fmt_str = backwards.unicode2bytes('%5s\t%d\t%f\n')
-        self.fmt_str_matlab = backwards.unicode2bytes('%5s\\t%d\\t%f\\n')
+        self.comment = b'# '
+        self.delimiter = b'\t'
+        self.newline = b'\n'
+        self.fmt_str = b'%5s\t%d\t%f\n'
+        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
         self.field_formats = self.fmt_str.split(self.newline)[0].split(self.delimiter)
-        self.fmt_str_line = backwards.unicode2bytes('# ') + self.fmt_str
+        self.fmt_str_line = b'# ' + self.fmt_str
         # self.file_cols = ['name', 'count', 'size']
         self.file_dtype = np.dtype(
             {'names': self.field_names,
@@ -535,8 +535,8 @@ class IOInfo(object):
             x['type'] = '1darray'
             if x['title'] == 'name':
                 x['precision'] = 40
-        self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
-        self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
+        self.field_names = [backwards.as_bytes(x) for x in self.field_names]
+        self.field_units = [backwards.as_bytes(x) for x in self.field_units]
         self.field_names_line = (self.comment
                                  + self.delimiter.join(self.field_names)
                                  + self.newline)
@@ -562,11 +562,11 @@ class IOInfo(object):
             iout = []
             for i in range(len(x)):
                 if i == 0:
-                    iout.append(backwards.unicode2bytes(x[i]))
+                    iout.append(backwards.as_bytes(x[i]))
                 else:
                     iout.append(units.add_units(x[i], self.field_units[i]))
             out.append(iout)
-            # out.append((backwards.unicode2bytes(x[0]), x[1], x[2]))
+            # out.append((backwards.as_bytes(x[0]), x[1], x[2]))
         return out
         
     @property
@@ -603,7 +603,7 @@ class IOInfo(object):
     @property
     def file_contents(self):
         r"""str: Complete contents of mock file."""
-        out = backwards.unicode2bytes('')
+        out = b''
         for line in self.header_lines:
             out += line
         for line in self.file_lines:
@@ -622,7 +622,7 @@ class IOInfo(object):
     def file_array_units(self):
         r"""list: List of arrays of mock file contents with units."""
         out = self.file_array
-        out = [units.add_units(out[n], backwards.bytes2unicode(u))
+        out = [units.add_units(out[n], backwards.as_str(u))
                for n, u in zip(out.dtype.names, self.field_units)]
         return out
 
@@ -636,7 +636,7 @@ class IOInfo(object):
     #         str: Bytes that represent the array.
 
     #     """
-    #     out = backwards.unicode2bytes('')
+    #     out = b''
     #     for n in arr.dtype.names:
     #         out = out + arr[n].tobytes()
     #     return out
@@ -758,12 +758,12 @@ class IOInfo(object):
     @property
     def msg_short(self):
         r"""str: Small test message for sending."""
-        return backwards.unicode2bytes('Test\tmessage')
+        return b'Test\tmessage'
 
     @property
     def msg_long(self):
         r"""str: Small test message for sending."""
-        return backwards.unicode2bytes('Test message' + self.maxMsgSize * '0')
+        return b'Test message' + self.maxMsgSize * '0'
 
     def write_table(self, fname):
         r"""Write the table out to a file.
@@ -798,7 +798,7 @@ class IOInfo(object):
                 out += "%s\t'%s'\n" % (k, v)
             else:
                 out += "%s\t%s\n" % (k, repr(v))
-        return backwards.unicode2bytes(out)
+        return backwards.as_bytes(out)
 
     def write_map(self, fname):
         r"""Write the map dictionary out to a file.

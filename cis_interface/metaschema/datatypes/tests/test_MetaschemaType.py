@@ -3,7 +3,6 @@ import copy
 import pprint
 import nose.tools as nt
 import jsonschema
-from cis_interface import backwards
 from cis_interface.metaschema.datatypes import MetaschemaTypeError
 from cis_interface.tests import CisTestClassInfo
 
@@ -17,7 +16,7 @@ class TestMetaschemaType(CisTestClassInfo):
 
     def __init__(self, *args, **kwargs):
         super(TestMetaschemaType, self).__init__(*args, **kwargs)
-        self._empty_msg = backwards.unicode2bytes('')
+        self._empty_msg = b''
         self._typedef = {}
         self._valid_encoded = []
         # {'type': self.import_cls.name,
@@ -240,7 +239,7 @@ class TestMetaschemaType(CisTestClassInfo):
         r"""Test error when deserializing message that is not bytes."""
         nt.assert_raises(TypeError, self.instance.deserialize, self)
         nt.assert_raises(ValueError, self.instance.deserialize,
-                         backwards.unicode2bytes('invalid'))
+                         b'invalid')
         
     def test_deserialize_empty(self):
         r"""Test call for empty string."""

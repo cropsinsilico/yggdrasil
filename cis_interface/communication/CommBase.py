@@ -510,7 +510,7 @@ class CommBase(tools.CisClass):
     @property
     def empty_msg(self):
         r"""str: Empty message."""
-        return backwards.unicode2bytes('')
+        return b''
 
     @property
     def comm_class(self):
@@ -812,7 +812,7 @@ class CommBase(tools.CisClass):
     @property
     def eof_msg(self):
         r"""str: Message indicating EOF."""
-        return backwards.unicode2bytes(CIS_MSG_EOF)
+        return CIS_MSG_EOF
 
     def is_eof(self, msg):
         r"""Determine if a message is an EOF.
@@ -1179,7 +1179,7 @@ class CommBase(tools.CisClass):
 
         """
         self.debug('')
-        msg_s = backwards.unicode2bytes(self.eof_msg)
+        msg_s = self.eof_msg
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
                 self._eof_sent.set()

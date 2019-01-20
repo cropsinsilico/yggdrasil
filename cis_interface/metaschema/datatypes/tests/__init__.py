@@ -1,5 +1,4 @@
 import nose.tools as nt
-from cis_interface import backwards
 from cis_interface.metaschema import datatypes
 from cis_interface.metaschema.tests import _valid_objects
 from cis_interface.metaschema.datatypes.ScalarMetaschemaType import (
@@ -41,7 +40,7 @@ def test_get_type_from_def():
 def test_guess_type_from_msg():
     r"""Test guess_type_from_msg."""
     nt.assert_raises(ValueError, datatypes.guess_type_from_msg,
-                     backwards.unicode2bytes('fake message'))
+                     b'fake message')
 
 
 def test_guess_type_from_obj():

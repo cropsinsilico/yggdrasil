@@ -759,7 +759,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             object: Decoded object.
 
         """
-        lines = backwards.bytes2unicode(msg).splitlines()
+        lines = backwards.as_str(msg).splitlines()
         metadata = {'comments': [], 'element_order': [], 'property_order': {}}
         if lines[0] != 'ply':
             raise ValueError("The first line must be 'ply'")

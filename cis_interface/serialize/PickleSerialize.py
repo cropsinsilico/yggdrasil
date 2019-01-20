@@ -23,7 +23,7 @@ class PickleSerialize(DefaultSerialize):
 
         """
         out = backwards.pickle.dumps(args)
-        return backwards.unicode2bytes(out)
+        return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

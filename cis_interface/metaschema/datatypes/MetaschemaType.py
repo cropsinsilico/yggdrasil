@@ -52,7 +52,7 @@ class MetaschemaType(object):
     python_types = []
     specificity = 0
     is_fixed = False
-    _empty_msg = backwards.unicode2bytes('')
+    _empty_msg = b''
     _replaces_existing = False
     
     def __init__(self, **typedef):
@@ -590,12 +590,12 @@ class MetaschemaType(object):
             if k in metadata:
                 raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
         if not is_raw:
-            data = backwards.unicode2bytes(json.dumps(data, sort_keys=True))
+            data = backwards.as_bytes(json.dumps(data, sort_keys=True))
         if no_metadata:
             return data
         metadata['size'] = len(data)
         metadata.setdefault('id', str(uuid.uuid4()))
-        metadata = backwards.unicode2bytes(json.dumps(metadata, sort_keys=True))
+        metadata = backwards.as_bytes(json.dumps(metadata, sort_keys=True))
         msg = CIS_MSG_HEAD + metadata + CIS_MSG_HEAD + data
         return msg
     
@@ -630,7 +630,7 @@ class MetaschemaType(object):
             if len(metadata) == 0:
                 metadata = dict(size=len(data))
             else:
-                metadata = json.loads(backwards.bytes2unicode(metadata))
+                metadata = json.loads(backwards.as_unicode(metadata))
         else:
             data = msg
             if metadata is None:
@@ -651,7 +651,7 @@ class MetaschemaType(object):
               or (metadata.get('type', None) == 'direct')):
             return data, metadata
         else:
-            data = json.loads(backwards.bytes2unicode(data))
+            data = json.loads(backwards.as_unicode(data))
             obj = self.decode(metadata, data, self._typedef,
                               typedef_validated=True)
         return obj, metadata

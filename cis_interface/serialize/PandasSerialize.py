@@ -101,11 +101,11 @@ class PandasSerialize(AsciiTableSerialize):
                     args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
         args_ = self.apply_field_names(args_)
         args_.to_csv(fd, index=False,
-                     sep=str(backwards.bytes2unicode(self.delimiter)),
+                     sep=backwards.as_str(self.delimiter),
                      mode='wb', encoding='utf8', header=self.write_header)
         out = fd.getvalue()
         fd.close()
-        return backwards.unicode2bytes(out)
+        return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -119,7 +119,7 @@ class PandasSerialize(AsciiTableSerialize):
         """
         fd = backwards.BytesIO(msg)
         out = pandas.read_csv(fd,
-                              sep=str(backwards.bytes2unicode(self.delimiter)),
+                              sep=backwards.as_str(self.delimiter),
                               encoding='utf8')
         fd.close()
         if not backwards.PY2:
@@ -193,7 +193,7 @@ class PandasSerialize(AsciiTableSerialize):
                                + b'two\t2\t2.0\n'
                                + b'three\t3\t3.0\n')
         else:
-            field_names = [backwards.bytes2unicode(x) for
+            field_names = [backwards.as_str(x) for
                            x in out['kwargs']['field_names']]
             out['objects'] = [list2pandas(x, names=field_names)
                               for x in out['objects']]

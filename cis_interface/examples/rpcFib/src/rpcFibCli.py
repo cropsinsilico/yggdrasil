@@ -3,7 +3,6 @@ import sys
 import numpy as np
 from cis_interface.interface.CisInterface import (
     CisRpcClient, CisInput, CisOutput)
-from cis_interface import backwards
 
 
 def fibClient(args):
@@ -21,8 +20,7 @@ def fibClient(args):
     ret, ycontent = ymlfile.recv()
     if not ret:
         raise RuntimeError('rpcFibCli(P): RECV ERROR')
-    print('rpcFibCli: yaml has %d lines' % len(ycontent.split(
-        backwards.unicode2bytes('\n'))))
+    print('rpcFibCli: yaml has %d lines' % len(ycontent.split(b'\n')))
 
     for i in range(1, iterations + 1):
         

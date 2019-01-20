@@ -61,9 +61,9 @@ class AsciiTableComm(AsciiFileComm):
         """
         out = super(AsciiFileComm, cls).get_testing_options(as_array=as_array,
                                                             **kwargs)
-        field_names = [backwards.bytes2unicode(x) for
+        field_names = [backwards.as_str(x) for
                        x in out['kwargs']['field_names']]
-        field_units = [backwards.bytes2unicode(x) for
+        field_units = [backwards.as_str(x) for
                        x in out['kwargs']['field_units']]
         if as_array:
             lst = out['send'][0]

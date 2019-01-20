@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from cis_interface import units, backwards
+from cis_interface import units
 from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as parent
 from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
@@ -70,13 +70,11 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
         if 'Array' not in self._cls:
             if self._explicit:
                 if self._type == 'bytes':
-                    self._valid_normalize = [(1, backwards.unicode2bytes('1')),
-                                             (backwards.bytes2unicode('1'),
-                                              backwards.unicode2bytes('1'))]
+                    self._valid_normalize = [(1, b'1'),
+                                             (u'1', b'1')]
                 elif self._type == 'unicode':
-                    self._valid_normalize = [(1, backwards.bytes2unicode('1')),
-                                             (backwards.unicode2bytes('1'),
-                                              backwards.bytes2unicode('1'))]
+                    self._valid_normalize = [(1, u'1'),
+                                             (b'1', u'1')]
                 else:
                     self._valid_normalize = [(str(self._value), self._value),
                                              ('hello', 'hello')]

@@ -26,7 +26,7 @@ class PlySerialize(DefaultSerialize):
     _seritype = 'ply'
     _schema_properties = dict(
         newline={'type': 'string',
-                 'default': str(backwards.bytes2unicode(_default_newline))})
+                 'default': backwards.as_str(_default_newline)})
     _default_type = {'type': 'ply'}
 
     def __init__(self, *args, **kwargs):
@@ -45,8 +45,7 @@ class PlySerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
-        return backwards.unicode2bytes(self.datatype.encode_data(args,
-                                                                 self.typedef))
+        return backwards.as_bytes(self.datatype.encode_data(args, self.typedef))
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -58,7 +57,7 @@ class PlySerialize(DefaultSerialize):
             obj: Deserialized message.
 
         """
-        return PlyDict(self.datatype.decode_data(backwards.bytes2unicode(msg),
+        return PlyDict(self.datatype.decode_data(backwards.as_str(msg),
                                                  self.typedef))
 
     @classmethod

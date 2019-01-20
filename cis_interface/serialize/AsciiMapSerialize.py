@@ -21,9 +21,9 @@ class AsciiMapSerialize(DefaultSerialize):
     _seritype = 'ascii_map'
     _schema_properties = {
         'delimiter': {'type': 'string',
-                      'default': str(backwards.bytes2unicode(_default_delimiter))},
+                      'default': backwards.as_str(_default_delimiter)},
         'newline': {'type': 'string',
-                    'default': str(backwards.bytes2unicode(_default_newline))}}
+                    'default': backwards.as_str(_default_newline)}}
     _default_type = {'type': 'object'}
 
     @property
@@ -47,12 +47,12 @@ class AsciiMapSerialize(DefaultSerialize):
             v = args[k]
             if not isinstance(k, backwards.string_types):
                 raise ValueError("Serialization of non-string keys not supported.")
-            out += str(backwards.bytes2unicode(k)) + self.delimiter
+            out += backwards.as_str(k) + self.delimiter
             if isinstance(v, backwards.string_types):
-                v = str(backwards.bytes2unicode(v))
+                v = backwards.as_str(v)
             out += json.dumps(v, cls=JSONReadableEncoder)
             out += self.newline
-        return backwards.unicode2bytes(out)
+        return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -68,7 +68,7 @@ class AsciiMapSerialize(DefaultSerialize):
             out = self.empty_msg
         else:
             out = dict()
-            lines = str(backwards.bytes2unicode(msg)).split(self.newline)
+            lines = (backwards.as_str(msg)).split(self.newline)
             for l in lines:
                 kv = l.split(self.delimiter)
                 if len(kv) <= 1:

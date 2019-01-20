@@ -16,7 +16,7 @@ from cis_interface import backwards
 from cis_interface.config import cis_cfg, cfg_logging
 
 
-CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+CIS_MSG_EOF = b'EOF!!!'
 CIS_MSG_BUF = 1024 * 2
 
 
@@ -106,7 +106,6 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     if out.isspace():  # pragma: debug
         return False
     out = out.decode('utf-8').splitlines()
-    # out = backwards.bytes2unicode(out.splitlines()[0])
     return out
 
 
@@ -452,7 +451,7 @@ def print_encoded(msg, *args, **kwargs):
 
     """
     try:
-        print(backwards.bytes2unicode(msg), *args, **kwargs)
+        print(backwards.as_unicode(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
         logging.debug("sys.stdout.encoding = %s, cannot print unicode",
                       sys.stdout.encoding)
@@ -460,7 +459,7 @@ def print_encoded(msg, *args, **kwargs):
         try:
             print(msg, *args, **kwargs)
         except UnicodeEncodeError:  # pragma: debug
-            print(backwards.unicode2bytes(msg), *args, **kwargs)
+            print(backwards.as_bytes(msg), *args, **kwargs)
 
 
 class TimeOut(object):

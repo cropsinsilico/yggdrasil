@@ -11,7 +11,7 @@ class TestAsciiMapSerialize(parent.TestDefaultSerialize):
 
     def test_error_delim(self):
         r"""Test error for message with too many delimiters on a line."""
-        msg = backwards.unicode2bytes(self.instance.delimiter.join(
+        msg = backwards.as_bytes(self.instance.delimiter.join(
             ['args1', 'val1', 'args2', 'val2']))
         self.assert_raises(ValueError, self.instance.deserialize, msg)
 

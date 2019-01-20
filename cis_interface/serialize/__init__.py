@@ -21,10 +21,10 @@ except ImportError:  # pragma: no cover
     _use_astropy = False
 
 
-_fmt_char = backwards.unicode2bytes('%')
-_default_comment = backwards.unicode2bytes('# ')
-_default_delimiter = backwards.unicode2bytes('\t')
-_default_newline = backwards.unicode2bytes('\n')
+_fmt_char = b'%'
+_default_comment = b'# '
+_default_delimiter = b'\t'
+_default_newline = b'\n'
 _serializer_registry = {}
 
 
@@ -114,9 +114,8 @@ def extract_formats(fmt_str):
         + "[lhjztL]*(?:64)?[bcdeEufFgGosxXi]"
         + "(?:%(?:\\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
         + "[lhjztL]*[eEfFgG]j)?")
-    out = re.findall(fmt_regex, backwards.bytes2unicode(fmt_str))
-    if isinstance(fmt_str, backwards.bytes_type):
-        out = [backwards.unicode2bytes(f) for f in out]
+    out = re.findall(fmt_regex, backwards.as_str(fmt_str))
+    out = [backwards.match_stype(fmt_str, f) for f in out]
     return out
     
 
@@ -203,7 +202,7 @@ def nptype2cformat(nptype, asbytes=False):
     # cfmt = cfmt.replace("h", "")
     # cfmt = cfmt.replace("l", "")
     if asbytes:
-        cfmt = backwards.unicode2bytes(cfmt)
+        cfmt = backwards.as_bytes(cfmt)
     return cfmt
 
 
@@ -231,7 +230,7 @@ def cformat2nptype(cfmt, names=None):
         raise TypeError("Input must be a string, bytes string, or list, not %s" %
                         type(cfmt))
     if isinstance(cfmt, backwards.string_types):
-        fmt_list = extract_formats(backwards.bytes2unicode(cfmt))
+        fmt_list = extract_formats(backwards.as_str(cfmt))
         if len(fmt_list) == 0:
             raise ValueError("Could not locate any format codes in the "
                              + "provided format string (%s)." % cfmt)
@@ -247,7 +246,7 @@ def cformat2nptype(cfmt, names=None):
         elif len(names) != nfmt:
             raise ValueError("Number of names does not match the number of fields.")
         else:
-            names = [backwards.bytes2unicode(n) for n in names]
+            names = [backwards.as_str(n) for n in names]
         out = np.dtype(dict(names=names, formats=dtype_list))
         # out = np.dtype([(n, d) for n, d in zip(names, dtype_list)])
         return out
@@ -323,7 +322,7 @@ def cformat2pyscanf(cfmt):
                         type(cfmt))
     if isinstance(cfmt, list):
         return [cformat2pyscanf(f) for f in cfmt]
-    cfmt_out = backwards.bytes2unicode(cfmt)
+    cfmt_out = backwards.as_str(cfmt)
     fmt_list = extract_formats(cfmt_out)
     if len(fmt_list) == 0:
         raise ValueError("Could not locate any format codes in the "
@@ -338,14 +337,13 @@ def cformat2pyscanf(cfmt):
         #     # Handle complex format specifier
         #     out = '%g%+gj'
         # else:
-        #     out = backwards.bytes2unicode(_fmt_char)
+        #     out = backwards.as_str(_fmt_char)
         #     out += cfmt_str[-1]
         #     out = out.replace('h', '')
         #     out = out.replace('l', '')
         #     out = out.replace('64', '')
         cfmt_out = cfmt_out.replace(cfmt_str, out, 1)
-    if isinstance(cfmt, backwards.bytes_type):
-        cfmt_out = backwards.unicode2bytes(cfmt_out)
+    cfmt_out = backwards.match_stype(cfmt, cfmt_out)
     return cfmt_out
 
 
@@ -671,7 +669,7 @@ def table2format(fmts=[], delimiter=None, newline=None, comment=None):
         comment = _default_comment
     if isinstance(fmts, np.dtype):
         fmts = nptype2cformat(fmts)
-    bytes_fmts = [backwards.unicode2bytes(f) for f in fmts]
+    bytes_fmts = [backwards.as_bytes(f) for f in fmts]
     fmt_str = comment + delimiter.join(bytes_fmts) + newline
     return fmt_str
 
@@ -728,14 +726,14 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
         fd = backwards.StringIO()
         table = apy_Table(arr1)
         delimiter = info['delimiter']
-        delimiter = backwards.bytes2unicode(delimiter)
+        delimiter = backwards.as_str(delimiter)
         apy_ascii.write(table, fd, delimiter=delimiter,
                         format='no_header')
-        out = backwards.unicode2bytes(fd.getvalue())
+        out = backwards.as_bytes(fd.getvalue())
     else:
         fd = backwards.BytesIO()
         for ele in arr1:
-            line = format_message(ele.tolist(), backwards.unicode2bytes(fmt_str))
+            line = format_message(ele.tolist(), backwards.as_bytes(fmt_str))
             fd.write(line)
         # fmt = fmt_str.split(info['newline'])[0]
         # np.savetxt(fd, arr1,
@@ -782,16 +780,16 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         names = dtype.names
     fd = backwards.BytesIO(msg)
     if names is not None:
-        names = [str(backwards.bytes2unicode(n)) for n in names]
+        names = [backwards.as_str(n) for n in names]
     np_kws = dict()
     if info.get('delimiter', None) is not None:
         np_kws['delimiter'] = info['delimiter']
     if info.get('comment', None) is not None:
         np_kws['comments'] = info['comment']
     for k, v in np_kws.items():
-        np_kws[k] = str(backwards.bytes2unicode(v))
+        np_kws[k] = backwards.as_str(v)
     if use_astropy:
-        # fd = backwards.StringIO(backwards.bytes2unicode(msg))
+        # fd = backwards.StringIO(backwards.as_str(msg))
         if 'comments' in np_kws:
             np_kws['comment'] = np_kws.pop('comments')
         tab = apy_ascii.read(fd, names=names, guess=True,
@@ -867,7 +865,7 @@ def array_to_bytes(arrs, dtype=None, order='C'):
         if ntyp == 0:
             out = arr1.tobytes(order='F')
         else:
-            out = backwards.unicode2bytes('')
+            out = b''
             for i in range(ntyp):
                 n = arr1.dtype.names[i]
                 if np.issubdtype(arr1.dtype[i], np.dtype('complex')):
@@ -979,7 +977,7 @@ def format_header(format_str=None, dtype=None,
         if fmts is None:
             fmts = nptype2cformat(dtype, asbytes=True)
         if field_names is None:
-            field_names = [backwards.unicode2bytes(n) for n in dtype.names]
+            field_names = [backwards.as_bytes(n) for n in dtype.names]
     if delimiter is None:
         delimiter = _default_delimiter
     if comment is None:
@@ -1004,7 +1002,7 @@ def format_header(format_str=None, dtype=None,
         #     continue
         assert(len(x) == nfld)
         out.append(comment
-                   + delimiter.join([backwards.unicode2bytes(ix) for ix in x]))
+                   + delimiter.join([backwards.as_bytes(ix) for ix in x]))
     out = newline.join(out) + newline
     return out
 
@@ -1041,8 +1039,8 @@ def discover_header(fd, serializer, newline=_default_newline,
     header_size = 0
     prev_pos = fd.tell()
     for line in fd:
-        sline = backwards.unicode2bytes(line.replace(
-            backwards.unicode2bytes(platform._newline), newline))
+        sline = backwards.as_bytes(line.replace(
+            backwards.as_bytes(platform._newline), newline))
         if not sline.startswith(comment):
             break
         header_size += len(line)
@@ -1061,7 +1059,7 @@ def discover_header(fd, serializer, newline=_default_newline,
     if (delimiter is None) or ('format_str' in header):
         delimiter = header['delimiter']
     # Try to determine format from array without header
-    str_fmt = backwards.unicode2bytes('%s')
+    str_fmt = b'%s'
     if ((header['format_str'] is None) or (str_fmt in header['format_str'])):
         fd.seek(prev_pos + header_size)
         all_contents = fd.read()
@@ -1077,15 +1075,15 @@ def discover_header(fd, serializer, newline=_default_newline,
         if header['format_str'] is None:
             header['format_str'] = table2format(
                 arr.dtype, delimiter=delimiter,
-                comment=backwards.unicode2bytes(''),
+                comment=b'',
                 newline=header['newline'])
         # Determine maximum size of string field
         while str_fmt in header['format_str']:
             field_formats = extract_formats(header['format_str'])
-            ifld = backwards.bytes2unicode(
+            ifld = backwards.as_str(
                 header['field_names'][field_formats.index(str_fmt)])
             max_len = len(max(arr[ifld], key=len))
-            new_str_fmt = backwards.unicode2bytes('%' + str(max_len) + 's')
+            new_str_fmt = backwards.as_bytes('%' + str(max_len) + 's')
             header['format_str'] = header['format_str'].replace(
                 str_fmt, new_str_fmt, 1)
     # Update serializer

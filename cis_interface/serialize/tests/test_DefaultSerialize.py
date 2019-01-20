@@ -15,7 +15,7 @@ class TestDefaultSerialize(CisTestClassInfo):
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize, self).__init__(*args, **kwargs)
         self._cls = 'DefaultSerialize'
-        self._empty_msg = backwards.unicode2bytes('')
+        self._empty_msg = b''
         self._header_info = dict(arg1='1', arg2='two')
         self.attr_list += ['datatype', 'typedef', 'numpy_dtype']
 
@@ -188,13 +188,13 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
         
     def _func_serialize(self, args):
         r"""Method that serializes using repr."""
-        return backwards.unicode2bytes(repr(args))
+        return backwards.as_bytes(repr(args))
 
     def _func_deserialize(self, args):
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return self.testing_options['empty']
-        x = eval(backwards.bytes2unicode(args))
+        x = eval(backwards.as_str(args))
         return x
 
 
@@ -202,13 +202,13 @@ class FakeSerializer(DefaultSerialize.DefaultSerialize):
 
     def func_serialize(self, args):
         r"""Method that serializes using repr."""
-        return backwards.unicode2bytes(repr(args))
+        return backwards.as_bytes(repr(args))
 
     def func_deserialize(self, args):
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return []
-        x = eval(backwards.bytes2unicode(args))
+        x = eval(backwards.as_str(args))
         return x
 
 

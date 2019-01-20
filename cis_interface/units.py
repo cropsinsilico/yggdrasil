@@ -79,7 +79,7 @@ def add_units(arr, unit_str, dtype=None):
 
     """
     if isinstance(unit_str, backwards.bytes_type):
-        unit_str = backwards.bytes2unicode(unit_str)
+        unit_str = backwards.as_str(unit_str)
     if is_null_unit(unit_str):
         return arr
     if dtype is None:
@@ -170,7 +170,7 @@ def is_unit(ustr):
         bool: True if the string is a valid unit. False otherwise.
 
     """
-    ustr = backwards.bytes2unicode(ustr)
+    ustr = backwards.as_str(ustr)
     if is_null_unit(ustr):
         return True
     try:

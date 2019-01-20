@@ -119,9 +119,9 @@ class DefaultSerialize(object):
                                 + b'  one\t1\t1.000000\n'
                                 + b'  two\t2\t2.000000\n'
                                 + b'three\t3\t3.000000\n')}
-            field_names = [backwards.bytes2unicode(x) for
+            field_names = [backwards.as_str(x) for
                            x in out['kwargs']['field_names']]
-            field_units = [backwards.bytes2unicode(x) for
+            field_units = [backwards.as_str(x) for
                            x in out['kwargs']['field_units']]
             rows = [(b'one', np.int32(1), 1.0),
                     (b'two', np.int32(2), 2.0),
@@ -187,13 +187,13 @@ class DefaultSerialize(object):
                 out[k] = copy.deepcopy(v)
         for k in out.keys():
             v = out[k]
-            if isinstance(v, backwards.bytes_type):
-                out[k] = backwards.bytes2unicode(v)
+            if isinstance(v, backwards.string_types):
+                out[k] = backwards.as_str(v)
             elif isinstance(v, (list, tuple)):
                 out[k] = []
                 for x in v:
-                    if isinstance(x, backwards.bytes_type):
-                        out[k].append(backwards.bytes2unicode(x))
+                    if isinstance(x, backwards.string_types):
+                        out[k].append(backwards.as_str(x))
                     else:
                         out[k].append(x)
             else:
@@ -204,7 +204,7 @@ class DefaultSerialize(object):
     def empty_msg(self):
         r"""obj: Object indicating empty message."""
         if self.is_user_defined:
-            out = backwards.unicode2bytes('')
+            out = b''
         else:
             out = self.datatype._empty_msg
         return out
@@ -239,9 +239,9 @@ class DefaultSerialize(object):
                 out = None
         if (out is not None):
             if as_bytes:
-                out = [backwards.unicode2bytes(x) for x in out]
+                out = [backwards.as_bytes(x) for x in out]
             else:
-                out = [backwards.bytes2unicode(x) for x in out]
+                out = [backwards.as_str(x) for x in out]
         return out
 
     def get_field_units(self, as_bytes=False):
@@ -274,9 +274,9 @@ class DefaultSerialize(object):
                 out = None
         if (out is not None):
             if as_bytes:
-                out = [backwards.unicode2bytes(x) for x in out]
+                out = [backwards.as_bytes(x) for x in out]
             else:
-                out = [backwards.bytes2unicode(x) for x in out]
+                out = [backwards.as_str(x) for x in out]
         return out
 
     @property
@@ -447,7 +447,7 @@ class DefaultSerialize(object):
                 continue
             # Key specific changes to type
             if k == 'format_str':
-                v = backwards.bytes2unicode(v)
+                v = backwards.as_str(v)
                 fmts = extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
@@ -479,7 +479,7 @@ class DefaultSerialize(object):
                 # Can only be used in conjunction with format_str
                 pass
             elif k in ['field_names', 'field_units']:
-                v = [backwards.bytes2unicode(x) for x in v]
+                v = [backwards.as_str(x) for x in v]
                 if k == 'field_names':
                     tk = 'title'
                 else:

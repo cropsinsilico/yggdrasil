@@ -271,9 +271,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Buffer received messages."""
         if self.direction == 'send':  # pragma: debug
             raise Exception("Send comm received a message.")
-        # self.add_backlog_recv(backwards.unicode2bytes(body))
         with self.rmq_lock:
-            self._buffered_messages.append(backwards.unicode2bytes(body))
+            self._buffered_messages.append(backwards.as_bytes(body))
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     # CONNECTION

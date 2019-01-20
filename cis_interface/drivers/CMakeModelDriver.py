@@ -240,7 +240,7 @@ class CMakeModelDriver(ModelDriver):
             if exit_code != 0:
                 os.chdir(curdir)
                 self.cleanup()
-                self.error(backwards.bytes2unicode(output))
+                self.error(backwards.as_unicode(output))
                 raise RuntimeError("CMake config failed with code %d." % exit_code)
             self.debug('Config output: \n%s' % output)
         # Build
@@ -253,7 +253,7 @@ class CMakeModelDriver(ModelDriver):
         exit_code = comp_process.returncode
         if exit_code != 0:
             os.chdir(curdir)
-            self.error(backwards.bytes2unicode(output))
+            self.error(backwards.as_unicode(output))
             self.cleanup()
             raise RuntimeError("CMake build failed with code %d." % exit_code)
         self.debug('Build output: \n%s' % output)

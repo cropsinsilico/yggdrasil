@@ -3,7 +3,7 @@ import sys
 import copy
 import warnings
 from pprint import pformat
-from cis_interface import backwards, platform, tools
+from cis_interface import platform, tools
 from cis_interface.drivers.Driver import Driver
 from threading import Event
 try:
@@ -108,7 +108,7 @@ class ModelDriver(Driver):
             raise RuntimeError("strace/valgrind options invalid on windows.")
         self.model_index = model_index
         self.env_copy = ['LANG', 'PATH', 'USER']
-        self._exit_line = backwards.unicode2bytes('EXIT')
+        self._exit_line = b'EXIT'
         # print(os.environ.keys())
         for k in self.env_copy:
             if k in os.environ:

@@ -23,7 +23,7 @@ class ObjSerialize(PlySerialize):
             bytes, str: Serialized message.
 
         """
-        return backwards.unicode2bytes(self.datatype.encode_data(args, self.typedef))
+        return backwards.as_bytes(self.datatype.encode_data(args, self.typedef))
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -35,7 +35,7 @@ class ObjSerialize(PlySerialize):
             obj: Deserialized message.
 
         """
-        return ObjDict(self.datatype.decode_data(backwards.bytes2unicode(msg),
+        return ObjDict(self.datatype.decode_data(backwards.as_str(msg),
                                                  self.typedef))
 
     @classmethod

@@ -11,9 +11,9 @@ class DirectSerialize(DefaultSerialize):
     _seritype = 'direct'
     _schema_properties = {
         'newline': {'type': 'string',
-                    'default': str(backwards.bytes2unicode(_default_newline))},
+                    'default': backwards.as_str(_default_newline)},
         'comment': {'type': 'string',
-                    'default': str(backwards.bytes2unicode(_default_comment))}}
+                    'default': backwards.as_str(_default_comment)}}
     _default_type = {'type': 'bytes'}
 
     def func_serialize(self, args):
@@ -30,7 +30,7 @@ class DirectSerialize(DefaultSerialize):
         if (((self.extra_kwargs.get('format_str', None) is not None)
              and isinstance(args, list))):
             args = format_message(args, self.extra_kwargs['format_str'])
-        return backwards.unicode2bytes(args)
+        return backwards.as_bytes(args)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

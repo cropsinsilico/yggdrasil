@@ -16,7 +16,7 @@ def test_serialize_nofmt():
 def test_deserialize_nofmt():
     r"""Test error on deserialization without a format."""
     inst = AsciiTableSerialize.AsciiTableSerialize()
-    test_msg = backwards.unicode2bytes('lskdbjs;kfbj')
+    test_msg = b'lskdbjs;kfbj'
     test_msg = inst.str_datatype.serialize(test_msg, metadata={})
     nt.assert_raises(RuntimeError, inst.deserialize, test_msg)
 
@@ -37,11 +37,11 @@ class TestAsciiTableSerialize(parent.TestDefaultSerialize):
                           self.testing_options['kwargs']['format_str'])
         field_names = self.testing_options['kwargs'].get('field_names', None)
         if field_names is not None:
-            field_names = [backwards.bytes2unicode(x) for x in field_names]
+            field_names = [backwards.as_str(x) for x in field_names]
         self.assert_equal(self.instance.field_names, field_names)
         field_units = self.testing_options['kwargs'].get('field_units', None)
         if field_units is not None:
-            field_units = [backwards.bytes2unicode(x) for x in field_units]
+            field_units = [backwards.as_str(x) for x in field_units]
         self.assert_equal(self.instance.field_units, field_units)
 
 
@@ -50,14 +50,14 @@ class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableSerializeSingle, self).__init__(*args, **kwargs)
-        self._inst_kwargs['format_str'] = backwards.unicode2bytes('%d\n')
+        self._inst_kwargs['format_str'] = b'%d\n'
         self._cls = 'AsciiTableSerialize'
         self._empty_obj = []
         self._objects = [(1, )]
 
     def get_testing_options(self):
         r"""Get testing options."""
-        out = {'kwargs': {'format_str': backwards.unicode2bytes('%d\n')},
+        out = {'kwargs': {'format_str': b'%d\n'},
                'empty': [],
                'objects': [(1, )],
                'extra_kwargs': {},

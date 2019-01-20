@@ -68,14 +68,14 @@ class ScalarMetaschemaType(MetaschemaType):
         if cls.is_fixed and ('subtype' in cls.fixed_properties):
             if (cls.fixed_properties['subtype'] == 'bytes'):
                 if isinstance(obj, backwards.string_types):
-                    obj = backwards.unicode2bytes(obj)
+                    obj = backwards.as_bytes(obj)
                 else:
-                    obj = backwards.unicode2bytes(str(obj))
+                    obj = backwards.as_bytes(str(obj))
             elif (cls.fixed_properties['subtype'] == 'unicode'):
                 if isinstance(obj, backwards.string_types):
-                    obj = backwards.bytes2unicode(obj)
+                    obj = backwards.as_unicode(obj)
                 else:
-                    obj = backwards.bytes2unicode(str(obj))
+                    obj = backwards.as_unicode(str(obj))
             else:
                 dtype = ScalarMetaschemaProperties._python_scalars[
                     cls.fixed_properties['subtype']][0]
@@ -124,7 +124,7 @@ class ScalarMetaschemaType(MetaschemaType):
             elif dtype.name.startswith('float'):
                 return float(arr[0])
             elif dtype.name.startswith('bytes'):
-                return backwards.bytes2unicode(arr[0])
+                return backwards.as_unicode(arr[0])
         return super(ScalarMetaschemaType, cls).encode_data_readable(obj, typedef)
 
     @classmethod

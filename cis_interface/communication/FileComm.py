@@ -97,9 +97,9 @@ class FileComm(CommBase.CommBase):
         self._series_index = 0
         # Put string attributes in the correct format
         if self.open_as_binary:
-            func_conv = backwards.unicode2bytes
+            func_conv = backwards.as_bytes
         else:
-            func_conv = backwards.bytes2unicode
+            func_conv = backwards.as_unicode
         for k in self._attr_conv:
             v = getattr(self, k)
             if v is not None:
@@ -414,7 +414,7 @@ class FileComm(CommBase.CommBase):
         """
         if msg != self.eof_msg:
             if not self.open_as_binary:
-                msg = backwards.bytes2unicode(msg)
+                msg = backwards.as_unicode(msg)
             self.fd.write(msg)
             if self.append == 'ow':
                 self.fd.truncate()
@@ -450,7 +450,7 @@ class FileComm(CommBase.CommBase):
         else:
             out = out.replace(self.platform_newline, self.newline)
         if not self.open_as_binary:
-            out = backwards.unicode2bytes(out)
+            out = backwards.as_bytes(out)
         return (flag, out)
 
     def purge(self):

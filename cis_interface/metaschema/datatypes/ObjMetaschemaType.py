@@ -552,7 +552,7 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
             object: Decoded object.
 
         """
-        lines = backwards.bytes2unicode(msg).splitlines()
+        lines = backwards.as_str(msg).splitlines()
         metadata = {'comments': []}
         out = {}
         # Parse

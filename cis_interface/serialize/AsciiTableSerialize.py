@@ -56,11 +56,11 @@ class AsciiTableSerialize(DefaultSerialize):
         field_units={'type': 'array', 'items': {'type': 'string'}},
         as_array={'type': 'boolean', 'default': False},
         delimiter={'type': 'string',
-                   'default': str(backwards.bytes2unicode(_default_delimiter))},
+                   'default': backwards.as_str(_default_delimiter)},
         newline={'type': 'string',
-                 'default': str(backwards.bytes2unicode(_default_newline))},
+                 'default': backwards.as_str(_default_newline)},
         comment={'type': 'string',
-                 'default': str(backwards.bytes2unicode(_default_comment))},
+                 'default': backwards.as_str(_default_comment)},
         use_astropy={'type': 'boolean', 'default': False})
 
     def update_serializer(self, *args, **kwargs):
@@ -76,8 +76,8 @@ class AsciiTableSerialize(DefaultSerialize):
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
         for k in ['format_str', 'delimiter', 'newline', 'comment']:
             v = getattr(self, k, None)
-            if isinstance(v, backwards.unicode_type):
-                setattr(self, k, backwards.unicode2bytes(v))
+            if isinstance(v, backwards.string_types):
+                setattr(self, k, backwards.as_bytes(v))
         self.update_format_str()
         self.update_field_names()
         self.update_field_units()
@@ -102,7 +102,7 @@ class AsciiTableSerialize(DefaultSerialize):
             if fmts:
                 self.format_str = table2format(
                     fmts=fmts, delimiter=self.delimiter, newline=self.newline,
-                    comment=backwards.unicode2bytes(''))
+                    comment=b'')
 
     def update_field_names(self):
         r"""list: Names for each field in the data type."""
@@ -136,7 +136,7 @@ class AsciiTableSerialize(DefaultSerialize):
                                  use_astropy=self.use_astropy)
         else:
             out = format_message(args, self.format_str)
-        return backwards.unicode2bytes(out)
+        return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.

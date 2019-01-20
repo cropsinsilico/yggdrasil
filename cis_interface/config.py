@@ -86,7 +86,7 @@ def find_all(name, path):
             (stdoutdata, stderrdata) = pfind.communicate()
             out = stdoutdata
             for l in stderrdata.splitlines():
-                if backwards.unicode2bytes('Permission denied') not in l:
+                if b'Permission denied' not in l:
                     raise subprocess.CalledProcessError(pfind.returncode,
                                                         ' '.join(args),
                                                         output=stderrdata)
@@ -154,15 +154,13 @@ def update_config_matlab(config):
                '-r', '%s' % cmd]
     try:  # pragma: matlab
         mtl_proc = subprocess.check_output(mtl_cmd)
-        mtl_id = backwards.unicode2bytes(mtl_id)
+        mtl_id = backwards.match_stype(mtl_proc, mtl_id)
         if mtl_id not in mtl_proc:  # pragma: debug
             print(mtl_proc)
             raise RuntimeError("Could not locate matlab root id (%s) in output."
                                % mtl_id)
-        opts['matlabroot'][1] = str(
-            backwards.bytes2unicode(mtl_proc.split(mtl_id)[-3]))
-        opts['release'][1] = str(
-            backwards.bytes2unicode(mtl_proc.split(mtl_id)[-2]))
+        opts['matlabroot'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-3])
+        opts['release'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-2])
     except (subprocess.CalledProcessError, OSError):  # pragma: no matlab
         pass
     for k in opts.keys():

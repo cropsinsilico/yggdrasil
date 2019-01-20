@@ -26,7 +26,7 @@ def test_register_metaschema_property():
     nt.assert_raises(ValueError, properties.register_metaschema_property, x)
     # Error when replacement class has schema
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),
-             {'name': existing_validator})
+             {'name': existing_validator, 'schema': {}})
     nt.assert_raises(ValueError, properties.register_metaschema_property, x)
     # Error when validate set
 
