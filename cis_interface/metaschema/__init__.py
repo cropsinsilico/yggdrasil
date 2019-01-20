@@ -4,6 +4,7 @@ import pprint
 import json
 import jsonschema
 import cis_interface
+from cis_interface import backwards
 from cis_interface.metaschema.properties import (
     get_registered_properties, import_all_properties)
 from cis_interface.metaschema.datatypes import (
@@ -65,7 +66,10 @@ def create_metaschema(overwrite=False):
     pprint.pprint(out)
     # Save it to a file
     with open(_metaschema_fname, 'w') as fd:
-        json.dump(out, fd, sort_keys=True, indent='\t')
+        if backwards.PY2:  # pragma: Python 2
+            json.dump(out, fd, sort_keys=True, indent=4)
+        else:  # pragma: Python 3
+            json.dump(out, fd, sort_keys=True, indent='\t')
     return out
 
 

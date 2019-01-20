@@ -438,8 +438,10 @@ def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
 # if platform._is_win:  # pragma: windows
 #     build_regex_win32(overwrite=False)
 # build_datatypes(overwrite=False)
-build_api(cpp=False, overwrite=False)
-build_api(cpp=True, overwrite=False)
+if not os.path.isfile(_api_shared_c):
+    build_api(cpp=False, overwrite=False)
+if not os.path.isfile(_api_shared_cpp):
+    build_api(cpp=True, overwrite=False)
 
 
 def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
