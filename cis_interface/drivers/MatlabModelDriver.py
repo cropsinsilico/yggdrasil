@@ -5,15 +5,15 @@ import os
 import psutil
 import warnings
 import weakref
+from cis_interface import backwards, tools, platform, config
 try:  # pragma: matlab
     import matlab.engine
-    _matlab_installed = True
+    _matlab_installed = (config.cis_cfg.get('matlab', 'disable', 'False') == 'False')
 except ImportError:  # pragma: no matlab
     debug("Could not import matlab.engine. "
           + "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface import backwards, tools, platform, config
 from cis_interface.tools import TimeOut, sleep
 from cis_interface.schema import register_component
 
