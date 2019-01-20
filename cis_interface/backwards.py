@@ -65,6 +65,20 @@ def scanf_bytes(fmt, bytes_line):
     return out_byt
 
 
+def assert_str(s):
+    r"""Assert that the input is in str type appropriate for the version of
+    Python.
+
+    Arguments:
+        s (obj): Object to be tested if it is of the proper str class.
+
+    Raises:
+        AssertionError: If the object is not in the proper str class.
+
+    """
+    assert(isinstance(s, string_type))
+
+
 def assert_bytes(s):
     r"""Assert that the input is in bytes appropriate for the version of
     Python.
@@ -93,72 +107,157 @@ def assert_unicode(s):
     assert(isinstance(s, unicode_type))
 
 
-def bytes2unicode(b):
+def as_unicode(s_in):
     r"""Convert from bytes/unicode/str to unicode.
 
     Arguments:
-        b (bytes, unicode, str): Bytes to be converted into unicode.
+        s_in (bytes, unicode, str): Object to be converted into unicode.
 
     Returns:
-        unicode/str: String version of input.
+        unicode/str: Unicode version of input (unicode in Python 2, str in
+            Python 3).
 
     Raises:
        TypeError: If supplied type cannot be converted to unicode.
 
     """
     if PY2:  # pragma: Python 2
-        if isinstance(b, (str, bytearray)):
-            s = unicode_type(b)
-            # s = unicode(b)
-        elif isinstance(b, unicode):
-            s = unicode_type(b)
-            # s = b
+        if isinstance(s_in, (str, bytearray)):
+            s_out = unicode_type(s_in)
+        elif isinstance(s_in, unicode):
+            s_out = s_in
         else:
-            raise TypeError("Cannot convert type %s to str" % type(b))
+            raise TypeError("Cannot convert type %s to unicode" % type(s_in))
     else:  # pragma: Python 3
-        if isinstance(b, str):
-            s = b
-        elif isinstance(b, (bytes, bytearray)):
-            s = b.decode("utf-8")
+        if isinstance(s_in, str):
+            s_out = s_in
+        elif isinstance(s_in, (bytes, bytearray)):
+            s_out = s_in.decode("utf-8")
         else:
-            raise TypeError("Cannot convert type %s to str" % type(b))
-    return s
+            raise TypeError("Cannot convert type %s to unicode" % type(s_in))
+    return s_out
 
 
-def unicode2bytes(s):
+def as_bytes(s_in):
     r"""Convert from bytes/unicode/str to a bytes object.
 
     Arguments:
-        s (str, bytes, unicode): Object to convert to a bytes version.
+        s_in (str, bytes, unicode): Object to convert to a bytes version.
 
     Returns:
-        bytes: Bytes version of input.
+        bytes/str: Bytes version of input (str in Python 2, bytes in Python 3).
 
     Raises:
        TypeError: If supplied type cannot be converted to bytes.
 
     """
     if PY2:  # pragma: Python 2
-        if isinstance(s, bytearray):
-            b = bytes_type(s)  # In python 2 str is bytes
-        elif isinstance(s, str):
-            b = bytes_type(s)
-        elif isinstance(s, unicode):
-            b = s.encode("utf-8")
+        if isinstance(s_in, bytearray):
+            s_out = bytes_type(s_in)  # In python 2 str is bytes
+        elif isinstance(s_in, str):
+            s_out = s_in
+        elif isinstance(s_in, unicode):
+            s_out = s_in.encode("utf-8")
         else:
-            raise TypeError("Cannot convert type %s to bytes" % type(s))
+            raise TypeError("Cannot convert type %s to bytes" % type(s_in))
     else:  # pragma: Python 3
-        if isinstance(s, bytes):
-            b = bytes_type(s)
-        elif isinstance(s, bytearray):
-            b = bytes_type(s)
-        elif isinstance(s, str):
-            b = s.encode("utf-8")
-            # b = bytes_type(s, 'utf-8')
-            # b = bytearray(s.encode('utf-8'))
+        if isinstance(s_in, bytes):
+            s_out = s_in
+        elif isinstance(s_in, bytearray):
+            s_out = bytes_type(s_in)
+        elif isinstance(s_in, str):
+            s_out = s_in.encode("utf-8")
         else:
-            raise TypeError("Cannot convert type %s to bytes" % type(s))
-    return b
+            raise TypeError("Cannot convert type %s to bytes" % type(s_in))
+    return s_out
+    
+
+def as_str(s_in):
+    r"""Convert from bytes/unicode/str to a str object.
+
+    Arguments:
+        s_in (str, bytes, unicode): Object to convert to a str version.
+
+    Returns:
+        str: Str version of input.
+
+    Raises:
+       TypeError: If supplied type cannot be converted to str.
+
+    """
+    if PY2:  # pragma: Python 2
+        s_out = as_bytes(s_in)
+    else:  # pragma: Python 3
+        s_out = as_unicode(s_in)
+    return s_out
+    
+
+# def bytes2unicode(b):
+#     r"""Convert from bytes/unicode/str to unicode.
+
+#     Arguments:
+#         b (bytes, unicode, str): Bytes to be converted into unicode.
+
+#     Returns:
+#         unicode/str: String version of input.
+
+#     Raises:
+#        TypeError: If supplied type cannot be converted to unicode.
+
+#     """
+#     if PY2:  # pragma: Python 2
+#         if isinstance(b, (str, bytearray)):
+#             s = unicode_type(b)
+#             # s = unicode(b)
+#         elif isinstance(b, unicode):
+#             s = unicode_type(b)
+#             # s = b
+#         else:
+#             raise TypeError("Cannot convert type %s to str" % type(b))
+#     else:  # pragma: Python 3
+#         if isinstance(b, str):
+#             s = b
+#         elif isinstance(b, (bytes, bytearray)):
+#             s = b.decode("utf-8")
+#         else:
+#             raise TypeError("Cannot convert type %s to str" % type(b))
+#     return s
+
+
+# def unicode2bytes(s):
+#     r"""Convert from bytes/unicode/str to a bytes object.
+
+#     Arguments:
+#         s (str, bytes, unicode): Object to convert to a bytes version.
+
+#     Returns:
+#         bytes: Bytes version of input.
+
+#     Raises:
+#        TypeError: If supplied type cannot be converted to bytes.
+
+#     """
+#     if PY2:  # pragma: Python 2
+#         if isinstance(s, bytearray):
+#             b = bytes_type(s)  # In python 2 str is bytes
+#         elif isinstance(s, str):
+#             b = bytes_type(s)
+#         elif isinstance(s, unicode):
+#             b = s.encode("utf-8")
+#         else:
+#             raise TypeError("Cannot convert type %s to bytes" % type(s))
+#     else:  # pragma: Python 3
+#         if isinstance(s, bytes):
+#             b = bytes_type(s)
+#         elif isinstance(s, bytearray):
+#             b = bytes_type(s)
+#         elif isinstance(s, str):
+#             b = s.encode("utf-8")
+#             # b = bytes_type(s, 'utf-8')
+#             # b = bytearray(s.encode('utf-8'))
+#         else:
+#             raise TypeError("Cannot convert type %s to bytes" % type(s))
+#     return b
 
 
 def match_stype(s1, s2):
@@ -177,24 +276,16 @@ def match_stype(s1, s2):
         TypeError: If s1 is not str, bytes, bytearray or unicode.
 
     """
-    if PY2:  # pragma: Python 2
-        if isinstance(s1, str):
-            out = unicode2bytes(s2)
-        elif isinstance(s1, unicode):
-            out = unicode(s2)
-        elif isinstance(s1, bytearray):
-            out = bytearray(bytes2unicode(s2), 'utf-8')
-        else:
-            raise TypeError("s1 must be str, bytes, bytearray or unicode.")
-    else:  # pragma: Python 3
-        if isinstance(s1, str):
-            out = bytes2unicode(s2)
-        elif isinstance(s1, bytes):
-            out = unicode2bytes(s2)
-        elif isinstance(s1, bytearray):
-            out = bytearray(bytes2unicode(s2), 'utf-8')
-        else:
-            raise TypeError("s1 must be str, bytes, bytearray or unicode.")
+    if isinstance(s1, string_type):
+        out = as_str(s2)
+    elif isinstance(s1, bytes_type):
+        out = as_bytes(s2)
+    elif isinstance(s1, unicode_type):
+        out = as_unicode(s2)
+    elif isinstance(s1, bytearray):
+        out = bytearray(as_unicode(s2), 'utf-8')
+    else:
+        raise TypeError("Cannot match s1 type of '%s'" % type(s1))
     return out
 
 
@@ -218,9 +309,9 @@ def format_bytes(s, args):
         is_bytes = isinstance(s, bytes)
         new_args = []
         if PY34 or not is_bytes:
-            converter = bytes2unicode
+            converter = as_unicode
         else:
-            converter = unicode2bytes
+            converter = as_bytes
         for a in args:
             if isinstance(a, (bytes, str)):
                 new_args.append(converter(a))
@@ -228,7 +319,7 @@ def format_bytes(s, args):
                 new_args.append(a)
         out = converter(s) % tuple(new_args)
         if is_bytes:
-            out = unicode2bytes(out)
+            out = as_bytes(out)
     return out
 
 
@@ -243,9 +334,9 @@ def encode_escape(s):
 
     """
     if PY2:  # pragma: Python 2
-        out = match_stype(s, bytes2unicode(s).encode('string-escape'))
+        out = match_stype(s, as_str(s).encode('string-escape'))
     else:  # pragma: Python 3
-        out = match_stype(s, bytes2unicode(s).encode('unicode-escape'))
+        out = match_stype(s, as_unicode(s).encode('unicode-escape'))
     return out
 
 
@@ -260,16 +351,18 @@ def decode_escape(s):
 
     """
     if PY2:  # pragma: Python 2
-        out = match_stype(s, unicode2bytes(s).decode('string-escape'))
+        out = match_stype(s, as_bytes(s).decode('string-escape'))
     else:  # pragma: Python 3
-        out = match_stype(s, unicode2bytes(s).decode('unicode-escape'))
+        out = match_stype(s, as_bytes(s).decode('unicode-escape'))
         # out = unicode2bytes(s).decode('unicode-escape').encode('latin1')
     return out
 
 
 # Python 3 version of np.genfromtxt
 # https://github.com/numpy/numpy/issues/3184
+bytes2unicode = as_unicode
+unicode2bytes = as_bytes
 
     
 __all__ = ['pickle', 'configparser', 'sio',
-           'bytes2unicode', 'unicode2bytes']
+           'as_str', 'as_bytes', 'as_unicode']
