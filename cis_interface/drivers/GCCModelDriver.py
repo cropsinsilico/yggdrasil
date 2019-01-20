@@ -474,17 +474,18 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     cpp = (src_ext not in ['.c'])
     ccflags0, ldflags0 = get_flags(cpp=cpp)
     # Compile C++ wrapper
-    # fname_lib_out = build_datatypes(just_obj=True, overwrite=False)
+    fname_lib_out = build_datatypes(just_obj=True, overwrite=False)
     # Compile each source file
-    fname_src_obj = []  # fname_lib_out]
+    fname_src_obj = []
     for isrc in src:
         fname_src_obj.append(call_compile(isrc,
                                           flags=copy.deepcopy(ccflags0 + ccflags),
                                           overwrite=overwrite,
                                           working_dir=working_dir))
+    fname_src_obj.append(fname_lib_out)
     # Link compile objects
     out = call_link(fname_src_obj, out, cpp=True,
-                    flags=copy.deepcopy(ccflags0 + ccflags + ldflags0 + ldflags),
+                    flags=copy.deepcopy(ldflags0 + ldflags),
                     overwrite=overwrite, working_dir=working_dir)
     return [out] + fname_src_obj
 
