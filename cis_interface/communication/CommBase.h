@@ -61,7 +61,7 @@ comm_t empty_comm_base() {
   ret.serializer = NULL;
   ret.maxMsgSize = 0;
   ret.msgBufSize = 0;
-  ret.always_send_header = 0;
+  ret.always_send_header = 1;
   ret.index_in_register = -1;
   ret.last_send = NULL;
   ret.sent_eof = NULL;
