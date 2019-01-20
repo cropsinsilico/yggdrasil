@@ -308,6 +308,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     # Get compiler
     cc = get_cc(shared=shared, static=static, cpp=cpp)
     # Construct arguments
+    args = [cc]
     if shared:
         if platform._is_win:  # pragma: windows
             flags.append('/DLL')
@@ -315,6 +316,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
             flags.append('-dynamiclib')
         else:
             flags.append('-shared')
+        args += flags
     elif static:
         if platform._is_win:  # pragma: windows
             pass
@@ -322,7 +324,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
             flags += ['-static']
         else:
             flags += ['-rcs', out]
-    args = [cc] + flags
+        args += flags
     if platform._is_win:  # pragma: windows
         args += ['/OUT:%s' % out]
     elif platform._is_mac:
@@ -336,6 +338,8 @@ def call_link(obj, out=None, flags=[], overwrite=False,
         else:
             args += ["-o", out]
     args += obj
+    if not (shared or static):
+        args += flags
     if platform._is_mac and shared:
         args.append('-L' + os.path.dirname(out))
         args.append('-l' + os.path.splitext(os.path.basename(out))[0].split('lib')[-1])
