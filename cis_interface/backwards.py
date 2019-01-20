@@ -2,6 +2,7 @@ r"""This module allows for backward compatibility."""
 import sys
 import time
 import base64
+from collections import OrderedDict
 from cis_interface.scanf import scanf
 _python_version = '%d.%d' % (sys.version_info[0], sys.version_info[1])
 PY2 = (sys.version_info[0] == 2)
@@ -287,6 +288,25 @@ def decode_escape(s):
     else:  # pragma: Python 3
         out = match_stype(s, as_bytes(s).decode('unicode-escape'))
     return out
+
+
+def as_unicode_recurse(s, convert_types=None):
+    r"""Ensure a structure is entirely in unicode, recursing as necessary."""
+    if convert_types is None:
+        convert_types = string_types
+    if isinstance(s, list):
+        for i in range(len(s)):
+            s[i] = as_unicode_recurse(s[i], convert_types=convert_types)
+    elif isinstance(s, tuple):
+        s_list = as_unicode_recurse(list(s), convert_types=convert_types)
+        s = tuple(s_list)
+    elif isinstance(s, (dict, OrderedDict)):
+        for k0 in s.keys():
+            k = as_unicode_recurse(k0, convert_types=convert_types)
+            s[k] = as_unicode_recurse(s.pop(k0))
+    elif isinstance(s, convert_types):
+        s = as_unicode(s)
+    return s
 
 
 # Python 3 version of np.genfromtxt

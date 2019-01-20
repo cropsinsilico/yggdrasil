@@ -1,10 +1,11 @@
 import os
 import glob
 import importlib
+from collections import OrderedDict
 from cis_interface.metaschema.properties import MetaschemaProperty
 
 
-_metaschema_properties = {}
+_metaschema_properties = OrderedDict()
 
 
 def register_metaschema_property(prop_class):

@@ -3,24 +3,26 @@ from cis_interface import units, backwards
 from cis_interface.metaschema.datatypes import MetaschemaTypeError
 from cis_interface.metaschema.properties import register_metaschema_property
 from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
+from collections import OrderedDict
 
 
 _valid_numpy_types = ['int', 'uint', 'float', 'complex']
-_valid_types = {k: k for k in _valid_numpy_types}
+_valid_types = OrderedDict([(k, k) for k in _valid_numpy_types])
 _flexible_types = ['string', 'bytes', 'unicode']
-_python_scalars = {'float': [float], 'int': [int],
-                   'uint': [], 'complex': [complex]}
+_python_scalars = OrderedDict([('float', [float]),
+                               ('int', [int]), ('uint', []),
+                               ('complex', [complex])])
 if backwards.PY2:  # pragma: Python 2
     from __builtin__ import unicode
     _valid_numpy_types += ['string', 'unicode']
     _valid_types['bytes'] = 'string'
     _valid_types['unicode'] = 'unicode'
-    _python_scalars.update(bytes=[str], unicode=[unicode])
+    _python_scalars.update([('bytes', [str]), ('unicode', [unicode])])
 else:  # pragma: Python 3
     _valid_numpy_types += ['bytes', 'unicode', 'str']
     _valid_types['bytes'] = 'bytes'
     _valid_types['unicode'] = 'str'
-    _python_scalars.update(bytes=[bytes], unicode=[str])
+    _python_scalars.update([('bytes', [bytes]), ('unicode', [str])])
 for t, t_np in _valid_types.items():
     prec_list = []
     if t in ['float']:

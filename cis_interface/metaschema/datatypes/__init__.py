@@ -4,11 +4,12 @@ import json
 import jsonschema
 import copy
 import importlib
+from collections import OrderedDict
 from cis_interface import backwards
 from cis_interface.metaschema.properties import get_metaschema_property
 
 
-_type_registry = {}
+_type_registry = OrderedDict()
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
 _base_validator = jsonschema.validators.validator_for({"$schema": ""})
 CIS_MSG_HEAD = b'CIS_MSG_HEAD'

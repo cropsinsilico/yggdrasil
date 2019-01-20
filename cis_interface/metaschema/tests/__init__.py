@@ -88,7 +88,7 @@ def test_get_metaschema():
         shutil.move(metaschema._metaschema_fname, temp)
         metaschema._metaschema = None
         new_metaschema = metaschema.get_metaschema()
-        nt.assert_equal(old_metaschema, new_metaschema)
+        nt.assert_equal(new_metaschema, old_metaschema)
     except BaseException:  # pragma: debug
         shutil.move(temp, metaschema._metaschema_fname)
         raise

@@ -24,7 +24,7 @@ _validator = None
 
 if os.path.isfile(_metaschema_fname):
     with open(_metaschema_fname, 'r') as fd:
-        _metaschema = json.load(fd)
+        _metaschema = json.load(fd)  # , object_pairs_hook=OrderedDict)
 
 
 def create_metaschema(overwrite=False):
@@ -61,6 +61,9 @@ def create_metaschema(overwrite=False):
             out['definitions']['simpleTypes']['enum'].append(k)
         for p in v.properties:
             assert(p in out['properties'])
+    # Convert to unicode if python 2
+    if backwards.PY2:  # pragma: Python 2
+        out = backwards.as_unicode_recurse(out, convert_types=(str,))
     # Print
     print('Created metaschema')
     pprint.pprint(out)
