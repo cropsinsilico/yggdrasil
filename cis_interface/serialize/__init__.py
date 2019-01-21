@@ -838,6 +838,7 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         print('new', dtype)
         if dtype is not None:
             arr = arr.astype(dtype)
+        print(arr, arr.dtype)
     fd.close()
     return arr
 
