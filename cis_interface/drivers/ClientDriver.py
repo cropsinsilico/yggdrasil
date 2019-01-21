@@ -1,4 +1,4 @@
-from cis_interface.drivers.ClientRequestDriver import ClientRequestDriver
+from yggdrasil.drivers.ClientRequestDriver import ClientRequestDriver
 
 
 class ClientDriver(ClientRequestDriver):

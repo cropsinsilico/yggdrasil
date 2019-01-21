@@ -11,18 +11,18 @@ import signal
 import atexit
 import uuid as uuid_gen
 import subprocess
-from cis_interface import platform
-from cis_interface import backwards
-from cis_interface.config import cis_cfg, cfg_logging
+from yggdrasil import platform
+from yggdrasil import backwards
+from yggdrasil.config import ygg_cfg, cfg_logging
 
 
-CIS_MSG_EOF = b'EOF!!!'
-CIS_MSG_BUF = 1024 * 2
+YGG_MSG_EOF = b'EOF!!!'
+YGG_MSG_BUF = 1024 * 2
 
 
 _stack_in_log = False
 _stack_in_timeout = False
-if ((logging.getLogger("cis_interface").getEffectiveLevel()
+if ((logging.getLogger("yggdrasil").getEffectiveLevel()
      <= logging.DEBUG)):  # pragma: debug
     _stack_in_log = False
     _stack_in_timeout = True
@@ -67,17 +67,17 @@ def check_locks():  # pragma: debug
 
 def check_sockets():  # pragma: debug
     r"""Check registered sockets."""
-    from cis_interface.communication import cleanup_comms
+    from yggdrasil.communication import cleanup_comms
     count = cleanup_comms('ZMQComm')
     if count > 0:
         logging.info("%d sockets closed." % count)
 
 
-def cis_atexit():  # pragma: debug
+def ygg_atexit():  # pragma: debug
     r"""Things to do at exit."""
     check_locks()
     check_threads()
-    if not os.environ.get('CIS_SUBPROCESS', False):
+    if not os.environ.get('YGG_SUBPROCESS', False):
         check_sockets()
     if backwards.PY34:
         # Print empty line to ensure close
@@ -85,7 +85,7 @@ def cis_atexit():  # pragma: debug
         sys.stdout.flush()
 
 
-atexit.register(cis_atexit)
+atexit.register(ygg_atexit)
 
 
 def locate_path(fname, basedir=os.path.abspath(os.sep)):
@@ -111,13 +111,13 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
 
 def get_supported_lang():
     r"""Get a list of the model programming languages that are supported
-    by cis_interface.
+    by yggdrasil.
 
     Returns:
-        list: The names of programming languages supported by cis_interface.
+        list: The names of programming languages supported by yggdrasil.
     
     """
-    from cis_interface import schema
+    from yggdrasil import schema
     s = schema.get_schema()
     out = s['model'].subtypes
     if 'c++' in out:
@@ -126,13 +126,13 @@ def get_supported_lang():
 
 
 def get_supported_comm():
-    r"""Get a list of the communication mechanisms supported by cis_interface.
+    r"""Get a list of the communication mechanisms supported by yggdrasil.
 
     Returns:
-        list: The names of communication mechanisms supported by cis_interface.
+        list: The names of communication mechanisms supported by yggdrasil.
 
     """
-    from cis_interface import schema
+    from yggdrasil import schema
     s = schema.get_schema()
     out = s['comm'].classes
     for k in ['CommBase', 'DefaultComm']:
@@ -142,7 +142,7 @@ def get_supported_comm():
 
 
 def is_lang_installed(lang):
-    r"""Check to see if cis_interface can run models written in a programming
+    r"""Check to see if yggdrasil can run models written in a programming
     language on the current machine.
 
     Args:
@@ -153,14 +153,14 @@ def is_lang_installed(lang):
             machine, False otherwise.
 
     """
-    from cis_interface import schema, drivers
+    from yggdrasil import schema, drivers
     s = schema.get_schema()
     drv = drivers.import_driver(s['model'].subtype2class[lang])
     return drv.is_installed()
 
 
 def is_comm_installed(comm, language=None):
-    r"""Check to see if cis_interface can use a communication mechanism on the
+    r"""Check to see if yggdrasil can use a communication mechanism on the
     current machine.
 
     Args:
@@ -174,13 +174,13 @@ def is_comm_installed(comm, language=None):
             machine, False otherwise.
 
     """
-    from cis_interface import communication
+    from yggdrasil import communication
     cmm = communication.get_comm_class(comm)
     return cmm.is_installed(language=language)
 
 
 def get_installed_lang():
-    r"""Get a list of the languages that are supported by cis_interface on the
+    r"""Get a list of the languages that are supported by yggdrasil on the
     current machine. This checks for the necessary interpreters, licenses, and/or
     compilers.
 
@@ -198,7 +198,7 @@ def get_installed_lang():
 
 def get_installed_comm(language=None):
     r"""Get a list of the communication channel types that are supported by
-    cis_interface on the current machine. This checks the operating system,
+    yggdrasil on the current machine. This checks the operating system,
     supporting libraries, and broker credentials. The order indicates the
     prefered order of use.
 
@@ -230,10 +230,10 @@ def get_installed_comm(language=None):
 def get_default_comm():
     r"""Get the default comm that should be used for message passing."""
     comm_list = get_installed_comm()
-    if 'CIS_DEFAULT_COMM' in os.environ:
-        _default_comm = os.environ['CIS_DEFAULT_COMM']
+    if 'YGG_DEFAULT_COMM' in os.environ:
+        _default_comm = os.environ['YGG_DEFAULT_COMM']
         if not is_comm_installed(_default_comm, language='any'):  # pragma: debug
-            raise Exception('Unsupported default comm %s set by CIS_DEFAULT_COMM' % (
+            raise Exception('Unsupported default comm %s set by YGG_DEFAULT_COMM' % (
                             _default_comm))
     else:
         if len(comm_list) > 0:
@@ -255,7 +255,7 @@ def get_default_comm():
     return _default_comm
 
 
-def get_CIS_MSG_MAX(comm_type=None):
+def get_YGG_MSG_MAX(comm_type=None):
     r"""Get the maximum message size for a given comm type.
 
     Args:
@@ -370,7 +370,7 @@ def eval_kwarg(x):
     return x
 
 
-class CisPopen(subprocess.Popen):
+class YggPopen(subprocess.Popen):
     r"""Uses Popen to open a process without a buffer. If not already set,
     the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
     0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
@@ -407,14 +407,14 @@ class CisPopen(subprocess.Popen):
                 kwargs.setdefault('preexec_fn', os.setpgrp)
         # if platform._is_win:  # pragma: windows
         #     kwargs.setdefault('universal_newlines', True)
-        super(CisPopen, self).__init__(cmd_args, **kwargs)
+        super(YggPopen, self).__init__(cmd_args, **kwargs)
 
     def kill(self, *args, **kwargs):
         r"""On windows using CTRL_BREAK_EVENT to kill the process."""
         if platform._is_win:  # pragma: windows
             self.send_signal(signal.CTRL_BREAK_EVENT)
         else:
-            super(CisPopen, self).kill(*args, **kwargs)
+            super(YggPopen, self).kill(*args, **kwargs)
 
 
 def popen_nobuffer(*args, **kwargs):
@@ -434,10 +434,10 @@ def popen_nobuffer(*args, **kwargs):
         **kwargs: Additional keywords arguments are passed to Popen.
 
     Returns:
-        CisPopen: Process that was started.
+        YggPopen: Process that was started.
 
     """
-    return CisPopen(*args, **kwargs)
+    return YggPopen(*args, **kwargs)
 
 
 def print_encoded(msg, *args, **kwargs):
@@ -510,8 +510,8 @@ class TimeOut(object):
 #     return wrapper
 
 
-class CisClass(logging.LoggerAdapter):
-    r"""Base class for CiS classes.
+class YggClass(logging.LoggerAdapter):
+    r"""Base class for Ygg classes.
 
     Args:
         name (str): Class name.
@@ -571,8 +571,8 @@ class CisClass(logging.LoggerAdapter):
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
-        self._cis_class = str(self.__class__).split("'")[1].split('.')[-1]
-        super(CisClass, self).__init__(logging.getLogger(self.__module__), {})
+        self._ygg_class = str(self.__class__).split("'")[1].split('.')[-1]
+        super(YggClass, self).__init__(logging.getLogger(self.__module__), {})
 
     @property
     def name(self):
@@ -580,20 +580,20 @@ class CisClass(logging.LoggerAdapter):
         return self._name
 
     @property
-    def cis_class(self):
+    def ygg_class(self):
         r"""str: Name of the class."""
-        return self._cis_class
+        return self._ygg_class
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
-        self._old_loglevel = cis_cfg.get('debug', 'cis')
-        cis_cfg.set('debug', 'cis', 'DEBUG')
+        self._old_loglevel = ygg_cfg.get('debug', 'ygg')
+        ygg_cfg.set('debug', 'ygg', 'DEBUG')
         cfg_logging()
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
         if self._old_loglevel is not None:
-            cis_cfg.set('debug', 'cis', self._old_loglevel)
+            ygg_cfg.set('debug', 'ygg', self._old_loglevel)
             cfg_logging()
             self._old_loglevel = None
 
@@ -642,7 +642,7 @@ class CisClass(logging.LoggerAdapter):
             the_func = stack[2][3]
             prefix = '%s(%s).%s[%d]' % (the_class, self.name, the_func, the_line)
         else:
-            prefix = '%s(%s)' % (self.cis_class, self.name)
+            prefix = '%s(%s)' % (self.ygg_class, self.name)
         new_msg = '%s: %s' % (prefix, self.as_str(msg))
         return new_msg, kwargs
 
@@ -692,7 +692,7 @@ class CisClass(logging.LoggerAdapter):
     def error(self):
         r"""Log an error level message."""
         self.errors.append('ERROR')
-        return super(CisClass, self).error
+        return super(YggClass, self).error
 
     @property
     def exception(self):
@@ -700,7 +700,7 @@ class CisClass(logging.LoggerAdapter):
         exc_info = sys.exc_info()
         if exc_info is not None and exc_info != (None, None, None):
             self.errors.append('ERROR')
-            return super(CisClass, self).exception
+            return super(YggClass, self).exception
         else:
             return self.error
 
@@ -901,8 +901,8 @@ class CisClass(logging.LoggerAdapter):
         del self._timeouts[key]
 
 
-class CisThread(threading.Thread, CisClass):
-    r"""Thread for CiS that tracks when the thread is started and joined.
+class YggThread(threading.Thread, YggClass):
+    r"""Thread for Ygg that tracks when the thread is started and joined.
 
     Attributes:
         lock (threading.RLock): Lock for accessing the sockets from multiple
@@ -914,17 +914,17 @@ class CisThread(threading.Thread, CisClass):
 
     """
     def __init__(self, name=None, target=None, args=(), kwargs=None,
-                 daemon=False, group=None, **cis_kwargs):
+                 daemon=False, group=None, **ygg_kwargs):
         global _lock_registry
         if kwargs is None:
             kwargs = {}
         thread_kwargs = dict(name=name, target=target, group=group,
                              args=args, kwargs=kwargs)
-        super(CisThread, self).__init__(**thread_kwargs)
-        CisClass.__init__(self, self.name, **cis_kwargs)
-        self._cis_target = target
-        self._cis_args = args
-        self._cis_kwargs = kwargs
+        super(YggThread, self).__init__(**thread_kwargs)
+        YggClass.__init__(self, self.name, **ygg_kwargs)
+        self._ygg_target = target
+        self._ygg_args = args
+        self._ygg_kwargs = kwargs
         self.debug('')
         self.lock = threading.RLock()
         self.start_event = threading.Event()
@@ -984,7 +984,7 @@ class CisThread(threading.Thread, CisClass):
         if not self.was_terminated:
             self.set_started_flag()
             self.before_start()
-        super(CisThread, self).start(*args, **kwargs)
+        super(YggThread, self).start(*args, **kwargs)
         self._calling_thread = threading.current_thread()
         # print("Thread = %s, Called by %s" % (self.name, self._calling_thread.name))
 
@@ -992,11 +992,11 @@ class CisThread(threading.Thread, CisClass):
         r"""Continue running until terminate event set."""
         self.debug("Starting method")
         try:
-            super(CisThread, self).run(*args, **kwargs)
+            super(YggThread, self).run(*args, **kwargs)
         except BaseException:  # pragma: debug
             self.exception("THREAD ERROR")
         finally:
-            for k in ['_cis_target', '_cis_args', '_cis_kwargs']:
+            for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
                 if hasattr(self, k):
                     delattr(self, k)
 
@@ -1058,10 +1058,10 @@ class CisThread(threading.Thread, CisClass):
                 self.cleanup()
 
 
-class CisThreadLoop(CisThread):
+class YggThreadLoop(YggThread):
     r"""Thread that will run a loop until the terminate event is called."""
     def __init__(self, *args, **kwargs):
-        super(CisThreadLoop, self).__init__(*args, **kwargs)
+        super(YggThreadLoop, self).__init__(*args, **kwargs)
         self._1st_main_terminated = False
         self.break_flag = False
         self.loop_event = threading.Event()
@@ -1132,8 +1132,8 @@ class CisThreadLoop(CisThread):
 
     def run_loop(self, *args, **kwargs):
         r"""Actions performed on each loop iteration."""
-        if self._cis_target:
-            self._cis_target(*self._cis_args, **self._cis_kwargs)
+        if self._ygg_target:
+            self._ygg_target(*self._ygg_args, **self._ygg_kwargs)
         else:
             self.set_break_flag()
 
@@ -1159,7 +1159,7 @@ class CisThreadLoop(CisThread):
             self.exception("THREAD ERROR")
             self.set_break_flag()
         finally:
-            for k in ['_cis_target', '_cis_args', '_cis_kwargs']:
+            for k in ['_ygg_target', '_ygg_args', '_ygg_kwargs']:
                 if hasattr(self, k):
                     delattr(self, k)
         try:
@@ -1170,4 +1170,4 @@ class CisThreadLoop(CisThread):
     def terminate(self, *args, **kwargs):
         r"""Also set break flag."""
         self.set_break_flag()
-        super(CisThreadLoop, self).terminate(*args, **kwargs)
+        super(YggThreadLoop, self).terminate(*args, **kwargs)

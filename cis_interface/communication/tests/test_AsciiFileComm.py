@@ -1,5 +1,5 @@
-import nose.tools as nt
-from cis_interface.communication.tests import test_FileComm as parent
+from yggdrasil.tests import assert_equal
+from yggdrasil.communication.tests import test_FileComm as parent
 
 
 class TestAsciiFileComm(parent.TestFileComm):
@@ -18,4 +18,4 @@ class TestAsciiFileComm(parent.TestFileComm):
         assert(flag)
         flag, msg_recv = self.recv_instance.recv()
         assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
+        assert_equal(msg_recv, self.recv_instance.eof_msg)

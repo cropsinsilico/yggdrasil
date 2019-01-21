@@ -1,7 +1,7 @@
-from cis_interface import backwards
-from cis_interface.communication import FileComm
-from cis_interface.schema import register_component
-from cis_interface.serialize.PickleSerialize import PickleSerialize
+from yggdrasil import backwards
+from yggdrasil.communication import FileComm
+from yggdrasil.schema import register_component
+from yggdrasil.serialize.PickleSerialize import PickleSerialize
 
 
 @register_component

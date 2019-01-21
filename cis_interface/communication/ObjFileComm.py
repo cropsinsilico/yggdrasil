@@ -1,6 +1,6 @@
-from cis_interface.communication.PlyFileComm import PlyFileComm
-from cis_interface.schema import register_component
-from cis_interface.serialize.ObjSerialize import ObjSerialize
+from yggdrasil.communication.PlyFileComm import PlyFileComm
+from yggdrasil.schema import register_component
+from yggdrasil.serialize.ObjSerialize import ObjSerialize
 
 
 @register_component

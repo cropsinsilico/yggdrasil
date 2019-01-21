@@ -10,8 +10,8 @@ function client(iterations, client_index)
   % RPC client-side connection will be $(server_name)_$(client_name)
   rpc_name = sprintf('server_client%d', client_index);
   log_name = sprintf('output_log%d', client_index);
-  rpc = CisInterface('CisRpcClient', rpc_name, '%d', '%d');
-  log = CisInterface('CisOutput', log_name, 'fib(%-2d) = %-2d\n');
+  rpc = YggInterface('YggRpcClient', rpc_name, '%d', '%d');
+  log = YggInterface('YggOutput', log_name, 'fib(%-2d) = %-2d\n');
 
   % Iterate over Fibonacci sequence
   for i = 1:iterations

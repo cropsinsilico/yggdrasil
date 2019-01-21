@@ -1,13 +1,13 @@
 from __future__ import print_function
-from cis_interface.interface.CisInterface import CisInput, CisOutput
+from yggdrasil.interface.YggInterface import YggInput, YggOutput
 
 
 def run():
     print('Hello from Python pipe_dst')
 
     # Ins/outs matching with the the model yaml
-    inq = CisInput('input_pipe')
-    outf = CisOutput('output_file')
+    inq = YggInput('input_pipe')
+    outf = YggOutput('output_file')
     print("pipe_dst(P): Created I/O channels")
 
     # Continue receiving input from the queue

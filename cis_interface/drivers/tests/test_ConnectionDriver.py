@@ -1,12 +1,12 @@
 import uuid
 import unittest
-from cis_interface import tools
-from cis_interface.tests import MagicTestError, assert_raises
-from cis_interface.schema import get_schema
-from cis_interface.drivers import import_driver
-from cis_interface.drivers.tests import test_Driver as parent
-from cis_interface.drivers.ConnectionDriver import ConnectionDriver
-from cis_interface.communication import (
+from yggdrasil import tools
+from yggdrasil.tests import MagicTestError, assert_raises
+from yggdrasil.schema import get_schema
+from yggdrasil.drivers import import_driver
+from yggdrasil.drivers.tests import test_Driver as parent
+from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
+from yggdrasil.communication import (
     new_comm, ZMQComm, IPCComm, RMQComm, get_comm_class)
 
 

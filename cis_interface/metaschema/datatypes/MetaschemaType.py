@@ -3,12 +3,12 @@ import json
 import uuid
 import pprint
 import jsonschema
-from cis_interface import backwards, tools
-from cis_interface.metaschema import get_metaschema, get_validator
-from cis_interface.metaschema.datatypes import (
+from yggdrasil import backwards, tools
+from yggdrasil.metaschema import get_metaschema, get_validator
+from yggdrasil.metaschema.datatypes import (
     MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class,
     conversions)
-from cis_interface.metaschema.properties import get_metaschema_property
+from yggdrasil.metaschema.properties import get_metaschema_property
 
 
 def _get_single_array_element(arr):
@@ -578,7 +578,7 @@ class MetaschemaType(object):
 
         """
         if ((isinstance(obj, backwards.bytes_type)
-             and ((obj == tools.CIS_MSG_EOF) or kwargs.get('raw', False)))):
+             and ((obj == tools.YGG_MSG_EOF) or kwargs.get('raw', False)))):
             metadata = kwargs
             data = obj
             is_raw = True
@@ -596,7 +596,7 @@ class MetaschemaType(object):
         metadata['size'] = len(data)
         metadata.setdefault('id', str(uuid.uuid4()))
         metadata = backwards.as_bytes(json.dumps(metadata, sort_keys=True))
-        msg = CIS_MSG_HEAD + metadata + CIS_MSG_HEAD + data
+        msg = YGG_MSG_HEAD + metadata + YGG_MSG_HEAD + data
         return msg
     
     def deserialize(self, msg, no_data=False, metadata=None, no_json=False):
@@ -623,10 +623,10 @@ class MetaschemaType(object):
         if not isinstance(msg, backwards.bytes_type):
             raise TypeError("Message to be deserialized is not bytes type.")
         # Check for header
-        if CIS_MSG_HEAD in msg:
+        if YGG_MSG_HEAD in msg:
             if metadata is not None:
                 raise ValueError("Metadata in header and provided by keyword.")
-            _, metadata, data = msg.split(CIS_MSG_HEAD, 2)
+            _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
             if len(metadata) == 0:
                 metadata = dict(size=len(data))
             else:
@@ -635,12 +635,12 @@ class MetaschemaType(object):
             data = msg
             if metadata is None:
                 metadata = dict(size=len(msg))
-                if (((len(msg) > 0) and (msg != tools.CIS_MSG_EOF)
+                if (((len(msg) > 0) and (msg != tools.YGG_MSG_EOF)
                      and (self._typedef != {'type': 'bytes'}))):
                     raise ValueError("Header marker not in message.")
         # Set flags based on data
         metadata['incomplete'] = (len(data) < metadata['size'])
-        if (data == tools.CIS_MSG_EOF):
+        if (data == tools.YGG_MSG_EOF):
             metadata['raw'] = True
         # Return based on flags
         if no_data:

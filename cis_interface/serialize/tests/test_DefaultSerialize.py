@@ -1,13 +1,13 @@
 import copy
 import numpy as np
 import unittest
-from cis_interface.tests import CisTestClassInfo
-from cis_interface import backwards, tools, serialize
-from cis_interface.serialize import DefaultSerialize
-from cis_interface.metaschema.datatypes import encode_type
+from yggdrasil.tests import YggTestClassInfo
+from yggdrasil import backwards, tools, serialize
+from yggdrasil.serialize import DefaultSerialize
+from yggdrasil.metaschema.datatypes import encode_type
 
 
-class TestDefaultSerialize(CisTestClassInfo):
+class TestDefaultSerialize(YggTestClassInfo):
     r"""Test class for DefaultSerialize class."""
 
     testing_option_kws = {}
@@ -22,7 +22,7 @@ class TestDefaultSerialize(CisTestClassInfo):
     @property
     def mod(self):
         r"""Module for class to be tested."""
-        return 'cis_interface.serialize.%s' % self.cls
+        return 'yggdrasil.serialize.%s' % self.cls
 
     def get_testing_options(self):
         r"""Get testing options."""
@@ -45,7 +45,7 @@ class TestDefaultSerialize(CisTestClassInfo):
     def empty_head(self, msg):
         r"""dict: Empty header for message only contains the size."""
         out = dict(size=len(msg), incomplete=False)
-        if msg == tools.CIS_MSG_EOF:
+        if msg == tools.YGG_MSG_EOF:
             out['eof'] = True
         return out
 
@@ -119,7 +119,7 @@ class TestDefaultSerialize(CisTestClassInfo):
         
     def test_serialize_eof(self):
         r"""Test serialize/deserialize EOF."""
-        iobj = tools.CIS_MSG_EOF
+        iobj = tools.YGG_MSG_EOF
         msg = self.instance.serialize(iobj)
         iout, ihead = self.instance.deserialize(msg)
         self.assert_equal(iout, iobj)
@@ -127,7 +127,7 @@ class TestDefaultSerialize(CisTestClassInfo):
         
     def test_serialize_eof_header(self):
         r"""Test serialize/deserialize EOF with header."""
-        iobj = tools.CIS_MSG_EOF
+        iobj = tools.YGG_MSG_EOF
         msg = self.instance.serialize(iobj, header_kwargs=self._header_info)
         iout, ihead = self.instance.deserialize(msg)
         self.assert_equal(iout, iobj)

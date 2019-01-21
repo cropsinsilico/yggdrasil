@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
 import numpy as np
-from cis_interface.interface.CisInterface import CisRpcClient
+from yggdrasil.interface.YggInterface import YggRpcClient
 
 
 def fibClient(args):
@@ -11,7 +11,7 @@ def fibClient(args):
 
     # Create RPC connection with server
     # RPC client-side connection will be $(server_name)_$(client_name)
-    rpc = CisRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d")
+    rpc = YggRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d")
 
     # Send all of the requests to the server
     for i in range(1, iterations + 1):

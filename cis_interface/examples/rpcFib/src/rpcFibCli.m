@@ -6,9 +6,9 @@ function rpcFibCli(iterations)
 
   % Set up connections matching yaml
   % RPC client-side connection will be $(server_name)_$(client_name)
-  ymlfile = CisInterface('CisInput', 'yaml_in');
-  rpc = CisInterface('CisRpcClient', 'rpcFibSrv_rpcFibCli', '%d', '%d %d');
-  log = CisInterface('CisOutput', 'output_log');
+  ymlfile = YggInterface('YggInput', 'yaml_in');
+  rpc = YggInterface('YggRpcClient', 'rpcFibSrv_rpcFibCli', '%d', '%d %d');
+  log = YggInterface('YggOutput', 'output_log');
 
   % Read entire contents of yaml
   [ret, ycontent] = ymlfile.recv();

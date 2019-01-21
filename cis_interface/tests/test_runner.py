@@ -1,12 +1,11 @@
 import os
-import nose.tools as nt
 import unittest
 import signal
 import uuid
-from cis_interface import runner, tools, platform
-from cis_interface.tests import CisTestBase
-# from cis_interface.tests import yamls as sc_yamls
-from cis_interface.examples import yamls as ex_yamls
+from yggdrasil import runner, tools, platform
+from yggdrasil.tests import YggTestBase, assert_raises
+# from yggdrasil.tests import yamls as sc_yamls
+from yggdrasil.examples import yamls as ex_yamls
 
 
 def test_get_runner():
@@ -55,16 +54,16 @@ def test_runner_terminate():
 
 def test_runner_error():
     r"""Test error on missing yaml."""
-    nt.assert_raises(IOError, runner.CisRunner,
-                     ['fake_yaml.yml'], 'test_cis_run')
+    assert_raises(IOError, runner.YggRunner,
+                  ['fake_yaml.yml'], 'test_ygg_run')
     
 
-class TestCisRunner(CisTestBase):
-    r"""Tests of the CisRunner class."""
+class TestYggRunner(YggTestBase):
+    r"""Tests of the YggRunner class."""
     def setup(self, *args, **kwargs):
-        super(TestCisRunner, self).setup(*args, **kwargs)
-        self.runner = runner.CisRunner([ex_yamls['hello']['python']],
-                                       'test_cis_run')
+        super(TestYggRunner, self).setup(*args, **kwargs)
+        self.runner = runner.YggRunner([ex_yamls['hello']['python']],
+                                       'test_ygg_run')
 
     def test_createIODriver(self):
         r"""Test createInputDriver and createOutputDriver."""
@@ -73,6 +72,6 @@ class TestCisRunner(CisTestBase):
                'driver': 'InputDriver',
                'working_dir': os.getcwd(),
                'kwargs': {}}
-        nt.assert_raises(Exception, self.runner.createInputDriver, yml)
+        assert_raises(Exception, self.runner.createInputDriver, yml)
         yml['driver'] = 'OutputDriver'
-        nt.assert_raises(Exception, self.runner.createOutputDriver, yml)
+        assert_raises(Exception, self.runner.createOutputDriver, yml)

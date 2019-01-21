@@ -1,9 +1,9 @@
 import sys
 import logging
 from subprocess import Popen, PIPE
-from cis_interface import platform, tools
-from cis_interface.schema import register_component
-from cis_interface.communication import CommBase, AsyncComm
+from yggdrasil import platform, tools
+from yggdrasil.schema import register_component
+from yggdrasil.communication import CommBase, AsyncComm
 try:
     import sysv_ipc
     _ipc_installed = (platform._is_linux or platform._is_mac)
@@ -26,7 +26,7 @@ def get_queue(qid=None):
 
     """
     if _ipc_installed:
-        kwargs = dict(max_message_size=tools.get_CIS_MSG_MAX())
+        kwargs = dict(max_message_size=tools.get_YGG_MSG_MAX())
         if qid is None:
             kwargs['flags'] = sysv_ipc.IPC_CREX
         mq = sysv_ipc.MessageQueue(qid, **kwargs)

@@ -1,9 +1,9 @@
 import json
-from cis_interface import backwards, platform
-from cis_interface.serialize import (
+from yggdrasil import backwards, platform
+from yggdrasil.serialize import (
     register_serializer, _default_delimiter, _default_newline)
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.metaschema.encoder import JSONReadableEncoder
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
 
 @register_serializer

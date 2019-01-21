@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 	 msg_count, msg_size);
 
   // Ins/outs matching with the the model yaml
-  CisOutput outq("output_pipe");
+  YggOutput outq("output_pipe");
   printf("pipe_src(CPP): Created I/O channels\n");
 
   // Create test message

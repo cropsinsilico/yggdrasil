@@ -1,6 +1,6 @@
 import numpy as np
-from cis_interface import units
-from cis_interface.metaschema.properties.tests import (
+from yggdrasil import units
+from yggdrasil.metaschema.properties.tests import (
     test_MetaschemaProperty as parent)
 
 

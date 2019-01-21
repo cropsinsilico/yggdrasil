@@ -1,5 +1,5 @@
-from cis_interface.tests import assert_equal, assert_raises
-from cis_interface import backwards
+from yggdrasil.tests import assert_equal, assert_raises
+from yggdrasil import backwards
 
 
 def test_assert_bytes():

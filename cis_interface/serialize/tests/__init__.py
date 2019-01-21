@@ -1,6 +1,6 @@
 import numpy as np
 import nose.tools as nt
-from cis_interface import serialize, backwards, platform
+from yggdrasil import serialize, backwards, platform
 
 
 unsupported_nptype = ['bool_']

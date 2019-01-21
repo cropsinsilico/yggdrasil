@@ -1,4 +1,4 @@
-from cis_interface.serialize.tests import test_AsciiTableSerialize as parent
+from yggdrasil.serialize.tests import test_AsciiTableSerialize as parent
 
 
 class TestPandasSerialize(parent.TestAsciiTableSerialize):

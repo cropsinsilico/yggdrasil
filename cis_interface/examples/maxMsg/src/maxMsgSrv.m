@@ -2,7 +2,7 @@
 
 disp('maxMsgSrv(M): Hello!');
 
-rpc = CisInterface('CisRpcServer', 'maxMsgSrv', '%s', '%s');
+rpc = YggInterface('YggRpcServer', 'maxMsgSrv', '%s', '%s');
 
 while (1)
   [flag, vars] = rpc.recv();

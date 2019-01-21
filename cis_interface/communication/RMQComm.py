@@ -1,5 +1,5 @@
-from cis_interface.communication import CommBase, AsyncComm
-from cis_interface.config import cis_cfg
+from yggdrasil.communication import CommBase, AsyncComm
+from yggdrasil.config import ygg_cfg
 import logging
 try:
     import pika
@@ -9,7 +9,7 @@ except ImportError:
                     + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
-from cis_interface.schema import register_component
+from yggdrasil.schema import register_component
 
 
 _rmq_param_sep = '_RMQPARAM_'
@@ -42,11 +42,11 @@ def check_rmq_server(url=None, **kwargs):
     if url is not None:
         parameters = pika.URLParameters(url)
     else:
-        username = kwargs.get('username', cis_cfg.get('rmq', 'user', 'guest'))
-        password = kwargs.get('password', cis_cfg.get('rmq', 'password', 'guest'))
-        host = kwargs.get('host', cis_cfg.get('rmq', 'host', 'localhost'))
-        port = kwargs.get('port', cis_cfg.get('rmq', 'port', '5672'))
-        vhost = kwargs.get('vhost', cis_cfg.get('rmq', 'vhost', '/'))
+        username = kwargs.get('username', ygg_cfg.get('rmq', 'user', 'guest'))
+        password = kwargs.get('password', ygg_cfg.get('rmq', 'password', 'guest'))
+        host = kwargs.get('host', ygg_cfg.get('rmq', 'host', 'localhost'))
+        port = kwargs.get('port', ygg_cfg.get('rmq', 'port', '5672'))
+        vhost = kwargs.get('vhost', ygg_cfg.get('rmq', 'vhost', '/'))
         credentials = pika.PlainCredentials(username, password)
         parameters = pika.ConnectionParameters(host=host, port=int(port),
                                                virtual_host=vhost,
@@ -157,21 +157,21 @@ class RMQComm(AsyncComm.AsyncComm):
         args = [name]
         if 'address' not in kwargs:
             if user is None:
-                user = cis_cfg.get('rmq', 'user', 'guest')
+                user = ygg_cfg.get('rmq', 'user', 'guest')
             if password is None:
-                password = cis_cfg.get('rmq', 'password', 'guest')
+                password = ygg_cfg.get('rmq', 'password', 'guest')
             if host is None:
-                host = cis_cfg.get('rmq', 'host', 'localhost')
+                host = ygg_cfg.get('rmq', 'host', 'localhost')
             # if host == 'localhost':
             #     host = socket.gethostname()
             if virtual_host is None:
-                virtual_host = cis_cfg.get('rmq', 'vhost', '/')
+                virtual_host = ygg_cfg.get('rmq', 'vhost', '/')
             if virtual_host == '/':
                 virtual_host = '%2f'
             if port is None:
-                port = cis_cfg.get('rmq', 'port', '5672')
+                port = ygg_cfg.get('rmq', 'port', '5672')
             if exchange is None:
-                exchange = cis_cfg.get('rmq', 'namespace', '')
+                exchange = ygg_cfg.get('rmq', 'namespace', '')
             url = 'amqp://%s:%s@%s:%s/%s' % (
                 user, password, host, port, virtual_host)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "CisInterface.h"
+#include "YggInterface.h"
 
 int main() {
   int exit_code = 0;
@@ -10,14 +10,14 @@ int main() {
   printf("Hello from C pipe_dst\n");
 
   // Ins/outs matching with the the model yaml
-  cisInput_t inq = cisInput("input_pipe");
-  cisOutput_t outf = cisOutput("output_file");
+  yggInput_t inq = yggInput("input_pipe");
+  yggOutput_t outf = yggOutput("output_file");
   printf("pipe_dst(C): Created I/O channels\n");
 
   // Continue receiving input from the queue
   int count = 0;
   while (1) {
-    ret = cis_recv_nolimit(inq, &buf, bufsiz);
+    ret = ygg_recv_nolimit(inq, &buf, bufsiz);
     if (ret < 0) {
       printf("pipe_dst(C): Input channel closed\n");
       break;
@@ -26,7 +26,7 @@ int main() {
       bufsiz = ret + 1;
       printf("pipe_dst(C): Buffer increased to %d bytes\n", bufsiz);
     }
-    ret = cis_send_nolimit(outf, buf, ret);
+    ret = ygg_send_nolimit(outf, buf, ret);
     if (ret < 0) {
       printf("pipe_dst(C): SEND ERROR ON MSG %d\n", count);
       exit_code = -1;

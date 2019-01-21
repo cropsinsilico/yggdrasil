@@ -1,5 +1,5 @@
-#ifndef CISSERIALIZEBASE_H_
-#define CISSERIALIZEBASE_H_
+#ifndef YGGSERIALIZEBASE_H_
+#define YGGSERIALIZEBASE_H_
 
 #include <../tools.h>
 
@@ -71,4 +71,4 @@ int deserialize_direct(const seri_t s, const char *buf, const size_t buf_siz,
 }
 #endif
 
-#endif /*CISSERIALIZEBASE_H_*/
+#endif /*YGGSERIALIZEBASE_H_*/

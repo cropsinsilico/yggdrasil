@@ -1,6 +1,6 @@
-from cis_interface.metaschema import normalizer as normalizer_mod
-from cis_interface.metaschema.properties import register_metaschema_property
-from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
+from yggdrasil.metaschema import normalizer as normalizer_mod
+from yggdrasil.metaschema.properties import register_metaschema_property
+from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
 @register_metaschema_property

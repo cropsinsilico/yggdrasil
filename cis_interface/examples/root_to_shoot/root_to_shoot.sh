@@ -20,14 +20,14 @@ case $1 in
 	;;
     --root )
 	echo "Running Root Model"
-	time cisrun root.yml root_files.yml
+	time yggrun root.yml root_files.yml
 	;;
     --shoot )
 	echo "Running Shoot Model"
-	time cisrun shoot.yml shoot_files.yml
+	time yggrun shoot.yml shoot_files.yml
 	;;
     * )
 	echo "Running Integration"
-	time cisrun root.yml shoot.yml root_to_shoot.yml
+	time yggrun root.yml shoot.yml root_to_shoot.yml
 	;;
 esac

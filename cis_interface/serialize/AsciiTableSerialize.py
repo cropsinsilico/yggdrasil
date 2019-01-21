@@ -1,11 +1,11 @@
-from cis_interface import backwards, units
-from cis_interface.serialize import (
+from yggdrasil import backwards, units
+from yggdrasil.serialize import (
     register_serializer, _default_delimiter, _default_newline, _default_comment,
     nptype2cformat, table2format, array_to_table, table_to_array,
     format_message, process_message)
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.metaschema import get_metaschema
-from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.metaschema import get_metaschema
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype)
 
 

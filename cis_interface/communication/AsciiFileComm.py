@@ -1,6 +1,6 @@
-from cis_interface import serialize, backwards, platform
-from cis_interface.communication.FileComm import FileComm
-from cis_interface.schema import register_component, inherit_schema
+from yggdrasil import serialize, backwards, platform
+from yggdrasil.communication.FileComm import FileComm
+from yggdrasil.schema import register_component, inherit_schema
 
 
 @register_component

@@ -1,4 +1,4 @@
-from cis_interface.communication.tests import test_PlyFileComm as parent
+from yggdrasil.communication.tests import test_PlyFileComm as parent
 
 
 class TestObjFileComm(parent.TestPlyFileComm):

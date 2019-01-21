@@ -1,9 +1,9 @@
-classdef CisInterfaceClass
+classdef YggInterfaceClass
   properties
     pyobj
   end
   methods
-    function obj = CisInterfaceClass(pyobj)
+    function obj = YggInterfaceClass(pyobj)
       if nargin > 0
 	obj.pyobj = pyobj;
       end

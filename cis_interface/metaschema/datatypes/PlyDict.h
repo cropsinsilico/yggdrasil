@@ -94,7 +94,7 @@ int alloc_ply(ply_t *p, int nvert, int nface, int do_color) {
   // Allocate vertices
   float **new_vert = (float**)malloc(p->nvert*sizeof(float*));
   if (new_vert == NULL) {
-    cislog_error("alloc_ply: Failed to allocate vertices.");
+    ygglog_error("alloc_ply: Failed to allocate vertices.");
     free_ply(p);
     return -1;
   }
@@ -102,18 +102,18 @@ int alloc_ply(ply_t *p, int nvert, int nface, int do_color) {
   for (i = 0; i < p->nvert; i++) {
     float *ivert = (float*)malloc(3*sizeof(float));
     if (ivert == NULL) {
-      cislog_error("alloc_ply: Failed to allocate vertex %d.", i);
+      ygglog_error("alloc_ply: Failed to allocate vertex %d.", i);
       free_ply(p);
       return -1;
     }
     p->vertices[i] = ivert;
   }
-  cislog_debug("alloc_ply: Allocated %d vertices.", nvert);
+  ygglog_debug("alloc_ply: Allocated %d vertices.", nvert);
   // Allocate vertex colors
   if (do_color) {
     int **new_vert_colors = (int**)malloc(p->nvert*sizeof(int*));
     if (new_vert_colors == NULL) {
-      cislog_error("alloc_ply: Failed to allocate vertex_colors.");
+      ygglog_error("alloc_ply: Failed to allocate vertex_colors.");
       free_ply(p);
       return -1;
     }
@@ -121,18 +121,18 @@ int alloc_ply(ply_t *p, int nvert, int nface, int do_color) {
     for (i = 0; i < p->nvert; i++) {
       int *ivert = (int*)malloc(3*sizeof(int));
       if (ivert == NULL) {
-	cislog_error("alloc_ply: Failed to allocate vertex color %d.", i);
+	ygglog_error("alloc_ply: Failed to allocate vertex color %d.", i);
 	free_ply(p);
 	return -1;
       }
       p->vertex_colors[i] = ivert;
     }
-    cislog_debug("alloc_ply: Allocated %d vertex colors.", nvert);
+    ygglog_debug("alloc_ply: Allocated %d vertex colors.", nvert);
   }
   // Allocate faces
   int **new_face = (int**)malloc(p->nface*sizeof(int*));
   if (new_face == NULL) {
-    cislog_error("alloc_ply: Failed to allocate faces.");
+    ygglog_error("alloc_ply: Failed to allocate faces.");
     free_ply(p);
     return -1;
   }
@@ -141,16 +141,16 @@ int alloc_ply(ply_t *p, int nvert, int nface, int do_color) {
     p->faces[i] = NULL;
     /* int *iface = (int*)malloc(3*sizeof(int)); */
     /* if (iface == NULL) { */
-    /*   cislog_error("alloc_ply: Failed to allocate face %d.", i); */
+    /*   ygglog_error("alloc_ply: Failed to allocate face %d.", i); */
     /*   free_ply(p); */
     /*   return -1; */
     /* } */
   }
-  cislog_debug("alloc_ply: Allocated %d faces.", nface);
+  ygglog_debug("alloc_ply: Allocated %d faces.", nface);
   // Allocate nvert_in_face
   int *new_nvert = (int*)malloc(p->nface*sizeof(int));
   if (new_nvert == NULL) {
-    cislog_error("alloc_ply: Failed to allocate nvert_in_face.");
+    ygglog_error("alloc_ply: Failed to allocate nvert_in_face.");
     free_ply(p);
     return -1;
   }
@@ -158,7 +158,7 @@ int alloc_ply(ply_t *p, int nvert, int nface, int do_color) {
   for (i = 0; i < p->nface; i++) {
     p->nvert_in_face[i] = 0;
   }
-  cislog_debug("alloc_ply: Allocate for %d vertices and %d faces.",
+  ygglog_debug("alloc_ply: Allocate for %d vertices and %d faces.",
 	       p->nvert, p->nface);
   return 0;
 };

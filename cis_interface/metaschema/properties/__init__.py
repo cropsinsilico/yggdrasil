@@ -2,7 +2,7 @@ import os
 import glob
 import importlib
 from collections import OrderedDict
-from cis_interface.metaschema.properties import MetaschemaProperty
+from yggdrasil.metaschema.properties import MetaschemaProperty
 
 
 _metaschema_properties = OrderedDict()
@@ -26,7 +26,7 @@ def register_metaschema_property(prop_class):
             metaschema.
 
     """
-    from cis_interface.metaschema import _metaschema, _base_validator
+    from yggdrasil.metaschema import _metaschema, _base_validator
     global _metaschema_properties
     prop_name = prop_class.name
     if prop_name in _metaschema_properties:
@@ -86,4 +86,4 @@ def import_all_properties():
     for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
         mod = os.path.basename(x)[:-3]
         if not mod.startswith('__'):
-            importlib.import_module('cis_interface.metaschema.properties.%s' % mod)
+            importlib.import_module('yggdrasil.metaschema.properties.%s' % mod)

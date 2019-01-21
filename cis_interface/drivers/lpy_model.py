@@ -1,10 +1,10 @@
 import sys
 from openalea.lpy import Lsystem
 from openalea.plantgl.all import Tesselator
-from cis_interface.interface.CisInterface import (
-    CisInput, CisPlyOutput, CisObjOutput, CisAsciiArrayOutput)
-from cis_interface.serialize.PlySerialize import PlyDict
-from cis_interface.serialize.ObjSerialize import ObjDict
+from yggdrasil.interface.YggInterface import (
+    YggInput, YggPlyOutput, YggObjOutput, YggAsciiArrayOutput)
+from yggdrasil.serialize.PlySerialize import PlyDict
+from yggdrasil.serialize.ObjSerialize import ObjDict
 
 
 # Parse input
@@ -20,13 +20,13 @@ else:
     out_meth = sys.argv[2]
 
 # Connect to I/O channels
-in1 = CisInput('LPy_time')
+in1 = YggInput('LPy_time')
 if out_meth == 'ply':
-    out = CisPlyOutput('LPy_mesh')
+    out = YggPlyOutput('LPy_mesh')
 elif out_meth == 'obj':
-    out = CisObjOutput('LPy_mesh')
+    out = YggObjOutput('LPy_mesh')
 else:
-    out = CisAsciiArrayOutput('LPy_mesh', '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n')
+    out = YggAsciiArrayOutput('LPy_mesh', '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n')
 
 # Create lsystem & discretizer
 lsys = Lsystem(fname)

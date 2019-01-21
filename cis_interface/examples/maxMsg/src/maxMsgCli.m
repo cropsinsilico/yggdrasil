@@ -4,11 +4,11 @@ charset = ['0123456789', ...
 	   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 
 
-msg_size = CisInterface('CIS_MSG_BUF');
+msg_size = YggInterface('YGG_MSG_BUF');
 fprintf('maxMsgCli(M): Hello message size is %d.\n', msg_size);
 
 % Create a max message, send/recv and verify
-rpc = CisInterface('CisRpcClient', 'maxMsgSrv_maxMsgCli', '%s', '%s');
+rpc = YggInterface('YggRpcClient', 'maxMsgSrv_maxMsgCli', '%s', '%s');
 
 % Create a max message
 output = randsample(charset, msg_size-1, true);

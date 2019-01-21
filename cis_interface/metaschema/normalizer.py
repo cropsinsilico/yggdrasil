@@ -2,7 +2,7 @@
 import copy
 import contextlib
 import jsonschema
-from cis_interface.metaschema.datatypes import get_type_class
+from yggdrasil.metaschema.datatypes import get_type_class
 
 
 class UndefinedProperty(object):

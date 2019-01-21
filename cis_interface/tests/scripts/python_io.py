@@ -2,13 +2,13 @@ import logging
 from logging import debug
 import os
 import sys
-from CisInterface import CisInput, CisOutput
+from YggInterface import YggInput, YggOutput
 
 
 def runhello():
     debug('hello pythonfiles from %s', os.getcwd())
-    inf = CisInput('inFile')
-    outf = CisOutput('outFile')
+    inf = YggInput('inFile')
+    outf = YggOutput('outFile')
     fdata = inf.recv()
     debug('got input %s', fdata)
     print(fdata)

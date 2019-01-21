@@ -1,10 +1,9 @@
 import os
-import nose.tools as nt
-from cis_interface.tests import CisTestClass, IOInfo
+from yggdrasil.tests import YggTestClass, IOInfo, assert_raises
 
 
-class TestCisTest(CisTestClass):
-    r"""Test errors for uninitialized CisTestClass."""
+class TestYggTest(YggTestClass):
+    r"""Test errors for uninitialized YggTestClass."""
 
     def create_instance(self):
         r"""Dummy overload to prevent initialization."""
@@ -17,14 +16,14 @@ class TestCisTest(CisTestClass):
 
     def test_import_cls(self):
         r"""Test import class with mod/cls unset."""
-        nt.assert_raises(Exception, getattr, self, 'import_cls')
+        assert_raises(Exception, getattr, self, 'import_cls')
         self._mod = 'drivers'
-        nt.assert_raises(Exception, getattr, self, 'import_cls')
+        assert_raises(Exception, getattr, self, 'import_cls')
 
     def test_post_teardown_ref(self):
         r"""Test errors on instance ref post teardown."""
         self.teardown()
-        nt.assert_raises(RuntimeError, getattr, self, 'instance')
+        assert_raises(RuntimeError, getattr, self, 'instance')
 
     
 def test_IOInfo():

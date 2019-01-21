@@ -12,11 +12,11 @@ import pandas
 import copy
 from scipy.io import savemat, loadmat
 import nose.tools as nt
-from cis_interface.config import cis_cfg, cfg_logging
-from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
-from cis_interface.backwards import pickle, BytesIO
-from cis_interface import backwards, platform, serialize, units
-from cis_interface.communication import cleanup_comms, get_comm_class
+from yggdrasil.config import ygg_cfg, cfg_logging
+from yggdrasil.tools import get_YGG_MSG_MAX, get_default_comm, YggClass
+from yggdrasil.backwards import pickle, BytesIO
+from yggdrasil import backwards, platform, serialize, units
+from yggdrasil.communication import cleanup_comms, get_comm_class
 
 
 # Test data
@@ -120,7 +120,21 @@ def assert_equal(x, y):
         nt.assert_equal(x, y)
 
 
-class CisTestBase(unittest.TestCase):
+def assert_not_equal(x, y):
+    r"""Assert that two objects are NOT equivalent.
+
+    Args:
+        x (object): Python object to compare against y.
+        y (object): Python object to compare against x.
+
+    Raises:
+        AssertionError: If the two objects are equivalent.
+
+    """
+    nt.assert_not_equal(x, y)
+        
+
+class YggTestBase(unittest.TestCase):
     r"""Wrapper for unittest.TestCase that allows use of nose setup and
     teardown methods along with description prefix.
 
@@ -155,7 +169,7 @@ class CisTestBase(unittest.TestCase):
         self._first_test = True
         skip_unittest = kwargs.pop('skip_unittest', False)
         if not skip_unittest:
-            super(CisTestBase, self).__init__(*args, **kwargs)
+            super(YggTestBase, self).__init__(*args, **kwargs)
 
     def assert_equal(self, x, y):
         r"""Assert that two values are equal."""
@@ -214,32 +228,32 @@ class CisTestBase(unittest.TestCase):
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
-        self._old_loglevel = cis_cfg.get('debug', 'cis')
-        cis_cfg.set('debug', 'cis', 'DEBUG')
+        self._old_loglevel = ygg_cfg.get('debug', 'ygg')
+        ygg_cfg.set('debug', 'ygg', 'DEBUG')
         cfg_logging()
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
         if self._old_loglevel is not None:
-            cis_cfg.set('debug', 'cis', self._old_loglevel)
+            ygg_cfg.set('debug', 'ygg', self._old_loglevel)
             cfg_logging()
             self._old_loglevel = None
 
     def set_default_comm(self, default_comm=None):
         r"""Set the default comm."""
-        self._old_default_comm = os.environ.get('CIS_DEFAULT_COMM', None)
+        self._old_default_comm = os.environ.get('YGG_DEFAULT_COMM', None)
         if default_comm is None:
             default_comm = self._new_default_comm
         if default_comm is not None:
-            os.environ['CIS_DEFAULT_COMM'] = default_comm
+            os.environ['YGG_DEFAULT_COMM'] = default_comm
 
     def reset_default_comm(self):
         r"""Reset the default comm to the original value."""
         if self._old_default_comm is None:
-            if 'CIS_DEFAULT_COMM' in os.environ:
-                del os.environ['CIS_DEFAULT_COMM']
+            if 'YGG_DEFAULT_COMM' in os.environ:
+                del os.environ['YGG_DEFAULT_COMM']
         else:  # pragma: debug
-            os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
+            os.environ['YGG_DEFAULT_COMM'] = self._old_default_comm
 
     def setUp(self, *args, **kwargs):
         self.setup(*args, **kwargs)
@@ -290,7 +304,7 @@ class CisTestBase(unittest.TestCase):
 
         """
         self._teardown_complete = True
-        x = CisClass('dummy', timeout=self.timeout, sleeptime=self.sleeptime)
+        x = YggClass('dummy', timeout=self.timeout, sleeptime=self.sleeptime)
         # Give comms time to close
         if ncurr_comm is None:
             Tout = x.start_timeout()
@@ -346,7 +360,7 @@ class CisTestBase(unittest.TestCase):
 
     def shortDescription(self):
         r"""Prefix first line of doc string."""
-        out = super(CisTestBase, self).shortDescription()
+        out = super(YggTestBase, self).shortDescription()
         if self.description_prefix:
             out = '%s: %s' % (self.description_prefix, out)
         return out
@@ -407,8 +421,8 @@ class CisTestBase(unittest.TestCase):
         self.check_file_contents(fname, result)
 
 
-class CisTestClass(CisTestBase):
-    r"""Test class for a CisClass."""
+class YggTestClass(YggTestBase):
+    r"""Test class for a YggClass."""
 
     _mod = None
     _cls = None
@@ -416,23 +430,23 @@ class CisTestClass(CisTestBase):
     def __init__(self, *args, **kwargs):
         self._inst_args = list()
         self._inst_kwargs = dict()
-        super(CisTestClass, self).__init__(*args, **kwargs)
+        super(YggTestClass, self).__init__(*args, **kwargs)
 
     def setup(self, *args, **kwargs):
         r"""Create an instance of the class."""
-        super(CisTestClass, self).setup(*args, **kwargs)
+        super(YggTestClass, self).setup(*args, **kwargs)
         self._instance = self.create_instance()
 
     def teardown(self, *args, **kwargs):
         r"""Remove the instance."""
         self.clear_instance()
-        super(CisTestClass, self).teardown(*args, **kwargs)
+        super(YggTestClass, self).teardown(*args, **kwargs)
 
     @property
     def description_prefix(self):
         r"""String prefix to prepend docstr test message with."""
         if self.cls is None:
-            return super(CisTestClass, self).description_prefix
+            return super(YggTestClass, self).description_prefix
         else:
             return self.cls
 
@@ -658,8 +672,8 @@ class IOInfo(object):
     def ply_dict(self):
         r"""dict: Ply dictionary."""
         if not hasattr(self, '_ply_dict'):
-            from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
-            from cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType import (
+            from yggdrasil.metaschema.datatypes.PlyMetaschemaType import PlyDict
+            from yggdrasil.metaschema.datatypes.tests.test_PlyMetaschemaType import (
                 _test_value)
             self._ply_dict = PlyDict(**_test_value)
         return self._ply_dict
@@ -668,8 +682,8 @@ class IOInfo(object):
     def obj_dict(self):
         r"""dict: Obj dictionary."""
         if not hasattr(self, '_obj_dict'):
-            from cis_interface.metaschema.datatypes.ObjMetaschemaType import ObjDict
-            from cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType import (
+            from yggdrasil.metaschema.datatypes.ObjMetaschemaType import ObjDict
+            from yggdrasil.metaschema.datatypes.tests.test_ObjMetaschemaType import (
                 _test_value)
             self._obj_dict = ObjDict(**_test_value)
         return self._obj_dict
@@ -754,7 +768,7 @@ class IOInfo(object):
     @property
     def maxMsgSize(self):
         r"""int: Maximum message size."""
-        return get_CIS_MSG_MAX()
+        return get_YGG_MSG_MAX()
 
     @property
     def msg_short(self):
@@ -857,19 +871,19 @@ class IOInfo(object):
             fd.write(self.obj_file_contents)
 
 
-# class CisTestBaseInfo(CisTestBase, IOInfo):
+# class YggTestBaseInfo(YggTestBase, IOInfo):
 #     r"""Test base with IOInfo available."""
 
 #     def __init__(self, *args, **kwargs):
-#         super(CisTestBaseInfo, self).__init__(*args, **kwargs)
+#         super(YggTestBaseInfo, self).__init__(*args, **kwargs)
 #         IOInfo.__init__(self)
 
 
-class CisTestClassInfo(CisTestClass, IOInfo):
-    r"""Test class for a CisClass with IOInfo available."""
+class YggTestClassInfo(YggTestClass, IOInfo):
+    r"""Test class for a YggClass with IOInfo available."""
 
     def __init__(self, *args, **kwargs):
-        super(CisTestClassInfo, self).__init__(*args, **kwargs)
+        super(YggTestClassInfo, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
 
 
@@ -959,5 +973,5 @@ def ErrorClass(base_class, *args, **kwargs):
 
 
 __all__ = ['data', 'scripts', 'yamls', 'IOInfo', 'ErrorClass',
-           'CisTestBase', 'CisTestClass',
-           'CisTestBaseInfo', 'CisTestClassInfo']
+           'YggTestBase', 'YggTestClass',
+           'YggTestBaseInfo', 'YggTestClassInfo']

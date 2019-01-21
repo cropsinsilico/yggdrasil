@@ -1,8 +1,8 @@
 r"""Tests for drivers sub-package."""
 import nose.tools as nt
-from cis_interface import drivers
-from cis_interface.drivers import Driver, ModelDriver, ConnectionDriver
-from cis_interface.tests import scripts
+from yggdrasil import drivers
+from yggdrasil.drivers import Driver, ModelDriver, ConnectionDriver
+from yggdrasil.tests import scripts
 
 
 def test_import_driver():

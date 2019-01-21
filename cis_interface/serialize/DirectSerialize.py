@@ -1,7 +1,7 @@
-from cis_interface import backwards
-from cis_interface.serialize import (
+from yggdrasil import backwards
+from yggdrasil.serialize import (
     register_serializer, _default_newline, _default_comment, format_message)
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
 @register_serializer

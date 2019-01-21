@@ -1,6 +1,6 @@
 import unittest
-from cis_interface.communication.RMQComm import _rmq_server_running
-import cis_interface.drivers.tests.test_ClientDriver as parent
+from yggdrasil.communication.RMQComm import _rmq_server_running
+import yggdrasil.drivers.tests.test_ClientDriver as parent
 
 
 @unittest.skipIf(not _rmq_server_running, "RMQ Server not running")

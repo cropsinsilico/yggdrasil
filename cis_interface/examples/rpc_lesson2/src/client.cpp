@@ -1,4 +1,4 @@
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 #include <stdio.h>
 
 
@@ -16,13 +16,13 @@ int main(int argc, char *argv[]) {
   char log_name[100];
   sprintf(rpc_name, "server_client%d", client_index);
   sprintf(log_name, "output_log%d", client_index);
-  CisRpcClient rpc(rpc_name, "%d", "%d");
-  CisOutput log(log_name, "fib(%-2d) = %-2d\n");
+  YggRpcClient rpc(rpc_name, "%d", "%d");
+  YggOutput log(log_name, "fib(%-2d) = %-2d\n");
   
   // Initialize variables
   int ret = 0;
   int fib = -1;
-  char *logmsg = (char*)malloc(CIS_MSG_MAX*sizeof(char));
+  char *logmsg = (char*)malloc(YGG_MSG_MAX*sizeof(char));
   int i;
 
   // Iterate over Fibonacci sequence

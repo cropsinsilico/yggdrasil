@@ -1,7 +1,7 @@
 import unittest
 import uuid
-from cis_interface.communication import new_comm
-from cis_interface.communication.tests import test_CommBase
+from yggdrasil.communication import new_comm
+from yggdrasil.communication.tests import test_CommBase
 
 
 class TestServerComm(test_CommBase.TestCommBase):

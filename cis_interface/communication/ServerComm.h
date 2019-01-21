@@ -1,6 +1,6 @@
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISSERVERCOMM_H_
-#define CISSERVERCOMM_H_
+#ifndef YGGSERVERCOMM_H_
+#define YGGSERVERCOMM_H_
 
 #include <CommBase.h>
 #include <DefaultComm.h>
@@ -40,7 +40,7 @@ int init_server_comm(comm_t *comm) {
   // Called to initialize/create server comm
   void *seri_in = (void*)get_format_type(comm->direction, 0);
   if (seri_in == NULL) {
-    cislog_error("init_server_comm: Failed to create seri_in.");
+    ygglog_error("init_server_comm: Failed to create seri_in.");
     return -1;
   }
   comm_t *handle;
@@ -63,7 +63,7 @@ int init_server_comm(comm_t *comm) {
   }
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   if (info == NULL) {
-    cislog_error("init_server_comm: Failed to malloc info.");
+    ygglog_error("init_server_comm: Failed to malloc info.");
     return -1;
   }
   info[0] = NULL;
@@ -119,14 +119,14 @@ int server_comm_nmsg(const comm_t x) {
  */
 static inline
 int server_comm_send(const comm_t x, const char *data, const size_t len) {
-  cislog_debug("server_comm_send(%s): %d bytes", x.name, len);
+  ygglog_debug("server_comm_send(%s): %d bytes", x.name, len);
   if (x.info == NULL) {
-    cislog_error("server_comm_send(%s): no response comm registered", x.name);
+    ygglog_error("server_comm_send(%s): no response comm registered", x.name);
     return -1;
   }
   comm_t **res_comm = (comm_t**)(x.info);
   if (res_comm[0] == NULL) {
-    cislog_error("server_comm_send(%s): no response comm registered", x.name);
+    ygglog_error("server_comm_send(%s): no response comm registered", x.name);
     return -1;
   }
   int ret = default_comm_send((*res_comm)[0], data, len);
@@ -151,9 +151,9 @@ int server_comm_send(const comm_t x, const char *data, const size_t len) {
  */
 static inline
 int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_realloc) {
-  cislog_debug("server_comm_recv(%s)", x.name);
+  ygglog_debug("server_comm_recv(%s)", x.name);
   if (x.handle == NULL) {
-    cislog_error("server_comm_recv(%s): no request comm registered", x.name);
+    ygglog_error("server_comm_recv(%s): no request comm registered", x.name);
     return -1;
   }
   comm_t *req_comm = (comm_t*)(x.handle);
@@ -169,7 +169,7 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   // Initialize new comm from received address
   comm_head_t head = parse_comm_header(*data, ret);
   if (!(head.valid)) {
-    cislog_error("server_comm_recv(%s): Error parsing header.", x.name);
+    ygglog_error("server_comm_recv(%s): Error parsing header.", x.name);
     return -1;
   }
   // Return EOF
@@ -179,13 +179,13 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   }
   // If there is not a response address
   if (strlen(head.response_address) == 0) {
-    cislog_error("server_comm_recv(%s): No response address in message.", x.name);
+    ygglog_error("server_comm_recv(%s): No response address in message.", x.name);
     return -1;
   }
   strcpy(x.address, head.id);
   void *seri_copy = (void*)copy_from_void(x.serializer->type, x.serializer->info);
   if (seri_copy == NULL) {
-    cislog_error("server_comm_recv(%s): Failed to create seri_copy.");
+    ygglog_error("server_comm_recv(%s): Failed to create seri_copy.");
     return -1;
   }
   comm_t **res_comm = (comm_t**)(x.info);
@@ -195,7 +195,7 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   int newret;
   newret = init_default_comm(res_comm[0]);
   if (newret < 0) {
-    cislog_error("server_comm_recv(%s): Could not initialize response comm.", x.name);
+    ygglog_error("server_comm_recv(%s): Could not initialize response comm.", x.name);
     return newret;
   }
   res_comm[0]->sent_eof[0] = 1;
@@ -207,4 +207,4 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
 }
 #endif
 
-#endif /*CISSERVERCOMM_H_*/
+#endif /*YGGSERVERCOMM_H_*/

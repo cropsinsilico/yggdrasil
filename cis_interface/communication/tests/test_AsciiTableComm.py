@@ -1,9 +1,9 @@
 import os
 import unittest
-import nose.tools as nt
-from cis_interface import backwards
-from cis_interface.communication import AsciiTableComm
-from cis_interface.communication.tests import test_AsciiFileComm as parent
+from yggdrasil import backwards
+from yggdrasil.tests import assert_equal
+from yggdrasil.communication import AsciiTableComm
+from yggdrasil.communication.tests import test_AsciiFileComm as parent
 
 
 def test_AsciiTableComm_nofmt():
@@ -23,7 +23,7 @@ def test_AsciiTableComm_nofmt():
         irow[0] = backwards.as_bytes(irow[0])
         idict = {'f%d' % i: irow[i] for i in range(len(irow))}
         # irow = tuple(irow)
-        nt.assert_equal(x, idict)
+        assert_equal(x, idict)
     flag, x = inst.recv()
     assert(not flag)
     inst.close()

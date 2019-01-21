@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 // Include C interface
-#include "CisInterface.h"
+#include "YggInterface.h"
 // Include C header containing model calculation
 #include "root.h"
 
@@ -11,13 +11,13 @@ int main(int argc, char *argv[]) {
   double r_r, dt, R_t, R_tp1;
 
   // Create input/output channels
-  cisInput_t RootGrowthRate = cisInput("root_growth_rate");
-  cisInput_t InitRootMass = cisInput("init_root_mass");
-  cisInput_t TimeStep = cisInput("root_time_step");
-  cisOutput_t NextRootMass = cisOutputFmt("next_root_mass", "%lf\n");
+  yggInput_t RootGrowthRate = yggInput("root_growth_rate");
+  yggInput_t InitRootMass = yggInput("init_root_mass");
+  yggInput_t TimeStep = yggInput("root_time_step");
+  yggOutput_t NextRootMass = yggOutputFmt("next_root_mass", "%lf\n");
 
   // Receive root growth rate
-  ret = cisRecv(RootGrowthRate, &r_r);
+  ret = yggRecv(RootGrowthRate, &r_r);
   if (ret < 0) {
     printf("root: Error receiving root growth rate.\n");
     return -1;
@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   printf("root: Received root growth rate: %lf\n", r_r);
 
   // Receive initial root mass
-  ret = cisRecv(InitRootMass, &R_t);
+  ret = yggRecv(InitRootMass, &R_t);
   if (ret < 0) {
     printf("root: Error receiving initial root mass.\n");
     return -1;
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
   printf("root: Received initial root mass: %lf\n", R_t);
 
   // Send initial root mass
-  ret = cisSend(NextRootMass, R_t);
+  ret = yggSend(NextRootMass, R_t);
   if (ret < 0) {
     printf("root: Error sending initial root mass.\n");
     return -1;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
   while (1) {
 
     // Receive the time step
-    ret = cisRecv(TimeStep, &dt);
+    ret = yggRecv(TimeStep, &dt);
     if (ret < 0) {
       printf("root: No more time steps.\n");
       break;
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     printf("root: Calculated next root mass: %lf\n", R_tp1);
 
     // Output root mass
-    ret = cisSend(NextRootMass, R_tp1);
+    ret = yggSend(NextRootMass, R_tp1);
     if (ret < 0) {
       printf("root: Error sending root mass for timestep %d.\n", i+1);
       return -1;

@@ -1,8 +1,8 @@
 import os
 import unittest
-from cis_interface.tests import scripts, assert_raises
-import cis_interface.drivers.tests.test_ModelDriver as parent
-from cis_interface.drivers.MakeModelDriver import MakeModelDriver
+from yggdrasil.tests import scripts, assert_raises
+import yggdrasil.drivers.tests.test_ModelDriver as parent
+from yggdrasil.drivers.MakeModelDriver import MakeModelDriver
 
 
 _driver_installed = MakeModelDriver.is_installed()

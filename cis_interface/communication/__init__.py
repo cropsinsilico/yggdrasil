@@ -1,7 +1,7 @@
 import os
 import glob
 import importlib
-from cis_interface import tools
+from yggdrasil import tools
 
 
 def determine_suffix(no_suffix=False, reverse_names=False,
@@ -52,7 +52,7 @@ def get_comm_class(comm=None):
     """
     if (comm is None) or (comm == 'DefaultComm'):
         comm = tools.get_default_comm()
-    mod = importlib.import_module('cis_interface.communication.%s' % comm)
+    mod = importlib.import_module('yggdrasil.communication.%s' % comm)
     comm_cls = getattr(mod, comm)
     return comm_cls
 

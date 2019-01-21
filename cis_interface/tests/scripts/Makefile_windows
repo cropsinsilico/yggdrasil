@@ -1,12 +1,12 @@
 IDIR = .
 CC = cl.exe
 LINK = link.exe
-CFLAGS = /I$(IDIR) $(CISCCFLAGS)
+CFLAGS = /I$(IDIR) $(YGGCCFLAGS)
 
 SDIR = .
 ODIR = .
 
-LIBS = $(CISLDFLAGS)
+LIBS = $(YGGLDFLAGS)
 
 DEPS = $(IDIR)\hellofunc.h
 

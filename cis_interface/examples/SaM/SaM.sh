@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="SaM"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="SaM"
 
 yaml= 
 
@@ -37,7 +37,7 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml
+yggrun $yaml
 
 outfile="${TMPDIR}SaM_output.txt"
 cat $outfile

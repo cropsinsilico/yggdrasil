@@ -1,6 +1,6 @@
 import os
-import nose.tools as nt
-from cis_interface import tools, platform  # , backwards
+from yggdrasil import tools, platform  # , backwards
+from yggdrasil.tests import assert_equal
 
 
 def test_get_installed_lang():
@@ -21,7 +21,7 @@ def test_locate_path():
     fpath = tools.locate_path(fname, basedir=basedir)
     assert(fpath)
     assert(__file__ in fpath)
-    # nt.assert_equal(__file__, fpath)
+    # assert_equal(__file__, fpath)
     # Search for invalid file
     fname = 'invalid_file.ext'
     fpath = tools.locate_path(fname, basedir=basedir)
@@ -40,7 +40,7 @@ def test_popen_nobuffer():
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
     res = out.decode('utf-8').splitlines()[0]
-    nt.assert_equal(res, ans)
+    assert_equal(res, ans)
     # Test w/ shell
     if platform._is_win:  # pragma: windows
         args = 'cd'
@@ -49,14 +49,14 @@ def test_popen_nobuffer():
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
     res = out.decode('utf-8').splitlines()[0]
-    nt.assert_equal(res, ans)
+    assert_equal(res, ans)
 
 
 def test_eval_kwarg():
     r"""Ensure strings & objects properly evaluated."""
     vals = [None, True, False, ['one', 'two'], 'one']
     for v in vals:
-        nt.assert_equal(tools.eval_kwarg(v), v)
-        nt.assert_equal(tools.eval_kwarg(str(v)), v)
-    nt.assert_equal(tools.eval_kwarg("'one'"), 'one')
-    nt.assert_equal(tools.eval_kwarg('"one"'), 'one')
+        assert_equal(tools.eval_kwarg(v), v)
+        assert_equal(tools.eval_kwarg(str(v)), v)
+    assert_equal(tools.eval_kwarg("'one'"), 'one')
+    assert_equal(tools.eval_kwarg('"one"'), 'one')

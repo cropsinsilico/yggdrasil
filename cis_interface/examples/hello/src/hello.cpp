@@ -1,4 +1,4 @@
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 #include <string>
 #include <iostream>
 using namespace std;
@@ -12,10 +12,10 @@ int main(int argc, char *argv[]) {
   cout << "Hello from C++\n";
   
   /* Matching with the the model yaml */
-  CisInput inf("inFile"); 
-  CisOutput outf("outFile");
-  CisInput inq("helloQueueIn");
-  CisOutput outq("helloQueueOut");
+  YggInput inf("inFile"); 
+  YggOutput outf("outFile");
+  YggInput inq("helloQueueIn");
+  YggOutput outq("helloQueueOut");
   cout << "hello(CPP): Created I/O channels\n";
 
   // Receive input from the local file

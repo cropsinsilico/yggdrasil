@@ -1,8 +1,8 @@
 
 % Get input and output channels matching yaml
-in1 = CisInterface('CisInput', 'input1_matlab');
-in2 = CisInterface('CisInput', 'static_matlab');
-out1 = CisInterface('CisOutput', 'output_matlab');
+in1 = YggInterface('YggInput', 'input1_matlab');
+in2 = YggInterface('YggInput', 'static_matlab');
+out1 = YggInterface('YggOutput', 'output_matlab');
 disp('SaM(M): Set up I/O channels');
 
 % Get input from input1 channel

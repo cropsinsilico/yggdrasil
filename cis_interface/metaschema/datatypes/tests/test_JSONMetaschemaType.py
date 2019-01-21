@@ -1,5 +1,5 @@
 import numpy as np
-from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as parent
+from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 
 
 class TestJSONBooleanMetaschemaType(parent.TestMetaschemaType):

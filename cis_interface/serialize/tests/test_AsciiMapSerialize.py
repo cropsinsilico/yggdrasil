@@ -1,5 +1,5 @@
-from cis_interface import backwards
-from cis_interface.serialize.tests import test_DefaultSerialize as parent
+from yggdrasil import backwards
+from yggdrasil.serialize.tests import test_DefaultSerialize as parent
 
 
 class TestAsciiMapSerialize(parent.TestDefaultSerialize):

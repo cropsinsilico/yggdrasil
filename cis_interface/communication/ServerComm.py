@@ -1,4 +1,4 @@
-from cis_interface.communication import CommBase, get_comm, get_comm_class
+from yggdrasil.communication import CommBase, get_comm, get_comm_class
 
 
 class ServerComm(CommBase.CommBase):

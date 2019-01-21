@@ -1,6 +1,6 @@
-from cis_interface import backwards, platform
-from cis_interface.serialize import register_serializer
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil import backwards, platform
+from yggdrasil.serialize import register_serializer
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
 @register_serializer

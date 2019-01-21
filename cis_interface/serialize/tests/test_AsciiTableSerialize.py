@@ -1,8 +1,8 @@
 import numpy as np
-import nose.tools as nt
-from cis_interface import backwards
-from cis_interface.serialize import AsciiTableSerialize
-from cis_interface.serialize.tests import test_DefaultSerialize as parent
+from yggdrasil import backwards
+from yggdrasil.tests import assert_raises
+from yggdrasil.serialize import AsciiTableSerialize
+from yggdrasil.serialize.tests import test_DefaultSerialize as parent
 
 
 def test_serialize_nofmt():
@@ -10,7 +10,7 @@ def test_serialize_nofmt():
     inst = AsciiTableSerialize.AsciiTableSerialize()
     inst._initialized = True
     test_msg = np.zeros((5, 5))
-    nt.assert_raises(RuntimeError, inst.serialize, test_msg)
+    assert_raises(RuntimeError, inst.serialize, test_msg)
 
     
 def test_deserialize_nofmt():
@@ -18,7 +18,7 @@ def test_deserialize_nofmt():
     inst = AsciiTableSerialize.AsciiTableSerialize()
     test_msg = b'lskdbjs;kfbj'
     test_msg = inst.str_datatype.serialize(test_msg, metadata={})
-    nt.assert_raises(RuntimeError, inst.deserialize, test_msg)
+    assert_raises(RuntimeError, inst.deserialize, test_msg)
 
 
 class TestAsciiTableSerialize(parent.TestDefaultSerialize):

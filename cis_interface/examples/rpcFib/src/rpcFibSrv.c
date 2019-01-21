@@ -1,5 +1,5 @@
 
-#include "CisInterface.h"
+#include "YggInterface.h"
 #include <stdio.h>
 
 
@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   printf("Hello from C rpcFibSrv: sleeptime = %f\n", timeSleep);
   
   // Create server-side rpc conneciton using model name
-  cisRpc_t rpc = cisRpcServer("rpcFibSrv", "%d", "%d %d");
+  yggRpc_t rpc = yggRpcServer("rpcFibSrv", "%d", "%d %d");
 
   // Continue receiving requests until error occurs (the connection is closed
   // by all clients that have connected).

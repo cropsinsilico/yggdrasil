@@ -1,6 +1,6 @@
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISCOMMHEADER_H_
-#define CISCOMMHEADER_H_
+#ifndef YGGCOMMHEADER_H_
+#define YGGCOMMHEADER_H_
 
 #include <../tools.h>
 #include <../dataio/AsciiTable.h>
@@ -9,9 +9,9 @@
 extern "C" {
 #endif
 
-#define CIS_MSG_HEAD "CIS_MSG_HEAD"
-#define HEAD_VAL_SEP ":CIS:"
-#define HEAD_KEY_SEP ",CIS,"
+#define YGG_MSG_HEAD "YGG_MSG_HEAD"
+#define HEAD_VAL_SEP ":YGG:"
+#define HEAD_KEY_SEP ",YGG,"
 #define COMMBUFFSIZ 2000
 
 
@@ -92,4 +92,4 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
 }
 #endif
 
-#endif /*CISCOMMHEADER_H_*/
+#endif /*YGGCOMMHEADER_H_*/

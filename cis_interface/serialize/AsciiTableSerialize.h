@@ -1,5 +1,5 @@
-#ifndef CISASCIITABLESERIALIZE_H_
-#define CISASCIITABLESERIALIZE_H_
+#ifndef YGGASCIITABLESERIALIZE_H_
+#define YGGASCIITABLESERIALIZE_H_
 
 #include <../tools.h>
 #include <SerializeBase.h>
@@ -90,4 +90,4 @@ int deserialize_ascii_table_array(const seri_t s, const char *buf,
 }
 #endif
 
-#endif /*CISASCIITABLESERIALIZE_H_*/
+#endif /*YGGASCIITABLESERIALIZE_H_*/

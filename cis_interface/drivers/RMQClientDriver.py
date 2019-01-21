@@ -1,4 +1,4 @@
-from cis_interface.drivers.ClientDriver import ClientDriver
+from yggdrasil.drivers.ClientDriver import ClientDriver
 
 
 class RMQClientDriver(ClientDriver):

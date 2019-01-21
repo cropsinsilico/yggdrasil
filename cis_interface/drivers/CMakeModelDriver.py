@@ -1,10 +1,10 @@
 import os
 import re
 import shutil
-from cis_interface import tools, backwards, platform
-from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface.drivers import GCCModelDriver
-from cis_interface.schema import register_component, inherit_schema
+from yggdrasil import tools, backwards, platform
+from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.drivers import GCCModelDriver
+from yggdrasil.schema import register_component, inherit_schema
 
 
 _regex_win32_dir = GCCModelDriver._incl_regex
@@ -128,7 +128,7 @@ class CMakeModelDriver(ModelDriver):
     r"""Class for running cmake compiled drivers. Before running the
     cmake command, the cmake commands for setting the necessary compiler & linker
     flags for the interface's C/C++ library are written to a file called
-    'cis_cmake.txt' that should be included in the CMakeLists.txt file (after
+    'ygg_cmake.txt' that should be included in the CMakeLists.txt file (after
     the target executable has been added).
 
     Args:
@@ -192,7 +192,7 @@ class CMakeModelDriver(ModelDriver):
             self.cmakeargs = [self.cmakeargs]
         self.preserve_cache = preserve_cache
         self.target_file = os.path.join(self.builddir, self.target)
-        self.include_file = os.path.join(self.sourcedir, 'cis_cmake.txt')
+        self.include_file = os.path.join(self.sourcedir, 'ygg_cmake.txt')
         self.args[0] = self.target_file
         # Set environment variables
         self.debug("Setting environment variables.")

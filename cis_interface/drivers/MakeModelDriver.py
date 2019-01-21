@@ -1,8 +1,8 @@
 import os
-from cis_interface import tools, platform
-from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface.drivers import GCCModelDriver
-from cis_interface.schema import register_component, inherit_schema
+from yggdrasil import tools, platform
+from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.drivers import GCCModelDriver
+from yggdrasil.schema import register_component, inherit_schema
 if platform._is_win:  # pragma: windows
     _default_make_command = 'nmake'
 else:
@@ -11,7 +11,7 @@ _default_makefile = 'Makefile'
 
 
 def setup_environ(compile_flags=[], linker_flags=[]):
-    r"""Set environment variables CISCCFLAGS and CISLDFLAGS.
+    r"""Set environment variables YGGCCFLAGS and YGGLDFLAGS.
 
     Args:
         compile_flags (list, optional): Additional compile flags that
@@ -21,15 +21,15 @@ def setup_environ(compile_flags=[], linker_flags=[]):
 
     """
     _compile_flags, _linker_flags = GCCModelDriver.get_flags()
-    os.environ['CISCCFLAGS'] = ' '.join(compile_flags + _compile_flags)
-    os.environ['CISLDFLAGS'] = ' '.join(linker_flags + _linker_flags)
+    os.environ['YGGCCFLAGS'] = ' '.join(compile_flags + _compile_flags)
+    os.environ['YGGLDFLAGS'] = ' '.join(linker_flags + _linker_flags)
 
 
 @register_component
 class MakeModelDriver(ModelDriver):
     r"""Class for running make file compiled drivers. Before running the
     make command, the necessary compiler & linker flags for the interface's
-    C/C++ library are stored the environment variables CISCCFLAGS and CISLDFLAGS
+    C/C++ library are stored the environment variables YGGCCFLAGS and YGGLDFLAGS
     respectively. These should be used in the make file to correctly compile
     with the interface's C/C++ libraries.
 
@@ -87,7 +87,7 @@ class MakeModelDriver(ModelDriver):
         self.args[0] = self.target_file
         # Set environment variables
         self.debug("Setting environment variables.")
-        compile_flags = ['-DCIS_DEBUG=%d' % self.logger.getEffectiveLevel()]
+        compile_flags = ['-DYGG_DEBUG=%d' % self.logger.getEffectiveLevel()]
         setup_environ(compile_flags=compile_flags)
         # Compile in a new process
         self.debug("Making target.")

@@ -1,6 +1,6 @@
-from cis_interface.communication import FileComm
-from cis_interface.schema import register_component
-from cis_interface.serialize.MatSerialize import MatSerialize
+from yggdrasil.communication import FileComm
+from yggdrasil.schema import register_component
+from yggdrasil.serialize.MatSerialize import MatSerialize
 
 
 @register_component

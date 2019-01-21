@@ -1,5 +1,5 @@
-#ifndef CISSERIALIZE_H_
-#define CISSERIALIZE_H_
+#ifndef YGGSERIALIZE_H_
+#define YGGSERIALIZE_H_
 
 #include "../tools.h"
 /*
@@ -64,19 +64,19 @@ int free_serializer(seri_t *s) {
 static inline
 int update_precision(seri_t *s, const char* type, void *info) {
   if (s == NULL) {
-    cislog_error("update_precision: Pointer to serializer is NULL.");
+    ygglog_error("update_precision: Pointer to serializer is NULL.");
     return -1;
   }
   if (strcmp(type, "scalar") == 0) {
     MetaschemaType* new_info = type_from_void(type, info);
     if (new_info == NULL) {
-      cislog_error("update_precision: Error getting type class.");
+      ygglog_error("update_precision: Error getting type class.");
       return -1;
     }
     const char *subtype = get_type_subtype(new_info);
     printf("subtype = %s\n", subtype);
     if (strcmp(subtype, "") == 0) {
-      cislog_error("update_precision: Error getting subtype.");
+      ygglog_error("update_precision: Error getting subtype.");
       return -1;
     }
     if ((strcmp(subtype, "bytes") != 0) && (strcmp(subtype, "unicode") != 0)) {
@@ -84,7 +84,7 @@ int update_precision(seri_t *s, const char* type, void *info) {
     }
     const size_t new_prec = get_type_precision(new_info);
     if (new_prec == 0) {
-      cislog_error("update_precision: Error getting new precision.");
+      ygglog_error("update_precision: Error getting new precision.");
       return -1;
     }
     return update_precision_from_void(s->type, s->info, new_prec);
@@ -104,7 +104,7 @@ int update_precision(seri_t *s, const char* type, void *info) {
 static inline
 int update_serializer(seri_t *s, const char* type, void *info) {
   if (s == NULL) {
-    cislog_error("update_serializer: Pointer to serializer is NULL.");
+    ygglog_error("update_serializer: Pointer to serializer is NULL.");
     return -1;
   }
   // Free before transfering information
@@ -112,7 +112,7 @@ int update_serializer(seri_t *s, const char* type, void *info) {
   if ((strlen(type) == 0) && (info != NULL)) {
     MetaschemaType* new_info = type_from_void(type, info);
     if (new_info == NULL) {
-      cislog_error("update_serializer: Error getting type.");
+      ygglog_error("update_serializer: Error getting type.");
       return -1;
     }
     const char* new_type = get_type_name(new_info);
@@ -135,13 +135,13 @@ static inline
 seri_t * init_serializer(const char* type, void *info) {
   seri_t *s = (seri_t*)malloc(sizeof(seri_t));
   if (s == NULL) {
-    cislog_error("init_serializer: Failed to allocate serializer.");
+    ygglog_error("init_serializer: Failed to allocate serializer.");
     return NULL;
   }
   s[0] = empty_serializer();
   int flag = update_serializer(s, type, info);
   if (flag != 0) {
-    cislog_error("init_serializer: Failed to create serializer.");
+    ygglog_error("init_serializer: Failed to create serializer.");
     free(s);
     s = NULL;
   }
@@ -165,7 +165,7 @@ static inline
 int serialize(const seri_t s, char **buf, size_t *buf_siz,
 	      const int allow_realloc, size_t *nargs, va_list_t ap) {
   if (s.info == NULL) {
-    cislog_error("serialize: Serializer type not initialized.");
+    ygglog_error("serialize: Serializer type not initialized.");
     return -1;
   }
   return serialize_from_void(s.type, s.info, buf, buf_siz,
@@ -189,7 +189,7 @@ static inline
 int deserialize(const seri_t s, const char *buf, const size_t buf_siz,
 		const int allow_realloc, size_t *nargs, va_list_t ap) {
   if (s.info == NULL) {
-    cislog_error("deserialize: Serializer type not initialized.");
+    ygglog_error("deserialize: Serializer type not initialized.");
     return -1;
   }
   return deserialize_from_void(s.type, s.info, buf, buf_siz,
@@ -201,4 +201,4 @@ int deserialize(const seri_t s, const char *buf, const size_t buf_siz,
 }
 #endif
 
-#endif /*CISSERIALIZE_H_*/
+#endif /*YGGSERIALIZE_H_*/

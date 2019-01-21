@@ -2,22 +2,21 @@ import os
 import uuid
 import warnings
 import unittest
-import nose.tools as nt
 import tempfile
-from cis_interface import runner, tools
-from cis_interface.examples import yamls
-from cis_interface.tests import CisTestBase
-from cis_interface.drivers.MatlabModelDriver import _matlab_installed
+from yggdrasil import runner, tools
+from yggdrasil.examples import yamls
+from yggdrasil.tests import YggTestBase, assert_equal
+from yggdrasil.drivers.MatlabModelDriver import _matlab_installed
 
 
 _c_comm_installed = tools.get_installed_comm(language='c')
 
 
-class TestExample(CisTestBase, tools.CisClass):
+class TestExample(YggTestBase, tools.YggClass):
     r"""Base class for running examples."""
 
     def __init__(self, *args, **kwargs):
-        tools.CisClass.__init__(self, None)
+        tools.YggClass.__init__(self, None)
         self.language = None
         self.uuid = str(uuid.uuid4())
         self.env = {}
@@ -102,7 +101,7 @@ class TestExample(CisTestBase, tools.CisClass):
         out_list = self.output_files
         assert(res_list is not None)
         assert(out_list is not None)
-        nt.assert_equal(len(res_list), len(out_list))
+        assert_equal(len(res_list), len(out_list))
         for res, fout in zip(res_list, out_list):
             self.check_file_exists(fout)
             if isinstance(res, tuple):

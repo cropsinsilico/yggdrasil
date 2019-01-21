@@ -1,8 +1,8 @@
 import copy
 import numpy as np
-from cis_interface import units
-from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as parent
-from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
+from yggdrasil import units
+from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     _valid_types)
 
 

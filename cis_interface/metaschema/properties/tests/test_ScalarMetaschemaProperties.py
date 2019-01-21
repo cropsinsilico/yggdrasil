@@ -1,20 +1,20 @@
 import numpy as np
-import nose.tools as nt
-from cis_interface import units
-from cis_interface.metaschema.properties import ScalarMetaschemaProperties
-from cis_interface.metaschema.properties.tests import (
+from yggdrasil import units
+from yggdrasil.tests import assert_raises
+from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
+from yggdrasil.metaschema.properties.tests import (
     test_MetaschemaProperty as parent)
-from cis_interface.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 
 
 def test_data2dtype_errors():
     r"""Check that error is raised for list, dict, & tuple objects."""
-    nt.assert_raises(MetaschemaTypeError, ScalarMetaschemaProperties.data2dtype, [])
+    assert_raises(MetaschemaTypeError, ScalarMetaschemaProperties.data2dtype, [])
 
 
 def test_definition2dtype_errors():
     r"""Check that error raised if type not specified."""
-    nt.assert_raises(KeyError, ScalarMetaschemaProperties.definition2dtype, {})
+    assert_raises(KeyError, ScalarMetaschemaProperties.definition2dtype, {})
 
 
 class TestSubtypeMetaschemaProperty(parent.TestMetaschemaProperty):
@@ -32,7 +32,7 @@ class TestSubtypeMetaschemaProperty(parent.TestMetaschemaProperty):
 
     def test_invalid_encode(self):
         r"""Test invalid encode for object dtype."""
-        nt.assert_raises(MetaschemaTypeError, self.import_cls.encode, object)
+        assert_raises(MetaschemaTypeError, self.import_cls.encode, object)
 
 
 class TestPrecisionMetaschemaProperty(parent.TestMetaschemaProperty):

@@ -15,10 +15,10 @@ enum { T_BOOLEAN, T_INTEGER, T_NULL, T_NUMBER, T_STRING, T_ARRAY, T_OBJECT,
 
 
 static inline
-void cislog_throw_error(const char* fmt, ...) {
+void ygglog_throw_error(const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  cisError_va(fmt, ap);
+  yggError_va(fmt, ap);
   va_end(ap);
   throw std::exception();
 };
@@ -71,11 +71,11 @@ public:
   }
   MetaschemaType(const rapidjson::Value &type_doc) : type_((const char*)malloc(100)), type_code_(-1) {
     if (not type_doc.IsObject())
-      cislog_throw_error("MetaschemaType: Parsed document is not an object.");
+      ygglog_throw_error("MetaschemaType: Parsed document is not an object.");
     if (not type_doc.HasMember("type"))
-      cislog_throw_error("MetaschemaType: Parsed header dosn't contain a type.");
+      ygglog_throw_error("MetaschemaType: Parsed header dosn't contain a type.");
     if (not type_doc["type"].IsString())
-      cislog_throw_error("MetaschemaType: Type in parsed header is not a string.");
+      ygglog_throw_error("MetaschemaType: Type in parsed header is not a string.");
     update_type(type_doc["type"].GetString());
     /*
     type_ = type_doc["type"].GetString();
@@ -92,7 +92,7 @@ public:
     std::map<const char*, int, strcomp> type_map = get_type_map();
     std::map<const char*, int, strcomp>::iterator it = type_map.find(type_);
     if (it == type_map.end()) {
-      cislog_throw_error("MetaschemaType: Unsupported type '%s'.", type_);
+      ygglog_throw_error("MetaschemaType: Unsupported type '%s'.", type_);
     }
     return it->second;
   }
@@ -108,10 +108,10 @@ public:
     *type_code_modifier = check_type();
   }
   virtual void set_length(size_t new_length) {
-    cislog_throw_error("MetaschemaType::set_length: Cannot set length for type '%s'.", type_);
+    ygglog_throw_error("MetaschemaType::set_length: Cannot set length for type '%s'.", type_);
   }
   virtual size_t get_length() {
-    cislog_throw_error("MetaschemaType::get_length: Cannot get length for type '%s'.", type_);
+    ygglog_throw_error("MetaschemaType::get_length: Cannot get length for type '%s'.", type_);
     return 0;
   }
   virtual size_t nargs_exp() {
@@ -127,7 +127,7 @@ public:
       return 2;
     }
     }
-    cislog_throw_error("MetaschemaType::nargs_exp: Cannot get number of expected arguments for type '%s'.", type_);
+    ygglog_throw_error("MetaschemaType::nargs_exp: Cannot get number of expected arguments for type '%s'.", type_);
     return 0;
   }
   
@@ -147,7 +147,7 @@ public:
   virtual bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 			   size_t *nargs, va_list_t &ap) {
     if (nargs_exp() > *nargs)
-      cislog_throw_error("MetaschemaType::encode_data: %d arguments expected, but only %d provided.",
+      ygglog_throw_error("MetaschemaType::encode_data: %d arguments expected, but only %d provided.",
 			 nargs_exp(), *nargs);
     switch (type_code_) {
     case T_BOOLEAN: {
@@ -186,7 +186,7 @@ public:
       return true;
     }
     }
-    cislog_error("MetaschemaType::encode_data: Cannot encode data of type '%s'.", type_);
+    ygglog_error("MetaschemaType::encode_data: Cannot encode data of type '%s'.", type_);
     return false;
   }
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
@@ -209,19 +209,19 @@ public:
 	dst_buf_siz = src_buf_siz_term;
 	char *temp = (char*)realloc(*dst_buf, dst_buf_siz);
 	if (temp == NULL) {
-	  cislog_error("MetaschemaType::copy_to_buffer: Failed to realloc destination buffer to %lu bytes.",
+	  ygglog_error("MetaschemaType::copy_to_buffer: Failed to realloc destination buffer to %lu bytes.",
 		       dst_buf_siz);
 	  return -1;
 	}
 	*dst_buf = temp;
-	cislog_debug("MetaschemaType::copy_to_buffer: Reallocated to %lu bytes.",
+	ygglog_debug("MetaschemaType::copy_to_buffer: Reallocated to %lu bytes.",
 		     dst_buf_siz);
       } else {
 	if (not skip_terminal) {
-	  cislog_error("MetaschemaType::copy_to_buffer: Source with termination character (%lu + 1) exceeds size of destination buffer (%lu).",
+	  ygglog_error("MetaschemaType::copy_to_buffer: Source with termination character (%lu + 1) exceeds size of destination buffer (%lu).",
 		       src_buf_siz, dst_buf_siz);
 	} else {
-	  cislog_error("MetaschemaType::copy_to_buffer: Source (%lu) exceeds size of destination buffer (%lu).",
+	  ygglog_error("MetaschemaType::copy_to_buffer: Source (%lu) exceeds size of destination buffer (%lu).",
 		       src_buf_siz, dst_buf_siz);
 	}
 	return -1;
@@ -239,7 +239,7 @@ public:
   virtual int serialize(char **buf, size_t *buf_siz,
 			const int allow_realloc, size_t *nargs, va_list_t &ap) {
     if (nargs_exp() != *nargs) {
-      cislog_throw_error("MetaschemaType::serialize: %d arguments expected, but %d provided.",
+      ygglog_throw_error("MetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     rapidjson::StringBuffer body_buf;
@@ -249,7 +249,7 @@ public:
       return -1;
     }
     if (*nargs != 0) {
-      cislog_error("MetaschemaType::serialize: %d arguments were not used.", *nargs);
+      ygglog_error("MetaschemaType::serialize: %d arguments were not used.", *nargs);
       return -1;
     }
     // Copy message to buffer
@@ -261,20 +261,20 @@ public:
   virtual bool decode_data(rapidjson::Value &data, const int allow_realloc,
 			   size_t *nargs, va_list_t &ap) {
     if (nargs_exp() != *nargs) {
-      cislog_throw_error("MetaschemaType::decode_data: %d arguments expected, but %d provided.",
+      ygglog_throw_error("MetaschemaType::decode_data: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     switch (type_code_) {
     case T_BOOLEAN: {
       if (not data.IsBool())
-	cislog_throw_error("MetaschemaType::decode_data: Data is not a bool.");
+	ygglog_throw_error("MetaschemaType::decode_data: Data is not a bool.");
       bool *arg;
       bool **p;
       if (allow_realloc) {
 	p = va_arg(ap.va, bool**);
 	arg = (bool*)realloc(*p, sizeof(bool));
 	if (arg == NULL)
-	  cislog_throw_error("MetaschemaType::decode_data: could not realloc bool pointer.");
+	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc bool pointer.");
 	*p = arg;
       } else {
 	arg = va_arg(ap.va, bool*);
@@ -285,14 +285,14 @@ public:
     }
     case T_INTEGER: {
       if (not data.IsInt())
-	cislog_throw_error("MetaschemaType::decode_data: Data is not an int.");
+	ygglog_throw_error("MetaschemaType::decode_data: Data is not an int.");
       int *arg;
       int **p;
       if (allow_realloc) {
 	p = va_arg(ap.va, int**);
 	arg = (int*)realloc(*p, sizeof(int));
 	if (arg == NULL)
-	  cislog_throw_error("MetaschemaType::decode_data: could not realloc int pointer.");
+	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc int pointer.");
 	*p = arg;
       } else {
 	arg = va_arg(ap.va, int*);
@@ -303,7 +303,7 @@ public:
     }
     case T_NULL: {
       if (not data.IsNull())
-	cislog_throw_error("MetaschemaType::decode_data: Data is not null.");
+	ygglog_throw_error("MetaschemaType::decode_data: Data is not null.");
       void **arg = va_arg(ap.va, void**);
       (*nargs)--;
       arg[0] = NULL;
@@ -311,14 +311,14 @@ public:
     }
     case T_NUMBER: {
       if (not data.IsDouble())
-	cislog_throw_error("MetaschemaType::decode_data: Data is not a double.");
+	ygglog_throw_error("MetaschemaType::decode_data: Data is not a double.");
       double *arg;
       double **p;
       if (allow_realloc) {
 	p = va_arg(ap.va, double**);
 	arg = (double*)realloc(*p, sizeof(double));
 	if (arg == NULL)
-	  cislog_throw_error("MetaschemaType::decode_data: could not realloc double pointer.");
+	  ygglog_throw_error("MetaschemaType::decode_data: could not realloc double pointer.");
 	*p = arg;
       } else {
 	arg = va_arg(ap.va, double*);
@@ -329,7 +329,7 @@ public:
     }
     case T_STRING: {
       if (not data.IsString())
-	cislog_throw_error("MetaschemaType::decode_data: Data is not a string.");
+	ygglog_throw_error("MetaschemaType::decode_data: Data is not a string.");
       char *arg;
       char **p;
       if (allow_realloc) {
@@ -345,20 +345,20 @@ public:
       int ret = copy_to_buffer(data.GetString(), data.GetStringLength(),
 			       p, *arg_siz, allow_realloc);
       if (ret < 0) {
-	cislog_error("MetaschemaType::decode_data: Failed to copy string buffer.");
+	ygglog_error("MetaschemaType::decode_data: Failed to copy string buffer.");
 	return false;
       }
       return true;
     }
     }
-    cislog_error("MetaschemaType::decode_data: Cannot decode data of type '%s'.", type_);
+    ygglog_error("MetaschemaType::decode_data: Cannot decode data of type '%s'.", type_);
     return false;
   }
   virtual int deserialize(const char *buf, const size_t buf_siz,
 			  const int allow_realloc, size_t* nargs, va_list_t &ap) {
     const size_t nargs_orig = *nargs;
     if (nargs_exp() > *nargs) {
-      cislog_throw_error("MetaschemaType::deserialize: %d arguments expected, but only %d provided.",
+      ygglog_throw_error("MetaschemaType::deserialize: %d arguments expected, but only %d provided.",
 			 nargs_exp(), *nargs);
     }
     // Parse body
@@ -366,11 +366,11 @@ public:
     body_doc.Parse(buf, buf_siz);
     bool out = decode_data(body_doc, allow_realloc, nargs, ap);
     if (not out) {
-      cislog_error("MetaschemaType::deserialize: One or more errors while parsing body.");
+      ygglog_error("MetaschemaType::deserialize: One or more errors while parsing body.");
       return -1;
     }
     if (*nargs != 0) {
-      cislog_error("MetaschemaType::deserialize: %d arguments were not used.", *nargs);
+      ygglog_error("MetaschemaType::deserialize: %d arguments were not used.", *nargs);
       return -1;
     }
     return (int)(nargs_orig - *nargs);

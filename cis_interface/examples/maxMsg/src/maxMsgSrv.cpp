@@ -1,14 +1,14 @@
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 #include <stdio.h>
 
 
 int main(int argc, char *argv[]) {  
 
     printf("maxMsgSrv(CPP): Hello!\n");
-    CisRpcServer rpc("maxMsgSrv", "%s", "%s");
-    size_t input_size = CIS_MSG_BUF;
+    YggRpcServer rpc("maxMsgSrv", "%s", "%s");
+    size_t input_size = YGG_MSG_BUF;
     char *input = (char*)malloc(input_size);
-    //char input[CIS_MSG_MAX];
+    //char input[YGG_MSG_MAX];
     
     while (1) {
       int ret = rpc.recvRealloc(2, &input, &input_size);

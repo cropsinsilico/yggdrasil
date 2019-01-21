@@ -4,13 +4,13 @@ import pprint
 import yaml
 from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
-from cis_interface import metaschema
-from cis_interface.drivers import import_all_drivers
-from cis_interface.communication import import_all_comms
+from yggdrasil import metaschema
+from yggdrasil.drivers import import_all_drivers
+from yggdrasil.communication import import_all_comms
 
 
 _schema_fname = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), '.cis_schema.yml'))
+    os.path.dirname(__file__), '.ygg_schema.yml'))
 _schema = None
 _registry = {}
 _registry_complete = False
@@ -115,7 +115,7 @@ def create_schema():
 
 
 def load_schema(fname=None):
-    r"""Return the cis_interface schema for YAML options.
+    r"""Return the yggdrasil schema for YAML options.
 
     Args:
         fname (str, optional): Full path to the file that the schema should be
@@ -123,7 +123,7 @@ def load_schema(fname=None):
             _schema_fname.
 
     Returns:
-        dict: cis_interface YAML options.
+        dict: yggdrasil YAML options.
 
     """
     if fname is None:
@@ -135,7 +135,7 @@ def load_schema(fname=None):
 
 
 def get_schema(fname=None):
-    r"""Return the cis_interface schema for YAML options.
+    r"""Return the yggdrasil schema for YAML options.
 
     Args:
         fname (str, optional): Full path to the file that the schema should be
@@ -143,7 +143,7 @@ def get_schema(fname=None):
             _schema_fname.
 
     Returns:
-        dict: cis_interface YAML options.
+        dict: yggdrasil YAML options.
 
     """
     global _schema
@@ -435,7 +435,7 @@ class SchemaRegistry(object):
         r"""dict: Schema for evaluating YAML input file."""
         required = ['comm', 'file', 'model', 'connection']
         out = {'title': 'YAML Schema',
-               'description': 'Schema for cis_interface YAML input files.',
+               'description': 'Schema for yggdrasil YAML input files.',
                'type': 'object',
                'definitions': {},
                'required': ['models'],
@@ -506,7 +506,7 @@ class SchemaRegistry(object):
 
         Args:
             fname (str): Full path to the file the schema should be saved to.
-            schema (dict): cis_interface YAML options.
+            schema (dict): yggdrasil YAML options.
 
         """
         out = self.schema

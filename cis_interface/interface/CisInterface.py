@@ -1,28 +1,28 @@
-from cis_interface import backwards, tools, serialize
-from cis_interface.communication import DefaultComm
+from yggdrasil import backwards, tools, serialize
+from yggdrasil.communication import DefaultComm
 
 
-CIS_MSG_MAX = tools.get_CIS_MSG_MAX()
-CIS_MSG_EOF = tools.CIS_MSG_EOF
-CIS_MSG_BUF = tools.CIS_MSG_BUF
+YGG_MSG_MAX = tools.get_YGG_MSG_MAX()
+YGG_MSG_EOF = tools.YGG_MSG_EOF
+YGG_MSG_BUF = tools.YGG_MSG_BUF
 
 
 def maxMsgSize():
     r"""int: The maximum message size."""
-    return CIS_MSG_MAX
+    return YGG_MSG_MAX
 
 
 def bufMsgSize():
     r"""int: Buffer size for average message."""
-    return CIS_MSG_BUF
+    return YGG_MSG_BUF
 
 
 def eof_msg():
     r"""str: Message signalling end of file."""
-    return CIS_MSG_EOF
+    return YGG_MSG_EOF
 
 
-def CisMatlab(_type, args=None):  # pragma: matlab
+def YggMatlab(_type, args=None):  # pragma: matlab
     r"""Short interface to identify functions called by Matlab.
 
     Args:
@@ -37,9 +37,13 @@ def CisMatlab(_type, args=None):  # pragma: matlab
     if args is None:
         args = []
     if _type.startswith('Psi'):
-        _type = _type.replace('Psi', 'Cis', 1)
+        _type = _type.replace('Psi', 'Ygg', 1)
     elif _type.startswith('PSI'):
-        _type = _type.replace('PSI', 'CIS', 1)
+        _type = _type.replace('PSI', 'YGG', 1)
+    if _type.startswith('Cis'):
+        _type = _type.replace('Cis', 'Ygg', 1)
+    elif _type.startswith('CIS'):
+        _type = _type.replace('CIS', 'YGG', 1)
     cls = eval(_type)
     if isinstance(cls, (int, backwards.bytes_type, backwards.unicode_type)):
         obj = cls
@@ -49,7 +53,7 @@ def CisMatlab(_type, args=None):  # pragma: matlab
     return obj
 
 
-def CisInput(name, format_str=None, **kwargs):
+def YggInput(name, format_str=None, **kwargs):
     r"""Get class for handling input from a message queue.
 
     Args:
@@ -73,7 +77,7 @@ def CisInput(name, format_str=None, **kwargs):
     return DefaultComm(name, **kwargs)
     
 
-def CisOutput(name, format_str=None, **kwargs):
+def YggOutput(name, format_str=None, **kwargs):
     r"""Get class for handling output to a message queue.
 
     Args:
@@ -97,7 +101,7 @@ def CisOutput(name, format_str=None, **kwargs):
     return DefaultComm(name, **kwargs)
 
     
-def CisRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
+def YggRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
     r"""Get class for handling requests and response for an RPC Server.
 
     Args:
@@ -111,7 +115,7 @@ def CisRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
         :class:.ServerComm: Communication object.
         
     """
-    from cis_interface.communication import ServerComm
+    from yggdrasil.communication import ServerComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -123,7 +127,7 @@ def CisRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
     return out
     
 
-def CisRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
+def YggRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
     r"""Get class for handling requests and response to an RPC Server from a
     client.
 
@@ -138,7 +142,7 @@ def CisRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
         :class:.ClientComm: Communication object.
         
     """
-    from cis_interface.communication import ClientComm
+    from yggdrasil.communication import ClientComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -151,37 +155,37 @@ def CisRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
     
 
 # Specialized classes for ascii IO
-def CisAsciiFileInput(name, **kwargs):
+def YggAsciiFileInput(name, **kwargs):
     r"""Get class for generic ASCII input.
 
     Args:
         name (str): The name of the input message queue that input should be
             received from.
-        **kwargs: Additional keyword arguments are passed to CisInput.
+        **kwargs: Additional keyword arguments are passed to YggInput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
-    return CisInput(name, **kwargs)
+    return YggInput(name, **kwargs)
 
 
-def CisAsciiFileOutput(name, **kwargs):
+def YggAsciiFileOutput(name, **kwargs):
     r"""Get class for generic ASCII output.
 
     Args:
         name (str): The name of the message queue where output should be sent.
-        **kwargs: Additional keyword arguments are passed to CisOutput.
+        **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
-    return CisOutput(name, **kwargs)
+    return YggOutput(name, **kwargs)
             
 
 # Specialized classes for ascii table IO
-def CisAsciiTableInput(name, as_array=False, **kwargs):
+def YggAsciiTableInput(name, as_array=False, **kwargs):
     r"""Get class for handling table-like formatted input.
 
     Args:
@@ -190,17 +194,17 @@ def CisAsciiTableInput(name, as_array=False, **kwargs):
         as_array (bool, optional): If True, recv returns the entire table
             array and can only be called once. If False, recv returns row
             entries. Default to False.
-        **kwargs: Additional keyword arguments are passed to CisInput.
+        **kwargs: Additional keyword arguments are passed to YggInput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
     kwargs['serializer_kwargs'] = dict(as_array=as_array)
-    return CisInput(name, **kwargs)
+    return YggInput(name, **kwargs)
 
 
-def CisAsciiTableOutput(name, fmt, as_array=False, **kwargs):
+def YggAsciiTableOutput(name, fmt, as_array=False, **kwargs):
     r"""Get class for handling table-like formatted output.
 
     Args:
@@ -210,7 +214,7 @@ def CisAsciiTableOutput(name, fmt, as_array=False, **kwargs):
         as_array (bool, optional): If True, send expects and entire array.
             If False, send expects the entries for one table row. Defaults to
             False.
-        **kwargs: Additional keyword arguments are passed to CisOutput.
+        **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:
         DefaultComm: Communication object.
@@ -220,34 +224,34 @@ def CisAsciiTableOutput(name, fmt, as_array=False, **kwargs):
         fmt = backwards.decode_escape(fmt)
     kwargs['serializer_kwargs'] = dict(as_array=as_array,
                                        format_str=fmt)
-    return CisOutput(name, **kwargs)
+    return YggOutput(name, **kwargs)
     
 
 # Specialized classes for ascii table IO arrays
-def CisAsciiArrayInput(name, **kwargs):
+def YggAsciiArrayInput(name, **kwargs):
     r"""Get class for handling table-like formatted input as arrays.
 
     Args:
         name (str): The name of the input message queue that input should be
             received from.
-        **kwargs: Additional keyword arguments are passed to CisAsciiTableInput.
+        **kwargs: Additional keyword arguments are passed to YggAsciiTableInput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
     kwargs['as_array'] = True
-    return CisAsciiTableInput(name, **kwargs)
+    return YggAsciiTableInput(name, **kwargs)
 
 
-def CisAsciiArrayOutput(name, fmt, **kwargs):
+def YggAsciiArrayOutput(name, fmt, **kwargs):
     r"""Get class for handling table-like formatted output as arrays.
 
     Args:
         name (str): The name of the message queue where output should be sent.
         fmt (str): A C style format string specifying how each 'row' of output
             should be formated. This should include the newline character.
-        **kwargs: Additional keyword arguments are passed to CisAsciiTableOutput.
+        **kwargs: Additional keyword arguments are passed to YggAsciiTableOutput.
 
     Returns:
         DefaultComm: Communication object.
@@ -256,47 +260,47 @@ def CisAsciiArrayOutput(name, fmt, **kwargs):
     if kwargs.get('matlab', False):  # pragma: matlab
         kwargs['send_converter'] = serialize.consolidate_array
     kwargs['as_array'] = True
-    return CisAsciiTableOutput(name, fmt, **kwargs)
+    return YggAsciiTableOutput(name, fmt, **kwargs)
 
 
 # Pickle io (for backwards compatibility)
-def CisPickleInput(name, **kwargs):
+def YggPickleInput(name, **kwargs):
     r"""Get class for handling pickled input.
 
     Args:
         name (str): The name of the input message queue that input should be
             received from.
-        **kwargs: Additional keyword arguments are passed to CisInput.
+        **kwargs: Additional keyword arguments are passed to YggInput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
-    return CisInput(name, **kwargs)
+    return YggInput(name, **kwargs)
 
 
-def CisPickleOutput(name, **kwargs):
+def YggPickleOutput(name, **kwargs):
     r"""Get class for handling pickled output.
 
     Args:
         name (str): The name of the message queue where output should be sent.
-        **kwargs: Additional keyword arguments are passed to CisOutput.
+        **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
-    return CisOutput(name, **kwargs)
+    return YggOutput(name, **kwargs)
 
 
 # Pandas io
-def CisPandasInput(name, **kwargs):
+def YggPandasInput(name, **kwargs):
     r"""Get class for handling Pandas input.
 
     Args:
         name (str): The name of the input message queue that input should be
             received from.
-        **kwargs: Additional keyword arguments are passed to CisInput.
+        **kwargs: Additional keyword arguments are passed to YggInput.
 
     Returns:
         DefaultComm: Communication object.
@@ -306,15 +310,15 @@ def CisPandasInput(name, **kwargs):
         kwargs['recv_converter'] = 'array'
     else:
         kwargs['recv_converter'] = 'pandas'
-    return CisInput(name, **kwargs)
+    return YggInput(name, **kwargs)
 
 
-def CisPandasOutput(name, **kwargs):
+def YggPandasOutput(name, **kwargs):
     r"""Get class for handling pandasd output.
 
     Args:
         name (str): The name of the message queue where output should be sent.
-        **kwargs: Additional keyword arguments are passed to CisOutput.
+        **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:
         DefaultComm: Communication object.
@@ -324,68 +328,68 @@ def CisPandasOutput(name, **kwargs):
         kwargs['send_converter'] = serialize.consolidate_array
     else:
         kwargs['send_converter'] = serialize.pandas2list
-    return CisOutput(name, **kwargs)
+    return YggOutput(name, **kwargs)
 
 
 # Ply io
-def CisPlyInput(name, **kwargs):
+def YggPlyInput(name, **kwargs):
     r"""Get class for handling Ply input.
 
     Args:
         name (str): The name of the input message queue that input should be
             received from.
-        **kwargs: Additional keyword arguments are passed to CisInput.
+        **kwargs: Additional keyword arguments are passed to YggInput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
     kwargs['serializer_kwargs'] = {'type': 'ply'}
-    return CisInput(name, **kwargs)
+    return YggInput(name, **kwargs)
 
 
-def CisPlyOutput(name, **kwargs):
+def YggPlyOutput(name, **kwargs):
     r"""Get class for handling Ply output.
 
     Args:
         name (str): The name of the message queue where output should be sent.
-        **kwargs: Additional keyword arguments are passed to CisOutput.
+        **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
     kwargs['serializer_kwargs'] = {'type': 'ply'}
-    return CisOutput(name, **kwargs)
+    return YggOutput(name, **kwargs)
 
 
 # Obj io
-def CisObjInput(name, **kwargs):
+def YggObjInput(name, **kwargs):
     r"""Get class for handling Obj input.
 
     Args:
         name (str): The name of the input message queue that input should be
             received from.
-        **kwargs: Additional keyword arguments are passed to CisInput.
+        **kwargs: Additional keyword arguments are passed to YggInput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
     kwargs['serializer_kwargs'] = {'type': 'obj'}
-    return CisInput(name, **kwargs)
+    return YggInput(name, **kwargs)
 
 
-def CisObjOutput(name, **kwargs):
+def YggObjOutput(name, **kwargs):
     r"""Get class for handling Obj output.
 
     Args:
         name (str): The name of the message queue where output should be sent.
-        **kwargs: Additional keyword arguments are passed to CisOutput.
+        **kwargs: Additional keyword arguments are passed to YggOutput.
 
     Returns:
         DefaultComm: Communication object.
         
     """
     kwargs['serializer_kwargs'] = {'type': 'obj'}
-    return CisOutput(name, **kwargs)
+    return YggOutput(name, **kwargs)

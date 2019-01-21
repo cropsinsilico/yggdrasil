@@ -1,6 +1,6 @@
 import numpy as np
-from cis_interface.metaschema.datatypes import register_type
-from cis_interface.metaschema.datatypes.ScalarMetaschemaType import (
+from yggdrasil.metaschema.datatypes import register_type
+from yggdrasil.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
 
 

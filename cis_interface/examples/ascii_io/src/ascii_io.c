@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 // Include interface methods
-#include "CisInterface.h"
+#include "YggInterface.h"
 
 #define BSIZE 8192 // the max
 
@@ -11,15 +11,15 @@ int main(int argc,char *argv[]){
   int error_code = 0;
 
   // Input & output to an ASCII file line by line
-  cisAsciiFileInput_t FileInput = cisAsciiFileInput("inputC_file");
-  cisAsciiFileOutput_t FileOutput = cisAsciiFileOutput("outputC_file");
+  yggAsciiFileInput_t FileInput = yggAsciiFileInput("inputC_file");
+  yggAsciiFileOutput_t FileOutput = yggAsciiFileOutput("outputC_file");
   // Input & output from a table row by row
-  cisAsciiTableInput_t TableInput = cisAsciiTableInput("inputC_table");
-  cisAsciiTableOutput_t TableOutput = cisAsciiTableOutput("outputC_table",
+  yggAsciiTableInput_t TableInput = yggAsciiTableInput("inputC_table");
+  yggAsciiTableOutput_t TableOutput = yggAsciiTableOutput("outputC_table",
 							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
-  cisAsciiArrayInput_t ArrayInput = cisAsciiArrayInput("inputC_array");
-  cisAsciiArrayOutput_t ArrayOutput = cisAsciiArrayOutput("outputC_array",
+  yggAsciiArrayInput_t ArrayInput = yggAsciiArrayInput("inputC_array");
+  yggAsciiArrayOutput_t ArrayOutput = yggAsciiArrayOutput("outputC_array",
 							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
 
   // Read lines from ASCII text file until end of file is reached.
@@ -32,11 +32,11 @@ int main(int argc,char *argv[]){
     line_size = LINE_SIZE_MAX; // Reset to size of buffer
 
     // Receive a single line
-    ret = cisRecvRealloc(FileInput, &line, &line_size);
+    ret = yggRecvRealloc(FileInput, &line, &line_size);
     if (ret >= 0) {
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
-      ret = cisSend(FileOutput, line, line_size);
+      ret = yggSend(FileOutput, line, line_size);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING LINE\n");
 	error_code = -1;
@@ -63,14 +63,14 @@ int main(int argc,char *argv[]){
     name_siz = BSIZE; // Reset to size of the buffer
 
     // Receive a single row with values stored in scalars declared locally
-    ret = cisRecv(TableInput, &name, &name_siz, &number, &value, &comp);
+    ret = yggRecv(TableInput, &name, &name_siz, &number, &value, &comp);
 		      
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %.5s, %ld, %3.1f, %g%+gj\n",
 	     name, number, value, creal(comp), cimag(comp));
-      ret = cisSend(TableOutput, name, name_siz, number, value, comp);
+      ret = yggSend(TableOutput, name, name_siz, number, value, comp);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ROW\n");
 	error_code = -1;
@@ -94,7 +94,7 @@ int main(int argc,char *argv[]){
   double _Complex *comp_arr = NULL;
   ret = 0;
   while (ret >= 0) {
-    ret = cisRecv(ArrayInput, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);
+    ret = yggRecv(ArrayInput, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);
     if (ret >= 0) {
       printf("Array: (%lu rows)\n", nrows);
       // Print each line in the array
@@ -104,7 +104,7 @@ int main(int argc,char *argv[]){
 	       value_arr[i], creal(comp_arr[i]), cimag(comp_arr[i]));
       // Send the columns in the array to output. Formatting is handled on the
       // output driver side.
-      ret = cisSend(ArrayOutput, nrows, name_arr, number_arr, value_arr, comp_arr);
+      ret = yggSend(ArrayOutput, nrows, name_arr, number_arr, value_arr, comp_arr);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ARRAY\n");
 	error_code = -1;

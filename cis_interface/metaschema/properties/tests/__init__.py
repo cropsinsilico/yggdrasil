@@ -1,6 +1,7 @@
-import nose.tools as nt
-from cis_interface.metaschema import properties, get_metaschema, _base_validator
-from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
+from yggdrasil.tests import (
+    assert_raises, assert_equal, assert_not_equal)
+from yggdrasil.metaschema import properties, get_metaschema, _base_validator
+from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
 existing = properties.get_registered_properties()
@@ -23,11 +24,11 @@ def test_register_metaschema_property():
     # Error when property class already registered
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),
              {'name': existing_class})
-    nt.assert_raises(ValueError, properties.register_metaschema_property, x)
+    assert_raises(ValueError, properties.register_metaschema_property, x)
     # Error when replacement class has schema
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),
              {'name': existing_validator, 'schema': {}})
-    nt.assert_raises(ValueError, properties.register_metaschema_property, x)
+    assert_raises(ValueError, properties.register_metaschema_property, x)
     # Error when validate set
 
     def fake_validate(*args, **kwargs):
@@ -35,15 +36,15 @@ def test_register_metaschema_property():
 
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),
              {'name': existing_validator, '_validate': fake_validate})
-    nt.assert_raises(ValueError, properties.register_metaschema_property, x)
+    assert_raises(ValueError, properties.register_metaschema_property, x)
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),
              {'name': existing_validator, 'schema': {}})
-    nt.assert_raises(ValueError, properties.register_metaschema_property, x)
+    assert_raises(ValueError, properties.register_metaschema_property, x)
     # Error when property not in existing metaschema
     get_metaschema()  # ensures it has been initialized
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),
              {'name': non_existant})
-    nt.assert_raises(ValueError, properties.register_metaschema_property, x)
+    assert_raises(ValueError, properties.register_metaschema_property, x)
 
 
 def test_get_registered_properties():
@@ -53,7 +54,7 @@ def test_get_registered_properties():
 
 def test_get_metaschema_property():
     r"""Test get_metaschema_property."""
-    nt.assert_equal(properties.get_metaschema_property(non_existant),
-                    MetaschemaProperty)
-    nt.assert_not_equal(properties.get_metaschema_property(existing_class),
-                        MetaschemaProperty)
+    assert_equal(properties.get_metaschema_property(non_existant),
+                 MetaschemaProperty)
+    assert_not_equal(properties.get_metaschema_property(existing_class),
+                     MetaschemaProperty)

@@ -37,10 +37,10 @@ public:
     case T_SCALAR:
       // Subtype
       if (not (type_doc.HasMember("subtype"))) {
-	cislog_throw_error("ScalarMetaschemaType: %s type must include 'subtype'.", type());
+	ygglog_throw_error("ScalarMetaschemaType: %s type must include 'subtype'.", type());
       }
       if (not (type_doc["subtype"].IsString())) {
-	cislog_throw_error("ScalarMetaschemaType: 'subtype' value must be a string.");
+	ygglog_throw_error("ScalarMetaschemaType: 'subtype' value must be a string.");
       }
       update_subtype(type_doc["subtype"].GetString());
       break;
@@ -50,15 +50,15 @@ public:
     }
     // Precision
     if (not (type_doc.HasMember("precision")))
-      cislog_throw_error("ScalarMetaschemaType: Precision missing.");
+      ygglog_throw_error("ScalarMetaschemaType: Precision missing.");
     if (not (type_doc["precision"].IsInt()))
-      cislog_throw_error("ScalarMetaschemaType: Precision must be integer.");
+      ygglog_throw_error("ScalarMetaschemaType: Precision must be integer.");
     size_t *precision_modifier = const_cast<size_t*>(&precision_);
     *precision_modifier = (size_t)(type_doc["precision"].GetInt());
     // Units
     if (type_doc.HasMember("units")) {
       if (not type_doc["units"].IsString())
-	cislog_throw_error("ScalarMetaschemaType: Units must be a string.");
+	ygglog_throw_error("ScalarMetaschemaType: Units must be a string.");
       update_units(type_doc["units"].GetString());
     } else {
       update_units("");
@@ -85,7 +85,7 @@ public:
     std::map<const char*, int, strcomp> type_map = get_type_map();
     std::map<const char*, int, strcomp>::iterator it = type_map.find(subtype_);
     if (it == type_map.end()) {
-      cislog_throw_error("ScalarMetaschemaType: Unsupported subtype '%s'.", subtype_);
+      ygglog_throw_error("ScalarMetaschemaType: Unsupported subtype '%s'.", subtype_);
     }
     return it->second;
   }
@@ -117,7 +117,7 @@ public:
   }
   void set_precision(const size_t new_precision) {
     if ((strcmp(subtype_, "bytes") != 0) and (strcmp(subtype_, "unicode") != 0)) {
-      cislog_throw_error("ScalarMetaschemaType::set_precision: Variable precision only allowed for bytes and unicode, not '%s'.", subtype_);
+      ygglog_throw_error("ScalarMetaschemaType::set_precision: Variable precision only allowed for bytes and unicode, not '%s'.", subtype_);
     }
     size_t *precision_modifier = const_cast<size_t*>(&precision_);
     *precision_modifier = new_precision;
@@ -157,7 +157,7 @@ public:
     unsigned char* arg = (unsigned char*)malloc(bytes_precision + 1);
     if ((strcmp(type(), "1darray") == 0) or (strcmp(type(), "ndarray") == 0)) {
       if (nelements() == 0) {
-	cislog_error("ScalarMetaschemaType::encode_data: Array types require the number of elements be non-zero.");
+	ygglog_error("ScalarMetaschemaType::encode_data: Array types require the number of elements be non-zero.");
 	return false;
       }
       switch (subtype_code_) {
@@ -169,7 +169,7 @@ public:
       }
     } else {
       if (arg == NULL) {
-	cislog_error("ScalarMetaschemaType::encode_data: Failed to malloc for %lu bytes.",
+	ygglog_error("ScalarMetaschemaType::encode_data: Failed to malloc for %lu bytes.",
 		     bytes_precision + 1);
 	return false;
       }
@@ -197,7 +197,7 @@ public:
 	  break;
 	}
 	default: {
-	  cislog_error("ScalarMetaschemaType::encode_data: Unsupported integer precision '%lu'.",
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported integer precision '%lu'.",
 		       precision_);
 	  return false;
 	}
@@ -227,7 +227,7 @@ public:
 	  break;
 	}
 	default: {
-	  cislog_error("ScalarMetaschemaType::encode_data: Unsupported unsigned integer precision '%lu'.",
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported unsigned integer precision '%lu'.",
 		       precision_);
 	  return false;
 	}
@@ -245,7 +245,7 @@ public:
 	  long double arg0 = va_arg(ap.va, long double);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
-	  cislog_error("ScalarMetaschemaType::encode_data: Unsupported float precision '%lu'.",
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported float precision '%lu'.",
 		       precision_);
 	  return false;
 	}
@@ -262,7 +262,7 @@ public:
 	  long double _Complex arg0 = va_arg(ap.va, long double _Complex);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
-	  cislog_error("ScalarMetaschemaType::encode_data: Unsupported complex precision '%lu'.",
+	  ygglog_error("ScalarMetaschemaType::encode_data: Unsupported complex precision '%lu'.",
 		       precision_);
 	  return false;
 	}
@@ -278,7 +278,7 @@ public:
 	int ret = copy_to_buffer(arg0, arg0_siz, (char**)(&arg), arg_siz,
 				 allow_realloc);
 	if (ret < 0) {
-	  cislog_error("ScalarMetaschemaType::encode_data: Failed to copy bytes/unicode variable to buffer.");
+	  ygglog_error("ScalarMetaschemaType::encode_data: Failed to copy bytes/unicode variable to buffer.");
 	  free(arg);
 	  return false;
 	} else if ((arg0_siz > bytes_precision) && (_variable_precision)) {
@@ -289,7 +289,7 @@ public:
 	break;
       }
       default: {
-	cislog_error("ScalarMetaschemaType::encode_data: Unsupported subtype '%s'.",
+	ygglog_error("ScalarMetaschemaType::encode_data: Unsupported subtype '%s'.",
 		     subtype_);
 	return false;
       }
@@ -308,7 +308,7 @@ public:
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
     if (not data.IsString()) {
-      cislog_error("ScalarMetaschemaType::decode_data: Raw data is not a string.");
+      ygglog_error("ScalarMetaschemaType::decode_data: Raw data is not a string.");
       return false;
     }
     unsigned char* encoded_bytes = (unsigned char*)data.GetString();
@@ -318,7 +318,7 @@ public:
 						 &decoded_len);
     size_t nbytes_expected = nbytes();
     if ((not _variable_precision) and (nbytes_expected != decoded_len)) {
-	cislog_error("ScalarMetaschemaType::decode_data: %lu bytes were expected, but %lu were decoded.",
+	ygglog_error("ScalarMetaschemaType::decode_data: %lu bytes were expected, but %lu were decoded.",
 		     nbytes_expected, decoded_len);
       return false;
     }
@@ -332,7 +332,7 @@ public:
       int ret = copy_to_buffer((char*)decoded_bytes, decoded_len, temp, temp_siz,
 			       allow_realloc0, skip_terminal);
       if (ret < 0) {
-	cislog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for array.");
+	ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for array.");
 	free(decoded_bytes);
 	if (*temp != NULL)
 	  free(*temp);
@@ -359,7 +359,7 @@ public:
 	int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 				 p, arg_siz[0], allow_realloc, skip_terminal);
 	if (ret < 0) {
-	  cislog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
+	  ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
 		       subtype());
 	  free(decoded_bytes);
 	  return false;
@@ -374,7 +374,7 @@ public:
 	int ret = copy_to_buffer((char*)decoded_bytes, decoded_len,
 				 p, *arg_siz, allow_realloc, skip_terminal);
 	if (ret < 0) {
-	  cislog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
+	  ygglog_error("ScalarMetaschemaType::decode_data: Failed to copy buffer for %s.",
 		       subtype());
 	  free(decoded_bytes);
 	  return false;
@@ -404,9 +404,9 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   OneDArrayMetaschemaType(const rapidjson::Value &type_doc) :
     ScalarMetaschemaType(type_doc) {
     if (not (type_doc.HasMember("length")))
-      cislog_throw_error("OneDArrayMetaschemaType: 1darray types must include 'length'.");
+      ygglog_throw_error("OneDArrayMetaschemaType: 1darray types must include 'length'.");
     if (not (type_doc["length"].IsInt()))
-      cislog_throw_error("OneDArrayMetaschemaType: 1darray 'length' value must be an int.");
+      ygglog_throw_error("OneDArrayMetaschemaType: 1darray 'length' value must be an int.");
     length_ = type_doc["length"].GetInt();
     update_type("1darray");
   }
@@ -449,14 +449,14 @@ public:
   NDArrayMetaschemaType(const rapidjson::Value &type_doc) :
     ScalarMetaschemaType(type_doc) {
     if (not (type_doc.HasMember("shape")))
-      cislog_throw_error("NDArrayMetaschemaType: ndarray types must include 'shape'.");
+      ygglog_throw_error("NDArrayMetaschemaType: ndarray types must include 'shape'.");
     if (not (type_doc["shape"].IsArray()))
-      cislog_throw_error("NDArrayMetaschemaType: ndarray 'shape' value must be an array.");
+      ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' value must be an array.");
     size_t ndim = type_doc["shape"].Size();
     size_t i;
     for (i = 0; i < ndim; i++) {
       if (not type_doc["shape"][i].IsInt())
-	cislog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be integers.");
+	ygglog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be integers.");
       shape_.push_back(type_doc["shape"][i].GetInt());
     }
     update_type("ndarray");

@@ -1,7 +1,7 @@
 import os
 import uuid
-from cis_interface.tests import CisTestClassInfo, assert_equal
-from cis_interface.communication import new_comm, get_comm, CommBase
+from yggdrasil.tests import CisTestClassInfo, assert_equal
+from yggdrasil.communication import new_comm, get_comm, CommBase
 
 
 def test_registry():
@@ -58,7 +58,7 @@ class TestCommBase(CisTestClassInfo):
     @property
     def mod(self):
         r"""str: Absolute module import."""
-        return 'cis_interface.communication.%s' % self.cls
+        return 'yggdrasil.communication.%s' % self.cls
 
     @property
     def is_installed(self):

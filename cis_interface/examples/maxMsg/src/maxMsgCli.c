@@ -1,4 +1,4 @@
-#include "CisInterface.h"
+#include "YggInterface.h"
 #include <stdio.h>
 
 
@@ -16,17 +16,17 @@ void rand_str(char *dest, size_t length) {
 
 int main(int argc, char *argv[]) {
 
-  //char output[CIS_MSG_BUF];
-  //char input[CIS_MSG_BUF];
-  size_t msg_size_output = CIS_MSG_BUF;
-  size_t msg_size_input = CIS_MSG_BUF;
+  //char output[YGG_MSG_BUF];
+  //char input[YGG_MSG_BUF];
+  size_t msg_size_output = YGG_MSG_BUF;
+  size_t msg_size_input = YGG_MSG_BUF;
   char *output = (char*)malloc(msg_size_output);
   char *input = (char*)malloc(msg_size_input);
 
   printf("maxMsgCli(C): Hello message size is %d.\n", (int)msg_size_output);
   
   // Create a max message, send/recv and verify
-  cisRpc_t rpc = cisRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s");
+  yggRpc_t rpc = yggRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s");
     
   // Create a max message
   rand_str(output, msg_size_output);

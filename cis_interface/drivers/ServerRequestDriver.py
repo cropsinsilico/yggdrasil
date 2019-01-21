@@ -1,6 +1,6 @@
-from cis_interface.drivers.ConnectionDriver import ConnectionDriver
-from cis_interface.drivers.ServerResponseDriver import ServerResponseDriver
-from cis_interface.drivers.ClientRequestDriver import CIS_CLIENT_INI
+from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
+from yggdrasil.drivers.ServerResponseDriver import ServerResponseDriver
+from yggdrasil.drivers.ClientRequestDriver import YGG_CLIENT_INI
 
 
 class ServerRequestDriver(ConnectionDriver):
@@ -138,7 +138,7 @@ class ServerRequestDriver(ConnectionDriver):
 
         """
         with self.lock:
-            if msg == CIS_CLIENT_INI:
+            if msg == YGG_CLIENT_INI:
                 self.debug("New client signed on.")
                 self.nclients += 1
                 msg = self.icomm.serializer.empty_msg

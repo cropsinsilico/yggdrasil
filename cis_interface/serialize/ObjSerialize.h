@@ -1,5 +1,5 @@
-#ifndef CISOBJSERIALIZE_H_
-#define CISOBJSERIALIZE_H_
+#ifndef YGGOBJSERIALIZE_H_
+#define YGGOBJSERIALIZE_H_
 
 #include <../tools.h>
 
@@ -151,7 +151,7 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   // Allocate vertices
   float **new_vert = (float**)malloc(p->nvert*sizeof(float*));
   if (new_vert == NULL) {
-    cislog_error("alloc_obj: Failed to allocate vertices.");
+    ygglog_error("alloc_obj: Failed to allocate vertices.");
     free_obj(p);
     return -1;
   }
@@ -159,18 +159,18 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nvert; i++) {
     float *ivert = (float*)malloc(3*sizeof(float));
     if (ivert == NULL) {
-      cislog_error("alloc_obj: Failed to allocate vertex %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate vertex %d.", i);
       free_obj(p);
       return -1;
     }
     p->vertices[i] = ivert;
   }
-  cislog_debug("alloc_obj: Allocated %d vertices.", nvert);
+  ygglog_debug("alloc_obj: Allocated %d vertices.", nvert);
   // Allocate vertex colors
   if (do_color) {
     int **new_vert_colors = (int**)malloc(p->nvert*sizeof(int*));
     if (new_vert_colors == NULL) {
-      cislog_error("alloc_obj: Failed to allocate vertex_colors.");
+      ygglog_error("alloc_obj: Failed to allocate vertex_colors.");
       free_obj(p);
       return -1;
     }
@@ -178,18 +178,18 @@ int alloc_obj(obj_t *p, int nvert, int nface,
     for (i = 0; i < p->nvert; i++) {
       int *ivert = (int*)malloc(3*sizeof(int));
       if (ivert == NULL) {
-	cislog_error("alloc_obj: Failed to allocate vertex color %d.", i);
+	ygglog_error("alloc_obj: Failed to allocate vertex color %d.", i);
 	free_obj(p);
 	return -1;
       }
       p->vertex_colors[i] = ivert;
     }
-    cislog_debug("alloc_obj: Allocated %d vertex colors.", nvert);
+    ygglog_debug("alloc_obj: Allocated %d vertex colors.", nvert);
   }
   // Allocate texcoords
   float **new_texc = (float**)malloc(p->ntexc*sizeof(float*));
   if (new_texc == NULL) {
-    cislog_error("alloc_obj: Failed to allocate texcoords.");
+    ygglog_error("alloc_obj: Failed to allocate texcoords.");
     free_obj(p);
     return -1;
   }
@@ -197,17 +197,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->ntexc; i++) {
     float *itexc = (float*)malloc(2*sizeof(float));
     if (itexc == NULL) {
-      cislog_error("alloc_obj: Failed to allocate texcoord %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate texcoord %d.", i);
       free_obj(p);
       return -1;
     }
     p->texcoords[i] = itexc;
   }
-  cislog_debug("alloc_obj: Allocated %d texcoords.", ntexc);
+  ygglog_debug("alloc_obj: Allocated %d texcoords.", ntexc);
   // Allocate normals
   float **new_norm = (float**)malloc(p->nnorm*sizeof(float*));
   if (new_norm == NULL) {
-    cislog_error("alloc_obj: Failed to allocate normals.");
+    ygglog_error("alloc_obj: Failed to allocate normals.");
     free_obj(p);
     return -1;
   }
@@ -215,17 +215,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nnorm; i++) {
     float *inorm = (float*)malloc(3*sizeof(float));
     if (inorm == NULL) {
-      cislog_error("alloc_obj: Failed to allocate normal %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate normal %d.", i);
       free_obj(p);
       return -1;
     }
     p->normals[i] = inorm;
   }
-  cislog_debug("alloc_obj: Allocated %d normals.", nnorm);
+  ygglog_debug("alloc_obj: Allocated %d normals.", nnorm);
   // Allocate faces
   int **new_face = (int**)malloc(p->nface*sizeof(int*));
   if (new_face == NULL) {
-    cislog_error("alloc_obj: Failed to allocate faces.");
+    ygglog_error("alloc_obj: Failed to allocate faces.");
     free_obj(p);
     return -1;
   }
@@ -233,17 +233,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nface; i++) {
     int *iface = (int*)malloc(3*sizeof(int));
     if (iface == NULL) {
-      cislog_error("alloc_obj: Failed to allocate face %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate face %d.", i);
       free_obj(p);
       return -1;
     }
     p->faces[i] = iface;
   }
-  cislog_debug("alloc_obj: Allocated %d faces.", nface);
+  ygglog_debug("alloc_obj: Allocated %d faces.", nface);
   // Allocate face texcoords
   int **new_ftexc = (int**)malloc(p->nface*sizeof(int*));
   if (new_ftexc == NULL) {
-    cislog_error("alloc_obj: Failed to allocate face texcoords.");
+    ygglog_error("alloc_obj: Failed to allocate face texcoords.");
     free_obj(p);
     return -1;
   }
@@ -251,17 +251,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nface; i++) {
     int *iftexc = (int*)malloc(3*sizeof(int));
     if (iftexc == NULL) {
-      cislog_error("alloc_obj: Failed to allocate texcoords for face %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate texcoords for face %d.", i);
       free_obj(p);
       return -1;
     }
     p->face_texcoords[i] = iftexc;
   }
-  cislog_debug("alloc_obj: Allocated %d face texcoords.", nface);
+  ygglog_debug("alloc_obj: Allocated %d face texcoords.", nface);
   // Allocate face normals
   int **new_fnorm = (int**)malloc(p->nface*sizeof(int*));
   if (new_fnorm == NULL) {
-    cislog_error("alloc_obj: Failed to allocate face normals.");
+    ygglog_error("alloc_obj: Failed to allocate face normals.");
     free_obj(p);
     return -1;
   }
@@ -269,15 +269,15 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nface; i++) {
     int *ifnorm = (int*)malloc(3*sizeof(int));
     if (ifnorm == NULL) {
-      cislog_error("alloc_obj: Failed to allocate normals for face %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate normals for face %d.", i);
       free_obj(p);
       return -1;
     }
     p->face_normals[i] = ifnorm;
   }
-  cislog_debug("alloc_obj: Allocated %d face normals.", nface);
+  ygglog_debug("alloc_obj: Allocated %d face normals.", nface);
   // Return
-  cislog_debug("alloc_obj: Allocated for %d vertices and %d faces.",
+  ygglog_debug("alloc_obj: Allocated for %d vertices and %d faces.",
 	       p->nvert, p->nface);
   return 0;
 };
@@ -308,14 +308,14 @@ int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
   args_used[0] = 1;
   buf[0] = '\0';
   // Format header
-  char header_format[500] = "# Author cis_auto\n"
-    "# Generated by cis_interface\n";
+  char header_format[500] = "# Author ygg_auto\n"
+    "# Generated by yggdrasil\n";
   if (strlen(p.material) != 0) {
     sprintf(header_format + strlen(header_format), "usemtl %s\n", p.material);
   }
   ilen = (int)strlen(header_format);
   if (ilen >= (buf_size - msg_len)) {
-    cislog_error("serialize_obj: Buffer (size = %d) is not large "
+    ygglog_error("serialize_obj: Buffer (size = %d) is not large "
 		 "enough to contain the header (size = %d).", buf_size, ilen);
     return msg_len + ilen;
   }
@@ -333,10 +333,10 @@ int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
 		      p.vertices[i][0], p.vertices[i][1], p.vertices[i][2]);
     }
     if (ilen < 0) {
-      cislog_error("serialize_obj: Error formatting vertex %d.", i);
+      ygglog_error("serialize_obj: Error formatting vertex %d.", i);
       return -1;
     } else if (ilen >= (buf_size - msg_len)) {
-      cislog_error("serialize_obj: Buffer (size = %d) is not large "
+      ygglog_error("serialize_obj: Buffer (size = %d) is not large "
 		   "enough to contain vertex %d (size = %d).",
 		   buf_size, i, ilen + msg_len);
       return msg_len + ilen;
@@ -348,10 +348,10 @@ int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
     ilen = snprintf(buf + msg_len, buf_size - msg_len, "vt %f %f\n",
 		    p.texcoords[i][0], p.texcoords[i][1]);
     if (ilen < 0) {
-      cislog_error("serialize_obj: Error formatting texcoord %d.", i);
+      ygglog_error("serialize_obj: Error formatting texcoord %d.", i);
       return -1;
     } else if (ilen >= (buf_size - msg_len)) {
-      cislog_error("serialize_obj: Buffer (size = %d) is not large "
+      ygglog_error("serialize_obj: Buffer (size = %d) is not large "
 		   "enough to contain texcoord %d (size = %d).",
 		   buf_size, i, ilen + msg_len);
       return msg_len + ilen;
@@ -363,10 +363,10 @@ int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
     ilen = snprintf(buf + msg_len, buf_size - msg_len, "vn %f %f %f\n",
 		    p.normals[i][0], p.normals[i][1], p.normals[i][2]);
     if (ilen < 0) {
-      cislog_error("serialize_obj: Error formatting normal %d.", i);
+      ygglog_error("serialize_obj: Error formatting normal %d.", i);
       return -1;
     } else if (ilen >= (buf_size - msg_len)) {
-      cislog_error("serialize_obj: Buffer (size = %d) is not large "
+      ygglog_error("serialize_obj: Buffer (size = %d) is not large "
 		   "enough to contain normal %d (size = %d).",
 		   buf_size, i, ilen + msg_len);
       return msg_len + ilen;
@@ -393,10 +393,10 @@ int serialize_obj(const seri_t s, char *buf, const size_t buf_size,
     }
     ilen = snprintf(buf + msg_len, buf_size - msg_len, "%s\n", iline);
     if (ilen < 0) {
-      cislog_error("serialize_obj: Error formatting line face %d.", i);
+      ygglog_error("serialize_obj: Error formatting line face %d.", i);
       return -1;
     } else if (ilen > (buf_size - msg_len)) {
-      cislog_error("serialize_obj: Buffer (size = %d) is not large "
+      ygglog_error("serialize_obj: Buffer (size = %d) is not large "
 		   "enough to contain line for face %d (size = %d).",
 		   buf_size, i, ilen + msg_len);
       return msg_len + ilen;
@@ -456,13 +456,13 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
   ntexc = count_matches(re_texc, buf);
   nnorm = count_matches(re_norm, buf);
   nmatl = count_matches(re_matl, buf);
-  cislog_debug("deserialize_obj: expecting %d verts, %d faces, %d texcoords, %d normals",
+  ygglog_debug("deserialize_obj: expecting %d verts, %d faces, %d texcoords, %d normals",
 	       nvert, nface, ntexc, nnorm);
   // Allocate
   if (out > 0) {
     int ret = alloc_obj(p, nvert, nface, ntexc, nnorm, do_colors);
     if (ret < 0) {
-      cislog_error("deserialize_obj: Error allocating obj structure.");
+      ygglog_error("deserialize_obj: Error allocating obj structure.");
       out = -1;
     }
   }
@@ -476,33 +476,33 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
     /* char ival[10]; */
     /* size_t ival_siz = 0; */
     while (cur_pos < buf_siz) {
-      cislog_debug("deserialize_obj: Starting position %d/%d",
+      ygglog_debug("deserialize_obj: Starting position %d/%d",
 		   cur_pos, buf_siz);
       int n_sub_matches = find_match("([^\n]*)\n", buf + cur_pos,
 				     &sind_line, &eind_line);
       if (n_sub_matches == 0) {
-	cislog_debug("deserialize_obj: End of file.");
+	ygglog_debug("deserialize_obj: End of file.");
 	sind_line = 0;
 	eind_line = buf_siz - cur_pos;
       }
       iline_siz = eind_line - sind_line;
       memcpy(iline, buf + cur_pos, iline_siz);
       iline[iline_siz] = '\0';
-      cislog_debug("deserialize_obj: iline = %s", iline);
+      ygglog_debug("deserialize_obj: iline = %s", iline);
       // Match line
       if (find_matches("#[^\n]*", iline, &sind, &eind) == 1) {
 	// Comment
-	cislog_debug("deserialize_obj: Comment");
+	ygglog_debug("deserialize_obj: Comment");
       } else if (find_matches(re_matl, iline, &sind, &eind) == n_re_matl) {
 	// Material
-	cislog_debug("deserialize_obj: Material");
+	ygglog_debug("deserialize_obj: Material");
 	int matl_size = (int)(eind[1] - sind[1]);
 	memcpy(p->material, iline+sind[1], matl_size);
 	p->material[matl_size] = '\0';
 	cmatl++;
       } else if (find_matches(re_vert, iline, &sind, &eind) == n_re_vert) {
 	// Vertex
-	cislog_debug("deserialize_obj: Vertex");
+	ygglog_debug("deserialize_obj: Vertex");
 	for (j = 0; j < 3; j++) {
 	  p->vertices[cvert][j] = (float)atof(iline + sind[j+1]);
 	}
@@ -514,14 +514,14 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
 	cvert++;
       } else if (find_matches(re_norm, iline, &sind, &eind) == n_re_norm) {
 	// Normals
-	cislog_debug("deserialize_obj: Normals");
+	ygglog_debug("deserialize_obj: Normals");
 	for (j = 0; j < 3; j++) {
 	  p->normals[cnorm][j] = (float)atof(iline + sind[j+1]);
 	}
 	cnorm++;
       } else if (find_matches(re_texc, iline, &sind, &eind) == n_re_texc) {
 	// Texcoords
-	cislog_debug("deserialize_obj: Texcoords");
+	ygglog_debug("deserialize_obj: Texcoords");
 	for (j = 0; j < 2; j++) {
 	  p->texcoords[ctexc][j] = (float)atof(iline + sind[j+1]);
 	}
@@ -530,7 +530,7 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
 	// Face
 	//int n_sub_matches2 = 
   find_matches(re_face, iline, &sind, &eind);
-	cislog_debug("deserialize_obj: Face");
+	ygglog_debug("deserialize_obj: Face");
 	for (j = 0; j < 3; j++) {
 	  p->faces[cface][j] = atoi(iline + sind[3*j+1]) - 1;
 	  if ((eind[3*j+2] - sind[3*j+2]) == 0)
@@ -545,37 +545,37 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
 	cface++;
       } else if (find_matches("\n+", iline, &sind, &eind) == 1) {
 	// Empty line
-	cislog_debug("deserialize_obj: Empty line");
+	ygglog_debug("deserialize_obj: Empty line");
       } else {
-	cislog_error("deserialize_obj: Could not match line: %s", iline);
+	ygglog_error("deserialize_obj: Could not match line: %s", iline);
 	out = -1;
 	break;
       }
       nlines++;
       cur_pos = cur_pos + eind_line;
-      cislog_debug("deserialize_obj: Advancing to position %d/%d",
+      ygglog_debug("deserialize_obj: Advancing to position %d/%d",
 		   cur_pos, buf_siz);
     }
   }
   if (out > 0) {
     if (cvert != nvert) {
-      cislog_error("deserialize_obj: Found %d verts, expected %d.", cvert, nvert);
+      ygglog_error("deserialize_obj: Found %d verts, expected %d.", cvert, nvert);
       out = -1;
     }
     if (cface != nface) {
-      cislog_error("deserialize_obj: Found %d faces, expected %d.", cface, nface);
+      ygglog_error("deserialize_obj: Found %d faces, expected %d.", cface, nface);
       out = -1;
     }
     if (ctexc != ntexc) {
-      cislog_error("deserialize_obj: Found %d texcs, expected %d.", ctexc, ntexc);
+      ygglog_error("deserialize_obj: Found %d texcs, expected %d.", ctexc, ntexc);
       out = -1;
     }
     if (cnorm != nnorm) {
-      cislog_error("deserialize_obj: Found %d norms, expected %d.", cnorm, nnorm);
+      ygglog_error("deserialize_obj: Found %d norms, expected %d.", cnorm, nnorm);
       out = -1;
     }
     if (cmatl != nmatl) {
-      cislog_error("deserialize_obj: Found %d materials, expected %d.", cmatl, nmatl);
+      ygglog_error("deserialize_obj: Found %d materials, expected %d.", cmatl, nmatl);
       out = -1;
     }
   }
@@ -592,4 +592,4 @@ int deserialize_obj(const seri_t s, const char *buf, const size_t buf_siz,
 }
 #endif
 
-#endif /*CISOBJSERIALIZE_H_*/
+#endif /*YGGOBJSERIALIZE_H_*/

@@ -1,12 +1,12 @@
 import json
-from cis_interface.metaschema.datatypes import get_registered_types
+from yggdrasil.metaschema.datatypes import get_registered_types
 
 
 _json_encoder = None
 
 
 class JSONEncoder(json.JSONEncoder):
-    r"""Encoder class for CiS messages."""
+    r"""Encoder class for Ygg messages."""
 
     def default(self, o):
         r"""Encoder that allows for expansion types."""
@@ -18,7 +18,7 @@ class JSONEncoder(json.JSONEncoder):
 
 
 class JSONReadableEncoder(json.JSONEncoder):
-    r"""Encoder class for CiS messages."""
+    r"""Encoder class for Ygg messages."""
 
     def default(self, o):
         r"""Encoder that allows for expansion types."""
@@ -30,7 +30,7 @@ class JSONReadableEncoder(json.JSONEncoder):
 
 
 # class JSONDecoder(json.JSONDecoder):
-#     r"""Decoder class for CiS messages."""
+#     r"""Decoder class for Ygg messages."""
 #
 #     def raw_decode(self, s, idx=0):
 #         r"""Decoder that further decodes objects."""

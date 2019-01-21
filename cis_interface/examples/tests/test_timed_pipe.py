@@ -1,7 +1,7 @@
 import os
 import unittest
-from cis_interface import tools
-from cis_interface.examples.tests import TestExample
+from yggdrasil import tools
+from yggdrasil.examples.tests import TestExample
 
 
 class ExampleTimedPipeTestBase(TestExample):

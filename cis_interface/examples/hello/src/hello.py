@@ -1,15 +1,15 @@
 from __future__ import print_function
-from cis_interface.interface.CisInterface import CisInput, CisOutput
+from yggdrasil.interface.YggInterface import YggInput, YggOutput
 
 
 def runhello():
     print('Hello from Python')
 
     # Ins/outs matching with the the model yaml
-    inf = CisInput('inFile')
-    outf = CisOutput('outFile')
-    inq = CisInput('helloQueueIn')
-    outq = CisOutput('helloQueueOut')
+    inf = YggInput('inFile')
+    outf = YggOutput('outFile')
+    inq = YggInput('helloQueueIn')
+    outq = YggOutput('helloQueueOut')
     print("hello(P): Created I/O channels")
 
     # Receive input from a local file

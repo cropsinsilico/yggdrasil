@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="rpcFib"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="rpcFib"
 export FIB_ITERATIONS="3"
 export FIB_SERVER_SLEEP_SECONDS="0.01"
 
@@ -59,7 +59,7 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml1 $yaml2 $yaml3
+yggrun $yaml1 $yaml2 $yaml3
 
 outfile="${TMPDIR}fibCli.txt"
 cat $outfile

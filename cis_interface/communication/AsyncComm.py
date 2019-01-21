@@ -1,6 +1,6 @@
 import uuid
 import threading
-from cis_interface.communication import CommBase
+from yggdrasil.communication import CommBase
 
 
 class AsyncTryAgain(Exception):
@@ -56,7 +56,7 @@ class AsyncComm(CommBase.CommBase):
 
     @property
     def backlog_thread(self):
-        r"""tools.CisThread: Thread that will handle sinding or receiving
+        r"""tools.YggThread: Thread that will handle sinding or receiving
         backlogged messages."""
         if self._backlog_thread is None:
             if self.direction == 'send':

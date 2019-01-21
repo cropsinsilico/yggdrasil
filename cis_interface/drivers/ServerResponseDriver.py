@@ -1,5 +1,5 @@
 import uuid
-from cis_interface.drivers.ConnectionDriver import ConnectionDriver
+from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 
 
 class ServerResponseDriver(ConnectionDriver):

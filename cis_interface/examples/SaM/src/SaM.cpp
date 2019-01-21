@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 
 #define BSIZE 1000
 
@@ -12,9 +12,9 @@ int main() {
     char outbuf[BSIZE];
 
     // Get input and output channels matching yaml
-    CisInput in1("input1_cpp");
-    CisInput in2("static_cpp");
-    CisOutput out1("output_cpp");
+    YggInput in1("input1_cpp");
+    YggInput in2("static_cpp");
+    YggOutput out1("output_cpp");
     printf("SaM(CPP): Set up I/O channels\n");
 
     // Get input from input1 channel

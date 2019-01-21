@@ -1,13 +1,13 @@
 #include <iostream>
 // Include methods for input/output channels
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 
 #define MYBUFSIZ 1000
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  CisInput in_channel("input");
-  CisOutput out_channel("output");
+  YggInput in_channel("input");
+  YggOutput out_channel("output");
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;

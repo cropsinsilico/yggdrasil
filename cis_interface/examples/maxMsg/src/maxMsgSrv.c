@@ -1,19 +1,19 @@
-#include "CisInterface.h"
+#include "YggInterface.h"
 #include <stdio.h>
 
 
 int main(int argc, char *argv[]) {  
 
     printf("maxMsgSrv(C): Hello!\n");
-    cisRpc_t rpc = cisRpcServer("maxMsgSrv", "%s", "%s");
-    size_t input_size = CIS_MSG_BUF;
+    yggRpc_t rpc = yggRpcServer("maxMsgSrv", "%s", "%s");
+    size_t input_size = YGG_MSG_BUF;
     char *input = (char*)malloc(input_size);
-    //char input[CIS_MSG_BUF];
+    //char input[YGG_MSG_BUF];
 
     while (1) {
       // Reset to size of buffer if not all utilized
-      if (input_size < CIS_MSG_BUF)
-	input_size = CIS_MSG_BUF;
+      if (input_size < YGG_MSG_BUF)
+	input_size = YGG_MSG_BUF;
       
       int ret = rpcRecvRealloc(rpc, &input, &input_size);
       if (ret < 0)

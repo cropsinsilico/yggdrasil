@@ -1,4 +1,4 @@
-from cis_interface.examples.tests import TestExample
+from yggdrasil.examples.tests import TestExample
 
 
 class TestExampleGS2(TestExample):

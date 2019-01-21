@@ -6,7 +6,7 @@ function timed_pipe_src(msg_count, msg_size)
           msg_count, msg_size);
 
   % Ins/outs matching with the the model yaml
-  outq = CisInterface('CisOutput', 'output_pipe');
+  outq = YggInterface('YggOutput', 'output_pipe');
   disp('pipe_src(M): Created I/O channels');
 
   % Send test message multiple times

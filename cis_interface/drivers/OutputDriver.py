@@ -1,5 +1,5 @@
-from cis_interface.drivers.ConnectionDriver import ConnectionDriver
-from cis_interface.schema import register_component
+from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
+from yggdrasil.schema import register_component
 
 
 @register_component

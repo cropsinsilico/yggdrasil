@@ -1,6 +1,6 @@
 % Initialize input/output channels 
-in_channel = CisInterface('CisAsciiArrayInput', 'inputA');
-out_channel = CisInterface('CisAsciiArrayOutput', 'outputA', '%6s\t%d\t%f\n');
+in_channel = YggInterface('YggAsciiArrayInput', 'inputA');
+out_channel = YggInterface('YggAsciiArrayOutput', 'outputA', '%6s\t%d\t%f\n');
 
 flag = true;
 

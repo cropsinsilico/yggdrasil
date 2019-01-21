@@ -1,8 +1,7 @@
 import os
 import copy
-import nose.tools as nt
-from cis_interface import tools, timing, backwards, platform
-from cis_interface.tests import CisTestClass
+from yggdrasil import tools, timing, backwards, platform
+from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
 
 
 _test_size = 1
@@ -46,13 +45,13 @@ def test_platform_error():
     else:
         test_platform = 'MacOS'
     x = timing.TimedRun(_test_lang, _test_lang, platform=test_platform)
-    nt.assert_raises(RuntimeError, x.can_run, raise_error=True)
+    assert_raises(RuntimeError, x.can_run, raise_error=True)
 
 
-class TimedRunTestBase(CisTestClass):
+class TimedRunTestBase(YggTestClass):
     r"""Base test class for the TimedRun class."""
 
-    _mod = 'cis_interface.timing'
+    _mod = 'yggdrasil.timing'
     _cls = 'TimedRun'
     test_name = 'timed_pipe'
     _filename = None
@@ -134,15 +133,15 @@ class TestTimedRun(TimedRunTestBase):
         x = self.instance.load(as_json=True)
         self.instance.save(x, overwrite=True)
         new_text = self.get_raw_data()
-        nt.assert_equal(new_text, old_text)
+        assert_equal(new_text, old_text)
 
     def test_save(self):
         r"""Test save with/without overwrite."""
         old_text = self.get_raw_data()
-        nt.assert_raises(RuntimeError, self.instance.save, self.instance.data)
+        assert_raises(RuntimeError, self.instance.save, self.instance.data)
         self.instance.save(self.instance.data, overwrite=True)
         new_text = self.get_raw_data()
-        nt.assert_equal(new_text, old_text)
+        assert_equal(new_text, old_text)
 
     def test_scaling_count(self):
         r"""Test running scaling with number of messages."""
@@ -151,8 +150,8 @@ class TestTimedRun(TimedRunTestBase):
         self.instance.scaling_count(self.size, scaling='log', **kwargs)
         self.instance.scaling_count(self.size, scaling='linear',
                                     per_message=True, **kwargs)
-        nt.assert_raises(ValueError, self.instance.scaling_count, self.size,
-                         scaling='invalid')
+        assert_raises(ValueError, self.instance.scaling_count, self.size,
+                      scaling='invalid')
 
     def test_scaling_size(self):
         r"""Test running scaling with size of messages."""
@@ -161,8 +160,8 @@ class TestTimedRun(TimedRunTestBase):
         self.instance.scaling_size(self.count, scaling='log', **kwargs)
         self.instance.scaling_size(self.count, scaling='linear',
                                    per_message=True, **kwargs)
-        nt.assert_raises(ValueError, self.instance.scaling_size, self.count,
-                         scaling='invalid')
+        assert_raises(ValueError, self.instance.scaling_size, self.count,
+                      scaling='invalid')
 
     def test_plot_scaling_joint(self):
         r"""Test plot_scaling_joint."""
@@ -194,13 +193,13 @@ class TestTimedRun(TimedRunTestBase):
             kwargs['time_method'] = 'bestof'
             kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
         # Errors
-        nt.assert_raises(RuntimeError, self.instance.plot_scaling,
-                         [self.size], [self.count])
-        nt.assert_raises(RuntimeError, self.instance.plot_scaling,
-                         self.size, self.count)
-        nt.assert_raises(ValueError, self.instance.plot_scaling,
-                         [self.size], self.count, nrep=self.nrep,
-                         time_method='invalid')
+        assert_raises(RuntimeError, self.instance.plot_scaling,
+                      [self.size], [self.count])
+        assert_raises(RuntimeError, self.instance.plot_scaling,
+                      self.size, self.count)
+        assert_raises(ValueError, self.instance.plot_scaling,
+                      [self.size], self.count, nrep=self.nrep,
+                      time_method='invalid')
 
     def test_perfjson_to_pandas(self):
         r"""Test perfjson_to_pandas."""
@@ -228,9 +227,9 @@ class TestTimedRun(TimedRunTestBase):
                 ikws['compare_values'] = [self.language]
             timing.plot_scalings(**ikws)
         # Errors
-        nt.assert_raises(ValueError, timing.plot_scalings, compare='invalid')
-        nt.assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
-                         comm_type='ZMQComm')
+        assert_raises(ValueError, timing.plot_scalings, compare='invalid')
+        assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
+                      comm_type='ZMQComm')
 
     def test_production_runs(self):
         r"""Test production tests (those used in paper)."""

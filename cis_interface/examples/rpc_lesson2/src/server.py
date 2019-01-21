@@ -1,5 +1,5 @@
 import numpy as np
-from cis_interface.interface.CisInterface import CisRpcServer
+from yggdrasil.interface.YggInterface import YggRpcServer
 
 
 def get_fibonacci(n):
@@ -31,7 +31,7 @@ def main():
     print('Hello from Python server!')
 
     # Create server-side rpc conneciton using model name
-    rpc = CisRpcServer("server", "%d", "%d")
+    rpc = YggRpcServer("server", "%d", "%d")
 
     # Continue receiving requests until the connection is closed when all
     # clients have disconnected.

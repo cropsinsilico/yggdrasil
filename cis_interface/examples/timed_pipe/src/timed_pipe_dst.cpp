@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 
 int main() {
   int ret = 0;
@@ -9,8 +9,8 @@ int main() {
   printf("Hello from C++ pipe_dst\n");
 
   // Ins/outs matching with the the model yaml
-  CisInput inq("input_pipe");
-  CisOutput outf("output_file");
+  YggInput inq("input_pipe");
+  YggOutput outf("output_file");
   printf("pipe_dst(CPP): Created I/O channels\n");
 
   // Continue receiving input from the queue

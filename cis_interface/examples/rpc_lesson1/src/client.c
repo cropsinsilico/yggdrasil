@@ -1,4 +1,4 @@
-#include "CisInterface.h"
+#include "YggInterface.h"
 #include <stdio.h>
 
 
@@ -10,13 +10,13 @@ int main(int argc, char *argv[]) {
   
   // Set up connections matching yaml
   // RPC client-side connection will be $(server_name)_$(client_name)
-  cisRpc_t rpc = cisRpcClient("server_client", "%d", "%d");
-  cisOutput_t log = cisOutputFmt("output_log", "fib(%-2d) = %-2d\n");
+  yggRpc_t rpc = yggRpcClient("server_client", "%d", "%d");
+  yggOutput_t log = yggOutputFmt("output_log", "fib(%-2d) = %-2d\n");
 
   // Initialize variables
   int ret = 0;
   int fib = -1;
-  char *logmsg = (char*)malloc(CIS_MSG_MAX*sizeof(char));
+  char *logmsg = (char*)malloc(YGG_MSG_MAX*sizeof(char));
   int i;
 
   // Iterate over Fibonacci sequence
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     printf("client(C): Response fib(%d) = %d\n", i, fib);
 
     // Log result by sending it to the log connection
-    ret = cisSend(log, i, fib);
+    ret = yggSend(log, i, fib);
     if (ret < 0) {
       printf("client(C): SEND ERROR\n");
       exit_code = -1;

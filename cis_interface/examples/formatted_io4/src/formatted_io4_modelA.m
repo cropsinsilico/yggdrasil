@@ -1,6 +1,6 @@
 % Initialize input/output channels 
-in_channel = CisInterface('CisPandasInput', 'inputA');
-out_channel = CisInterface('CisPandasOutput', 'outputA');
+in_channel = YggInterface('YggPandasInput', 'inputA');
+out_channel = YggInterface('YggPandasOutput', 'outputA');
 
 flag = true;
 

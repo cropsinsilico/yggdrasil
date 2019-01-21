@@ -1,4 +1,4 @@
-from cis_interface.drivers.ServerDriver import ServerDriver
+from yggdrasil.drivers.ServerDriver import ServerDriver
 
 
 class RMQAsyncServerDriver(ServerDriver):

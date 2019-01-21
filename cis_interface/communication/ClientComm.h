@@ -1,6 +1,6 @@
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISCLIENTCOMM_H_
-#define CISCLIENTCOMM_H_
+#ifndef YGGCLIENTCOMM_H_
+#define YGGCLIENTCOMM_H_
 
 #include <../tools.h>
 #include <CommBase.h>
@@ -50,7 +50,7 @@ int init_client_comm(comm_t *comm) {
   // Called to initialize/create client comm
   void *seri_out = (void*)get_format_type(comm->direction, 0);
   if (seri_out == NULL) {
-    cislog_error("init_client_comm: Failed to create output serializer.");
+    ygglog_error("init_client_comm: Failed to create output serializer.");
     return -1;
   }
   comm_t *handle;
@@ -66,7 +66,7 @@ int init_client_comm(comm_t *comm) {
   // Keep track of response comms
   int *ncomm = (int*)malloc(sizeof(int));
   if (ncomm == NULL) {
-    cislog_error("init_client_comm: Failed to malloc ncomm.");
+    ygglog_error("init_client_comm: Failed to malloc ncomm.");
     return -1;
   }
   ncomm[0] = 0;
@@ -75,7 +75,7 @@ int init_client_comm(comm_t *comm) {
   comm->always_send_header = 1;
   comm_t ***info = (comm_t***)malloc(sizeof(comm_t**));
   if (info == NULL) {
-    cislog_error("init_client_comm: Failed to malloc info.");
+    ygglog_error("init_client_comm: Failed to malloc info.");
     return -1;
   }
   info[0] = NULL;
@@ -192,7 +192,7 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   comm_t ***res_comm = (comm_t***)(x.info);
   res_comm[0] = (comm_t**)realloc(res_comm[0], sizeof(comm_t*)*(ncomm + 1));
   if (res_comm[0] == NULL) {
-    cislog_error("client_response_header: Failed to realloc response comm.");
+    ygglog_error("client_response_header: Failed to realloc response comm.");
     head.valid = 0;
     return head;
   }
@@ -201,7 +201,7 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
-    cislog_error("client_response_header(%s): could not create response comm", x.name);
+    ygglog_error("client_response_header(%s): could not create response comm", x.name);
     head.valid = 0;
     return head;
   }
@@ -209,12 +209,12 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   res_comm[0][ncomm]->recv_eof[0] = 1;
   inc_client_response_count(x);
   ncomm = get_client_response_count(x);
-  cislog_debug("client_response_header(%s): Created response comm number %d",
+  ygglog_debug("client_response_header(%s): Created response comm number %d",
 	       x.name, ncomm);
   // Add address & request ID to header
   strcpy(head.response_address, res_comm[0][ncomm - 1]->address);
   sprintf(head.request_id, "%d", rand());
-  cislog_debug("client_response_header(%s): response_address = %s, request_id = %s",
+  ygglog_debug("client_response_header(%s): response_address = %s, request_id = %s",
 	       x.name, head.response_address, head.request_id);
   return head;
 };
@@ -229,9 +229,9 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
 static inline
 int client_comm_send(comm_t x, const char *data, const size_t len) {
   int ret;
-  cislog_debug("client_comm_send(%s): %d bytes", x.name, len);
+  ygglog_debug("client_comm_send(%s): %d bytes", x.name, len);
   if (x.handle == NULL) {
-    cislog_error("client_comm_send(%s): no request comm registered", x.name);
+    ygglog_error("client_comm_send(%s): no request comm registered", x.name);
     return -1;
   }
   comm_t *req_comm = (comm_t*)(x.handle);
@@ -255,20 +255,20 @@ int client_comm_send(comm_t x, const char *data, const size_t len) {
  */
 static inline
 int client_comm_recv(comm_t x, char **data, const size_t len, const int allow_realloc) {
-  cislog_debug("client_comm_recv(%s)", x.name);
+  ygglog_debug("client_comm_recv(%s)", x.name);
   if ((x.info == NULL) || (get_client_response_count(x) == 0)) {
-    cislog_error("client_comm_recv(%s): no response comm registered", x.name);
+    ygglog_error("client_comm_recv(%s): no response comm registered", x.name);
     return -1;
   }
   comm_t ***res_comm = (comm_t***)(x.info);
   int ret = default_comm_recv(res_comm[0][0][0], data, len, allow_realloc);
   if (ret < 0) {
-    cislog_error("client_comm_recv(%s): default_comm_recv returned %d",
+    ygglog_error("client_comm_recv(%s): default_comm_recv returned %d",
 		 x.name, ret);
     return ret;
   }
   // Close response comm and decrement count of response comms
-  cislog_debug("client_comm_recv(%s): default_comm_recv returned %d",
+  ygglog_debug("client_comm_recv(%s): default_comm_recv returned %d",
 	       x.name, ret);
   free_default_comm(res_comm[0][0]);
   free_comm_base(res_comm[0][0]);
@@ -284,4 +284,4 @@ int client_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
 }
 #endif
 
-#endif /*CISCLIENTCOMM_H_*/
+#endif /*YGGCLIENTCOMM_H_*/

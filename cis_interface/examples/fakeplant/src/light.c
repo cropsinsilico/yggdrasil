@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "CisInterface.h"
+#include "YggInterface.h"
 
 
 double calc_light_intensity(double ambient_light, 
@@ -20,13 +20,13 @@ double calc_light_intensity(double ambient_light,
 int main(int argc,char *argv[]) {
   int i, ret, return_code = 0;
 
-  cisInput_t AmbInput = cisAsciiTableInput("ambient_light");
-  cisInput_t StructInput = cisAsciiArrayInput("canopy_structure");
-  cisOutput_t LightOutput = cisAsciiTableOutput("light_intensity", "%lf\n");
+  yggInput_t AmbInput = yggAsciiTableInput("ambient_light");
+  yggInput_t StructInput = yggAsciiArrayInput("canopy_structure");
+  yggOutput_t LightOutput = yggAsciiTableOutput("light_intensity", "%lf\n");
 
   // Receive Ambient light
   double ambient_light;
-  ret = cisRecv(AmbInput, &ambient_light);
+  ret = yggRecv(AmbInput, &ambient_light);
   if (ret < 0) {
     printf("light: Error receiving ambient light.\n");
     return -1;
@@ -48,7 +48,7 @@ int main(int argc,char *argv[]) {
   double light_intensity = 0.0;
   ret = 0;
   while (1) {
-    ret = cisRecv(StructInput, &npatch,
+    ret = yggRecv(StructInput, &npatch,
 		  &x1[0], &x1[1], &x1[2],
 		  &x2[0], &x2[1], &x2[2],
 		  &x3[0], &x3[1], &x3[2]);
@@ -65,7 +65,7 @@ int main(int argc,char *argv[]) {
 	     x1[0][i], x1[1][i], x1[2][i], light_intensity,
 	     x2[0][i], x2[1][i], x2[2][i],
 	     x3[0][i], x3[1][i], x3[2][i]);
-      ret = cisSend(LightOutput, light_intensity);
+      ret = yggSend(LightOutput, light_intensity);
       if (ret < 0) {
 	printf("light: Error sending light intensity output.\n");
 	return_code = -1;

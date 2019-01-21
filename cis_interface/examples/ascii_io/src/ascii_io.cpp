@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <complex>
 // Include interface methods
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 
 #define BSIZE 8192 // the max
 
@@ -12,15 +12,15 @@ int main(int argc,char *argv[]){
   int error_code = 0;
 
   // Input & output to an ASCII file line by line
-  CisAsciiFileInput FileInput("inputCPP_file");
-  CisAsciiFileOutput FileOutput("outputCPP_file");
+  YggAsciiFileInput FileInput("inputCPP_file");
+  YggAsciiFileOutput FileOutput("outputCPP_file");
   // Input & output from a table row by row
-  CisAsciiTableInput TableInput("inputCPP_table");
-  CisAsciiTableOutput TableOutput("outputCPP_table",
+  YggAsciiTableInput TableInput("inputCPP_table");
+  YggAsciiTableOutput TableOutput("outputCPP_table",
                                   "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
-  CisAsciiArrayInput ArrayInput("inputCPP_array");
-  CisAsciiArrayOutput ArrayOutput("outputCPP_array",
+  YggAsciiArrayInput ArrayInput("inputCPP_array");
+  YggAsciiArrayOutput ArrayOutput("outputCPP_array",
 				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
 
   // Read lines from ASCII text file until end of file is reached.
@@ -64,7 +64,7 @@ int main(int argc,char *argv[]){
     name_siz = BSIZE;  // Reset to buffer size
 
     // Receive a single row with values stored in scalars declared locally
-    //ret = cisRecv(TableInput.pi(), &name, &name_siz, &number, &value, &comp);
+    //ret = yggRecv(TableInput.pi(), &name, &name_siz, &number, &value, &comp);
     ret = TableInput.recv(5, &name, &name_siz, &number, &value, &comp);
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting

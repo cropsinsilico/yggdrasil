@@ -13,14 +13,14 @@ import itertools
 import numpy as np
 import pandas as pd
 import logging
-from cis_interface import tools, runner, examples, backwards, platform
-from cis_interface import platform as cis_platform
-from cis_interface.tests import CisTestBase
-from cis_interface.drivers import MatlabModelDriver
+from yggdrasil import tools, runner, examples, backwards, platform
+from yggdrasil import platform as ygg_platform
+from yggdrasil.tests import YggTestBase
+from yggdrasil.drivers import MatlabModelDriver
 import matplotlib as mpl
 if os.environ.get('DISPLAY', '') == '':  # pragma: debug
     mpl.use('Agg')
-elif cis_platform._is_mac:
+elif ygg_platform._is_mac:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
 _linewidth = 2
@@ -79,7 +79,7 @@ def write_perf_script(script_file, nmsg, msg_size,
         # 'for k, v in os.environ.items():',
         # '    print("\'%s\': %s" % (k, v))',
         #
-        'from cis_interface import timing',
+        'from yggdrasil import timing',
         'nrep = %d' % nrep,
         'nmsg = %d' % nmsg,
         'warmups = %d' % _perf_warmups,
@@ -155,7 +155,7 @@ def get_source(lang, direction, test_name='timed_pipe'):
     return out
 
 
-class TimedRun(CisTestBase, tools.CisClass):
+class TimedRun(YggTestBase, tools.YggClass):
     r"""Class to time sending messages from one language to another.
 
     Args:
@@ -204,7 +204,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         if comm_type is None:
             comm_type = tools.get_default_comm()
         if platform is None:
-            platform = cis_platform._platform
+            platform = ygg_platform._platform
         if python_ver is None:
             python_ver = backwards._python_version
         suffix = '%s_%s_py%s' % (test_name, platform, python_ver.replace('.', ''))
@@ -221,7 +221,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.python_ver = python_ver
         self.program_name = test_name
         name = '%s_%s_%s' % (test_name, lang_src, lang_dst)
-        tools.CisClass.__init__(self, name)
+        tools.YggClass.__init__(self, name)
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
         self.lang_src = lang_src
         self.lang_dst = lang_dst
@@ -249,7 +249,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             bool: True if the test can be run, False otherwise.
 
         """
-        out = ((self.platform.lower() == cis_platform._platform.lower())
+        out = ((self.platform.lower() == ygg_platform._platform.lower())
                and (self.python_ver == backwards._python_version)
                and (self.matlab_running == MatlabModelDriver.is_matlab_running())
                and (self.lang_src in _lang_list)
@@ -261,7 +261,7 @@ class TimedRun(CisTestBase, tools.CisClass):
                    '\tPython Version: %s' % self.python_ver,
                    '\tMatlab Running: %s' % self.matlab_running,
                    'Because one or more platform properties are incompatible:',
-                   '\tOperating System: %s' % cis_platform._platform,
+                   '\tOperating System: %s' % ygg_platform._platform,
                    '\tPython Version: %s' % backwards._python_version,
                    '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running()]
             raise RuntimeError('\n'.join(msg))
@@ -288,7 +288,7 @@ class TimedRun(CisTestBase, tools.CisClass):
     @property
     def max_msg_size(self):
         r"""int: Largest size of message that can be sent without being split."""
-        return tools.get_CIS_MSG_MAX(comm_type=self.comm_type)
+        return tools.get_YGG_MSG_MAX(comm_type=self.comm_type)
 
     @property
     def default_msg_size(self):
@@ -1150,7 +1150,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         default_vars = {'comm_type': tools.get_default_comm(),
                         'lang_src': 'python',
                         'lang_dst': 'python',
-                        'platform': cis_platform._platform,
+                        'platform': ygg_platform._platform,
                         'python_ver': backwards._python_version}
         default_vals = {'comm_type': _comm_list,
                         'language': _lang_list,

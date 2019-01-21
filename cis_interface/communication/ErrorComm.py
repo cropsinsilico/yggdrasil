@@ -1,5 +1,5 @@
-from cis_interface.tests import ErrorClass
-from cis_interface.communication import get_comm_class
+from yggdrasil.tests import ErrorClass
+from yggdrasil.communication import get_comm_class
 
 
 def ErrorComm(name, base_comm='CommBase', **kwargs):

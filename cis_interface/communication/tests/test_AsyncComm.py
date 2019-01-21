@@ -1,5 +1,5 @@
 import nose.tools as nt
-from cis_interface.communication.tests import test_CommBase
+from yggdrasil.communication.tests import test_CommBase
 
 
 class TestAsyncComm(test_CommBase.TestCommBase):

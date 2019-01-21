@@ -1,6 +1,6 @@
 import os
-from cis_interface.examples.tests import TestExample
-from cis_interface.drivers.MatlabModelDriver import _matlab_installed
+from yggdrasil.examples.tests import TestExample
+from yggdrasil.drivers.MatlabModelDriver import _matlab_installed
 
 
 class TestExampleSaM(TestExample):

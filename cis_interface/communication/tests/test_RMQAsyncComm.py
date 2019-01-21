@@ -1,8 +1,8 @@
 import unittest
-import nose.tools as nt
-from cis_interface.communication import new_comm
-from cis_interface.communication.RMQComm import _rmq_server_running
-from cis_interface.communication.tests import test_RMQComm as parent
+from yggdrasil.tests import assert_raises
+from yggdrasil.communication import new_comm
+from yggdrasil.communication.RMQComm import _rmq_server_running
+from yggdrasil.communication.tests import test_RMQComm as parent
 
     
 @unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
@@ -33,4 +33,4 @@ class TestRMQAsyncComm(parent.TestRMQComm):
 def test_not_running():
     r"""Test raise of an error if a RMQ server is not running."""
     comm_kwargs = dict(comm='RMQAsyncComm', direction='send', reverse_names=True)
-    nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
+    assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

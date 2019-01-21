@@ -1,7 +1,7 @@
 import jsonschema
 import copy
-from cis_interface.metaschema.datatypes import register_type, compare_schema
-from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
+from yggdrasil.metaschema.datatypes import register_type, compare_schema
+from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
 def create_fixed_type_class(name, description, base, fixed_properties,
@@ -198,7 +198,7 @@ class FixedMetaschemaType(MetaschemaType):
                 schema properties.
 
         Raises:
-            CisTypeError: If the object is not the correct type.
+            YggTypeError: If the object is not the correct type.
 
         Returns:
             dict: Encoded type definition.

@@ -2,8 +2,8 @@ import os
 import pprint
 import pystache
 import yaml
-from cis_interface import backwards
-from cis_interface.schema import standardize, get_schema
+from yggdrasil import backwards
+from yggdrasil.schema import standardize, get_schema
 
 
 def load_yaml(fname):

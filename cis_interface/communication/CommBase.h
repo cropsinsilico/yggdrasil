@@ -1,6 +1,6 @@
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISCOMMBASE_H_
-#define CISCOMMBASE_H_
+#ifndef YGGCOMMBASE_H_
+#define YGGCOMMBASE_H_
 
 #include <../tools.h>
 #include <../metaschema/datatypes/datatypes.h>
@@ -87,7 +87,7 @@ comm_t* new_comm_base(char *address, const char *direction,
 		      const comm_type t, void *seri_info) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
   if (ret == NULL) {
-    cislog_error("new_comm_base: Failed to malloc comm.");
+    ygglog_error("new_comm_base: Failed to malloc comm.");
     return ret;
   }
   ret[0] = empty_comm_base();
@@ -101,7 +101,7 @@ comm_t* new_comm_base(char *address, const char *direction,
     strcpy(ret->direction, direction);
   }
   ret->serializer = init_serializer("", seri_info);
-  ret->maxMsgSize = CIS_MSG_MAX;
+  ret->maxMsgSize = YGG_MSG_MAX;
   ret->last_send = (time_t*)malloc(sizeof(time_t));
   ret->last_send[0] = 0;
   ret->sent_eof = (int*)malloc(sizeof(int));
@@ -142,7 +142,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
   }
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
   if (ret == NULL) {
-    cislog_error("init_comm_base: Error in new_comm_base");
+    ygglog_error("init_comm_base: Error in new_comm_base");
     return ret;
   }
   if (name == NULL) {
@@ -150,11 +150,11 @@ comm_t* init_comm_base(const char *name, const char *direction,
   } else
     strcpy(ret->name, full_name);
   if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
-    cislog_error("init_comm_base: %s not registered as environment variable.\n",
+    ygglog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);
     ret->valid = 0;
   }
-  cislog_debug("init_comm_base(%s): Done", ret->name);
+  ygglog_debug("init_comm_base(%s): Done", ret->name);
   return ret;
 };
 
@@ -194,7 +194,7 @@ int free_comm_base(comm_t *x) {
 
 /*!
   @brief Send a message to the comm.
-  Send a message smaller than CIS_MSG_MAX bytes to an output comm. If the
+  Send a message smaller than YGG_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -210,9 +210,9 @@ int comm_base_send(const comm_t x, const char *data, const size_t len) {
   len;
 #endif
   // Make sure you arn't sending a message that is too big
-  if (len > CIS_MSG_MAX) {
-    cislog_error("comm_base_send(%s): message too large for single packet (CIS_MSG_MAX=%d, len=%d)",
-		 x.name, CIS_MSG_MAX, len);
+  if (len > YGG_MSG_MAX) {
+    ygglog_error("comm_base_send(%s): message too large for single packet (YGG_MSG_MAX=%d, len=%d)",
+		 x.name, YGG_MSG_MAX, len);
     return -1;
   }
   return 0;
@@ -223,4 +223,4 @@ int comm_base_send(const comm_t x, const char *data, const size_t len) {
 }
 #endif
   
-#endif /*CISCOMMBASE_H_*/
+#endif /*YGGCOMMBASE_H_*/

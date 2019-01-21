@@ -1,8 +1,8 @@
 import numpy as np
-from cis_interface import units, backwards, platform
-from cis_interface.metaschema.datatypes import MetaschemaTypeError
-from cis_interface.metaschema.properties import register_metaschema_property
-from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
+from yggdrasil import units, backwards, platform
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema.properties import register_metaschema_property
+from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 from collections import OrderedDict
 
 

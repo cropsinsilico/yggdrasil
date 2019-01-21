@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-from cis_interface import serialize
-from cis_interface.communication.AsciiTableComm import AsciiTableComm
-from cis_interface.schema import register_component
-from cis_interface.serialize.PandasSerialize import PandasSerialize
+from yggdrasil import serialize
+from yggdrasil.communication.AsciiTableComm import AsciiTableComm
+from yggdrasil.schema import register_component
+from yggdrasil.serialize.PandasSerialize import PandasSerialize
 
 
 def pandas_send_converter(obj):
