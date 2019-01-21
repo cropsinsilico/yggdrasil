@@ -2,27 +2,27 @@ include *.md
 include *.png
 include *.svg
 include *.txt
-recursive-include cis_interface *.cfg
-recursive-include cis_interface *.yml
-recursive-include cis_interface *.sh
-recursive-include cis_interface *.m
-recursive-include cis_interface *.c
-recursive-include cis_interface *.h
-recursive-include cis_interface *.cpp
-recursive-include cis_interface *.hpp
-recursive-include cis_interface *.lpy
-recursive-include cis_interface *.ply
-recursive-include cis_interface *.obj
-recursive-include cis_interface *.txt
-recursive-include cis_interface/examples *.py
-recursive-include cis_interface/tests/scripts *.py
-include cis_interface/drivers/matlab_screenrc
-include cis_interface/regex/CMakeLists.txt
-include cis_interface/tests/scripts/CMakeLists.txt
-include cis_interface/tests/scripts/Makefile_linux
-include cis_interface/tests/scripts/Makefile_windows
+recursive-include yggdrasil *.cfg
+recursive-include yggdrasil *.yml
+recursive-include yggdrasil *.sh
+recursive-include yggdrasil *.m
+recursive-include yggdrasil *.c
+recursive-include yggdrasil *.h
+recursive-include yggdrasil *.cpp
+recursive-include yggdrasil *.hpp
+recursive-include yggdrasil *.lpy
+recursive-include yggdrasil *.ply
+recursive-include yggdrasil *.obj
+recursive-include yggdrasil *.txt
+recursive-include yggdrasil/examples *.py
+recursive-include yggdrasil/tests/scripts *.py
+include yggdrasil/drivers/matlab_screenrc
+include yggdrasil/regex/CMakeLists.txt
+include yggdrasil/tests/scripts/CMakeLists.txt
+include yggdrasil/tests/scripts/Makefile_linux
+include yggdrasil/tests/scripts/Makefile_windows
 graft docs
 include versioneer.py
-include cis_interface/_version.py
+include yggdrasil/_version.py
 include install_matlab_engine.py
 include create_coveragerc.py

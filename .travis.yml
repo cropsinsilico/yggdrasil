@@ -28,7 +28,7 @@ matrix:
     - python: 3.6
       env: INSTALLZMQ=0 INSTALLRMQ=0
     - python: 3.6
-      env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1
+      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=1
     - python: 3.7
       dist: xenial
       sudo: true
@@ -160,16 +160,16 @@ install:
     pip install $NUMPY
     pip install $MATPLOTLIB
     pip install nose coverage coveralls codecov flake8
-    # Install cis_interface
+    # Install yggdrasil
     pip install -e .
 
 before_script:
   - |
-    flake8 cis_interface
+    flake8 yggdrasil
 
 script:
   - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx
+    nosetests --nologcapture --with-coverage --cover-package=yggdrasil -svx
 
 after_success:
   - coveralls
