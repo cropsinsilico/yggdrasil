@@ -831,8 +831,9 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         if dtype is not None:
             arr = arr.astype(dtype)
     else:
+        np_ver = tuple([float(x) for x in (np.__version__).split('.')])
         print('dtype', dtype)
-        if not backwards.PY2:  # pragma: Python 2
+        if (np_ver >= (1.0, 14.0, 0.0)):
             np_kws['encoding'] = 'bytes'
         arr = np.genfromtxt(fd, autostrip=True, dtype=None,
                             names=names, **np_kws)
