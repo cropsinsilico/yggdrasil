@@ -832,8 +832,10 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
             arr = arr.astype(dtype)
     else:
         print('dtype', dtype)
+        if not backwards.PY2:  # pragma: Python 2
+            np_kws['encoding'] = 'bytes'
         arr = np.genfromtxt(fd, autostrip=True, dtype=None,
-                            names=names, encoding='bytes', **np_kws)
+                            names=names, **np_kws)
         print('orig', arr.dtype)
         print('new', dtype)
         if dtype is not None:
