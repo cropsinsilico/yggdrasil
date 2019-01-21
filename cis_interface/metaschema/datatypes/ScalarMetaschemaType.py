@@ -142,8 +142,8 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         bytes = backwards.base64_decode(obj.encode('ascii'))
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
-        arr = np.frombuffer(bytes, dtype=dtype)
-        # arr = np.fromstring(bytes, dtype=dtype)
+        # arr = np.frombuffer(bytes, dtype=dtype)
+        arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
         out = cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)
