@@ -101,7 +101,8 @@ class ScalarMetaschemaType(MetaschemaType):
         arr = cls.to_array(obj)
         bytes = arr.tobytes()
         out = backwards.base64_encode(bytes).decode('ascii')
-        print('encode', arr, arr.dtype, bytes, out)
+        if len(out) < 100:
+            print('encode', arr, arr.dtype, bytes, out)
         return out
 
     @classmethod
