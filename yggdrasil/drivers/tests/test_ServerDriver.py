@@ -1,5 +1,5 @@
 import uuid
-from yggdrasill.tests import assert_raises, assert_equal
+from yggdrasil.tests import assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_ConnectionDriver as parent
 from yggdrasil import runner, tools
 
