@@ -20,19 +20,19 @@ communications protocols or translating models to the same programming
 language.
 
 Please refer to the package
-`documentation <https://cropsinsilico.github.io/cis_interface/>`__ for
+`documentation <https://cropsinsilico.github.io/yggdrasil/>`__ for
 additional information about the package and directions for installing
 it.
 
-.. |PyPI version| image:: https://badge.fury.io/py/cis_interface.svg
-   :target: https://badge.fury.io/py/cis_interface
-.. |Build Status| image:: https://travis-ci.org/cropsinsilico/cis_interface.svg?branch=master
-   :target: https://travis-ci.org/cropsinsilico/cis_interface
+.. |PyPI version| image:: https://badge.fury.io/py/yggdrasil.svg
+   :target: https://badge.fury.io/py/yggdrasil
+.. |Build Status| image:: https://travis-ci.org/cropsinsilico/yggdrasil.svg?branch=master
+   :target: https://travis-ci.org/cropsinsilico/yggdrasil
 .. |Build status| image:: https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/master?svg=true
    :target: https://ci.appveyor.com/project/langmm/cis-interface/branch/master
-.. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/cis_interface/badge.svg?branch=master
-   :target: https://coveralls.io/github/cropsinsilico/cis_interface?branch=master
-.. |codecov| image:: https://codecov.io/gh/cropsinsilico/cis_interface/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/cropsinsilico/cis_interface
+.. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
+   :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
+.. |codecov| image:: https://codecov.io/gh/cropsinsilico/yggdrasil/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/cropsinsilico/yggdrasil
 .. |PEP8| image:: https://img.shields.io/badge/code%20style-pep8-orange.svg
    :target: https://www.python.org/dev/peps/pep-0008/
