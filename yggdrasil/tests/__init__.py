@@ -100,7 +100,8 @@ def assert_equal(x, y):
         for ix, iy in zip(x, y):
             assert_equal(ix, iy)
     elif isinstance(y, dict):
-        nt.assert_equal(type(x), type(y))
+        assert(issubclass(y.__class__, dict))
+        # nt.assert_equal(type(x), type(y))
         nt.assert_equal(len(x), len(y))
         for k, iy in y.items():
             ix = x[k]
