@@ -146,6 +146,8 @@ class ScalarMetaschemaType(MetaschemaType):
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
         # arr = np.frombuffer(bytes, dtype=dtype)
         arr = np.fromstring(bytes, dtype=dtype)
+        if len(obj) < 100:
+            print('decode', arr, arr.dtype, bytes, obj)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
         out = cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)
