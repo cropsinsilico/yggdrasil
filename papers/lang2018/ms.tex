@@ -133,7 +133,7 @@
 \newcommand{\cis}{{\tt cis\_interface}{}}
 \newcommand{\pkglink}{\todo{cis\_interface}}
 %\newcommand{\pkg}{{\tt \todo{cis\_interface}}{}}
-\newcommand{\pkgrun}{{\tt \todo{cisrun}}}
+\newcommand{\pkgrun}{{\tt yggrun}}
 \newcommand{\A}{Appendix{ }}
 \newcommand{\hrefgit}[1]{\href{https://github.com/cropsinsilico/cis_interface}{\todo{#1}}}
 \newcommand{\hrefdoc}[1]{\href{https://cropsinsilico.github.io/cis_interface/}{\todo{#1}}}
@@ -141,21 +141,21 @@
 
 %---------------------------------------------------------------------------------
 % SOURCE CODE
-\newcommand{\rootsrc}{\lstinputlisting[language=C,label={lst:src:root},caption={root.h: Source code for root model in C.}]{../../cis_interface/examples/root_to_shoot/src/root.h}}
-\newcommand{\shootsrc}{\lstinputlisting[language=Python,label={lst:src:shoot},caption={shoot.py: Source code for shoot model in Python.}]{../../cis_interface/examples/root_to_shoot/src/shoot.py}}
+\newcommand{\rootsrc}{\lstinputlisting[language=C,label={lst:src:root},caption={root.h: Source code for root model in C.}]{../../yggdrasil/examples/root_to_shoot/src/root.h}}
+\newcommand{\shootsrc}{\lstinputlisting[language=Python,label={lst:src:shoot},caption={shoot.py: Source code for shoot model in Python.}]{../../yggdrasil/examples/root_to_shoot/src/shoot.py}}
 
 %---------------------------------------------------------------------------------
 % WRAPPER CODE
-\newcommand{\rootwrap}{\lstinputlisting[language=C,label={lst:wrap:root},caption={root\_wrapper.c: Wrapper source code for root model in C.}]{../../cis_interface/examples/root_to_shoot/src/root_wrapper.c}}
-\newcommand{\shootwrap}{\lstinputlisting[language=Python,label={lst:wrap:shoot},caption={shoot\_wrapper.py: Wrapper source code for shoot model in Python}]{../../cis_interface/examples/root_to_shoot/src/shoot_wrapper.py}}
+\newcommand{\rootwrap}{\lstinputlisting[language=C,label={lst:wrap:root},caption={root\_wrapper.c: Wrapper source code for root model in C.}]{../../yggdrasil/examples/root_to_shoot/src/root_wrapper.c}}
+\newcommand{\shootwrap}{\lstinputlisting[language=Python,label={lst:wrap:shoot},caption={shoot\_wrapper.py: Wrapper source code for shoot model in Python}]{../../yggdrasil/examples/root_to_shoot/src/shoot_wrapper.py}}
 
 %---------------------------------------------------------------------------------
 % YAML FILES
-\newcommand{\rootyml}{\lstinputlisting[label={lst:yml:root},caption={root.yml: Model YAML specification file for root model.}]{../../cis_interface/examples/root_to_shoot/root.yml}}
-\newcommand{\shootyml}{\lstinputlisting[label={lst:yml:shoot},caption={shoot.yml: Model YAML specification file for shoot model.}]{../../cis_interface/examples/root_to_shoot/shoot.yml}}
-\newcommand{\rootymlfiles}{\lstinputlisting[label={lst:yml:root_files},caption={root\_files.yml: Connection YAML specification file for running the root model in isolation.}]{../../cis_interface/examples/root_to_shoot/root_files.yml}}
-\newcommand{\shootymlfiles}{\lstinputlisting[label={lst:yml:shoot_files},caption={shoot\_files.yml: Model YAML specification file for running the shoot model in isolation.}]{../../cis_interface/examples/root_to_shoot/shoot_files.yml}}
-\newcommand{\intyml}{\lstinputlisting[label={lst:yml:int},caption={root\_to\_shoot.yml: Connection YAML specification file for the root/shoot integration.}]{../../cis_interface/examples/root_to_shoot/root_to_shoot.yml}}
+\newcommand{\rootyml}{\lstinputlisting[label={lst:yml:root},caption={root.yml: Model YAML specification file for root model.}]{../../yggdrasil/examples/root_to_shoot/root.yml}}
+\newcommand{\shootyml}{\lstinputlisting[label={lst:yml:shoot},caption={shoot.yml: Model YAML specification file for shoot model.}]{../../yggdrasil/examples/root_to_shoot/shoot.yml}}
+\newcommand{\rootymlfiles}{\lstinputlisting[label={lst:yml:root_files},caption={root\_files.yml: Connection YAML specification file for running the root model in isolation.}]{../../yggdrasil/examples/root_to_shoot/root_files.yml}}
+\newcommand{\shootymlfiles}{\lstinputlisting[label={lst:yml:shoot_files},caption={shoot\_files.yml: Model YAML specification file for running the shoot model in isolation.}]{../../yggdrasil/examples/root_to_shoot/shoot_files.yml}}
+\newcommand{\intyml}{\lstinputlisting[label={lst:yml:int},caption={root\_to\_shoot.yml: Connection YAML specification file for the root/shoot integration.}]{../../yggdrasil/examples/root_to_shoot/root_to_shoot.yml}}
 
 %---------------------------------------------------------------------------------
 % CODE STYLE
@@ -275,7 +275,7 @@ and the output of the shoot growth model is $S_{t+1}$, the shoot mass at the nex
 %
 While it is possible to run both models in isolation if all of the appropriate input variables are provided, the value of $R_{t+1}$ calculated by the root growth model could be used as input to the shoot growth model. However, because the two models are written in different languages, the two models cannot be directly integrated. To integrate the models a scientist must either "manually" integrate them by running one model and then the other or translate one of the models into the language of the other so that it can be called directly. For a tightly coupled set of models such as these where one model depends directly on the result from the other at the current time step, manual integration is very inefficient for more than a handful of time steps even when done using a script. Although translating one or both of these simple toy models would be relatively straight forward, actual plant models are much more complex and could contain thousands of lines of code that would be time consuming to translate and result in unnecessary duplication of model algorithms.
 
-We present an Open Source Python package, {\pkg}, for creating and running integration networks by connecting existing computational models written in different programming languages. {\pkg} was developed as part of the Crops \emph{in Silico} \citep{Marshall-Colon2017} initiative to build a complete crop \emph{in silico} from the level of the genes to the level of the field. {\pkg} is available on Github\footnote{{\tt https://github.com/cropsinsilico/\pkglink}} with full documentation\footnote{{\tt https://cropsinsilico.github.io/\pkglink/}} and can be installed from PyPI\footnote{{\tt https://pypi.org/project/\pkglink/}} via {\tt pip install {\pkg}} or conda-forge\footnote{{\tt https://github.com/conda-forge/\pkglink-feedstock}} via {\tt conda -c conda-forge install {\pkg}}. Although developed for the purpose of integrating plant biology models, {\pkg} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\pkg} package to integrate models, \S\ref{S:example} provides a worked example of integrating the two model presented above, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} describes a few use cases for {\pkg}, 
+We present an Open Source Python package, {\pkg}, for creating and running integration networks by connecting existing computational models written in different programming languages. {\pkg} was developed as part of the Crops \emph{in Silico} \citep{Marshall-Colon2017} initiative to build a complete crop \emph{in silico} from the level of the genes to the level of the field. {\pkg} is available on Github\footnote{{\tt https://github.com/cropsinsilico/\pkglink}} with full documentation\footnote{{\tt https://cropsinsilico.github.io/\pkglink/}} and can be installed from PyPI\footnote{{\tt https://pypi.org/project/\pkglink/}} via \todo{\tt pip install {\pkg}} or conda-forge\footnote{{\tt https://github.com/conda-forge/\pkglink-feedstock}} via \todo{\tt conda -c conda-forge install {\pkg}}. Although developed for the purpose of integrating plant biology models, {\pkg} can be applied to any situation requiring coordination between models in the supported languages. \S\ref{S:background} provides background information on existing efforts for cross-language model integration, \S\ref{S:methods} describes the methods used by the {\pkg} package to integrate models, \S\ref{S:example} provides a worked example of integrating the two model presented above, \S\ref{S:results} presents several tests demonstrating the performance of message passing between integrated models, and \S\ref{S:discuss} describes a few use cases for {\pkg}, 
 summarizes the features and limitations of the {\pkg} package, and outlines areas of ongoing and future development.
 
 %---------------------------------------------------------------------------------
