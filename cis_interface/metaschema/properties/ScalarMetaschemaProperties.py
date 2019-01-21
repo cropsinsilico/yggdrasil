@@ -1,5 +1,5 @@
 import numpy as np
-from cis_interface import units, backwards
+from cis_interface import units, backwards, platform
 from cis_interface.metaschema.datatypes import MetaschemaTypeError
 from cis_interface.metaschema.properties import register_metaschema_property
 from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
@@ -26,11 +26,15 @@ else:  # pragma: Python 3
 for t, t_np in _valid_types.items():
     prec_list = []
     if t in ['float']:
-        prec_list = [16, 32, 64, 128]
+        prec_list = [16, 32, 64]
+        if not platform._is_win:
+            prec_list.append(128)  # Not available on windows
     if t in ['int', 'uint']:
         prec_list = [8, 16, 32, 64]
     elif t in ['complex']:
-        prec_list = [64, 128, 256]
+        prec_list = [64, 128]
+        if not platform._is_win:
+            prec_list.append(256)  # Not available on windows
     if hasattr(np, t_np):
         _python_scalars[t].append(getattr(np, t_np))
     _python_scalars[t].append(np.dtype(t_np).type)
