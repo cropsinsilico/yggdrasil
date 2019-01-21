@@ -1,6 +1,6 @@
 import os
 import uuid
-from yggdrasil.tests import CisTestClassInfo, assert_equal
+from yggdrasil.tests import YggTestClassInfo, assert_equal
 from yggdrasil.communication import new_comm, get_comm, CommBase
 
 
@@ -21,7 +21,7 @@ def test_registry():
     assert(not CommBase.unregister_comm(comm_class, key))
 
 
-class TestCommBase(CisTestClassInfo):
+class TestCommBase(YggTestClassInfo):
     r"""Tests for CommBase communication class.
 
     Attributes:

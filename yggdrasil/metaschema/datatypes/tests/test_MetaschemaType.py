@@ -126,7 +126,7 @@ class TestMetaschemaType(YggTestClassInfo):
         r"""Test update_typedef raises error on non-matching typename."""
         self.instance.update_typedef(**self.typedef)
         assert_raises(MetaschemaTypeError, self.instance.update_typedef,
-                         type='invalid')
+                      type='invalid')
         if self._explicit:
             typedef_base = self.import_cls.typedef_fixed2base(self.typedef)
             self.instance.update_typedef(**typedef_base)

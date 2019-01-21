@@ -31,20 +31,20 @@ definitions:
     - anyOf:
       - properties:
           commtype:
-            enum: [zmq]
-        title: ZMQComm
-      - properties:
-          commtype:
-            enum: [ipc]
-        title: IPCComm
-      - properties:
-          commtype:
             enum: [rmq_async]
         title: RMQAsyncComm
       - properties:
           commtype:
+            enum: [zmq]
+        title: ZMQComm
+      - properties:
+          commtype:
             enum: [rmq]
         title: RMQComm
+      - properties:
+          commtype:
+            enum: [ipc]
+        title: IPCComm
       - properties:
           commtype:
             enum: [default]
@@ -158,6 +158,15 @@ definitions:
             enum: [mat]
         title: MatFileComm
       - properties:
+          filetype:
+            enum: [ply]
+        title: PlyFileComm
+      - properties:
+          delimiter: {type: string}
+          filetype:
+            enum: [map]
+        title: AsciiMapComm
+      - properties:
           delimiter: {type: string}
           filetype:
             enum: [table]
@@ -168,15 +177,6 @@ definitions:
           filetype:
             enum: [ascii]
         title: AsciiFileComm
-      - properties:
-          filetype:
-            enum: [ply]
-        title: PlyFileComm
-      - properties:
-          delimiter: {type: string}
-          filetype:
-            enum: [map]
-        title: AsciiMapComm
       - properties:
           filetype:
             enum: [binary]
@@ -193,13 +193,13 @@ definitions:
         args:
           items: {type: string}
           type: array
-        builddir: &id004 {type: string}
+        builddir: &id007 {type: string}
         cc: &id010 {type: string}
         client_of:
           default: []
           items: {type: string}
           type: array
-        cmakeargs: &id005
+        cmakeargs: &id008
           items: {type: string}
           type: array
         driver: {type: string}
@@ -211,16 +211,16 @@ definitions:
         language:
           enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
           type: string
-        make_command: &id007 {type: string}
-        makedir: &id008 {type: string}
-        makefile: &id009 {type: string}
+        make_command: &id004 {type: string}
+        makedir: &id005 {type: string}
+        makefile: &id006 {type: string}
         name: {type: string}
         outputs:
           default: []
           items: {$ref: '#/definitions/comm'}
           type: array
         overwrite: &id011 {type: boolean}
-        sourcedir: &id006 {type: string}
+        sourcedir: &id009 {type: string}
         strace_flags:
           default: []
           items: {type: string}
@@ -240,23 +240,27 @@ definitions:
             enum: [python]
         title: PythonModelDriver
       - properties:
-          builddir: *id004
-          cmakeargs: *id005
-          language:
-            enum: [cmake]
-          sourcedir: *id006
-        title: CMakeModelDriver
-      - properties:
           language:
             enum: [matlab]
         title: MatlabModelDriver
       - properties:
           language:
+            enum: [lpy]
+        title: LPyModelDriver
+      - properties:
+          language:
             enum: [make]
-          make_command: *id007
-          makedir: *id008
-          makefile: *id009
+          make_command: *id004
+          makedir: *id005
+          makefile: *id006
         title: MakeModelDriver
+      - properties:
+          builddir: *id007
+          cmakeargs: *id008
+          language:
+            enum: [cmake]
+          sourcedir: *id009
+        title: CMakeModelDriver
       - properties:
           cc: *id010
           language:
@@ -265,15 +269,11 @@ definitions:
         title: GCCModelDriver
       - properties:
           language:
-            enum: [lpy]
-        title: LPyModelDriver
-      - properties:
-          language:
             enum: [executable]
         title: ModelDriver
     description: Schema for model components.
     title: model
-description: Schema for cis_interface YAML input files.
+description: Schema for yggdrasil YAML input files.
 properties:
   models:
     items: {$ref: '#/definitions/model'}

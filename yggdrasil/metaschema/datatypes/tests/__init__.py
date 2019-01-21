@@ -40,7 +40,7 @@ def test_get_type_from_def():
 def test_guess_type_from_msg():
     r"""Test guess_type_from_msg."""
     assert_raises(ValueError, datatypes.guess_type_from_msg,
-                     b'fake message')
+                  b'fake message')
 
 
 def test_guess_type_from_obj():
