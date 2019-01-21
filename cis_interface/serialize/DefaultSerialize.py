@@ -2,7 +2,7 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from cis_interface import backwards, tools, units
+from cis_interface import backwards, tools, units, platform
 from cis_interface.serialize import (
     register_serializer, get_serializer, extract_formats, cformat2nptype,
     consolidate_array)
@@ -149,6 +149,7 @@ class DefaultSerialize(object):
                    'extra_kwargs': {}}
             out['objects'] = [b'Test message\n', b'Test message 2\n']
             out['contents'] = b''.join(out['objects'])
+        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out
         
     @classmethod

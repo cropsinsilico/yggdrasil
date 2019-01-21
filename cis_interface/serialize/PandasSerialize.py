@@ -205,4 +205,5 @@ class PandasSerialize(AsciiTableSerialize):
                                + b'two\t2\t2.0\n'
                                + b'three\t3\t3.0\n')
         out['kwargs'].update(out['typedef'])
+        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

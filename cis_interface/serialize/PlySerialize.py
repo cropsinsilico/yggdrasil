@@ -1,4 +1,4 @@
-from cis_interface import backwards
+from cis_interface import backwards, platform
 from cis_interface.serialize import register_serializer, _default_newline
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.metaschema.datatypes.PlyMetaschemaType import PlyDict
@@ -104,4 +104,5 @@ class PlySerialize(DefaultSerialize):
                              + b'0.0000 1.0000 1.0000\n'
                              + b'3 0 1 2\n'
                              + b'3 3 4 5\n'))
+        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

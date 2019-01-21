@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.io import savemat, loadmat
-from cis_interface import backwards
+from cis_interface import backwards, platform
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
@@ -78,4 +78,5 @@ class MatSerialize(DefaultSerialize):
         out['objects'] = [msg, msg]
         out['empty'] = dict()
         out['contents'] = cls().func_serialize(msg)
+        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

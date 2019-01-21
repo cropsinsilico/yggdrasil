@@ -1,4 +1,4 @@
-from cis_interface import backwards
+from cis_interface import backwards, platform
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
@@ -64,4 +64,5 @@ class PickleSerialize(DefaultSerialize):
         else:  # pragma: Python 3
             out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
                                + b'\x80\x03C\x0fTest message 2\nq\x00.')
+        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out
