@@ -12,24 +12,21 @@ NextRootMass = CisInput('next_root_mass')
 NextShootMass = CisOutput('next_shoot_mass', '%lf\n')
 
 # Receive shoot growth rate
-flag, input = ShootGrowthRate.recv()
+flag, r_s = ShootGrowthRate.recv()
 if not flag:
     raise RuntimeError('shoot: Error receiving shoot growth rate.')
-r_s = input[0]
 print('shoot: Received shoot growth rate: %f' % r_s)
 
 # Receive initial shoot mass
-flag, input = InitShootMass.recv()
+flag, S_t = InitShootMass.recv()
 if not flag:
     raise RuntimeError('shoot: Error receiving initial shootmass.')
-S_t = input[0]
 print('shoot: Received initial shoot mass: %f' % S_t)
 
 # Receive inital root mass
-flag, input = NextRootMass.recv()
+flag, R_t = NextRootMass.recv()
 if not flag:
     raise RuntimeError('shoot: Error receiving initial root mass.')
-R_t = input[0]
 print('shoot: Received initial root mass: %f' % R_t)
 
 # Send initial shoot mass
@@ -42,19 +39,17 @@ i = 0
 while True:
     
     # Receive the time step
-    flag, input = TimeStep.recv()
+    flag, dt = TimeStep.recv()
     if not flag:
         print('shoot: No more time steps.')
         break
-    dt = input[0]
     print('shoot: Received next time step: %f' % dt)
 
     # Receive the next root mass
-    flag, input = NextRootMass.recv()
+    flag, R_tp1 = NextRootMass.recv()
     if not flag:
         # This raises an error because there must be a root mass for each time step
         raise RuntimeError('shoot: Error receiving root mass for timestep %d.' % (i + 1))
-    R_tp1 = input[0]
     print('shoot: Received next root mass: %f' % R_tp1)
 
     # Calculate shoot mass

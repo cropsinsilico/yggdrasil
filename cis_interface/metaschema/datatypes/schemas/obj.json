@@ -1,0 +1,378 @@
+{
+	"definitions": {
+		"curve": {
+			"additionalProperties": false,
+			"description": "Properties of describing a curve.",
+			"properties": {
+				"ending_param": {
+					"type": "float"
+				},
+				"starting_param": {
+					"type": "float"
+				},
+				"vertex_indices": {
+					"items": {
+						"type": [
+							"int",
+							"uint"
+						]
+					},
+					"minItems": 2,
+					"type": "array"
+				}
+			},
+			"required": [
+				"starting_param",
+				"ending_param",
+				"vertex_indices"
+			],
+			"type": "object"
+		},
+		"curve2D": {
+			"description": "Array of parameter indices describine a 2D curve on a surface.",
+			"items": {
+				"type": [
+					"int",
+					"uint"
+				]
+			},
+			"minItems": 2,
+			"type": "array"
+		},
+		"face": {
+			"description": "Array of vertex, texture, and normal indices describing a face.",
+			"items": {
+				"additionalProperties": false,
+				"properties": {
+					"normal_index": {
+						"type": [
+							"int",
+							"uint"
+						]
+					},
+					"texcoord_index": {
+						"type": [
+							"int",
+							"uint"
+						]
+					},
+					"vertex_index": {
+						"type": [
+							"int",
+							"uint"
+						]
+					}
+				},
+				"required": [
+					"vertex_index"
+				],
+				"type": "object"
+			},
+			"minItems": 3,
+			"type": "array"
+		},
+		"line": {
+			"description": "Array of vertex indices and texture indices describing a line.",
+			"items": {
+				"additionalProperties": false,
+				"properties": {
+					"texcoord_index": {
+						"type": [
+							"int",
+							"uint"
+						]
+					},
+					"vertex_index": {
+						"type": [
+							"int",
+							"uint"
+						]
+					}
+				},
+				"required": [
+					"vertex_index"
+				],
+				"type": "object"
+			},
+			"minItems": 2,
+			"type": "array"
+		},
+		"normal": {
+			"additionalProperties": false,
+			"description": "Map describing a single normal.",
+			"properties": {
+				"i": {
+					"type": "float"
+				},
+				"j": {
+					"type": "float"
+				},
+				"k": {
+					"type": "float"
+				}
+			},
+			"required": [
+				"i",
+				"j",
+				"k"
+			],
+			"type": "object"
+		},
+		"param": {
+			"additionalProperties": false,
+			"description": "Map describing a single parameter space point.",
+			"properties": {
+				"u": {
+					"type": "float"
+				},
+				"v": {
+					"type": "float"
+				},
+				"w": {
+					"default": 1.0,
+					"type": "float"
+				}
+			},
+			"required": [
+				"u",
+				"v"
+			],
+			"type": "object"
+		},
+		"point": {
+			"description": "Array of vertex indices describing a set of points.",
+			"items": {
+				"type": [
+					"int",
+					"uint"
+				]
+			},
+			"minItems": 1,
+			"type": "array"
+		},
+		"surface": {
+			"additionalProperties": false,
+			"description": "Properties describing a surface.",
+			"properties": {
+				"ending_param_u": {
+					"type": "float"
+				},
+				"ending_param_v": {
+					"type": "float"
+				},
+				"starting_param_u": {
+					"type": "float"
+				},
+				"starting_param_v": {
+					"type": "float"
+				},
+				"vertex_indices": {
+					"items": {
+						"additionalProperties": false,
+						"properties": {
+							"normal_index": {
+								"type": [
+									"int",
+									"uint"
+								]
+							},
+							"texcoord_index": {
+								"type": [
+									"int",
+									"uint"
+								]
+							},
+							"vertex_index": {
+								"type": [
+									"int",
+									"uint"
+								]
+							}
+						},
+						"required": [
+							"vertex_index"
+						],
+						"type": "object"
+					},
+					"minItems": 2,
+					"type": "array"
+				}
+			},
+			"required": [
+				"starting_param_u",
+				"ending_param_u",
+				"starting_param_v",
+				"ending_param_v",
+				"vertex_indices"
+			],
+			"type": "object"
+		},
+		"texcoord": {
+			"additionalProperties": false,
+			"description": "Map describing a single texture vertex.",
+			"properties": {
+				"u": {
+					"type": "float"
+				},
+				"v": {
+					"default": 0.0,
+					"type": "float"
+				},
+				"w": {
+					"default": 0.0,
+					"type": "float"
+				}
+			},
+			"required": [
+				"u"
+			],
+			"type": "object"
+		},
+		"vertex": {
+			"additionalProperties": false,
+			"description": "Map describing a single vertex.",
+			"properties": {
+				"blue": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"green": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"red": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"w": {
+					"default": 1.0,
+					"type": "float"
+				},
+				"x": {
+					"type": "float"
+				},
+				"y": {
+					"type": "float"
+				},
+				"z": {
+					"type": "float"
+				}
+			},
+			"required": [
+				"x",
+				"y",
+				"z"
+			],
+			"type": "object"
+		}
+	},
+	"dependencies": {
+		"curve2Ds": [
+			"params"
+		],
+		"curves": [
+			"vertices"
+		],
+		"faces": [
+			"vertices"
+		],
+		"lines": [
+			"vertices"
+		],
+		"surfaces": [
+			"vertices"
+		]
+	},
+	"description": "A mapping container for Obj 3D data.",
+	"properties": {
+		"curve2Ds": {
+			"description": "Array of curve2Ds.",
+			"items": {
+				"$ref": "#/definitions/curve2D"
+			},
+			"type": "array"
+		},
+		"curves": {
+			"description": "Array of curves.",
+			"items": {
+				"$ref": "#/definitions/curve"
+			},
+			"type": "array"
+		},
+		"faces": {
+			"description": "Array of faces.",
+			"items": {
+				"$ref": "#/definitions/face"
+			},
+			"type": "array"
+		},
+		"lines": {
+			"description": "Array of lines.",
+			"items": {
+				"$ref": "#/definitions/line"
+			},
+			"type": "array"
+		},
+		"material": {
+			"description": "Name of the material to use.",
+			"type": [
+				"unicode",
+				"string"
+			]
+		},
+		"normals": {
+			"description": "Array of normals.",
+			"items": {
+				"$ref": "#/definitions/normal"
+			},
+			"type": "array"
+		},
+		"params": {
+			"description": "Array of parameter coordinates.",
+			"items": {
+				"$ref": "#/definitions/param"
+			},
+			"type": "array"
+		},
+		"points": {
+			"description": "Array of points.",
+			"items": {
+				"$ref": "#/definitions/point"
+			},
+			"type": "array"
+		},
+		"surfaces": {
+			"description": "Array of surfaces.",
+			"items": {
+				"$ref": "#/definitions/surface"
+			},
+			"type": "array"
+		},
+		"texcoords": {
+			"description": "Array of texture vertices.",
+			"items": {
+				"$ref": "#/definitions/texcoord"
+			},
+			"type": "array"
+		},
+		"vertices": {
+			"description": "Array of vertices.",
+			"items": {
+				"$ref": "#/definitions/vertex"
+			},
+			"type": "array"
+		}
+	},
+	"required": [
+		"vertices",
+		"faces"
+	],
+	"title": "obj",
+	"type": "object"
+}

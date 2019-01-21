@@ -83,3 +83,10 @@ def test_update_config():
     config.update_config(test_cfg)
     assert(os.path.isfile(test_cfg))
     os.remove(test_cfg)
+
+
+def test_cfg_logging():
+    r"""Test cfg_logging."""
+    os.environ['CIS_SUBPROCESS'] = 'True'
+    config.cfg_logging()
+    del os.environ['CIS_SUBPROCESS']

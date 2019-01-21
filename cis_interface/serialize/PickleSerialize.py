@@ -1,21 +1,17 @@
-from cis_interface import backwards
+from cis_interface import backwards, platform
+from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
+@register_serializer
 class PickleSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message by pickling.
     """
 
-    @property
-    def serializer_type(self):
-        r"""int: Type of serializer."""
-        return 4
-        
-    @property
-    def empty_msg(self):
-        r"""obj: Object indicating empty message."""
-        return backwards.unicode2bytes('')
-            
+    _seritype = 'pickle'
+    _schema_properties = dict()
+    _default_type = {'type': 'bytes'}
+
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -27,7 +23,7 @@ class PickleSerialize(DefaultSerialize):
 
         """
         out = backwards.pickle.dumps(args)
-        return backwards.unicode2bytes(out)
+        return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -39,8 +35,34 @@ class PickleSerialize(DefaultSerialize):
             obj: Deserialized Python object.
 
         """
-        if len(msg) == 0:
-            out = self.empty_msg
-        else:
-            out = backwards.pickle.loads(msg)
+        out = backwards.pickle.loads(msg)
+        return out
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                empty (object): Object produced from deserializing an empty
+                    message.
+                objects (list): List of objects to be serialized/deserialized.
+                extra_kwargs (dict): Extra keyword arguments not used to
+                    construct type definition.
+                typedef (dict): Type definition resulting from the supplied
+                    kwargs.
+                dtype (np.dtype): Numpy data types that is consistent with the
+                    determined type definition.
+
+        """
+        out = super(PickleSerialize, cls).get_testing_options()
+        if backwards.PY2:  # pragma: Python 2
+            out['contents'] = ("S'Test message\\n'\np1\n."
+                               + "S'Test message 2\\n'\np1\n.")
+        else:  # pragma: Python 3
+            out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
+                               + b'\x80\x03C\x0fTest message 2\nq\x00.')
+        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

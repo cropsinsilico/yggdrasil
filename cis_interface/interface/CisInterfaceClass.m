@@ -42,6 +42,14 @@ classdef CisInterfaceClass
     function flag = send_dict(obj, varargin)
       flag = obj.eval_pyobj('send_dict', nargin-1, varargin);
     end
+    function [flag, res] = recv_array(obj, varargin)
+      ml_res = obj.eval_pyobj('recv_array', nargin-1, varargin);
+      flag = ml_res{1};
+      res = ml_res{2};
+    end
+    function flag = send_array(obj, varargin)
+      flag = obj.eval_pyobj('send_array', nargin-1, varargin);
+    end
     function flag = send_eof(obj, varargin)
       flag = obj.eval_pyobj('send_eof', nargin-1, varargin);
     end

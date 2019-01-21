@@ -11,7 +11,7 @@ import socket
 from cis_interface.tools import CisClass
 from cis_interface.config import cis_cfg, cfg_environment
 from cis_interface import platform, backwards, yamlfile
-from cis_interface.drivers import create_driver, import_driver
+from cis_interface.drivers import create_driver
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -294,10 +294,12 @@ class CisRunner(CisClass):
         """
         yml['models'] = []
         if yml['args'] not in self._outputchannels:
-            if not os.path.isfile(yml['args']):
-                raise Exception(("Input driver %s could not locate a "
-                                 + "corresponding file or output channel %s") % (
-                                     yml["name"], yml["args"]))
+            for x in yml['icomm_kws']['comm']:
+                if 'filetype' not in x:
+                    raise Exception(
+                        ("Input driver %s could not locate a "
+                         + "corresponding file or output channel %s") % (
+                            x["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
 
@@ -311,28 +313,17 @@ class CisRunner(CisClass):
             object: An instance of the specified driver.
 
         """
-        from cis_interface.drivers import FileOutputDriver
         yml['models'] = []
         if yml['args'] in self._inputchannels:
             yml.setdefault('comm_env', {})
             yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
-            # yml['kwargs'].setdefault('comm_env', {})
-            # yml['kwargs']['comm_env'] = self._inputchannels[
-            #     yml['args']]['instance'].comm_env
-        drv_cls = import_driver(yml['driver'])
         if yml['args'] not in self._inputchannels:
-            try:
-                assert(issubclass(drv_cls,
-                                  FileOutputDriver.FileOutputDriver))
-            except AssertionError:
-                raise Exception(("Output driver %s is not a subclass of "
-                                 + "FileOutputDriver and there is not a "
-                                 + "corresponding input channel %s.") % (
-                                     yml["name"], yml["args"]))
-        else:
-            
-            # TODO: Add input comm environment variables somehow
-            pass
+            for x in yml['ocomm_kws']['comm']:
+                if 'filetype' not in x:
+                    raise Exception(
+                        ("Output driver %s could not locate a "
+                         + "corresponding file or input channel %s") % (
+                            x["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
         

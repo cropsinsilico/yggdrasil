@@ -1,0 +1,164 @@
+{
+	"definitions": {
+		"color": {
+			"type": [
+				"int",
+				"uint"
+			]
+		},
+		"coord": {
+			"type": "float"
+		},
+		"edge": {
+			"additionalProperties": false,
+			"description": "Vertex indices describing an edge.",
+			"properties": {
+				"blue": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"green": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"red": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"vertex1": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"vertex2": {
+					"type": [
+						"int",
+						"uint"
+					]
+				}
+			},
+			"required": [
+				"vertex1",
+				"vertex2"
+			],
+			"type": "object"
+		},
+		"face": {
+			"additionalProperties": false,
+			"description": "Map describing a single face.",
+			"properties": {
+				"vertex_index": {
+					"items": {
+						"type": [
+							"int",
+							"uint"
+						]
+					},
+					"minItems": 3,
+					"type": "array"
+				}
+			},
+			"required": [
+				"vertex_index"
+			],
+			"type": "object"
+		},
+		"index": {
+			"type": [
+				"int",
+				"uint"
+			]
+		},
+		"vertex": {
+			"additionalProperties": false,
+			"description": "Map describing a single vertex.",
+			"properties": {
+				"blue": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"green": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"red": {
+					"type": [
+						"int",
+						"uint"
+					]
+				},
+				"x": {
+					"type": "float"
+				},
+				"y": {
+					"type": "float"
+				},
+				"z": {
+					"type": "float"
+				}
+			},
+			"required": [
+				"x",
+				"y",
+				"z"
+			],
+			"type": "object"
+		}
+	},
+	"dependencies": {
+		"edges": [
+			"vertices"
+		],
+		"faces": [
+			"vertices"
+		]
+	},
+	"description": "A mapping container for Ply 3D data.",
+	"properties": {
+		"edges": {
+			"description": "Array of edges.",
+			"items": {
+				"$ref": "#/definitions/edge"
+			},
+			"type": "array"
+		},
+		"faces": {
+			"description": "Array of faces.",
+			"items": {
+				"$ref": "#/definitions/face"
+			},
+			"type": "array"
+		},
+		"material": {
+			"description": "Name of the material to use.",
+			"type": [
+				"unicode",
+				"string"
+			]
+		},
+		"vertices": {
+			"description": "Array of vertices.",
+			"items": {
+				"$ref": "#/definitions/vertex"
+			},
+			"type": "array"
+		}
+	},
+	"required": [
+		"vertices",
+		"faces"
+	],
+	"title": "ply",
+	"type": "object"
+}

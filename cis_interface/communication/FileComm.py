@@ -1,13 +1,24 @@
 import os
 import tempfile
-from cis_interface import backwards, platform, serialize
+from cis_interface import backwards, platform
 from cis_interface.communication import CommBase
-from cis_interface.schema import register_component
+from cis_interface.schema import register_component, inherit_schema
+from cis_interface.serialize.DirectSerialize import DirectSerialize
 
 
 @register_component
 class FileComm(CommBase.CommBase):
     r"""Class for handling I/O from/to a file on disk.
+
+    >>> x = FileComm('test_send', address='test_file.txt', direction='send')
+    >>> x.send('Test message')
+    True
+    >>> with open('test_file.txt', 'r') as fd:
+    ...     print(fd.read())
+    Test message
+    >>> x = FileComm('test_recv', address='test_file.txt', direction='recv')
+    >>> x.recv()
+    (True, b'Test message')
 
     Args:
         name (str): The environment variable where communication address is
@@ -49,56 +60,72 @@ class FileComm(CommBase.CommBase):
     """
 
     _filetype = 'binary'
+    _datatype = {'type': 'bytes'}
     _schema_type = 'file'
-    _schema = dict(CommBase.CommBase._schema,
-                   working_dir={'type': 'string', 'required': True},
-                   filetype={'type': 'string', 'required': False,
-                             'default': _filetype},
-                   append={'type': 'boolean', 'required': False},
-                   in_temp={'type': 'boolean', 'required': False},
-                   newline={'type': 'string', 'required': False,
-                            'default': backwards.bytes2unicode(
-                                serialize._default_newline)},
-                   is_series={'type': 'boolean', 'required': False})
+    _schema_required = ['name', 'filetype', 'working_dir']
+    _schema_properties = inherit_schema(
+        CommBase.CommBase._schema_properties,
+        {'working_dir': {'type': 'string'},
+         'filetype': {'type': 'string', 'default': _filetype},
+         'append': {'type': 'boolean', 'default': False},
+         'in_temp': {'type': 'boolean', 'default': False},
+         'is_series': {'type': 'boolean', 'default': False}},
+        remove_keys=['commtype', 'datatype'], **DirectSerialize._schema_properties)
+    _default_serializer = DirectSerialize
+    _attr_conv = ['newline', 'platform_newline']
+    _default_extension = '.txt'
+    is_file = True
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
         return super(FileComm, self).__init__(*args, **kwargs)
 
-    def _init_before_open(self, read_meth='read', append=False, in_temp=False,
-                          open_as_binary=True, newline=None, is_series=False,
-                          **kwargs):
+    def _init_before_open(self, read_meth='read', open_as_binary=True, **kwargs):
         r"""Get absolute path and set attributes."""
         super(FileComm, self)._init_before_open(**kwargs)
+        # Process file class keywords
         if not hasattr(self, '_fd'):
             self._fd = None
         if read_meth not in ['read', 'readline']:
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
-        self.append = append
-        if newline is None:
-            newline = serialize._default_newline
-        self.newline = newline
         self.platform_newline = platform._newline
-        self.in_temp = in_temp
         if self.in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
         self.open_as_binary = open_as_binary
-        self.is_file = True
-        self.is_series = is_series
         self._series_index = 0
         # Put string attributes in the correct format
-        attr_conv = ['newline', 'platform_newline']
         if self.open_as_binary:
-            func_conv = backwards.unicode2bytes
+            func_conv = backwards.as_bytes
         else:
-            func_conv = backwards.bytes2unicode
-        for k in attr_conv:
+            func_conv = backwards.as_unicode
+        for k in self._attr_conv:
             v = getattr(self, k)
             if v is not None:
                 setattr(self, k, func_conv(v))
 
+    @classmethod
+    def get_testing_options(cls, read_meth='read', **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = super(FileComm, cls).get_testing_options(**kwargs)
+        out['kwargs']['read_meth'] = read_meth
+        if read_meth == 'readline':
+            out['recv'] = out['recv'][0].splitlines(True)
+        return out
+        
     @classmethod
     def is_installed(cls, language=None):
         r"""Determine if the necessary libraries are installed for this
@@ -387,7 +414,7 @@ class FileComm(CommBase.CommBase):
         """
         if msg != self.eof_msg:
             if not self.open_as_binary:
-                msg = backwards.bytes2unicode(msg)
+                msg = backwards.as_unicode(msg)
             self.fd.write(msg)
             if self.append == 'ow':
                 self.fd.truncate()
@@ -423,7 +450,7 @@ class FileComm(CommBase.CommBase):
         else:
             out = out.replace(self.platform_newline, self.newline)
         if not self.open_as_binary:
-            out = backwards.unicode2bytes(out)
+            out = backwards.as_bytes(out)
         return (flag, out)
 
     def purge(self):

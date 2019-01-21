@@ -11,10 +11,9 @@ function rpcFibCliPar(iterations)
   % Send all of the requests to the server
   for i = 1:iterations
     fprintf('rpcFibCliPar(M): fib(->%-2d) ::: \n', i);
-    ret = rpc.send(i);
+    ret = rpc.send(int32(i));
     if (~ret);
-      disp('rpcFibCliPar(M): SEND FAILED');
-      exit(-1);
+      error('rpcFibCliPar(M): SEND FAILED');
     end
   end
 
@@ -23,15 +22,12 @@ function rpcFibCliPar(iterations)
     fprintf('rpcFibCliPar(M): fib(->%-2d) ::: ', i);
     [ret, fib] = rpc.recv();
     if (~ret);
-      disp('rpcFibCliPar(M): RECV FAILED')
-      exit(-1);
-      break;
+      error('rpcFibCliPar(M): RECV FAILED')
     end
     fprintf('rpcFibCliPar(M): fib(%2d<-) = %-2d<-\n', fib{1}, fib{2});
   end
 
   disp('Goodbye from Matlab rpcFibCliPar');
-  exit(0);
   
 end
 

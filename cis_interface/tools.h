@@ -55,6 +55,11 @@ extern "C" {
 #endif
 static int _cis_error_flag = 0;
 
+/*! @brief Define macros to allow counts of variables. */
+// https://codecraft.co/2014/11/25/variadic-macros-tricks/
+#define _GET_NTH_ARG(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N, ...) N
+#define COUNT_VARARGS(...) _GET_NTH_ARG("ignored", ##__VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+
 
 /*!
   @brief Get an unsigned long seed from the least significant 32bits of a pointer.
@@ -67,6 +72,13 @@ unsigned long ptr2seed(void *ptr) {
   unsigned long seed = (unsigned long)(v & 0xFFFFFFFFLL);
   return seed;
 };
+
+
+/*! @brief Structure used to wrap va_list and allow pointer passing.*/
+typedef struct va_list_t {
+  va_list va;
+} va_list_t;
+    
 
 
 //==============================================================================
@@ -131,6 +143,20 @@ void cisDebug(const char* fmt, ...) {
 };
   
 /*!
+  @brief Print an error log message from a variable argument list.
+  Prints a formatted message, prepending it with ERROR and the process id. A
+  newline character is added to the end of the message.
+  @param[in] fmt a constant character pointer to a format string.
+  @param[in] ap va_list Variable argument list.
+  @param[in] ... arguments to be formatted in the format string.
+ */
+static inline
+void cisError_va(const char* fmt, va_list ap) {
+  cisLog("ERROR", fmt, ap);
+  _cis_error_flag = 1;
+};
+
+/*!
   @brief Print an error log message.
   Prints a formatted message, prepending it with ERROR and the process id. A
   newline character is added to the end of the message.
@@ -141,9 +167,8 @@ static inline
 void cisError(const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  cisLog("ERROR", fmt, ap);
+  cisError_va(fmt, ap);
   va_end(ap);
-  _cis_error_flag = 1;
 };
 
 #ifdef CIS_DEBUG

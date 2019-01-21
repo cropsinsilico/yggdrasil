@@ -1,6 +1,8 @@
-from cis_interface import serialize, backwards
+import numpy as np
+from cis_interface import serialize, backwards, units
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
 from cis_interface.schema import register_component, inherit_schema
+from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
 @register_component
@@ -21,19 +23,19 @@ class AsciiTableComm(AsciiFileComm):
     """
     
     _filetype = 'table'
-    _schema = inherit_schema(AsciiFileComm._schema, 'filetype', _filetype,
-                             delimiter={'type': 'string', 'required': False},
-                             use_astropy={'type': 'boolean', 'required': False})
+    _schema_properties = inherit_schema(
+        AsciiFileComm._schema_properties,
+        {'as_array': {'type': 'boolean', 'default': False},
+         'field_names': {'type': 'array', 'items': {'type': 'string'}},
+         'field_units': {'type': 'array', 'items': {'type': 'string'}}},
+        **AsciiTableSerialize._schema_properties)
+    _default_serializer = AsciiTableSerialize
+    _attr_conv = AsciiFileComm._attr_conv + ['delimiter', 'format_str']
 
-    def _init_before_open(self, delimiter=None, use_astropy=False,
-                          serializer_kwargs=None, **kwargs):
+    def _init_before_open(self, **kwargs):
         r"""Set up dataio and attributes."""
-        if serializer_kwargs is None:
-            serializer_kwargs = {}
         self.header_was_read = False
         self.header_was_written = False
-        serializer_kwargs.update(stype=3, use_astropy=use_astropy)
-        kwargs['serializer_kwargs'] = serializer_kwargs
         super(AsciiTableComm, self)._init_before_open(**kwargs)
         if self.serializer.as_array:
             self.read_meth = 'read'
@@ -41,10 +43,39 @@ class AsciiTableComm(AsciiFileComm):
             self.read_meth = 'readline'
         if self.append:
             self.header_was_written = True
-        if delimiter is None:
-            delimiter = serialize._default_delimiter
-        self.delimiter = backwards.unicode2bytes(delimiter)
         
+    @classmethod
+    def get_testing_options(cls, as_array=False, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = super(AsciiFileComm, cls).get_testing_options(as_array=as_array,
+                                                            **kwargs)
+        field_names = [backwards.as_str(x) for
+                       x in out['kwargs']['field_names']]
+        field_units = [backwards.as_str(x) for
+                       x in out['kwargs']['field_units']]
+        if as_array:
+            lst = out['send'][0]
+            out['recv'] = [[units.add_units(np.hstack([x[i] for x in out['send']]), u)
+                            for i, (n, u) in enumerate(zip(field_names, field_units))]]
+            out['dict'] = {k: l for k, l in zip(field_names, lst)}
+            out['msg_array'] = serialize.list2numpy(lst, names=field_names)
+        else:
+            out['recv'] = out['send']
+            out['dict'] = {k: v for k, v in zip(field_names, out['send'][0])}
+        return out
+    
     def read_header(self):
         r"""Read header lines from the file and update serializer info."""
         if self.header_was_read:
@@ -52,9 +83,9 @@ class AsciiTableComm(AsciiFileComm):
         pos = self.record_position()
         self.change_position(0)
         serialize.discover_header(self.fd, self.serializer,
-                                  newline=self.newline, comment=self.comment,
+                                  newline=self.newline,
+                                  comment=self.comment,
                                   delimiter=self.delimiter)
-        self.delimiter = self.serializer.table_info['delimiter']
         self.change_position(*pos)
         self.header_was_read = True
 
@@ -64,8 +95,8 @@ class AsciiTableComm(AsciiFileComm):
             return
         header_msg = serialize.format_header(
             format_str=self.serializer.format_str,
-            field_names=self.serializer.field_names,
-            field_units=self.serializer.field_units,
+            field_names=self.serializer.get_field_names(as_bytes=True),
+            field_units=self.serializer.get_field_units(as_bytes=True),
             comment=self.comment, newline=self.newline,
             delimiter=self.delimiter)
         self.fd.write(header_msg)

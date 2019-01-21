@@ -2,6 +2,7 @@
 from __future__ import print_function
 import threading
 import logging
+import pprint
 import os
 import sys
 import inspect
@@ -15,7 +16,7 @@ from cis_interface import backwards
 from cis_interface.config import cis_cfg, cfg_logging
 
 
-CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+CIS_MSG_EOF = b'EOF!!!'
 CIS_MSG_BUF = 1024 * 2
 
 
@@ -105,7 +106,6 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     if out.isspace():  # pragma: debug
         return False
     out = out.decode('utf-8').splitlines()
-    # out = backwards.bytes2unicode(out.splitlines()[0])
     return out
 
 
@@ -135,7 +135,9 @@ def get_supported_comm():
     from cis_interface import schema
     s = schema.get_schema()
     out = s['comm'].classes
-    out.remove('CommBase')
+    for k in ['CommBase', 'DefaultComm']:
+        if k in out:
+            out.remove(k)
     return list(set(out))
 
 
@@ -153,7 +155,7 @@ def is_lang_installed(lang):
     """
     from cis_interface import schema, drivers
     s = schema.get_schema()
-    drv = drivers.import_driver(s.language2class[lang])
+    drv = drivers.import_driver(s['model'].subtype2class[lang])
     return drv.is_installed()
 
 
@@ -449,15 +451,15 @@ def print_encoded(msg, *args, **kwargs):
 
     """
     try:
-        print(backwards.bytes2unicode(msg), *args, **kwargs)
-    except UnicodeEncodeError:  # pragma: debug
+        print(backwards.as_unicode(msg), *args, **kwargs)
+    except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
         logging.debug("sys.stdout.encoding = %s, cannot print unicode",
                       sys.stdout.encoding)
         kwargs.pop('end', None)
         try:
             print(msg, *args, **kwargs)
         except UnicodeEncodeError:  # pragma: debug
-            print(backwards.unicode2bytes(msg), *args, **kwargs)
+            print(backwards.as_bytes(msg), *args, **kwargs)
 
 
 class TimeOut(object):
@@ -540,6 +542,7 @@ class CisClass(logging.LoggerAdapter):
             are suppressed.
 
     """
+
     def __init__(self, name, uuid=None, working_dir=None,
                  timeout=60.0, sleeptime=0.01, **kwargs):
         self._name = name
@@ -559,6 +562,7 @@ class CisClass(logging.LoggerAdapter):
         self.extra_kwargs = kwargs
         self.sched_out = None
         self.suppress_special_debug = False
+        self._periodic_logs = {}
         # self.logger = logging.getLogger(self.__module__)
         # self.logger.basicConfig(
         #     format=("%(levelname)s:%(module)s" +
@@ -592,6 +596,25 @@ class CisClass(logging.LoggerAdapter):
             cis_cfg.set('debug', 'cis', self._old_loglevel)
             cfg_logging()
             self._old_loglevel = None
+
+    def pprint(self, obj, block_indent=0, indent_str='    ', **kwargs):
+        r"""Use pprint to represent an object as a string.
+
+        Args:
+            obj (object): Python object to represent.
+            block_indent (int, optional): Number of indents that should be
+                placed in front of the entire block. Defaults to 0.
+            indent_str (str, optional): String that should be used to indent.
+                Defaults to 4 spaces.
+            **kwargs: Additional keyword arguments are passed to pprint.pformat.
+
+        Returns:
+            str: String representation of object using pprint.
+
+        """
+        sblock = block_indent * indent_str
+        out = sblock + pprint.pformat(obj, **kwargs).replace('\n', '\n' + sblock)
+        return out
 
     def as_str(self, obj):
         r"""Return str version of object if it is not already a string.
@@ -635,6 +658,27 @@ class CisClass(logging.LoggerAdapter):
     def dummy_log(self, *args, **kwargs):
         r"""Dummy log function that dosn't do anything."""
         pass
+
+    def periodic_debug(self, key, period=10):
+        r"""Log that should occur periodically rather than with every call.
+
+        Arguments:
+            key (str): Key that should be used to identify the debug message.
+            period (int, optional): Period (in number of messages) that messages
+                should be logged at. Defaults to 10.
+
+        Returns:
+            method: Logging method to be used.
+
+        """
+        if key in self._periodic_logs:
+            self._periodic_logs[key] += 1
+        else:
+            self._periodic_logs[key] = 0
+        if (self._periodic_logs[key] % period) == 0:
+            return self.debug
+        else:
+            return self.dummy_log
 
     @property
     def special_debug(self):

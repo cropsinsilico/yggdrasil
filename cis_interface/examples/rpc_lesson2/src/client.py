@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 from cis_interface.interface.CisInterface import (
     CisRpcClient, CisOutput)
 
@@ -11,12 +12,8 @@ def main(iterations, client_index):
         iterations (int): The number of Fibonacci numbers to log.
         client_index (int): Index of the client in total list of clients.
 
-    Returns:
-        int: Exit code. Negative if an error occurred.
-
     """
 
-    exit_code = 0
     print('Hello from Python client%d: iterations = %d ' % (client_index,
                                                             iterations))
 
@@ -30,27 +27,21 @@ def main(iterations, client_index):
         
         # Call the server and receive response
         print('client%d(Python): Calling fib(%d)' % (client_index, i))
-        ret, result = rpc.call(i)
+        ret, result = rpc.call(np.int32(i))
         if not ret:
-            print('client%d(Python): RPC CALL ERROR' % client_index)
-            exit_code = -1
-            break
+            raise RuntimeError('client%d(Python): RPC CALL ERROR' % client_index)
         fib = result[0]
         print('client%d(Python): Response fib(%d) = %d' % (client_index, i, fib))
 
         # Log result by sending it to the log connection
-        ret = log.send(i, fib)
+        ret = log.send(np.int32(i), fib)
         if not ret:
-            print('client%d(Python): SEND ERROR' % client_index)
-            exit_code = -1
-            break
+            raise RuntimeError('client%d(Python): SEND ERROR' % client_index)
 
     print('Goodbye from Python client%d' % client_index)
-    return exit_code
 
     
 if __name__ == '__main__':
     # Take number of iterations from the first argument and the
     # client index from the second
-    exit_code = main(int(sys.argv[1]), int(sys.argv[2]))
-    sys.exit(exit_code)
+    main(int(sys.argv[1]), int(sys.argv[2]))

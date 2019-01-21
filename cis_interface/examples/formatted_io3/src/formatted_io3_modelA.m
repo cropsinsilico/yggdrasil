@@ -9,7 +9,7 @@ while flag
 
   % Receive input from input channel
   % If there is an error, the flag will be False.
-  [flag, arr] = in_channel.recv();
+  [flag, arr] = in_channel.recv_array();
   if (~flag)
     disp('Model A: No more input.');
     break;
@@ -24,12 +24,10 @@ while flag
 
   % Send output to output channel
   % If there is an error, the flag will be False
-  flag = out_channel.send(arr);
+  flag = out_channel.send_array(arr);
   if (~flag)
-    disp('Model A: Error sending output.');
+    error('Model A: Error sending output.');
     break;
   end;
   
 end;
-
-exit(0);

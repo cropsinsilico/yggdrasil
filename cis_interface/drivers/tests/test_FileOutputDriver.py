@@ -1,5 +1,6 @@
 import os
-import nose.tools as nt
+import unittest
+from cis_interface.schema import get_schema
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
 
@@ -11,13 +12,17 @@ class TestFileOutputParam(parent.TestConnectionParam):
 
     """
 
+    ocomm_name = 'FileComm'
+    testing_option_kws = {}
+
     def __init__(self, *args, **kwargs):
         super(TestFileOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'FileOutputDriver'
-        self.filepath = os.path.abspath('%s_input.txt' % self.name)
+        self.filepath = os.path.abspath('%s_input%s' %
+                                        (self.name,
+                                         self.ocomm_import_cls._default_extension))
         self.args = self.filepath
         self.timeout = 5.0
-        self.ocomm_name = 'FileComm'
 
     @property
     def recv_comm_kwargs(self):
@@ -52,8 +57,11 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
 
     def send_file_contents(self):
         r"""Send file contents to driver."""
-        self.send_comm.send(self.file_contents)
-        self.send_comm.send_eof()
+        for x in self.testing_options['send']:
+            flag = self.send_comm.send(x)
+            assert(flag)
+        flag = self.send_comm.send_eof()
+        assert(flag)
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
@@ -76,7 +84,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     @property
     def contents_to_read(self):
         r"""str: Contents that should be read to the file."""
-        return self.file_contents
+        return self.testing_options['contents']
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
@@ -87,9 +95,10 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         r"""Assertions to make after stopping the driver instance."""
         super(TestFileOutputDriver, self).assert_after_stop()
         assert(os.path.isfile(self.filepath))
-        with open(self.filepath, 'rb') as fd:
-            data = fd.read()
-        nt.assert_equal(data, self.contents_to_read)
+        if self.testing_options.get('exact_contents', True):
+            with open(self.filepath, 'rb') as fd:
+                data = fd.read()
+            self.assert_equal(data, self.contents_to_read)
 
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""
@@ -102,10 +111,27 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         # Don't send any messages to the file
         pass
     
+    @unittest.skipIf(True, 'File driver')
     def test_send_recv(self):
         r"""Disabled: Test sending/receiving small message."""
         pass
 
+    @unittest.skipIf(True, 'File driver')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test sending/receiving large message."""
         pass
+
+
+# Dynamically create tests based on registered file classes
+s = get_schema()
+file_types = list(s['file'].schema_subtypes.keys())
+for k in file_types:
+    cls_exp = type('Test%sOutputDriver' % k,
+                   (TestFileOutputDriver, ), {'ocomm_name': k})
+    globals()[cls_exp.__name__] = cls_exp
+    if k == 'AsciiTableComm':
+        cls_exp2 = type('Test%sArrayOutputDriver' % k,
+                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+        globals()[cls_exp2.__name__] = cls_exp2
+        del cls_exp2
+    del cls_exp

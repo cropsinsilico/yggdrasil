@@ -53,9 +53,11 @@ def test_ipcrm_queues():
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
 class TestIPCComm(test_AsyncComm.TestAsyncComm):
     r"""Test for IPCComm communication class."""
+
+    comm = 'IPCComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestIPCComm, self).__init__(*args, **kwargs)
-        self.comm = 'IPCComm'
         self.attr_list += ['q']
 
 

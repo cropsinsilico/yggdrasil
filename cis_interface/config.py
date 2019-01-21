@@ -6,6 +6,7 @@ This module imports the configuration for cis_interface.
 
 """
 import os
+import sys
 import shutil
 import warnings
 import logging
@@ -85,7 +86,7 @@ def find_all(name, path):
             (stdoutdata, stderrdata) = pfind.communicate()
             out = stdoutdata
             for l in stderrdata.splitlines():
-                if backwards.unicode2bytes('Permission denied') not in l:
+                if b'Permission denied' not in l:
                     raise subprocess.CalledProcessError(pfind.returncode,
                                                         ' '.join(args),
                                                         output=stderrdata)
@@ -125,6 +126,52 @@ def locate_file(fname):
     return first
 
 
+def update_config_matlab(config):
+    r"""Update config options specific to matlab.
+
+    Args:
+        config (CisConfigParser): Config class that options should be set for.
+
+    Returns:
+        list: Section, option, description tuples for options that could not be
+            set.
+
+    """
+    out = []
+    if not config.has_section('matlab'):
+        config.add_section('matlab')
+    opts = {
+        'startup_waittime_s': [('The time allowed for a Matlab engine to start'
+                               + 'before timing out and reporting an error.'),
+                               10],
+        'release': ['The version (release number) of matlab that is installed.',
+                    ''],
+        'matlabroot': ['The path to the default installation of matlab.', '']}
+    mtl_id = '=MATLABROOT='
+    cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
+           + ",matlabroot,version('-release')); exit();")
+    mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
+               '-r', '%s' % cmd]
+    try:  # pragma: matlab
+        mtl_proc = subprocess.check_output(mtl_cmd)
+        mtl_id = backwards.match_stype(mtl_proc, mtl_id)
+        if mtl_id not in mtl_proc:  # pragma: debug
+            print(mtl_proc)
+            raise RuntimeError("Could not locate matlab root id (%s) in output."
+                               % mtl_id)
+        opts['matlabroot'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-3])
+        opts['release'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-2])
+    except (subprocess.CalledProcessError, OSError):  # pragma: no matlab
+        pass
+    for k in opts.keys():
+        if not config.has_option('matlab', k):
+            if opts[k][1]:
+                config.set('matlab', k, opts[k][1])
+            else:
+                out.append(('matlab', k, opts[k][0]))
+    return out
+
+
 def update_config_windows(config):  # pragma: windows
     r"""Update config options specific to windows.
 
@@ -140,10 +187,14 @@ def update_config_windows(config):  # pragma: windows
     if not config.has_section('windows'):
         config.add_section('windows')
     # Find paths
-    clibs = [('libzmq_include', 'zmq.h', 'The full path to the zmq.h header file.'),
-             ('libzmq_static', 'zmq.lib', 'The full path to the zmq.lib static library.'),
-             ('czmq_include', 'czmq.h', 'The full path to the czmq.h header file.'),
-             ('czmq_static', 'czmq.lib', 'The full path to the czmq.lib static library.')]
+    clibs = [('libzmq_include', 'zmq.h',
+              'The full path to the zmq.h header file.'),
+             ('libzmq_static', 'zmq.lib',
+              'The full path to the zmq.lib static library.'),
+             ('czmq_include', 'czmq.h',
+              'The full path to the czmq.h header file.'),
+             ('czmq_static', 'czmq.lib',
+              'The full path to the czmq.lib static library.')]
     for opt, fname, desc in clibs:
         if not config.has_option('windows', opt):
             fpath = locate_file(fname)
@@ -176,17 +227,18 @@ def update_config(config_file, config_base=None):
     miss = []
     if platform._is_win:  # pragma: windows
         miss += update_config_windows(cp)
+    miss += update_config_matlab(cp)
     with open(config_file, 'w') as fd:
         cp.write(fd)
     for sect, opt, desc in miss:  # pragma: windows
-        warnings.warn(("Could not locate option %s in section %s."
+        warnings.warn(("Could not set option %s in section %s."
                        + "Please set this in %s to: %s")
                       % (opt, sect, config_file, desc))
 
         
 # In order read: defaults, user, local files
 if not os.path.isfile(usr_config_file):
-    print('Creating user config file: "%s".' % usr_config_file)
+    logging.info('Creating user config file: "%s".' % usr_config_file)
     update_config(usr_config_file)
 assert(os.path.isfile(usr_config_file))
 assert(os.path.isfile(def_config_file))
@@ -225,15 +277,25 @@ def cfg_logging(cfg=None):
             environment. Defaults to :data:`cis_interface.config.cis_cfg`.
 
     """
+    is_model = (os.environ.get('CIS_SUBPROCESS', "False") == "True")
     if cfg is None:
         cfg = cis_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
     logLevelCIS = eval('logging.%s' % cfg.get('debug', 'cis', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
-    logging.getLogger("cis_interface").setLevel(level=logLevelCIS)
-    logging.getLogger("pika").setLevel(level=logLevelRMQ)
-        
+    cis_logger = logging.getLogger("cis_interface")
+    rmq_logger = logging.getLogger("pika")
+    cis_logger.setLevel(level=logLevelCIS)
+    rmq_logger.setLevel(level=logLevelRMQ)
+    # For models, route the loggs to stdout so that they are displayed by the
+    # model driver.
+    if is_model:
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(logLevelCIS)
+        cis_logger.addHandler(handler)
+        rmq_logger.addHandler(handler)
+
 
 def cfg_environment(env=None, cfg=None):
     r"""Set environment variables based on config options.

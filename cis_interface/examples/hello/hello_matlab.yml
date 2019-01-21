@@ -2,23 +2,22 @@
 
 model:
   name: hello_matlab
-  driver: MatlabModelDriver
+  language: matlab
   args: ./src/hello.m  # Runs the matlab script using Matlab engine
 
   inputs:
-    - name: inFile
-      driver: FileInputDriver
-      args: ./Input/input.txt
-    - name: helloQueueIn    
-      driver: InputDriver
-      args: helloQueue
-      onexit: printStatus
-
+    - inFile
+    - helloQueueIn
   outputs:
-    - name: helloQueueOut    
-      driver: OutputDriver
-      args: helloQueue
-    - name: outFile
-      driver: FileOutputDriver
-      args: output_hello.txt
-      in_temp: True
+    - helloQueueOut
+    - outFile
+
+connections:
+  - input: ./Input/input.txt
+    output: inFile
+  - input: helloQueueOut
+    output: helloQueueIn
+    onexit: printStatus
+  - input: outFile
+    output: output_hello.txt
+    in_temp: True

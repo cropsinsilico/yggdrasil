@@ -1,4 +1,4 @@
-import sys
+import numpy as np
 from cis_interface.interface.CisInterface import CisRpcServer
 
 
@@ -26,14 +26,8 @@ def get_fibonacci(n):
 
 
 def main():
-    r"""Function to execute server communication and computation in a loop.
+    r"""Function to execute server communication and computation in a loop."""
 
-    Returns:
-        int: Exit code. Negative if an error occurred.
-
-    """
-
-    exit_code = 0
     print('Hello from Python server!')
 
     # Create server-side rpc conneciton using model name
@@ -55,16 +49,12 @@ def main():
         print('server: Sending response for Fibonacci number %d: %d' % (n, result))
 
         # Send response back
-        flag = rpc.send(result)
+        flag = rpc.send(np.int32(result))
         if not flag:
-            print('server: ERROR sending')
-            exit_code = -1
-            break
+            raise RuntimeError('server: ERROR sending')
 
     print('Goodbye from Python server')
-    return exit_code
 
     
 if __name__ == '__main__':
-    exit_code = main()
-    sys.exit(exit_code)
+    main()

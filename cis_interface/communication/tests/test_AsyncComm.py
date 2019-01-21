@@ -5,9 +5,10 @@ from cis_interface.communication.tests import test_CommBase
 class TestAsyncComm(test_CommBase.TestCommBase):
     r"""Tests for AsyncComm communication class."""
 
+    comm = 'AsyncComm'
+
     def __init__(self, *args, **kwargs):
         super(TestAsyncComm, self).__init__(*args, **kwargs)
-        self.comm = 'AsyncComm'
         self.attr_list += ['dont_backlog', 'backlog_send_ready',
                            'backlog_recv_ready']
 

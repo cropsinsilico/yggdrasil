@@ -5,7 +5,7 @@
 #include <../tools.h>
 #include <CommBase.h>
 #include <DefaultComm.h>
-#include <comm_header.h>
+#include "../metaschema/datatypes/datatypes.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -48,18 +48,17 @@ int init_client_comm(comm_t *comm) {
     return init_default_comm(comm);
   }
   // Called to initialize/create client comm
-  char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
+  void *seri_out = (void*)get_format_type(comm->direction, 0);
   if (seri_out == NULL) {
-    cislog_error("init_client_comm: Failed to malloc output serializer.");
+    cislog_error("init_client_comm: Failed to create output serializer.");
     return -1;
   }
-  strcpy(seri_out, comm->direction);
   comm_t *handle;
   if (strlen(comm->name) == 0) {
-    handle = new_comm_base(comm->address, "send", _default_comm, (void*)seri_out);
+    handle = new_comm_base(comm->address, "send", _default_comm, seri_out);
     sprintf(handle->name, "client_request.%s", comm->address);
   } else {
-    handle = init_comm_base(comm->name, "send", _default_comm, (void*)seri_out);
+    handle = init_comm_base(comm->name, "send", _default_comm, seri_out);
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
@@ -197,13 +196,8 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
     head.valid = 0;
     return head;
   }
-  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer->info)) + 1);
-  if (seri_copy == NULL) {
-    cislog_error("client_response_header: Failed to malloc copy of serializer info.");
-    head.valid = 0;
-    return head;
-  }
-  strcpy(seri_copy, (char*)(x.serializer->info));
+  void *seri_copy = (void*)copy_from_void(x.serializer->type,
+					  x.serializer->info);
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {

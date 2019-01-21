@@ -5,10 +5,15 @@ import threading
 from cis_interface import backwards
 from cis_interface.communication import new_comm, get_comm_class
 from cis_interface.drivers.Driver import Driver
-from cis_interface.schema import register_component, str_to_function
+from cis_interface.schema import get_schema
 
 
-@register_component
+def _translate_list2element(arr):
+    if not isinstance(arr, (list, tuple)):
+        raise Exception("List of field required.")
+    return arr[0]
+
+
 class ConnectionDriver(Driver):
     r"""Class that continuously passes messages from one comm to another.
 
@@ -52,40 +57,34 @@ class ConnectionDriver(Driver):
             model exits, but before the driver is shut down.
 
     """
-    
+
+    _connection_type = 'default'
     _icomm_type = 'DefaultComm'
     _ocomm_type = 'DefaultComm'
+    _direction = 'any'
     _schema_type = 'connection'
-    _schema = {'input': {'type': ['string', 'list'], 'required': True,
-                         'schema': {'type': 'string'},
-                         'excludes': 'input_file'},
-               'input_file': {'required': True, 'type': 'dict',
-                              'excludes': 'input', 'schema': 'file'},
-               'output': {'type': ['string', 'list'], 'required': True,
-                          'schema': {'type': 'string'},
-                          'excludes': 'output_file'},
-               'output_file': {'required': True, 'type': 'dict',
-                               'excludes': 'output', 'schema': 'file'},
-               'translator': {'type': ['function', 'list'],
-                              'schema': {'type': 'function'},
-                              'required': False},
-               'onexit': {'type': 'string', 'required': False}}
-    _is_input = False
-    _is_output = False
+    _schema_required = ['inputs', 'outputs']
+    _schema_properties = {
+        'inputs': {'type': 'array', 'minItems': 1,
+                   'items': {'anyOf': [{'$ref': '#/definitions/comm'},
+                                       {'$ref': '#/definitions/file'}]}},
+        'outputs': {'type': 'array', 'minItems': 1,
+                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
+                                        {'$ref': '#/definitions/file'}]}},
+        'translator': {'type': 'array', 'items': {'type': 'function'}},
+        'onexit': {'type': 'string'}}
 
-    @classmethod
-    def direction(cls):
-        r"""Get direction of connection."""
-        if cls._is_input:
-            out = 'input'
-        elif cls._is_output:
-            out = 'output'
-        else:
-            out = None
-        return out
+    @property
+    def _is_input(self):
+        r"""bool: True if the connection is providing input to a model."""
+        return (self._direction == 'input')
 
-    def __init__(self, name, translator=None, timeout_send_1st=None,
-                 single_use=False, onexit=None, **kwargs):
+    @property
+    def _is_output(self):
+        r"""bool: True if the connection is retreiving output from a model."""
+        return (self._direction == 'output')
+
+    def __init__(self, name, translator=None, single_use=False, onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         # Translator
         if translator is None:
@@ -94,8 +93,6 @@ class ConnectionDriver(Driver):
             translator = [translator]
         self.translator = []
         for t in translator:
-            if isinstance(t, str):
-                t = str_to_function(t)
             if not hasattr(t, '__call__'):
                 raise ValueError("Translator %s not callable." % t)
             self.translator.append(t)
@@ -104,10 +101,7 @@ class ConnectionDriver(Driver):
         self.onexit = onexit
         # Attributes
         self._eof_sent = False
-        if timeout_send_1st is None:
-            timeout_send_1st = self.timeout
         self.single_use = single_use
-        self.timeout_send_1st = timeout_send_1st
         self._first_send_done = False
         self._comm_opened = threading.Event()
         self._comm_closed = False
@@ -122,57 +116,86 @@ class ConnectionDriver(Driver):
         self.close_state = ''
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
-        self.debug('')
-        self.debug(80 * '=')
-        self.debug('class = %s', self.__class__)
         # self.debug('    env: %s', str(self.env))
-        self.debug('    input: name = %s, address = %s',
-                   self.icomm.name, self.icomm.address)
-        self.debug('    output: name = %s, address = %s',
+        self.debug('\n' + 80 * '=' + '\n',
+                   'class = %s\n',
+                   '    input: name = %s, address = %s\n'
+                   + '    output: name = %s, address = %s\n'
+                   + (80 * '='), self.__class__,
+                   self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
-        self.debug(80 * '=')
+
+    def _init_single_comm(self, name, io, comm_kws, **kwargs):
+        r"""Parse keyword arguments for input/output comm."""
+        self.debug("Creating %s comm", io)
+        s = get_schema()
+        if comm_kws is None:
+            comm_kws = dict()
+        if io == 'input':
+            direction = 'recv'
+            comm_type = self._icomm_type
+            touches_model = self._is_output
+            attr_comm = 'icomm'
+            comm_kws['close_on_eof_recv'] = False
+        else:
+            direction = 'send'
+            comm_type = self._ocomm_type
+            touches_model = self._is_input
+            attr_comm = 'ocomm'
+        comm_kws['direction'] = direction
+        comm_kws['dont_open'] = True
+        comm_kws['reverse_names'] = True
+        comm_kws.setdefault('comm', {'comm': comm_type})
+        assert(name == self.name)
+        comm_kws.setdefault('name', name)
+        if not isinstance(comm_kws['comm'], list):
+            comm_kws['comm'] = [comm_kws['comm']]
+        for i, x in enumerate(comm_kws['comm']):
+            if x is None:
+                comm_kws['comm'][i] = dict()
+            elif not isinstance(x, dict):
+                comm_kws['comm'][i] = dict(comm=x)
+            comm_kws['comm'][i].setdefault('comm', comm_type)
+        any_files = False
+        all_files = True
+        if not touches_model:
+            comm_kws['no_suffix'] = True
+            ikws = []
+            for x in comm_kws['comm']:
+                if get_comm_class(x['comm']).is_file:
+                    any_files = True
+                    ikws += s['file'].get_subtype_properties(x['comm'])
+                else:
+                    all_files = False
+                    ikws += s['comm'].get_subtype_properties(x['comm'])
+            ikws = list(set(ikws))
+            for k in ikws:
+                if (k not in comm_kws) and (k in kwargs):
+                    comm_kws[k] = kwargs.pop(k)
+            if ('comm_env' in kwargs) and ('comm_env' not in comm_kws):
+                comm_kws['env'] = kwargs.pop('comm_env')
+        if any_files and (io == 'input'):
+            kwargs.setdefault('timeout_send_1st', 60)
+        self.debug('%s comm_kws:\n%s', attr_comm, self.pprint(comm_kws, 1))
+        setattr(self, attr_comm, new_comm(comm_kws.pop('name'), **comm_kws))
+        setattr(self, '%s_kws' % attr_comm, comm_kws)
+        if touches_model:
+            self.env.update(getattr(self, attr_comm).opp_comms)
+        elif not all_files:
+            self.comm_env.update(getattr(self, attr_comm).opp_comms)
+        return kwargs
 
     def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
         r"""Parse keyword arguments for input/output comms."""
-        if icomm_kws is None:
-            icomm_kws = dict()
-        if ocomm_kws is None:
-            ocomm_kws = dict()
-        # Input communicator
-        self.debug("Creating input comm")
-        icomm_kws['direction'] = 'recv'
-        icomm_kws['dont_open'] = True
-        icomm_kws['reverse_names'] = True
-        icomm_kws['close_on_eof_recv'] = False
-        icomm_kws.setdefault('comm', self._icomm_type)
-        icomm_kws.setdefault('name', name)
-        if self._is_input:
-            ikws = get_comm_class(icomm_kws['comm'])._schema
-            for k in ikws:
-                if (k not in icomm_kws) and (k in kwargs):
-                    icomm_kws[k] = kwargs[k]
-        self.icomm = new_comm(icomm_kws.pop('name'), **icomm_kws)
-        self.icomm_kws = icomm_kws
-        self.env.update(**self.icomm.opp_comms)
-        # Output communicator
-        self.debug("Creating output comm")
-        ocomm_kws['direction'] = 'send'
-        ocomm_kws['dont_open'] = True
-        ocomm_kws['reverse_names'] = True
-        ocomm_kws.setdefault('comm', self._ocomm_type)
-        ocomm_kws.setdefault('name', name)
-        if self._is_output:
-            okws = get_comm_class(ocomm_kws['comm'])._schema
-            for k in okws:
-                if (k not in ocomm_kws) and (k in kwargs):
-                    ocomm_kws[k] = kwargs[k]
+        kwargs = self._init_single_comm(name, 'input', icomm_kws, **kwargs)
         try:
-            self.ocomm = new_comm(ocomm_kws.pop('name'), **ocomm_kws)
+            kwargs = self._init_single_comm(name, 'output', ocomm_kws, **kwargs)
         except BaseException:
             self.icomm.close()
             raise
-        self.ocomm_kws = ocomm_kws
-        self.env.update(**self.ocomm.opp_comms)
+        # Apply keywords dependent on comms
+        self.timeout_send_1st = kwargs.pop('timeout_send_1st', self.timeout)
+        self.debug('Final env:\n%s', self.pprint(self.env, 1))
         
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
@@ -474,7 +497,7 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
-        if (self.ocomm._send_serializer):
+        if (self.ocomm._send_serializer) and self.icomm.serializer._initialized:
             self.update_serializer(msg)
         for t in self.translator:
             msg = t(msg)
@@ -482,11 +505,54 @@ class ConnectionDriver(Driver):
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        if self.ocomm.serializer.serializer_type == 0:
-            old_kwargs = self.ocomm.serializer.serializer_info
-            del old_kwargs['stype']
-            self.ocomm.serializer = self.icomm.serializer
-            self.ocomm.serializer.update_serializer(**old_kwargs)
+        sinfo = self.icomm.serializer.typedef
+        sinfo.update(self.icomm.serializer.serializer_info)
+        sinfo.pop('seritype', None)
+        self.debug('Before update:\n'
+                   + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
+                   + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
+                   self.pprint(self.icomm.serializer.serializer_info, 2),
+                   self.pprint(self.icomm.serializer.typedef, 2),
+                   self.pprint(self.ocomm.serializer.serializer_info, 2),
+                   self.pprint(self.ocomm.serializer.typedef, 2))
+        self.ocomm.serializer.initialize_serializer(sinfo)
+        self.ocomm.serializer.update_serializer(skip_type=True,
+                                                **self.icomm._last_header)
+        if (((self.icomm.serializer.typedef['type'] == 'array')
+             and (self.ocomm.serializer.typedef['type'] != 'array')
+             and (len(self.icomm.serializer.typedef['items']) == 1))):
+            self.translator.insert(0, _translate_list2element)
+        # inter_model = False
+        # if self.icomm.is_file:
+        #     # Remove the file information and only pass the type definition
+        #     typedef_in = self.icomm.serializer.typedef
+        #     sinfo = self.icomm.serializer.typedef
+        #     sinfo.pop('seritype', None)
+        # elif self.ocomm.is_file:
+        #     # Maintain the default serializer type for the file
+        #     sinfo = self.icomm.serializer.serializer_info
+        #     sinfo.pop('seritype')
+        #     sinfo.update(self.ocomm.serializer.serializer_info)
+        #     sinfo.update(self.icomm.serializer.typedef)
+        # else:
+        #     # Copy the serializer and prevent the type from being overwritten
+        #     # TODO: icomm is probably initialized so the serializer info
+        #     # from the output comm won't be used.
+        #     sinfo = self.ocomm.serializer.serializer_info
+        #     sinfo.pop('seritype', None)
+        #     self.ocomm.serializer = self.icomm.serializer
+        #     inter_model = True
+        # if (not inter_model) and self.ocomm.serializer._initialized:  # pragma: debug
+        #     self.ocomm.serializer.update_serializer(**sinfo)
+        # else:
+        #     self.ocomm.serializer.initialize_serializer(sinfo)
+        self.debug('After update:\n'
+                   + '  icomm:\n    sinfo:\n%s\n    typedef:\n%s\n'
+                   + '  ocomm:\n    sinfo:\n%s\n    typedef:\n%s',
+                   self.pprint(self.icomm.serializer.serializer_info, 2),
+                   self.pprint(self.icomm.serializer.typedef, 2),
+                   self.pprint(self.ocomm.serializer.serializer_info, 2),
+                   self.pprint(self.ocomm.serializer.typedef, 2))
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.
@@ -615,8 +681,6 @@ class ConnectionDriver(Driver):
         if not self.is_valid:
             self.debug("Breaking loop")
             self.set_close_state('invalid')
-            # self.info("%s: breaking loop, input=%s, output=%s", self.name,
-            #           self.icomm.is_open, self.ocomm.is_open)
             self.set_break_flag()
             return
         # Receive a message

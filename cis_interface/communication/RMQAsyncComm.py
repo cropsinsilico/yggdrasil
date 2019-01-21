@@ -1,12 +1,14 @@
 import threading
 from cis_interface import backwards, tools
 from cis_interface.communication import RMQComm
+from cis_interface.schema import register_component
 if RMQComm._rmq_installed:
     import pika
 else:
     pika = False
 
 
+@register_component
 class RMQAsyncComm(RMQComm.RMQComm):
     r"""Class for handling asynchronous RabbitMQ communications. It is not
     recommended to use this class as it can leave hanging threads if not
@@ -24,6 +26,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         rmq_thread (tools.CisThread): Thread used to run IO loop.
 
     """
+    
+    _commtype = 'rmq_async'
     
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""
@@ -269,9 +273,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Buffer received messages."""
         if self.direction == 'send':  # pragma: debug
             raise Exception("Send comm received a message.")
-        # self.add_backlog_recv(backwards.unicode2bytes(body))
         with self.rmq_lock:
-            self._buffered_messages.append(backwards.unicode2bytes(body))
+            self._buffered_messages.append(backwards.as_bytes(body))
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     # CONNECTION

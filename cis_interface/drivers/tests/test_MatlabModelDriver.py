@@ -20,9 +20,10 @@ def test_is_matlab_running():
 
 @unittest.skipIf(MatlabModelDriver._matlab_installed, "Matlab installed.")
 def test_matlab_not_installed():  # pragma: no matlab
-    r"""Assert that errors are raise when Matlab is not installed."""
+    r"""Assert that errors are raised when Matlab is not installed."""
     nt.assert_raises(RuntimeError, MatlabModelDriver.start_matlab)
-    nt.assert_raises(RuntimeError, MatlabModelDriver.stop_matlab, None, None, None)
+    nt.assert_raises(RuntimeError, MatlabModelDriver.stop_matlab,
+                     None, None, None, None)
     nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabProcess, None, None)
     nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, None, None)
 
@@ -35,12 +36,34 @@ def test_matlab_runner():  # pragma: matlab
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_matlab_exit():  # pragma: matlab
+    r"""Test error when model contains 'exit' call."""
+    MatlabModelDriver.MatlabModelDriver('error', [scripts['matlab_error']])
+    # Re-enable if it becomes necessary to raise an error instead of just a warning
+    # nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, 'error',
+    #                  [scripts['matlab_error']])
+
+
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_get_matlab_version():  # pragma: matlab
+    r"""Test get_matlab_version."""
+    MatlabModelDriver.get_matlab_version()
+
+
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_locate_matlabroot():  # pragma: matlab
+    r"""Test locate_matlabroot."""
+    MatlabModelDriver.locate_matlabroot()
+
+
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
 class TestMatlabModelParam(parent.TestModelParam):  # pragma: matlab
     r"""Test parameters for MatlabModelDriver."""
 
+    driver = "MatlabModelDriver"
+    
     def __init__(self, *args, **kwargs):
         super(TestMatlabModelParam, self).__init__(*args, **kwargs)
-        self.driver = "MatlabModelDriver"
         self.args = [scripts["matlab"], "test", 1]
         self.attr_list += ['started_matlab', 'mlengine']
 

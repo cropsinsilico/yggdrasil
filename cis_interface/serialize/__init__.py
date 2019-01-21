@@ -1,5 +1,8 @@
 import re
 import copy
+import os
+import glob
+import importlib
 import numpy as np
 import pandas
 from cis_interface import backwards, platform, units
@@ -18,58 +21,73 @@ except ImportError:  # pragma: no cover
     _use_astropy = False
 
 
-_fmt_char = backwards.unicode2bytes('%')
-_default_comment = backwards.unicode2bytes('# ')
-_default_delimiter = backwards.unicode2bytes('\t')
-_default_newline = backwards.unicode2bytes('\n')
+_fmt_char = b'%'
+_default_comment = b'# '
+_default_delimiter = b'\t'
+_default_newline = b'\n'
+_serializer_registry = {}
 
 
-def guess_serializer(msg, **kwargs):
-    r"""Guess the type of serializer required based on the message object.
+def register_serializer(seri_class):
+    r"""Register a serializer class.
 
     Args:
-        msg (obj): Python object that needs to be serialized.
-        **kwargs: Additional keyword arguments are passed to the serializer.
+        seri_class (class): Serialzier class to register.
 
     Returns:
-        dict: Extracted keyword arguments for creating a serializer.
+        class: Registered serializer class.
+
+    Raises:
+        ValueError: If the serializer is already registered.
 
     """
-    sinfo = dict(**kwargs)
-    kws_fmt = {k: kwargs.get(k, None) for k in ['delimiter', 'newline']}
-    kws_fmt['comment'] = backwards.unicode2bytes('')
-    if sinfo.get('stype', 0) > 3:
-        # Don't guess for Pandas, Pickle, Map
-        pass
-    elif isinstance(msg, np.ndarray):
-        names = [backwards.unicode2bytes(n) for n in msg.dtype.names]
-        sinfo.setdefault('field_names', names)
-        sinfo.setdefault('format_str', table2format(msg.dtype, **kws_fmt))
-        sinfo.setdefault('as_array', True)
-    elif isinstance(msg, (list, tuple)):
-        if 'format_str' not in sinfo:
-            typ_list = []
-            for x in msg:
-                if isinstance(x, backwards.string_types):
-                    typ_list.append(np.dtype('S1'))
-                else:
-                    typ_list.append(np.dtype(type(x)))
-            new_type = dict(formats=typ_list,
-                            names=['f%d' % i for i in range(len(typ_list))])
-            row_dtype = np.dtype(new_type)
-            format_str = table2format(row_dtype, **kws_fmt)
-            format_str = format_str.replace(backwards.unicode2bytes('%1s'),
-                                            backwards.unicode2bytes('%s'))
-            sinfo.setdefault('format_str', format_str)
-    return sinfo
+    global _serializer_registry
+    seri_name = seri_class._seritype
+    if seri_name in _serializer_registry:
+        raise ValueError("Serializer '%s' already registered." % seri_name)
+    _serializer_registry[seri_name] = seri_class
+    return seri_class
 
 
-def get_serializer(stype=None, **kwargs):
+def get_registered_serializers():
+    r"""Return a dictionary of registered serializers.
+
+    Returns:
+        dict: Registered serializer/class pairs.
+
+    """
+    return _serializer_registry
+
+
+def import_all_serializers():
+    r"""Import all serializers to ensure they are registered."""
+    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*Serialize.py')):
+        seri_mod = os.path.basename(x)[:-3]
+        if not seri_mod.startswith('__'):
+            importlib.import_module('cis_interface.serialize.%s' % seri_mod)
+
+
+def get_serializer_class(seri_name):
+    r"""Return a serializer class given it's name.
+
+    Args:
+        seri_name (str): Name of serializer class.
+
+    Returns:
+        class: Serializer class.
+
+    """
+    if seri_name not in _serializer_registry:
+        raise ValueError("Class for serializer '%s' could not be found." % seri_name)
+    return _serializer_registry[seri_name]
+
+
+def get_serializer(seritype='default', **kwargs):
     r"""Create a serializer from the provided information.
 
     Args:
-        stype (int, optional): Integer code specifying which serializer to
-            use. Defaults to 0.
+        seritype (str, optional): Name of serializer type to use. Defaults to
+            'default'.
         **kwargs: Additional keyword arguments are passed to the serializer
             class.
 
@@ -77,34 +95,7 @@ def get_serializer(stype=None, **kwargs):
         DefaultSerializer: Serializer based on provided information.
 
     """
-    if stype is None:
-        stype = 0
-    if stype in [0, 1, 2]:
-        from cis_interface.serialize import DefaultSerialize
-        cls = DefaultSerialize.DefaultSerialize
-    elif stype in [3]:
-        from cis_interface.serialize import AsciiTableSerialize
-        cls = AsciiTableSerialize.AsciiTableSerialize
-    elif stype == 4:
-        from cis_interface.serialize import PickleSerialize
-        cls = PickleSerialize.PickleSerialize
-    elif stype == 5:
-        from cis_interface.serialize import MatSerialize
-        cls = MatSerialize.MatSerialize
-    elif stype == 6:
-        from cis_interface.serialize import PandasSerialize
-        cls = PandasSerialize.PandasSerialize
-    elif stype == 7:
-        from cis_interface.serialize import AsciiMapSerialize
-        cls = AsciiMapSerialize.AsciiMapSerialize
-    elif stype == 8:
-        from cis_interface.serialize import PlySerialize
-        cls = PlySerialize.PlySerialize
-    elif stype == 9:
-        from cis_interface.serialize import ObjSerialize
-        cls = ObjSerialize.ObjSerialize
-    else:
-        raise RuntimeError("Unknown serializer type code: %d" % stype)
+    cls = get_serializer_class(seritype)
     return cls(**kwargs)
 
 
@@ -123,9 +114,8 @@ def extract_formats(fmt_str):
         + "[lhjztL]*(?:64)?[bcdeEufFgGosxXi]"
         + "(?:%(?:\\d+\\$)?[+-](?:[ 0]|\'.{1})?-?\\d*(?:\\.\\d+)?"
         + "[lhjztL]*[eEfFgG]j)?")
-    out = re.findall(fmt_regex, backwards.bytes2unicode(fmt_str))
-    if isinstance(fmt_str, backwards.bytes_type):
-        out = [backwards.unicode2bytes(f) for f in out]
+    out = re.findall(fmt_regex, backwards.as_str(fmt_str))
+    out = [backwards.match_stype(fmt_str, f) for f in out]
     return out
     
 
@@ -212,7 +202,7 @@ def nptype2cformat(nptype, asbytes=False):
     # cfmt = cfmt.replace("h", "")
     # cfmt = cfmt.replace("l", "")
     if asbytes:
-        cfmt = backwards.unicode2bytes(cfmt)
+        cfmt = backwards.as_bytes(cfmt)
     return cfmt
 
 
@@ -240,7 +230,7 @@ def cformat2nptype(cfmt, names=None):
         raise TypeError("Input must be a string, bytes string, or list, not %s" %
                         type(cfmt))
     if isinstance(cfmt, backwards.string_types):
-        fmt_list = extract_formats(backwards.bytes2unicode(cfmt))
+        fmt_list = extract_formats(backwards.as_str(cfmt))
         if len(fmt_list) == 0:
             raise ValueError("Could not locate any format codes in the "
                              + "provided format string (%s)." % cfmt)
@@ -256,7 +246,7 @@ def cformat2nptype(cfmt, names=None):
         elif len(names) != nfmt:
             raise ValueError("Number of names does not match the number of fields.")
         else:
-            names = [backwards.bytes2unicode(n) for n in names]
+            names = [backwards.as_str(n) for n in names]
         out = np.dtype(dict(names=names, formats=dtype_list))
         # out = np.dtype([(n, d) for n, d in zip(names, dtype_list)])
         return out
@@ -332,7 +322,7 @@ def cformat2pyscanf(cfmt):
                         type(cfmt))
     if isinstance(cfmt, list):
         return [cformat2pyscanf(f) for f in cfmt]
-    cfmt_out = backwards.bytes2unicode(cfmt)
+    cfmt_out = backwards.as_str(cfmt)
     fmt_list = extract_formats(cfmt_out)
     if len(fmt_list) == 0:
         raise ValueError("Could not locate any format codes in the "
@@ -347,14 +337,13 @@ def cformat2pyscanf(cfmt):
         #     # Handle complex format specifier
         #     out = '%g%+gj'
         # else:
-        #     out = backwards.bytes2unicode(_fmt_char)
+        #     out = backwards.as_str(_fmt_char)
         #     out += cfmt_str[-1]
         #     out = out.replace('h', '')
         #     out = out.replace('l', '')
         #     out = out.replace('64', '')
         cfmt_out = cfmt_out.replace(cfmt_str, out, 1)
-    if isinstance(cfmt, backwards.bytes_type):
-        cfmt_out = backwards.unicode2bytes(cfmt_out)
+    cfmt_out = backwards.match_stype(cfmt, cfmt_out)
     return cfmt_out
 
 
@@ -418,6 +407,11 @@ def process_message(msg, fmt_str):
         nargs = 0
     else:
         nargs = len(args)
+        if len(args) > 1:
+            dtype = cformat2nptype(fmt_str)
+            dtype_list = [dtype[i] for i in range(nargs)]
+            args = tuple([np.array([a], idtype)[0] for
+                          a, idtype in zip(args, dtype_list)])
     if nargs != nfmt:
         raise ValueError("%d arguments were extracted, " % nargs
                          + "but format string expected %d." % nfmt)
@@ -484,8 +478,18 @@ def combine_eles(arrs, dtype=None):
     """
     neles = len(arrs)
     # Check types of arrays
+    any_arrays = False
+    all_arrays = True
     for i, a in enumerate(arrs):
-        if not isinstance(a, (np.ndarray, np.void, list, tuple)):
+        if isinstance(a, (np.ndarray, np.void, list, tuple)):
+            any_arrays = True
+        else:
+            all_arrays = False
+    if not all_arrays:
+        if not any_arrays:
+            arrs = [arrs]
+            neles = 1
+        else:
             raise TypeError("Elements must be arrays, lists or tuples. "
                             + "Element %d has type %s." % (i, type(a)))
     # Check that there are enough elements for each data type
@@ -665,7 +669,7 @@ def table2format(fmts=[], delimiter=None, newline=None, comment=None):
         comment = _default_comment
     if isinstance(fmts, np.dtype):
         fmts = nptype2cformat(fmts)
-    bytes_fmts = [backwards.unicode2bytes(f) for f in fmts]
+    bytes_fmts = [backwards.as_bytes(f) for f in fmts]
     fmt_str = comment + delimiter.join(bytes_fmts) + newline
     return fmt_str
 
@@ -722,14 +726,14 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
         fd = backwards.StringIO()
         table = apy_Table(arr1)
         delimiter = info['delimiter']
-        delimiter = backwards.bytes2unicode(delimiter)
+        delimiter = backwards.as_str(delimiter)
         apy_ascii.write(table, fd, delimiter=delimiter,
                         format='no_header')
-        out = backwards.unicode2bytes(fd.getvalue())
+        out = backwards.as_bytes(fd.getvalue())
     else:
         fd = backwards.BytesIO()
         for ele in arr1:
-            line = format_message(ele.tolist(), fmt_str)
+            line = format_message(ele.tolist(), backwards.as_bytes(fmt_str))
             fd.write(line)
         # fmt = fmt_str.split(info['newline'])[0]
         # np.savetxt(fd, arr1,
@@ -776,16 +780,16 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         names = dtype.names
     fd = backwards.BytesIO(msg)
     if names is not None:
-        names = [backwards.bytes2unicode(n) for n in names]
+        names = [backwards.as_str(n) for n in names]
     np_kws = dict()
     if info.get('delimiter', None) is not None:
         np_kws['delimiter'] = info['delimiter']
     if info.get('comment', None) is not None:
         np_kws['comments'] = info['comment']
     for k, v in np_kws.items():
-        np_kws[k] = backwards.bytes2unicode(v)
+        np_kws[k] = backwards.as_str(v)
     if use_astropy:
-        # fd = backwards.StringIO(backwards.bytes2unicode(msg))
+        # fd = backwards.StringIO(backwards.as_str(msg))
         if 'comments' in np_kws:
             np_kws['comment'] = np_kws.pop('comments')
         tab = apy_ascii.read(fd, names=names, guess=True,
@@ -827,10 +831,17 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         if dtype is not None:
             arr = arr.astype(dtype)
     else:
+        np_ver = tuple([float(x) for x in (np.__version__).split('.')])
+        print('dtype', dtype)
+        if (np_ver >= (1.0, 14.0, 0.0)):
+            np_kws['encoding'] = 'bytes'
         arr = np.genfromtxt(fd, autostrip=True, dtype=None,
                             names=names, **np_kws)
+        print('orig', arr.dtype)
+        print('new', dtype)
         if dtype is not None:
             arr = arr.astype(dtype)
+        print(arr, arr.dtype)
     fd.close()
     return arr
 
@@ -861,7 +872,7 @@ def array_to_bytes(arrs, dtype=None, order='C'):
         if ntyp == 0:
             out = arr1.tobytes(order='F')
         else:
-            out = backwards.unicode2bytes('')
+            out = b''
             for i in range(ntyp):
                 n = arr1.dtype.names[i]
                 if np.issubdtype(arr1.dtype[i], np.dtype('complex')):
@@ -973,7 +984,7 @@ def format_header(format_str=None, dtype=None,
         if fmts is None:
             fmts = nptype2cformat(dtype, asbytes=True)
         if field_names is None:
-            field_names = [backwards.unicode2bytes(n) for n in dtype.names]
+            field_names = [backwards.as_bytes(n) for n in dtype.names]
     if delimiter is None:
         delimiter = _default_delimiter
     if comment is None:
@@ -992,13 +1003,13 @@ def format_header(format_str=None, dtype=None,
     # Create lines
     out = []
     for x in [field_names, field_units, fmts]:
-        if (x is None):
+        if (x is None) or (len(max(x, key=len)) == 0):
             continue
         # if (len(x) == 0) or (x[0] == 'None'):
         #     continue
         assert(len(x) == nfld)
         out.append(comment
-                   + delimiter.join([backwards.unicode2bytes(ix) for ix in x]))
+                   + delimiter.join([backwards.as_bytes(ix) for ix in x]))
     out = newline.join(out) + newline
     return out
 
@@ -1035,8 +1046,8 @@ def discover_header(fd, serializer, newline=_default_newline,
     header_size = 0
     prev_pos = fd.tell()
     for line in fd:
-        sline = backwards.unicode2bytes(line.replace(
-            backwards.unicode2bytes(platform._newline), newline))
+        sline = backwards.as_bytes(line.replace(
+            backwards.as_bytes(platform._newline), newline))
         if not sline.startswith(comment):
             break
         header_size += len(line)
@@ -1046,36 +1057,44 @@ def discover_header(fd, serializer, newline=_default_newline,
                           lineno_format=lineno_format,
                           lineno_names=lineno_names,
                           lineno_units=lineno_units)
-    for k in ['format_str', 'field_names', 'field_units']:
-        if header.get(k, False):
-            setattr(serializer, k, header[k])
+    # Override header with information set explicitly in serializer
+    for k in serializer._oldstyle_kws:
+        v = getattr(serializer, k, None)
+        if v is not None:
+            header[k] = v
+    header.setdefault('format_str', None)
     if (delimiter is None) or ('format_str' in header):
         delimiter = header['delimiter']
     # Try to determine format from array without header
-    str_fmt = backwards.unicode2bytes('%s')
-    if (((serializer.format_str is None)
-         or (str_fmt in serializer.format_str))):
+    str_fmt = b'%s'
+    if ((header['format_str'] is None) or (str_fmt in header['format_str'])):
         fd.seek(prev_pos + header_size)
         all_contents = fd.read()
         if len(all_contents) == 0:  # pragma: debug
             return  # In case the file has not been written
         arr = table_to_array(all_contents,
-                             names=serializer.field_names,
+                             names=header.get('field_names', None),
                              comment=comment,
                              delimiter=delimiter,
                              use_astropy=use_astropy)
-        serializer.field_names = arr.dtype.names
-        if serializer.format_str is None:
-            serializer.format_str = table2format(
+        header['field_names'] = arr.dtype.names
+        # Get format from array
+        if header['format_str'] is None:
+            header['format_str'] = table2format(
                 arr.dtype, delimiter=delimiter,
-                comment=backwards.unicode2bytes(''),
+                comment=b'',
                 newline=header['newline'])
-        while str_fmt in serializer.format_str:
-            ifld = serializer.field_formats.index(str_fmt)
-            max_len = len(max(arr[serializer.field_names[ifld]], key=len))
-            new_str_fmt = backwards.unicode2bytes('%' + str(max_len) + 's')
-            serializer.format_str = serializer.format_str.replace(
+        # Determine maximum size of string field
+        while str_fmt in header['format_str']:
+            field_formats = extract_formats(header['format_str'])
+            ifld = backwards.as_str(
+                header['field_names'][field_formats.index(str_fmt)])
+            max_len = len(max(arr[ifld], key=len))
+            new_str_fmt = backwards.as_bytes('%' + str(max_len) + 's')
+            header['format_str'] = header['format_str'].replace(
                 str_fmt, new_str_fmt, 1)
+    # Update serializer
+    serializer.initialize_serializer(header)
     # Seek to just after the header
     fd.seek(prev_pos + header_size)
 
@@ -1156,6 +1175,76 @@ def parse_header(header, newline=_default_newline, lineno_format=None,
     return out
 
 
+def dict2list(d, order=None):
+    r"""Covert a dictionary of arrays to a list of arrays.
+
+    Args:
+        d (dict): Dictionary of arrays.
+        order (list, optional): Key order in which values from the dictionary
+            should be add to the list.
+
+    Returns:
+        list: List with contents from the input array.
+
+    """
+    if not isinstance(d, dict):
+        raise TypeError("d must be a dictionary, not %s." % type(d))
+    if order is None:
+        order = sorted(list(d.keys()))
+    out = [d[k] for k in order]
+    return out
+
+
+def list2dict(l, names=None):
+    r"""Convert a list of arrays to a dictionary of arrays.
+
+    Args:
+        l (list): List of arrays.
+        names (list, optional): Names to give to the new fields. Defaults to
+            names based on order (e.g. 'f0', 'f1').
+
+    Returns:
+        dict: Dictionary of arrays.
+
+    """
+    if not isinstance(l, (list, tuple)):
+        raise TypeError("l must be a list or tuple, not %s." % type(l))
+    if names is None:
+        names = ['f%d' % i for i in range(len(l))]
+    out = {k: x for k, x in zip(names, l)}
+    return out
+
+
+def numpy2list(arr):
+    r"""Covert a numpy structured array to a list of arrays.
+
+    Args:
+        arr (np.ndarray): Array to convert.
+
+    Returns:
+        list: List with contents from the input array.
+
+    """
+    if not isinstance(arr, np.ndarray):
+        raise TypeError("arr must be a numpy array, not %s." % type(arr))
+    return dict2list(numpy2dict(arr), order=arr.dtype.names)
+
+
+def list2numpy(l, names=None):
+    r"""Convert a list of arrays to a numpy structured array.
+
+    Args:
+        l (list): List of arrays.
+        names (list, optional): Names to give to the new fields. Defaults to
+            names based on order.
+
+    Returns:
+        np.ndarray: Structured numpy array.
+
+    """
+    return dict2numpy(list2dict(l, names=names), order=names)
+
+
 def numpy2dict(arr):
     r"""Covert a numpy structured array to a dictionary of arrays.
 
@@ -1166,6 +1255,8 @@ def numpy2dict(arr):
         dict: Dictionary with contents from the input array.
 
     """
+    if not isinstance(arr, np.ndarray):
+        raise TypeError("arr must be a numpy array, not %s." % type(arr))
     out = dict()
     if arr.dtype.names is None:
         out['0'] = arr
@@ -1187,6 +1278,8 @@ def dict2numpy(d, order=None):
         np.ndarray: Structured numpy array.
 
     """
+    if not isinstance(d, dict):
+        raise TypeError("d must be a dictionary, not %s." % type(d))
     if order is None:
         order = sorted([k for k in d.keys()])
     dtypes = [d[k].dtype for k in order]
@@ -1208,7 +1301,10 @@ def numpy2pandas(arr):
         pandas.DataFrame: Pandas data frame with contents from the input array.
 
     """
-    return pandas.DataFrame(arr)
+    if not isinstance(arr, np.ndarray):
+        raise TypeError("arr must be a numpy array, not %s." % type(arr))
+    out = pandas.DataFrame(arr)
+    return out
 
 
 def pandas2numpy(frame, index=False):
@@ -1223,6 +1319,10 @@ def pandas2numpy(frame, index=False):
         np.ndarray: Structured numpy array.
 
     """
+    if not isinstance(frame, pandas.DataFrame):
+        raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
+    if frame.empty:
+        return np.array([])
     arr = frame.to_records(index=index)
     # Covert object type to string
     old_dtype = arr.dtype
@@ -1248,7 +1348,7 @@ def pandas2numpy(frame, index=False):
 
 
 def dict2pandas(d, order=None):
-    r"""Convert a dictionary of arrays to a numpy structured array.
+    r"""Convert a dictionary of arrays to a Pandas DataFrame.
 
     Args:
         d (dict): Dictionary of arrays.
@@ -1272,7 +1372,44 @@ def pandas2dict(frame):
         dict: Dictionary with contents from the input frame.
 
     """
+    if not isinstance(frame, pandas.DataFrame):
+        raise TypeError("frame must be a pandas data frame, not %s." % type(frame))
+    if frame.empty:
+        return {}
     return numpy2dict(pandas2numpy(frame))
+
+
+def list2pandas(l, names=None):
+    r"""Convert a list of arrays to a Pandas DataFrame.
+
+    Args:
+        l (list): List of arrays.
+        names (list, optional): Names to give to the new fields. Defaults to
+            names based on order (e.g. 'f0', 'f1').
+
+    Returns:
+        pandas.DataFrame: Pandas data frame with contents from the input list.
+
+    """
+    return numpy2pandas(list2numpy(l, names=names))
+
+
+def pandas2list(frame):
+    r"""Convert a Pandas DataFrame to a list of arrays.
+
+    Args:
+        frame (pandas.DataFrame): Frame to convert.
+
+    Returns:
+        list: List with contents from the input frame.
+
+    """
+    if frame.empty:
+        return []
+    return numpy2list(pandas2numpy(frame))
+
+
+import_all_serializers()
 
 
 __all__ = []

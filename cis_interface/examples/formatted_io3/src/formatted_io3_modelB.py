@@ -11,7 +11,7 @@ while True:
 
     # Receive input from input channel
     # If there is an error, the flag will be False
-    flag, arr = in_channel.recv()
+    flag, arr = in_channel.recv_array()
     if not flag:
         print("Model B: No more input.")
         break
@@ -23,7 +23,6 @@ while True:
 
     # Send output to output channel
     # If there is an error, the flag will be False
-    flag = out_channel.send(arr)
+    flag = out_channel.send_array(arr)
     if not flag:
-        print("Model B: Error sending output.")
-        break
+        raise RuntimeError("Model B: Error sending output.")

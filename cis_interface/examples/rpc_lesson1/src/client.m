@@ -2,7 +2,6 @@
 function client(iterations)
   
   iterations = str2num(iterations);
-  exit_code = 0;
   fprintf('Hello from Matlab client: iterations = %d\n', iterations);
 
   % Set up connections matching yaml
@@ -15,26 +14,21 @@ function client(iterations)
     
     % Call the server and receive response
     fprintf('client(Matlab): Calling fib(%d)\n', i);
-    [ret, result] = rpc.call(i);
+    [ret, result] = rpc.call(int32(i));
     if (~ret);
-      disp('client(Matlab): RPC CALL ERROR');
-      exit_code = -1;
-      break;
+      error('client(Matlab): RPC CALL ERROR');
     end;
     fib = result{1};
     fprintf('client(Matlab): Response fib(%d) = %d\n', i, fib);
 
     % Log result by sending it to the log connection
-    ret = log.send(i, fib);
+    ret = log.send(int32(i), fib);
     if (~ret);
-      disp('client(Matlab): SEND ERROR');
-      exit_code = -1;
-      break;
+      error('client(Matlab): SEND ERROR');
     end;
   end;
 
   disp('Goodbye from Matlab client');
-  exit(exit_code);
   
 end
 

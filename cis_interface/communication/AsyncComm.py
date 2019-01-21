@@ -36,7 +36,7 @@ class AsyncComm(CommBase.CommBase):
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
         self.backlog_open = False
-        self.loop_count = 0
+        self._used_direct = False
         super(AsyncComm, self).__init__(name, **kwargs)
 
     def printStatus(self, nindent=0):
@@ -297,10 +297,9 @@ class AsyncComm(CommBase.CommBase):
             self.debug("Stopping because send_backlog failed")
             self._close_backlog()
             return
-        self.loop_count += 1
-        if (self.loop_count % 100) == 0:
-            self.debug("Sleeping (is_confirmed_send=%s)",
-                       str(self.is_confirmed_send))
+        self.periodic_debug('run_backlog_send', period=1000)(
+            "Sleeping (is_confirmed_send=%s)",
+            str(self.is_confirmed_send))
         self.sleep()
 
     def run_backlog_recv(self):
@@ -318,10 +317,9 @@ class AsyncComm(CommBase.CommBase):
             self.debug("Stopping backlog recv thread")
             self.backlog_thread.set_break_flag()
             return
-        self.loop_count += 1
-        if (self.loop_count % 100) == 0:
-            self.debug("Sleeping (is_confirmed_recv=%s)",
-                       str(self.is_confirmed_recv))
+        self.periodic_debug('run_backlog_recv', period=1000)(
+            "Sleeping (is_confirmed_recv=%s)",
+            str(self.is_confirmed_recv))
         self.sleep()
 
     def send_backlog(self):
@@ -331,10 +329,14 @@ class AsyncComm(CommBase.CommBase):
             return True
         try:
             imsg, ikwargs = self.backlog_send[0]
+            if not self._used_direct:
+                self.suppress_special_debug = True
             flag = self._send_direct(imsg, **ikwargs)
+            self.suppress_special_debug = False
             if flag:
                 self.debug("Sent %d bytes to %s", len(imsg), self.address)
                 self.pop_backlog_send()
+                self._used_direct = True
         except AsyncTryAgain:  # pragma: debug
             flag = True
         except BaseException:  # pragma: debug
@@ -354,10 +356,14 @@ class AsyncComm(CommBase.CommBase):
             flag = True
         else:
             try:
+                if not self._used_direct:
+                    self.suppress_special_debug = True
                 flag, data = self._recv_direct()
+                self.suppress_special_debug = False
                 if flag and data:
                     self.debug("Recv %d bytes from %s", len(data), self.address)
                     self.add_backlog_recv(data)
+                    self._used_direct = True
             except BaseException:  # pragma: debug
                 self.exception('Error receiving into backlog.')
                 flag = False
@@ -413,7 +419,12 @@ class AsyncComm(CommBase.CommBase):
             no_backlog = True
         if no_backlog or not self.backlog_send_ready.is_set():
             try:
+                if not self._used_direct:
+                    self.suppress_special_debug = True
                 out = self._send_direct(payload, **kwargs)
+                self.suppress_special_debug = False
+                if out:
+                    self._used_direct = True
                 if no_backlog:
                     if out and (self.direction == 'send'):
                         out = self.wait_for_confirm(active_confirm=True,
@@ -468,7 +479,12 @@ class AsyncComm(CommBase.CommBase):
             if self.n_msg_direct_recv == 0:  # pragma: debug
                 self.verbose_debug("No messages waiting.")
                 return (True, self.empty_msg)
+            if not self._used_direct:
+                self.suppress_special_debug = True
             out = self._recv_direct()
+            self.suppress_special_debug = False
+            if out:
+                self._used_direct = True
             if out and (self.direction == 'recv'):
                 self.wait_for_confirm(active_confirm=True,
                                       timeout=False,

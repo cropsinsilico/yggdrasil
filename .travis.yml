@@ -78,6 +78,15 @@ before_install:
     conda update -q conda
     # Useful for debugging any issues with conda
     conda info -a
+    
+    # Install rapid-json
+    echo Installing rapidjson...;
+    # conda install rapidjson -c conda-forge
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+       sh ci/install-rapidjson-osx.sh
+    else
+       sh ci/install-rapidjson-linux.sh
+    fi
 
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
        brew update

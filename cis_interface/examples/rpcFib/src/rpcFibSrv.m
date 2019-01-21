@@ -13,7 +13,7 @@ function rpcFibSrv(sleeptime)
     [flag, input] = rpc.recv();
     if (~flag);
       fprintf('rpcFibSrv(M): end of input');
-      exit(0);
+      return;
     end
 
     % Compute fibonacci number
@@ -32,15 +32,14 @@ function rpcFibSrv(sleeptime)
 
     % Sleep and then send response back
     pause(sleeptime);
-    flag = rpc.send(input{1}, result);
+    flag = rpc.send(input{1}, int32(result));
     if (~flag);
-      fprintf('rpcFibSrv(M): ERROR sending');
-      exit(-1);
+      error('rpcFibSrv(M): ERROR sending');
     end
   end
 
   disp('Goodbye from Matlab rpcFibSrv');
-  exit(0);
+
 end
 
 

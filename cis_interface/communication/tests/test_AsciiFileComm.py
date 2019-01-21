@@ -4,9 +4,11 @@ from cis_interface.communication.tests import test_FileComm as parent
 
 class TestAsciiFileComm(parent.TestFileComm):
     r"""Test for AsciiFileComm communication class."""
+
+    comm = 'AsciiFileComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestAsciiFileComm, self).__init__(*args, **kwargs)
-        self.comm = 'AsciiFileComm'
         self.attr_list += ['comment']
 
     def test_send_recv_comment(self):

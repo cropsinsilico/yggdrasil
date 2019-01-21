@@ -1,13 +1,15 @@
-from cis_interface.communication.tests.test_CommBase import TestCommBase
+from cis_interface.communication.tests import test_CommBase as parent
 import nose.tools as nt
 import uuid
 
 
-class TestForkComm(TestCommBase):
+class TestForkComm(parent.TestCommBase):
     r"""Tests for ForkComm communication class."""
+
+    comm = 'ForkComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestForkComm, self).__init__(*args, **kwargs)
-        self.comm = 'ForkComm'
         self.attr_list += ['comm_list', 'curr_comm_index']
         self.ncomm = 2
 

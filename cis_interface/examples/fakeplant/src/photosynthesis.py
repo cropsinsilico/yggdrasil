@@ -1,4 +1,3 @@
-import sys
 from cis_interface.interface import CisInput, CisOutput
 
 
@@ -26,14 +25,12 @@ if __name__ == '__main__':
     # Receive temperature & CO2 concentration of environment
     flag, msg = in_temp.recv()
     if not flag:
-        print("photosynthesis: Failed to receive temperature.")
-        sys.exit(-1)
+        raise RuntimeError("photosynthesis: Failed to receive temperature.")
     T = msg[0]
     print("photosynthesis: T = %f" % T)
     flag, msg = in_co2.recv()
     if not flag:
-        print("photosynthesis: Failed to receive CO2 concentration.")
-        sys.exit(-1)
+        raise RuntimeError("photosynthesis: Failed to receive CO2 concentration.")
     CO2 = msg[0]
     print("photosynthesis: CO2 = %f" % CO2)
 
@@ -49,7 +46,4 @@ if __name__ == '__main__':
               + "--> photosynthesis rate = %f" % PR)
         flag = out_photo.send(PR)
         if not flag:
-            print("photosynthesis: Failed to send output.")
-            sys.exit(-1)
-
-    sys.exit(0)
+            raise RuntimeError("photosynthesis: Failed to send output.")

@@ -164,35 +164,32 @@ class CMakeModelDriver(ModelDriver):
     """
 
     _language = 'cmake'
-    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
-                             sourcedir={'type': 'string', 'required': False},
-                             builddir={'type': 'string', 'required': False},
-                             cmakeargs={'type': 'list', 'required': False,
-                                        'schema': {'type': 'string'}})
+    _schema_properties = inherit_schema(
+        ModelDriver._schema_properties,
+        {'sourcedir': {'type': 'string'},
+         'builddir': {'type': 'string'},
+         'cmakeargs': {'type': 'array', 'default': [],
+                       'items': {'type': 'string'}}})
 
-    def __init__(self, name, args, sourcedir=None, builddir=None,
-                 cmakeargs=None, preserve_cache=False, **kwargs):
+    def __init__(self, name, args, preserve_cache=False, **kwargs):
         super(CMakeModelDriver, self).__init__(name, args, **kwargs)
         if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.compiled = False
         self.target = self.args[0]
-        if sourcedir is None:
-            sourcedir = self.working_dir
-        elif not os.path.isabs(sourcedir):
-            sourcedir = os.path.realpath(os.path.join(self.working_dir, sourcedir))
-        self.sourcedir = sourcedir
-        if builddir is None:
-            builddir = os.path.join(sourcedir, 'build')
-        elif not os.path.isabs(builddir):
-            builddir = os.path.realpath(os.path.join(self.working_dir, builddir))
-        self.builddir = builddir
-        if cmakeargs is None:
-            cmakeargs = []
-        elif isinstance(cmakeargs, backwards.string_types):
-            cmakeargs = [cmakeargs]
-        self.cmakeargs = cmakeargs
+        if self.sourcedir is None:
+            self.sourcedir = self.working_dir
+        elif not os.path.isabs(self.sourcedir):
+            self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
+                                                           self.sourcedir))
+        if self.builddir is None:
+            self.builddir = os.path.join(self.sourcedir, 'build')
+        elif not os.path.isabs(self.builddir):
+            self.builddir = os.path.realpath(os.path.join(self.working_dir,
+                                                          self.builddir))
+        if isinstance(self.cmakeargs, backwards.string_types):
+            self.cmakeargs = [self.cmakeargs]
         self.preserve_cache = preserve_cache
         self.target_file = os.path.join(self.builddir, self.target)
         self.include_file = os.path.join(self.sourcedir, 'cis_cmake.txt')
@@ -243,7 +240,7 @@ class CMakeModelDriver(ModelDriver):
             if exit_code != 0:
                 os.chdir(curdir)
                 self.cleanup()
-                self.error(backwards.bytes2unicode(output))
+                self.error(backwards.as_unicode(output))
                 raise RuntimeError("CMake config failed with code %d." % exit_code)
             self.debug('Config output: \n%s' % output)
         # Build
@@ -256,7 +253,7 @@ class CMakeModelDriver(ModelDriver):
         exit_code = comp_process.returncode
         if exit_code != 0:
             os.chdir(curdir)
-            self.error(backwards.bytes2unicode(output))
+            self.error(backwards.as_unicode(output))
             self.cleanup()
             raise RuntimeError("CMake build failed with code %d." % exit_code)
         self.debug('Build output: \n%s' % output)

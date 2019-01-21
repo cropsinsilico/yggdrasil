@@ -22,14 +22,16 @@ def test_error_valgrind_strace_windows():  # pragma: windows
 
 class TestModelParam(parent.TestParam):
     r"""Test parameters for basic ModelDriver class."""
+
+    driver = 'ModelDriver'
     
     def __init__(self, *args, **kwargs):
         super(TestModelParam, self).__init__(*args, **kwargs)
-        self.driver = 'ModelDriver'
-        if platform._is_win:  # pragma: windows
-            self.args = ['timeout', '0']
-        else:
-            self.args = ['sleep', '0.1']
+        if self.args is None:
+            if platform._is_win:  # pragma: windows
+                self.args = ['timeout', '0']
+            else:
+                self.args = ['sleep', '0.1']
         self.attr_list += ['args', 'process', 'queue', 'queue_thread',
                            'is_server', 'client_of',
                            'event_process_kill_called',

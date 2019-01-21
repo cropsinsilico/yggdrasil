@@ -12,9 +12,6 @@ while (1)
           prate{1}, grate);
   flag = output.send(grate);
   if (~flag)
-    disp('growth: Error sending growth rate.');
-    exit(-1);
+    error('growth: Error sending growth rate.');
   end;
 end;
-
-exit(0);

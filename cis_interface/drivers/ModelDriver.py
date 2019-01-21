@@ -1,8 +1,9 @@
 import os
 import sys
 import copy
+import warnings
 from pprint import pformat
-from cis_interface import backwards, platform, tools
+from cis_interface import platform, tools
 from cis_interface.drivers.Driver import Driver
 from threading import Event
 try:
@@ -59,31 +60,34 @@ class ModelDriver(Driver):
 
     _language = 'executable'
     _schema_type = 'model'
-    _schema = {'name': {'type': 'string', 'required': True},
-               'language': {'type': 'string', 'required': True},
-               'args': {'type': ['list', 'string'], 'required': True,
-                        'schema': {'type': 'string'}},
-               'inputs': {'type': 'list', 'required': False,
-                          'schema': {'type': 'dict',
-                                     'schema': 'comm'}},
-               'outputs': {'type': 'list', 'required': False,
-                           'schema': {'type': 'dict',
-                                      'schema': 'comm'}},
-               'working_dir': {'type': 'string', 'required': True},
-               'is_server': {'type': 'boolean', 'required': False},
-               'client_of': {'type': 'list', 'required': False,
-                             'schema': {'type': 'string'}},
-               'with_strace': {'type': 'boolean', 'required': False},
-               'strace_flags': {'type': 'list', 'required': False,
-                                'schema': {'type': 'string'}},
-               'with_valgrind': {'type': 'boolean', 'required': False},
-               'valgrind_flags': {'type': 'list', 'required': False,
-                                  'schema': {'type': 'string'}}}
+    _schema_required = ['name', 'language', 'args', 'working_dir']
+    _schema_properties = {
+        'name': {'type': 'string'},
+        'language': {'type': 'string'},
+        'args': {'type': 'array',
+                 'items': {'type': 'string'}},
+        'inputs': {'type': 'array', 'default': [],
+                   'items': {'$ref': '#/definitions/comm'}},
+        'outputs': {'type': 'array', 'default': [],
+                    'items': {'$ref': '#/definitions/comm'}},
+        'working_dir': {'type': 'string'},
+        'is_server': {'type': 'boolean', 'default': False},
+        'client_of': {'type': 'array', 'items': {'type': 'string'},
+                      'default': []},
+        'with_strace': {'type': 'boolean', 'default': False},
+        'strace_flags': {'type': 'array', 'default': [],
+                         'items': {'type': 'string'}},
+        'with_valgrind': {'type': 'boolean', 'default': False},
+        'valgrind_flags': {'type': 'array', 'default': ['--leak-check=full'],  # '-v'
+                           'items': {'type': 'string'}}}
 
-    def __init__(self, name, args, is_server=False, client_of=[],
-                 with_strace=False, strace_flags=None,
-                 with_valgrind=False, valgrind_flags=None,
-                 model_index=0, **kwargs):
+    def __init__(self, name, args, model_index=0, **kwargs):
+        for k, v in self._schema_properties.items():
+            if k in ['name', 'language', 'args',
+                     'inputs', 'outputs', 'working_dir']:
+                continue
+            default = v.get('default', None)
+            setattr(self, k, kwargs.pop(k, default))
         super(ModelDriver, self).__init__(name, **kwargs)
         self.debug(str(args))
         if not isinstance(args, list):
@@ -94,26 +98,17 @@ class ModelDriver(Driver):
         self.model_process = None
         self.queue = Queue()
         self.queue_thread = None
-        self.is_server = is_server
-        self.client_of = client_of
         self.event_process_kill_called = Event()
         self.event_process_kill_complete = Event()
         # Strace/valgrind
-        if with_strace and with_valgrind:
+        if self.with_strace and self.with_valgrind:
             raise RuntimeError("Trying to run with strace and valgrind.")
-        if (with_strace or with_valgrind) and platform._is_win:  # pragma: windows
+        if (((self.with_strace or self.with_valgrind)
+             and platform._is_win)):  # pragma: windows
             raise RuntimeError("strace/valgrind options invalid on windows.")
-        self.with_strace = with_strace
-        if strace_flags is None:
-            strace_flags = []
-        self.strace_flags = strace_flags
-        self.with_valgrind = with_valgrind
-        if valgrind_flags is None:
-            valgrind_flags = ['--leak-check=full']  # '-v'
-        self.valgrind_flags = valgrind_flags
         self.model_index = model_index
         self.env_copy = ['LANG', 'PATH', 'USER']
-        self._exit_line = backwards.unicode2bytes('EXIT')
+        self._exit_line = b'EXIT'
         # print(os.environ.keys())
         for k in self.env_copy:
             if k in os.environ:
@@ -182,7 +177,10 @@ class ModelDriver(Driver):
             except BaseException:  # pragma: debug
                 pass
         else:
-            self.queue.put(line.decode('utf-8'))
+            try:
+                self.queue.put(line.decode('utf-8'))
+            except BaseException as e:
+                warnings.warn("Error in printing output: %s" % e)
 
     def before_loop(self):
         r"""Actions before loop."""
@@ -287,8 +285,10 @@ class ModelDriver(Driver):
             if self.queue_thread is not None:
                 if not self.was_break:  # pragma: debug
                     # Wait for messages to be printed
+                    self.debug("Waiting for queue_thread to finish up.")
                     self.queue_thread.wait(self.timeout)
                 if self.queue_thread.is_alive():  # pragma: debug
+                    self.debug("Setting break flag for queue_thread to finish up.")
                     self.queue_thread.set_break_flag()
                     self.queue_thread.wait(self.timeout)
                     try:

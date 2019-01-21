@@ -1,5 +1,4 @@
 from __future__ import print_function
-import sys
 # Import necessary connection interfaces
 from cis_interface.tools import print_encoded
 from cis_interface.interface.CisInterface import (
@@ -8,8 +7,6 @@ from cis_interface.interface.CisInterface import (
 
     
 if __name__ == '__main__':
-
-    error_code = 0
 
     # Input & output to an ASCII file line by line
     in_file = CisAsciiFileInput('inputPy_file')
@@ -36,9 +33,7 @@ if __name__ == '__main__':
             print("File: %s" % line)
             ret = out_file.send_line(line)
             if not ret:
-                print("ascii_io(P): ERROR SENDING LINE")
-                error_code = -1
-                break
+                raise RuntimeError("ascii_io(P): ERROR SENDING LINE")
         else:
             # If the receive was not succesful, send the end-of-file message to
             # close the output file.
@@ -55,13 +50,11 @@ if __name__ == '__main__':
         if ret:
             # If the receive was succesful, send the values to output.
             # Formatting is taken care of on the output driver side.
-            print_encoded("Table: %s, %d, %3.1f, %s" % line)
+            print_encoded("Table: %s, %d, %3.1f, %s" % tuple(line))
             # print("Table: %s, %d, %3.1f, %s" % line)
             ret = out_table.send_row(*line)
             if not ret:
-                print("ascii_io(P): ERROR SENDING ROW")
-                error_code = -1
-                break
+                raise RuntimeError("ascii_io(P): ERROR SENDING ROW")
         else:
             # If the receive was not succesful, send the end-of-file message to
             # close the output file.
@@ -80,10 +73,6 @@ if __name__ == '__main__':
             # Send the array to output. Formatting is handled on the output driver side.
             ret = out_array.send_array(arr)
             if not ret:
-                print("ascii_io(P): ERROR SENDING ARRAY")
-                error_code = -1
-                break
+                raise RuntimeError("ascii_io(P): ERROR SENDING ARRAY")
         else:
             print("ascii_io(P): End of array input (Python)")
-
-    sys.exit(error_code)

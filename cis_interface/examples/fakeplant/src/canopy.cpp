@@ -54,10 +54,10 @@ int main(int argc, char *argv[]) {
   }
   printf("canopy: layout = %f, %f, %f\n",
 	 layout[0], layout[1], layout[2]);
-  npatch = in_struct.recv(9, &x1[0], &x1[1], &x1[2],
-			  &x2[0], &x2[1], &x2[2],
-			  &x3[0], &x3[1], &x3[2]);
-  if (npatch < 0) {
+  ret = in_struct.recv(10, &npatch, &x1[0], &x1[1], &x1[2],
+		       &x2[0], &x2[1], &x2[2],
+		       &x3[0], &x3[1], &x3[2]);
+  if (ret < 0) {
     printf("canopy: Error receiving structure\n");
     free(layout);
     free(x1);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 
   // Send canopy to output and get growth rate for it
   double *growth_rate = (double*)malloc(npatch*sizeof(double));
-  ret = out_struct.send(9, npatch,
+  ret = out_struct.send(10, npatch,
 			x1[0], x1[1], x1[2],
 			x2[0], x2[1], x2[2],
 			x3[0], x3[1], x3[2]);
@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
 	     x2[0][i], x2[1][i], x2[2][i],
 	     x3[0][i], x3[1][i], x3[2][i]);
     }
-    ret = out_struct.send(9, npatch,
+    ret = out_struct.send(10, npatch,
 			  x1[0], x1[1], x1[2],
 			  x2[0], x2[1], x2[2],
 			  x3[0], x3[1], x3[2]);

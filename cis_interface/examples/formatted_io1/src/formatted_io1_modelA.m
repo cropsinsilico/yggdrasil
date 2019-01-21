@@ -1,6 +1,6 @@
 % Initialize input/output channels 
-in_channel = CisInterface('CisInput', 'inputA', '%6s\t%d\t%f\n');
-out_channel = CisInterface('CisOutput', 'outputA', '%6s\t%d\t%f\n');
+in_channel = CisInterface('CisInput', 'inputA');
+out_channel = CisInterface('CisOutput', 'outputA');
 
 flag = true;
 
@@ -14,21 +14,16 @@ while flag
     disp('Model A: No more input.');
     break;
   end;
-  name = msg{1};
-  count = msg{2};
-  size = msg{3};
 
   % Print received message
-  fprintf('Model A: %s, %d, %f\n', name, count, size);
+  fprintf('Model A: %s\n', msg);
 
   % Send output to output channel
   % If there is an error, the flag will be False
-  flag = out_channel.send(name, count, size);
+  flag = out_channel.send(msg);
   if (~flag)
-    disp('Model A: Error sending output.');
+    error('Model A: Error sending output.');
     break;
   end;
   
 end;
-
-exit(0);

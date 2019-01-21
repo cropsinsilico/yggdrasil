@@ -8,9 +8,11 @@ from cis_interface.communication.tests import test_RMQComm as parent
 @unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
 class TestRMQAsyncComm(parent.TestRMQComm):
     r"""Test for RMQAsyncComm communication class."""
+
+    comm = 'RMQAsyncComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestRMQAsyncComm, self).__init__(*args, **kwargs)
-        self.comm = 'RMQAsyncComm'
         self.attr_list += ['times_connected', 'rmq_thread', 'rmq_lock']
 
     def test_reconnect(self):

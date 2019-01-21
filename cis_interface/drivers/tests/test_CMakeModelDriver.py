@@ -78,9 +78,10 @@ def test_CMakeModelDriver_error_nofile():
 class TestCMakeModelParam(parent.TestModelParam):
     r"""Test parameters for CMakeModelDriver."""
 
+    driver = 'CMakeModelDriver'
+    
     def __init__(self, *args, **kwargs):
         super(TestCMakeModelParam, self).__init__(*args, **kwargs)
-        self.driver = 'CMakeModelDriver'
         self.attr_list += ['compiled', 'target', 'sourcedir',
                            'builddir', 'target_file', 'include_file',
                            'cmakeargs']

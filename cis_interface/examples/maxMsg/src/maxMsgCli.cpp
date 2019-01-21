@@ -18,30 +18,32 @@ int main(int argc, char *argv[]) {
 
     //char output[CIS_MSG_BUF];
     //char input[CIS_MSG_BUF];
-    size_t msg_size = CIS_MSG_BUF;
-    char *output = (char*)malloc(msg_size);
-    char *input = (char*)malloc(msg_size);
+    size_t msg_size_output = CIS_MSG_BUF;
+    size_t msg_size_input = CIS_MSG_BUF;
+    char *output = (char*)malloc(msg_size_output);
+    char *input = (char*)malloc(msg_size_input);
   
-    printf("maxMsgCli(CPP): Hello message size is %d.\n", (int)msg_size);
+    printf("maxMsgCli(CPP): Hello message size is %d.\n", (int)msg_size_output);
     
     // Create a max message, send/recv and verify
     CisRpcClient rpc("maxMsgSrv_maxMsgCli", "%s", "%s");
     
     // Create a max message
-    rand_str(output, msg_size);
+    rand_str(output, msg_size_output);
     printf("maxMsgCli(CPP): sending %.10s...\n", output);
     
     // Call RPC server
-    if (rpc.call(2, output, input) < 0) {
+    if (rpc.callRealloc(4, output, msg_size_output-1,
+			&input, &msg_size_input) < 0) {
       printf("maxMsgCli(CPP): RPC ERROR\n");
       free(output);
       free(input);
       return -1;
     }
-    printf("maxMsgCli(CPP): received %.10s...\n", input);
+    printf("maxMsgCli(CPP): received %lu bytes: %.10s...\n", msg_size_input, input);
 
     // Check to see if response matches
-    if (strncmp(output, input, msg_size)) {
+    if (strncmp(output, input, msg_size_output-1)) {
         printf("maxMsgCli(CPP): ERROR: input/output do not match\n");
         free(output);
         free(input);

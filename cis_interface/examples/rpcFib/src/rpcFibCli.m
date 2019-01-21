@@ -13,8 +13,7 @@ function rpcFibCli(iterations)
   % Read entire contents of yaml
   [ret, ycontent] = ymlfile.recv();
   if (~ret);
-    disp('rpcFibCli(M): RECV ERROR');
-    exit(-1);
+    error('rpcFibCli(M): RECV ERROR');
   end
   fprintf('rpcFibCli: yaml has %d lines\n', ...
 	  length(strsplit(ycontent, '\n', 'CollapseDelimiters', false)));
@@ -23,10 +22,9 @@ function rpcFibCli(iterations)
     
     % Call the server and receive response
     fprintf('rpcFibCli(M):  fib(->%-2d) ::: ', i);
-    [ret, fib] = rpc.call(i);
+    [ret, fib] = rpc.call(int32(i));
     if (~ret);
-      disp('rpcFibCli(M): RPC CALL ERROR');
-      exit(-1);
+      error('rpcFibCli(M): RPC CALL ERROR');
     end
 
     % Log result by sending it to the log connection
@@ -34,13 +32,12 @@ function rpcFibCli(iterations)
     fprintf(s);
     ret = log.send(s);
     if (~ret);
-      disp('rpcFibCli(M): SEND ERROR');
-      exit(-1);
+      error('rpcFibCli(M): SEND ERROR');
     end
   end
 
   disp('Goodbye from Matlab rpcFibCli');
-  exit(0);
+  return;
   
 end
 

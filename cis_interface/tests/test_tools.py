@@ -31,7 +31,7 @@ def test_locate_path():
 def test_popen_nobuffer():
     r"""Test open of process without buffer."""
     ans = os.getcwd()  # + '\n'
-    # ans = backwards.unicode2bytes(ans)
+    # ans = backwards.as_bytes(ans)
     # Test w/o shell
     if platform._is_win:  # pragma: windows
         args = ['cmd', '/c', 'cd']

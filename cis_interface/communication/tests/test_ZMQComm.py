@@ -61,9 +61,11 @@ def test_error_on_send_open_twice():
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
 class TestZMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for ZMQComm communication class."""
+
+    comm = 'ZMQComm'
+    
     def __init__(self, *args, **kwargs):
         super(TestZMQComm, self).__init__(*args, **kwargs)
-        self.comm = 'ZMQComm'
         self.protocol = None
         self.socket_type = None
         self.attr_list += ['context', 'socket', 'socket_type_name',
@@ -108,6 +110,7 @@ class TestZMQComm_client(TestZMQComm):
         out['is_client'] = True
         return out
         
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -120,6 +123,7 @@ class TestZMQCommINPROC(TestZMQComm):
         super(TestZMQCommINPROC, self).__init__(*args, **kwargs)
         self.protocol = 'inproc'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -131,6 +135,7 @@ class TestZMQCommTCP(TestZMQComm):
         super(TestZMQCommTCP, self).__init__(*args, **kwargs)
         self.protocol = 'tcp'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -143,6 +148,7 @@ class TestZMQCommIPC(TestZMQComm):
         super(TestZMQCommIPC, self).__init__(*args, **kwargs)
         self.protocol = 'ipc'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -160,6 +166,7 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 #         super(TestZMQCommUDP, self).__init__(*args, **kwargs)
 #         self.protocol = 'udp'
 
+#     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
 #         r"""Disabled send/recv of large message."""
 #         pass
@@ -171,6 +178,7 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 #         super(TestZMQCommPGM, self).__init__(*args, **kwargs)
 #         self.protocol = 'pgm'
 
+#     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
 #         r"""Disabled send/recv of large message."""
 #         pass
@@ -182,6 +190,7 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 #         super(TestZMQCommEPGM, self).__init__(*args, **kwargs)
 #         self.protocol = 'epgm'
 
+#     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
 #         r"""Disabled send/recv of large message."""
 #         pass
@@ -194,6 +203,7 @@ class TestZMQCommPAIR(TestZMQComm):
         super(TestZMQCommPAIR, self).__init__(*args, **kwargs)
         self.socket_type = 'PAIR'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -205,6 +215,7 @@ class TestZMQCommPUSH(TestZMQComm):
         super(TestZMQCommPUSH, self).__init__(*args, **kwargs)
         self.socket_type = 'PUSH'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -216,6 +227,7 @@ class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
         super(TestZMQCommPUSH_INPROC, self).__init__(*args, **kwargs)
         self.socket_type = 'PUSH'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -227,6 +239,7 @@ class TestZMQCommPUB(TestZMQComm):
         super(TestZMQCommPUB, self).__init__(*args, **kwargs)
         self.socket_type = 'PUB'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -238,6 +251,7 @@ class TestZMQCommREQ(TestZMQComm):
         super(TestZMQCommREQ, self).__init__(*args, **kwargs)
         self.socket_type = 'REQ'
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
@@ -260,6 +274,7 @@ class TestZMQCommROUTER(TestZMQComm):
         self.do_send_recv(reverse_comms=True, send_kwargs=dict(
             identity=self.recv_instance.dealer_identity))
 
+    @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass

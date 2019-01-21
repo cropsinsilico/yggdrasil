@@ -1,6 +1,6 @@
 model:
   name: matlab_model
-  driver: MatlabModelDriver
+  language: matlab
   args:
     - ../scripts/matlab_model.m
       

@@ -2,8 +2,8 @@
 from cis_interface.interface.CisInterface import CisInput, CisOutput
 
 # Initialize input/output channels
-in_channel = CisInput('inputA', '%6s\t%d\t%f\n')
-out_channel = CisOutput('outputA', '%6s\t%d\t%f\n')
+in_channel = CisInput('inputA')
+out_channel = CisOutput('outputA')
 
 # Loop until there is no longer input or the queues are closed
 while True:
@@ -14,14 +14,12 @@ while True:
     if not flag:
         print("Model A: No more input.")
         break
-    name, count, size = msg
 
     # Print received message
-    print('Model A: %s, %d, %f' % (name, count, size))
+    print('Model A: %s' % msg)
 
     # Send output to output channel
     # If there is an error, the flag will be False
-    flag = out_channel.send(name, count, size)
+    flag = out_channel.send(msg)
     if not flag:
-        print("Model A: Error sending output.")
-        break
+        raise RuntimeError("Model A: Error sending output.")
