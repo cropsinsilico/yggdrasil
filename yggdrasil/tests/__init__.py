@@ -742,7 +742,7 @@ class IOInfo(object):
                     x = pickle.load(fd)
         # elif isinstance(x, backwards.bytes_type):
         #     x = pickle.loads(x)
-        self.assert_equal(type(x), type(y))
+        assert_equal(type(x), type(y))
         for k in y:
             if k not in x:  # pragma: debug
                 raise AssertionError("Key %s expected, but not in result." % k)
