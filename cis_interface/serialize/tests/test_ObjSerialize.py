@@ -1,4 +1,4 @@
-from cis_interface.serialize.tests import test_PlySerialize as parent
+from yggdrasil.serialize.tests import test_PlySerialize as parent
 
 
 class TestObjSerialize(parent.TestPlySerialize):

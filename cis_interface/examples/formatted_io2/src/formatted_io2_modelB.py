@@ -1,10 +1,10 @@
 # Import classes for input/output channels
-from cis_interface.interface.CisInterface import (
-    CisAsciiTableInput, CisAsciiTableOutput)
+from yggdrasil.interface.YggInterface import (
+    YggAsciiTableInput, YggAsciiTableOutput)
 
 # Initialize input/output channels
-in_channel = CisAsciiTableInput('inputB')
-out_channel = CisAsciiTableOutput('outputB', '%6s\t%d\t%f\n')
+in_channel = YggAsciiTableInput('inputB')
+out_channel = YggAsciiTableOutput('outputB', '%6s\t%d\t%f\n')
 
 # Loop until there is no longer input or the queues are closed
 while True:

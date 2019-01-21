@@ -5,7 +5,7 @@ import glob
 import importlib
 import numpy as np
 import pandas
-from cis_interface import backwards, platform, units
+from yggdrasil import backwards, platform, units
 try:
     if not backwards.PY2:  # pragma: Python 3
         from astropy.io import ascii as apy_ascii
@@ -64,7 +64,7 @@ def import_all_serializers():
     for x in glob.glob(os.path.join(os.path.dirname(__file__), '*Serialize.py')):
         seri_mod = os.path.basename(x)[:-3]
         if not seri_mod.startswith('__'):
-            importlib.import_module('cis_interface.serialize.%s' % seri_mod)
+            importlib.import_module('yggdrasil.serialize.%s' % seri_mod)
 
 
 def get_serializer_class(seri_name):

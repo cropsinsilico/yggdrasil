@@ -1,7 +1,7 @@
 import os
 import unittest
-from cis_interface.schema import get_schema
-import cis_interface.drivers.tests.test_ConnectionDriver as parent
+from yggdrasil.schema import get_schema
+import yggdrasil.drivers.tests.test_ConnectionDriver as parent
 
 
 class TestFileOutputParam(parent.TestConnectionParam):

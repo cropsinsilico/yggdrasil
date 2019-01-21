@@ -1,5 +1,5 @@
-from cis_interface.drivers.InputDriver import InputDriver
-from cis_interface.schema import register_component
+from yggdrasil.drivers.InputDriver import InputDriver
+from yggdrasil.schema import register_component
 
 
 @register_component

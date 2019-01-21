@@ -1,5 +1,5 @@
-input = CisInterface('CisInput', 'photosynthesis_rate');
-output = CisInterface('CisOutput', 'growth_rate', '%f\n');
+input = YggInterface('YggInput', 'photosynthesis_rate');
+output = YggInterface('YggOutput', 'growth_rate', '%f\n');
 
 while (1)
   [flag, prate] = input.recv();

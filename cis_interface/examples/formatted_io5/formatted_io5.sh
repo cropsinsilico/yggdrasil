@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="formatted_io5"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="formatted_io5"
 
 yaml= 
 
@@ -25,4 +25,4 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml
+yggrun $yaml

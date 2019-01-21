@@ -1,15 +1,15 @@
 # Import Python interface
-from cis_interface.interface import CisInput, CisOutput
+from yggdrasil.interface import YggInput, YggOutput
 # Import Python module containing model calculation
 from shoot import calc_shoot_mass
 
 
 # Create input/output channels
-ShootGrowthRate = CisInput('shoot_growth_rate')
-InitShootMass = CisInput('init_shoot_mass')
-TimeStep = CisInput('shoot_time_step')
-NextRootMass = CisInput('next_root_mass')
-NextShootMass = CisOutput('next_shoot_mass', '%lf\n')
+ShootGrowthRate = YggInput('shoot_growth_rate')
+InitShootMass = YggInput('init_shoot_mass')
+TimeStep = YggInput('shoot_time_step')
+NextRootMass = YggInput('next_root_mass')
+NextShootMass = YggOutput('next_shoot_mass', '%lf\n')
 
 # Receive shoot growth rate
 flag, r_s = ShootGrowthRate.recv()

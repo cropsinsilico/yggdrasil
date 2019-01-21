@@ -1,10 +1,10 @@
 import os
 import copy
 import logging
-from cis_interface import platform, tools
-from cis_interface.config import cis_cfg
-from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface.schema import register_component, inherit_schema
+from yggdrasil import platform, tools
+from yggdrasil.config import ygg_cfg
+from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.schema import register_component, inherit_schema
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -17,12 +17,12 @@ _incl_dtype = os.path.join(_top_dir, 'metaschema', 'datatypes')
 _regex_win32_lib = os.path.join(_incl_regex, 'regex_win32.lib')
 if platform._is_win:  # pragma: windows
     _datatypes_lib = os.path.join(_incl_dtype, 'datatypes.lib')
-    _api_shared_c = os.path.join(_incl_interface, 'cis.lib')
-    _api_shared_cpp = os.path.join(_incl_interface, 'cis++.lib')
+    _api_shared_c = os.path.join(_incl_interface, 'ygg.lib')
+    _api_shared_cpp = os.path.join(_incl_interface, 'ygg++.lib')
 else:
     _datatypes_lib = os.path.join(_incl_dtype, 'libdatatypes.a')
-    _api_shared_c = os.path.join(_incl_interface, 'libcis.a')
-    _api_shared_cpp = os.path.join(_incl_interface, 'libcis++.a')
+    _api_shared_c = os.path.join(_incl_interface, 'libygg.a')
+    _api_shared_cpp = os.path.join(_incl_interface, 'libygg++.a')
 
 
 def get_zmq_flags(for_cmake=False):
@@ -41,8 +41,8 @@ def get_zmq_flags(for_cmake=False):
     if tools.is_comm_installed('ZMQComm', language='c'):
         if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
-                plib = cis_cfg.get('windows', '%s_static' % l, False)
-                pinc = cis_cfg.get('windows', '%s_include' % l, False)
+                plib = ygg_cfg.get('windows', '%s_static' % l, False)
+                pinc = ygg_cfg.get('windows', '%s_include' % l, False)
                 if not (plib and pinc):  # pragma: debug
                     raise Exception("Could not locate %s .lib and .h files." % l)
                 pinc_d = os.path.dirname(pinc)
@@ -77,7 +77,7 @@ def get_ipc_flags(for_cmake=False):
 
 
 def get_flags(for_cmake=False, for_api=False, cpp=False):
-    r"""Get the necessary flags for compiling & linking with CiS libraries.
+    r"""Get the necessary flags for compiling & linking with Ygg libraries.
 
     Args:
         for_cmake (bool, optional): If True, the returned flags will match the
@@ -122,9 +122,9 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
         else:
             _linker_flags += ["-L" + _incl_interface]
             if cpp:
-                _linker_flags += ["-lcis++"]
+                _linker_flags += ["-lygg++"]
             else:
-                _linker_flags += ["-lcis"]
+                _linker_flags += ["-lygg"]
     if tools.get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]
     return _compile_flags, _linker_flags
@@ -359,7 +359,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
 def build_api(cpp=False, overwrite=False):
     r"""Build api library."""
     # Get paths
-    api_src = os.path.join(_incl_interface, 'CisInterface')
+    api_src = os.path.join(_incl_interface, 'YggInterface')
     if cpp:
         api_lib = _api_shared_cpp
         api_src += '.cpp'
@@ -597,7 +597,7 @@ class GCCModelDriver(ModelDriver):
         self.src = []
         self.ldflags = []
         self.ccflags = []
-        self.ccflags.append('-DCIS_DEBUG=%d' % self.logger.getEffectiveLevel())
+        self.ccflags.append('-DYGG_DEBUG=%d' % self.logger.getEffectiveLevel())
         self.run_args = []
         self.efile = None
         is_object = False

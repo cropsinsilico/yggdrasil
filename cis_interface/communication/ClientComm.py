@@ -1,5 +1,5 @@
 import uuid
-from cis_interface.communication import (
+from yggdrasil.communication import (
     CommBase, new_comm, get_comm, get_comm_class)
 
 

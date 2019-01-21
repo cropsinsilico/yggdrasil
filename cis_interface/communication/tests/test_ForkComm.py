@@ -1,5 +1,5 @@
-from cis_interface.communication.tests import test_CommBase as parent
-import nose.tools as nt
+from yggdrasil.tests import assert_raises
+from yggdrasil.communication.tests import test_CommBase as parent
 import uuid
 
 
@@ -27,7 +27,7 @@ class TestForkComm(parent.TestCommBase):
 
     def test_error_name(self):
         r"""Test error on missing address."""
-        nt.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
+        assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
 
     def test_error_send(self):
         r"""Disabled: Test error on send."""

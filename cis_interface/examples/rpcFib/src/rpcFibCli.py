@@ -1,8 +1,8 @@
 from __future__ import print_function
 import sys
 import numpy as np
-from cis_interface.interface.CisInterface import (
-    CisRpcClient, CisInput, CisOutput)
+from yggdrasil.interface.YggInterface import (
+    YggRpcClient, YggInput, YggOutput)
 
 
 def fibClient(args):
@@ -12,9 +12,9 @@ def fibClient(args):
 
     # Set up connections matching yaml
     # RPC client-side connection will be $(server_name)_$(client_name)
-    ymlfile = CisInput("yaml_in")
-    rpc = CisRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d")
-    log = CisOutput("output_log")
+    ymlfile = YggInput("yaml_in")
+    rpc = YggRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d")
+    log = YggOutput("output_log")
 
     # Read entire contents of yaml
     ret, ycontent = ymlfile.recv()

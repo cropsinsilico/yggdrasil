@@ -1,5 +1,5 @@
 import numpy as np
-from cis_interface.communication.tests import test_AsciiTableComm as parent
+from yggdrasil.communication.tests import test_AsciiTableComm as parent
 
 
 class TestPandasFileComm(parent.TestAsciiTableComm):

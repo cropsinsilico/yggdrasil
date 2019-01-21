@@ -1,5 +1,5 @@
-from cis_interface import tools
-import cis_interface.drivers.tests.test_ConnectionDriver as parent
+from yggdrasil import tools
+import yggdrasil.drivers.tests.test_ConnectionDriver as parent
 
 
 class TestClientResponseParam(parent.TestConnectionParam):

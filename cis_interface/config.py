@@ -1,5 +1,5 @@
 """
-This module imports the configuration for cis_interface.
+This module imports the configuration for yggdrasil.
 
 .. todo::
    Remove reference to environment variables for accessing config options.
@@ -12,15 +12,15 @@ import warnings
 import logging
 # import pprint
 import subprocess
-from cis_interface.backwards import configparser
-from cis_interface import platform, backwards
-config_file = '.cis_interface.cfg'
+from yggdrasil.backwards import configparser
+from yggdrasil import platform, backwards
+config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
 usr_config_file = os.path.expanduser(os.path.join('~', config_file))
 loc_config_file = os.path.join(os.getcwd(), config_file)
 
 
-class CisConfigParser(configparser.ConfigParser):
+class YggConfigParser(configparser.ConfigParser):
     r"""Config parser that returns None if option not provided on get."""
 
     def get(self, section, option, default=None, **kwargs):
@@ -130,7 +130,7 @@ def update_config_matlab(config):
     r"""Update config options specific to matlab.
 
     Args:
-        config (CisConfigParser): Config class that options should be set for.
+        config (YggConfigParser): Config class that options should be set for.
 
     Returns:
         list: Section, option, description tuples for options that could not be
@@ -176,7 +176,7 @@ def update_config_windows(config):  # pragma: windows
     r"""Update config options specific to windows.
 
     Args:
-        config (CisConfigParser): Config class that options should be set for.
+        config (YggConfigParser): Config class that options should be set for.
 
     Returns:
         list: Section, option, description tuples for options that could not be
@@ -222,7 +222,7 @@ def update_config(config_file, config_base=None):
     assert(os.path.isfile(config_base))
     if not os.path.isfile(config_file):
         shutil.copy(config_base, config_file)
-    cp = CisConfigParser()
+    cp = YggConfigParser()
     cp.read(config_file)
     miss = []
     if platform._is_win:  # pragma: windows
@@ -243,28 +243,29 @@ if not os.path.isfile(usr_config_file):
 assert(os.path.isfile(usr_config_file))
 assert(os.path.isfile(def_config_file))
 files = [def_config_file, usr_config_file, loc_config_file]
-cis_cfg = CisConfigParser()
-cis_cfg.read(files)
+ygg_cfg = YggConfigParser()
+ygg_cfg.read(files)
 
 
 # Aliases for old versions of config options
-alias_map = [(('debug', 'psi'), ('debug', 'cis'))]
+alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
+             (('debug', 'cis'), ('debug', 'ygg'))]
 for old, new in alias_map:
-    v = cis_cfg.get(*old)
+    v = ygg_cfg.get(*old)
     if v:  # pragma: debug
-        cis_cfg.set(new[0], new[1], v)
+        ygg_cfg.set(new[0], new[1], v)
 
 
 # Set associated environment variables
-env_map = [('debug', 'cis', 'CIS_DEBUG'),
+env_map = [('debug', 'ygg', 'YGG_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
-           ('debug', 'client', 'CIS_CLIENT_DEBUG'),
-           ('rmq', 'namespace', 'CIS_NAMESPACE'),
-           ('rmq', 'host', 'CIS_MSG_HOST'),
-           ('rmq', 'vhost', 'CIS_MSG_VHOST'),
-           ('rmq', 'user', 'CIS_MSG_USER'),
-           ('rmq', 'password', 'CIS_MSG_PW'),
-           ('parallel', 'cluster', 'CIS_CLUSTER'),
+           ('debug', 'client', 'YGG_CLIENT_DEBUG'),
+           ('rmq', 'namespace', 'YGG_NAMESPACE'),
+           ('rmq', 'host', 'YGG_MSG_HOST'),
+           ('rmq', 'vhost', 'YGG_MSG_VHOST'),
+           ('rmq', 'user', 'YGG_MSG_USER'),
+           ('rmq', 'password', 'YGG_MSG_PW'),
+           ('parallel', 'cluster', 'YGG_CLUSTER'),
            ]
 
 
@@ -272,28 +273,28 @@ def cfg_logging(cfg=None):
     r"""Set logging levels from config options.
 
     Args:
-        cfg (:class:`cis_interface.config.CisConfigParser`, optional):
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
             Config parser with options that should be used to update the
-            environment. Defaults to :data:`cis_interface.config.cis_cfg`.
+            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
 
     """
-    is_model = (os.environ.get('CIS_SUBPROCESS', "False") == "True")
+    is_model = (os.environ.get('YGG_SUBPROCESS', "False") == "True")
     if cfg is None:
-        cfg = cis_cfg
+        cfg = ygg_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
-    logLevelCIS = eval('logging.%s' % cfg.get('debug', 'cis', 'NOTSET'))
+    logLevelYGG = eval('logging.%s' % cfg.get('debug', 'ygg', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
-    cis_logger = logging.getLogger("cis_interface")
+    ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
-    cis_logger.setLevel(level=logLevelCIS)
+    ygg_logger.setLevel(level=logLevelYGG)
     rmq_logger.setLevel(level=logLevelRMQ)
     # For models, route the loggs to stdout so that they are displayed by the
     # model driver.
     if is_model:
         handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logLevelCIS)
-        cis_logger.addHandler(handler)
+        handler.setLevel(logLevelYGG)
+        ygg_logger.addHandler(handler)
         rmq_logger.addHandler(handler)
 
 
@@ -303,15 +304,15 @@ def cfg_environment(env=None, cfg=None):
     Args:
         env (dict, optional): Dictionary of environment variables that should
             be updated. Defaults to `os.environ`.
-        cfg (:class:`cis_interface.config.CisConfigParser`, optional):
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
             Config parser with options that should be used to update the
-            environment. Defaults to :data:`cis_interface.config.cis_cfg`.
+            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
 
     """
     if env is None:
         env = os.environ
     if cfg is None:
-        cfg = cis_cfg
+        cfg = ygg_cfg
     for s, o, e in env_map:
         v = cfg.get(s, o)
         if v:

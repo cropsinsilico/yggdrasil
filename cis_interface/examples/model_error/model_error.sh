@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="model_error"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="model_error"
 
 yaml= 
 
@@ -33,7 +33,7 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml
+yggrun $yaml
 
 outfile="${TMPDIR}output_model_error.txt"
 cat $outfile

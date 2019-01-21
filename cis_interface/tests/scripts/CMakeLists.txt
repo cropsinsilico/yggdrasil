@@ -3,4 +3,4 @@ project(gcc_model)
 
 ADD_EXECUTABLE(gcc_model gcc_model.cpp hellofunc.c)
 
-INCLUDE(cis_cmake.txt)
+INCLUDE(ygg_cmake.txt)

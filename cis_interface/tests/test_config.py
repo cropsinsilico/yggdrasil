@@ -1,7 +1,7 @@
 import os
 import tempfile
-import nose.tools as nt
-from cis_interface import config, backwards
+from yggdrasil.tests import assert_equal
+from yggdrasil import config, backwards
 
 
 def make_temp(fname_base, count=1):
@@ -32,16 +32,16 @@ def make_temp_multiple():
     return make_temp('multiple_test_file', count=2)
 
 
-def test_CisConfigParser():
+def test_YggConfigParser():
     r"""Ensure that get returns proper defaults etc."""
-    x = config.CisConfigParser()
+    x = config.YggConfigParser()
     x.add_section('test_section')
     x.set('test_section', 'test_option', 'test_value')
-    nt.assert_equal(x.get('test_section', 'test_option'), 'test_value')
-    nt.assert_equal(x.get('test_section', 'fake_option'), None)
-    nt.assert_equal(x.get('test_section', 'fake_option', 5), 5)
-    nt.assert_equal(x.get('fake_section', 'fake_option'), None)
-    nt.assert_equal(x.get('fake_section', 'fake_option', 5), 5)
+    assert_equal(x.get('test_section', 'test_option'), 'test_value')
+    assert_equal(x.get('test_section', 'fake_option'), None)
+    assert_equal(x.get('test_section', 'fake_option', 5), 5)
+    assert_equal(x.get('fake_section', 'fake_option'), None)
+    assert_equal(x.get('fake_section', 'fake_option', 5), 5)
 
 
 def test_locate_file():
@@ -52,12 +52,12 @@ def test_locate_file():
     sdir, spat, sans = make_temp_single()
     sout = config.locate_file(spat)
     assert(isinstance(sout, backwards.string_types))
-    nt.assert_equal(sout, sans[0])
+    assert_equal(sout, sans[0])
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     mout = config.locate_file(mpat)
     assert(isinstance(mout, backwards.string_types))
-    nt.assert_equal(mout, mans[0])
+    assert_equal(mout, mans[0])
     
 
 def test_find_all():
@@ -68,12 +68,12 @@ def test_find_all():
     sdir, spat, sans = make_temp_single()
     sout = config.find_all(spat, sdir)
     assert(isinstance(sout, list))
-    nt.assert_equal(sout, sans)
+    assert_equal(sout, sans)
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
     mout = config.find_all(mpat, mdir)
     assert(isinstance(mout, list))
-    nt.assert_equal(mout, mans)
+    assert_equal(mout, mans)
 
 
 def test_update_config():
@@ -87,6 +87,6 @@ def test_update_config():
 
 def test_cfg_logging():
     r"""Test cfg_logging."""
-    os.environ['CIS_SUBPROCESS'] = 'True'
+    os.environ['YGG_SUBPROCESS'] = 'True'
     config.cfg_logging()
-    del os.environ['CIS_SUBPROCESS']
+    del os.environ['YGG_SUBPROCESS']

@@ -1,10 +1,10 @@
 # Import classes for input/output channels
-from cis_interface.interface.CisInterface import (
-    CisPandasInput, CisPandasOutput)
+from yggdrasil.interface.YggInterface import (
+    YggPandasInput, YggPandasOutput)
 
 # Initialize input/output channels
-in_channel = CisPandasInput('inputA')
-out_channel = CisPandasOutput('outputA')
+in_channel = YggPandasInput('inputA')
+out_channel = YggPandasOutput('outputA')
 
 # Loop until there is no longer input or the queues are closed
 while True:

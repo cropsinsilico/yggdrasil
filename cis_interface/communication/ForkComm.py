@@ -1,7 +1,7 @@
-from cis_interface.communication import CommBase, get_comm, get_comm_class
+from yggdrasil.communication import CommBase, get_comm, get_comm_class
 
 
-_address_sep = ':CIS_ADD:'
+_address_sep = ':YGG_ADD:'
 
 
 def get_comm_name(name, i):

@@ -13,7 +13,7 @@ def import_driver(driver=None):
     """
     if driver is None:
         driver = 'Driver'
-    drv = importlib.import_module('cis_interface.drivers.%s' % driver)
+    drv = importlib.import_module('yggdrasil.drivers.%s' % driver)
     class_ = getattr(drv, driver)
     return class_
                     

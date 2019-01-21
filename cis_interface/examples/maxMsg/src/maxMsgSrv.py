@@ -1,8 +1,8 @@
-from cis_interface.interface.CisInterface import CisRpcServer
+from yggdrasil.interface.YggInterface import YggRpcServer
 
 
 print("maxMsgSrv(P): Hello!")
-rpc = CisRpcServer("maxMsgSrv", "%s", "%s")
+rpc = YggRpcServer("maxMsgSrv", "%s", "%s")
 
 while True:
     ret, input = rpc.rpcRecv()

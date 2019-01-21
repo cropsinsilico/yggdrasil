@@ -1,6 +1,6 @@
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISASCIITABLECOMM_H_
-#define CISASCIITABLECOMM_H_
+#ifndef YGGASCIITABLECOMM_H_
+#define YGGASCIITABLECOMM_H_
 
 #include <../tools.h>
 #include <CommBase.h>
@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 /*! @brief Number of tables creates. */
-static unsigned _cisAsciiTablesCreated;
+static unsigned _yggAsciiTablesCreated;
 
 /*!
   @brief Initialize a ASCII table comm.
@@ -29,7 +29,7 @@ int init_ascii_table_comm(comm_t *comm) {
   asciiTable_t *handle = (asciiTable_t*)(get_ascii_table_from_void(comm->serializer->type,
 								   comm->serializer->info));
   if (handle == NULL) {
-    cislog_error("init_ascii_table_comm: Could not get table.");
+    ygglog_error("init_ascii_table_comm: Could not get table.");
     return -1;
   }
   if (strcmp(comm->direction, "send") == 0)
@@ -37,22 +37,22 @@ int init_ascii_table_comm(comm_t *comm) {
   else
     flag = at_update(handle, comm->address, "r");
   if (flag != 0) {
-    cislog_error("init_ascii_table_comm: Could not set asciiTable address.");
+    ygglog_error("init_ascii_table_comm: Could not set asciiTable address.");
     return -1;
   }
   comm->handle = (void*)handle;
   // Simplify received formats
   if (strcmp(comm->direction, "recv") == 0) {
-    flag = simplify_formats(handle->format_str, CIS_MSG_MAX);
+    flag = simplify_formats(handle->format_str, YGG_MSG_MAX);
     if (flag < 0) {
-      cislog_error("init_ascii_table_comm: Failed to simplify recvd format.");
+      ygglog_error("init_ascii_table_comm: Failed to simplify recvd format.");
       return -1;
     }
   }
   // Open the table
   flag = at_open(handle);
   if (flag != 0) {
-    cislog_error("init_ascii_table_comm: Could not open %s", comm->name);
+    ygglog_error("init_ascii_table_comm: Could not open %s", comm->name);
     comm->valid = 0;
     return -1;
   }
@@ -70,9 +70,9 @@ int init_ascii_table_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_table_address(comm_t *comm) {
-  sprintf(comm->name, "tempASCIITable.%d", _cisAsciiTablesCreated);
+  sprintf(comm->name, "tempASCIITable.%d", _yggAsciiTablesCreated);
   int ret = init_ascii_table_comm(comm);
-  _cisAsciiTablesCreated++;
+  _yggAsciiTablesCreated++;
   return ret;
 };
 
@@ -94,9 +94,9 @@ int init_ascii_table_array_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_table_array_address(comm_t *comm) {
-  sprintf(comm->name, "tempASCIITableArray.%d", _cisAsciiTablesCreated);
+  sprintf(comm->name, "tempASCIITableArray.%d", _yggAsciiTablesCreated);
   int ret = init_ascii_table_array_comm(comm);
-  _cisAsciiTablesCreated++;
+  _yggAsciiTablesCreated++;
   return ret;
 };
 
@@ -187,4 +187,4 @@ int ascii_table_comm_recv(const comm_t x, char **data, const size_t len,
 }
 #endif
 
-#endif /*CISASCIITABLECOMM_H_*/
+#endif /*YGGASCIITABLECOMM_H_*/

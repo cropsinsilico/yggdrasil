@@ -1,6 +1,6 @@
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISASCIIFILECOMM_H_
-#define CISASCIIFILECOMM_H_
+#ifndef YGGASCIIFILECOMM_H_
+#define YGGASCIIFILECOMM_H_
 
 #include <../tools.h>
 #include <CommBase.h>
@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 /*! @brief Number of files creates. */
-static unsigned _cisAsciiFilesCreated;
+static unsigned _yggAsciiFilesCreated;
 
 /*!
   @brief Initialize a ASCII file comm.
@@ -27,7 +27,7 @@ int init_ascii_file_comm(comm_t *comm) {
   strcpy(comm->address, comm->name);
   asciiFile_t *handle = (asciiFile_t*)malloc(sizeof(asciiFile_t));
   if (handle == NULL) {
-    cislog_error("init_ascii_file_comm: Failed to malloc asciiFile handle.");
+    ygglog_error("init_ascii_file_comm: Failed to malloc asciiFile handle.");
     return -1;
   }
   if (strcmp(comm->direction, "send") == 0)
@@ -37,7 +37,7 @@ int init_ascii_file_comm(comm_t *comm) {
   comm->handle = (void*)handle;
   int ret = af_open(handle);
   if (ret != 0) {
-    cislog_error("init_ascii_file_comm: Could not open %s", comm->name);
+    ygglog_error("init_ascii_file_comm: Could not open %s", comm->name);
     comm->valid = 0;
   }
   return ret;
@@ -50,7 +50,7 @@ int init_ascii_file_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_file_address(comm_t *comm) {
-  sprintf(comm->name, "temp%d", _cisAsciiFilesCreated);
+  sprintf(comm->name, "temp%d", _yggAsciiFilesCreated);
   int ret = init_ascii_file_comm(comm);
   return ret;
 };
@@ -147,4 +147,4 @@ int ascii_file_comm_recv(const comm_t x, char **data, size_t len,
 }
 #endif
 
-#endif /*CISASCIIFILECOMM_H_*/
+#endif /*YGGASCIIFILECOMM_H_*/

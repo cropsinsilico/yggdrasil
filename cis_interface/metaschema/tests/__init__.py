@@ -2,8 +2,8 @@ import os
 import numpy as np
 import shutil
 import tempfile
-import nose.tools as nt
-from cis_interface import metaschema
+from yggdrasil import metaschema
+from yggdrasil.tests import assert_raises, assert_equal
 
 
 def test_func():  # pragma: debug
@@ -77,7 +77,7 @@ _normalize_objects = [
 def test_create_metaschema():
     r"""Test errors in create_metaschema."""
     assert(metaschema.get_metaschema())
-    nt.assert_raises(RuntimeError, metaschema.create_metaschema, overwrite=False)
+    assert_raises(RuntimeError, metaschema.create_metaschema, overwrite=False)
 
 
 def test_get_metaschema():
@@ -88,7 +88,7 @@ def test_get_metaschema():
         shutil.move(metaschema._metaschema_fname, temp)
         metaschema._metaschema = None
         new_metaschema = metaschema.get_metaschema()
-        nt.assert_equal(new_metaschema, old_metaschema)
+        assert_equal(new_metaschema, old_metaschema)
     except BaseException:  # pragma: debug
         shutil.move(temp, metaschema._metaschema_fname)
         raise
@@ -110,10 +110,10 @@ def test_normalize_instance():
     r"""Test normalize_instance."""
     for schema, x, y in _normalize_objects:
         z = metaschema.normalize_instance(x, schema, test_attr=1)
-        nt.assert_equal(z, y)
+        assert_equal(z, y)
 
 
 def test_create_normalizer():
     r"""Test create normalizer with default types."""
     cls = metaschema.normalizer.create(metaschema.get_metaschema())
-    nt.assert_equal(cls({'type': 'int'}).normalize('1'), '1')
+    assert_equal(cls({'type': 'int'}).normalize('1'), '1')

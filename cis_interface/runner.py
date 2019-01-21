@@ -1,4 +1,4 @@
-"""This module provides tools for running models using cis_interface."""
+"""This module provides tools for running models using yggdrasil."""
 import sys
 import logging
 # import atexit
@@ -8,34 +8,34 @@ import signal
 from pprint import pformat
 from itertools import chain
 import socket
-from cis_interface.tools import CisClass
-from cis_interface.config import cis_cfg, cfg_environment
-from cis_interface import platform, backwards, yamlfile
-from cis_interface.drivers import create_driver
+from yggdrasil.tools import YggClass
+from yggdrasil.config import ygg_cfg, cfg_environment
+from yggdrasil import platform, backwards, yamlfile
+from yggdrasil.drivers import create_driver
 
 
 COLOR_TRACE = '\033[30;43;22m'
 COLOR_NORMAL = '\033[0m'
 
 
-# def setup_cis_logging(prog, level=None):
-#     r"""Set the log lovel based on environment variable 'CIS_DEBUG'. If the
+# def setup_ygg_logging(prog, level=None):
+#     r"""Set the log lovel based on environment variable 'YGG_DEBUG'. If the
 #     variable is not set, the log level is set to 'NOTSET'.
 
 #     Args:
 #         prog (str): Name to prepend log messages with.
 #         level (str, optional): String specifying the logging level. Defaults
-#             to None and the environment variable 'CIS_DEBUG' is used.
+#             to None and the environment variable 'YGG_DEBUG' is used.
 
 #     """
 #     if level is None:
-#         level = cis_cfg.get('debug', 'cis', 'NOTSET')
+#         level = ygg_cfg.get('debug', 'ygg', 'NOTSET')
 #     logLevel = eval('logging.' + level)
 #     logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
 #                         prog + ': %(message)s' + COLOR_NORMAL)
 
 
-class CisRunner(CisClass):
+class YggRunner(YggClass):
     r"""This class handles the orchestration of starting the model and
     IO drivers, monitoring their progress, and cleaning up on exit.
 
@@ -48,11 +48,11 @@ class CisRunner(CisClass):
             from. Defaults to None.
         rank (int, optional): Rank of this set of models if run in parallel.
             Defaults to 0.
-        cis_debug_level (str, optional): Level for CiS debug messages. Defaults
-            to environment variable 'CIS_DEBUG'.
+        ygg_debug_level (str, optional): Level for Ygg debug messages. Defaults
+            to environment variable 'YGG_DEBUG'.
         rmq_debug_level (str, optional): Level for RabbitMQ debug messages.
             Defaults to environment variable 'RMQ_DEBUG'.
-        cis_debug_prefix (str, optional): Prefix for CiS debug messages.
+        ygg_debug_prefix (str, optional): Prefix for Ygg debug messages.
             Defaults to namespace.
 
     Attributes:
@@ -72,9 +72,9 @@ class CisRunner(CisClass):
 
     """
     def __init__(self, modelYmls, namespace, host=None, rank=0,
-                 cis_debug_level=None, rmq_debug_level=None,
-                 cis_debug_prefix=None):
-        super(CisRunner, self).__init__('runner')
+                 ygg_debug_level=None, rmq_debug_level=None,
+                 ygg_debug_prefix=None):
+        super(YggRunner, self).__init__('runner')
         self.namespace = namespace
         self.host = host
         self.rank = rank
@@ -88,9 +88,9 @@ class CisRunner(CisClass):
         self._old_handlers = {}
         self.error_flag = False
         # Setup logging
-        # if cis_debug_prefix is None:
-        #     cis_debug_prefix = namespace
-        # setup_cis_logging(cis_debug_prefix, level=cis_debug_level)
+        # if ygg_debug_prefix is None:
+        #     ygg_debug_prefix = namespace
+        # setup_ygg_logging(ygg_debug_prefix, level=ygg_debug_level)
         # Update environment based on config
         cfg_environment()
         # Parse yamls
@@ -533,10 +533,10 @@ def get_runner(models, **kwargs):
     Args:
         models (list): List of yaml files containing information on the models
             that should be run.
-        **kwargs: Additonal keyword arguments are passed to CisRunner.
+        **kwargs: Additonal keyword arguments are passed to YggRunner.
 
     Returns:
-        CisRunner: Runner for the provided models.
+        YggRunner: Runner for the provided models.
 
     Raises:
         Exception: If config option 'namespace' in 'rmq' section not set.
@@ -544,17 +544,17 @@ def get_runner(models, **kwargs):
     """
     # Get environment variables
     logger = logging.getLogger(__name__)
-    namespace = kwargs.pop('namespace', cis_cfg.get('rmq', 'namespace', False))
+    namespace = kwargs.pop('namespace', ygg_cfg.get('rmq', 'namespace', False))
     if not namespace:  # pragma: debug
         raise Exception('rmq:namespace not set in config file')
     rank = os.environ.get('PARALLEL_SEQ', '0')
     host = socket.gethostname()
-    os.environ['CIS_RANK'] = rank
-    os.environ['CIS_HOST'] = host
+    os.environ['YGG_RANK'] = rank
+    os.environ['YGG_HOST'] = host
     rank = int(rank)
     kwargs.update(rank=rank, host=host)
     # Run
     logger.debug("Running in %s with path %s namespace %s rank %d",
                  os.getcwd(), sys.path, namespace, rank)
-    cisRunner = CisRunner(models, namespace, **kwargs)
-    return cisRunner
+    yggRunner = YggRunner(models, namespace, **kwargs)
+    return yggRunner

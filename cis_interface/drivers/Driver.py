@@ -1,9 +1,9 @@
 import os
-from cis_interface.config import cis_cfg
-from cis_interface import tools
+from yggdrasil.config import ygg_cfg
+from yggdrasil import tools
 
 
-class Driver(tools.CisThreadLoop):
+class Driver(tools.YggThreadLoop):
     r"""Base class for all drivers.
 
     Args:
@@ -49,11 +49,11 @@ class Driver(tools.CisThreadLoop):
         super(Driver, self).__init__(name, **kwargs)
         self._thread_initialized = True
         self.debug('')
-        # if cis_cfg.get('debug', 'cis') == 'DEBUG':
+        # if ygg_cfg.get('debug', 'ygg') == 'DEBUG':
         #     self.sleeptime = 1.0
         # Set defaults
         if namespace is None:
-            namespace = cis_cfg.get('rmq', 'namespace')
+            namespace = ygg_cfg.get('rmq', 'namespace')
             self.debug("Setting namespace to %s", namespace)
         if kwargs.get('working_dir', None) is None:
             if isinstance(yml, dict) and ('working_dir' in yml):

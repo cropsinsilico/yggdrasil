@@ -5,7 +5,7 @@
 #include "PlyDict.h"
 #include "ObjDict.h"
 
-#define MSG_HEAD_SEP "CIS_MSG_HEAD"
+#define MSG_HEAD_SEP "YGG_MSG_HEAD"
 #define COMMBUFFSIZ 2000
 #define FMT_LEN 100
 
@@ -263,10 +263,10 @@ int split_head_body(const char *buf, const size_t buf_siz,
   ret = find_match(re_head, buf, &sind, &eind);
 #endif
   if (ret < 0) {
-    cislog_error("split_head_body: Could not find header in '%.1000s'", buf);
+    ygglog_error("split_head_body: Could not find header in '%.1000s'", buf);
     return -1;
   } else if (ret == 0) {
-    cislog_debug("split_head_body: No header in '%.1000s...'", buf);
+    ygglog_debug("split_head_body: No header in '%.1000s...'", buf);
     sind_head = 0;
     eind_head = 0;
     sind_body = 0;
@@ -281,7 +281,7 @@ int split_head_body(const char *buf, const size_t buf_siz,
   // bodysiz = (eind_body - sind_body);
   char* temp = (char*)realloc(*head, *headsiz + 1);
   if (temp == NULL) {
-    cislog_error("split_head_body: Failed to reallocate header.");
+    ygglog_error("split_head_body: Failed to reallocate header.");
     return -1;
   }
   *head = temp;

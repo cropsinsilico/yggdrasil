@@ -1,6 +1,6 @@
-/*! @brief Flag for checking if CisInterface.h has already been included.*/
-#ifndef CISINTERFACE_H_
-#define CISINTERFACE_H_
+/*! @brief Flag for checking if YggInterface.h has already been included.*/
+#ifndef YGGINTERFACE_H_
+#define YGGINTERFACE_H_
 
 #include <../tools.h>
 #include <../metaschema/datatypes/datatypes.h>
@@ -13,9 +13,9 @@ extern "C" {
 #endif
 
 /*! @brief Aliases to preserve names of original structures. */
-#define cisOutput_t comm_t
-#define cisInput_t comm_t
-#define cis_free free_comm
+#define yggOutput_t comm_t
+#define yggInput_t comm_t
+#define ygg_free free_comm
 
 //==============================================================================
 /*!
@@ -23,95 +23,95 @@ extern "C" {
 
   Output Usage:
       1. One-time: Create output channel (store in named variables)
-            cisOutput_t output_channel = cisOutput("out_name");
+            yggOutput_t output_channel = yggOutput("out_name");
       2. Prepare: Format data to a character array buffer.
-            char buffer[CIS_MSG_BUF]; 
+            char buffer[YGG_MSG_BUF]; 
 	    sprintf(buffer, "a=%d, b=%d", 1, 2);
       3. Send:
-	    ret = cis_send(output_channel, buffer, strlen(buffer));
+	    ret = ygg_send(output_channel, buffer, strlen(buffer));
 
   Input Usage:
       1. One-time: Create output channel (store in named variables)
-            cisInput_t input_channel = cisInput("in_name");
+            yggInput_t input_channel = yggInput("in_name");
       2. Prepare: Allocate a character array buffer.
-            char buffer[CIS_MSG_BUF];
+            char buffer[YGG_MSG_BUF];
       3. Receive:
-            int ret = cis_recv(input_channel, buffer, CIS_MSG_BUF);
+            int ret = ygg_recv(input_channel, buffer, YGG_MSG_BUF);
 */
 //==============================================================================
 
 /*!
-  @brief Constructor for cisOutput_t structure with format.
-  Create a cisOutput_t structure based on a provided name that is used to
+  @brief Constructor for yggOutput_t structure with format.
+  Create a yggOutput_t structure based on a provided name that is used to
   locate a particular comm address stored in the environment variable name
   and a format string that can be used to format arguments into outgoing 
   messages for the queue.   
   @param[in] name constant character pointer to name of queue.
   @param[in] fmtString character pointer to format string.
-  @returns cisOutput_t output queue structure.
+  @returns yggOutput_t output queue structure.
  */
 static inline
-cisOutput_t cisOutputFmt(const char *name, const char *fmtString){
+yggOutput_t yggOutputFmt(const char *name, const char *fmtString){
   return init_comm_format(name, "send", _default_comm, fmtString, 0);
 };
 
 /*!
-  @brief Constructor for cisInput_t structure with format.
-  Create a cisInput_t structure based on a provided name that is used to
+  @brief Constructor for yggInput_t structure with format.
+  Create a yggInput_t structure based on a provided name that is used to
   locate a particular comm address stored in the environment variable name and
   a format stirng that can be used to extract arguments from received messages.
   @param[in] name constant character pointer to name of queue.
   @param[in] fmtString character pointer to format string.
-  @returns cisInput_t input queue structure.
+  @returns yggInput_t input queue structure.
  */
 static inline
-cisInput_t cisInputFmt(const char *name, const char *fmtString){
+yggInput_t yggInputFmt(const char *name, const char *fmtString){
   return init_comm_format(name, "recv", _default_comm, fmtString, 0);
 };
 
 /*!
-  @brief Constructor for cisOutput_t output structure.
-  Create a cisOutput_t structure based on a provided name that is used to
+  @brief Constructor for yggOutput_t output structure.
+  Create a yggOutput_t structure based on a provided name that is used to
   locate a particular comm address stored in the environment variable name.
   @param[in] name constant character pointer to name of queue.
-  @returns cisOutput_t output queue structure.
+  @returns yggOutput_t output queue structure.
  */
 static inline
-cisOutput_t cisOutput(const char *name) {
-  cisOutput_t ret = cisOutputFmt(name, NULL);
+yggOutput_t yggOutput(const char *name) {
+  yggOutput_t ret = yggOutputFmt(name, NULL);
   return ret;
 };
 
 /*!
-  @brief Constructor for cisInput_t structure.
-  Create a cisInput_t structure based on a provided name that is used to
+  @brief Constructor for yggInput_t structure.
+  Create a yggInput_t structure based on a provided name that is used to
   locate a particular comm address stored in the environment variable name.
   @param[in] name constant character pointer to name of queue.
-  @returns cisInput_t input queue structure.
+  @returns yggInput_t input queue structure.
  */
 static inline
-cisInput_t cisInput(const char *name){
-  cisInput_t ret = cisInputFmt(name, NULL);
+yggInput_t yggInput(const char *name){
+  yggInput_t ret = yggInputFmt(name, NULL);
   return ret;
 };
 
 /*!
   @brief Send a message to an output queue.
-  Send a message smaller than CIS_MSG_MAX bytes to an output queue. If the
+  Send a message smaller than YGG_MSG_MAX bytes to an output queue. If the
   message is larger, it will not be sent.
-  @param[in] cisQ cisOutput_t structure that queue should be sent to.
+  @param[in] yggQ yggOutput_t structure that queue should be sent to.
   @param[in] data character pointer to message that should be sent.
   @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int cis_send(const cisOutput_t cisQ, const char *data, const size_t len) {
+int ygg_send(const yggOutput_t yggQ, const char *data, const size_t len) {
   int nargs_exp = 2;
-  int nargs_used = commSend(cisQ, data, len);
+  int nargs_used = commSend(yggQ, data, len);
   if (nargs_used == nargs_exp) {
     return 0;
   } else {
-    cislog_error("cis_send(%s): %d arguments expected, but %d used.",
+    ygglog_error("ygg_send(%s): %d arguments expected, but %d used.",
 		 nargs_exp, nargs_used);
     return -1;
   }
@@ -119,18 +119,18 @@ int cis_send(const cisOutput_t cisQ, const char *data, const size_t len) {
 
 /*!
   @brief Send EOF message to the output queue.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
+  @param[in] yggQ yggOutput_t structure that message should be sent to.
   @returns int 0 if send successfull, -1 if unsuccessful.
 */
 static inline
-int cis_send_eof(const cisOutput_t cisQ) {
-  return comm_send_eof(cisQ);
+int ygg_send_eof(const yggOutput_t yggQ) {
+  return comm_send_eof(yggQ);
 };
 
 /*!
   @brief Receive a message from an input queue.
-  Receive a message smaller than CIS_MSG_MAX bytes from an input queue.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
+  Receive a message smaller than YGG_MSG_MAX bytes from an input queue.
+  @param[in] yggQ yggOutput_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the message
   should be saved.
   @param[in] len const size_t length of the allocated message buffer in bytes.
@@ -138,16 +138,16 @@ int cis_send_eof(const cisOutput_t cisQ) {
   message if message was received.
  */
 static inline
-int cis_recv(const cisInput_t cisQ, char *data, const size_t len){
+int ygg_recv(const yggInput_t yggQ, char *data, const size_t len){
   char* temp = NULL;
   int ret = -1;
   size_t len_used = len;
   int nargs_exp = 2;
-  int nargs_used = commRecv(cisQ, data, &len_used);
+  int nargs_used = commRecv(yggQ, data, &len_used);
   if (nargs_used == nargs_exp) {
     ret = (int)len_used;
   } else if (nargs_used >= 0) {
-    cislog_error("cis_recv: nargs_used = %d, nargs_exp = %d", nargs_used, nargs_exp);
+    ygglog_error("ygg_recv: nargs_used = %d, nargs_exp = %d", nargs_used, nargs_exp);
     ret = -1;
   } else {
     ret = nargs_used;
@@ -159,36 +159,36 @@ int cis_recv(const cisInput_t cisQ, char *data, const size_t len){
 
 /*!
   @brief Send a large message to an output queue.
-  Send a message larger than CIS_MSG_MAX bytes to an output queue by breaking
+  Send a message larger than YGG_MSG_MAX bytes to an output queue by breaking
   it up between several smaller messages and sending initial message with the
   size of the message that should be expected. Must be partnered with
-  cis_recv_nolimit for communication to make sense.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
+  ygg_recv_nolimit for communication to make sense.
+  @param[in] yggQ yggOutput_t structure that message should be sent to.
   @param[in] data character pointer to message that should be sent.
   @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int cis_send_nolimit(const cisOutput_t cisQ, const char *data, const size_t len){
-  return cis_send(cisQ, data, len);
+int ygg_send_nolimit(const yggOutput_t yggQ, const char *data, const size_t len){
+  return ygg_send(yggQ, data, len);
 };
 
 /*!
   @brief Send EOF message to the output queue.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
+  @param[in] yggQ yggOutput_t structure that message should be sent to.
   @returns int 0 if send successfull, -1 if unsuccessful.
 */
 static inline
-int cis_send_nolimit_eof(const cisOutput_t cisQ) {
-  return comm_send_nolimit_eof(cisQ);
+int ygg_send_nolimit_eof(const yggOutput_t yggQ) {
+  return comm_send_nolimit_eof(yggQ);
 };
 
 /*!
   @brief Receive a large message from an input queue.
-  Receive a message larger than CIS_MSG_MAX bytes from an input queue by
+  Receive a message larger than YGG_MSG_MAX bytes from an input queue by
   receiving it in parts. This expects the first message to be the size of
   the total message.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
+  @param[in] yggQ yggOutput_t structure that message should be sent to.
   @param[out] data character pointer to pointer for allocated buffer where the
   message should be stored. A pointer to a pointer is used so that the buffer
   may be reallocated as necessary for the incoming message.
@@ -197,15 +197,15 @@ int cis_send_nolimit_eof(const cisOutput_t cisQ) {
   message if message was received.
  */
 static inline
-int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
+int ygg_recv_nolimit(const yggInput_t yggQ, char **data, const size_t len){
   int ret = -1;
   size_t len_used = 0; // Send 0 to indicate data can be realloced
-  int nargs_used = commRecvRealloc(cisQ, data, &len_used);
+  int nargs_used = commRecvRealloc(yggQ, data, &len_used);
   int nargs_exp = 2;
   if (nargs_used == nargs_exp) {
     ret = (int)len_used;
   } else if (nargs_used >= 0) {
-    cislog_error("cis_recv_nolimit: nargs_used = %d, nargs_exp = %d", nargs_used, nargs_exp);
+    ygglog_error("ygg_recv_nolimit: nargs_used = %d, nargs_exp = %d", nargs_used, nargs_exp);
     ret = -1;
   } else {
     ret = nargs_used;
@@ -220,19 +220,19 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
 
   Output Usage:
       1. One-time: Create output channel with format specifier.
-            cisOutput_t output_channel = cisOutputFmt("out_name", "a=%d, b=%d");
+            yggOutput_t output_channel = yggOutputFmt("out_name", "a=%d, b=%d");
       2. Send:
-	    ret = cisSend(output_channel, 1, 2);
+	    ret = yggSend(output_channel, 1, 2);
       3. Free:
-            cis_free(&output_channel);
+            ygg_free(&output_channel);
 
   Input Usage:
       1. One-time: Create output channel with format specifier.
-            cisInput_t input_channel = cisInput("in_name", "a=%d, b=%d");
+            yggInput_t input_channel = yggInput("in_name", "a=%d, b=%d");
       2. Prepare: Allocate space for recovered variables.
             int a, b;
       3. Receive:
-            int ret = cisRecv(input_channel, &a, &b);
+            int ret = yggRecv(input_channel, &a, &b);
 */
 //==============================================================================
 
@@ -240,35 +240,35 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
   @brief Send arguments as a small formatted message to an output queue.
   Use the format string to create a message from the input arguments that
   is then sent to the specified output queue. If the message is larger than
-  CIS_MSG_MAX or cannot be encoded, it will not be sent.  
-  @param[in] cisQ cisOutput_t structure that queue should be sent to.
+  YGG_MSG_MAX or cannot be encoded, it will not be sent.  
+  @param[in] yggQ yggOutput_t structure that queue should be sent to.
   @param[in] ... arguments to be formatted into a message using sprintf.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
-#define cisSend commSend
+#define yggSend commSend
 
 /*!
   @brief Assign arguments by receiving and parsing a message from an input queue.
-  Receive a message smaller than CIS_MSG_MAX bytes from an input queue and parse
+  Receive a message smaller than YGG_MSG_MAX bytes from an input queue and parse
   it using the associated format string.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
+  @param[in] yggQ yggOutput_t structure that message should be sent to.
   @param[out] ... arguments that should be assigned by parsing the
   received message using sscanf. As these are being assigned, they should be
   pointers to memory that has already been allocated.
   @returns int -1 if message could not be received or could not be parsed.
   Length of the received message if message was received and parsed.
  */
-#define cisRecv commRecv
-#define cisRecvRealloc commRecvRealloc
+#define yggRecv commRecv
+#define yggRecvRealloc commRecvRealloc
 
 
 /*! @brief Definitions for symmetry, but there is no difference. */
-#define vcisSend vcommSend
-#define vcisRecv vcommRecv
-#define vcisSend_nolimit vcommSend
-#define vcisRecv_nolimit vcommRecv
-#define cisSend_nolimit commSend
-#define cisRecv_nolimit commRecv
+#define vyggSend vcommSend
+#define vyggRecv vcommRecv
+#define vyggSend_nolimit vcommSend
+#define vyggRecv_nolimit vcommRecv
+#define yggSend_nolimit commSend
+#define yggRecv_nolimit commRecv
 
  
 //==============================================================================
@@ -281,7 +281,7 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
   Server Usage:
       1. One-time: Create server channels with format specifiers for input and
          output.
-            cisRpc_t srv = cisRpcServer("srv_name", "%d", "%d %d");
+            yggRpc_t srv = yggRpcServer("srv_name", "%d", "%d %d");
       2. Prepare: Allocate space for recovered variables from request.
             int a;
       3. Receive request:
@@ -296,7 +296,7 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
       1. One-time: Create client channels to desired server with format
          specifiers for output and input (should be the same arguments as for
 	 the server except for name).
-	    cisRpc_t cli = cisRpcClient("cli_name", "%d", "%d %d"); 
+	    yggRpc_t cli = yggRpcClient("cli_name", "%d", "%d %d"); 
       2. Prepare: Allocate space for recovered variables from response.
             int b, c;
       3. Call server:
@@ -316,35 +316,35 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
   Contains information required to coordinate sending/receiving 
   response/requests from/to an RPC server/client.
  */
-#define cisRpc_t comm_t
+#define yggRpc_t comm_t
 
 /*!
   @brief Constructor for client side RPC structure.
-  Creates an instance of cisRpc_t with provided information.  
+  Creates an instance of yggRpc_t with provided information.  
   @param[in] name constant character pointer to name for queues.
   @param[in] outFormat character pointer to format that should be used for
   formatting output.
   @param[in] inFormat character pointer to format that should be used for
   parsing input.
-  @return cisRpc_t structure with provided info.
+  @return yggRpc_t structure with provided info.
  */
 static inline
-comm_t cisRpcClient(const char *name, const char *outFormat, const char *inFormat){
+comm_t yggRpcClient(const char *name, const char *outFormat, const char *inFormat){
   return init_comm_format(name, outFormat, CLIENT_COMM, inFormat, 0);
 };
 
 /*!
   @brief Constructor for server side RPC structure.
-  Creates an instance of cisRpc_t with provided information.  
+  Creates an instance of yggRpc_t with provided information.  
   @param[in] name constant character pointer to name for queues.
   @param[in] inFormat character pointer to format that should be used for
   parsing input.
   @param[in] outFormat character pointer to format that should be used for
   formatting output.
-  @return cisRpc_t structure with provided info.
+  @return yggRpc_t structure with provided info.
  */
 static inline
-comm_t cisRpcServer(const char *name, const char *inFormat, const char *outFormat){
+comm_t yggRpcServer(const char *name, const char *inFormat, const char *outFormat){
   return init_comm_format(name, inFormat, SERVER_COMM, outFormat, 0);
 };
 
@@ -353,7 +353,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   Format provided arguments list using the output queue format string and
   then sends it to the output queue under the assumption that it is larger
   than the maximum message size.
-  @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] rpc yggRpc_t structure with RPC information.
   @param[in] ap va_list variable list of arguments for formatting.
   @return integer specifying if the send was succesful. Values >= 0 indicate
   success.
@@ -366,7 +366,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   larger than the maximum message size. Then parse the message using the
   input queue format string to extract parameters and assign them to the
   arguments.
-  @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] rpc yggRpc_t structure with RPC information.
   @param[out] ap va_list variable list of arguments that should be assigned
   parameters extracted using the format string. Since these will be assigned,
   they should be pointers to memory that has already been allocated.
@@ -381,7 +381,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   Format provided arguments using the output queue format string and
   then sends it to the output queue under the assumption that it is larger
   than the maximum message size.
-  @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] rpc yggRpc_t structure with RPC information.
   @param[in] ... arguments for formatting.
   @return integer specifying if the send was succesful. Values >= 0 indicate
   success.
@@ -394,7 +394,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   larger than the maximum message size. Then parse the message using the
   input queue format string to extract parameters and assign them to the
   arguments.
-  @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] rpc yggRpc_t structure with RPC information.
   @param[out] ... mixed arguments that should be assigned parameters extracted
   using the format string. Since these will be assigned, they should be
   pointers to memory that has already been allocated.
@@ -409,7 +409,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   Format arguments using the output queue format string, send the message to the
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
-  @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] rpc yggRpc_t structure with RPC information.
   @param[in,out] ap va_list mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will
@@ -418,7 +418,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   success.
  */
 static inline
-int vrpcCallBase(const cisRpc_t rpc, const int allow_realloc,
+int vrpcCallBase(const yggRpc_t rpc, const int allow_realloc,
 		 size_t nargs, va_list_t ap) {
   int sret, rret;
   rret = 0;
@@ -433,12 +433,12 @@ int vrpcCallBase(const cisRpc_t rpc, const int allow_realloc,
 					  send_comm->serializer->info);
   sret = vcommSend(rpc, send_nargs, ap);
   if (sret < 0) {
-    cislog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
+    ygglog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
     return -1;
   }
 
   // Advance through sent arguments
-  cislog_debug("vrpcCall: Used %d arguments in send", sret);
+  ygglog_debug("vrpcCall: Used %d arguments in send", sret);
   int i;
   for (i = 0; i < sret; i++) {
     va_arg(op.va, void*);
@@ -461,7 +461,7 @@ int vrpcCallBase(const cisRpc_t rpc, const int allow_realloc,
   Format arguments using the output queue format string, send the message to the
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
-  @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] rpc yggRpc_t structure with RPC information.
   @param[in,out] ... mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will
@@ -470,7 +470,7 @@ int vrpcCallBase(const cisRpc_t rpc, const int allow_realloc,
   success.
  */
 static inline
-int nrpcCallBase(const cisRpc_t rpc, const int allow_realloc, size_t nargs, ...){
+int nrpcCallBase(const yggRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
   va_list_t ap;
   va_start(ap.va, nargs);
@@ -491,15 +491,15 @@ int nrpcCallBase(const cisRpc_t rpc, const int allow_realloc, size_t nargs, ...)
   Input Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fin = cisAsciiFileInput("file_channel"); // channel
-	    comm_t fin = cisAsciiFileInput_local("/local/file.txt"); // local file
+	    comm_t fin = yggAsciiFileInput("file_channel"); // channel
+	    comm_t fin = yggAsciiFileInput_local("/local/file.txt"); // local file
       2. Prepare: Get pointer for line.
             char *line;
       3. Receive each line, terminating when receive returns -1 (EOF or channel
          closed).
 	    int ret = 1;
 	    while (ret > 0) {
-	      ret = cisRecv(fin, &line); // line will be realloced to fit message
+	      ret = yggRecv(fin, &line); // line will be realloced to fit message
 	      // Do something with the line
 	    }
       4. Cleanup. Call functions to deallocate structures.
@@ -508,21 +508,21 @@ int nrpcCallBase(const cisRpc_t rpc, const int allow_realloc, size_t nargs, ...)
   Output Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fout = cisAsciiFileOutput("file_channel"); // channel
-	    comm_t fout = cisAsciiFileOutput_local("/local/file.txt"); // local file
+	    comm_t fout = yggAsciiFileOutput("file_channel"); // channel
+	    comm_t fout = yggAsciiFileOutput_local("/local/file.txt"); // local file
       2. Send lines to the file. If return value is not 0, the send was not
           succesfull.
             int ret;
-	    ret = cisSend(fin, "Line 1\n");
-	    ret = cisSend(fout, "Line 1\n");
-	    ret = cisSend(fout, "Line 2\n");
+	    ret = yggSend(fin, "Line 1\n");
+	    ret = yggSend(fout, "Line 1\n");
+	    ret = yggSend(fout, "Line 2\n");
 
 */
 //==============================================================================
 
 /*! @brief Definitions for file sturctures. */
-#define cisAsciiFileInput_t comm_t
-#define cisAsciiFileOutput_t comm_t
+#define yggAsciiFileInput_t comm_t
+#define yggAsciiFileOutput_t comm_t
 
 /*!
   @brief Constructor for AsciiFile output comm to channel.
@@ -530,7 +530,7 @@ int nrpcCallBase(const cisRpc_t rpc, const int allow_realloc, size_t nargs, ...)
   @returns comm_t for line-by-line output to a file or channel.
  */
 static inline
-comm_t cisAsciiFileOutput(const char *name) {
+comm_t yggAsciiFileOutput(const char *name) {
   comm_t out = init_comm(name, "send", _default_comm, NULL);
   return out;
 };
@@ -541,7 +541,7 @@ comm_t cisAsciiFileOutput(const char *name) {
   @returns comm_t for line-by-line output to a file or channel.
  */
 static inline
-comm_t cisAsciiFileOutput_local(const char *name) {
+comm_t yggAsciiFileOutput_local(const char *name) {
   comm_t out = init_comm(name, "send", ASCII_FILE_COMM, NULL);
   return out;
 };
@@ -552,7 +552,7 @@ comm_t cisAsciiFileOutput_local(const char *name) {
   @returns comm_t for line-by-line input from a file or channel.
  */
 static inline
-comm_t cisAsciiFileInput(const char *name) {
+comm_t yggAsciiFileInput(const char *name) {
   comm_t out = init_comm(name, "recv", _default_comm, NULL);
   return out;
 };
@@ -564,7 +564,7 @@ comm_t cisAsciiFileInput(const char *name) {
   @returns comm_t for line-by-line input from a file or channel.
  */
 static inline
-comm_t cisAsciiFileInput_local(const char *name) {
+comm_t yggAsciiFileInput_local(const char *name) {
   comm_t out = init_comm(name, "recv", ASCII_FILE_COMM, NULL);
   return out;
 };
@@ -584,8 +584,8 @@ comm_t cisAsciiFileInput_local(const char *name) {
   Input by Row Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fin = cisAsciiTableInput("file_channel");    // channel
-	    comm_t fin = cisAsciiTableInput_local("/local/file.txt"); // local table
+	    comm_t fin = yggAsciiTableInput("file_channel");    // channel
+	    comm_t fin = yggAsciiTableInput_local("/local/file.txt"); // local table
       2. Prepare: Allocate space for variables in row (the format in this
          example is "%5s %d %f\n" like the output example below).
 	    char a[5];
@@ -595,22 +595,22 @@ comm_t cisAsciiFileInput_local(const char *name) {
          closed).
 	    int ret = 1;
 	    while (ret > 0) {
-	      ret = cisRecv(fin, &a, &b, &c);
+	      ret = yggRecv(fin, &a, &b, &c);
 	      // Do something with the row
 	    }
 
   Output by Row Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file and a format string for rows.
-	    comm_t fout = cisAsciiTableOutput("file_channel",    // channel
+	    comm_t fout = yggAsciiTableOutput("file_channel",    // channel
                                               "%5s %d %f\n");
-	    comm_t fout = cisAsciiTableOutput_local("/local/file.txt", // local table
+	    comm_t fout = yggAsciiTableOutput_local("/local/file.txt", // local table
                                                     "%5s %d %f\n");
       2. Send rows to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
-	    ret = cisSend(fout, "one", 1, 1.0);
-	    ret = cisSend(fout, "two", 2, 2.0);
+	    ret = yggSend(fout, "one", 1, 1.0);
+	    ret = yggSend(fout, "two", 2, 2.0);
 
   Array
   =====
@@ -618,8 +618,8 @@ comm_t cisAsciiFileInput_local(const char *name) {
   Input by Array Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fin = cisAsciiArrayInput("file_channel");    // channel
-	    comm_t fin = cisAsciiArrayInput_local("/local/file.txt"); // local table
+	    comm_t fin = yggAsciiArrayInput("file_channel");    // channel
+	    comm_t fin = yggAsciiArrayInput_local("/local/file.txt"); // local table
       2. Prepare: Declare pointers for table columns (they will be allocated by
          the interface once the number of rows is known).
 	    char *aCol;
@@ -628,7 +628,7 @@ comm_t cisAsciiFileInput_local(const char *name) {
       3. Receive entire table as columns. Return value will be the number of
          elements in each column (the number of table rows). Negative values
 	 indicate errors.
-            int ret = cisRecv(fin, &a, &b, &c);
+            int ret = yggRecv(fin, &a, &b, &c);
       4. Cleanup. Call functions to deallocate structures.
             free(a);
             free(b);
@@ -637,9 +637,9 @@ comm_t cisAsciiFileInput_local(const char *name) {
   Output by Array Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file and a format string for rows.
-	    comm_t fout = cisAsciiArrayOutput("file_channel",    // channel
+	    comm_t fout = yggAsciiArrayOutput("file_channel",    // channel
                                               "%5s %d %f\n");
-	    comm_t fout = cisAsciiArrayOutput_local("/local/file.txt", // local table
+	    comm_t fout = yggAsciiArrayOutput_local("/local/file.txt", // local table
 	                                            "%5s %d %f\n");
       2. Send columns to the file by providing pointers (or arrays). Formatting
          is handled by the interface. If return value is not 0, the send was not
@@ -647,16 +647,16 @@ comm_t cisAsciiFileInput_local(const char *name) {
 	    char aCol[] = {"one  ", "two  ", "three"}; \\ Each str is of len 5
 	    int bCol[3] = {1, 2, 3};
 	    float cCol[3] = {1.0, 2.0, 3.0};
-            int ret = cisSend(fout, a, b, c);
+            int ret = yggSend(fout, a, b, c);
 
 */
 //==============================================================================
 
 /*! @brief Definitions for table sturctures. */
-#define cisAsciiTableInput_t comm_t
-#define cisAsciiTableOutput_t comm_t
-#define cisAsciiArrayInput_t comm_t
-#define cisAsciiArrayOutput_t comm_t
+#define yggAsciiTableInput_t comm_t
+#define yggAsciiTableOutput_t comm_t
+#define yggAsciiArrayInput_t comm_t
+#define yggAsciiArrayOutput_t comm_t
 
 /*!
   @brief Constructor for table output comm to an output channel.
@@ -666,7 +666,7 @@ comm_t cisAsciiFileInput_local(const char *name) {
   @returns comm_t output structure.
  */
 static inline
-comm_t cisAsciiTableOutput(const char *name, const char *format_str) {
+comm_t yggAsciiTableOutput(const char *name, const char *format_str) {
   return init_comm_format(name, "send", _default_comm, format_str, 0);
 };
 
@@ -676,7 +676,7 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str) {
   @returns comm_t input structure.
  */
 static inline
-comm_t cisAsciiTableInput(const char *name) {
+comm_t yggAsciiTableInput(const char *name) {
   return init_comm(name, "recv", _default_comm, NULL);
 };
 
@@ -688,7 +688,7 @@ comm_t cisAsciiTableInput(const char *name) {
   @returns comm_t output structure.
  */
 static inline
-comm_t cisAsciiTableOutput_local(const char *name, const char *format_str) {
+comm_t yggAsciiTableOutput_local(const char *name, const char *format_str) {
   void* seri_info = get_ascii_table_type(format_str, 0);
   return init_comm(name, "send", ASCII_TABLE_COMM, seri_info);
 };
@@ -699,7 +699,7 @@ comm_t cisAsciiTableOutput_local(const char *name, const char *format_str) {
   @returns comm_t input structure.
  */
 static inline
-comm_t cisAsciiTableInput_local(const char *name) {
+comm_t yggAsciiTableInput_local(const char *name) {
   void* seri_info = get_ascii_table_type(NULL, 0);
   return init_comm(name, "recv", ASCII_TABLE_COMM, seri_info);
 };
@@ -712,7 +712,7 @@ comm_t cisAsciiTableInput_local(const char *name) {
   @returns comm_t output structure.
  */
 static inline
-comm_t cisAsciiArrayOutput(const char *name, const char *format_str) {
+comm_t yggAsciiArrayOutput(const char *name, const char *format_str) {
   return init_comm_format(name, "send", _default_comm, format_str, 1);
 };
 
@@ -722,8 +722,8 @@ comm_t cisAsciiArrayOutput(const char *name, const char *format_str) {
   @returns comm_t input structure.
  */
 static inline
-comm_t cisAsciiArrayInput(const char *name) {
-  return cisAsciiTableInput(name);
+comm_t yggAsciiArrayInput(const char *name) {
+  return yggAsciiTableInput(name);
 };
 
 /*!
@@ -734,7 +734,7 @@ comm_t cisAsciiArrayInput(const char *name) {
   @returns comm_t output structure.
  */
 static inline
-comm_t cisAsciiArrayOutput_local(const char *name, const char *format_str) {
+comm_t yggAsciiArrayOutput_local(const char *name, const char *format_str) {
   void* seri_info = get_ascii_table_type(format_str, 1);
   return init_comm(name, "send", ASCII_TABLE_COMM, seri_info);
 };
@@ -745,7 +745,7 @@ comm_t cisAsciiArrayOutput_local(const char *name, const char *format_str) {
   @returns comm_t input structure.
  */
 static inline
-comm_t cisAsciiArrayInput_local(const char *name) {
+comm_t yggAsciiArrayInput_local(const char *name) {
   void* seri_info = get_ascii_table_type(NULL, 1);
   return init_comm(name, "recv", ASCII_TABLE_COMM, seri_info);
 };
@@ -758,34 +758,34 @@ comm_t cisAsciiArrayInput_local(const char *name) {
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fin = cisPlyInput("file_channel");  // channel
+	    comm_t fin = yggPlyInput("file_channel");  // channel
       2. Prepare: Allocate ply structure.
             ply_t p;
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
 	    int ret = 1;
 	    while (ret > 0) {
-	      ret = cisRecv(fin, &p);
+	      ret = yggRecv(fin, &p);
 	      // Do something with the ply structure
 	    }
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fout = cisPlyOutput("file_channel");  // channel
+	    comm_t fout = yggPlyOutput("file_channel");  // channel
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
 	    ply_t p;
 	    // Populate the structure
-	    ret = cisSend(fout, p);
-	    ret = cisSend(fout, p);
+	    ret = yggSend(fout, p);
+	    ret = yggSend(fout, p);
 
 */
 //==============================================================================
 
 /*! @brief Definitions for ply structures. */
-#define cisPlyInput_t comm_t
-#define cisPlyOutput_t comm_t
+#define yggPlyInput_t comm_t
+#define yggPlyOutput_t comm_t
 
 /*!
   @brief Constructor for ply output comm to an output channel.
@@ -793,7 +793,7 @@ comm_t cisAsciiArrayInput_local(const char *name) {
   @returns comm_t output structure.
  */
 static inline
-comm_t cisPlyOutput(const char *name) {
+comm_t yggPlyOutput(const char *name) {
   comm_t out = init_comm(name, "send", _default_comm, get_ply_type());
   if ((out.valid) && (out.serializer->info == NULL)) {
     out.valid = 0;
@@ -807,7 +807,7 @@ comm_t cisPlyOutput(const char *name) {
   @returns comm_t input structure.
  */
 static inline
-comm_t cisPlyInput(const char *name) {
+comm_t yggPlyInput(const char *name) {
   return init_comm(name, "recv", _default_comm, NULL);
 };
 
@@ -820,34 +820,34 @@ comm_t cisPlyInput(const char *name) {
 
   Input Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fin = cisObjInput("file_channel");  // channel
+	    comm_t fin = yggObjInput("file_channel");  // channel
       2. Prepare: Allocate obj structure.
             obj_t p;
       3. Receive each structure, terminating when receive returns -1 (EOF or channel
          closed).
 	    int ret = 1;
 	    while (ret > 0) {
-	      ret = cisRecv(fin, &p);
+	      ret = yggRecv(fin, &p);
 	      // Do something with the obj structure
 	    }
 
   Output by Usage:
       1. One-time: Create file interface by providing a channel name.
-	    comm_t fout = cisObjOutput("file_channel");  // channel
+	    comm_t fout = yggObjOutput("file_channel");  // channel
       2. Send structure to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
 	    obj_t p;
 	    // Populate the structure
-	    ret = cisSend(fout, p);
-	    ret = cisSend(fout, p);
+	    ret = yggSend(fout, p);
+	    ret = yggSend(fout, p);
 
 */
 //==============================================================================
 
 /*! @brief Definitions for obj structures. */
-#define cisObjInput_t comm_t
-#define cisObjOutput_t comm_t
+#define yggObjInput_t comm_t
+#define yggObjOutput_t comm_t
 
 /*!
   @brief Constructor for obj output comm to an output channel.
@@ -855,7 +855,7 @@ comm_t cisPlyInput(const char *name) {
   @returns comm_t output structure.
  */
 static inline
-comm_t cisObjOutput(const char *name) {
+comm_t yggObjOutput(const char *name) {
   comm_t out = init_comm(name, "send", _default_comm, get_obj_type());
   if ((out.valid) && (out.serializer->info == NULL)) {
     out.valid = 0;
@@ -869,7 +869,7 @@ comm_t cisObjOutput(const char *name) {
   @returns comm_t input structure.
  */
 static inline
-comm_t cisObjInput(const char *name) {
+comm_t yggObjInput(const char *name) {
   return init_comm(name, "recv", _default_comm, NULL);
 };
 
@@ -878,4 +878,4 @@ comm_t cisObjInput(const char *name) {
 }
 #endif
 
-#endif /*CISINTERFACE_H_*/
+#endif /*YGGINTERFACE_H_*/

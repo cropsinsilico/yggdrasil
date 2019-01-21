@@ -1,6 +1,6 @@
 r"""Tests for platform compatiblity."""
 import nose.tools as nt
-from cis_interface import platform
+from yggdrasil import platform
 
 
 def test_os():

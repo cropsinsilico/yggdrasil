@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <hellofunc.h>
-#include <CisInterface.h>
+#include <YggInterface.h>
 
 int main() {
   sleep(1);

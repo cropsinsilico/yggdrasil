@@ -6,10 +6,10 @@ import threading
 import logging
 import subprocess
 import warnings
-from cis_interface import backwards, tools, platform
-from cis_interface.config import cis_cfg
-from cis_interface.schema import register_component
-from cis_interface.communication import CommBase, AsyncComm
+from yggdrasil import backwards, tools, platform
+from yggdrasil.config import ygg_cfg
+from yggdrasil.schema import register_component
+from yggdrasil.communication import CommBase, AsyncComm
 
 
 _socket_type_pairs = [('PUSH', 'PULL'),
@@ -24,8 +24,8 @@ _flag_zmq_filter = b'_ZMQFILTER_'
 _default_socket_type = 4
 _default_protocol = 'tcp'
 _wait_send_t = 0  # 0.0001
-_reply_msg = b'CIS_REPLY'
-_purge_msg = b'CIS_PURGE'
+_reply_msg = b'YGG_REPLY'
+_purge_msg = b'YGG_PURGE'
 _global_context = zmq.Context.instance()
 
 
@@ -41,7 +41,7 @@ def check_czmq():
         opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
                 'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
         for o in opts:
-            if not cis_cfg.get('windows', o, None):  # pragma: debug
+            if not ygg_cfg.get('windows', o, None):  # pragma: debug
                 warnings.warn("Config option %s not set." % o)
                 return False
         return True

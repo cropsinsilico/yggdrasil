@@ -4,15 +4,15 @@ import uuid
 import atexit
 import threading
 from logging import info
-from cis_interface import backwards, tools, serialize
-from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
-from cis_interface.communication import (
+from yggdrasil import backwards, tools, serialize
+from yggdrasil.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
+from yggdrasil.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
-from cis_interface.schema import register_component
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.metaschema.datatypes.JSONArrayMetaschemaType import (
+from yggdrasil.schema import register_component
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
-from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
+from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 
 
@@ -123,7 +123,7 @@ def cleanup_comms(comm_class, close_func=None):
     return count
 
 
-class CommThreadLoop(tools.CisThreadLoop):
+class CommThreadLoop(tools.YggThreadLoop):
     r"""Thread loop for comms to ensure cleanup.
 
     Args:
@@ -164,7 +164,7 @@ class CommThreadLoop(tools.CisThreadLoop):
         super(CommThreadLoop, self).on_main_terminated()
 
 
-class CommServer(tools.CisThreadLoop):
+class CommServer(tools.YggThreadLoop):
     r"""Basic server object to keep track of clients.
 
     Attributes:
@@ -199,7 +199,7 @@ class CommServer(tools.CisThreadLoop):
 
 
 @register_component
-class CommBase(tools.CisClass):
+class CommBase(tools.YggClass):
     r"""Class for handling I/O.
 
     Args:
@@ -372,7 +372,7 @@ class CommBase(tools.CisClass):
         # else:
         #     self._timeout_drain = self.timeout
         self._closing_event = threading.Event()
-        self._closing_thread = tools.CisThread(target=self.linger_close,
+        self._closing_thread = tools.YggThread(target=self.linger_close,
                                                # daemon=self.matlab,
                                                name=self.name + '.ClosingThread')
         self._eof_recv = threading.Event()
@@ -505,7 +505,7 @@ class CommBase(tools.CisClass):
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        return get_CIS_MSG_MAX()
+        return get_YGG_MSG_MAX()
 
     @property
     def empty_msg(self):
@@ -812,7 +812,7 @@ class CommBase(tools.CisClass):
     @property
     def eof_msg(self):
         r"""str: Message indicating EOF."""
-        return CIS_MSG_EOF
+        return YGG_MSG_EOF
 
     def is_eof(self, msg):
         r"""Determine if a message is an EOF.
@@ -1349,7 +1349,7 @@ class CommBase(tools.CisClass):
         raise NotImplementedError("_recv method needs implemented.")
 
     def _recv_multipart(self, data, leng_exp, **kwargs):
-        r"""Receive a message larger than CIS_MSG_MAX that is sent in multiple
+        r"""Receive a message larger than YGG_MSG_MAX that is sent in multiple
         parts.
 
         Args:

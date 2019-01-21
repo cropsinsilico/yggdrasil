@@ -1,9 +1,9 @@
 import copy
 import jsonschema
-from cis_interface.metaschema.datatypes import (
+from yggdrasil.metaschema.datatypes import (
     register_type, get_type_class, _type_registry)
-from cis_interface.metaschema.properties import get_metaschema_property
-from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
+from yggdrasil.metaschema.properties import get_metaschema_property
+from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 
 

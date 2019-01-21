@@ -2,10 +2,10 @@
 import os
 import numpy as np
 import threading
-from cis_interface import backwards
-from cis_interface.communication import new_comm, get_comm_class
-from cis_interface.drivers.Driver import Driver
-from cis_interface.schema import get_schema
+from yggdrasil import backwards
+from yggdrasil.communication import new_comm, get_comm_class
+from yggdrasil.drivers.Driver import Driver
+from yggdrasil.schema import get_schema
 
 
 def _translate_list2element(arr):

@@ -1,10 +1,9 @@
 import os
-import nose.tools as nt
 import unittest
-from cis_interface import platform, tools
-from cis_interface.tests import scripts
-import cis_interface.drivers.tests.test_ModelDriver as parent
-from cis_interface.drivers.GCCModelDriver import (
+from yggdrasil import platform, tools
+from yggdrasil.tests import scripts, assert_raises, assert_equal
+import yggdrasil.drivers.tests.test_ModelDriver as parent
+from yggdrasil.drivers.GCCModelDriver import (
     GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags)
 
 
@@ -15,36 +14,36 @@ def test_get_zmq_flags():
     r"""Test get_zmq_flags."""
     cc, ld = get_zmq_flags()
     if not tools.is_comm_installed('ZMQComm', language='c'):
-        nt.assert_equal(len(cc), 0)
-        nt.assert_equal(len(ld), 0)
+        assert_equal(len(cc), 0)
+        assert_equal(len(ld), 0)
 
 
 def test_get_ipc_flags():
     r"""Test get_ipc_flags."""
     cc, ld = get_ipc_flags()
     if not tools.is_comm_installed('IPCComm', language='c'):  # pragma: windows
-        nt.assert_equal(len(cc), 0)
-        nt.assert_equal(len(ld), 0)
+        assert_equal(len(cc), 0)
+        assert_equal(len(ld), 0)
 
 
 def test_get_flags():
     r"""Test get_flags."""
     cc, ld = get_flags()
     if not _driver_installed:  # pragma: windows
-        nt.assert_equal(len(cc), 0)
-        nt.assert_equal(len(ld), 0)
+        assert_equal(len(cc), 0)
+        assert_equal(len(ld), 0)
 
 
 @unittest.skipIf(_driver_installed, "C Library installed")
 def test_GCCModelDriver_no_C_library():  # pragma: windows
     r"""Test GCCModelDriver error when C library not installed."""
-    nt.assert_raises(RuntimeError, GCCModelDriver, 'test', scripts['c'])
+    assert_raises(RuntimeError, GCCModelDriver, 'test', scripts['c'])
 
 
 @unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_GCCModelDriver_errors():
     r"""Test GCCModelDriver errors."""
-    nt.assert_raises(RuntimeError, GCCModelDriver, 'test', 'test.py')
+    assert_raises(RuntimeError, GCCModelDriver, 'test', 'test.py')
 
 
 @unittest.skipIf(not _driver_installed, "C Library not installed")

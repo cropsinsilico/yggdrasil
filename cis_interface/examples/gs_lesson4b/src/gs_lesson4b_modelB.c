@@ -1,13 +1,13 @@
 #include <stdio.h>
 // Include methods for input/output channels
-#include "CisInterface.h"
+#include "YggInterface.h"
 
 #define MYBUFSIZ 1000
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  cisInput_t in_channel = cisInput("inputB");
-  cisOutput_t out_channel = cisOutput("outputB");
+  yggInput_t in_channel = yggInput("inputB");
+  yggOutput_t out_channel = yggOutput("outputB");
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     // Receive input from input channel
     // If there is an error, the flag will be negative
     // Otherwise, it is the size of the received message
-    flag = cis_recv(in_channel, buf, MYBUFSIZ);
+    flag = ygg_recv(in_channel, buf, MYBUFSIZ);
     if (flag < 0) {
       printf("Model B: No more input.\n");
       break;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     // Send output to output channel
     // If there is an error, the flag will be negative
-    flag = cis_send(out_channel, buf, flag);
+    flag = ygg_send(out_channel, buf, flag);
     if (flag < 0) {
       printf("Model B: Error sending output.\n");
       break;

@@ -104,17 +104,17 @@ public:
       for (i = 1; i < items_.size(); i++) {
 	inrows = items_[i]->get_length();
 	if (*nrows != inrows) {
-	  cislog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
+	  ygglog_error("JSONArrayMetaschemaType::decode_data: Number of rows not consistent across all items.");
 	  return false;
 	}
       }
     }
     if (not data.IsArray()) {
-      cislog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
+      ygglog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
       return false;
     }
     if (data.Size() != items_.size()) {
-      cislog_error("JSONArrayMetaschemaType::decode_data: %lu items expected, but %lu found.",
+      ygglog_error("JSONArrayMetaschemaType::decode_data: %lu items expected, but %lu found.",
 		   items_.size(), data.Size());
       return false;
     }

@@ -1,6 +1,6 @@
 import copy
-from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as parent
-from cis_interface.metaschema.datatypes.tests import (
+from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
+from yggdrasil.metaschema.datatypes.tests import (
     test_ContainerMetaschemaType as container_utils)
 
 

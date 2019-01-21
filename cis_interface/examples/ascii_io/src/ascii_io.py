@@ -1,23 +1,23 @@
 from __future__ import print_function
 # Import necessary connection interfaces
-from cis_interface.tools import print_encoded
-from cis_interface.interface.CisInterface import (
-    CisAsciiFileInput, CisAsciiFileOutput,
-    CisAsciiTableInput, CisAsciiTableOutput)
+from yggdrasil.tools import print_encoded
+from yggdrasil.interface.YggInterface import (
+    YggAsciiFileInput, YggAsciiFileOutput,
+    YggAsciiTableInput, YggAsciiTableOutput)
 
     
 if __name__ == '__main__':
 
     # Input & output to an ASCII file line by line
-    in_file = CisAsciiFileInput('inputPy_file')
-    out_file = CisAsciiFileOutput('outputPy_file')
+    in_file = YggAsciiFileInput('inputPy_file')
+    out_file = YggAsciiFileOutput('outputPy_file')
     # Input & output from a table row by row
-    in_table = CisAsciiTableInput('inputPy_table')
-    out_table = CisAsciiTableOutput('outputPy_table',
+    in_table = YggAsciiTableInput('inputPy_table')
+    out_table = YggAsciiTableOutput('outputPy_table',
                                     '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
     # Input & output from a table as an array
-    in_array = CisAsciiTableInput('inputPy_array', as_array=True)
-    out_array = CisAsciiTableOutput('outputPy_array',
+    in_array = YggAsciiTableInput('inputPy_array', as_array=True)
+    out_array = YggAsciiTableOutput('outputPy_array',
                                     '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n',
                                     as_array=True)
 

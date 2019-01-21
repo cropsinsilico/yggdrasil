@@ -19,7 +19,7 @@ public:
     MetaschemaType("ascii_table"), as_array_(as_array), table_(NULL) {
     table_ = (asciiTable_t*)malloc(sizeof(asciiTable_t));
     if (table_ == NULL)
-      cislog_throw_error("AsciiTableMetaschemaType: Failed to allocate table.");
+      ygglog_throw_error("AsciiTableMetaschemaType: Failed to allocate table.");
     table_[0] = asciiTable("seri", "0", format_str, NULL, NULL, NULL);
   }
   ~AsciiTableMetaschemaType() {
@@ -49,13 +49,13 @@ public:
   // Encoding
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
-    cislog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
+    ygglog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
     return false;
   }
   int serialize(char **buf, size_t *buf_siz,
 		const int allow_realloc, size_t *nargs, va_list_t &ap) {
     if (nargs_exp() != *nargs) {
-      cislog_throw_error("AsciiTableMetaschemaType::serialize: %d arguments expected, but %d provided.",
+      ygglog_throw_error("AsciiTableMetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     *nargs = *nargs - nargs_exp();
@@ -67,7 +67,7 @@ public:
       ret = at_vrow_to_bytes(*table_, *buf, *buf_siz, ap.va);
     }
     if (*nargs != 0) {
-      cislog_error("AsciiTableMetaschemaType::serialize: %d arguments were not used.", *nargs);
+      ygglog_error("AsciiTableMetaschemaType::serialize: %d arguments were not used.", *nargs);
       return -1;
     }
     return ret;
@@ -76,13 +76,13 @@ public:
   // Decoding
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
-    cislog_error("AsciiTableMetaschemaType::decode_data: AsciiTable type cannot be JSON decoded.");
+    ygglog_error("AsciiTableMetaschemaType::decode_data: AsciiTable type cannot be JSON decoded.");
     return false;
   }
   int deserialize(const char *buf, const size_t buf_siz,
 		  const int allow_realloc, size_t *nargs, va_list_t &ap) {
     if (nargs_exp() != *nargs) {
-      cislog_throw_error("AsciiTableMetaschemaType::deserialize: %d arguments expected, but %d provided.",
+      ygglog_throw_error("AsciiTableMetaschemaType::deserialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     const size_t nargs_orig = *nargs;
@@ -92,21 +92,21 @@ public:
       ret = at_vbytes_to_array(*table_, buf, buf_siz, ap.va);
     } else {
       if (allow_realloc) {
-	cislog_error("AsciiTableMetaschemaType::deserialize: allow_realloc not supported for rows.");
+	ygglog_error("AsciiTableMetaschemaType::deserialize: allow_realloc not supported for rows.");
 	return -1;
       }
       ret = at_vbytes_to_row(*table_, buf, ap.va);
     }
     if (ret < 0) {
-      cislog_error("AsciiTableMetaschemaType::deserialize: Error using table.");
+      ygglog_error("AsciiTableMetaschemaType::deserialize: Error using table.");
       return -1;
     } else if (ret != nargs_exp()) {
-      cislog_error("AsciiTableMetaschemaType::deserialize: Table used %d arguments, but was expected to used %d.",
+      ygglog_error("AsciiTableMetaschemaType::deserialize: Table used %d arguments, but was expected to used %d.",
 		   ret, nargs_exp());
       return -1;
     }
     if (*nargs != 0) {
-      cislog_error("AsciiTableMetaschemaType::deserialize: %d arguments were not used.", *nargs);
+      ygglog_error("AsciiTableMetaschemaType::deserialize: %d arguments were not used.", *nargs);
       return -1;
     }
     return (int)(nargs_orig - *nargs);

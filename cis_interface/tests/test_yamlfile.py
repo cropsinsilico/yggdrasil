@@ -1,9 +1,8 @@
 import tempfile
 import os
-import nose.tools as nt
 from jsonschema.exceptions import ValidationError
-from cis_interface import yamlfile
-from cis_interface.tests import CisTestClass
+from yggdrasil import yamlfile
+from yggdrasil.tests import YggTestClass, assert_raises
 _yaml_env = 'TEST_YAML_FILE'
 
 
@@ -14,18 +13,18 @@ def direct_translate(msg):  # pragma: no cover
 
 def test_load_yaml_error():
     r"""Test error on loading invalid file."""
-    nt.assert_raises(IOError, yamlfile.load_yaml, 'invalid')
+    assert_raises(IOError, yamlfile.load_yaml, 'invalid')
 
 
 def test_parse_component_error():
     r"""Test errors in parse_component."""
-    nt.assert_raises(TypeError, yamlfile.parse_component,
-                     1, 'invalid', 'invalid')
-    nt.assert_raises(ValueError, yamlfile.parse_component,
-                     {}, 'invalid', 'invalid')
+    assert_raises(TypeError, yamlfile.parse_component,
+                  1, 'invalid', 'invalid')
+    assert_raises(ValueError, yamlfile.parse_component,
+                  {}, 'invalid', 'invalid')
 
 
-class YamlTestBase(CisTestClass):
+class YamlTestBase(YggTestClass):
     r"""Test base for yamlfile."""
     _contents = tuple()
 
@@ -94,7 +93,7 @@ class YamlTestBaseError(YamlTestBase):
         r"""Test error reading & parsing yaml."""
         if (self._error is None) or (self.nfiles == 0):
             return
-        nt.assert_raises(self._error, yamlfile.parse_yaml, self.files)
+        assert_raises(self._error, yamlfile.parse_yaml, self.files)
 
 
 class TestYamlModelOnly(YamlTestBase):

@@ -1,9 +1,9 @@
 import os
 import tempfile
-from cis_interface import backwards, platform
-from cis_interface.communication import CommBase
-from cis_interface.schema import register_component, inherit_schema
-from cis_interface.serialize.DirectSerialize import DirectSerialize
+from yggdrasil import backwards, platform
+from yggdrasil.communication import CommBase
+from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.serialize.DirectSerialize import DirectSerialize
 
 
 @register_component

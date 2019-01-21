@@ -1,7 +1,7 @@
 import types
 import importlib
-from cis_interface.metaschema.datatypes import register_type
-from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
+from yggdrasil.metaschema.datatypes import register_type
+from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
 @register_type

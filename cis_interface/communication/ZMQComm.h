@@ -1,6 +1,6 @@
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISZMQCOMM_H_
-#define CISZMQCOMM_H_
+#ifndef YGGZMQCOMM_H_
+#define YGGZMQCOMM_H_
 
 #include <CommBase.h>
 #include "../metaschema/datatypes/datatypes.h"
@@ -17,11 +17,11 @@ extern "C" {
 
 static unsigned _zmq_rand_seeded = 0;
 static unsigned _last_port_set = 0;
-static unsigned _cisSocketsCreated = 0;
+static unsigned _yggSocketsCreated = 0;
 static int _last_port = 49152;
 /* static double _wait_send_t = 0;  // 0.0001; */
-static char _reply_msg[100] = "CIS_REPLY";
-static char _purge_msg[100] = "CIS_PURGE";
+static char _reply_msg[100] = "YGG_REPLY";
+static char _purge_msg[100] = "YGG_PURGE";
 static int _zmq_sleeptime = 10000;
 
 /*! 
@@ -85,7 +85,7 @@ static inline
 int init_zmq_reply(comm_t *comm) {
   zmq_reply_t *zrep = (zmq_reply_t*)malloc(sizeof(zmq_reply_t));
   if (zrep == NULL) {
-    cislog_error("init_zmq_reply(%s): Failed to malloc reply.", comm->name);
+    ygglog_error("init_zmq_reply(%s): Failed to malloc reply.", comm->name);
     return -1;
   }
   zrep->nsockets = 0;
@@ -109,7 +109,7 @@ int find_reply_socket(const comm_t *comm, const char *address) {
   // Get reply
   zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
   if (zrep == NULL) {
-    cislog_error("find_reply_socket(%s): Reply structure not initialized.", comm->name);
+    ygglog_error("find_reply_socket(%s): Reply structure not initialized.", comm->name);
     return -2;
   }
   int i = 0;
@@ -132,39 +132,39 @@ int do_reply_send(const comm_t *comm) {
   // Get reply
   zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
   if (zrep == NULL) {
-    cislog_error("do_reply_send(%s): Reply structure not initialized.", comm->name);
+    ygglog_error("do_reply_send(%s): Reply structure not initialized.", comm->name);
     return -1;
   }
   zrep->n_msg++;
   zsock_t *s = (zsock_t*)(zrep->sockets[0]);
   if (s == NULL) {
-    cislog_error("do_reply_send(%s): Socket is NULL.", comm->name);
+    ygglog_error("do_reply_send(%s): Socket is NULL.", comm->name);
     return -1;
   }
   // Poll
-  cislog_debug("do_reply_send(%s): address=%s, begin", comm->name,
+  ygglog_debug("do_reply_send(%s): address=%s, begin", comm->name,
   	       zrep->addresses[0]);
 #if defined(__cplusplus) && defined(_WIN32)
   // TODO: There seems to be an error in the poller when using it in C++
 #else
   zpoller_t *poller = zpoller_new(s, NULL);
   if (!(poller)) {
-    cislog_error("do_reply_send(%s): Could not create poller", comm->name);
+    ygglog_error("do_reply_send(%s): Could not create poller", comm->name);
     return -1;
   }
   assert(poller);
-  cislog_debug("do_reply_send(%s): waiting on poller...", comm->name);
+  ygglog_debug("do_reply_send(%s): waiting on poller...", comm->name);
   void *p = zpoller_wait(poller, -1);
   //void *p = zpoller_wait(poller, 1000);
-  cislog_debug("do_reply_send(%s): poller returned", comm->name); 
+  ygglog_debug("do_reply_send(%s): poller returned", comm->name); 
   zpoller_destroy(&poller);
   if (p == NULL) {
     if (zpoller_terminated(poller)) {
-      cislog_error("do_reply_send(%s): Poller interrupted", comm->name);
+      ygglog_error("do_reply_send(%s): Poller interrupted", comm->name);
     } else if (zpoller_expired(poller)) {
-      cislog_error("do_reply_send(%s): Poller expired", comm->name);
+      ygglog_error("do_reply_send(%s): Poller expired", comm->name);
     } else {
-      cislog_error("do_reply_send(%s): Poller failed", comm->name);
+      ygglog_error("do_reply_send(%s): Poller failed", comm->name);
     }
     return -1;
   }
@@ -172,14 +172,14 @@ int do_reply_send(const comm_t *comm) {
   // Receive
   zframe_t *msg = zframe_recv(s);
   if (msg == NULL) {
-    cislog_error("do_reply_send(%s): did not receive", comm->name);
+    ygglog_error("do_reply_send(%s): did not receive", comm->name);
     return -1;
   }
   char *msg_data = (char*)zframe_data(msg);
   // Check for EOF
   int is_purge = 0;
-  if (strcmp(msg_data, CIS_MSG_EOF) == 0) {
-    cislog_debug("do_reply_send(%s): EOF received", comm->name);
+  if (strcmp(msg_data, YGG_MSG_EOF) == 0) {
+    ygglog_debug("do_reply_send(%s): EOF received", comm->name);
     zrep->n_msg = 0;
     zrep->n_rep = 0;
     return -2;
@@ -191,11 +191,11 @@ int do_reply_send(const comm_t *comm) {
   int ret = zframe_send(&msg, s, 0);
   // Check for purge or EOF
   if (ret < 0) {
-    cislog_error("do_reply_send(%s): Error sending reply frame.", comm->name);
+    ygglog_error("do_reply_send(%s): Error sending reply frame.", comm->name);
     zframe_destroy(&msg);
   } else {
     if (is_purge == 1) {
-      cislog_debug("do_reply_send(%s): PURGE received", comm->name);
+      ygglog_debug("do_reply_send(%s): PURGE received", comm->name);
       zrep->n_msg = 0;
       zrep->n_rep = 0;
       ret = do_reply_send(comm);
@@ -203,7 +203,7 @@ int do_reply_send(const comm_t *comm) {
       zrep->n_rep++;
     }
   }
-  cislog_debug("do_reply_send(%s): address=%s, end", comm->name,
+  ygglog_debug("do_reply_send(%s): address=%s, end", comm->name,
 	       zrep->addresses[0]);
   return ret;
 };
@@ -220,29 +220,29 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
   // Get reply
   zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
   if (zrep == NULL) {
-    cislog_error("do_reply_recv(%s): Reply structure not initialized.", comm->name);
+    ygglog_error("do_reply_recv(%s): Reply structure not initialized.", comm->name);
     return -1;
   }
   zsock_t *s = (zsock_t*)(zrep->sockets[isock]);
   if (s == NULL) {
-    cislog_error("do_reply_recv(%s): Socket is NULL.", comm->name);
+    ygglog_error("do_reply_recv(%s): Socket is NULL.", comm->name);
     return -1;
   }
-  cislog_debug("do_reply_recv(%s): address=%s, begin", comm->name,
+  ygglog_debug("do_reply_recv(%s): address=%s, begin", comm->name,
 	       zrep->addresses[isock]);
   zframe_t *msg_send = zframe_new(msg, strlen(msg));
   if (msg_send == NULL) {
-    cislog_error("do_reply_recv(%s): Error creating frame.", comm->name);
+    ygglog_error("do_reply_recv(%s): Error creating frame.", comm->name);
     return -1;
   }
   // Send
   int ret = zframe_send(&msg_send, s, 0);
   if (ret < 0) {
-    cislog_error("do_reply_recv(%s): Error sending confirmation.", comm->name);
+    ygglog_error("do_reply_recv(%s): Error sending confirmation.", comm->name);
     zframe_destroy(&msg_send);
     return -1;
   }
-  if (strcmp(msg, CIS_MSG_EOF) == 0) {
+  if (strcmp(msg, YGG_MSG_EOF) == 0) {
     zrep->n_msg = 0;
     zrep->n_rep = 0;
     zsock_set_linger(s, _zmq_sleeptime);
@@ -251,12 +251,12 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
   // Receive
   zframe_t *msg_recv = zframe_recv(s);
   if (msg_recv == NULL) {
-    cislog_error("do_reply_recv(%s): did not receive", comm->name);
+    ygglog_error("do_reply_recv(%s): did not receive", comm->name);
     return -1;
   }
   zframe_destroy(&msg_recv);
   zrep->n_rep++;
-  cislog_debug("do_reply_recv(%s): address=%s, end", comm->name,
+  ygglog_debug("do_reply_recv(%s): address=%s, end", comm->name,
 	       zrep->addresses[isock]);
   return 0;
 };
@@ -272,21 +272,21 @@ char *set_reply_send(const comm_t *comm) {
   // Get reply
   zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
   if (zrep == NULL) {
-    cislog_error("set_reply_send(%s): Reply structure not initialized.", comm->name);
+    ygglog_error("set_reply_send(%s): Reply structure not initialized.", comm->name);
     return out;
   }
   // Create socket
   if (zrep->nsockets == 0) {
     zrep->sockets = (zsock_t**)malloc(sizeof(zsock_t*));
     if (zrep->sockets == NULL) {
-      cislog_error("set_reply_send(%s): Error mallocing sockets.", comm->name);
+      ygglog_error("set_reply_send(%s): Error mallocing sockets.", comm->name);
       return out;
     }
     zrep->nsockets = 1;
     zrep->sockets[0] = zsock_new(ZMQ_REP);
     zsock_set_linger(zrep->sockets[0], 0);
     if (zrep->sockets[0] == NULL) {
-      cislog_error("set_reply_send(%s): Could not initialize empty socket.",
+      ygglog_error("set_reply_send(%s): Could not initialize empty socket.",
 		   comm->name);
       return out;
     }
@@ -296,15 +296,15 @@ char *set_reply_send(const comm_t *comm) {
       strcpy(host, "127.0.0.1");
     char address[100];
     if (_last_port_set == 0) {
-      cislog_debug("model_index = %s", getenv("CIS_MODEL_INDEX"));
-      _last_port = 49152 + 1000 * atoi(getenv("CIS_MODEL_INDEX"));
+      ygglog_debug("model_index = %s", getenv("YGG_MODEL_INDEX"));
+      _last_port = 49152 + 1000 * atoi(getenv("YGG_MODEL_INDEX"));
       _last_port_set = 1;
-      cislog_debug("_last_port = %d", _last_port);
+      ygglog_debug("_last_port = %d", _last_port);
     }
     sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
     int port = zsock_bind(zrep->sockets[0], "%s", address);
     if (port == -1) {
-      cislog_error("set_reply_send(%s): Could not bind socket to address = %s",
+      ygglog_error("set_reply_send(%s): Could not bind socket to address = %s",
 		   comm->name, address);
       return out;
     }
@@ -313,7 +313,7 @@ char *set_reply_send(const comm_t *comm) {
     zrep->addresses = (char**)malloc(sizeof(char*));
     zrep->addresses[0] = (char*)malloc((strlen(address) + 1)*sizeof(char));
     strcpy(zrep->addresses[0], address);
-    cislog_debug("set_reply_send(%s): New reply socket: %s", comm->name, address);
+    ygglog_debug("set_reply_send(%s): New reply socket: %s", comm->name, address);
   }
   out = zrep->addresses[0];
   return out;
@@ -330,27 +330,27 @@ int set_reply_recv(const comm_t *comm, const char* address) {
   // Get reply
   zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
   if (zrep == NULL) {
-    cislog_error("set_reply_recv(%s): Reply structure not initialized.", comm->name);
+    ygglog_error("set_reply_recv(%s): Reply structure not initialized.", comm->name);
     return out;
   }
   // Match address and create if it dosn't exist
   int isock = find_reply_socket(comm, address);
   if (isock < 0) {
     if (isock == -2) {
-      cislog_error("set_reply_recv(%s): Error locating socket.", comm->name);
+      ygglog_error("set_reply_recv(%s): Error locating socket.", comm->name);
       return out;
     }
     // Realloc arrays
     zrep->sockets = (zsock_t**)realloc(zrep->sockets,
 				       sizeof(zsock_t*)*(zrep->nsockets + 1));
     if (zrep->sockets == NULL) {
-      cislog_error("set_reply_recv(%s): Error reallocing sockets.", comm->name);
+      ygglog_error("set_reply_recv(%s): Error reallocing sockets.", comm->name);
       return out;
     }
     zrep->addresses = (char**)realloc(zrep->addresses,
 				      sizeof(char*)*(zrep->nsockets + 1));
     if (zrep->addresses == NULL) {
-      cislog_error("set_reply_recv(%s): Error reallocing addresses.", comm->name);
+      ygglog_error("set_reply_recv(%s): Error reallocing addresses.", comm->name);
       return out;
     }
     // Create new socket
@@ -359,24 +359,24 @@ int set_reply_recv(const comm_t *comm, const char* address) {
     zrep->sockets[isock] = zsock_new(ZMQ_REQ);
     zsock_set_linger(zrep->sockets[isock], 0);
     if (zrep->sockets[isock] == NULL) {
-      cislog_error("set_reply_recv(%s): Could not initialize empty socket.",
+      ygglog_error("set_reply_recv(%s): Could not initialize empty socket.",
 		   comm->name);
       return out;
     }
     zrep->addresses[isock] = (char*)malloc(sizeof(char)*(strlen(address) + 1));
     if (zrep->addresses[isock] == NULL) {
-      cislog_error("set_reply_recv(%s): Could not realloc new address.",
+      ygglog_error("set_reply_recv(%s): Could not realloc new address.",
 		   comm->name);
       return out;
     }
     strcpy(zrep->addresses[isock], address);
     int ret = zsock_connect(zrep->sockets[isock], "%s", address);
     if (ret < 0) {
-      cislog_error("set_reply_recv(%s): Could not connect to socket.",
+      ygglog_error("set_reply_recv(%s): Could not connect to socket.",
 		   comm->name);
       return out;
     }
-    cislog_debug("set_reply_recv(%s): New recv socket: %s", comm->name, address);
+    ygglog_debug("set_reply_recv(%s): New recv socket: %s", comm->name, address);
   }
   return isock;
 };
@@ -417,7 +417,7 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   // Get reply
   zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
   if (zrep == NULL) {
-    cislog_error("check_reply_recv(%s): Reply structure not initialized.", comm->name);
+    ygglog_error("check_reply_recv(%s): Reply structure not initialized.", comm->name);
     return -1;
   }
   zrep->n_msg++;
@@ -432,7 +432,7 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
     address_len = strlen(head.zmq_reply);
     memcpy(address, head.zmq_reply, address_len);
   } else {
-    cislog_error("check_reply_recv(%s): Error parsing reply header in '%s'",
+    ygglog_error("check_reply_recv(%s): Error parsing reply header in '%s'",
 		 comm->name, data);
     return -1;
   }
@@ -440,13 +440,13 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
   // Match address and create if it dosn't exist
   int isock = set_reply_recv(comm, address);
   if (isock < 0) {
-    cislog_error("check_reply_recv(%s): Error setting reply socket.");
+    ygglog_error("check_reply_recv(%s): Error setting reply socket.");
     return -1;
   }
   // Confirm message receipt
   ret = do_reply_recv(comm, isock, _reply_msg);
   if (ret < 0) {
-    cislog_error("check_reply_recv(%s): Error during reply.", comm->name);
+    ygglog_error("check_reply_recv(%s): Error during reply.", comm->name);
     return -1;
   }
   return new_len;
@@ -480,10 +480,10 @@ int new_zmq_address(comm_t *comm) {
     sprintf(address, "%s://%s", protocol, comm->name);
   } else {
      if (_last_port_set == 0) {
-      cislog_debug("model_index = %s", getenv("CIS_MODEL_INDEX"));
-      _last_port = 49152 + 1000 * atoi(getenv("CIS_MODEL_INDEX"));
+      ygglog_debug("model_index = %s", getenv("YGG_MODEL_INDEX"));
+      _last_port = 49152 + 1000 * atoi(getenv("YGG_MODEL_INDEX"));
       _last_port_set = 1;
-      cislog_debug("_last_port = %d", _last_port);
+      ygglog_debug("_last_port = %d", _last_port);
     }
    sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
     /* strcat(address, ":!"); // For random port */
@@ -491,13 +491,13 @@ int new_zmq_address(comm_t *comm) {
   // Bind
   zsock_t *s = zsock_new(ZMQ_PAIR);
   if (s == NULL) {
-    cislog_error("new_zmq_address: Could not initialize empty socket.");
+    ygglog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
   zsock_set_linger(s, 0);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
-    cislog_error("new_zmq_address: Could not bind socket to address = %s",
+    ygglog_error("new_zmq_address: Could not bind socket to address = %s",
 		 address);
     return -1;
   }
@@ -508,11 +508,11 @@ int new_zmq_address(comm_t *comm) {
     sprintf(address, "%s://%s:%d", protocol, host, port);
   }
   strcpy(comm->address, address);
-  cislog_debug("new_zmq_address: Bound socket to %s", comm->address);
+  ygglog_debug("new_zmq_address: Bound socket to %s", comm->address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
   comm->handle = (void*)s;
-  _cisSocketsCreated++;
+  _yggSocketsCreated++;
   // Init reply
   int ret = init_zmq_reply(comm);
   return ret;
@@ -531,18 +531,18 @@ int init_zmq_comm(comm_t *comm) {
   comm->msgBufSize = 100;
   zsock_t *s = zsock_new(ZMQ_PAIR);
   if (s == NULL) {
-    cislog_error("init_zmq_address: Could not initialize empty socket.");
+    ygglog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
   }
   zsock_set_linger(s, 0);
   ret = zsock_connect(s, "%s", comm->address);
   if (ret == -1) {
-    cislog_error("init_zmq_address: Could not connect socket to address = %s",
+    ygglog_error("init_zmq_address: Could not connect socket to address = %s",
   		 comm->address);
     zsock_destroy(&s);
     return ret;
   }
-  cislog_debug("init_zmq_address: Connected socket to %s", comm->address);
+  ygglog_debug("init_zmq_address: Connected socket to %s", comm->address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer
@@ -564,7 +564,7 @@ int free_zmq_comm(comm_t *x) {
     return ret;
   // Drain input
   if ((is_recv(x->direction)) && (x->valid == 1)) {
-    if (_cis_error_flag == 0) {
+    if (_ygg_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
       while (zmq_comm_nmsg(*x) > 0) {
@@ -590,7 +590,7 @@ int free_zmq_comm(comm_t *x) {
   if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);
     if (s != NULL) {
-      cislog_debug("Destroying socket: %s", x->address);
+      ygglog_debug("Destroying socket: %s", x->address);
       zsock_destroy(&s);
     }
     x->handle = NULL;
@@ -611,13 +611,13 @@ int zmq_comm_nmsg(const comm_t x) {
       zsock_t *s = (zsock_t*)(x.handle);
       zpoller_t *poller = zpoller_new(s, NULL);
       if (poller == NULL) {
-	cislog_error("zmq_comm_nmsg: Could not create poller");
+	ygglog_error("zmq_comm_nmsg: Could not create poller");
 	return -1;
       }
       void *p = zpoller_wait(poller, 1);
       if (p == NULL) {
 	if (zpoller_terminated(poller)) {
-	  cislog_error("zmq_comm_nmsg: Poller interrupted");
+	  ygglog_error("zmq_comm_nmsg: Poller interrupted");
 	  out = -1;
 	} else {
 	  out = 0;
@@ -639,7 +639,7 @@ int zmq_comm_nmsg(const comm_t x) {
     /* } */
     zmq_reply_t *zrep = (zmq_reply_t*)(x.reply);
     if (zrep != NULL) {
-      cislog_debug("zmq_comm_nmsg(%s): nmsg = %d, nrep = %d",
+      ygglog_debug("zmq_comm_nmsg(%s): nmsg = %d, nrep = %d",
 		   x.name, zrep->n_msg, zrep->n_rep);
       out = zrep->n_msg - zrep->n_rep;
     }
@@ -649,7 +649,7 @@ int zmq_comm_nmsg(const comm_t x) {
 
 /*!
   @brief Send a message to the comm.
-  Send a message smaller than CIS_MSG_MAX bytes to an output comm. If the
+  Send a message smaller than YGG_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -658,28 +658,28 @@ int zmq_comm_nmsg(const comm_t x) {
  */
 static inline
 int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
-  cislog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
+  ygglog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
   zsock_t *s = (zsock_t*)(x.handle);
   if (s == NULL) {
-    cislog_error("zmq_comm_send(%s): socket handle is NULL", x.name);
+    ygglog_error("zmq_comm_send(%s): socket handle is NULL", x.name);
     return -1;
   }
   int new_len = 0;
   char *new_data = check_reply_send(&x, data, (int)len, &new_len);
   if (new_data == NULL) {
-    cislog_error("zmq_comm_send(%s): Adding reply address failed.", x.name);
+    ygglog_error("zmq_comm_send(%s): Adding reply address failed.", x.name);
     return -1;
   }
   zframe_t *f = zframe_new(new_data, new_len);
   int ret = -1;
   if (f == NULL) {
-    cislog_error("zmq_comm_send(%s): frame handle is NULL", x.name);
+    ygglog_error("zmq_comm_send(%s): frame handle is NULL", x.name);
   } else {
     ret = zframe_send(&f, s, 0);
     if (ret < 0) {
-      cislog_error("zmq_comm_send(%s): Error in zframe_send", x.name);
+      ygglog_error("zmq_comm_send(%s): Error in zframe_send", x.name);
       zframe_destroy(&f);
     }
   }
@@ -688,20 +688,20 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
     ret = do_reply_send(&x);
     if (ret < 0) {
       if (ret == -2) {
-	cislog_error("zmq_comm_send(%s): EOF received", x.name);
+	ygglog_error("zmq_comm_send(%s): EOF received", x.name);
       } else {
-	cislog_error("zmq_comm_send(%s): Error in do_reply_send", x.name);
+	ygglog_error("zmq_comm_send(%s): Error in do_reply_send", x.name);
       }
     }
   }
-  cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
+  ygglog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
   free(new_data);
   return ret;
 };
 
 /*!
   @brief Receive a message from an input comm.
-  Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
+  Receive a message smaller than YGG_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
@@ -715,10 +715,10 @@ static inline
 int zmq_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
   int ret = -1;
-  cislog_debug("zmq_comm_recv(%s)", x.name);
+  ygglog_debug("zmq_comm_recv(%s)", x.name);
   zsock_t *s = (zsock_t*)(x.handle);
   if (s == NULL) {
-    cislog_error("zmq_comm_recv(%s): socket handle is NULL", x.name);
+    ygglog_error("zmq_comm_recv(%s): socket handle is NULL", x.name);
     return ret;
   }
   while (1) {
@@ -726,13 +726,13 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
     if (nmsg < 0) return ret;
     else if (nmsg > 0) break;
     else {
-      cislog_debug("zmq_comm_recv(%s): no messages, sleep", x.name);
-      usleep(CIS_SLEEP_TIME);
+      ygglog_debug("zmq_comm_recv(%s): no messages, sleep", x.name);
+      usleep(YGG_SLEEP_TIME);
     }
   }
   zframe_t *out = zframe_recv(s);
   if (out == NULL) {
-    cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
+    ygglog_debug("zmq_comm_recv(%s): did not receive", x.name);
     return ret;
   }
   // Realloc and copy data
@@ -740,16 +740,16 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   // size_t len_recv = (size_t)ret + 1;
   if (len_recv > len) {
     if (allow_realloc) {
-      cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
+      ygglog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
 		   x.name, len, len_recv);
       (*data) = (char*)realloc(*data, len_recv);
       if (*data == NULL) {
-	cislog_error("zmq_comm_recv(%s): failed to realloc buffer.", x.name);
+	ygglog_error("zmq_comm_recv(%s): failed to realloc buffer.", x.name);
 	zframe_destroy(&out);
 	return -1;
       }
     } else {
-      cislog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+      ygglog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
 		   x.name, len, len_recv);
       zframe_destroy(&out);
       return -((int)(len_recv - 1));
@@ -761,7 +761,7 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   ret = (int)len_recv - 1;
   /*
   if (strlen(*data) != ret) {
-    cislog_error("zmq_comm_recv(%s): Size of string (%d) doesn't match expected (%d)",
+    ygglog_error("zmq_comm_recv(%s): Size of string (%d) doesn't match expected (%d)",
 		 x.name, strlen(*data), ret);
     return -1;
   }
@@ -769,10 +769,10 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   // Check reply
   ret = check_reply_recv(&x, *data, ret);
   if (ret < 0) {
-    cislog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
+    ygglog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
     return ret;
   }
-  cislog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
+  ygglog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
   return ret;
 };
 
@@ -785,7 +785,7 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
  */
 static inline
 void zmq_install_error() {
-  cislog_error("Compiler flag 'ZMQINSTALLED' not defined so ZMQ bindings are disabled.");
+  ygglog_error("Compiler flag 'ZMQINSTALLED' not defined so ZMQ bindings are disabled.");
 };
 
 /*!
@@ -834,7 +834,7 @@ int zmq_comm_nmsg(const comm_t x) {
 
 /*!
   @brief Send a message to the comm.
-  Send a message smaller than CIS_MSG_MAX bytes to an output comm. If the
+  Send a message smaller than YGG_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -849,7 +849,7 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
 
 /*!
   @brief Receive a message from an input comm.
-  Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
+  Receive a message smaller than YGG_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
@@ -894,4 +894,4 @@ int set_reply_recv(const comm_t *comm, const char* address) {
 }
 #endif
 
-#endif /*CISZMQCOMM_H_*/
+#endif /*YGGZMQCOMM_H_*/

@@ -1,8 +1,7 @@
-import nose.tools as nt
-from cis_interface.tests import CisTestClassInfo
-from cis_interface.metaschema import get_validator, get_metaschema
-from cis_interface.metaschema.datatypes import MetaschemaTypeError
-from cis_interface.metaschema.properties.MetaschemaProperty import (
+from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
+from yggdrasil.metaschema import get_validator, get_metaschema
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.metaschema.properties.MetaschemaProperty import (
     create_property)
 
 
@@ -19,12 +18,12 @@ def test_dynamic():
         return
 
     new_prop = create_property('invalid', None, encode, validate, compare)
-    nt.assert_equal(new_prop.encode('hello'), None)
-    nt.assert_equal(list(new_prop.validate(None, None, None, None)), [])
-    nt.assert_equal(list(new_prop.compare(True, False)), [])
+    assert_equal(new_prop.encode('hello'), None)
+    assert_equal(list(new_prop.validate(None, None, None, None)), [])
+    assert_equal(list(new_prop.compare(True, False)), [])
 
 
-class TestMetaschemaProperty(CisTestClassInfo):
+class TestMetaschemaProperty(YggTestClassInfo):
     r"""Test class for MetaschemaProperty class."""
     
     _mod = 'MetaschemaProperty'
@@ -42,7 +41,7 @@ class TestMetaschemaProperty(CisTestClassInfo):
     @property
     def mod(self):
         r"""str: Absolute name of module containing class to be tested."""
-        return 'cis_interface.metaschema.properties.%s' % self._mod
+        return 'yggdrasil.metaschema.properties.%s' % self._mod
 
     @property
     def inst_args(self):
@@ -56,12 +55,12 @@ class TestMetaschemaProperty(CisTestClassInfo):
             errors = list(self.import_cls.compare(x, value))
             assert(not errors)
         if self.import_cls.name == 'base':
-            nt.assert_raises(NotImplementedError, self.import_cls.encode, None)
+            assert_raises(NotImplementedError, self.import_cls.encode, None)
 
     def test_encode_errors(self):
         r"""Test errors raised by encode."""
         for instance in self._encode_errors:
-            nt.assert_raises(MetaschemaTypeError, self.import_cls.encode, instance)
+            assert_raises(MetaschemaTypeError, self.import_cls.encode, instance)
 
     def test_validate_valid(self):
         r"""Test validation method for the class on valid objects."""

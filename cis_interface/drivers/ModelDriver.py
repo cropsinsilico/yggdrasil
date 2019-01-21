@@ -3,14 +3,14 @@ import sys
 import copy
 import warnings
 from pprint import pformat
-from cis_interface import platform, tools
-from cis_interface.drivers.Driver import Driver
+from yggdrasil import platform, tools
+from yggdrasil.drivers.Driver import Driver
 from threading import Event
 try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
-from cis_interface.schema import register_component
+from yggdrasil.schema import register_component
 
 
 @register_component
@@ -23,7 +23,7 @@ class ModelDriver(Driver):
             line. This should be a complete command including the necessary
             executable and command line arguments to that executable.
         is_server (bool, optional): If True, the model is assumed to be a server
-            and an instance of :class:`cis_interface.drivers.ServerDriver`
+            and an instance of :class:`yggdrasil.drivers.ServerDriver`
             is started. Defaults to False.
         client_of (str, list, optional): The names of ne or more servers that
             this model is a client of. Defaults to empty list.
@@ -40,10 +40,10 @@ class ModelDriver(Driver):
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
-        process (:class:`cis_interface.tools.CisPopen`): Process used to run
+        process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
         is_server (bool): If True, the model is assumed to be a server and an
-            instance of :class:`cis_interface.drivers.ServerDriver` is
+            instance of :class:`yggdrasil.drivers.ServerDriver` is
             started.
         client_of (list): The names of server models that this model is a
             client of.
@@ -129,8 +129,8 @@ class ModelDriver(Driver):
     def set_env(self):
         env = copy.deepcopy(self.env)
         env.update(os.environ)
-        env['CIS_SUBPROCESS'] = "True"
-        env['CIS_MODEL_INDEX'] = str(self.model_index)
+        env['YGG_SUBPROCESS'] = "True"
+        env['YGG_MODEL_INDEX'] = str(self.model_index)
         return env
 
     def before_start(self):
@@ -146,12 +146,12 @@ class ModelDriver(Driver):
         elif self.with_valgrind:
             pre_args += ['valgrind'] + self.valgrind_flags
         # print(pre_args + self.args)
-        self.model_process = tools.CisPopen(pre_args + self.args, env=env,
+        self.model_process = tools.YggPopen(pre_args + self.args, env=env,
                                             cwd=self.working_dir,
                                             forward_signals=False,
                                             shell=platform._is_win)
         # Start thread to queue output
-        self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop,
+        self.queue_thread = tools.YggThreadLoop(target=self.enqueue_output_loop,
                                                 name=self.name + '.EnqueueLoop')
         self.queue_thread.start()
 

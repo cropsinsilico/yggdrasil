@@ -1,10 +1,9 @@
-import nose.tools as nt
 import numpy as np
-from cis_interface.tests import CisTestBase
-from cis_interface import units
+from yggdrasil.tests import YggTestBase, assert_equal, assert_raises
+from yggdrasil import units
 
 
-class TestPint(CisTestBase):
+class TestPint(YggTestBase):
     r"""Tests for using pint for units."""
     _unit_package = 'pint'
 
@@ -41,17 +40,17 @@ class TestPint(CisTestBase):
     def test_get_units(self):
         r"""Test get_units."""
         for v in self._vars_nounits:
-            nt.assert_equal(units.get_units(v), '')
+            assert_equal(units.get_units(v), '')
         for v in self._vars_units:
-            nt.assert_equal(units.get_units(v), str(units.as_unit('cm').units))
+            assert_equal(units.get_units(v), str(units.as_unit('cm').units))
 
     def test_add_units(self):
         r"""Test add_units."""
         for v in self._vars_nounits:
             x = units.add_units(v, 'cm')
             assert(units.has_units(x))
-        nt.assert_equal(units.add_units(1.0, ''), 1.0)
-        nt.assert_equal(units.add_units(1.0, 'n/a'), 1.0)
+        assert_equal(units.add_units(1.0, ''), 1.0)
+        assert_equal(units.add_units(1.0, 'n/a'), 1.0)
 
     def test_is_null_unit(self):
         r"""Test is_null_unit."""
@@ -62,7 +61,7 @@ class TestPint(CisTestBase):
     def test_as_unit(self):
         r"""Test as_unit."""
         units.as_unit('cm')
-        nt.assert_raises(ValueError, units.as_unit, 'invalid')
+        assert_raises(ValueError, units.as_unit, 'invalid')
 
     def test_is_unit(self):
         r"""Test is_unit."""
@@ -80,7 +79,7 @@ class TestPint(CisTestBase):
         units.convert_to(1, 'm')
         for v in self._vars_units:
             units.convert_to(v, 'm')
-            nt.assert_raises(ValueError, units.convert_to, v, 's')
+            assert_raises(ValueError, units.convert_to, v, 's')
 
     def test_are_compatible(self):
         r"""Test are_compatible."""

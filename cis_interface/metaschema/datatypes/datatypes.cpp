@@ -17,11 +17,11 @@
 // C++ functions
 MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
   if (not type_doc.IsObject())
-    cislog_throw_error("type_from_doc: Parsed document is not an object.");
+    ygglog_throw_error("type_from_doc: Parsed document is not an object.");
   if (not type_doc.HasMember("type"))
-    cislog_throw_error("type_from_doc: Parsed header dosn't contain a type.");
+    ygglog_throw_error("type_from_doc: Parsed header dosn't contain a type.");
   if (not type_doc["type"].IsString())
-    cislog_throw_error("type_from_doc: Type in parsed header is not a string.");
+    ygglog_throw_error("type_from_doc: Type in parsed header is not a string.");
   const char *type = type_doc["type"].GetString();
   std::map<const char*, int, strcomp> type_map = get_type_map();
   std::map<const char*, int, strcomp>::iterator it = type_map.find(type);
@@ -37,9 +37,9 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
       // Enhanced types
     case T_ARRAY: {
       if (not (type_doc.HasMember("items")))
-	cislog_throw_error("JSONArrayMetaschemaType: Items missing.");
+	ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
       if (not (type_doc["items"].IsArray()))
-	cislog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
+	ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
       std::vector<MetaschemaType*> items;
       size_t i;
       for (i = 0; i < type_doc["items"].Size(); i++) {
@@ -49,9 +49,9 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
     }
     case T_OBJECT: {
       if (not (type_doc.HasMember("properties")))
-	cislog_throw_error("JSONObjectMetaschemaType: Properties missing.");
+	ygglog_throw_error("JSONObjectMetaschemaType: Properties missing.");
       if (not (type_doc["properties"].IsObject()))
-	cislog_throw_error("JSONObjectMetaschemaType: Properties must be an object.");
+	ygglog_throw_error("JSONObjectMetaschemaType: Properties must be an object.");
       std::map<const char*, MetaschemaType*, strcomp> properties;
       for (rapidjson::Value::ConstMemberIterator itr = type_doc.MemberBegin(); itr != type_doc.MemberEnd(); ++itr) {
 	properties[itr->name.GetString()] = type_from_doc(itr->value);
@@ -79,7 +79,7 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
       return (new ObjMetaschemaType(type_doc));
     }
   }
-  cislog_throw_error("Could not find class from doc for type '%s'.", type);
+  ygglog_throw_error("Could not find class from doc for type '%s'.", type);
   return NULL;
 };
 
@@ -87,16 +87,16 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
 bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
   // Type
   if (not head_doc.IsObject()) {
-    cislog_error("update_header_from_doc: head document must be an object.");
+    ygglog_error("update_header_from_doc: head document must be an object.");
     return false;
   }
   // Size
   if (not head_doc.HasMember("size")) {
-    cislog_error("update_header_from_doc: No size information in the header.");
+    ygglog_error("update_header_from_doc: No size information in the header.");
     return false;
   }
   if (not head_doc["size"].IsInt()) {
-    cislog_error("update_header_from_doc: Size is not integer.");
+    ygglog_error("update_header_from_doc: Size is not integer.");
     return false;
   }
   head.size = (size_t)(head_doc["size"].GetInt());
@@ -113,7 +113,7 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
   while (strcmp(*n, "") != 0) {
     if (head_doc.HasMember(*n)) {
       if (not head_doc[*n].IsString()) {
-	cislog_error("update_header_from_doc: '%s' is not a string.", *n);
+	ygglog_error("update_header_from_doc: '%s' is not a string.", *n);
 	return false;
       }
       char *target = NULL;
@@ -131,13 +131,13 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
       } else if (strcmp(*n, "zmq_reply_worker") == 0) {
 	target = head.zmq_reply_worker;
       } else {
-	cislog_error("update_header_from_doc: '%s' not handled.", *n);
+	ygglog_error("update_header_from_doc: '%s' not handled.", *n);
 	return false;
       }
       const char *str = head_doc[*n].GetString();
       size_t len = head_doc[*n].GetStringLength();
       if (len > target_size) {
-	cislog_error("update_header_from_doc: Size of value for key '%s' (%d) exceeds size of target buffer (%d).",
+	ygglog_error("update_header_from_doc: Size of value for key '%s' (%d) exceeds size of target buffer (%d).",
 		     *n, len, target_size);
 	return false;
       }
@@ -161,7 +161,7 @@ extern "C" {
     try {
       return type_class->type();
     } catch(...) {
-      cislog_error("get_type_name: C++ exception thrown.");
+      ygglog_error("get_type_name: C++ exception thrown.");
       return "";
     }
   }
@@ -169,13 +169,13 @@ extern "C" {
   const char* get_type_subtype(MetaschemaType* type_class) {
     try {
       if (strcmp(type_class->type(), "scalar") != 0) {
-	cislog_error("get_type_subtype: Only scalars have subtype.");
+	ygglog_error("get_type_subtype: Only scalars have subtype.");
 	return "";
       }
       ScalarMetaschemaType* scalar_class = (ScalarMetaschemaType*)type_class;
       return scalar_class->subtype();
     } catch(...) {
-      cislog_error("get_type_subtype: C++ exception thrown.");
+      ygglog_error("get_type_subtype: C++ exception thrown.");
       return "";
     }
   };
@@ -183,13 +183,13 @@ extern "C" {
   const size_t get_type_precision(MetaschemaType* type_class) {
     try {
       if (strcmp(type_class->type(), "scalar") != 0) {
-	cislog_error("get_type_precision: Only scalars have precision.");
+	ygglog_error("get_type_precision: Only scalars have precision.");
 	return 0;
       }
       ScalarMetaschemaType* scalar_class = (ScalarMetaschemaType*)type_class;
       return scalar_class->precision();
     } catch(...) {
-      cislog_error("get_type_precision: C++ exception thrown.");
+      ygglog_error("get_type_precision: C++ exception thrown.");
       return 0;
     }
   };
@@ -198,7 +198,7 @@ extern "C" {
     try {
       return (new DirectMetaschemaType()); 
     } catch(...) {
-      cislog_error("get_direct_type: Failed to create type.");
+      ygglog_error("get_direct_type: Failed to create type.");
       return NULL;
     }
   }
@@ -208,7 +208,7 @@ extern "C" {
     try {
       return (new ScalarMetaschemaType(subtype, precision, units));
     } catch(...) {
-      cislog_error("get_scalar_type: Failed to create type.");
+      ygglog_error("get_scalar_type: Failed to create type.");
       return NULL;
     }
   }
@@ -218,7 +218,7 @@ extern "C" {
     try {
       return (new OneDArrayMetaschemaType(subtype, precision, length, units));
     } catch(...) {
-      cislog_error("get_1darray_type: Failed to create type.");
+      ygglog_error("get_1darray_type: Failed to create type.");
       return NULL;
     }
   }
@@ -234,7 +234,7 @@ extern "C" {
       }
       return (new NDArrayMetaschemaType(subtype, precision, shape_vec, units));
     } catch(...) {
-      cislog_error("get_ndarray_type: Failed to create type.");
+      ygglog_error("get_ndarray_type: Failed to create type.");
       return NULL;
     }
   }
@@ -247,7 +247,7 @@ extern "C" {
       }
       return (new JSONArrayMetaschemaType(items_vec));
     } catch(...) {
-      cislog_error("get_json_array_type: Failed to create type.");
+      ygglog_error("get_json_array_type: Failed to create type.");
       return NULL;
     }
   }
@@ -261,7 +261,7 @@ extern "C" {
       }
       return (new JSONObjectMetaschemaType(properties));
     } catch(...) {
-      cislog_error("get_json_object_type: Failed to create type.");
+      ygglog_error("get_json_object_type: Failed to create type.");
       return NULL;
     }
   }
@@ -269,7 +269,7 @@ extern "C" {
     try {
       return (new PlyMetaschemaType()); 
     } catch(...) {
-      cislog_error("get_ply_type: Failed to create type.");
+      ygglog_error("get_ply_type: Failed to create type.");
       return NULL;
     }
   }
@@ -277,7 +277,7 @@ extern "C" {
     try {
       return (new ObjMetaschemaType()); 
     } catch(...) {
-      cislog_error("get_obj_type: Failed to create type.");
+      ygglog_error("get_obj_type: Failed to create type.");
       return NULL;
     }
   }
@@ -285,7 +285,7 @@ extern "C" {
     try {
       return (new AsciiTableMetaschemaType(format_str, as_array)); 
     } catch(...) {
-      cislog_error("get_ascii_table_type: Failed to create type.");
+      ygglog_error("get_ascii_table_type: Failed to create type.");
       return NULL;
     }
   }
@@ -306,7 +306,7 @@ extern "C" {
 	char isubtype[FMT_LEN] = "";
 	mres = find_match(re_fmt, format_str + beg, &sind, &eind);
 	if (mres < 0) {
-	  cislog_throw_error("get_format_type: find_match returned %d", mres);
+	  ygglog_throw_error("get_format_type: find_match returned %d", mres);
 	} else if (mres == 0) {
 	  // Make sure its not just a format string with no newline
 	  mres = find_match(re_fmt_eof, format_str + beg, &sind, &eind);
@@ -385,7 +385,7 @@ extern "C" {
 	  strcpy(isubtype, "uint");
 	  iprecision = 8 * sizeof(unsigned int);
 	} else {
-	  cislog_throw_error("get_format_type: Could not parse format string: %s", ifmt);
+	  ygglog_throw_error("get_format_type: Could not parse format string: %s", ifmt);
 	}
 	if (as_array == 1) {
 	  items.push_back(new OneDArrayMetaschemaType(isubtype, iprecision, 0));
@@ -399,7 +399,7 @@ extern "C" {
       //out->display();
       return out;
     } catch(...) {
-      cislog_error("get_format_type: Failed to create type from format.");
+      ygglog_error("get_format_type: Failed to create type from format.");
       return NULL;
     }
   }
@@ -453,12 +453,12 @@ extern "C" {
 	if (strcmp(new_type, type_name) != 0) {
 	  return type_from_void(new_type, type);
 	} else {
-	  cislog_error("type_from_void: No handler for type '%s'.", type_name);
+	  ygglog_error("type_from_void: No handler for type '%s'.", type_name);
 	  return NULL;
 	}
       }
     } catch(...) {
-      cislog_error("type_from_void: C++ exception.");
+      ygglog_error("type_from_void: C++ exception.");
       return NULL;
     }
   }
@@ -497,7 +497,7 @@ extern "C" {
 	} else if (strcmp(*n, "zmq_reply_worker") == 0) {
 	  target = head.zmq_reply_worker;
 	} else {
-	  cislog_error("format_comm_header: '%s' not handled.", *n);
+	  ygglog_error("format_comm_header: '%s' not handled.", *n);
 	  return -1;
 	}
 	if (strlen(target) > 0) {
@@ -511,14 +511,14 @@ extern "C" {
       int ret = snprintf(buf, buf_siz, "%s%s%s",
 			 MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
       if (ret > buf_siz) {
-	cislog_error("format_comm_header: Header exceeds buffer size: '%s%s%s'.",
+	ygglog_error("format_comm_header: Header exceeds buffer size: '%s%s%s'.",
 		     MSG_HEAD_SEP, head_buf.GetString(), MSG_HEAD_SEP);
 	return -1;
       }
-      cislog_debug("format_comm_header: Header = '%s'", buf);
+      ygglog_debug("format_comm_header: Header = '%s'", buf);
       return ret;
     } catch(...) {
-      cislog_error("format_comm_header: C++ exception thrown.");
+      ygglog_error("format_comm_header: C++ exception thrown.");
       return -1;
     }
   }
@@ -532,7 +532,7 @@ extern "C" {
       // Split header/body
       ret = split_head_body(buf, buf_siz, &head, &headsiz);
       if (ret < 0) {
-	cislog_error("parse_comm_header: Error splitting head and body.");
+	ygglog_error("parse_comm_header: Error splitting head and body.");
 	out.valid = 0;
 	if (head != NULL) 
 	  free(head);
@@ -551,7 +551,7 @@ extern "C" {
       rapidjson::Document head_doc;
       head_doc.Parse(head, headsiz);
       if (not head_doc.IsObject())
-	cislog_throw_error("parse_comm_header: Parsed header document is not an object.");
+	ygglog_throw_error("parse_comm_header: Parsed header document is not an object.");
       MetaschemaType* type;
       if (head_doc.HasMember("type")) {
 	type = type_from_doc(head_doc);
@@ -561,7 +561,7 @@ extern "C" {
       strcpy(out.type, type->type());
       out.serializer_info = (void*)type;
       if (not update_header_from_doc(out, head_doc)) {
-	cislog_error("parse_comm_header: Error updating header from JSON doc.");
+	ygglog_error("parse_comm_header: Error updating header from JSON doc.");
 	out.valid = 0;
 	strcpy(out.type, "");
 	out.serializer_info = NULL;
@@ -571,7 +571,7 @@ extern "C" {
       }
       return out;
     } catch(...) {
-      cislog_error("parse_comm_header: C++ exception thrown.");
+      ygglog_error("parse_comm_header: C++ exception thrown.");
       out.valid = 0;
       if (head != NULL)
 	free(head);
@@ -590,7 +590,7 @@ extern "C" {
       }
       return (void*)(type->table());
     } catch (...) {
-      cislog_error("get_ascii_table_from_void: C++ exception thrown.");
+      ygglog_error("get_ascii_table_from_void: C++ exception thrown.");
       return NULL;
     }
   }
@@ -603,7 +603,7 @@ extern "C" {
       }
       return type->type();
     } catch(...) {
-      cislog_error("get_type_name_from_void: C++ exception thrown.");
+      ygglog_error("get_type_name_from_void: C++ exception thrown.");
       return NULL;
     }
   }
@@ -619,7 +619,7 @@ extern "C" {
       }
       return type->copy();
     } catch (...) {
-      cislog_error("copy_from_void: C++ exception thrown.");
+      ygglog_error("copy_from_void: C++ exception thrown.");
       return NULL;
     }
   }
@@ -629,16 +629,16 @@ extern "C" {
     try {
       MetaschemaType *type = type_from_void(name, info);
       if (type == NULL) {
-	cislog_error("update_precision_from_void: Could not recover type.");
+	ygglog_error("update_precision_from_void: Could not recover type.");
 	return -1;
       }
       if (strcmp(type->type(), "scalar") != 0) {
-	cislog_throw_error("update_precision_from_void: Can only update precision for bytes or unicode scalars.");
+	ygglog_throw_error("update_precision_from_void: Can only update precision for bytes or unicode scalars.");
       }
       ScalarMetaschemaType *scalar_type = (ScalarMetaschemaType*)type;
       scalar_type->set_precision(new_precision);
     } catch (...) {
-      cislog_error("update_precision_from_void: C++ exception thrown.");
+      ygglog_error("update_precision_from_void: C++ exception thrown.");
       return -1;
     }
     return 0;
@@ -649,12 +649,12 @@ extern "C" {
       try {
 	MetaschemaType *type = type_from_void(name, info);
 	if (type == NULL) {
-	  cislog_error("free_type_from_void: Could not recover type.");
+	  ygglog_error("free_type_from_void: Could not recover type.");
 	  return -1;
 	}
 	delete type;
       } catch (...) {
-	cislog_error("free_type_from_void: C++ exception thrown.");
+	ygglog_error("free_type_from_void: C++ exception thrown.");
 	return -1;
       }
     }
@@ -667,12 +667,12 @@ extern "C" {
     try {
       MetaschemaType* type = type_from_void(name, info);
       if (type == NULL) {
-	cislog_error("deserialize_from_void: Failed to get type from void.");
+	ygglog_error("deserialize_from_void: Failed to get type from void.");
 	return -1;
       }
       return type->deserialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
-      cislog_error("deserialize_from_void: C++ exception thrown.");
+      ygglog_error("deserialize_from_void: C++ exception thrown.");
       return -1;
     }
   }
@@ -683,12 +683,12 @@ extern "C" {
     try {
       MetaschemaType* type = type_from_void(name, info);
       if (type == NULL) {
-	cislog_error("serialize_from_void: Failed to get type from void.");
+	ygglog_error("serialize_from_void: Failed to get type from void.");
 	return -1;
       }
       return type->serialize(buf, buf_siz, allow_realloc, nargs, ap);
     } catch (...) {
-      cislog_error("serialize_from_void: C++ exception thrown.");
+      ygglog_error("serialize_from_void: C++ exception thrown.");
       return -1;
     }
   }
@@ -697,12 +697,12 @@ extern "C" {
     try {
       MetaschemaType* type = type_from_void(name, info);
       if (type == NULL) {
-	cislog_error("display_from_void: Failed to get type from void.");
+	ygglog_error("display_from_void: Failed to get type from void.");
 	return;
       }
       type->display();
     } catch(...) {
-      cislog_error("display_from_void: C++ exception thrown.");
+      ygglog_error("display_from_void: C++ exception thrown.");
     }
   }
 
@@ -710,12 +710,12 @@ extern "C" {
     try {
       MetaschemaType* type = type_from_void(name, info);
       if (type == NULL) {
-	cislog_error("nargs_exp_from_void: Failed to get type from void.");
+	ygglog_error("nargs_exp_from_void: Failed to get type from void.");
 	return 0;
       }
       return type->nargs_exp();
     } catch(...) {
-      cislog_error("nargs_exp_from_void: C++ exception thrown.");
+      ygglog_error("nargs_exp_from_void: C++ exception thrown.");
     }
     return 0;
   }

@@ -1,13 +1,13 @@
 #!/usr/bin/python
-from cis_interface.interface.CisInterface import CisInput, CisOutput
+from yggdrasil.interface.YggInterface import YggInput, YggOutput
 
 
 if __name__ == '__main__':
 
     # Get input and output channels matching yaml
-    in1 = CisInput('input1_python')
-    in2 = CisInput('static_python')
-    out1 = CisOutput('output_python')
+    in1 = YggInput('input1_python')
+    in2 = YggInput('static_python')
+    out1 = YggOutput('output_python')
     print('SaM(P): Set up I/O channels')
 
     # Get input from input1 channel

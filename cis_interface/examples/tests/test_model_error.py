@@ -1,6 +1,6 @@
 import glob
 import os
-from cis_interface.examples.tests import TestExample
+from yggdrasil.examples.tests import TestExample
 
 
 class TestExampleModelError(TestExample):

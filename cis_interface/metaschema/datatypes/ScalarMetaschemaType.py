@@ -1,11 +1,11 @@
 import numpy as np
 import copy
-from cis_interface import units, backwards
-from cis_interface.metaschema.datatypes import register_type
-from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
-from cis_interface.metaschema.datatypes.FixedMetaschemaType import (
+from yggdrasil import units, backwards
+from yggdrasil.metaschema.datatypes import register_type
+from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
+from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
     create_fixed_type_class)
-from cis_interface.metaschema.properties import ScalarMetaschemaProperties
+from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
 
 
 @register_type

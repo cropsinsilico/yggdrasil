@@ -1,6 +1,6 @@
-from cis_interface.communication import FileComm
-from cis_interface.schema import register_component, inherit_schema
-from cis_interface.serialize.AsciiMapSerialize import AsciiMapSerialize
+from yggdrasil.communication import FileComm
+from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.serialize.AsciiMapSerialize import AsciiMapSerialize
 
 
 @register_component

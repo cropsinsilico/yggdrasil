@@ -1,18 +1,18 @@
-import nose.tools as nt
-from cis_interface.metaschema.datatypes import conversions
+from yggdrasil.tests import assert_raises
+from yggdrasil.metaschema.datatypes import conversions
 
 
 def test_register_conversion_errors():
     r"""Test errors in register_conversion."""
     x = list(conversions._conversion_registry.keys())[0]
-    nt.assert_raises(ValueError, conversions.register_conversion, x[0], x[1])
+    assert_raises(ValueError, conversions.register_conversion, x[0], x[1])
 
 
 def test_ply2obj():
     r"""Test conversion between ply and obj objects."""
-    from cis_interface.metaschema.datatypes import (
+    from yggdrasil.metaschema.datatypes import (
         ObjMetaschemaType, PlyMetaschemaType)
-    from cis_interface.metaschema.datatypes.tests import (
+    from yggdrasil.metaschema.datatypes.tests import (
         test_ObjMetaschemaType, test_PlyMetaschemaType)
     obj_class = ObjMetaschemaType.ObjMetaschemaType
     ply_class = PlyMetaschemaType.PlyMetaschemaType

@@ -1,8 +1,8 @@
 #include <CommBase.h>
 
 /*! @brief Flag for checking if this header has already been included. */
-#ifndef CISDEFAULTCOMM_H_
-#define CISDEFAULTCOMM_H_
+#ifndef YGGDEFAULTCOMM_H_
+#define YGGDEFAULTCOMM_H_
 
 // IPC Comm
 #ifdef IPCDEF

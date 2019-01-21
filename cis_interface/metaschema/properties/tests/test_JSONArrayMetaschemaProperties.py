@@ -1,4 +1,4 @@
-from cis_interface.metaschema.properties.tests import (
+from yggdrasil.metaschema.properties.tests import (
     test_MetaschemaProperty as parent)
 
 

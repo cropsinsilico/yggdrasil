@@ -42,8 +42,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = ""
-    cfg.parentdir_prefix = "cis_interface-"
-    cfg.versionfile_source = "cis_interface/_version.py"
+    cfg.parentdir_prefix = "yggdrasil-"
+    cfg.versionfile_source = "yggdrasil/_version.py"
     cfg.verbose = False
     return cfg
 

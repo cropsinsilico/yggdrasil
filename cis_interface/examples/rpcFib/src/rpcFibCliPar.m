@@ -6,7 +6,7 @@ function rpcFibCliPar(iterations)
 
   % Create RPC connection with serover
   % RPC client-side connection will be $(server_name)_$(client_name)
-  rpc = CisInterface('CisRpcClient', 'rpcFibSrv_rpcFibCliPar', '%d', '%d %d');
+  rpc = YggInterface('YggRpcClient', 'rpcFibSrv_rpcFibCliPar', '%d', '%d %d');
 
   % Send all of the requests to the server
   for i = 1:iterations

@@ -1,4 +1,4 @@
-from cis_interface.metaschema.datatypes.tests import (
+from yggdrasil.metaschema.datatypes.tests import (
     test_JSONObjectMetaschemaType as parent)
 
 

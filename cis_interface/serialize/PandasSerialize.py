@@ -2,12 +2,12 @@ import pandas
 import copy
 import numpy as np
 import warnings
-from cis_interface import backwards, platform
-from cis_interface.metaschema.datatypes.ArrayMetaschemaType import (
+from yggdrasil import backwards, platform
+from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
-from cis_interface.serialize import (
+from yggdrasil.serialize import (
     register_serializer, pandas2numpy, list2pandas)
-from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
+from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
 @register_serializer

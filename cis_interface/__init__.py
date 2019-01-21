@@ -1,6 +1,6 @@
 r"""This package provides a framework for integrating models across languages
 such that they can be run simultaneously, passing input back and forth."""
-from cis_interface import platform
+from yggdrasil import platform
 import os
 import sys
 import nose
@@ -47,7 +47,7 @@ def run_nose(verbose=False, nocapture=False, stop=False,
         nose_argv.append('--nologcapture')
     if withcoverage:
         nose_argv.append('--with-coverage')
-        nose_argv.append('--cover-package=cis_interface')
+        nose_argv.append('--cover-package=yggdrasil')
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     if (test_dir is None):

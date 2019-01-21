@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "gcc_model.h"
 #include "hellofunc.h"
-#include <CisInterface.hpp>
+#include <YggInterface.hpp>
 
 int main() {
   sleep(1);

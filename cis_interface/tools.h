@@ -1,5 +1,5 @@
-#ifndef CISTOOLS_H_
-#define CISTOOLS_H_
+#ifndef YGGTOOLS_H_
+#define YGGTOOLS_H_
 
 #include <string.h>
 #include <stdio.h>
@@ -23,37 +23,37 @@ extern "C" {
 #include <windows.h>
 #include "getline_win32.h"
 #include <process.h>
-#define cis_getpid _getpid
+#define ygg_getpid _getpid
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
 #include "regex_posix.h"
 #include <stdint.h>
 #include <unistd.h>
-#define cis_getpid getpid
+#define ygg_getpid getpid
 #endif
 
 /*! @brief Maximum message size. */
 #ifdef IPCDEF
-#define CIS_MSG_MAX 2048
+#define YGG_MSG_MAX 2048
 #else
-#define CIS_MSG_MAX 1048576
+#define YGG_MSG_MAX 1048576
 #endif
 /*! @brief End of file message. */
-#define CIS_MSG_EOF "EOF!!!"
+#define YGG_MSG_EOF "EOF!!!"
 /*! @brief Resonable size for buffer. */
-#define CIS_MSG_BUF 2048
+#define YGG_MSG_BUF 2048
 /*! @brief Sleep time in micro-seconds */
-#define CIS_SLEEP_TIME 250000
+#define YGG_SLEEP_TIME 250000
 
 /*! @brief Define old style names for compatibility. */
-#define PSI_MSG_MAX CIS_MSG_MAX
-#define PSI_MSG_BUF CIS_MSG_BUF
-#define PSI_MSG_EOF CIS_MSG_EOF
+#define PSI_MSG_MAX YGG_MSG_MAX
+#define PSI_MSG_BUF YGG_MSG_BUF
+#define PSI_MSG_EOF YGG_MSG_EOF
 #ifdef PSI_DEBUG
-#define CIS_DEBUG PSI_DEBUG
+#define YGG_DEBUG PSI_DEBUG
 #endif
-static int _cis_error_flag = 0;
+static int _ygg_error_flag = 0;
 
 /*! @brief Define macros to allow counts of variables. */
 // https://codecraft.co/2014/11/25/variadic-macros-tricks/
@@ -85,10 +85,10 @@ typedef struct va_list_t {
 /*!
   Logging
 
-  Alliases are set at compile-time based on the value of CIS_CLIENT_DEBUG. If 
+  Alliases are set at compile-time based on the value of YGG_CLIENT_DEBUG. If 
   set to INFO, only messages logged with info or error alias are printed. If
   set to DEBUG, messages logged with error, info or debug aliases are printed.
-  Otherwise, only error messages are printed. If the CIS_CLIENT_DEBUG is
+  Otherwise, only error messages are printed. If the YGG_CLIENT_DEBUG is
   changed, any code including this header must be recompiled for the change to
   take effect.
 
@@ -105,8 +105,8 @@ typedef struct va_list_t {
   @param[in] ap va_list of arguments to be formatted in the format string.
  */
 static inline
-void cisLog(const char* prefix, const char* fmt, va_list ap) {
-  fprintf(stdout, "%s: %d: ", prefix, cis_getpid());
+void yggLog(const char* prefix, const char* fmt, va_list ap) {
+  fprintf(stdout, "%s: %d: ", prefix, ygg_getpid());
   vfprintf(stdout, fmt, ap);
   fprintf(stdout, "\n");
   fflush(stdout);
@@ -120,10 +120,10 @@ void cisLog(const char* prefix, const char* fmt, va_list ap) {
   @param[in] ... arguments to be formatted in the format string.
  */
 static inline
-void cisInfo(const char* fmt, ...) {
+void yggInfo(const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  cisLog("INFO", fmt, ap);
+  yggLog("INFO", fmt, ap);
   va_end(ap);
 };
   
@@ -135,10 +135,10 @@ void cisInfo(const char* fmt, ...) {
   @param[in] ... arguments to be formatted in the format string.
  */
 static inline
-void cisDebug(const char* fmt, ...) {
+void yggDebug(const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  cisLog("DEBUG", fmt, ap);
+  yggLog("DEBUG", fmt, ap);
   va_end(ap);
 };
   
@@ -151,9 +151,9 @@ void cisDebug(const char* fmt, ...) {
   @param[in] ... arguments to be formatted in the format string.
  */
 static inline
-void cisError_va(const char* fmt, va_list ap) {
-  cisLog("ERROR", fmt, ap);
-  _cis_error_flag = 1;
+void yggError_va(const char* fmt, va_list ap) {
+  yggLog("ERROR", fmt, ap);
+  _ygg_error_flag = 1;
 };
 
 /*!
@@ -164,35 +164,35 @@ void cisError_va(const char* fmt, va_list ap) {
   @param[in] ... arguments to be formatted in the format string.
  */
 static inline
-void cisError(const char* fmt, ...) {
+void yggError(const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  cisError_va(fmt, ap);
+  yggError_va(fmt, ap);
   va_end(ap);
 };
 
-#ifdef CIS_DEBUG
-#if CIS_DEBUG <= 10
-#define cislog_error cisError
-#define cislog_info cisInfo
-#define cislog_debug cisDebug
-#elif CIS_DEBUG <= 20
-#define cislog_error cisError
-#define cislog_info cisInfo
-#define cislog_debug while (0) cisDebug
-#elif CIS_DEBUG <= 40
-#define cislog_error cisError
-#define cislog_info while (0) cisInfo
-#define cislog_debug while (0) cisDebug
+#ifdef YGG_DEBUG
+#if YGG_DEBUG <= 10
+#define ygglog_error yggError
+#define ygglog_info yggInfo
+#define ygglog_debug yggDebug
+#elif YGG_DEBUG <= 20
+#define ygglog_error yggError
+#define ygglog_info yggInfo
+#define ygglog_debug while (0) yggDebug
+#elif YGG_DEBUG <= 40
+#define ygglog_error yggError
+#define ygglog_info while (0) yggInfo
+#define ygglog_debug while (0) yggDebug
 #else
-#define cislog_error while (0) cisError
-#define cislog_info while (0) cisInfo
-#define cislog_debug while (0) cisDebug
+#define ygglog_error while (0) yggError
+#define ygglog_info while (0) yggInfo
+#define ygglog_debug while (0) yggDebug
 #endif
 #else
-#define cislog_error cisError
-#define cislog_info while (0) cisInfo
-#define cislog_debug while (0) cisDebug
+#define ygglog_error yggError
+#define ygglog_info while (0) yggInfo
+#define ygglog_debug while (0) yggDebug
 #endif
 
 /*!
@@ -221,7 +221,7 @@ int not_empty_match(const char *pattern, const char *buf) {
  */
 static inline
 int is_eof(const char *buf) {
-  return not_empty_match(CIS_MSG_EOF, buf);
+  return not_empty_match(YGG_MSG_EOF, buf);
 };
 
 /*!
@@ -248,4 +248,4 @@ int is_send(const char *buf) {
 }
 #endif
 
-#endif /*CISTOOLS_H_*/
+#endif /*YGGTOOLS_H_*/

@@ -1,7 +1,6 @@
 import os
-import nose.tools as nt
-from cis_interface.tests import CisTestClassInfo
-from cis_interface import drivers
+from yggdrasil.tests import YggTestClassInfo, assert_raises
+from yggdrasil import drivers
 
 
 def test_import_driver():
@@ -9,7 +8,7 @@ def test_import_driver():
     drivers.import_driver()
 
 
-class TestParam(CisTestClassInfo):
+class TestParam(YggTestClassInfo):
     r"""Test parameters for basic Driver test class.
 
     Attributes:
@@ -53,7 +52,7 @@ class TestParam(CisTestClassInfo):
     @property
     def mod(self):
         r"""str: Absolute path to module containing driver."""
-        return 'cis_interface.drivers.%s' % self.cls
+        return 'yggdrasil.drivers.%s' % self.cls
 
     @property
     def inst_args(self):
@@ -189,12 +188,12 @@ class TestDriverNoStart(TestParam):
         self.instance.start_timeout(10, key='fake_key')
         assert(not self.instance.check_timeout(key='fake_key'))
         # Test errors
-        nt.assert_raises(KeyError, self.instance.start_timeout,
-                         0.1, key='fake_key')
+        assert_raises(KeyError, self.instance.start_timeout,
+                      0.1, key='fake_key')
         self.instance.stop_timeout(key='fake_key')
-        nt.assert_raises(KeyError, self.instance.check_timeout)
-        nt.assert_raises(KeyError, self.instance.check_timeout, key='fake_key')
-        nt.assert_raises(KeyError, self.instance.stop_timeout, key='fake_key')
+        assert_raises(KeyError, self.instance.check_timeout)
+        assert_raises(KeyError, self.instance.check_timeout, key='fake_key')
+        assert_raises(KeyError, self.instance.stop_timeout, key='fake_key')
         # Test w/ timeout
         T = self.instance.start_timeout(0.001)  # self.instance.sleeptime)
         while not T.is_out:

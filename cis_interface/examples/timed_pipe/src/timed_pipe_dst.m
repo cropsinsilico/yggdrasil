@@ -1,8 +1,8 @@
 disp('Hello from Matlab pipe_dst');
 
 % Ins/outs matching with the the model yaml
-inq = CisInterface('CisInput', 'input_pipe');
-outf = CisInterface('CisOutput', 'output_file');
+inq = YggInterface('YggInput', 'input_pipe');
+outf = YggInterface('YggOutput', 'output_file');
 disp('pipe_dst(M): Created I/O channels');
 
 % Continue receiving input from the queue

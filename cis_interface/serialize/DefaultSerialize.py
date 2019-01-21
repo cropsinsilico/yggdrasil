@@ -2,16 +2,16 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from cis_interface import backwards, tools, units, platform
-from cis_interface.serialize import (
+from yggdrasil import backwards, tools, units, platform
+from yggdrasil.serialize import (
     register_serializer, get_serializer, extract_formats, cformat2nptype,
     consolidate_array)
-from cis_interface.metaschema import get_metaschema
-from cis_interface.metaschema.datatypes import (
+from yggdrasil.metaschema import get_metaschema
+from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
-from cis_interface.metaschema.properties.ScalarMetaschemaProperties import (
+from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype, _flexible_types)
-from cis_interface.metaschema.datatypes.ArrayMetaschemaType import (
+from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
 
 
@@ -536,7 +536,7 @@ class DefaultSerialize(object):
         """
         if header_kwargs is None:
             header_kwargs = {}
-        if isinstance(args, backwards.bytes_type) and (args == tools.CIS_MSG_EOF):
+        if isinstance(args, backwards.bytes_type) and (args == tools.YGG_MSG_EOF):
             header_kwargs['raw'] = True
         self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata}

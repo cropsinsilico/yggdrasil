@@ -1,5 +1,5 @@
-from cis_interface.drivers.ConnectionDriver import ConnectionDriver
-from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
+from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
+from yggdrasil.drivers.ClientResponseDriver import ClientResponseDriver
 
 # ----
 # Client sends resquest to local client output comm
@@ -24,8 +24,8 @@ from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 # ----
 
 
-CIS_CLIENT_INI = b'CIS_BEGIN_CLIENT'
-CIS_CLIENT_EOF = b'CIS_END_CLIENT'
+YGG_CLIENT_INI = b'YGG_BEGIN_CLIENT'
+YGG_CLIENT_EOF = b'YGG_END_CLIENT'
 
 
 class ClientRequestDriver(ConnectionDriver):
@@ -142,7 +142,7 @@ class ClientRequestDriver(ConnectionDriver):
         super(ClientRequestDriver, self).before_loop()
         # self.sleep()  # Help ensure that the server is connected
         self.debug("Sending client sign on")
-        super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI,
+        super(ClientRequestDriver, self).send_message(YGG_CLIENT_INI,
                                                       header_kwargs={'raw': True})
         self.ocomm._send_serializer = True
         # self.info("%s: before loop complete", self.name)

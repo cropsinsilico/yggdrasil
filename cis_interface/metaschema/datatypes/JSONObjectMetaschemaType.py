@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-from cis_interface.serialize import pandas2dict, numpy2dict, list2dict
-from cis_interface.metaschema.datatypes import register_type
-from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
+from yggdrasil.serialize import pandas2dict, numpy2dict, list2dict
+from yggdrasil.metaschema.datatypes import register_type
+from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
 

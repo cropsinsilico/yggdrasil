@@ -1,68 +1,67 @@
 import os
-import nose.tools as nt
 import unittest
-from cis_interface.communication import get_comm, get_comm_class
-from cis_interface.interface import CisInterface
-from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
-from cis_interface.drivers import (
+from yggdrasil.communication import get_comm, get_comm_class
+from yggdrasil.interface import YggInterface
+from yggdrasil.tools import YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF
+from yggdrasil.drivers import (
     import_driver, InputDriver, OutputDriver, MatlabModelDriver)
-from cis_interface.tests import CisTestClassInfo
+from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
 
 
-CIS_MSG_MAX = get_CIS_MSG_MAX()
+YGG_MSG_MAX = get_YGG_MSG_MAX()
 
 
 def test_maxMsgSize():
     r"""Test max message size."""
-    nt.assert_equal(CisInterface.maxMsgSize(), CIS_MSG_MAX)
+    assert_equal(YggInterface.maxMsgSize(), YGG_MSG_MAX)
 
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    nt.assert_equal(CisInterface.eof_msg(), CIS_MSG_EOF)
+    assert_equal(YggInterface.eof_msg(), YGG_MSG_EOF)
 
 
 def test_bufMsgSize():
     r"""Test buf message size."""
-    nt.assert_equal(CisInterface.bufMsgSize(), CIS_MSG_BUF)
+    assert_equal(YggInterface.bufMsgSize(), YGG_MSG_BUF)
 
 
 def test_init():
     r"""Test error on init."""
-    nt.assert_raises(Exception, CisInterface.CisInput, 'error')
-    nt.assert_raises(Exception, CisInterface.CisOutput, 'error')
+    assert_raises(Exception, YggInterface.YggInput, 'error')
+    assert_raises(Exception, YggInterface.YggOutput, 'error')
     
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
-def test_CisMatlab_class():  # pragma: matlab
+def test_YggMatlab_class():  # pragma: matlab
     r"""Test Matlab interface for classes."""
     name = 'test'
     # Input
     drv = InputDriver.InputDriver(name, 'link')
     drv.start()
     os.environ.update(drv.env)
-    CisInterface.CisMatlab('CisInput', (name, '%f\\n%d'))
+    YggInterface.YggMatlab('YggInput', (name, '%f\\n%d'))
     drv.terminate()
     # Output
     drv = OutputDriver.OutputDriver(name, 'link')
     drv.start()
     os.environ.update(drv.env)
-    CisInterface.CisMatlab('CisOutput', (name, '%f\\n%d'))
+    YggInterface.YggMatlab('YggOutput', (name, '%f\\n%d'))
     drv.terminate()
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
-def test_CisMatlab_variables():  # pragma: matlab
+def test_YggMatlab_variables():  # pragma: matlab
     r"""Test Matlab interface for variables."""
-    nt.assert_equal(CisInterface.CisMatlab('CIS_MSG_MAX'), CIS_MSG_MAX)
-    nt.assert_equal(CisInterface.CisMatlab('CIS_MSG_EOF'), CIS_MSG_EOF)
+    assert_equal(YggInterface.YggMatlab('YGG_MSG_MAX'), YGG_MSG_MAX)
+    assert_equal(YggInterface.YggMatlab('YGG_MSG_EOF'), YGG_MSG_EOF)
 
 
-class TestBase(CisTestClassInfo):
+class TestBase(YggTestClassInfo):
     r"""Test class for interface classes."""
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
-        self._mod = 'cis_interface.interface.CisInterface'
+        self._mod = 'yggdrasil.interface.YggInterface'
         self.name = 'test' + self.uuid
         self.matlab = False
         self.idriver = None
@@ -233,11 +232,11 @@ class TestBase(CisTestClassInfo):
         super(TestBase, self).remove_instance(inst)
             
     
-class TestCisInput(TestBase):
+class TestYggInput(TestBase):
     r"""Test basic input to python."""
     def __init__(self, *args, **kwargs):
-        super(TestCisInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisInput'
+        super(TestYggInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggInput'
         self.direction = 'input'
 
     def test_msg(self):
@@ -258,18 +257,18 @@ class TestCisInput(TestBase):
                 self.assert_equal(msg_recv, msg)
             
 
-class TestCisInputMatlab(TestCisInput):
+class TestYggInputMatlab(TestYggInput):
     r"""Test basic input to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestCisInputMatlab, self).__init__(*args, **kwargs)
+        super(TestYggInputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
 
 
-class TestCisOutput(TestBase):
+class TestYggOutput(TestBase):
     r"""Test basic output to python."""
     def __init__(self, *args, **kwargs):
-        super(TestCisOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisOutput'
+        super(TestYggOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggOutput'
         self.direction = 'output'
 
     def test_msg(self):
@@ -298,18 +297,18 @@ class TestCisOutput(TestBase):
                 self.assert_equal(msg_recv, msg)
         
 
-class TestCisOutputMatlab(TestCisOutput):
+class TestYggOutputMatlab(TestYggOutput):
     r"""Test basic output to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestCisOutputMatlab, self).__init__(*args, **kwargs)
+        super(TestYggOutputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
 
 
-class TestCisRpcClient(TestCisOutput):
+class TestYggRpcClient(TestYggOutput):
     r"""Test client-side RPC communication with Python."""
     def __init__(self, *args, **kwargs):
-        super(TestCisRpcClient, self).__init__(*args, **kwargs)
-        self._cls = 'CisRpcClient'
+        super(TestYggRpcClient, self).__init__(*args, **kwargs)
+        self._cls = 'YggRpcClient'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ServerComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -327,7 +326,7 @@ class TestCisRpcClient(TestCisOutput):
     
     def test_msg(self):
         r"""Test sending/receiving message."""
-        super(TestCisRpcClient, self).test_msg()
+        super(TestYggRpcClient, self).test_msg()
         for msg in self.messages:
             msg_flag = self.test_comm.send(msg)
             assert(msg_flag)
@@ -336,19 +335,19 @@ class TestCisRpcClient(TestCisOutput):
             self.assert_equal(msg_recv, msg)
         
         
-class TestCisRpcClientMatlab(TestCisRpcClient):
+class TestYggRpcClientMatlab(TestYggRpcClient):
     r"""Test client-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestCisRpcClientMatlab, self).__init__(*args, **kwargs)
+        super(TestYggRpcClientMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
-class TestCisRpcServer(TestCisInput):
+class TestYggRpcServer(TestYggInput):
     r"""Test server-side RPC communication with Python."""
     def __init__(self, *args, **kwargs):
-        super(TestCisRpcServer, self).__init__(*args, **kwargs)
-        self._cls = 'CisRpcServer'
+        super(TestYggRpcServer, self).__init__(*args, **kwargs)
+        self._cls = 'YggRpcServer'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ClientComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -366,7 +365,7 @@ class TestCisRpcServer(TestCisInput):
     
     def test_msg(self):
         r"""Test sending/receiving message."""
-        super(TestCisRpcServer, self).test_msg()
+        super(TestYggRpcServer, self).test_msg()
         for msg in self.messages:
             msg_flag = self.instance.send(msg)
             assert(msg_flag)
@@ -375,156 +374,156 @@ class TestCisRpcServer(TestCisInput):
             self.assert_equal(msg_recv, msg)
         
         
-class TestCisRpcServerMatlab(TestCisRpcServer):
+class TestYggRpcServerMatlab(TestYggRpcServer):
     r"""Test server-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestCisRpcServerMatlab, self).__init__(*args, **kwargs)
+        super(TestYggRpcServerMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
 # AsciiFile
-class TestCisAsciiFileInput(TestCisInput):
+class TestYggAsciiFileInput(TestYggInput):
     r"""Test input from an unformatted text file."""
     def __init__(self, *args, **kwargs):
-        super(TestCisAsciiFileInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisAsciiFileInput'
+        super(TestYggAsciiFileInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggAsciiFileInput'
         self.is_file = True
         self.filecomm = 'AsciiFileComm'
 
 
-class TestCisAsciiFileOutput(TestCisOutput):
+class TestYggAsciiFileOutput(TestYggOutput):
     r"""Test output to an unformatted text file."""
     def __init__(self, *args, **kwargs):
-        super(TestCisAsciiFileOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisAsciiFileOutput'
+        super(TestYggAsciiFileOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggAsciiFileOutput'
         self.is_file = True
         self.filecomm = 'AsciiFileComm'
 
 
 # AsciiTable
-class TestCisAsciiTableInput(TestCisAsciiFileInput):
+class TestYggAsciiTableInput(TestYggAsciiFileInput):
     r"""Test input from an ascii table."""
     def __init__(self, *args, **kwargs):
-        super(TestCisAsciiTableInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisAsciiTableInput'
+        super(TestYggAsciiTableInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggAsciiTableInput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
 
         
-class TestCisAsciiTableOutput(TestCisAsciiFileOutput):
+class TestYggAsciiTableOutput(TestYggAsciiFileOutput):
     r"""Test output from an ascii table."""
     def __init__(self, *args, **kwargs):
-        super(TestCisAsciiTableOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisAsciiTableOutput'
+        super(TestYggAsciiTableOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggAsciiTableOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self._inst_args = [self.name, self.fmt_str]
         self._inst_kwargs = {}
 
 
-class TestCisAsciiTableOutputMatlab(TestCisAsciiTableOutput):
+class TestYggAsciiTableOutputMatlab(TestYggAsciiTableOutput):
     r"""Test output from an ascii table as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestCisAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
+        super(TestYggAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
         self._inst_args = [self.name, self.fmt_str_matlab]
         
 
 # AsciiTable Array
-class TestCisAsciiArrayInput(TestCisAsciiTableInput):
+class TestYggAsciiArrayInput(TestYggAsciiTableInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestCisAsciiArrayInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisAsciiArrayInput'
+        super(TestYggAsciiArrayInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggAsciiArrayInput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self.testing_option_kws = {'as_array': True}
 
 
-class TestCisAsciiArrayOutput(TestCisAsciiTableOutput):
+class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestCisAsciiArrayOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisAsciiArrayOutput'
+        super(TestYggAsciiArrayOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggAsciiArrayOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
         self.testing_option_kws = {'as_array': True}
         
 
 # Pickle
-class TestCisPickleInput(TestCisInput):
+class TestYggPickleInput(TestYggInput):
     r"""Test input from a pickle file."""
     def __init__(self, *args, **kwargs):
-        super(TestCisPickleInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisPickleInput'
+        super(TestYggPickleInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggPickleInput'
         self.is_file = True
         self.filecomm = 'PickleFileComm'
 
 
-class TestCisPickleOutput(TestCisOutput):
+class TestYggPickleOutput(TestYggOutput):
     r"""Test output from a pickle."""
     def __init__(self, *args, **kwargs):
-        super(TestCisPickleOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisPickleOutput'
+        super(TestYggPickleOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggPickleOutput'
         self.is_file = True
         self.filecomm = 'PickleFileComm'
 
         
 # Pandas
-class TestCisPandasInput(TestCisInput):
+class TestYggPandasInput(TestYggInput):
     r"""Test input from a pandas file."""
     def __init__(self, *args, **kwargs):
-        super(TestCisPandasInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisPandasInput'
+        super(TestYggPandasInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggPandasInput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
         self.testing_option_kws = {'as_frames': True}
 
 
-class TestCisPandasOutput(TestCisOutput):
+class TestYggPandasOutput(TestYggOutput):
     r"""Test output from a pandas."""
     def __init__(self, *args, **kwargs):
-        super(TestCisPandasOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisPandasOutput'
+        super(TestYggPandasOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggPandasOutput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
         self.testing_option_kws = {'as_frames': True}
 
 
 # Ply
-class TestCisPlyInput(TestCisInput):
+class TestYggPlyInput(TestYggInput):
     r"""Test input from a ply file."""
     def __init__(self, *args, **kwargs):
-        super(TestCisPlyInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisPlyInput'
+        super(TestYggPlyInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggPlyInput'
         self.is_file = True
         self.filecomm = 'PlyFileComm'
 
 
-class TestCisPlyOutput(TestCisOutput):
+class TestYggPlyOutput(TestYggOutput):
     r"""Test output from a ply."""
     def __init__(self, *args, **kwargs):
-        super(TestCisPlyOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisPlyOutput'
+        super(TestYggPlyOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggPlyOutput'
         self.is_file = True
         self.filecomm = 'PlyFileComm'
 
 
 # Obj
-class TestCisObjInput(TestCisInput):
+class TestYggObjInput(TestYggInput):
     r"""Test input from a obj file."""
     def __init__(self, *args, **kwargs):
-        super(TestCisObjInput, self).__init__(*args, **kwargs)
-        self._cls = 'CisObjInput'
+        super(TestYggObjInput, self).__init__(*args, **kwargs)
+        self._cls = 'YggObjInput'
         self.is_file = True
         self.filecomm = 'ObjFileComm'
 
 
-class TestCisObjOutput(TestCisOutput):
+class TestYggObjOutput(TestYggOutput):
     r"""Test output from a obj."""
     def __init__(self, *args, **kwargs):
-        super(TestCisObjOutput, self).__init__(*args, **kwargs)
-        self._cls = 'CisObjOutput'
+        super(TestYggObjOutput, self).__init__(*args, **kwargs)
+        self._cls = 'YggObjOutput'
         self.is_file = True
         self.filecomm = 'ObjFileComm'

@@ -5,17 +5,17 @@ import os
 import psutil
 import warnings
 import weakref
-from cis_interface import backwards, tools, platform, config
+from yggdrasil import backwards, tools, platform, config
 try:  # pragma: matlab
     import matlab.engine
-    _matlab_installed = (config.cis_cfg.get('matlab', 'disable', 'False') == 'False')
+    _matlab_installed = (config.ygg_cfg.get('matlab', 'disable', 'False') == 'False')
 except ImportError:  # pragma: no matlab
     debug("Could not import matlab.engine. "
           + "Matlab support will be disabled.")
     _matlab_installed = False
-from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface.tools import TimeOut, sleep
-from cis_interface.schema import register_component
+from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.tools import TimeOut, sleep
+from yggdrasil.schema import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -147,10 +147,10 @@ def start_matlab(skip_connect=False, timeout=None):  # pragma: matlab
     if not _matlab_installed:  # pragma: no matlab
         raise RuntimeError("Matlab is not installed.")
     if timeout is None:
-        timeout = float(config.cis_cfg.get('matlab', 'startup_waittime_s', 10))
+        timeout = float(config.ygg_cfg.get('matlab', 'startup_waittime_s', 10))
     old_process = set(locate_matlab_engine_processes())
     old_matlab = set(matlab.engine.find_matlab())
-    screen_session = str('cis_matlab' + datetime.today().strftime("%Y%j%H%M%S")
+    screen_session = str('ygg_matlab' + datetime.today().strftime("%Y%j%H%M%S")
                          + '_%d' % len(old_matlab))
     try:
         args = ['screen', '-dmS', screen_session, '-c',
@@ -196,7 +196,7 @@ def connect_matlab(matlab_session, first_connect=False):  # pragma: matlab
     matlab_engine.eval('clear classes;', nargout=0)
     err = backwards.StringIO()
     try:
-        matlab_engine.eval("CisInterface('CIS_MSG_MAX');", nargout=0,
+        matlab_engine.eval("YggInterface('YGG_MSG_MAX');", nargout=0,
                            stderr=err)
     except BaseException:
         matlab_engine.addpath(_top_dir, nargout=0)
@@ -266,7 +266,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session, matlab_process,
                       + "Killed Matlab sharedEngine process.")
 
 
-class MatlabProcess(tools.CisClass):  # pragma: matlab
+class MatlabProcess(tools.YggClass):  # pragma: matlab
     r"""Add features to mimic subprocess.Popen while running Matlab function
     asynchronously.
 

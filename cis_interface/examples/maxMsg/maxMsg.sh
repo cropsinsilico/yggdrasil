@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="maxMsg"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="maxMsg"
 
 yaml1=
 yaml2= 
@@ -44,4 +44,4 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml1 $yaml2
+yggrun $yaml1 $yaml2

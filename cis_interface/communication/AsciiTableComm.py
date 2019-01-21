@@ -1,8 +1,8 @@
 import numpy as np
-from cis_interface import serialize, backwards, units
-from cis_interface.communication.AsciiFileComm import AsciiFileComm
-from cis_interface.schema import register_component, inherit_schema
-from cis_interface.serialize.AsciiTableSerialize import AsciiTableSerialize
+from yggdrasil import serialize, backwards, units
+from yggdrasil.communication.AsciiFileComm import AsciiFileComm
+from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
 @register_component

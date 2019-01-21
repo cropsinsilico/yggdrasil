@@ -1,7 +1,7 @@
-from cis_interface.metaschema.datatypes import (
+from yggdrasil.metaschema.datatypes import (
     get_registered_types, get_type_class, MetaschemaTypeError)
-from cis_interface.metaschema.properties import register_metaschema_property
-from cis_interface.metaschema.properties.MetaschemaProperty import MetaschemaProperty
+from yggdrasil.metaschema.properties import register_metaschema_property
+from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
 def _specificity_sort_key(item):

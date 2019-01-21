@@ -152,7 +152,7 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   // Allocate vertices
   float **new_vert = (float**)malloc(p->nvert*sizeof(float*));
   if (new_vert == NULL) {
-    cislog_error("alloc_obj: Failed to allocate vertices.");
+    ygglog_error("alloc_obj: Failed to allocate vertices.");
     free_obj(p);
     return -1;
   }
@@ -160,18 +160,18 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nvert; i++) {
     float *ivert = (float*)malloc(3*sizeof(float));
     if (ivert == NULL) {
-      cislog_error("alloc_obj: Failed to allocate vertex %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate vertex %d.", i);
       free_obj(p);
       return -1;
     }
     p->vertices[i] = ivert;
   }
-  cislog_debug("alloc_obj: Allocated %d vertices.", nvert);
+  ygglog_debug("alloc_obj: Allocated %d vertices.", nvert);
   // Allocate vertex colors
   if (do_color) {
     int **new_vert_colors = (int**)malloc(p->nvert*sizeof(int*));
     if (new_vert_colors == NULL) {
-      cislog_error("alloc_obj: Failed to allocate vertex_colors.");
+      ygglog_error("alloc_obj: Failed to allocate vertex_colors.");
       free_obj(p);
       return -1;
     }
@@ -179,18 +179,18 @@ int alloc_obj(obj_t *p, int nvert, int nface,
     for (i = 0; i < p->nvert; i++) {
       int *ivert = (int*)malloc(3*sizeof(int));
       if (ivert == NULL) {
-	cislog_error("alloc_obj: Failed to allocate vertex color %d.", i);
+	ygglog_error("alloc_obj: Failed to allocate vertex color %d.", i);
 	free_obj(p);
 	return -1;
       }
       p->vertex_colors[i] = ivert;
     }
-    cislog_debug("alloc_obj: Allocated %d vertex colors.", nvert);
+    ygglog_debug("alloc_obj: Allocated %d vertex colors.", nvert);
   }
   // Allocate texcoords
   float **new_texc = (float**)malloc(p->ntexc*sizeof(float*));
   if (new_texc == NULL) {
-    cislog_error("alloc_obj: Failed to allocate texcoords.");
+    ygglog_error("alloc_obj: Failed to allocate texcoords.");
     free_obj(p);
     return -1;
   }
@@ -198,17 +198,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->ntexc; i++) {
     float *itexc = (float*)malloc(2*sizeof(float));
     if (itexc == NULL) {
-      cislog_error("alloc_obj: Failed to allocate texcoord %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate texcoord %d.", i);
       free_obj(p);
       return -1;
     }
     p->texcoords[i] = itexc;
   }
-  cislog_debug("alloc_obj: Allocated %d texcoords.", ntexc);
+  ygglog_debug("alloc_obj: Allocated %d texcoords.", ntexc);
   // Allocate normals
   float **new_norm = (float**)malloc(p->nnorm*sizeof(float*));
   if (new_norm == NULL) {
-    cislog_error("alloc_obj: Failed to allocate normals.");
+    ygglog_error("alloc_obj: Failed to allocate normals.");
     free_obj(p);
     return -1;
   }
@@ -216,17 +216,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nnorm; i++) {
     float *inorm = (float*)malloc(3*sizeof(float));
     if (inorm == NULL) {
-      cislog_error("alloc_obj: Failed to allocate normal %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate normal %d.", i);
       free_obj(p);
       return -1;
     }
     p->normals[i] = inorm;
   }
-  cislog_debug("alloc_obj: Allocated %d normals.", nnorm);
+  ygglog_debug("alloc_obj: Allocated %d normals.", nnorm);
   // Allocate faces
   int **new_face = (int**)malloc(p->nface*sizeof(int*));
   if (new_face == NULL) {
-    cislog_error("alloc_obj: Failed to allocate faces.");
+    ygglog_error("alloc_obj: Failed to allocate faces.");
     free_obj(p);
     return -1;
   }
@@ -234,17 +234,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nface; i++) {
     int *iface = (int*)malloc(3*sizeof(int));
     if (iface == NULL) {
-      cislog_error("alloc_obj: Failed to allocate face %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate face %d.", i);
       free_obj(p);
       return -1;
     }
     p->faces[i] = iface;
   }
-  cislog_debug("alloc_obj: Allocated %d faces.", nface);
+  ygglog_debug("alloc_obj: Allocated %d faces.", nface);
   // Allocate face texcoords
   int **new_ftexc = (int**)malloc(p->nface*sizeof(int*));
   if (new_ftexc == NULL) {
-    cislog_error("alloc_obj: Failed to allocate face texcoords.");
+    ygglog_error("alloc_obj: Failed to allocate face texcoords.");
     free_obj(p);
     return -1;
   }
@@ -252,17 +252,17 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nface; i++) {
     int *iftexc = (int*)malloc(3*sizeof(int));
     if (iftexc == NULL) {
-      cislog_error("alloc_obj: Failed to allocate texcoords for face %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate texcoords for face %d.", i);
       free_obj(p);
       return -1;
     }
     p->face_texcoords[i] = iftexc;
   }
-  cislog_debug("alloc_obj: Allocated %d face texcoords.", nface);
+  ygglog_debug("alloc_obj: Allocated %d face texcoords.", nface);
   // Allocate face normals
   int **new_fnorm = (int**)malloc(p->nface*sizeof(int*));
   if (new_fnorm == NULL) {
-    cislog_error("alloc_obj: Failed to allocate face normals.");
+    ygglog_error("alloc_obj: Failed to allocate face normals.");
     free_obj(p);
     return -1;
   }
@@ -270,15 +270,15 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   for (i = 0; i < p->nface; i++) {
     int *ifnorm = (int*)malloc(3*sizeof(int));
     if (ifnorm == NULL) {
-      cislog_error("alloc_obj: Failed to allocate normals for face %d.", i);
+      ygglog_error("alloc_obj: Failed to allocate normals for face %d.", i);
       free_obj(p);
       return -1;
     }
     p->face_normals[i] = ifnorm;
   }
-  cislog_debug("alloc_obj: Allocated %d face normals.", nface);
+  ygglog_debug("alloc_obj: Allocated %d face normals.", nface);
   // Return
-  cislog_debug("alloc_obj: Allocated for %d vertices and %d faces.",
+  ygglog_debug("alloc_obj: Allocated for %d vertices and %d faces.",
 	       p->nvert, p->nface);
   return 0;
 };

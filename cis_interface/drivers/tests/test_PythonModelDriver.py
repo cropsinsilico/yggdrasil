@@ -1,5 +1,5 @@
-from cis_interface.tests import scripts
-import cis_interface.drivers.tests.test_ModelDriver as parent
+from yggdrasil.tests import scripts
+import yggdrasil.drivers.tests.test_ModelDriver as parent
 
 
 class TestPythonModelParam(parent.TestModelParam):

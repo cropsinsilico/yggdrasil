@@ -1,73 +1,73 @@
-/*! @brief Flag for checking if CisInterface.hpp has already been included.*/
-#ifndef CISINTERFACE_HPP_
-#define CISINTERFACE_HPP_
+/*! @brief Flag for checking if YggInterface.hpp has already been included.*/
+#ifndef YGGINTERFACE_HPP_
+#define YGGINTERFACE_HPP_
 
-#include "CisInterface.h"
+#include "YggInterface.h"
 
 
 /*!
-  @brief C++ interface to cisInput_t functionality.
+  @brief C++ interface to yggInput_t functionality.
 
-  The CisInput class is a basic wrapper around the C cisInput_t
-  structure and associated functions from the CisInterface.h header.
+  The YggInput class is a basic wrapper around the C yggInput_t
+  structure and associated functions from the YggInterface.h header.
   It provides the user with C++ style access to basic input via
   an IPC queue.
  */
-class CisInput {
-  cisInput_t _pi;
+class YggInput {
+  yggInput_t _pi;
 public:
 
   /*!
-    @brief Constructor for CisInput.
+    @brief Constructor for YggInput.
     @param[in] name constant character pointer to name of input queue. This
     should be the argument to an input driver in the yaml specification file.
    */
-  CisInput(const char *name) : _pi(cisInput(name)) {}
+  YggInput(const char *name) : _pi(yggInput(name)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisInput(cisInput_t x) : _pi(x) {}
+  YggInput(yggInput_t x) : _pi(x) {}
 
   /*!
-    @brief Constructor for CisInput with format.
+    @brief Constructor for YggInput with format.
     @param[in] name constant character pointer to name of input queue. This
     should be the argument to an input driver in the yaml specification file.
     @param[in] fmt character pointer to format string for parsing messages.
    */
-  CisInput(const char *name, const char *fmt) : _pi(cisInputFmt(name, fmt)) {}
+  YggInput(const char *name, const char *fmt) : _pi(yggInputFmt(name, fmt)) {}
 
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { cis_free(&_pi); }
+  void _destroy_pi() { ygg_free(&_pi); }
   
   /*!
-    @brief Destructor for CisInput.
-    See cis_free in CisInterface.h for details.
+    @brief Destructor for YggInput.
+    See ygg_free in YggInterface.h for details.
   */
-  ~CisInput() { _destroy_pi(); }
+  ~YggInput() { _destroy_pi(); }
   
   /*!
-    @brief Return the cisInput_t structure.
-    @return cisInput_t structure underlying the class.
+    @brief Return the yggInput_t structure.
+    @return yggInput_t structure underlying the class.
   */
-  cisInput_t pi() {
+  yggInput_t pi() {
     return _pi;
   };
 
   /*!
-    @brief Receive a message shorter than CIS_MSG_MAX from the input queue.
-    See cis_recv in CisInterface.h for additional details.
+    @brief Receive a message shorter than YGG_MSG_MAX from the input queue.
+    See ygg_recv in YggInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
     should be saved.
     @param[in] len size_t length of the allocated message buffer in bytes.
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv(char *data, const size_t len) { return cis_recv(_pi, data, len); }
+  int recv(char *data, const size_t len) { return ygg_recv(_pi, data, len); }
 
   /*!
-    @brief Receive and parse a message shorter than CIS_MSG_MAX from the input
-    queue. See cisRecv from CisInterface.h for details.
+    @brief Receive and parse a message shorter than YGG_MSG_MAX from the input
+    queue. See yggRecv from YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[out] ... mixed arguments that should be assigned parameters extracted
     using the format string. Since these will be assigned, they should be
@@ -104,8 +104,8 @@ public:
   }
   
   /*!
-    @brief Receive a message larger than CIS_MSG_MAX from the input queue.
-    See cis_recv_nolimit in CisInterface.h for additional details.
+    @brief Receive a message larger than YGG_MSG_MAX from the input queue.
+    See ygg_recv_nolimit in YggInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
     should be saved.
     @param[in] len size_t length of the allocated message buffer in bytes.
@@ -113,12 +113,12 @@ public:
     message if message was received.
    */
   int recv_nolimit(char **data, const size_t len) {
-    return cis_recv_nolimit(_pi, data, len);
+    return ygg_recv_nolimit(_pi, data, len);
   }
   
   /*!
-    @brief Receive and parse a message larger than CIS_MSG_MAX from the input
-    queue. See cisRecv from CisInterface.h for details.
+    @brief Receive and parse a message larger than YGG_MSG_MAX from the input
+    queue. See yggRecv from YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[out] ... mixed arguments that should be assigned parameters extracted
     using the format string. Since these will be assigned, they should be
@@ -129,7 +129,7 @@ public:
   int recv_nolimit(const int nargs, ...) {
     va_list_t va;
     va_start(va.va, nargs);
-    int ret = vcisRecv(_pi, 0, nargs, va);
+    int ret = vyggRecv(_pi, 0, nargs, va);
     va_end(va.va);
     return ret;
   }
@@ -138,69 +138,69 @@ public:
 
 
 /*!
-  @brief C++ interface to cisOutput_t functionality.
+  @brief C++ interface to yggOutput_t functionality.
 
-  The CisOutput class is a basic wrapper around the C cisOutput_t
-  structure and associated functions from the CisInterface.h header.
+  The YggOutput class is a basic wrapper around the C yggOutput_t
+  structure and associated functions from the YggInterface.h header.
   It provides the user with C++ style access to basic output via
   an IPC queue.
  */
-class CisOutput {
-  cisOutput_t _pi;
+class YggOutput {
+  yggOutput_t _pi;
 public:
   
   /*!
-    @brief Constructor for CisOutput.
+    @brief Constructor for YggOutput.
     @param[in] name constant character pointer to name of output queue. This
     should be the argument to an output driver in the yaml specification file.
    */
-  CisOutput(const char *name) : _pi(cisOutput(name)) {}
+  YggOutput(const char *name) : _pi(yggOutput(name)) {}
   
   /*!
-    @brief Constructor for CisOutput with format.
+    @brief Constructor for YggOutput with format.
     @param[in] name constant character pointer to name of output queue. This
     should be the argument to an output driver in the yaml specification file.
     @param[in] fmt character pointer to format string for formatting variables.
    */
-  CisOutput(const char *name, const char *fmt) : _pi(cisOutputFmt(name, fmt)) {}
+  YggOutput(const char *name, const char *fmt) : _pi(yggOutputFmt(name, fmt)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisOutput(cisOutput_t x) : _pi(x) {}
+  YggOutput(yggOutput_t x) : _pi(x) {}
   
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { cis_free(&_pi); }
+  void _destroy_pi() { ygg_free(&_pi); }
   
   /*!
-    @brief Destructor for CisOutput.
-    See cis_free in CisInterface.h for details.
+    @brief Destructor for YggOutput.
+    See ygg_free in YggInterface.h for details.
   */
-  ~CisOutput() { _destroy_pi(); }
+  ~YggOutput() { _destroy_pi(); }
   
   /*!
-    @brief Return the cisOutput_t structure.
-    @return cisOutput_t structure underlying the class.
+    @brief Return the yggOutput_t structure.
+    @return yggOutput_t structure underlying the class.
   */
-  cisOutput_t pi() {
+  yggOutput_t pi() {
     return _pi;
   };
 
   /*!
-    @brief Send a message smaller than CIS_MSG_MAX to the output queue.
-    If the message is larger than CIS_MSG_MAX an error code will be returned.
-    See cis_send in CisInterface.h for details.
+    @brief Send a message smaller than YGG_MSG_MAX to the output queue.
+    If the message is larger than YGG_MSG_MAX an error code will be returned.
+    See ygg_send in YggInterface.h for details.
     @param[in] data character pointer to message that should be sent.
     @param[in] len size_t length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
   int send(const char *data, const size_t len) {
-    return cis_send(_pi, data, len);
+    return ygg_send(_pi, data, len);
   }
 
   /*!
-    @brief Format and send a message smaller than CIS_MSG_MAX to the output
-    queue. See cisSend from CisInterface.h for details.
+    @brief Format and send a message smaller than YGG_MSG_MAX to the output
+    queue. See yggSend from YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[in] ... arguments for formatting.  
     @return integer specifying if the send was succesful. Values >= 0 indicate
@@ -209,25 +209,25 @@ public:
   int send(const int nargs, ...) {
     va_list_t va;
     va_start(va.va, nargs);
-    int ret = vcisSend(_pi, nargs, va);
+    int ret = vyggSend(_pi, nargs, va);
     va_end(va.va);
     return ret;
   }
 
   /*!
-    @brief Send a message larger than CIS_MSG_MAX to the output queue.
-    See cis_send_nolimit in CisInterface.h for details.
+    @brief Send a message larger than YGG_MSG_MAX to the output queue.
+    See ygg_send_nolimit in YggInterface.h for details.
     @param[in] data character pointer to message that should be sent.
     @param[in] len size_t length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
   int send_nolimit(const char *data, const size_t len) {
-    return cis_send_nolimit(_pi, data, len);
+    return ygg_send_nolimit(_pi, data, len);
   }
   
   /*!
-    @brief Format and send a message larger than CIS_MSG_MAX to the output
-    queue. See cisSend from CisInterface.h for details.
+    @brief Format and send a message larger than YGG_MSG_MAX to the output
+    queue. See yggSend from YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[in] ... arguments for formatting.  
     @return integer specifying if the send was succesful. Values >= 0 indicate
@@ -236,7 +236,7 @@ public:
   int send_nolimit(const int nargs, ...) {
     va_list_t va;
     va_start(va.va, nargs);
-    int ret = vcisSend(_pi, nargs, va);
+    int ret = vyggSend(_pi, nargs, va);
     va_end(va.va);
     return ret;
   }
@@ -245,47 +245,47 @@ public:
     @brief Send EOF message to output file, closing it.
     @returns int 0 if send was succesfull. All other values indicate errors.
    */
-  int send_eof() { return cis_send_eof(_pi); }
+  int send_eof() { return ygg_send_eof(_pi); }
 };
 	
 
 /*!
-  @brief C++ interface to cisRpc_t functionality.
+  @brief C++ interface to yggRpc_t functionality.
 
-  The CisRpc class is a basic wrapper around the C cisRpc_t
-  structure and associated functions from the CisInterface.h header.
+  The YggRpc class is a basic wrapper around the C yggRpc_t
+  structure and associated functions from the YggInterface.h header.
   It provides the user with C++ style access to basic RPC messaging via IPC
   queues.
  */
-class CisRpc {
-  cisRpc_t _pi;
+class YggRpc {
+  yggRpc_t _pi;
 public:
 
   /*! @brief Empty constructor for inheritance. */
-  CisRpc(cisRpc_t x) : _pi(x) {}
+  YggRpc(yggRpc_t x) : _pi(x) {}
   
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
   */
-  void _destroy_pi() { cis_free(&_pi); }
+  void _destroy_pi() { ygg_free(&_pi); }
   
   /*!
-    @brief Destructor for CisRpc.
-    See cis_free in CisInterface.h for details.
+    @brief Destructor for YggRpc.
+    See ygg_free in YggInterface.h for details.
   */
-  ~CisRpc() { _destroy_pi(); }
+  ~YggRpc() { _destroy_pi(); }
   
   /*!
-    @brief Return the cisRpc_t structure.
-    @return cisRpc_t structure underlying the class.
+    @brief Return the yggRpc_t structure.
+    @return yggRpc_t structure underlying the class.
   */
-  cisRpc_t pi() {
+  yggRpc_t pi() {
     return _pi;
   };
 
   /*!
     @brief Format and send a message to an RPC output queue.
-    See rpcSend from CisInterface.h for details.
+    See rpcSend from YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[in] ... arguments for formatting.  
     @return integer specifying if the send was succesful. Values >= 0 indicate
@@ -301,7 +301,7 @@ public:
 
   /*!
     @brief Receive and parse a message from an RPC input queue. 
-    See rpcRecv from CisInterface.h for details.
+    See rpcRecv from YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[out] ... mixed arguments that should be assigned parameters extracted
     using the format string. Since these will be assigned, they should be
@@ -320,7 +320,7 @@ public:
   /*!
     @brief Receive and parse a message from an RPC input queue, allowing
     destination memory to be reallocated as necessary.
-    See rpcRecv from CisInterface.h for details.
+    See rpcRecv from YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[out] ... mixed arguments that should be assigned parameters extracted
     using the format string. Since these will be assigned and reallocated if
@@ -340,17 +340,17 @@ public:
 
 
 /*!
-  @brief C++ interface to cisRpc_t server-side functionality.
-  The CisRpcServer class is a basic wrapper around the C cisRpc_t
-  structure and associated server-side functions from the CisInterface.h
+  @brief C++ interface to yggRpc_t server-side functionality.
+  The YggRpcServer class is a basic wrapper around the C yggRpc_t
+  structure and associated server-side functions from the YggInterface.h
   header. It provides the user with C++ style access to basic RPC server
   operations.
  */
-class CisRpcServer : public CisRpc {
+class YggRpcServer : public YggRpc {
 public:
 
   /*!
-    @brief Constructor for CisRpcServer.
+    @brief Constructor for YggRpcServer.
     @param[in] name constant character pointer name used for input and output
     queues.
     @param[in] inFormat character pointer to format that should be used for
@@ -358,30 +358,30 @@ public:
     @param[in] outFormat character pointer to format that should be used for
     formatting output.
    */
-  CisRpcServer(const char *name, const char *inFormat, const char *outFormat) :
-    CisRpc(cisRpcServer(name, inFormat, outFormat)) {}
+  YggRpcServer(const char *name, const char *inFormat, const char *outFormat) :
+    YggRpc(yggRpcServer(name, inFormat, outFormat)) {}
 
   /*!
-    @brief Destructor for CisRpcServer.
-    See cis_free in CisInterface.h for details.
+    @brief Destructor for YggRpcServer.
+    See ygg_free in YggInterface.h for details.
   */
-  ~CisRpcServer() { _destroy_pi(); }
+  ~YggRpcServer() { _destroy_pi(); }
   
 };
 
 
 /*!
-  @brief C++ interface to cisRpc_t client-side functionality.
-  The CisRpcClient class is a basic wrapper around the C cisRpc_t
-  structure and associated client-side functions from the CisInterface.h
+  @brief C++ interface to yggRpc_t client-side functionality.
+  The YggRpcClient class is a basic wrapper around the C yggRpc_t
+  structure and associated client-side functions from the YggInterface.h
   header. It provides the user with C++ style access to basic RPC client
   operations.
  */
-class CisRpcClient : public CisRpc {
+class YggRpcClient : public YggRpc {
 public:
 
   /*!
-    @brief Constructor for CisRpcClient.
+    @brief Constructor for YggRpcClient.
     @param[in] name constant character pointer name used for input and output
     queues.
     @param[in] outFormat character pointer to format that should be used for
@@ -389,20 +389,20 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  CisRpcClient(const char *name, const char *outFormat, const char *inFormat) :
-    CisRpc(cisRpcClient(name, outFormat, inFormat)) {}
+  YggRpcClient(const char *name, const char *outFormat, const char *inFormat) :
+    YggRpc(yggRpcClient(name, outFormat, inFormat)) {}
 
   /*!
-    @brief Destructor for CisRpcClient.
-    See cis_free in CisInterface.h for details.
+    @brief Destructor for YggRpcClient.
+    See ygg_free in YggInterface.h for details.
   */
-  ~CisRpcClient() { _destroy_pi(); }
+  ~YggRpcClient() { _destroy_pi(); }
   
   /*!
     @brief Send request to an RPC server from the client and wait for a
     response, preserving the current sizes of memory at the provided output
     variable references.
-    See rpcCall in CisInterface.h for details.
+    See rpcCall in YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[in,out] ... mixed arguments that include those that should be
     formatted using the output format string, followed by those that should be
@@ -412,7 +412,7 @@ public:
     indicate success.
   */
   int call(const int nargs, ...) {
-    cisRpc_t _cpi = pi();
+    yggRpc_t _cpi = pi();
     va_list_t va;
     va_start(va.va, nargs);
     int ret = vrpcCall(_cpi, nargs, va);
@@ -424,7 +424,7 @@ public:
     @brief Send request to an RPC server from the client and wait for a
     response, allowing the memory pointed to by the pointers that the output
     variables reference to be reallocated.
-    See rpcCall in CisInterface.h for details.
+    See rpcCall in YggInterface.h for details.
     @param[in] nargs int Number of arguments being passed.
     @param[in,out] ... mixed arguments that include those that should be
     formatted using the output format string, followed by those that should be
@@ -436,7 +436,7 @@ public:
     indicate success.
   */
   int callRealloc(const int nargs, ...) {
-    cisRpc_t _cpi = pi();
+    yggRpc_t _cpi = pi();
     va_list_t va;
     va_start(va.va, nargs);
     int ret = vrpcCallRealloc(_cpi, nargs, va);
@@ -448,25 +448,25 @@ public:
 
 
 /*!
-  @brief C++ interface to cisAsciiFileOutput_t functionality.
-  The CisAsciiFileOutput class is a basic wrapper around the C
-  cisAsciiFileOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggAsciiFileOutput_t functionality.
+  The YggAsciiFileOutput class is a basic wrapper around the C
+  yggAsciiFileOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file output operations.
  */
-class CisAsciiFileOutput : public CisOutput {
+class YggAsciiFileOutput : public YggOutput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiFileOutput.
+    @brief Constructor for YggAsciiFileOutput.
     @param[in] name constant character pointer to the name of an output channel.
    */
-  CisAsciiFileOutput(const char *name) :
-    CisOutput(cisAsciiFileOutput(name)) {}
+  YggAsciiFileOutput(const char *name) :
+    YggOutput(yggAsciiFileOutput(name)) {}
   
   /*! @brief Empty constructor for inheritance. */
-  CisAsciiFileOutput(cisOutput_t x) :
-    CisOutput(x) {}
+  YggAsciiFileOutput(yggOutput_t x) :
+    YggOutput(x) {}
   
   /*!
     @brief Send a single line to a file or queue.
@@ -479,49 +479,49 @@ public:
 
 
 /*!
-  @brief C++ interface to cisAsciiFileOutput_t functionality for local files.
-  The CisAsciiFileOutput_local class is a basic wrapper around the C
-  cisAsciiFileOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggAsciiFileOutput_t functionality for local files.
+  The YggAsciiFileOutput_local class is a basic wrapper around the C
+  yggAsciiFileOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file output operations.
  */
-class CisAsciiFileOutput_local : public CisAsciiFileOutput {
+class YggAsciiFileOutput_local : public YggAsciiFileOutput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiFileOutput.
+    @brief Constructor for YggAsciiFileOutput.
     @param[in] name constant character pointer to path of local file.
    */
-  CisAsciiFileOutput_local(const char *name) :
-    CisAsciiFileOutput(cisAsciiFileOutput_local(name)) {}
+  YggAsciiFileOutput_local(const char *name) :
+    YggAsciiFileOutput(yggAsciiFileOutput_local(name)) {}
   
 };
 
 
 /*!
-  @brief C++ interface to cisAsciiFileInput_t functionality.
-  The CisAsciiFileInput class is a basic wrapper around the C
-  cisAsciiFileInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggAsciiFileInput_t functionality.
+  The YggAsciiFileInput class is a basic wrapper around the C
+  yggAsciiFileInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file input operations.
  */
-class CisAsciiFileInput : public CisInput {
+class YggAsciiFileInput : public YggInput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiFileInput.
+    @brief Constructor for YggAsciiFileInput.
     @param[in] name constant character pointer to the name of an input channel.
    */
-  CisAsciiFileInput(const char *name) :
-    CisInput(cisAsciiFileInput(name)) {}
+  YggAsciiFileInput(const char *name) :
+    YggInput(yggAsciiFileInput(name)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisAsciiFileInput(cisInput_t x) :
-    CisInput(x) {}
+  YggAsciiFileInput(yggInput_t x) :
+    YggInput(x) {}
   
   /*!
     @brief Receive a single line from an associated file or queue.
-    See af_recv_line in CisInterface.h for details.
+    See af_recv_line in YggInterface.h for details.
     @param[out] line character pointer to allocate memory where the received
     line should be stored.
     @param[in] n size_t Size of the allocated memory block in bytes.
@@ -534,305 +534,305 @@ public:
 
 
 /*!
-  @brief C++ interface to cisAsciiFileInput_t functionality for local files.
-  The CisAsciiFileInput_local class is a basic wrapper around the C
-  cisAsciiFileInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggAsciiFileInput_t functionality for local files.
+  The YggAsciiFileInput_local class is a basic wrapper around the C
+  yggAsciiFileInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file input operations.
  */
-class CisAsciiFileInput_local : public CisAsciiFileInput {
+class YggAsciiFileInput_local : public YggAsciiFileInput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiFileInput_local.
+    @brief Constructor for YggAsciiFileInput_local.
     @param[in] name constant character pointer to path of local file.
    */
-  CisAsciiFileInput_local(const char *name) :
-    CisAsciiFileInput(cisAsciiFileInput_local(name)) {}
+  YggAsciiFileInput_local(const char *name) :
+    YggAsciiFileInput(yggAsciiFileInput_local(name)) {}
 
 };
 
 
 /*!
-  @brief C++ interface to cisAsciiTableOutput_t functionality.
+  @brief C++ interface to yggAsciiTableOutput_t functionality.
 
-  The CisAsciiTableOutput class is a basic wrapper around the C
-  cisAsciiTableOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiTableOutput class is a basic wrapper around the C
+  yggAsciiTableOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table output operations.
  */
-class CisAsciiTableOutput : public CisAsciiFileOutput {
+class YggAsciiTableOutput : public YggAsciiFileOutput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiTableOutput.
+    @brief Constructor for YggAsciiTableOutput.
     @param[in] name constant character pointer to the name of an output channel.
     @param[in] format_str character pointer to format string that should be used
     to format rows into table lines.
    */
-  CisAsciiTableOutput(const char *name, const char *format_str) :
-    CisAsciiFileOutput(cisAsciiTableOutput(name, format_str)) {}
+  YggAsciiTableOutput(const char *name, const char *format_str) :
+    YggAsciiFileOutput(yggAsciiTableOutput(name, format_str)) {}
 
 };
 
 
 /*!
-  @brief C++ interface to cisAsciiTableOutput_t functionality for local files.
+  @brief C++ interface to yggAsciiTableOutput_t functionality for local files.
 
-  The CisAsciiTableOutput class is a basic wrapper around the C
-  cisAsciiTableOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiTableOutput class is a basic wrapper around the C
+  yggAsciiTableOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table output operations.
  */
-class CisAsciiTableOutput_local : public CisAsciiFileOutput {
+class YggAsciiTableOutput_local : public YggAsciiFileOutput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiTableOutput for local files.
+    @brief Constructor for YggAsciiTableOutput for local files.
     @param[in] name constant character pointer to path of local table.
     @param[in] format_str character pointer to format string that should be used
     to format rows into table lines.
    */
-  CisAsciiTableOutput_local(const char *name, const char *format_str) :
-    CisAsciiFileOutput(cisAsciiTableOutput_local(name, format_str)) {}
+  YggAsciiTableOutput_local(const char *name, const char *format_str) :
+    YggAsciiFileOutput(yggAsciiTableOutput_local(name, format_str)) {}
 
 };
 
 
 /*!
-  @brief C++ interface to cisAsciiTableOutput_t functionality with arrays.
+  @brief C++ interface to yggAsciiTableOutput_t functionality with arrays.
 
-  The CisAsciiArrayOutput class is a basic wrapper around the C
-  cisAsciiTableOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiArrayOutput class is a basic wrapper around the C
+  yggAsciiTableOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table output operations.
  */
-class CisAsciiArrayOutput : public CisAsciiFileOutput {
+class YggAsciiArrayOutput : public YggAsciiFileOutput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiArrayOutput.
+    @brief Constructor for YggAsciiArrayOutput.
     @param[in] name constant character pointer to the name of an output channel.
     @param[in] format_str character pointer to format string that should be used
     to format arrays into a table.
    */
-  CisAsciiArrayOutput(const char *name, const char *format_str) :
-    CisAsciiFileOutput(cisAsciiArrayOutput(name, format_str)) {}
+  YggAsciiArrayOutput(const char *name, const char *format_str) :
+    YggAsciiFileOutput(yggAsciiArrayOutput(name, format_str)) {}
 
 };
 
 
 /*!
-  @brief C++ interface to cisAsciiTableOutput_t functionality for local files.
+  @brief C++ interface to yggAsciiTableOutput_t functionality for local files.
 
-  The CisAsciiArrayOutput class is a basic wrapper around the C
-  cisAsciiTableOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiArrayOutput class is a basic wrapper around the C
+  yggAsciiTableOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table output operations.
  */
-class CisAsciiArrayOutput_local : public CisAsciiFileOutput {
+class YggAsciiArrayOutput_local : public YggAsciiFileOutput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiArrayOutput for local files.
+    @brief Constructor for YggAsciiArrayOutput for local files.
     @param[in] name constant character pointer to path of local table.
     @param[in] format_str character pointer to format string that should be used
     to format arrays into table columns.
    */
-  CisAsciiArrayOutput_local(const char *name, const char *format_str) :
-    CisAsciiFileOutput(cisAsciiArrayOutput_local(name, format_str)) {}
+  YggAsciiArrayOutput_local(const char *name, const char *format_str) :
+    YggAsciiFileOutput(yggAsciiArrayOutput_local(name, format_str)) {}
 
 };
 
 
 /*!
-  @brief C++ interface to cisAsciiTableInput_t functionality.
+  @brief C++ interface to yggAsciiTableInput_t functionality.
 
-  The CisAsciiTableInput class is a basic wrapper around the C
-  cisAsciiTableInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiTableInput class is a basic wrapper around the C
+  yggAsciiTableInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table input operations.
  */
-class CisAsciiTableInput : public CisAsciiFileInput {
+class YggAsciiTableInput : public YggAsciiFileInput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiTableInput.
+    @brief Constructor for YggAsciiTableInput.
     Due to issues with the C++ version of vsscanf, flags and precision
     indicators for floating point format specifiers (e.g. %e, %f), must be
     removed so that table input can be properly parsed.
     @param[in] name constant character pointer to the name of an input channel.
    */
-  CisAsciiTableInput(const char *name) :
-    CisAsciiFileInput(cisAsciiTableInput(name)) {}
+  YggAsciiTableInput(const char *name) :
+    YggAsciiFileInput(yggAsciiTableInput(name)) {}
 
 };
 
 /*!
-  @brief C++ interface to cisAsciiTableInput_t functionality for local files.
+  @brief C++ interface to yggAsciiTableInput_t functionality for local files.
 
-  The CisAsciiTableInput class is a basic wrapper around the C
-  cisAsciiTableInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiTableInput class is a basic wrapper around the C
+  yggAsciiTableInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table input operations.
  */
-class CisAsciiTableInput_local : public CisAsciiFileInput {
+class YggAsciiTableInput_local : public YggAsciiFileInput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiTableInput_local.
+    @brief Constructor for YggAsciiTableInput_local.
     Due to issues with the C++ version of vsscanf, flags and precision
     indicators for floating point format specifiers (e.g. %e, %f), must be
     removed so that table input can be properly parsed.
     @param[in] name constant character pointer to path of local table.
    */
-  CisAsciiTableInput_local(const char *name) :
-    CisAsciiFileInput(cisAsciiTableInput_local(name)) {}
+  YggAsciiTableInput_local(const char *name) :
+    YggAsciiFileInput(yggAsciiTableInput_local(name)) {}
 
 };
 
 /*!
-  @brief C++ interface to cisAsciiTableInput_t functionality for arrays.
+  @brief C++ interface to yggAsciiTableInput_t functionality for arrays.
 
-  The CisAsciiArrayInput class is a basic wrapper around the C
-  cisAsciiTableInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiArrayInput class is a basic wrapper around the C
+  yggAsciiTableInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table input operations.
  */
-class CisAsciiArrayInput : public CisAsciiFileInput {
+class YggAsciiArrayInput : public YggAsciiFileInput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiArrayInput.
+    @brief Constructor for YggAsciiArrayInput.
     Due to issues with the C++ version of vsscanf, flags and precision
     indicators for floating point format specifiers (e.g. %e, %f), must be
     removed so that table input can be properly parsed.
     @param[in] name constant character pointer to the name of an input channel.
    */
-  CisAsciiArrayInput(const char *name) :
-    CisAsciiFileInput(cisAsciiArrayInput(name)) {}
+  YggAsciiArrayInput(const char *name) :
+    YggAsciiFileInput(yggAsciiArrayInput(name)) {}
 
 };
 
 /*!
-  @brief C++ interface to cisAsciiTableInput_t functionality for local files
+  @brief C++ interface to yggAsciiTableInput_t functionality for local files
   as arrays.
 
-  The CisAsciiArrayInput class is a basic wrapper around the C
-  cisAsciiTableInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  The YggAsciiArrayInput class is a basic wrapper around the C
+  yggAsciiTableInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII table input operations.
  */
-class CisAsciiArrayInput_local : public CisAsciiFileInput {
+class YggAsciiArrayInput_local : public YggAsciiFileInput {
 public:
 
   /*!
-    @brief Constructor for CisAsciiArrayInput_local.
+    @brief Constructor for YggAsciiArrayInput_local.
     Due to issues with the C++ version of vsscanf, flags and precision
     indicators for floating point format specifiers (e.g. %e, %f), must be
     removed so that table input can be properly parsed.
     @param[in] name constant character pointer to path of local table.
    */
-  CisAsciiArrayInput_local(const char *name) :
-    CisAsciiFileInput(cisAsciiArrayInput_local(name)) {}
+  YggAsciiArrayInput_local(const char *name) :
+    YggAsciiFileInput(yggAsciiArrayInput_local(name)) {}
 
 };
 
 
 /*!
-  @brief C++ interface to cisPlyOutput_t functionality.
-  The CisPlyOutput class is a basic wrapper around the C
-  cisPlyOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggPlyOutput_t functionality.
+  The YggPlyOutput class is a basic wrapper around the C
+  yggPlyOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file output operations.
  */
-class CisPlyOutput : public CisOutput {
+class YggPlyOutput : public YggOutput {
 public:
 
   /*!
-    @brief Constructor for CisPlyOutput.
+    @brief Constructor for YggPlyOutput.
     @param[in] name constant character pointer to the name of an output channel.
    */
-  CisPlyOutput(const char *name) :
-    CisOutput(cisPlyOutput(name)) {}
+  YggPlyOutput(const char *name) :
+    YggOutput(yggPlyOutput(name)) {}
   
   /*! @brief Empty constructor for inheritance. */
-  CisPlyOutput(cisOutput_t x) :
-    CisOutput(x) {}
+  YggPlyOutput(yggOutput_t x) :
+    YggOutput(x) {}
   
 };
 
 
 /*!
-  @brief C++ interface to cisPlyInput_t functionality.
-  The CisPlyInput class is a basic wrapper around the C
-  cisPlyInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggPlyInput_t functionality.
+  The YggPlyInput class is a basic wrapper around the C
+  yggPlyInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file input operations.
  */
-class CisPlyInput : public CisInput {
+class YggPlyInput : public YggInput {
 public:
 
   /*!
-    @brief Constructor for CisPlyInput.
+    @brief Constructor for YggPlyInput.
     @param[in] name constant character pointer to the name of an input channel.
    */
-  CisPlyInput(const char *name) :
-    CisInput(cisPlyInput(name)) {}
+  YggPlyInput(const char *name) :
+    YggInput(yggPlyInput(name)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisPlyInput(cisInput_t x) :
-    CisInput(x) {}
+  YggPlyInput(yggInput_t x) :
+    YggInput(x) {}
   
 };
 
 
 /*!
-  @brief C++ interface to cisObjOutput_t functionality.
-  The CisObjOutput class is a basic wrapper around the C
-  cisObjOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggObjOutput_t functionality.
+  The YggObjOutput class is a basic wrapper around the C
+  yggObjOutput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file output operations.
  */
-class CisObjOutput : public CisOutput {
+class YggObjOutput : public YggOutput {
 public:
 
   /*!
-    @brief Constructor for CisObjOutput.
+    @brief Constructor for YggObjOutput.
     @param[in] name constant character pointer to the name of an output channel.
    */
-  CisObjOutput(const char *name) :
-    CisOutput(cisObjOutput(name)) {}
+  YggObjOutput(const char *name) :
+    YggOutput(yggObjOutput(name)) {}
   
   /*! @brief Empty constructor for inheritance. */
-  CisObjOutput(cisOutput_t x) :
-    CisOutput(x) {}
+  YggObjOutput(yggOutput_t x) :
+    YggOutput(x) {}
   
 };
 
 
 /*!
-  @brief C++ interface to cisObjInput_t functionality.
-  The CisObjInput class is a basic wrapper around the C
-  cisObjInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
+  @brief C++ interface to yggObjInput_t functionality.
+  The YggObjInput class is a basic wrapper around the C
+  yggObjInput_t structure and associated functions from the
+  YggInterface.h header. It provides the user with C++ style access to basic
   ASCII file input operations.
  */
-class CisObjInput : public CisInput {
+class YggObjInput : public YggInput {
 public:
 
   /*!
-    @brief Constructor for CisObjInput.
+    @brief Constructor for YggObjInput.
     @param[in] name constant character pointer to the name of an input channel.
    */
-  CisObjInput(const char *name) :
-    CisInput(cisObjInput(name)) {}
+  YggObjInput(const char *name) :
+    YggInput(yggObjInput(name)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisObjInput(cisInput_t x) :
-    CisInput(x) {}
+  YggObjInput(yggInput_t x) :
+    YggInput(x) {}
   
 };
 
 
-#endif /*CISINTERFACE_HPP_*/
+#endif /*YGGINTERFACE_HPP_*/

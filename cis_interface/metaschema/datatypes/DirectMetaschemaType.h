@@ -24,13 +24,13 @@ public:
   // Encoding
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
-    cislog_error("DirectMetaschemaType::encode_data: Direct type cannot be JSON encoded.");
+    ygglog_error("DirectMetaschemaType::encode_data: Direct type cannot be JSON encoded.");
     return false;
   }
   int serialize(char **buf, size_t *buf_siz,
 		const int allow_realloc, size_t *nargs, va_list_t &ap) {
     if (nargs_exp() != *nargs) {
-      cislog_throw_error("DirectMetaschemaType::serialize: %d arguments expected, but %d provided.",
+      ygglog_throw_error("DirectMetaschemaType::serialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     *nargs = *nargs - nargs_exp();
@@ -38,7 +38,7 @@ public:
     char *msg = va_arg(ap.va, char*);
     size_t msg_siz = va_arg(ap.va, size_t);
     if (*nargs != 0) {
-      cislog_error("DirectMetaschemaType::serialize: %d arguments were not used.", *nargs);
+      ygglog_error("DirectMetaschemaType::serialize: %d arguments were not used.", *nargs);
       return -1;
     }
     // Copy message to buffer
@@ -48,13 +48,13 @@ public:
   // Decoding
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
-    cislog_error("DirectMetaschemaType::decode_data: Direct type cannot be JSON decoded.");
+    ygglog_error("DirectMetaschemaType::decode_data: Direct type cannot be JSON decoded.");
     return false;
   }
   int deserialize(const char *buf, const size_t buf_siz,
 		  const int allow_realloc, size_t *nargs, va_list_t &ap) {
     if (nargs_exp() != *nargs) {
-      cislog_throw_error("DirectMetaschemaType::deserialize: %d arguments expected, but %d provided.",
+      ygglog_throw_error("DirectMetaschemaType::deserialize: %d arguments expected, but %d provided.",
 			 nargs_exp(), *nargs);
     }
     const size_t nargs_orig = *nargs;
@@ -74,7 +74,7 @@ public:
       return -1;
     }
     if (*nargs != 0) {
-      cislog_error("DirectMetaschemaType::deserialize: %d arguments were not used.", *nargs);
+      ygglog_error("DirectMetaschemaType::deserialize: %d arguments were not used.", *nargs);
       return -1;
     }
     return (int)(nargs_orig - *nargs);

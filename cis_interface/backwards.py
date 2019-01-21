@@ -3,7 +3,7 @@ import sys
 import time
 import base64
 from collections import OrderedDict
-from cis_interface.scanf import scanf
+from yggdrasil.scanf import scanf
 _python_version = '%d.%d' % (sys.version_info[0], sys.version_info[1])
 PY2 = (sys.version_info[0] == 2)
 PY34 = ((sys.version_info[0] == 3) and (sys.version_info[1] == 4))

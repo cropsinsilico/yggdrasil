@@ -1,6 +1,6 @@
-from cis_interface.metaschema.datatypes import (
+from yggdrasil.metaschema.datatypes import (
     get_type_class, complete_typedef, encode_data, encode_data_readable)
-from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
+from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
 class ContainerMetaschemaType(MetaschemaType):

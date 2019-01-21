@@ -1,6 +1,6 @@
 % Initialize input/output channels 
-in_channel = CisInterface('CisInput', 'inputA');
-out_channel = CisInterface('CisOutput', 'outputA');
+in_channel = YggInterface('YggInput', 'inputA');
+out_channel = YggInterface('YggOutput', 'outputA');
 
 flag = true;
 

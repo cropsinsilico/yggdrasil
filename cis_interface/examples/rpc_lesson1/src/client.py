@@ -1,7 +1,7 @@
 import sys
 import numpy as np
-from cis_interface.interface.CisInterface import (
-    CisRpcClient, CisOutput)
+from yggdrasil.interface.YggInterface import (
+    YggRpcClient, YggOutput)
 
 
 def main(iterations):
@@ -17,8 +17,8 @@ def main(iterations):
 
     # Set up connections matching yaml
     # RPC client-side connection will be $(server_name)_$(client_name)
-    rpc = CisRpcClient("server_client", "%d", "%d")
-    log = CisOutput("output_log", 'fib(%-2d) = %-2d\n')
+    rpc = YggRpcClient("server_client", "%d", "%d")
+    log = YggOutput("output_log", 'fib(%-2d) = %-2d\n')
 
     # Iterate over Fibonacci sequence
     for i in range(1, iterations + 1):

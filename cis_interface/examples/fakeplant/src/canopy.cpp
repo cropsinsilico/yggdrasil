@@ -1,4 +1,4 @@
-#include "CisInterface.hpp"
+#include "YggInterface.hpp"
 #include <string>
 #include <iostream>
 using namespace std;
@@ -21,12 +21,12 @@ void grow_canopy(double tstep, double *growth_rate, double *layout,
 int main(int argc, char *argv[]) {
 
   int i, j, return_code = 0;
-  CisInput in_layout("plant_layout");
-  CisAsciiArrayInput in_struct("init_canopy_structure");
-  CisInput in_time("time");
-  CisInput in_growth("growth_rate");
+  YggInput in_layout("plant_layout");
+  YggAsciiArrayInput in_struct("init_canopy_structure");
+  YggInput in_time("time");
+  YggInput in_growth("growth_rate");
   char struct_format[200] = "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n";
-  CisAsciiArrayOutput out_struct("canopy_structure", struct_format);
+  YggAsciiArrayOutput out_struct("canopy_structure", struct_format);
   double time_prev, time_curr, time_step;
   time_curr = 0.0;
 

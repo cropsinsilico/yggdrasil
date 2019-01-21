@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="rpc_lesson1"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="rpc_lesson1"
 export FIB_ITERATIONS="3"
 
 yaml1= 
@@ -31,7 +31,7 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml1 $yaml2
+yggrun $yaml1 $yaml2
 
 outfile="${TMPDIR}client_output.txt"
 echo $outfile

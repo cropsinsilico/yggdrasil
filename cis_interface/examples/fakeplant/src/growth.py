@@ -1,4 +1,4 @@
-from cis_interface.interface import CisInput, CisOutput
+from yggdrasil.interface import YggInput, YggOutput
 
 
 def calculate_growth(photosynthesis_rate):
@@ -15,8 +15,8 @@ def calculate_growth(photosynthesis_rate):
 
 
 if __name__ == '__main__':
-    input = CisInput('photosynthesis_rate')
-    output = CisOutput('growth_rate', '%f\n')
+    input = YggInput('photosynthesis_rate')
+    output = YggOutput('growth_rate', '%f\n')
     
     while True:
         flag, prate = input.recv()

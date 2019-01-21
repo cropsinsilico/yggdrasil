@@ -6,7 +6,7 @@
 #include "base64.h"
 #include "../comm_header.h"
 
-#define CIS_MSG_HEAD "CIS_MSG_HEAD"
+#define YGG_MSG_HEAD "YGG_MSG_HEAD"
 #define COMMBUFFSIZ 2000
 
 #ifndef __cplusplus /* If this is a C compiler, use C++ linkage */
@@ -66,7 +66,7 @@ public:
       }
       if (target) {
 	if (len > size_t) {
-	  cislog_error("HeadDocumentDecoder: Size of value for key '%s' (%d) exceeds size of target buffer (%d).",
+	  ygglog_error("HeadDocumentDecoder: Size of value for key '%s' (%d) exceeds size of target buffer (%d).",
 		       curr_key_, len, target_size);
 	  return false;
 	}
@@ -124,11 +124,11 @@ public:
   bool StartScalar() {
     // TODO: Way to pass arbitrary & dynamic data back to C
     if (level_ > 1) {
-      cislog_error("BodyDecoder: Maximum level of 1 imposed to prevent arbitrary objects.");
+      ygglog_error("BodyDecoder: Maximum level of 1 imposed to prevent arbitrary objects.");
       return false;
     }
     if ((level_ == 1) and (not in_array_.top())) {
-      cislog_error("BodyDecoder: Only flat arrays are allowed.");
+      ygglog_error("BodyDecoder: Only flat arrays are allowed.");
       return false;
     }
     if (in_array_.top()) {
@@ -136,29 +136,29 @@ public:
 	curr_type_.push(curr_type_);
       } else if (curr_type_.top().IsArray()) {
 	if (array_element_count_.top() > curr_type_.top().Size()) {
-	  cislog_error("BodyDecoder: Array does not have an element %d." % array_element_count_.top());
+	  ygglog_error("BodyDecoder: Array does not have an element %d." % array_element_count_.top());
 	  return false;
 	}
 	if (not curr_type_.top()[array_element_count_.top()].IsObject()) {
-	  cislog_error("BodyDecoder: Type for element %d is not an object." % array_element_count_.top());
+	  ygglog_error("BodyDecoder: Type for element %d is not an object." % array_element_count_.top());
 	  return false;
 	}
 	curr_type_.push(curr_type_.top()[array_element_count_.top()].GetObject());
       } else {
-	cislog_error("BodyDecoder: Array type must be an object or array of types.");
+	ygglog_error("BodyDecoder: Array type must be an object or array of types.");
 	return false;
       }
     }
     if (!(curr_type_.top().IsObject())) {
-      cislog_error("BodyDecoder: Type definition must be an object.");
+      ygglog_error("BodyDecoder: Type definition must be an object.");
       return false;
     }
     if (not curr_type_.top().HasMember("type")) {
-      cislog_error("BodyDecoder: Type object does not have explicit type entry.");
+      ygglog_error("BodyDecoder: Type object does not have explicit type entry.");
       return false;
     }
     if (not curr_type_.top()["type"].IsString()) {
-      cislog_error("BodyDecoder: Type is not a string.");
+      ygglog_error("BodyDecoder: Type is not a string.");
       return false;
     }
     in_array.push(false);
@@ -212,28 +212,28 @@ public:
     case "ndarray": {
       if (strcmp(type, "1darray") == 0) {
 	if (not (curr_type_.top().HasMember("length"))) {
-	  cislog_error("BodyDecoder: 1darray types must include 'length'.");
+	  ygglog_error("BodyDecoder: 1darray types must include 'length'.");
 	  return false;
 	}
 	if (not (curr_type_.top()["length"].IsInt())) {
-	  cislog_error("BodyDecoder: 1darray 'length' value must be an int.");
+	  ygglog_error("BodyDecoder: 1darray 'length' value must be an int.");
 	  return false;
 	}
 	nele = (size_t)curr_type_.top()["length"].GetInt();
       } else {
 	if (not (curr_type_.top().HasMember("shape"))) {
-	  cislog_error("BodyDecoder: ndarray types must include 'shape'.");
+	  ygglog_error("BodyDecoder: ndarray types must include 'shape'.");
 	  return false;
 	}
 	if (not (curr_type_.top()["shape"].IsArray())) {
-	  cislog_error("BodyDecoder: ndarray 'shape' value must be an int.");
+	  ygglog_error("BodyDecoder: ndarray 'shape' value must be an int.");
 	  return false;
 	}
 	a = curr_type_.top()["shape"];
 	nele = 1;
 	for (rapidjson::Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr) {
 	  if (not (itr.IsInt())) {
-	    cislog_error("BodyDecoder: All elements in shape must be intengers.");
+	    ygglog_error("BodyDecoder: All elements in shape must be intengers.");
 	    return false;
 	  }
 	  nele = nele * (size_t)iter.GetInt();
@@ -248,11 +248,11 @@ public:
     case "complex":
     case "unicode": {
       if (not (curr_type_.top().HasMember("precision"))) {
-	cislog_error("BodyDecoder: Precision missing.");
+	ygglog_error("BodyDecoder: Precision missing.");
 	return false;
       }
       if (not (curr_type_.top()["precision"].IsInt())) {
-	cislog_error("BodyDecoder: Precision must be integer.");
+	ygglog_error("BodyDecoder: Precision must be integer.");
 	return false;
       }
       size_t prec = (size_t)curr_type_.top()["precision"].GetInt();
@@ -261,7 +261,7 @@ public:
       size_t decoded_len = 0;
       unsigned char *decoded = base64_decode(str, len, &decoded_len);
       if (nbytes != decoded_len) {
-	cislog_error("BodyDecoder: %d bytes were expected, but %d were decoded.",
+	ygglog_error("BodyDecoder: %d bytes were expected, but %d were decoded.",
 		     nbytes, decoded_len);
 	return false;
       }
@@ -272,7 +272,7 @@ public:
       head_->nargs_populated += 1;
       t2 = (unsigned char*)realloc(*temp, nbytes);
       if (t2 == NULL) {
-	cislog_error("BodyDecoder: Failed ro realloc temp var.");
+	ygglog_error("BodyDecoder: Failed ro realloc temp var.");
 	free(*temp);
 	return false;
       }
@@ -288,11 +288,11 @@ public:
     if (not StartScalar())
       return false;
     if (not curr_type_.top().HasMember("properties")) {
-      cislog_error("BodyDecoder: Object type def does not have 'properties' defined.");
+      ygglog_error("BodyDecoder: Object type def does not have 'properties' defined.");
       return false;
     }
     if (not curr_type_.top()["properties"].IsObject()) {
-      cislog_error("BodyDecoder: Properties value is not an object.");
+      ygglog_error("BodyDecoder: Properties value is not an object.");
       return false;
     }
     curr_type_.push(curr_type_.top()["properties"].GetObject());
@@ -309,7 +309,7 @@ public:
       curr_type_.pop();
     }
     if (not curr_type_.top().HasMember(str)) {
-      cislog_error("BodyDecoder: There is not a property definition for key '%s'.", str);
+      ygglog_error("BodyDecoder: There is not a property definition for key '%s'.", str);
       return false;
     }
     curr_type_.push(curr_type_.top()[str]);
@@ -330,7 +330,7 @@ public:
     if (!(StartScalar()))
       return false;
     if (not curr_type_.top().HasMember("items")) {
-      cislog_error("BodyDecoder: Object type def does not have 'items' defined.");
+      ygglog_error("BodyDecoder: Object type def does not have 'items' defined.");
       return false;
     }
     curr_type_.push(curr_type_.top()["items"]);

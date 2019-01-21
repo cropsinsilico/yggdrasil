@@ -1,7 +1,7 @@
 import threading
-from cis_interface import backwards, tools
-from cis_interface.communication import RMQComm
-from cis_interface.schema import register_component
+from yggdrasil import backwards, tools
+from yggdrasil.communication import RMQComm
+from yggdrasil.schema import register_component
 if RMQComm._rmq_installed:
     import pika
 else:
@@ -23,7 +23,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
     Attributes:
         times_connected (int): Number of times that this connections has been
             established.
-        rmq_thread (tools.CisThread): Thread used to run IO loop.
+        rmq_thread (tools.YggThread): Thread used to run IO loop.
 
     """
     
@@ -55,7 +55,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if name is None:
             name = self.name
         self.rmq_thread_count += 1
-        return tools.CisThread(name=name + '.RMQThread%d' % self.rmq_thread_count,
+        return tools.YggThread(name=name + '.RMQThread%d' % self.rmq_thread_count,
                                target=self.run_thread)
 
     def run_thread(self):

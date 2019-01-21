@@ -1,7 +1,7 @@
 r"""Routines for interfacing with framework from Python/C/C++/Matlab."""
-from cis_interface.interface import CisInterface
-from cis_interface.interface.CisInterface import (
-    CIS_MSG_EOF, CisInput, CisOutput)
+from yggdrasil.interface import YggInterface
+from yggdrasil.interface.YggInterface import (
+    YGG_MSG_EOF, YggInput, YggOutput)
 
 
-__all__ = ['CisInterface', 'CisInput', 'CisOutput', 'CIS_MSG_EOF']
+__all__ = ['YggInterface', 'YggInput', 'YggOutput', 'YGG_MSG_EOF']

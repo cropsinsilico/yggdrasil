@@ -3,8 +3,8 @@
 #
 import os
 import sys
-from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface.schema import register_component
+from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.schema import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))

@@ -1,7 +1,7 @@
 import copy
-import nose.tools as nt
-from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as parent
-from cis_interface.metaschema.datatypes.tests import (
+from yggdrasil.tests import assert_raises
+from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
+from yggdrasil.metaschema.datatypes.tests import (
     test_ContainerMetaschemaType as container_utils)
 
 
@@ -34,7 +34,7 @@ class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
 
     def test_container_errors(self):
         r"""Test errors on container operations."""
-        nt.assert_raises(RuntimeError, self.import_cls._assign, [], 10, None)
+        assert_raises(RuntimeError, self.import_cls._assign, [], 10, None)
 
     def test_item_dictionary(self):
         r"""Test dictionary as items value."""

@@ -1,13 +1,13 @@
 import numpy as np
 import copy
 import pprint
-import nose.tools as nt
 import jsonschema
-from cis_interface.metaschema.datatypes import MetaschemaTypeError
-from cis_interface.tests import CisTestClassInfo
+from yggdrasil.tests import assert_raises, assert_equal
+from yggdrasil.metaschema.datatypes import MetaschemaTypeError
+from yggdrasil.tests import YggTestClassInfo
 
 
-class TestMetaschemaType(CisTestClassInfo):
+class TestMetaschemaType(YggTestClassInfo):
     r"""Test class for MetaschemaType class."""
 
     _mod = 'MetaschemaType'
@@ -32,7 +32,7 @@ class TestMetaschemaType(CisTestClassInfo):
     @property
     def mod(self):
         r"""str: Absolute name of module containing class to be tested."""
-        return 'cis_interface.metaschema.datatypes.%s' % self._mod
+        return 'yggdrasil.metaschema.datatypes.%s' % self._mod
 
     @property
     def typedef(self):
@@ -88,16 +88,16 @@ class TestMetaschemaType(CisTestClassInfo):
                 pprint.pprint(y)
                 raise AssertionError("Compared objects are different types. "
                                      "%s vs. %s" % (type(x), type(y)))
-            nt.assert_equal(x, y)
+            assert_equal(x, y)
 
     def test_validate(self):
         r"""Test validation."""
         if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
-                nt.assert_raises(NotImplementedError, self.import_cls.validate, x)
+                assert_raises(NotImplementedError, self.import_cls.validate, x)
         else:
             for x in self._valid_decoded:
-                nt.assert_equal(self.import_cls.validate(x), True)
+                assert_equal(self.import_cls.validate(x), True)
 
     def test_normalize(self):
         r"""Test normalization."""
@@ -113,9 +113,9 @@ class TestMetaschemaType(CisTestClassInfo):
             t2 = copy.deepcopy(x1)
             t2['type'] = t1['type']
             x2 = self.import_cls.typedef_fixed2base(t2)
-            nt.assert_equal(x1, x2)
+            assert_equal(x1, x2)
             y = self.import_cls.typedef_base2fixed(x1)
-            nt.assert_equal(y, self.typedef)
+            assert_equal(y, self.typedef)
 
     def test_extract_typedef(self):
         r"""Test extract_typedef."""
@@ -125,7 +125,7 @@ class TestMetaschemaType(CisTestClassInfo):
     def test_update_typedef(self):
         r"""Test update_typedef raises error on non-matching typename."""
         self.instance.update_typedef(**self.typedef)
-        nt.assert_raises(MetaschemaTypeError, self.instance.update_typedef,
+        assert_raises(MetaschemaTypeError, self.instance.update_typedef,
                          type='invalid')
         if self._explicit:
             typedef_base = self.import_cls.typedef_fixed2base(self.typedef)
@@ -147,11 +147,11 @@ class TestMetaschemaType(CisTestClassInfo):
         r"""Test encode/decode data & type."""
         if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
-                nt.assert_raises(NotImplementedError, self.import_cls.encode_type, x)
-                nt.assert_raises(NotImplementedError, self.import_cls.encode_data,
-                                 x, self.typedef)
-            nt.assert_raises(NotImplementedError, self.import_cls.decode_data, None,
-                             self.typedef)
+                assert_raises(NotImplementedError, self.import_cls.encode_type, x)
+                assert_raises(NotImplementedError, self.import_cls.encode_data,
+                              x, self.typedef)
+            assert_raises(NotImplementedError, self.import_cls.decode_data, None,
+                          self.typedef)
         else:
             for x in self._valid_decoded:
                 y = self.import_cls.encode_type(x, **self._encode_type_kwargs)
@@ -159,58 +159,58 @@ class TestMetaschemaType(CisTestClassInfo):
                 x2 = self.import_cls.decode_data(z, y)
                 self.assert_result_equal(x2, x)
             if self._cls != 'JSONNullMetaschemaType':
-                nt.assert_raises(MetaschemaTypeError, self.import_cls.encode_type, None)
+                assert_raises(MetaschemaTypeError, self.import_cls.encode_type, None)
 
     def test_check_encoded(self):
         r"""Test check_encoded."""
         # Test invalid for incorrect typedef
         if len(self._valid_encoded) > 0:
-            nt.assert_equal(self.import_cls.check_encoded(self._valid_encoded[0],
-                                                          {}), False)
+            assert_equal(self.import_cls.check_encoded(self._valid_encoded[0],
+                                                       {}), False)
         # Test valid
         for x in self._valid_encoded:
-            nt.assert_equal(self.import_cls.check_encoded(x, self.typedef), True)
+            assert_equal(self.import_cls.check_encoded(x, self.typedef), True)
         # Test invalid
         for x in self._invalid_encoded:
-            nt.assert_equal(self.import_cls.check_encoded(x, self.typedef), False)
+            assert_equal(self.import_cls.check_encoded(x, self.typedef), False)
 
     def test_check_decoded(self):
         r"""Test check_decoded."""
         # Not implemented for base class
         if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
-                nt.assert_raises(NotImplementedError, self.import_cls.check_decoded,
-                                 x, self.typedef)
+                assert_raises(NotImplementedError, self.import_cls.check_decoded,
+                              x, self.typedef)
         else:
             # Test object alone
             if len(self._valid_decoded) > 0:
                 x = self._valid_decoded[0]
-                nt.assert_equal(self.import_cls.check_decoded(x, None), True)
+                assert_equal(self.import_cls.check_decoded(x, None), True)
             # Test valid
             for x in self._valid_decoded:
-                nt.assert_equal(self.import_cls.check_decoded(x, self.typedef), True)
+                assert_equal(self.import_cls.check_decoded(x, self.typedef), True)
             # Test invalid with incorrect typedef
             for x in self._valid_decoded:
-                nt.assert_equal(self.import_cls.check_decoded(x, {}), False)
+                assert_equal(self.import_cls.check_decoded(x, {}), False)
             # Test invalid
             for x in self._invalid_decoded:
-                nt.assert_equal(self.import_cls.check_decoded(x, self.typedef), False)
+                assert_equal(self.import_cls.check_decoded(x, self.typedef), False)
 
     def test_encode_errors(self):
         r"""Test error on encode."""
         if self._cls == 'MetaschemaType':
-            nt.assert_raises(NotImplementedError, self.import_cls.encode,
-                             self._invalid_decoded[0], self.typedef)
+            assert_raises(NotImplementedError, self.import_cls.encode,
+                          self._invalid_decoded[0], self.typedef)
         else:
-            nt.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
-                             self.import_cls.encode,
-                             self._invalid_decoded[0], self.typedef)
+            assert_raises((ValueError, jsonschema.exceptions.ValidationError),
+                          self.import_cls.encode,
+                          self._invalid_decoded[0], self.typedef)
 
     def test_decode_errors(self):
         r"""Test error on decode."""
-        nt.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
-                         self.import_cls.decode,
-                         self._invalid_encoded[0], self.typedef)
+        assert_raises((ValueError, jsonschema.exceptions.ValidationError),
+                      self.import_cls.decode,
+                      self._invalid_encoded[0], self.typedef)
 
     def test_transform_type(self):
         r"""Test transform_type."""
@@ -222,7 +222,7 @@ class TestMetaschemaType(CisTestClassInfo):
         r"""Test serialize/deserialize."""
         if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
-                nt.assert_raises(NotImplementedError, self.instance.serialize, x)
+                assert_raises(NotImplementedError, self.instance.serialize, x)
         else:
             for x in self._valid_decoded:
                 msg = self.instance.serialize(x)
@@ -232,25 +232,24 @@ class TestMetaschemaType(CisTestClassInfo):
     def test_serialize_error(self):
         r"""Test error when serializing metadata that already contains 'data'."""
         if (self._cls != 'MetaschemaType') and (len(self._valid_decoded) > 0):
-            nt.assert_raises(RuntimeError, self.instance.serialize,
-                             self._valid_decoded[0], data='something')
+            assert_raises(RuntimeError, self.instance.serialize,
+                          self._valid_decoded[0], data='something')
 
     def test_deserialize_error(self):
         r"""Test error when deserializing message that is not bytes."""
-        nt.assert_raises(TypeError, self.instance.deserialize, self)
-        nt.assert_raises(ValueError, self.instance.deserialize,
-                         b'invalid')
+        assert_raises(TypeError, self.instance.deserialize, self)
+        assert_raises(ValueError, self.instance.deserialize, b'invalid')
         
     def test_deserialize_empty(self):
         r"""Test call for empty string."""
         out = self.instance.deserialize(self._empty_msg)
         self.assert_result_equal(out[0], self.instance._empty_msg)
-        nt.assert_equal(out[1], dict(size=0, incomplete=False))
-        # nt.assert_equal(out, self.instance._empty_msg)
+        assert_equal(out[1], dict(size=0, incomplete=False))
+        # assert_equal(out, self.instance._empty_msg)
 
     def test_deserialize_incomplete(self):
         r"""Test call for incomplete message."""
         if (self._cls != 'MetaschemaType') and (len(self._valid_decoded) > 0):
             out = self.instance.serialize(self._valid_decoded[0])
             obj, metadata = self.instance.deserialize(out[:-1])
-            nt.assert_equal(metadata['incomplete'], True)
+            assert_equal(metadata['incomplete'], True)

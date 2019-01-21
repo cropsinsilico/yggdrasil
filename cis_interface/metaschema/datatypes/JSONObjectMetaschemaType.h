@@ -68,14 +68,14 @@ public:
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
     if (not data.IsObject()) {
-      cislog_error("JSONObjectMetaschemaType::decode_data: Raw data is not an object.");
+      ygglog_error("JSONObjectMetaschemaType::decode_data: Raw data is not an object.");
       return false;
     }
     std::map<const char*, MetaschemaType*, strcomp>::iterator it;
     size_t i = 0;
     for (it = properties_.begin(); it != properties_.end(); it++, i++) {
       if (not data.HasMember(it->first)) {
-	cislog_error("JSONObjectMetaschemaType::decode_data: Data dosn't have member '%s'.",
+	ygglog_error("JSONObjectMetaschemaType::decode_data: Data dosn't have member '%s'.",
 		     it->first);
 	return false;
       }

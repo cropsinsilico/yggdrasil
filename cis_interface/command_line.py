@@ -3,29 +3,29 @@ import os
 import sys
 import copy
 import traceback
-from cis_interface import runner, schema, config, timing
-from cis_interface.drivers import GCCModelDriver
+from yggdrasil import runner, schema, config, timing
+from yggdrasil.drivers import GCCModelDriver
 
 
-def cisrun():
+def yggrun():
     r"""Start a run."""
     prog = sys.argv[0].split(os.path.sep)[-1]
     # Print help
     if '-h' in sys.argv:
-        print('Usage: cisrun [YAMLFILE1] [YAMLFILE2]...')
+        print('Usage: yggrun [YAMLFILE1] [YAMLFILE2]...')
         return
     models = sys.argv[1:]
-    cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
+    yggRunner = runner.get_runner(models, ygg_debug_prefix=prog)
     try:
-        cisRunner.run()
-        cisRunner.debug("runner returns, exiting")
+        yggRunner.run()
+        yggRunner.debug("runner returns, exiting")
     except Exception as ex:
-        cisRunner.pprint("cisrun exception: %s" % type(ex))
+        yggRunner.pprint("yggrun exception: %s" % type(ex))
         print(traceback.format_exc())
     print('')
 
 
-def ciscc():
+def yggcc():
     r"""Compile C/C++ program."""
     # prog = sys.argv[0].split(os.path.sep)[-1]
     src = sys.argv[1:]
@@ -56,7 +56,7 @@ def ld_flags():
 
 
 def regen_schema():
-    r"""Regenerate the cis_interface schema."""
+    r"""Regenerate the yggdrasil schema."""
     if os.path.isfile(schema._schema_fname):
         os.remove(schema._schema_fname)
     schema.clear_schema()
@@ -64,31 +64,31 @@ def regen_schema():
 
 
 def update_config():
-    r"""Update the user config file for cis_interface."""
+    r"""Update the user config file for yggdrasil."""
     config.update_config(config.usr_config_file, config.def_config_file)
 
 
-def cistime_comm():
+def yggtime_comm():
     r"""Plot timing statistics comparing the different communication mechanisms."""
     timing.plot_scalings(compare='commtype')
 
 
-def cistime_lang():
+def yggtime_lang():
     r"""Plot timing statistics comparing the different languages."""
     timing.plot_scalings(compare='language')
 
 
-def cistime_os():
+def yggtime_os():
     r"""Plot timing statistics comparing the different operating systems."""
     timing.plot_scalings(compare='platform')
 
 
-def cistime_py():
+def yggtime_py():
     r"""Plot timing statistics comparing the different versions of Python."""
     timing.plot_scalings(compare='python')
 
 
-def cistime_paper():
+def yggtime_paper():
     r"""Create plots for timing."""
     _lang_list = timing._lang_list
     _lang_list_nomatlab = copy.deepcopy(_lang_list)
@@ -105,5 +105,5 @@ def cistime_paper():
 
 
 if __name__ == '__main__':
-    cisrun()
+    yggrun()
     sys.exit(0)

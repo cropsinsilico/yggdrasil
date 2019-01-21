@@ -5,14 +5,14 @@ import jsonschema
 import copy
 import importlib
 from collections import OrderedDict
-from cis_interface import backwards
-from cis_interface.metaschema.properties import get_metaschema_property
+from yggdrasil import backwards
+from yggdrasil.metaschema.properties import get_metaschema_property
 
 
 _type_registry = OrderedDict()
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
 _base_validator = jsonschema.validators.validator_for({"$schema": ""})
-CIS_MSG_HEAD = b'CIS_MSG_HEAD'
+YGG_MSG_HEAD = b'YGG_MSG_HEAD'
 
 
 class MetaschemaTypeError(TypeError):
@@ -65,7 +65,7 @@ def register_type(type_class):
     # type_class._schema_required = type_class.definition_schema()['required']
     # type_class._schema_properties = {}  # TODO: Transfer from
     # TODO: Enable schema tracking once ported to jsonschema
-    # from cis_interface.schema import register_component
+    # from yggdrasil.schema import register_component
     # register_component(type_class)
     _type_registry[type_name] = type_class
     return type_class
@@ -84,7 +84,7 @@ def add_type_from_schema(path_to_schema, **kwargs):
             the new class.
 
     """
-    from cis_interface.metaschema.datatypes.FixedMetaschemaType import (
+    from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
         create_fixed_type_class)
     if 'target_globals' not in kwargs:
         kwargs['target_globals'] = globals()
@@ -143,14 +143,14 @@ def import_all_types():
     for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
         type_mod = os.path.basename(x)[:-3]
         if not type_mod.startswith('__'):
-            importlib.import_module('cis_interface.metaschema.datatypes.%s' % type_mod)
+            importlib.import_module('yggdrasil.metaschema.datatypes.%s' % type_mod)
     # Load types from schema
     schema_files = glob.glob(os.path.join(_schema_dir, '*.json'))
     names = []
     for f in schema_files:
         names.append(add_type_from_schema(f))
     # TODO: Need to make sure metaschema updated if it was already loaded
-    from cis_interface.metaschema import _metaschema
+    from yggdrasil.metaschema import _metaschema
     if _metaschema is not None:
         reload = False
         curr = _metaschema
@@ -237,8 +237,8 @@ def guess_type_from_msg(msg):
 
     """
     try:
-        if CIS_MSG_HEAD in msg:
-            _, metadata, data = msg.split(CIS_MSG_HEAD, 2)
+        if YGG_MSG_HEAD in msg:
+            _, metadata, data = msg.split(YGG_MSG_HEAD, 2)
             metadata = json.loads(backwards.as_unicode(metadata))
             cls = _type_registry[metadata['type']]
         else:
@@ -358,7 +358,7 @@ def decode(msg):
 
     """
     cls = guess_type_from_msg(msg)
-    metadata = json.loads(backwards.as_unicode(msg.split(CIS_MSG_HEAD, 2)[1]))
+    metadata = json.loads(backwards.as_unicode(msg.split(YGG_MSG_HEAD, 2)[1]))
     typedef = cls.extract_typedef(metadata)
     cls_inst = cls(**typedef)
     obj = cls_inst.deserialize(msg)[0]

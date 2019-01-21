@@ -1,8 +1,8 @@
 import os
 import pprint
 import tempfile
-import nose.tools as nt
-from cis_interface import schema
+from yggdrasil import schema
+from yggdrasil.tests import assert_raises, assert_equal
 
 
 _normalize_objects = [
@@ -48,13 +48,13 @@ _normalize_objects = [
 
 def test_SchemaRegistry():
     r"""Test schema registry."""
-    nt.assert_raises(ValueError, schema.SchemaRegistry, {})
+    assert_raises(ValueError, schema.SchemaRegistry, {})
     x = schema.SchemaRegistry()
-    nt.assert_equal(x == 0, False)
+    assert_equal(x == 0, False)
     fname = os.path.join(tempfile.gettempdir(), 'temp.yml')
     with open(fname, 'w') as fd:
         fd.write('')
-    nt.assert_raises(Exception, x.load, fname)
+    assert_raises(Exception, x.load, fname)
     os.remove(fname)
     
 
@@ -84,19 +84,19 @@ def test_create_schema():
     assert(s0 is not None)
     assert(os.path.isfile(fname))
     s1 = schema.get_schema(fname)
-    nt.assert_equal(s1.schema, s0.schema)
-    # nt.assert_equal(s1, s0)
+    assert_equal(s1.schema, s0.schema)
+    # assert_equal(s1, s0)
     os.remove(fname)
     # Test getting schema
     s2 = schema.load_schema(fname)
     assert(os.path.isfile(fname))
-    nt.assert_equal(s2, s0)
+    assert_equal(s2, s0)
     os.remove(fname)
 
 
 def test_cdriver2filetype_error():
     r"""Test errors in cdriver2filetype."""
-    nt.assert_raises(ValueError, schema.cdriver2filetype, 'invalid')
+    assert_raises(ValueError, schema.cdriver2filetype, 'invalid')
 
 
 def test_standardize():
@@ -111,7 +111,7 @@ def test_standardize():
               'output': [{'name': 'outputA'}]})]
     for is_singular, keys, suffixes, x, y in vals:
         schema.standardize(x, keys, suffixes=suffixes, is_singular=is_singular)
-        nt.assert_equal(x, y)
+        assert_equal(x, y)
 
 
 def test_normalize():
@@ -120,7 +120,7 @@ def test_normalize():
     for x, y in _normalize_objects:
         a = s.normalize(x, backwards_compat=True)
         try:
-            nt.assert_equal(a, y)
+            assert_equal(a, y)
         except BaseException:  # pragma: debug
             pprint.pprint(a)
             pprint.pprint(y)

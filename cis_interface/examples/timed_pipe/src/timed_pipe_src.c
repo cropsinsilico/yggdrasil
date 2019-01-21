@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "CisInterface.h"
+#include "YggInterface.h"
 
 int main(int argc, char *argv[]) {
   if (argc != 3) {
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
 	 msg_count, msg_size);
 
   // Ins/outs matching with the the model yaml
-  cisOutput_t outq = cisOutput("output_pipe");
+  yggOutput_t outq = yggOutput("output_pipe");
   printf("pipe_src(C): Created I/O channels\n");
 
   // Create test message
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
   // Send test message multiple times
   int count = 0;
   for (i = 0; i < msg_count; i++) {
-    ret = cis_send(outq, test_msg, msg_size);
+    ret = ygg_send(outq, test_msg, msg_size);
     if (ret < 0) {
       printf("pipe_src(C): SEND ERROR ON MSG %d\n", i);
       exit_code = -1;

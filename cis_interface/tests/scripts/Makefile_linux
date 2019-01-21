@@ -1,12 +1,12 @@
 IDIR = .
 CC = gcc
 LINK = g++
-CFLAGS = -I$(IDIR) $(CISCCFLAGS)
+CFLAGS = -I$(IDIR) $(YGGCCFLAGS)
 
 ODIR = .
 LDIR = .
 
-LIBS = -lm $(CISLDFLAGS)
+LIBS = -lm $(YGGLDFLAGS)
 
 _DEPS = hellofunc.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))

@@ -1,7 +1,7 @@
 import uuid
-import nose.tools as nt
-import cis_interface.drivers.tests.test_ConnectionDriver as parent
-from cis_interface import runner, tools
+from yggdrasill.tests import assert_raises, assert_equal
+import yggdrasil.drivers.tests.test_ConnectionDriver as parent
+from yggdrasil import runner, tools
 
 
 class TestServerParam(parent.TestConnectionParam):
@@ -84,7 +84,7 @@ class TestServerDriverNoStart(TestServerParam,
         r"""Test error raised when trying to access attributes set on recv."""
         err_attr = ['request_id', 'response_address']
         for k in err_attr:
-            nt.assert_raises(AttributeError, getattr, self.instance, k)
+            assert_raises(AttributeError, getattr, self.instance, k)
 
 
 class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
@@ -110,7 +110,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         while ((not T.is_out) and (self.instance.nclients != 1)):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
-        nt.assert_equal(self.instance.nclients, 1)
+        assert_equal(self.instance.nclients, 1)
         # Create new client
         cli_drv2 = self.create_client(comm_address=self.cli_drv.comm_address)
         cli_drv2.start()
@@ -118,21 +118,21 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         while ((not T.is_out) and (self.instance.nclients != 2)):
             self.instance.sleep()
         self.instance.stop_timeout()
-        nt.assert_equal(self.instance.nclients, 2)
+        assert_equal(self.instance.nclients, 2)
         # Send sign off
         cli_drv2.icomm.close()
         T = self.instance.start_timeout()
         while ((not T.is_out) and (self.instance.nclients != 1)):
             self.instance.sleep()
         self.instance.stop_timeout()
-        nt.assert_equal(self.instance.nclients, 1)
+        assert_equal(self.instance.nclients, 1)
         # Close client and wait for sign off
         self.cli_drv.icomm.close()
         T = self.instance.start_timeout()
         while ((not T.is_out) and (self.instance.nclients != 0)):
             self.instance.sleep()
         self.instance.stop_timeout()
-        nt.assert_equal(self.instance.nclients, 0)
+        assert_equal(self.instance.nclients, 0)
         # Clean up
         cli_drv2.terminate()
 
@@ -151,13 +151,13 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         # Receive on server side, then send back
         flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
         assert(flag)
-        nt.assert_equal(srv_msg, msg_send)
+        assert_equal(srv_msg, msg_send)
         flag = self.recv_comm.send(srv_msg)
         assert(flag)
         # Receive response on server side
         flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
         assert(flag)
-        nt.assert_equal(cli_msg, msg_send)
+        assert_equal(cli_msg, msg_send)
 
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""

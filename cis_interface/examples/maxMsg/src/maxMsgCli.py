@@ -1,6 +1,6 @@
 import sys
 import random
-from cis_interface.interface.CisInterface import CisRpcClient, CIS_MSG_BUF
+from yggdrasil.interface.YggInterface import YggRpcClient, YGG_MSG_BUF
 
 
 def rand_str(length):
@@ -16,12 +16,12 @@ def rand_str(length):
     return out
 
 
-msg_size = CIS_MSG_BUF
+msg_size = YGG_MSG_BUF
 
 print("maxMsgCli(P): Hello message size %d." % msg_size)
 
 # Create a max message, send/recv and verify
-rpc = CisRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s")
+rpc = YggRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s")
 
 # Create a max message
 output = rand_str(msg_size)

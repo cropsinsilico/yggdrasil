@@ -1,12 +1,12 @@
 #!/bin/bash
 
 _old_default=$CIS_DEFAULT_COMM
-export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="timed_pipe"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="timed_pipe"
 export PIPE_MSG_COUNT=50
 export PIPE_MSG_SIZE=10
-export CIS_DEFAULT_COMM="IPCComm"
-# export CIS_DEFAULT_COMM="ZMQComm"
+export YGG_DEFAULT_COMM="IPCComm"
+# export YGG_DEFAULT_COMM="ZMQComm"
 
 yaml= 
 
@@ -38,8 +38,8 @@ case $1 in
 	;;
 esac
 
-time cisrun $yaml
+time yggrun $yaml
 
 # outfile="${TMPDIR}output_timed_pipe.txt"
 # cat $outfile
-export CIS_DEFAULT_COMM=$_old_default
+export YGG_DEFAULT_COMM=$_old_default
