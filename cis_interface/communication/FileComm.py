@@ -124,6 +124,7 @@ class FileComm(CommBase.CommBase):
         out['kwargs']['read_meth'] = read_meth
         if read_meth == 'readline':
             out['recv'] = out['recv'][0].splitlines(True)
+        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out
         
     @classmethod
