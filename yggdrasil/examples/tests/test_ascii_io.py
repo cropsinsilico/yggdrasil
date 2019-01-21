@@ -1,7 +1,7 @@
 import os
 import numpy as np
-from cis_interface import serialize
-from cis_interface.examples.tests import TestExample
+from yggdrasil import serialize
+from yggdrasil.examples.tests import TestExample
 
 
 class TestExampleAsciiIO(TestExample):
