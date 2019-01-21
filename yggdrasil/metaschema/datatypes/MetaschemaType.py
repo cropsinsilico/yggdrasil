@@ -6,7 +6,7 @@ import jsonschema
 from yggdrasil import backwards, tools
 from yggdrasil.metaschema import get_metaschema, get_validator
 from yggdrasil.metaschema.datatypes import (
-    MetaschemaTypeError, compare_schema, CIS_MSG_HEAD, get_type_class,
+    MetaschemaTypeError, compare_schema, YGG_MSG_HEAD, get_type_class,
     conversions)
 from yggdrasil.metaschema.properties import get_metaschema_property
 

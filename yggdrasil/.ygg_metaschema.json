@@ -31,19 +31,19 @@
                 "number", 
                 "object", 
                 "string", 
-                "1darray", 
-                "bytes", 
-                "complex", 
-                "float", 
-                "function", 
-                "int", 
-                "ndarray", 
-                "obj", 
                 "ply", 
-                "scalar", 
+                "obj", 
                 "schema", 
+                "scalar", 
+                "int", 
                 "uint", 
-                "unicode"
+                "float", 
+                "complex", 
+                "bytes", 
+                "unicode", 
+                "function", 
+                "1darray", 
+                "ndarray"
             ]
         }, 
         "stringArray": {
@@ -266,6 +266,6 @@
             "type": "string"
         }
     }, 
-    "title": "Cis meta-schema for data type schemas", 
+    "title": "Ygg meta-schema for data type schemas", 
     "type": "object"
 }

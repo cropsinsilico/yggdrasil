@@ -5,7 +5,7 @@ import atexit
 import threading
 from logging import info
 from yggdrasil import backwards, tools, serialize
-from yggdrasil.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
+from yggdrasil.tools import get_YGG_MSG_MAX, YGG_MSG_EOF
 from yggdrasil.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
 from yggdrasil.schema import register_component
