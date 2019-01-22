@@ -986,10 +986,6 @@ def _normalize_connio_elements_comm(normalizer, value, instance, schema):
                     for k in comm_keys:
                         if k in opp_comm:
                             instance.setdefault(k, opp_comm[k])
-                if ('commtype' not in instance):
-                    instance['commtype'] = schema['properties']['commtype']['default']
-                # if ('commtype' not in opp_comm):
-                #     opp_comm['commtype'] = schema['properties']['commtype']['default']
     return instance
 
 
