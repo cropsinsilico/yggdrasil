@@ -138,8 +138,10 @@ def update_config_matlab(config):
 
     """
     out = []
-    if not config.has_section('matlab'):
-        config.add_section('matlab')
+    # This should be uncommented if the matlab section is removed from the
+    # default config file
+    # if not config.has_section('matlab'):
+    #     config.add_section('matlab')
     opts = {
         'startup_waittime_s': [('The time allowed for a Matlab engine to start'
                                + 'before timing out and reporting an error.'),
