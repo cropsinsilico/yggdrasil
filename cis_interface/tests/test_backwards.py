@@ -45,38 +45,79 @@ def test_assert_str():
         backwards.assert_str(v)
     for v in invalid:
         assert_raises(AssertionError, backwards.assert_str, v)
+
+
+def test_recurse_conv():
+    r"""Test error on incorrect type for recurse_conv."""
+    assert_raises(TypeError, backwards.recurse_conv, None, backwards.as_unicode)
         
 
-def test_as_str():
-    r"""Ensure what results is proper str type."""
-    res = 'hello'
-    vals = ['hello', b'hello', u'hello', bytearray('hello', 'utf-8')]
-    for v in vals:
-        backwards.assert_str(res)
-        assert_equal(backwards.as_str(v), res)
-    assert_raises(TypeError, backwards.as_str, 1)
-    
-        
 def test_as_unicode():
-    r"""Ensure what results is proper bytes type."""
+    r"""Test as_unicode."""
+    # Just strings
     res = u'hello'
     vals = ['hello', b'hello', u'hello', bytearray('hello', 'utf-8')]
     for v in vals:
         backwards.assert_unicode(res)
         assert_equal(backwards.as_unicode(v), res)
     assert_raises(TypeError, backwards.as_unicode, 1)
-
+    # Recursive
+    valpha = 'abcdef'
+    ralpha = [backwards.as_unicode(a) for a in valpha]
+    vals_rec = [vals, tuple(vals), {k: v for k, v in zip(valpha, vals)}]
+    resl = [res for v in vals]
+    resl_rec = [resl, tuple(resl), {k: v for k, v in zip(ralpha, resl)}]
+    for v, r in zip(vals_rec, resl_rec):
+        assert_equal(backwards.as_unicode(v, recurse=True), r)
+    # Integer
+    assert_equal(backwards.as_unicode(int(1), convert_types=(int,)), u'1')
+    assert_equal(backwards.as_unicode(int(1), allow_pass=True), int(1))
+    
 
 def test_as_bytes():
-    r"""Ensure what results is proper bytes type."""
+    r"""Test as_bytes."""
+    # Just strings
     res = b'hello'
     vals = ['hello', b'hello', u'hello', bytearray('hello', 'utf-8')]
     for v in vals:
         backwards.assert_bytes(res)
         assert_equal(backwards.as_bytes(v), res)
     assert_raises(TypeError, backwards.as_bytes, 1)
+    # Recursive
+    valpha = 'abcdef'
+    ralpha = [backwards.as_bytes(a) for a in valpha]
+    vals_rec = [vals, tuple(vals), {k: v for k, v in zip(valpha, vals)}]
+    resl = [res for v in vals]
+    resl_rec = [resl, tuple(resl), {k: v for k, v in zip(ralpha, resl)}]
+    for v, r in zip(vals_rec, resl_rec):
+        assert_equal(backwards.as_bytes(v, recurse=True), r)
+    # Integer
+    assert_equal(backwards.as_bytes(int(1), convert_types=(int,)), b'1')
+    assert_equal(backwards.as_bytes(int(1), allow_pass=True), int(1))
 
 
+def test_as_str():
+    r"""Test as_str."""
+    # Just strings
+    res = 'hello'
+    vals = ['hello', b'hello', u'hello', bytearray('hello', 'utf-8')]
+    for v in vals:
+        backwards.assert_str(res)
+        assert_equal(backwards.as_str(v), res)
+    assert_raises(TypeError, backwards.as_str, 1)
+    # Recursive
+    ralpha = 'abcdef'
+    valpha = [backwards.as_bytes(a) for a in ralpha]
+    vals_rec = [vals, tuple(vals), {k: v for k, v in zip(valpha, vals)}]
+    resl = [res for v in vals]
+    resl_rec = [resl, tuple(resl), {k: v for k, v in zip(ralpha, resl)}]
+    for v, r in zip(vals_rec, resl_rec):
+        assert_equal(backwards.as_str(v, recurse=True), r)
+    # Integer
+    assert_equal(backwards.as_str(int(1), convert_types=(int,)), '1')
+    assert_equal(backwards.as_str(int(1), allow_pass=True), int(1))
+    
+        
 def test_match_stype():
     r"""Test string type matching."""
     slist = ['hello', b'hello', u'hello', bytearray('hello', 'utf-8')]
@@ -109,16 +150,3 @@ def test_decode_escape():
     s = 'hello\\nhello'
     ans = 'hello\nhello'
     assert_equal(backwards.decode_escape(s), ans)
-
-
-def test_as_unicode_recurse():
-    r"""Test as_unicode_recurse."""
-    res = u'hello'
-    vals = [['hello', b'hello', u'hello', bytearray('hello', 'utf-8')]]
-    results = [[res for v in vals[0]]]
-    vals += [tuple(vals[0]), {k: v for k, v in zip('abcdefg', vals[0])},
-             [vals[0]]]
-    results += [tuple(results[0]), {k: v for k, v in zip('abcdefg', results[0])},
-                [results[0]]]
-    for v, r in zip(vals, results):
-        assert_equal(backwards.as_unicode_recurse(v), r)

@@ -108,42 +108,107 @@ def assert_unicode(s):
     assert(isinstance(s, unicode_type))
 
 
-def as_unicode(s_in):
+def recurse_conv(s, func_conv, **kwargs):
+    r"""Recurse into list, tuples, or dicts, applying a conversion funciton.
+
+    Args:
+        s (object): Object to apply conversion to.
+        func_conv (function): Callable conversion function that takes the object
+            as input and returns a converted version of it.
+        **kwargs: Additional keyword arguments are passed to the conversion
+            function.
+
+    Returns:
+        object: Converted version of the object.
+
+    Raises:
+        TypeError: If the object is not a list, tuple, or dictionary.
+
+    """
+    if isinstance(s, list):
+        s_out = []
+        for i in range(len(s)):
+            s_out.append(func_conv(s[i], **kwargs))
+    elif isinstance(s, tuple):
+        s_out = tuple(func_conv(list(s), **kwargs))
+    elif isinstance(s, (dict, OrderedDict)):
+        s_out = {}
+        for k0 in s.keys():
+            k = func_conv(k0, **kwargs)
+            s_out[k] = func_conv(s[k0], **kwargs)
+    else:
+        raise TypeError("Cannot recurse into type: %s" % type(s))
+    return s_out
+
+
+def as_unicode(s_in, recurse=False, convert_types=None, allow_pass=False):
     r"""Convert from bytes/unicode/str to unicode.
 
     Arguments:
         s_in (bytes, unicode, str): Object to be converted into unicode.
+        recurse (bool, optional): If True, objects that are lists, tuples, or
+            dicts will be recursed into, converting string elements into
+            unicode.
+        convert_types (list, optional): Python types that should be converted
+            to unicode. Defaults to the string types for the current Python
+            version ([str, unicode, bytearray] in Python 2, [bytes, str,
+            bytearray] otherwise).
+        allow_pass (bool, optional): If True and the provided object is not
+            converted, no error will be raised. Defaults to False and objects
+            that cannot be converted will raise an error.
 
     Returns:
         unicode/str: Unicode version of input (unicode in Python 2, str in
             Python 3).
 
     Raises:
-       TypeError: If supplied type cannot be converted to unicode.
+       TypeError: If supplied type cannot be converted to unicode and allow_pass
+           is False.
 
     """
-    if PY2:  # pragma: Python 2
-        if isinstance(s_in, (str, bytearray)):
-            s_out = unicode_type(s_in)
-        elif isinstance(s_in, unicode):
-            s_out = s_in
-        else:
-            raise TypeError("Cannot convert type %s to unicode" % type(s_in))
-    else:  # pragma: Python 3
-        if isinstance(s_in, str):
-            s_out = s_in
-        elif isinstance(s_in, (bytes, bytearray)):
-            s_out = s_in.decode("utf-8")
-        else:
-            raise TypeError("Cannot convert type %s to unicode" % type(s_in))
+    if convert_types is None:
+        convert_types = string_types
+    if isinstance(s_in, convert_types):
+        if PY2:  # pragma: Python 2
+            if isinstance(s_in, (str, bytearray)):
+                s_out = unicode_type(s_in)
+            elif isinstance(s_in, unicode):
+                s_out = s_in
+            else:
+                s_out = unicode_type(s_in)
+        else:  # pragma: Python 3
+            if isinstance(s_in, str):
+                s_out = s_in
+            elif isinstance(s_in, (bytes, bytearray)):
+                s_out = s_in.decode("utf-8")
+            else:
+                s_out = unicode_type(s_in)
+    elif recurse and isinstance(s_in, (list, tuple, dict, OrderedDict)):
+        s_out = recurse_conv(s_in, as_unicode, recurse=True,
+                             convert_types=convert_types, allow_pass=allow_pass)
+    elif allow_pass:
+        s_out = s_in
+    else:
+        raise TypeError("Cannot convert type %s to unicode." % type(s_in)
+                        + "Must be one of: %s" % str(convert_types))
     return s_out
 
 
-def as_bytes(s_in):
+def as_bytes(s_in, recurse=False, convert_types=None, allow_pass=False):
     r"""Convert from bytes/unicode/str to a bytes object.
 
     Arguments:
         s_in (str, bytes, unicode): Object to convert to a bytes version.
+        recurse (bool, optional): If True, objects that are lists, tuples, or
+            dicts will be recursed into, converting string elements into
+            unicode.
+        convert_types (list, optional): Python types that should be converted
+            to unicode. Defaults to the string types for the current Python
+            version ([str, unicode, bytearray] in Python 2, [bytes, str,
+            bytearray] otherwise).
+        allow_pass (bool, optional): If True and the provided object is not
+            converted, no error will be raised. Defaults to False and objects
+            that cannot be converted will raise an error.
 
     Returns:
         bytes/str: Bytes version of input (str in Python 2, bytes in Python 3).
@@ -152,32 +217,53 @@ def as_bytes(s_in):
        TypeError: If supplied type cannot be converted to bytes.
 
     """
-    if PY2:  # pragma: Python 2
-        if isinstance(s_in, bytearray):
-            s_out = bytes_type(s_in)  # In python 2 str is bytes
-        elif isinstance(s_in, str):
-            s_out = s_in
-        elif isinstance(s_in, unicode):
-            s_out = s_in.encode("utf-8")
-        else:
-            raise TypeError("Cannot convert type %s to bytes" % type(s_in))
-    else:  # pragma: Python 3
-        if isinstance(s_in, bytes):
-            s_out = s_in
-        elif isinstance(s_in, bytearray):
-            s_out = bytes_type(s_in)
-        elif isinstance(s_in, str):
-            s_out = s_in.encode("utf-8")
-        else:
-            raise TypeError("Cannot convert type %s to bytes" % type(s_in))
+    if convert_types is None:
+        convert_types = string_types
+    if isinstance(s_in, convert_types):
+        if PY2:  # pragma: Python 2
+            if isinstance(s_in, bytearray):
+                s_out = bytes_type(s_in)  # In python 2 str is bytes
+            elif isinstance(s_in, str):
+                s_out = s_in
+            elif isinstance(s_in, unicode):
+                s_out = s_in.encode("utf-8")
+            else:
+                s_out = str(s_in)
+        else:  # pragma: Python 3
+            if isinstance(s_in, bytes):
+                s_out = s_in
+            elif isinstance(s_in, bytearray):
+                s_out = bytes_type(s_in)
+            elif isinstance(s_in, str):
+                s_out = s_in.encode("utf-8")
+            else:
+                s_out = as_bytes(str(s_in))
+    elif recurse and isinstance(s_in, (list, tuple, dict, OrderedDict)):
+        s_out = recurse_conv(s_in, as_bytes, recurse=True,
+                             convert_types=convert_types, allow_pass=allow_pass)
+    elif allow_pass:
+        s_out = s_in
+    else:
+        raise TypeError("Cannot convert type %s to bytes." % type(s_in)
+                        + "Must be one of: %s" % str(convert_types))
     return s_out
     
 
-def as_str(s_in):
+def as_str(s_in, recurse=False, convert_types=None, allow_pass=False):
     r"""Convert from bytes/unicode/str to a str object.
 
     Arguments:
         s_in (str, bytes, unicode): Object to convert to a str version.
+        recurse (bool, optional): If True, objects that are lists, tuples, or
+            dicts will be recursed into, converting string elements into
+            unicode.
+        convert_types (list, optional): Python types that should be converted
+            to unicode. Defaults to the string types for the current Python
+            version ([str, unicode, bytearray] in Python 2, [bytes, str,
+            bytearray] otherwise).
+        allow_pass (bool, optional): If True and the provided object is not
+            converted, no error will be raised. Defaults to False and objects
+            that cannot be converted will raise an error.
 
     Returns:
         str: Str version of input.
@@ -187,9 +273,11 @@ def as_str(s_in):
 
     """
     if PY2:  # pragma: Python 2
-        s_out = as_bytes(s_in)
+        s_out = as_bytes(s_in, recurse=recurse, convert_types=convert_types,
+                         allow_pass=allow_pass)
     else:  # pragma: Python 3
-        s_out = as_unicode(s_in)
+        s_out = as_unicode(s_in, recurse=recurse, convert_types=convert_types,
+                           allow_pass=allow_pass)
     return s_out
     
 
@@ -288,25 +376,6 @@ def decode_escape(s):
     else:  # pragma: Python 3
         out = match_stype(s, as_bytes(s).decode('unicode-escape'))
     return out
-
-
-def as_unicode_recurse(s, convert_types=None):
-    r"""Ensure a structure is entirely in unicode, recursing as necessary."""
-    if convert_types is None:
-        convert_types = string_types
-    if isinstance(s, list):
-        for i in range(len(s)):
-            s[i] = as_unicode_recurse(s[i], convert_types=convert_types)
-    elif isinstance(s, tuple):
-        s_list = as_unicode_recurse(list(s), convert_types=convert_types)
-        s = tuple(s_list)
-    elif isinstance(s, (dict, OrderedDict)):
-        for k0 in s.keys():
-            k = as_unicode_recurse(k0, convert_types=convert_types)
-            s[k] = as_unicode_recurse(s.pop(k0))
-    elif isinstance(s, convert_types):
-        s = as_unicode(s)
-    return s
 
 
 # Python 3 version of np.genfromtxt

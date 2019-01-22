@@ -63,7 +63,8 @@ def create_metaschema(overwrite=False):
             assert(p in out['properties'])
     # Convert to unicode if python 2
     if backwards.PY2:  # pragma: Python 2
-        out = backwards.as_unicode_recurse(out, convert_types=(str,))
+        out = backwards.as_unicode(out, recurse=True, convert_types=(str,),
+                                   allow_pass=True)
     # Print
     print('Created metaschema')
     pprint.pprint(out)
