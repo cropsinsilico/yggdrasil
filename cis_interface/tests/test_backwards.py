@@ -109,3 +109,16 @@ def test_decode_escape():
     s = 'hello\\nhello'
     ans = 'hello\nhello'
     assert_equal(backwards.decode_escape(s), ans)
+
+
+def test_as_unicode_recurse():
+    r"""Test as_unicode_recurse."""
+    res = u'hello'
+    vals = [['hello', b'hello', u'hello', bytearray('hello', 'utf-8')]]
+    results = [[res for v in vals[0]]]
+    vals += [tuple(vals[0]), {k: v for k, v in zip('abcdefg', vals[0])},
+             [vals[0]]]
+    results += [tuple(results[0]), {k: v for k, v in zip('abcdefg', results[0])},
+                [results[0]]]
+    for v, r in zip(vals, results):
+        assert_equal(backwards.as_unicode_recurse(v), r)
