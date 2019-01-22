@@ -433,13 +433,10 @@ class CommBase(tools.CisClass):
         """
         out = cls._default_serializer.get_testing_options(**kwargs)
         out = {'kwargs': out['kwargs'],
-               'send': out['objects'],
+               'send': copy.deepcopy(out['objects']),
                'msg': out['objects'][0],
                'contents': out['contents']}
-        if isinstance(out['send'][0], bytes):
-            out['recv'] = [out['contents']]
-        else:
-            out['recv'] = out['send']
+        out['recv'] = copy.deepcopy(out['send'])
         out['dict'] = {'f0': out['msg']}
         return out
 

@@ -122,8 +122,8 @@ class FileComm(CommBase.CommBase):
         """
         out = super(FileComm, cls).get_testing_options(**kwargs)
         out['kwargs']['read_meth'] = read_meth
-        if read_meth == 'readline':
-            out['recv'] = out['recv'][0].splitlines(True)
+        if (read_meth == 'read') and isinstance(out['recv'][0], backwards.bytes_type):
+            out['recv'] = [b''.join(out['recv'])]
         return out
         
     @classmethod
