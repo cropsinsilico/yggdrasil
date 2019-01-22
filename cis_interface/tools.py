@@ -704,19 +704,6 @@ class CisClass(logging.LoggerAdapter):
         else:
             return self.error
 
-    def raise_error(self, e):
-        r"""Raise an exception, logging it first.
-
-        Args:
-            e (Exception): Exception to raise.
-
-        Raises:
-            The provided exception.
-
-        """
-        self.errors.append(repr(e))
-        raise e
-
     def print_encoded(self, msg, *args, **kwargs):
         r"""Print bytes to stdout, encoding if possible.
 
@@ -736,7 +723,7 @@ class CisClass(logging.LoggerAdapter):
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
 
-    def sched_task(self, t, func, args=[], kwargs={}, store_output=False):
+    def sched_task(self, t, func, args=None, kwargs=None, store_output=False):
         r"""Schedule a task that will be executed after a certain time has
         elapsed.
 
@@ -753,12 +740,15 @@ class CisClass(logging.LoggerAdapter):
                 stored. Defaults to False.
 
         """
+        if args is None:
+            args = []
+        if kwargs is None:
+            kwargs = {}
         self.sched_out = None
         if store_output:
-            tobj = threading.Timer(t, self._task_with_output,
-                                   args=[func] + args, kwargs=kwargs)
-        else:
-            tobj = threading.Timer(t, func, args=args, kwargs=kwargs)
+            args = [func] + args
+            func = self._task_with_output
+        tobj = threading.Timer(t, func, args=args, kwargs=kwargs)
         tobj.start()
 
     def sleep(self, t=None):
