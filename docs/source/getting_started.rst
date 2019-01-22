@@ -4,7 +4,7 @@ Getting started
 ===============
 
 
-The |cis_interface| runs user defined models and orchestrates asynchronous 
+The |yggdrasil| runs user defined models and orchestrates asynchronous 
 communication between models using drivers that coordinate the different 
 components via threads. Model drivers run the models as seperate processes 
 and monitor them to redirect output to stdout and determine if the model 
@@ -34,21 +34,21 @@ the path to the model source code that should be run. There are specialized
 drivers for simple source written in Python, Matlab, C, and C++, but any
 executable can be run as a model using the 'ModelDriver' driver. Then the 'args'
 model parameter should be the path to the execuatable. Additional information on 
-the format |cis_interface| YAML files should take can be found in the 
+the format |yggdrasil| YAML files should take can be found in the 
 :ref:`YAML Files <yaml_rst>` section.
 
-This model can then be run using the |cis_interface| framework by calling the
-commandline entry point `cisrun` followed by the path to the YAML.::
+This model can then be run using the |yggdrasil| framework by calling the
+commandline entry point `yggrun` followed by the path to the YAML.::
 
-  $ cisrun model.yml
+  $ yggrun model.yml
 
 
 Running multiple models
 -----------------------
 
-Multiple models can be run by either passing multiple YAML files to `cisrun`::
+Multiple models can be run by either passing multiple YAML files to `yggrun`::
 
-  $ cisrun model1.yml model2.yml
+  $ yggrun model1.yml model2.yml
 
 or including multiple models in a single YAML file.
 
@@ -59,7 +59,7 @@ Model file input/output
 -----------------------
 
 Models can get input from or send output to files via input and output channels.
-To do so |cis_interface| provides several useful functions for interfacing with
+To do so |yggdrasil| provides several useful functions for interfacing with
 these channels. In the example below, the model receives input from a channel
 named 'input' and sends output to a channel named 'output'.
 

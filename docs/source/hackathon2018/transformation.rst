@@ -19,7 +19,7 @@ the file.::
 
   $ cp growth.py growth_mlang.py
 
-Then move back up into the ``cis_home`` direcotry.
+Then move back up into the ``ygg_home`` direcotry.
 
   $ cd ../
 
@@ -29,8 +29,8 @@ Adding API Calls
 
 The first step in transforming this model is to replace the calls 
 reading/writing input/output from/to files with API calls that will 
-instead receive/send input/output from/to the |cis_interface| framework. 
-There is a |cis_interface| API in C, C++, Python and Matlab. 
+instead receive/send input/output from/to the |yggdrasil| framework. 
+There is a |yggdrasil| API in C, C++, Python and Matlab. 
 
 
 Importing the API
@@ -40,7 +40,7 @@ Since the test
 model is in Python, we first need to import the necessary classes, this can be 
 accomplished with the line::
 
-  from cis_interface.interface import CisInput, CisOutput
+  from yggdrasil.interface import YggInput, YggOutput
 
 This imports the Python API classes for connecting to input and output channels. 
 
@@ -56,8 +56,8 @@ be done by replacing the lines::
 
 with::
 
-  input = CisInput('photosynthesis_rate')
-  output = CisOutput('growth_rate', '%f\n')
+  input = YggInput('photosynthesis_rate')
+  output = YggOutput('growth_rate', '%f\n')
 
 The first call creates the ``input`` object that connects to a channel named 
 ``photosynthesis_rate``. The second creates an ``output`` object that connects 
@@ -69,7 +69,7 @@ Loop over input, run calculation, & send to output
 --------------------------------------------------
 
 The next step in our model loops over the input photosynthesis rates, 
-calculating the growth rate. When we are using input from |cis_interface|, 
+calculating the growth rate. When we are using input from |yggdrasil|, 
 we will want to continue looping over input until the channel is closed. To 
 do so we can use a while loop that only breaks when receivinga message from 
 the interface fails. In addition, we will want to send each calculated 
@@ -282,7 +282,7 @@ running your model with connections to the file.
 .. image:: interface_images/interface_manifest.png
 
 You can then copy that information to your clipboard and past it into a new file 
-called ``growth_to_file.yml`` in the ``cis_home`` directory.
+called ``growth_to_file.yml`` in the ``ygg_home`` directory.
 
 
 Running the Model-to-File Integration
@@ -290,9 +290,9 @@ Running the Model-to-File Integration
 
 You can run the integration you just created by executing::
 
-  $ cisrun growth_to_file.yml
+  $ yggrun growth_to_file.yml
 
-from the ``cis_home`` directory. This will output information on the 
+from the ``ygg_home`` directory. This will output information on the 
 calculated growth rates to the screen and generate the output file 
 ``hackathon2018/Output/growth_rate.txt``. If the model ran correctly, the output file 
 should look like this::

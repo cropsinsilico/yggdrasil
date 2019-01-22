@@ -3,7 +3,7 @@
 Formatted I/O
 =============
 
-In addition to passing raw strings, the |cis_interface| framework also has 
+In addition to passing raw strings, the |yggdrasil| framework also has 
 support for formatting/processing messages from/to language native objects.
 
 
@@ -34,13 +34,13 @@ Tables by Row
 Tables can also be passed in a similar manner. For input from a table, the format
 string does not need to be provided and will be determined by the source of the 
 table. There are different API classes/functions for I/O from/to table channels 
-versus standard channels in each language. (e.g. ``CisInput`` vs. 
-``CisAsciiTableInput`` in Python)
+versus standard channels in each language. (e.g. ``YggInput`` vs. 
+``YggAsciiTableInput`` in Python)
 
 .. include:: examples/formatted_io2_src.rst
 
 The ``filetype: table`` options in the YAML tell the 
-|cis_interface| framework that the file should be read/written as a table 
+|yggdrasil| framework that the file should be read/written as a table 
 row-by-row including verification that each row conforms with the table.
 
 .. include:: examples/formatted_io2_yml.rst
@@ -100,6 +100,6 @@ Ply/Obj file formats.
 .. include:: examples/formatted_io5_yml.rst
 
 In Python the data is returned as a dictionary subclass
-(:class:`cis_interface.serialize.PlySerialize.PlyDict` or 
-:class:`cis_interface.serialize.ObjSerialize.ObjDict`) while in 
+(:class:`yggdrasil.serialize.PlySerialize.PlyDict` or 
+:class:`yggdrasil.serialize.ObjSerialize.ObjDict`) while in 
 C/C++ it is returned as a structure (:c:type:`ply_t` or :c:type:`obj_t`).

@@ -3,14 +3,14 @@
 Configuration Files
 ###################
 
-Many components of the |cis_interface| framework's behavior can be controlled
-by options in the configuration file. When installed |cis_interface| creates
-a user config file called '.cis_interface.cfg' in your home directory. By
+Many components of the |yggdrasil| framework's behavior can be controlled
+by options in the configuration file. When installed |yggdrasil| creates
+a user config file called '.yggdrasil.cfg' in your home directory. By
 editting the options in the user config file, you can customize the behavior
 of your framework runs.
 
 Further customization for specific runs can be
-achieved by creating a local config file called '.cis_interface.cfg' in the 
+achieved by creating a local config file called '.yggdrasil.cfg' in the 
 directory where the interface will be run. Any options not found in the local
 will be filled in with values from the user config file. Any options not
 found in the user config file will be filled in with default package values.
@@ -36,12 +36,12 @@ The debug options are:
 ======    =======    =================================================
 Option    Default    Description
 ======    =======    =================================================
-cis       INFO       Controls the level of messages printed by the
-                     |cis_interface| framework itself.
+ygg       INFO       Controls the level of messages printed by the
+                     |yggdrasil| framework itself.
 rmq       WARNING    Controls the level of messages printed by
 		     RabbitMQ.
 client    INFO       Controls the level of messages printed by
-                     |cis_interface| calls from the models.
+                     |yggdrasil| calls from the models.
 ======    =======    =================================================
 
 
@@ -84,7 +84,7 @@ Parallel Options
 ----------------
 
 Options in the '[parallel]' section control the behavior of parallelization.
-Although, not supported in the current version of |cis_interface|, these
+Although, not supported in the current version of |yggdrasil|, these
 include:
 
 =========    =======    ==============================================

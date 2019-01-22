@@ -106,7 +106,7 @@ create your YAML file by clicking the ``Generate Manifest`` button,
 .. image:: interface_images/network_manifest.png
 
 Copy this information to you clipboard and past it into a new file 
-called ``growth_network.yml`` in the ``cis_home`` directory.
+called ``growth_network.yml`` in the ``ygg_home`` directory.
 
 
 Running the Model-to-Model Integration
@@ -114,7 +114,7 @@ Running the Model-to-Model Integration
 
 You can run the integration you just created by executing::
 
-  $ cisrun growth_network.yml
+  $ yggrun growth_network.yml
 
-from the ``cis_home`` directory. This will output information on the 
+from the ``ygg_home`` directory. This will output information on the 
 screen from all of the models being run.

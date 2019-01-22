@@ -8,7 +8,7 @@ or more YAML files. YAML files have a human readable structure that can be parse
 by many different programming languages to recreate data structures. While the 
 YAML language can express very complex data structures (more information can be 
 found `here <http://yaml.org/>`_), only a few key concepts 
-are needed to create a YAML file for use with the |cis_interface| framework.
+are needed to create a YAML file for use with the |yggdrasil| framework.
 
 * Indentation: Entries with the same indentation belong to the same collection.
 * Sequences: Entries that begin with a dash and a space (- ) are members 
@@ -20,7 +20,7 @@ are needed to create a YAML file for use with the |cis_interface| framework.
 Model Options
 -------------
 
-At the root level of a |cis_interface| YAML, should be a mapping key ``model:`` 
+At the root level of a |yggdrasil| YAML, should be a mapping key ``model:`` 
 or ``models:``. This denotes information pertaining to the model(s) that should 
 be run. The value for this key can be a single model entry::
 
@@ -90,12 +90,12 @@ Key          Description
 =========    ===================================================================
 is_server    If ``True``, this model will be considered to function as a 
 	     server for one or more models. The corresponding channel that 
-             should be passed to the |cis_interface| API will be the name of 
+             should be passed to the |yggdrasil| API will be the name of 
 	     the model.
 client_of    The names of one or more models that this model will call as a 
              server. If there are more than one, this should be specified as 
              a sequence collection. The corresponding channel(s) that should 
-	     be passed to the |cis_interface| API will be the name of the 
+	     be passed to the |yggdrasil| API will be the name of the 
 	     server model joined with the name of the client model with an 
 	     underscore ``<server_model>_<client_model>``. There will be one 
 	     channel created for each server the model is a client of.
@@ -228,7 +228,7 @@ should be a mapping collection with, at minimum, the following keys:
 Key       Description
 ======    ======================================================================
 name      The name of the channel that will be provided by the model to the 
-          |cis_interface| API. This can be any text, but should be unique.
+          |yggdrasil| API. This can be any text, but should be unique.
 driver    The name of the input/output driver class that should be used. 
           A list of available input/output drivers can be found
           :ref:`here <io_drivers_rst>`.
