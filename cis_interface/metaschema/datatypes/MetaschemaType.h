@@ -228,8 +228,11 @@ public:
       }
     }
     memcpy(*dst_buf, src_buf, src_buf_siz);
-    if (not skip_terminal)
-      (*dst_buf)[src_buf_siz] = '\0';
+    if (not skip_terminal) {
+      size_t i;
+      for (i = src_buf_siz; i < dst_buf_siz; i++)
+	(*dst_buf)[i] = '\0';
+    }
     return (int)src_buf_siz;
   }
 
