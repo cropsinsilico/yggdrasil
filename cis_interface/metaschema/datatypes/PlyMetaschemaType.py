@@ -434,7 +434,9 @@ class PlyDict(dict):
         obj_colors = []
         for v in self['vertices']:
             xarr = conversion * np.array([v[k] for k in ['x', 'y', 'z']])
-            obj_points.append(pgl.Vector3(xarr[0], xarr[1], xarr[2]))
+            obj_points.append(pgl.Vector3(np.float64(xarr[0]),
+                                          np.float64(xarr[1]),
+                                          np.float64(xarr[2])))
             c = [v.get(k, None) for k in ['red', 'green', 'blue']]
             if None not in c:
                 obj_colors.append(pgl.Color4(c[0], c[1], c[2], 1))

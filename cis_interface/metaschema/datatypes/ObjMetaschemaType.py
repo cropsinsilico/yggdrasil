@@ -1,6 +1,7 @@
 import os
 import json
 import copy
+import numpy as np
 from cis_interface import backwards
 from cis_interface.metaschema.datatypes import register_type_from_file, _schema_dir
 from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -299,7 +300,8 @@ class ObjDict(PlyDict):
         if self.get('texcoords', []):
             obj_texcoords = []
             for t in self['texcoords']:
-                obj_texcoords.append(pgl.Vector2(t['u'], t['v']))
+                obj_texcoords.append(pgl.Vector2(np.float64(t['u']),
+                                                 np.float64(t['v'])))
             kwargs['texCoordList'] = pgl.Point2Array(obj_texcoords)
             obj_ftexcoords = []
             for i, f in enumerate(self['faces']):
@@ -314,7 +316,9 @@ class ObjDict(PlyDict):
         if self.get('normals', []):
             obj_normals = []
             for n in self['normals']:
-                obj_normals.append(pgl.Vector3(n['i'], n['j'], n['k']))
+                obj_normals.append(pgl.Vector3(np.float64(n['i']),
+                                               np.float64(n['j']),
+                                               np.float64(n['k'])))
             kwargs['normalList'] = pgl.Point3Array(obj_normals)
             obj_fnormals = []
             for i, f in enumerate(self['faces']):

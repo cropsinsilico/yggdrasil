@@ -7,10 +7,10 @@ _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
 
 if _is_win:  # pragma: windows
-    _newline = '\r\n'
+    _newline = b'\r\n'
     _platform = 'Windows'
 else:
-    _newline = '\n'
+    _newline = b'\n'
     if _is_mac:
         _platform = 'MacOS'
     elif _is_linux:

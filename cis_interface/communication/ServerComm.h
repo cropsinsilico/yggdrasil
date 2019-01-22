@@ -59,7 +59,7 @@ int init_server_comm(comm_t *comm) {
   if (_default_comm == ZMQ_COMM) {
     comm->always_send_header = 1;
   } else {
-    comm->always_send_header = 0;
+    comm->always_send_header = 1; // Always send header.
   }
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   if (info == NULL) {
