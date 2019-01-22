@@ -439,7 +439,10 @@ class PlyDict(dict):
                                           np.float64(xarr[2])))
             c = [v.get(k, None) for k in ['red', 'green', 'blue']]
             if None not in c:
-                obj_colors.append(pgl.Color4(c[0], c[1], c[2], 1))
+                obj_colors.append(pgl.Color4(np.uint8(c[0]),
+                                             np.uint8(c[1]),
+                                             np.uint8(c[2]),
+                                             np.uint8(1)))
         points = pgl.Point3Array(obj_points)
         if obj_colors:
             colors = pgl.Color4Array(obj_colors)
