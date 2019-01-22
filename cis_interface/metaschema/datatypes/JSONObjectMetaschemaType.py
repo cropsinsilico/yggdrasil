@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from cis_interface.serialize import pandas2dict, numpy2dict, list2dict
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -42,6 +41,7 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
             RuntimeError: If obj is a list or tuple, but key_order is not provided.
 
         """
+        from cis_interface.serialize import pandas2dict, numpy2dict, list2dict
         if isinstance(obj, pd.DataFrame):
             obj = pandas2dict(obj)
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):

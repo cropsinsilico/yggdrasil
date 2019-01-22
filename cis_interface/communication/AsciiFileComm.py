@@ -1,4 +1,4 @@
-from cis_interface import serialize, backwards, platform
+from cis_interface import serialize, backwards  # , platform
 from cis_interface.communication.FileComm import FileComm
 from cis_interface.schema import register_component, inherit_schema
 
@@ -53,7 +53,7 @@ class AsciiFileComm(FileComm):
             cls._schema_properties['comment']['default'] + 'Comment\n')
         out['send'].append(comment)
         out['contents'] = b''.join(out['send'])
-        out['contents'] = out['contents'].replace(b'\n', platform._newline)
+        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         out['dict'] = {'f0': out['msg']}
         return out
     

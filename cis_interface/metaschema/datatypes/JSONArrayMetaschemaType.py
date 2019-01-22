@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from cis_interface.serialize import pandas2list, numpy2list, dict2list
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -78,6 +77,7 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             RuntimeError: If obj is a dictionary, but key_order is not provided.
 
         """
+        from cis_interface.serialize import pandas2list, numpy2list, dict2list
         if isinstance(obj, pd.DataFrame):
             obj = pandas2list(obj)
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
