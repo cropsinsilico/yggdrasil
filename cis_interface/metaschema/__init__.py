@@ -56,7 +56,7 @@ def create_metaschema(overwrite=False):
             assert(k not in out['properties'])
             out['properties'][k] = v.schema
     # Add types
-    for k, v in get_registered_types().items():
+    for k, v in sorted(get_registered_types().items()):
         if k not in out['definitions']['simpleTypes']['enum']:
             out['definitions']['simpleTypes']['enum'].append(k)
         for p in v.properties:

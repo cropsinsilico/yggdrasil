@@ -11,3 +11,13 @@ TODO
 * Update conda to reflect name change
 * Update docs to reflect name change
 * Change client/server use of direction/serializer info to be more transparent
+* Update docs with information about installing rapidjson
+* Update docs with information about installing from pip/conda
+* Go through docs to strip out deprecated info
+* Change "args" in drivers to more transparent wording (source_code, etc.)
+* Alias input/output keyword arguments for connections to from/to for clarity
+* Update docs to reflect changes to YAML spec
+* Add schema to documentation
+* Write docs on units
+* Docs on datatypes w/ example of user defined data type
+* Update/replace io_drivers section of docs
