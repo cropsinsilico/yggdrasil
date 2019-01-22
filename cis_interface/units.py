@@ -9,7 +9,7 @@ _use_unyt = True
 if _use_unyt:
     _unit_quantity = unyt.array.unyt_quantity
     _unit_array = unyt.array.unyt_array
-else:
+else:  # pragma: no cover
     _unit_quantity = _ureg_pint.Quantity
     _unit_array = _ureg_pint.Quantity
 
