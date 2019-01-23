@@ -239,7 +239,6 @@ class MetaschemaType(object):
         out = copy.deepcopy(metadata)
         if reqkeys is None:
             reqkeys = cls.get_extract_properties(metadata)
-            # reqkeys = cls.definition_schema().get('required', [])
         keylist = [k for k in out.keys()]
         for k in keylist:
             if k not in reqkeys:
@@ -283,10 +282,7 @@ class MetaschemaType(object):
     @classmethod
     def metaschema(cls):
         r"""JSON meta schema for validating schemas for this type."""
-        out = get_metaschema()
-        if cls.name == 'base':  # This is patch to allow tests to run
-            out['definitions']['simpleTypes']['enum'].append('base')
-        return out
+        return get_metaschema()
 
     @classmethod
     def validator(cls):
