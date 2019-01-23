@@ -24,11 +24,13 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
     _empty_msg = {}
 
     @classmethod
-    def coerce_type(cls, obj, key_order=None, **kwargs):
+    def coerce_type(cls, obj, typedef=None, key_order=None, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
             obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
             key_order (list, optional): Order or keys correpsonding to elements in
                 a provided list or tuple. Defaults to None.
             **kwargs: Additional keyword arguments are metadata entries that may

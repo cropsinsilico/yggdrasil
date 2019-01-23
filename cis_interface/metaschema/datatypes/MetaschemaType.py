@@ -107,11 +107,13 @@ class MetaschemaType(object):
         return obj
 
     @classmethod
-    def coerce_type(cls, obj, **kwargs):
+    def coerce_type(cls, obj, typedef=None, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
             obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
             **kwargs: Additional keyword arguments are metadata entries that may
                 aid in coercing the type.
 
@@ -189,7 +191,7 @@ class MetaschemaType(object):
             dict: Encoded type definition.
 
         """
-        obj = cls.coerce_type(obj)
+        obj = cls.coerce_type(obj, typedef=typedef)
         if typedef is None:
             typedef = {}
         if not cls.validate(obj):
@@ -480,8 +482,9 @@ class MetaschemaType(object):
             TypeError: If the encoded data is not of bytes type.
 
         """
-        # Coerce, then transform
-        obj = cls.coerce_type(obj, **kwargs)
+        # Coerce, then check object, then transform
+        obj = cls.coerce_type(obj, typedef=typedef,
+                              typedef_validated=typedef_validated, **kwargs)
         cls.check_decoded(obj, typedef, raise_errors=True,
                           typedef_validated=typedef_validated)
         obj_t = cls.transform_type(obj, typedef)
