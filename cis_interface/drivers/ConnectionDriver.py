@@ -9,9 +9,9 @@ from cis_interface.schema import get_schema
 
 
 def _translate_list2element(arr):
-    if not isinstance(arr, (list, tuple)):
-        raise Exception("List of field required.")
-    return arr[0]
+    if isinstance(arr, (list, tuple)):
+        arr = arr[0]
+    return arr
 
 
 class ConnectionDriver(Driver):
