@@ -239,6 +239,8 @@ class TestCisInput(TestBase):
         super(TestCisInput, self).__init__(*args, **kwargs)
         self._cls = 'CisInput'
         self.direction = 'input'
+        if self.__class__ == TestCisInput:
+            self.testing_option_kws = {'as_format': True}
 
     def test_msg(self):
         r"""Test sending/receiving message."""
@@ -271,6 +273,8 @@ class TestCisOutput(TestBase):
         super(TestCisOutput, self).__init__(*args, **kwargs)
         self._cls = 'CisOutput'
         self.direction = 'output'
+        if self.__class__ == TestCisOutput:
+            self.testing_option_kws = {'as_format': True}
 
     def test_msg(self):
         r"""Test sending/receiving message."""
