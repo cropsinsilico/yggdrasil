@@ -574,11 +574,8 @@ def ErrorClass(base_class, *args, **kwargs):
         def replace_method(self, method_name, replacement):
             r"""Temporarily replace method with another."""
             self._replaced_methods[method_name] = self.getattr(method_name)
-            if isinstance(self._replaced_methods[method_name], property):
-                self.setattr(method_name, property(replacement))
-            else:
-                self.setattr(method_name, replacement)
-                
+            self.setattr(method_name, replacement)
+            
         def restore_method(self, method_name):
             r"""Restore the original method."""
             self.setattr(method_name, self._replaced_methods.pop(method_name))
