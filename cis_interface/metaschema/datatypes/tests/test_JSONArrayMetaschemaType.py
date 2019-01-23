@@ -1,5 +1,6 @@
 import copy
 import numpy as np
+from cis_interface import serialize
 from cis_interface.tests import assert_equal, assert_raises
 from cis_interface.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
@@ -8,15 +9,27 @@ from cis_interface.metaschema.datatypes.tests import (
     test_ContainerMetaschemaType as container_utils)
 
 
-def test_coerce_single():
-    r"""Test serialization of single element."""
-    typedef = {'type': 'array', 'items': [{'type': 'bytes'}]}
-    msg_send = b'hello'
-    msg_recv = [msg_send]
+def test_coerce():
+    r"""Test serialization of coerced types."""
+    typedef = {'type': 'array', 'items': [{'type': '1darray',
+                                           'subtype': 'float',
+                                           'title': 'a',
+                                           'precision': 64}]}
     x = JSONArrayMetaschemaType(**typedef)
-    msg_seri = x.serialize(msg_send)
-    assert_equal(x.deserialize(msg_seri)[0], msg_recv)
+    key_order = ['a']
+    msg_recv = [np.zeros(3, 'float64')]
+    msg_send_list = [msg_recv[0],
+                     serialize.list2numpy(msg_recv, names=key_order),
+                     serialize.list2pandas(msg_recv, names=key_order),
+                     serialize.list2dict(msg_recv, names=key_order)]
 
+    def do_send_recv(msg_send):
+        msg_seri = x.serialize(msg_send, tyepdef=typedef, key_order=key_order)
+        assert_equal(x.deserialize(msg_seri)[0], msg_recv)
+
+    for y in msg_send_list:
+        do_send_recv(y)
+    
 
 class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
     r"""Test class for JSONArrayMetaschemaType class with float."""

@@ -48,11 +48,7 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
             obj = pandas2dict(obj)
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
             obj = numpy2dict(obj)
-        elif isinstance(obj, (list, tuple)):
-            if key_order is None:
-                # key_order = ['f%d' % i for i in range(len(obj))]
-                raise RuntimeError("Key order must be provided to coerce %s."
-                                   % type(obj))
+        elif isinstance(obj, (list, tuple)) and (key_order is not None):
             obj = list2dict(obj, names=key_order)
         return obj
 
