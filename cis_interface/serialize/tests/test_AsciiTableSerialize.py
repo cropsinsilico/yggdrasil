@@ -17,7 +17,7 @@ def test_deserialize_nofmt():
     r"""Test error on deserialization without a format."""
     inst = AsciiTableSerialize.AsciiTableSerialize()
     test_msg = b'lskdbjs;kfbj'
-    test_msg = inst.str_datatype.serialize(test_msg, metadata={})
+    test_msg = inst.func_datatype.serialize(test_msg, metadata={})
     nt.assert_raises(RuntimeError, inst.deserialize, test_msg)
 
 

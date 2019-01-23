@@ -26,6 +26,17 @@ class DefaultSerialize(object):
         func_deserialize (func, optional): Callable object that takes a bytes
             string as input and returns a deserialized python object. Defaults
             to None.
+        encode_func_serialize (bool, optional): If True, the data returned by
+            func_serialize (if provided) will be encoded. If False, the data
+            returned by func_serialize will not be encoded. Defaults to None
+            and is not used.
+        decode_func_deserialize (bool, optional): If True, the data passed to
+            func_deserialize (if provided) will be decoded first. If False, the
+            data passed to func_deserialize will not be decoded. Defaults to
+            None and is not used.
+        func_typedef (dict, optional): Type definition for encoding/decoding
+            messages returned/passed by/to func_serialize/func_deserialize.
+            Defaults to None and is not used.
         **kwargs: Additional keyword args are processed as part of the type
             definition.
 
@@ -34,6 +45,14 @@ class DefaultSerialize(object):
             and returns a bytes string representation.
         func_deserialize (func): Callable object that takes a bytes string as
             input and returns a deserialized python object.
+        encode_func_serialize (bool): If True, the data returned by
+            func_serialize (if provided) will be encoded. If False, the data
+            returned by func_serialize will not be encoded.
+        decode_func_deserialize (bool): If True, the data passed to
+            func_deserialize (if provided) will be decoded first. If False, the
+            data passed to func_deserialize will not be decoded.
+        func_typedef (dict): Type definition for encoding/decoding messages
+            returned/passed by/to func_serialize/func_deserialize.
 
     """
 
@@ -43,8 +62,13 @@ class DefaultSerialize(object):
     _schema_properties = {}
     _default_type = {'type': 'bytes'}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
-
-    def __init__(self, func_serialize=None, func_deserialize=None, **kwargs):
+    encode_func_serialize = False
+    decode_func_deserialize = False
+    func_typedef = {'type': 'bytes'}
+    
+    def __init__(self, func_serialize=None, func_deserialize=None,
+                 encode_func_serialize=None, decode_func_deserialize=None,
+                 func_typedef=None, **kwargs):
         self._alias = None
         self.is_user_defined = False
         self.extra_kwargs = {}
@@ -63,6 +87,12 @@ class DefaultSerialize(object):
             else:
                 self.func_deserialize = func_deserialize
             self.is_user_defined = True
+        if encode_func_serialize is not None:
+            self.encode_func_serialize = encode_func_serialize
+        if decode_func_deserialize is not None:
+            self.decode_func_deserialize = decode_func_deserialize
+        if func_typedef is not None:
+            self.func_typedef = func_typedef
         # Set properties to None
         for k, v in self._schema_properties.items():
             setattr(self, k, v.get('default', None))
@@ -70,8 +100,8 @@ class DefaultSerialize(object):
         self._initialized = False
         self.datatype = get_type_from_def(self._default_type,
                                           dont_complete=True)
-        self.str_datatype = get_type_from_def({'type': 'bytes'},
-                                              dont_complete=True)
+        self.func_datatype = get_type_from_def(self.func_typedef,
+                                               dont_complete=True)
         self.update_serializer(**kwargs)
         self._initialized = (self.typedef != self._default_type)
 
@@ -160,7 +190,7 @@ class DefaultSerialize(object):
     def typedef(self):
         r"""dict: Type definition."""
         if self.is_user_defined:
-            return copy.deepcopy(self.str_datatype._typedef)
+            return copy.deepcopy(self.func_datatype._typedef)
         return copy.deepcopy(self.datatype._typedef)
 
     def __getattribute__(self, name):
@@ -532,17 +562,18 @@ class DefaultSerialize(object):
         if hasattr(self, 'func_serialize'):
             if header_kwargs.get('raw', False):
                 data = args
-                if no_metadata:
-                    return data
             else:
                 data = self.func_serialize(args)
-                if not isinstance(data, backwards.bytes_type):
-                    print(data, type(data))
-                    raise TypeError("Serialization function did not yield bytes type.")
-                if not no_metadata:
-                    metadata['metadata'] = self.datatype.encode_type(
-                        args, typedef=self.typedef)
-            out = self.str_datatype.serialize(data, **metadata)
+                if not self.encode_func_serialize:
+                    if not isinstance(data, backwards.bytes_type):
+                        raise TypeError(("Serialization function returned object "
+                                         + "of type '%s', not required '%s' type.")
+                                        % (type(data), backwards.bytes_type))
+                    metadata['dont_encode'] = True
+                    if not no_metadata:
+                        metadata['metadata'] = self.datatype.encode_type(
+                            args, typedef=self.typedef)
+            out = self.func_datatype.serialize(data, **metadata)
         else:
             out = self.datatype.serialize(args, **metadata)
         return out
@@ -563,7 +594,9 @@ class DefaultSerialize(object):
 
         """
         if hasattr(self, 'func_deserialize'):
-            out, metadata = self.str_datatype.deserialize(msg, **kwargs)
+            if not self.decode_func_deserialize:
+                kwargs['dont_decode'] = True
+            out, metadata = self.func_datatype.deserialize(msg, **kwargs)
             if metadata['size'] == 0:
                 out = self.empty_msg
             elif not (metadata.get('incomplete', False)

@@ -287,7 +287,10 @@ class TestDefaultSerialize_class(TestDefaultSerialize_func):
         assert(issubclass(temp_seri.__class__, DefaultSerialize.DefaultSerialize))
         out = super(TestDefaultSerialize_class, self).get_testing_options()
         out['kwargs'] = {'func_serialize': temp_seri,
-                         'func_deserialize': temp_seri}
+                         'func_deserialize': temp_seri,
+                         'func_typedef': {'type': 'bytes'},
+                         'encode_func_serialize': True,
+                         'decode_func_deserialize': True}
         return out
         
 

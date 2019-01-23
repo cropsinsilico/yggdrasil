@@ -564,13 +564,16 @@ class MetaschemaType(object):
         out = cls.transform_type(out, typedef)
         return out
 
-    def serialize(self, obj, no_metadata=False, **kwargs):
+    def serialize(self, obj, no_metadata=False, dont_encode=False, **kwargs):
         r"""Serialize a message.
 
         Args:
             obj (object): Python object to be formatted.
             no_metadata (bool, optional): If True, no metadata will be added to
                 the serialized message. Defaults to False.
+            dont_encode (bool, optional): If True, the input message will not
+                be encoded using type specific or JSON encoding. Defaults to
+                False.
             **kwargs: Additional keyword arguments are added to the metadata.
 
         Returns:
@@ -578,7 +581,8 @@ class MetaschemaType(object):
 
         """
         if ((isinstance(obj, backwards.bytes_type)
-             and ((obj == tools.CIS_MSG_EOF) or kwargs.get('raw', False)))):
+             and ((obj == tools.CIS_MSG_EOF) or kwargs.get('raw', False)
+                  or dont_encode))):
             metadata = kwargs
             data = obj
             is_raw = True
@@ -599,7 +603,7 @@ class MetaschemaType(object):
         msg = CIS_MSG_HEAD + metadata + CIS_MSG_HEAD + data
         return msg
     
-    def deserialize(self, msg, no_data=False, metadata=None, no_json=False):
+    def deserialize(self, msg, no_data=False, metadata=None, dont_decode=False):
         r"""Deserialize a message.
 
         Args:
@@ -609,8 +613,9 @@ class MetaschemaType(object):
             metadata (dict, optional): Metadata that should be used to deserialize
                 the message instead of the current header content. Defaults to
                 None and is not used.
-            no_json (bool, optional): If True, the raw data is returned without
-                deserializing with json.
+            dont_decode (bool, optional): If True, type specific and JSON
+                decoding will not be used to decode the message. Defaults to
+                False.
 
         Returns:
             tuple(obj, dict): Deserialized message and header information.
@@ -636,7 +641,8 @@ class MetaschemaType(object):
             if metadata is None:
                 metadata = dict(size=len(msg))
                 if (((len(msg) > 0) and (msg != tools.CIS_MSG_EOF)
-                     and (self._typedef != {'type': 'bytes'}))):
+                     and (self._typedef != {'type': 'bytes'})
+                     and (not dont_decode))):
                     raise ValueError("Header marker not in message.")
         # Set flags based on data
         metadata['incomplete'] = (len(data) < metadata['size'])
@@ -647,8 +653,8 @@ class MetaschemaType(object):
             return metadata
         elif len(data) == 0:
             return self._empty_msg, metadata
-        elif (metadata['incomplete'] or metadata.get('raw', False) or no_json
-              or (metadata.get('type', None) == 'direct')):
+        elif (metadata['incomplete'] or metadata.get('raw', False)
+              or (metadata.get('type', None) == 'direct') or dont_decode):
             return data, metadata
         else:
             data = json.loads(backwards.as_unicode(data))

@@ -1080,13 +1080,14 @@ class CommBase(tools.CisClass):
     def serialize(self, *args, **kwargs):
         r"""Serialize a message using the associated serializer."""
         # Don't send metadata for files
+        # kwargs.setdefault('dont_encode', self.is_file)
         kwargs.setdefault('no_metadata', self.is_file)
         return self.serializer.serialize(*args, **kwargs)
 
     def deserialize(self, *args, **kwargs):
         r"""Deserialize a message using the associated deserializer."""
         # Don't serialize files using JSON
-        kwargs.setdefault('no_json', self.is_file)
+        # kwargs.setdefault('dont_decode', self.is_file)
         return self.serializer.deserialize(*args, **kwargs)
 
     # SEND METHODS
