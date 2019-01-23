@@ -4,8 +4,7 @@ import numpy as np
 import warnings
 from cis_interface import backwards, tools, units, platform
 from cis_interface.serialize import (
-    register_serializer, get_serializer, extract_formats, cformat2nptype,
-    consolidate_array)
+    register_serializer, extract_formats, cformat2nptype, consolidate_array)
 from cis_interface.metaschema import get_metaschema
 from cis_interface.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
@@ -119,22 +118,22 @@ class DefaultSerialize(object):
                                 + b'  one\t1\t1.000000\n'
                                 + b'  two\t2\t2.000000\n'
                                 + b'three\t3\t3.000000\n')}
-            field_names = [backwards.as_str(x) for
-                           x in out['kwargs']['field_names']]
-            field_units = [backwards.as_str(x) for
-                           x in out['kwargs']['field_units']]
+            out['field_names'] = [backwards.as_str(x) for
+                                  x in out['kwargs']['field_names']]
+            out['field_units'] = [backwards.as_str(x) for
+                                  x in out['kwargs']['field_units']]
             rows = [(b'one', np.int32(1), 1.0),
                     (b'two', np.int32(2), 2.0),
                     (b'three', np.int32(3), 3.0)]
             if as_array:
                 out['kwargs']['as_array'] = as_array
                 dtype = np.dtype(
-                    {'names': field_names,
+                    {'names': out['field_names'],
                      'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
                 out['dtype'] = dtype
                 arr = np.array(rows, dtype=dtype)
                 lst = [units.add_units(arr[n], u) for n, u
-                       in zip(field_names, field_units)]
+                       in zip(out['field_names'], out['field_units'])]
                 out['objects'] = [lst, lst]
                 for x in out['typedef']['items']:
                     x['subtype'] = x['type']
@@ -193,10 +192,7 @@ class DefaultSerialize(object):
             elif isinstance(v, (list, tuple)):
                 out[k] = []
                 for x in v:
-                    if isinstance(x, backwards.string_types):
-                        out[k].append(backwards.as_str(x))
-                    else:
-                        out[k].append(x)
+                    out[k].append(backwards.as_str(x, allow_pass=True))
             else:
                 out[k] = v
         return out
@@ -341,22 +337,6 @@ class DefaultSerialize(object):
         self._initialized = (self.typedef != self._default_type)
         # self._initialized = True
 
-    def update_from_message(self, msg, **kwargs):
-        r"""Update serializer information based on the message.
-
-        Args:
-            msg (obj): Python object being sent as a message.
-            **kwargs: Additional keyword arguments are assumed to be typedef
-                options and are passed to update_serializer.
-
-        """
-        out = copy.deepcopy(self.typedef)
-        out.update(kwargs)
-        cls = guess_type_from_obj(msg)
-        typedef = cls.encode_type(msg, **out)
-        typedef.update(**kwargs)
-        self.update_serializer(extract=True, **typedef)
-
     def update_serializer(self, extract=False, skip_type=False, **kwargs):
         r"""Update serializer with provided information.
 
@@ -381,11 +361,13 @@ class DefaultSerialize(object):
         _metaschema = get_metaschema()
         # Create alias if another seritype is needed
         seritype = kwargs.pop('seritype', self._seritype)
-        if (seritype != self._seritype) and (seritype != 'default'):
-            kwargs.update(extract=extract, seritype=seritype)
-            self._alias = get_serializer(**kwargs)
-            assert(self._seritype == seritype)
-            return
+        if (seritype != self._seritype) and (seritype != 'default'):  # pragma: debug
+            # kwargs.update(extract=extract, seritype=seritype)
+            # self._alias = get_serializer(**kwargs)
+            # assert(self._seritype == seritype)
+            # return
+            raise Exception("Cannot change types form %s to %s." %
+                            (self._seritype, seritype))
         # Remove metadata keywords unrelated to serialization
         # TODO: Find a better way of tracking these
         _remove_kws = ['size', 'id', 'incomplete', 'raw', 'commtype', 'filetype',
@@ -452,10 +434,11 @@ class DefaultSerialize(object):
                 fmts = extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
-                        if len(typedef.get('items', [])) != len(fmts):
-                            warnings.warn(("Number of items in typedef (%d) doesn't"
-                                           + "match the number of formats (%d).")
-                                          % (len(typedef.get('items', [])), len(fmts)))
+                        assert(len(typedef.get('items', [])) == len(fmts))
+                        # if len(typedef.get('items', [])) != len(fmts):
+                        #     warnings.warn(("Number of items in typedef (%d) doesn't"
+                        #                    + "match the number of formats (%d).")
+                        #                   % (len(typedef.get('items', [])), len(fmts)))
                     continue
                 as_array = self.extra_kwargs.get('as_array',
                                                  getattr(self, 'as_array', False))
@@ -488,10 +471,11 @@ class DefaultSerialize(object):
                 if isinstance(typedef['items'], dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
-                if len(v) != len(typedef.get('items', [])):
-                    warnings.warn('%d %ss provided, but only %d items in typedef.'
-                                  % (len(v), k, len(typedef.get('items', []))))
-                    continue
+                assert(len(v) == len(typedef.get('items', [])))
+                # if len(v) != len(typedef.get('items', [])):
+                #     warnings.warn('%d %ss provided, but only %d items in typedef.'
+                #                   % (len(v), k, len(typedef.get('items', []))))
+                #     continue
                 all_updated = True
                 for iv, itype in zip(v, typedef.get('items', [])):
                     if tk in itype:
@@ -553,16 +537,14 @@ class DefaultSerialize(object):
             else:
                 data = self.func_serialize(args)
                 if not isinstance(data, backwards.bytes_type):
+                    print(data, type(data))
                     raise TypeError("Serialization function did not yield bytes type.")
-                if no_metadata:
-                    return data
-                metadata['metadata'] = self.datatype.encode_type(
-                    args, typedef=self.typedef)
+                if not no_metadata:
+                    metadata['metadata'] = self.datatype.encode_type(
+                        args, typedef=self.typedef)
             out = self.str_datatype.serialize(data, **metadata)
         else:
             out = self.datatype.serialize(args, **metadata)
-        if not isinstance(out, backwards.bytes_type):
-            raise TypeError("Serialization function did not yield bytes type.")
         return out
 
     def deserialize(self, msg, **kwargs):

@@ -1,10 +1,17 @@
 import copy
 import numpy as np
 import unittest
-from cis_interface.tests import CisTestClassInfo
+from cis_interface.tests import CisTestClassInfo, assert_equal
 from cis_interface import backwards, tools, serialize
 from cis_interface.serialize import DefaultSerialize
 from cis_interface.metaschema.datatypes import encode_type
+
+
+def test_demote_string():
+    r"""Test format str creation of typedef."""
+    x = DefaultSerialize.DefaultSerialize(format_str='%s')
+    assert_equal(x.typedef, {'type': 'array',
+                             'items': [{'type': 'bytes'}]})
 
 
 class TestDefaultSerialize(CisTestClassInfo):
@@ -63,10 +70,18 @@ class TestDefaultSerialize(CisTestClassInfo):
                           self.testing_options.get('is_user_defined', False))
         self.assert_equal(self.instance.numpy_dtype,
                           self.testing_options['dtype'])
-        self.assert_equal(self.instance.typedef,
-                          self.testing_options['typedef'])
         self.assert_equal(self.instance.extra_kwargs,
                           self.testing_options['extra_kwargs'])
+        self.assert_equal(self.instance.typedef,
+                          self.testing_options['typedef'])
+        if isinstance(self.instance.typedef.get('items', []), dict):
+            self.assert_raises(Exception, self.instance.get_field_names)
+            self.assert_raises(Exception, self.instance.get_field_units)
+        else:
+            self.assert_equal(self.instance.get_field_names(),
+                              self.testing_options.get('field_names', None))
+            self.assert_equal(self.instance.get_field_units(),
+                              self.testing_options.get('field_units', None))
         
     def test_serialize(self):
         r"""Test serialize/deserialize."""
@@ -75,6 +90,11 @@ class TestDefaultSerialize(CisTestClassInfo):
             iout, ihead = self.instance.deserialize(msg)
             self.assert_result_equal(iout, iobj)
             # self.assert_equal(ihead, self.empty_head(msg))
+
+    def test_serialize_no_metadata(self):
+        r"""Test serializing without metadata."""
+        self.instance.serialize(self.testing_options['objects'][0],
+                                no_metadata=True)
 
     def test_deserialize_error(self):
         r"""Test error when deserializing message that is not bytes."""
@@ -161,6 +181,52 @@ class TestDefaultSerialize_array(TestDefaultSerialize_format):
     r"""Test class for DefaultSerialize class with format as array."""
 
     testing_option_kws = {'as_format': True, 'as_array': True}
+
+
+class TestDefaultSerialize_uniform(TestDefaultSerialize):
+    r"""Test class for items as dictionary."""
+    
+    def get_testing_options(self):
+        r"""Get testing options."""
+        out = {'kwargs': {'type': 'array', 'items': {'type': '1darray',
+                                                     'subtype': 'float',
+                                                     'precision': 64}},
+               # 'field_units': ['cm', 'g']},
+               'empty': [],
+               'objects': [[np.zeros(3, 'float'), np.zeros(3, 'float')],
+                           [np.ones(3, 'float'), np.ones(3, 'float')]],
+               'extra_kwargs': {},
+               'typedef': {'type': 'array', 'items': {'type': '1darray',
+                                                      'subtype': 'float',
+                                                      'precision': 64}},
+               'dtype': np.dtype("float64"),  # np.dtype([('f0', '<f8'), ('f1', '<f8')]),
+               'is_user_defined': False}
+        return out
+
+
+class TestDefaultSerialize_uniform_names(TestDefaultSerialize_uniform):
+    r"""Test class for items as dictionary."""
+    
+    def get_testing_options(self):
+        r"""Get testing options."""
+        out = super(TestDefaultSerialize_uniform_names, self).get_testing_options()
+        out['kwargs']['field_names'] = [b'a', b'b']
+        out['kwargs']['field_units'] = [b'cm', b'g']
+        out['field_names'] = ['a', 'b']
+        out['field_units'] = ['cm', 'g']
+        out['dtype'] = np.dtype([('a', '<f8'), ('b', '<f8')])
+        out['typedef'] = {'type': 'array',
+                          'items': [{'type': '1darray',
+                                     'subtype': 'float',
+                                     'precision': 64,
+                                     'title': 'a',
+                                     'units': 'cm'},
+                                    {'type': '1darray',
+                                     'subtype': 'float',
+                                     'precision': 64,
+                                     'title': 'b',
+                                     'units': 'g'}]}
+        return out
 
 
 class TestDefaultSerialize_func(TestDefaultSerialize):
@@ -261,6 +327,11 @@ class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
         r"""Test serialize with function that dosn't return correct type."""
         self.assert_raises(TypeError, self.instance.serialize, (1,))
 
+    @unittest.skipIf(True, 'Error testing')
+    def test_serialize_no_metadata(self):
+        r"""Test serializing without metadata."""
+        pass
+        
     @unittest.skipIf(True, 'Error testing')
     def test_serialize_header(self):
         r"""Disabled: Test serialize/deserialize with header."""
