@@ -114,12 +114,12 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     @unittest.skipIf(True, 'File driver')
     def test_send_recv(self):
         r"""Disabled: Test sending/receiving small message."""
-        pass
+        pass  # pragma: no cover
 
     @unittest.skipIf(True, 'File driver')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test sending/receiving large message."""
-        pass
+        pass  # pragma: no cover
 
 
 # Dynamically create tests based on registered file classes
