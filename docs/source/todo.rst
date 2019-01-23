@@ -21,3 +21,4 @@ TODO
 * Write docs on units
 * Docs on datatypes w/ example of user defined data type
 * Update/replace io_drivers section of docs
+* Remove IOInfo test class as no longer used

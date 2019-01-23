@@ -103,13 +103,13 @@ def assert_equal(x, y):
             ix = x[k]
             assert_equal(ix, iy)
     elif isinstance(y, (np.ndarray, pd.DataFrame)):
-        if units.has_units(y) and (not units.has_units(x)):
+        if units.has_units(y) and (not units.has_units(x)):  # pragma: debug
             y = units.get_data(y)
         elif (not units.has_units(y)) and units.has_units(x):
             x = units.get_data(x)
         np.testing.assert_array_equal(x, y)
     else:
-        if units.has_units(y) and (not units.has_units(x)):
+        if units.has_units(y) and (not units.has_units(x)):  # pragma: debug
             y = units.get_data(y)
         elif (not units.has_units(y)) and units.has_units(x):
             x = units.get_data(x)
