@@ -16,11 +16,42 @@ class UninitializedNormalized(object):
 
 
 def create(*args, **kwargs):
+    r"""Dynamically create a validation/normalization class that subclasses
+    the jsonschema validation class.
+
+    Args:
+        normalizers (dict, optional): Keys are tuples representing paths that
+            exist within the schema at which the normalization functions stored
+            in lists as their value counterparts should be executed. Defaults to
+            empty dictionary.
+        no_defaults (bool, optional): If True, defaults will not be set during
+            normalization. Defaults to False.
+        *args: Additional arguments are passed to jsonschema.validators.create.
+        **kwargs: Additional keyword arguments are passed to
+            jsonschema.validators.create.
+        
+    """
     normalizers = kwargs.pop('normalizers', ())
     no_defaults = kwargs.pop('no_defaults', ())
     validator_class = jsonschema.validators.create(*args, **kwargs)
 
     class Normalizer(validator_class):
+        r"""Class that can be used to normalize (or validate) objects against
+        JSON schemas.
+
+        Args:
+            *args: Additional arguments are passed to the base validator class.
+            **kwargs: Additional keyword arguments are passed to the base
+                validator class.
+
+        Attributes:
+            NORMALIZERS (dict): Keys are tuples representing paths that exist
+                within the schema at which the normalization functions stored in
+                lists as their value counterparts should be executed.
+            NO_DEFAULTS (bool): If True, defaults will not be set during
+                normalization.
+
+        """
         NORMALIZERS = dict(normalizers)
         NO_DEFAULTS = no_defaults
 
@@ -34,6 +65,21 @@ def create(*args, **kwargs):
             self._normalized_stack = []
 
         def iter_errors(self, instance, _schema=None):
+            r"""Iterate through all of the errors encountered during validation
+            of an instance at the current level or lower against properties in a
+            schema.
+
+            Args:
+                instance (object): Instance that will be validated.
+                _schema (dict, optional): Schema that the instance will be
+                    validated against. Defaults to the schema used to initialize
+                    the class.
+
+            Yields:
+                ValidationError: Errors encountered during validation of the
+                    instance.
+
+            """
             if _schema is None:
                 _schema = self.schema
 
@@ -108,14 +154,32 @@ def create(*args, **kwargs):
 
         @property
         def current_path(self):
+            r"""tuple: Current path from the top of the instance to the current
+            instance being validated/normalized."""
             return tuple(self._path_stack)
 
         @property
         def current_schema_path(self):
+            r"""tuple: Current path from the top of the schema to the current
+            schema being used for validation/normalization."""
             return tuple(self._schema_path_stack)
 
         @contextlib.contextmanager
         def normalizing(self, **kwargs):
+            r"""Context for normalization that records normalizers before
+            context is initialized so that they can be restored once the context
+            exist.
+
+            Args:
+                **kwargs: Keyword arguments are treated as attributes that
+                    should be added to the class in the context. If the class
+                    already has an attribute of the same name, it is stored
+                    for restoration after the context exits.
+
+            Yields:
+                ValidationError: Errors encountered during validation.
+
+            """
             for k, v in kwargs.items():
                 if k == 'normalizers':
                     for ik, iv in self.NORMALIZERS.items():
@@ -144,6 +208,25 @@ def create(*args, **kwargs):
                 self._normalizing = False
 
         def descend(self, instance, schema, path=None, schema_path=None):
+            r"""Descend along a path in the schema/instance, recording
+            information about the normalization state so that it can be replaced
+            with the original value if there is a validation error along the
+            descent path.
+
+            Args:
+                instance (object): Current instance being validated against the
+                    schema.
+                schema (dict): Current schema that the instance is being
+                    validated against.
+                path (str, int, optional): Path that resulted in the current
+                    instance. Defaults to None.
+                schema_path (str, int, optional): Path that resulted in the
+                    current schema. Defaults to None.
+
+            Yields:
+                ValidationError: Errors raised during validation of the instance.
+
+            """
             if self._normalizing:
                 if path is not None:
                     self._normalized_stack.append(self._normalized)
@@ -177,6 +260,23 @@ def create(*args, **kwargs):
                     self._schema_path_stack.pop()
 
         def validate(self, instance, _schema=None, normalize=False, **kwargs):
+            r"""Validate an instance against a schema.
+
+            Args:
+                instance (object): Object to be validated.
+                _schema (dict, optional): Schema by which the instance should be
+                    validated. Defaults to None and will be set to the schema
+                    used to create the class.
+                normalize (bool, optional): If True, the instance will also be
+                    normalized as it is validated. Defaults to False.
+                **kwargs: Additional keyword arguments are passed to the
+                    'normalizing' context if normalize is True, otherwise they
+                    are ignored.
+
+            Returns:
+                object: Normalized instance if normalize == True.
+
+            """
             if normalize:
                 with self.normalizing(**kwargs):
                     super(Normalizer, self).validate(instance, _schema=_schema)
@@ -186,6 +286,21 @@ def create(*args, **kwargs):
                 super(Normalizer, self).validate(instance, _schema=_schema)
 
         def normalize(self, instance, _schema=None, **kwargs):
+            r"""Normalize an instance during validation, allowing for aliases,
+            defaults, or simple type conversions.
+
+            Args:
+                instance (object): Object to be normalized and validated.
+                _schema (dict, optional): Schema by which the instance should be
+                    normalized and validated. Defaults to None and will be set
+                    to the schema used to create the class.
+                **kwargs: Additional keyword arguments are passed to the
+                    'normalizing' context.
+
+            Returns:
+                object: Normalized instance.
+
+            """
             with self.normalizing(**kwargs):
                 errors = list(self.iter_errors(instance, _schema=_schema))
                 # for e in errors[::-1]:
@@ -193,12 +308,22 @@ def create(*args, **kwargs):
                 #     print(e)
                 # print(80 * '-')
             if errors:
-                # raise jsonschema.ValidationError('error')
                 return instance
             else:
                 return self._normalized
 
         def is_type(self, instance, type):
+            r"""Determine if an object is an example of the given type.
+
+            Args:
+                instance (object): Object to test against to the type.
+                type (str): Name of type that object should be tested against.
+
+            Returns:
+                bool: True if the instance is of the specified type. False
+                    otherwise.
+
+            """
             out = super(Normalizer, self).is_type(instance, type)
             if out:
                 out = get_type_class(type).validate(instance)
