@@ -15,12 +15,15 @@ def test_dynamic():
         return
 
     def compare(prop1, prop2):
+        if not prop2:
+            yield 'Test error'
         return
 
     new_prop = create_property('invalid', None, encode, validate, compare)
     assert_equal(new_prop.encode('hello'), None)
     assert_equal(list(new_prop.validate(None, None, None, None)), [])
-    assert_equal(list(new_prop.compare(True, False)), [])
+    assert_equal(list(new_prop.compare(True, True)), [])
+    assert_equal(list(new_prop.compare(True, False)), ['Test error'])
 
 
 class TestMetaschemaProperty(CisTestClassInfo):
