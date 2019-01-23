@@ -52,10 +52,10 @@ class TestServerComm(test_CommBase.TestCommBase):
     def test_call(self):
         r"""Test RPC call."""
         self.send_instance.sched_task(0.0, self.send_instance.rpcCall,
-                                      args=[self.msg_short], store_output=True)
+                                      args=[self.test_msg], store_output=True)
         flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
         assert(flag)
-        self.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.test_msg)
         flag = self.recv_instance.rpcSend(msg_recv)
         assert(flag)
         T = self.recv_instance.start_timeout()
@@ -64,16 +64,16 @@ class TestServerComm(test_CommBase.TestCommBase):
         self.recv_instance.stop_timeout()
         flag, msg_recv = self.send_instance.sched_out
         assert(flag)
-        self.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.test_msg)
 
     def test_call_alias(self):
         r"""Test RPC call aliases."""
         # self.send_instance.sched_task(0.0, self.send_instance.rpcSend,
-        #                               args=[self.msg_short], store_output=True)
+        #                               args=[self.test_msg], store_output=True)
         self.recv_instance.sched_task(self.sleeptime, self.recv_instance.rpcRecv,
                                       kwargs=dict(timeout=self.timeout),
                                       store_output=True)
-        flag = self.send_instance.rpcSend(self.msg_short)
+        flag = self.send_instance.rpcSend(self.test_msg)
         assert(flag)
         T = self.recv_instance.start_timeout()
         while (not T.is_out) and (self.recv_instance.sched_out is None):  # pragma: debug
@@ -82,12 +82,12 @@ class TestServerComm(test_CommBase.TestCommBase):
         flag, msg_recv = self.recv_instance.sched_out
         # flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
         assert(flag)
-        self.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.test_msg)
         flag = self.recv_instance.rpcSend(msg_recv)
         assert(flag)
         flag, msg_recv = self.send_instance.rpcRecv(timeout=self.timeout)
         assert(flag)
-        self.assert_equal(msg_recv, self.msg_short)
+        self.assert_equal(msg_recv, self.test_msg)
 
     def test_call_nolimit(self):
         r"""Test RPC nolimit call."""
@@ -116,7 +116,7 @@ class TestServerComm(test_CommBase.TestCommBase):
     #     r"""Test purging messages from the client comm."""
     #     # Purge send while open
     #     if self.comm != 'CommBase':
-    #         flag = self.send_instance.send(self.msg_short)
+    #         flag = self.send_instance.send(self.test_msg)
     #         assert(flag)
     #         T = self.recv_instance.start_timeout()
     #         while (not T.is_out) and (self.recv_instance.n_msg == 0):  # pragma: debug

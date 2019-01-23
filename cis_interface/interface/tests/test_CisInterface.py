@@ -1,12 +1,12 @@
 import os
-import nose.tools as nt
+import numpy as np
 import unittest
 from cis_interface.communication import get_comm, get_comm_class
 from cis_interface.interface import CisInterface
 from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
 from cis_interface.drivers import (
     import_driver, InputDriver, OutputDriver, MatlabModelDriver)
-from cis_interface.tests import CisTestClassInfo
+from cis_interface.tests import CisTestClassInfo, assert_raises, assert_equal
 
 
 CIS_MSG_MAX = get_CIS_MSG_MAX()
@@ -14,23 +14,23 @@ CIS_MSG_MAX = get_CIS_MSG_MAX()
 
 def test_maxMsgSize():
     r"""Test max message size."""
-    nt.assert_equal(CisInterface.maxMsgSize(), CIS_MSG_MAX)
+    assert_equal(CisInterface.maxMsgSize(), CIS_MSG_MAX)
 
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    nt.assert_equal(CisInterface.eof_msg(), CIS_MSG_EOF)
+    assert_equal(CisInterface.eof_msg(), CIS_MSG_EOF)
 
 
 def test_bufMsgSize():
     r"""Test buf message size."""
-    nt.assert_equal(CisInterface.bufMsgSize(), CIS_MSG_BUF)
+    assert_equal(CisInterface.bufMsgSize(), CIS_MSG_BUF)
 
 
 def test_init():
     r"""Test error on init."""
-    nt.assert_raises(Exception, CisInterface.CisInput, 'error')
-    nt.assert_raises(Exception, CisInterface.CisOutput, 'error')
+    assert_raises(Exception, CisInterface.CisInput, 'error')
+    assert_raises(Exception, CisInterface.CisOutput, 'error')
     
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
@@ -54,8 +54,8 @@ def test_CisMatlab_class():  # pragma: matlab
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
 def test_CisMatlab_variables():  # pragma: matlab
     r"""Test Matlab interface for variables."""
-    nt.assert_equal(CisInterface.CisMatlab('CIS_MSG_MAX'), CIS_MSG_MAX)
-    nt.assert_equal(CisInterface.CisMatlab('CIS_MSG_EOF'), CIS_MSG_EOF)
+    assert_equal(CisInterface.CisMatlab('CIS_MSG_MAX'), CIS_MSG_MAX)
+    assert_equal(CisInterface.CisMatlab('CIS_MSG_EOF'), CIS_MSG_EOF)
 
 
 class TestBase(CisTestClassInfo):
@@ -310,10 +310,12 @@ class TestCisRpcClient(TestCisOutput):
     def __init__(self, *args, **kwargs):
         super(TestCisRpcClient, self).__init__(*args, **kwargs)
         self._cls = 'CisRpcClient'
+        self.fmt_str = b'%5s\t%d\t%f\n'
+        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ServerComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
-        self._messages = [self.file_rows[0]]
+        self._messages = [(b'one', np.int32(1), 1.0)]
         
     @property
     def odriver_class(self):
@@ -349,10 +351,12 @@ class TestCisRpcServer(TestCisInput):
     def __init__(self, *args, **kwargs):
         super(TestCisRpcServer, self).__init__(*args, **kwargs)
         self._cls = 'CisRpcServer'
+        self.fmt_str = b'%5s\t%d\t%f\n'
+        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ClientComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
-        self._messages = [self.file_rows[0]]
+        self._messages = [(b'one', np.int32(1), 1.0)]
         
     @property
     def odriver_class(self):
@@ -419,6 +423,8 @@ class TestCisAsciiTableOutput(TestCisAsciiFileOutput):
         self._cls = 'CisAsciiTableOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
+        self.fmt_str = b'%5s\t%d\t%f\n'
+        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
         self._inst_args = [self.name, self.fmt_str]
         self._inst_kwargs = {}
 

@@ -5,7 +5,7 @@ import atexit
 import threading
 from logging import info
 from cis_interface import backwards, tools, serialize
-from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
+from cis_interface.tools import CIS_MSG_EOF
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
 from cis_interface.schema import register_component
@@ -287,6 +287,7 @@ class CommBase(tools.CisClass):
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
         matlab (bool): True if the comm will be accessed by Matlab code.
+        maxMsgSize (int): Maximum size of a single message that should be sent.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -311,6 +312,7 @@ class CommBase(tools.CisClass):
                           'as_array': {'type': 'boolean', 'default': False}}
     _default_serializer = DefaultSerialize
     is_file = False
+    _maxMsgSize = 0
 
     def __init__(self, name, address=None, direction='send',
                  dont_open=False, is_interface=False, recv_timeout=0.0,
@@ -438,6 +440,10 @@ class CommBase(tools.CisClass):
                'contents': out['contents']}
         out['recv'] = copy.deepcopy(out['send'])
         out['dict'] = {'f0': out['msg']}
+        if isinstance(out['msg'], backwards.bytes_type):
+            out['msg_long'] = out['msg'] + (cls._maxMsgSize * b'0')
+        else:
+            out['msg_long'] = out['msg']
         return out
 
     def printStatus(self, nindent=0):
@@ -502,8 +508,8 @@ class CommBase(tools.CisClass):
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        return get_CIS_MSG_MAX()
-
+        return self._maxMsgSize
+        
     @property
     def empty_msg(self):
         r"""str: Empty message."""

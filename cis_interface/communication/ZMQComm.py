@@ -354,6 +354,9 @@ class ZMQComm(AsyncComm.AsyncComm):
     """
 
     _commtype = 'zmq'
+    # Based on limit of 32bit int, this could be 2**30, but this is
+    # too large for stack allocation in C so 2**20 will be used.
+    _maxMsgSize = 2**20
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
@@ -457,13 +460,6 @@ class ZMQComm(AsyncComm.AsyncComm):
         else:
             out = super(ZMQComm, cls).is_installed(language=language)
         return out
-
-    @property
-    def maxMsgSize(self):
-        r"""int: Maximum size of a single message that should be sent."""
-        # Based on limit of 32bit int, this could be 2**30, but this is
-        # too large for stack allocation in C so 2**20 will be used.
-        return 2**20
 
     @classmethod
     def underlying_comm_class(self):

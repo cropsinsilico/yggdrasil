@@ -75,6 +75,7 @@ class FileComm(CommBase.CommBase):
     _attr_conv = ['newline', 'platform_newline']
     _default_extension = '.txt'
     is_file = True
+    _maxMsgSize = 0
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
@@ -142,11 +143,6 @@ class FileComm(CommBase.CommBase):
         """
         # Filesystem is implied
         return True
-
-    @property
-    def maxMsgSize(self):
-        r"""int: Maximum size of a single message that should be sent."""
-        return 0
 
     @classmethod
     def underlying_comm_class(self):

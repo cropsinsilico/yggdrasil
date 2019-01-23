@@ -1,6 +1,5 @@
-import os
 import nose.tools as nt
-from cis_interface.tests import CisTestClass, IOInfo
+from cis_interface.tests import CisTestClass
 
 
 class TestCisTest(CisTestClass):
@@ -25,24 +24,3 @@ class TestCisTest(CisTestClass):
         r"""Test errors on instance ref post teardown."""
         self.teardown()
         nt.assert_raises(RuntimeError, getattr, self, 'instance')
-
-    
-def test_IOInfo():
-    r"""Test funcitonality of IOInfo."""
-    out = IOInfo()
-    # Pickle version
-    fname_pickle = 'test_data_dict.dat'
-    with open(fname_pickle, 'wb') as fd:
-        fd.write(out.pickled_data)
-    out.assert_equal_data_dict(fname_pickle)
-    with open(fname_pickle, 'rb') as fd:
-        out.assert_equal_data_dict(fd)
-    os.remove(fname_pickle)
-    # Mat version
-    fname_mat = 'test_data_dict.mat'
-    with open(fname_mat, 'wb') as fd:
-        fd.write(out.mat_data)
-    out.assert_equal_data_dict(fname_mat)
-    with open(fname_mat, 'rb') as fd:
-        out.assert_equal_data_dict(fd)
-    os.remove(fname_mat)
