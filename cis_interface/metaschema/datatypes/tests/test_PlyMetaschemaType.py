@@ -3,12 +3,11 @@ import copy
 import shutil
 import tempfile
 import numpy as np
-import nose.tools as nt
 import unittest
 from cis_interface.metaschema.datatypes.tests import (
     test_JSONObjectMetaschemaType as parent)
 from cis_interface.metaschema.datatypes import PlyMetaschemaType
-from cis_interface.tests import CisTestClassInfo
+from cis_interface.tests import CisTestClassInfo, assert_raises, assert_equal
 from cis_interface.drivers.LPyModelDriver import _lpy_installed
 
 
@@ -51,13 +50,13 @@ for f in _test_value['faces']:
 
 def test_create_schema():
     r"""Test create_schema."""
-    nt.assert_raises(RuntimeError, PlyMetaschemaType.create_schema, overwrite=False)
+    assert_raises(RuntimeError, PlyMetaschemaType.create_schema, overwrite=False)
     temp = os.path.join(tempfile.gettempdir(), 'temp_schema')
     old_schema = PlyMetaschemaType.get_schema()
     try:
         shutil.move(PlyMetaschemaType._schema_file, temp)
         new_schema = PlyMetaschemaType.get_schema()
-        nt.assert_equal(old_schema, new_schema)
+        assert_equal(old_schema, new_schema)
     except BaseException:  # pragma: debug
         shutil.move(temp, PlyMetaschemaType._schema_file)
         raise
@@ -66,17 +65,27 @@ def test_create_schema():
 
 def test_translate_ply2fmt_errors():
     r"""Test errors in translate_ply2fmt."""
-    nt.assert_raises(ValueError, PlyMetaschemaType.translate_ply2fmt, 'invalid')
+    assert_raises(ValueError, PlyMetaschemaType.translate_ply2fmt, 'invalid')
 
 
 def test_translate_ply2py_errors():
     r"""Test errors in translate_ply2py."""
-    nt.assert_raises(ValueError, PlyMetaschemaType.translate_ply2py, 'invalid')
+    assert_raises(ValueError, PlyMetaschemaType.translate_ply2py, 'invalid')
 
 
 def test_translate_py2ply_errors():
     r"""Test errors in translate_py2ply."""
-    nt.assert_raises(ValueError, PlyMetaschemaType.translate_py2ply, 'float128')
+    assert_raises(ValueError, PlyMetaschemaType.translate_py2ply, 'float128')
+
+
+def test_singular2plural():
+    r"""Test conversion from singular element names to plural ones and back."""
+    pairs = [('face', 'faces'), ('vertex', 'vertices'),
+             ('vertex_index', 'vertex_indices')]
+    for s, p in pairs:
+        assert_equal(PlyMetaschemaType.singular2plural(s), p)
+        assert_equal(PlyMetaschemaType.plural2singular(p), s)
+    assert_raises(ValueError, PlyMetaschemaType.plural2singular, 'invalid')
 
 
 class TestPlyDict(CisTestClassInfo):
@@ -97,7 +106,7 @@ class TestPlyDict(CisTestClassInfo):
 
     def test_count_elements(self):
         r"""Test count_elements."""
-        nt.assert_raises(ValueError, self.instance.count_elements, 'invalid')
+        assert_raises(ValueError, self.instance.count_elements, 'invalid')
         self.instance.count_elements('vertices')
 
     def test_mesh(self):
@@ -109,7 +118,7 @@ class TestPlyDict(CisTestClassInfo):
         ply1 = copy.deepcopy(self.instance)
         ply2 = ply1.merge(self.instance)
         ply1.merge([self.instance], no_copy=True)
-        nt.assert_equal(ply1, ply2)
+        assert_equal(ply1, ply2)
 
     def test_append(self):
         r"""Test appending ply objects."""
@@ -121,8 +130,8 @@ class TestPlyDict(CisTestClassInfo):
         r"""Test applying a scalar colormap."""
         o = copy.deepcopy(self.instance)
         scalar_arr = np.arange(o.count_elements('faces')).astype('float')
-        nt.assert_raises(NotImplementedError, o.apply_scalar_map,
-                         scalar_arr, scale_by_area=True)
+        assert_raises(NotImplementedError, o.apply_scalar_map,
+                      scalar_arr, scale_by_area=True)
         new_faces = []
         if _as_obj:
             for f in o['faces']:
@@ -138,7 +147,7 @@ class TestPlyDict(CisTestClassInfo):
             o1 = o.apply_scalar_map(scalar_arr, scaling=scale, scale_by_area=True)
             o2.apply_scalar_map(scalar_arr, scaling=scale, scale_by_area=True,
                                 no_copy=True)
-            nt.assert_equal(o1, o2)
+            assert_equal(o1, o2)
 
     @unittest.skipIf(not _lpy_installed, "LPy library not installed.")
     def test_to_from_scene(self, _as_obj=False):  # pragma: lpy
@@ -147,7 +156,7 @@ class TestPlyDict(CisTestClassInfo):
         cls = o1.__class__
         s = o1.to_scene(name='test')
         o2 = cls.from_scene(s)
-        nt.assert_equal(o2, o1)
+        assert_equal(o2, o1)
         if _as_obj:
             o2['faces'] = [[{'vertex_index': x} for x in [0, 1, 2, 3]]]
             o3 = copy.deepcopy(o2)
@@ -158,8 +167,20 @@ class TestPlyDict(CisTestClassInfo):
             o3 = copy.deepcopy(o2)
             o3['faces'] = [{'vertex_index': [0, 1, 2]},
                            {'vertex_index': [0, 1, 2, 3]}]
-        nt.assert_raises(ValueError, o2.to_scene)
-        nt.assert_raises(ValueError, o3.to_scene)
+        assert_raises(ValueError, o2.to_scene)
+        assert_raises(ValueError, o3.to_scene)
+
+    def test_to_from_dict(self):
+        r"""Test transformation to/from dict."""
+        x = self.instance.as_dict()
+        y = self.import_cls.from_dict(x)
+        assert_equal(y, self.instance)
+
+    def test_properties(self):
+        r"""Test explicit exposure of specific element counts as properties
+        against counts based on singular elements."""
+        assert_equal(self.instance.nvert, self.instance.count_elements('vertex'))
+        assert_equal(self.instance.nface, self.instance.count_elements('face'))
 
 
 class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
@@ -186,4 +207,4 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
 
     def test_decode_data_errors(self):
         r"""Test errors in decode_data."""
-        nt.assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
+        assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
