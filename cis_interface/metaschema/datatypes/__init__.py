@@ -306,29 +306,6 @@ def encode_data(obj, typedef=None):
     return cls.encode_data(obj, typedef=typedef)
 
 
-def encode_data_readable(obj, typedef=None):
-    r"""Encode an object into a JSON serializable object that is human readable
-    but dosn't guarantee identical deserialization.
-
-    Args:
-        obj (object): Python object to be encoded.
-        typedef (dict, optional): JSON schema describing the object. Defaults
-            to None and class is determined from the object.
-
-    Returns:
-        object: JSON serializable version of the object.
-
-    """
-    if isinstance(typedef, dict) and ('type' in typedef):
-        cls = get_type_class(typedef['type'])
-    else:
-        cls = guess_type_from_obj(obj)
-        if typedef is None:
-            metadata = cls.encode_type(obj)
-            typedef = cls.extract_typedef(metadata)
-    return cls.encode_data_readable(obj, typedef=typedef)
-
-
 def encode(obj):
     r"""Encode an object into a message.
 
@@ -433,10 +410,9 @@ def compare_schema(schema1, schema2, root1=None, root2=None):
             type_cls1 = get_type_class(schema1['type'])
             if type_cls1.is_fixed:
                 schema1 = type_cls1.typedef_fixed2base(schema1)
-            if isinstance(schema2['type'], list):
-                type_list = schema2['type']
-            else:
-                type_list = [schema2['type']]
+            type_list = schema2['type']
+            if not isinstance(schema2['type'], list):
+                type_list = [type_list]
             all_errors = []
             for itype in type_list:
                 itype_cls2 = get_type_class(itype)
