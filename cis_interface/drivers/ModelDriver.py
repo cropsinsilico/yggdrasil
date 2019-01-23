@@ -179,7 +179,7 @@ class ModelDriver(Driver):
         else:
             try:
                 self.queue.put(line.decode('utf-8'))
-            except BaseException as e:
+            except BaseException as e:  # pragma: debug
                 warnings.warn("Error in printing output: %s" % e)
 
     def before_loop(self):
