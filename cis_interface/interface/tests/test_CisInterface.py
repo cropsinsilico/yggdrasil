@@ -81,7 +81,7 @@ class TestBase(CisTestClassInfo):
     def odriver_class(self):
         r"""class: Output driver class."""
         if self.direction is None:
-            return None
+            return None  # pragma: no cover
         elif (self.direction == 'output') and self.is_file:
             return import_driver('FileOutputDriver')
         elif (self.direction == 'input') and self.is_file:
@@ -92,7 +92,7 @@ class TestBase(CisTestClassInfo):
     def idriver_class(self):
         r"""class: Input driver class."""
         if self.direction is None:
-            return None
+            return None  # pragma: no cover
         elif (self.direction == 'output') and self.is_file:
             return None
         elif (self.direction == 'input') and self.is_file:
@@ -108,7 +108,7 @@ class TestBase(CisTestClassInfo):
             return ([self.name, self.filename],
                     {'ocomm_kws': filecomm_kwargs})
         elif (self.direction == 'input') and self.is_file:
-            return None, None
+            return None, None  # pragma: no cover
         elif (self.direction == 'output'):
             return [self.name, self.name + '_link'], {}
         elif (self.direction == 'input'):
@@ -119,7 +119,7 @@ class TestBase(CisTestClassInfo):
     def idriver_args(self):
         r"""list: Input driver arguments."""
         if (self.direction == 'output') and self.is_file:
-            return None, None
+            return None, None  # pragma: no cover
         elif (self.direction == 'input') and self.is_file:
             filecomm_kwargs = self.testing_options['kwargs']
             filecomm_kwargs['comm'] = self.filecomm
