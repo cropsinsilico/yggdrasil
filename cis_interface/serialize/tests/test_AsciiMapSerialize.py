@@ -19,3 +19,9 @@ class TestAsciiMapSerialize(parent.TestDefaultSerialize):
         r"""Test error on serializing dictionary with non-string values."""
         obj = {1: 'here'}
         self.assert_raises(ValueError, self.instance.serialize, obj)
+
+    def test_remove_quotes(self):
+        r"""Test deserialization of message with single quotes."""
+        send_msg = b"a\t'a_value'\n"
+        recv_msg = {'a': 'a_value'}
+        self.assert_equal(self.instance.deserialize(send_msg)[0], recv_msg)

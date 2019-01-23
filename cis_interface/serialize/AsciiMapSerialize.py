@@ -64,22 +64,19 @@ class AsciiMapSerialize(DefaultSerialize):
             dict: Deserialized Python dictionary.
 
         """
-        if len(msg) == 0:
-            out = self.empty_msg
-        else:
-            out = dict()
-            lines = (backwards.as_str(msg)).split(self.newline)
-            for l in lines:
-                kv = l.split(self.delimiter)
-                if len(kv) <= 1:
-                    continue
-                elif len(kv) == 2:
-                    if kv[1].startswith("'") and kv[1].endswith("'"):
-                        out[kv[0]] = kv[1].strip("'")
-                    else:
-                        out[kv[0]] = json.loads(kv[1])
+        out = dict()
+        lines = (backwards.as_str(msg)).split(self.newline)
+        for l in lines:
+            kv = l.split(self.delimiter)
+            if len(kv) <= 1:
+                continue
+            elif len(kv) == 2:
+                if kv[1].startswith("'") and kv[1].endswith("'"):
+                    out[kv[0]] = kv[1].strip("'")
                 else:
-                    raise ValueError("Line has more than one delimiter: " + l)
+                    out[kv[0]] = json.loads(kv[1])
+            else:
+                raise ValueError("Line has more than one delimiter: " + l)
         return out
 
     @classmethod
