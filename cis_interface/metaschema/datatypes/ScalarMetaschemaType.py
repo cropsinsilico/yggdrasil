@@ -133,8 +133,8 @@ class ScalarMetaschemaType(MetaschemaType):
 
         Args:
             obj (object): Object to transform.
-            typedef (dict): Type definition that should be used to transform the
-                object.
+            typedef (dict, optional): Type definition that should be used to
+                transform the object. Defaults to None.
 
         Returns:
             object: Transformed object.
@@ -146,7 +146,7 @@ class ScalarMetaschemaType(MetaschemaType):
         typedef1 = copy.deepcopy(typedef0)
         typedef1.update(**typedef)
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef1)
-        arr = cls.to_array(obj).astype(dtype)
+        arr = cls.to_array(obj).astype(dtype, casting='same_kind')
         out = cls.from_array(arr, unit_str=typedef0.get('units', None), dtype=dtype)
         out = cls.as_python_type(out, typedef)
         return units.convert_to(out, typedef1.get('units', None))
