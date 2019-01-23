@@ -252,11 +252,11 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
                'is_user_defined': True}
         return out
         
-    def _func_serialize(self, args):
+    def _func_serialize(self, args):  # pragma: no cover
         r"""Method that serializes using repr."""
         return backwards.as_bytes(repr(args))
 
-    def _func_deserialize(self, args):
+    def _func_deserialize(self, args):  # pragma: no cover
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return self.testing_options['empty']
@@ -266,11 +266,11 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
 
 class FakeSerializer(DefaultSerialize.DefaultSerialize):
 
-    def func_serialize(self, args):
+    def func_serialize(self, args):  # pragma: no cover
         r"""Method that serializes using repr."""
         return backwards.as_bytes(repr(args))
 
-    def func_deserialize(self, args):
+    def func_deserialize(self, args):  # pragma: no cover
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return []
@@ -330,19 +330,19 @@ class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
     @unittest.skipIf(True, 'Error testing')
     def test_serialize_no_metadata(self):
         r"""Test serializing without metadata."""
-        pass
+        pass  # pragma: no cover
         
     @unittest.skipIf(True, 'Error testing')
     def test_serialize_header(self):
         r"""Disabled: Test serialize/deserialize with header."""
-        pass
+        pass  # pragma: no cover
 
     @unittest.skipIf(True, 'Error testing')
     def test_serialize_sinfo(self):
         r"""Disabled: Test serialize/deserialize with serializer info."""
-        pass
+        pass  # pragma: no cover
 
     @unittest.skipIf(True, 'Error testing')
     def test_field_specs(self):
         r"""Disabled: Test field specifiers."""
-        pass
+        pass  # pragma: no cover
