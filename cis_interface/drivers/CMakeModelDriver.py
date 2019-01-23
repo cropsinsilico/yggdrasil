@@ -251,7 +251,7 @@ class CMakeModelDriver(ModelDriver):
         comp_process = tools.popen_nobuffer(build_cmd)
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
-        if exit_code != 0:
+        if exit_code != 0:  # pragma: debug
             os.chdir(curdir)
             self.error(backwards.as_unicode(output))
             self.cleanup()
