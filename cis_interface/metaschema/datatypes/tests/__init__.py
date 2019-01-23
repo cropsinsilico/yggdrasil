@@ -72,10 +72,18 @@ def test_compare_schema():
         ({'type': 'object', 'definitions': {'a': {'type': 'int'}},
           'properties': {'x': {'$ref': '#/definitions/a'}}},
          {'type': 'object', 'definitions': {'b': {'type': 'int'}},
-          'properties': {'x': {'$ref': '#/definitions/b'}}})]
+          'properties': {'x': {'$ref': '#/definitions/b'}}}),
+        ({'type': 'object', 'properties': {'x': {'type': 'float'}}},
+         {'type': 'object', 'properties': {'x': {'type': 'float'},
+                                           'y': {'type': 'float'}},
+          'required': ['x']})]
     invalid = [
         ({'type': 'int'}, {}), ({}, {'type': 'int'}),
-        ({'type': 'int'}, {'type': 'int', 'precision': 4})]
+        ({'type': 'int'}, {'type': 'int', 'precision': 4}),
+        ({'type': 'object', 'definitions': {'a': {'type': 'float'}},
+          'properties': {'x': {'$ref': '#/definitions/a'}}},
+         {'type': 'object', 'definitions': {'b': {'type': 'int'}},
+          'properties': {'x': {'$ref': '#/definitions/b'}}})]
     for x in valid:
         errors = list(datatypes.compare_schema(*x))
         assert(not errors)
