@@ -1,5 +1,4 @@
-import nose.tools as nt
-from cis_interface.tests import CisTestClassInfo
+from cis_interface.tests import CisTestClassInfo, assert_equal
 from cis_interface.metaschema import get_validator, get_metaschema
 from cis_interface.metaschema.datatypes import MetaschemaTypeError
 from cis_interface.metaschema.properties.MetaschemaProperty import (
@@ -19,9 +18,9 @@ def test_dynamic():
         return
 
     new_prop = create_property('invalid', None, encode, validate, compare)
-    nt.assert_equal(new_prop.encode('hello'), None)
-    nt.assert_equal(list(new_prop.validate(None, None, None, None)), [])
-    nt.assert_equal(list(new_prop.compare(True, False)), [])
+    assert_equal(new_prop.encode('hello'), None)
+    assert_equal(list(new_prop.validate(None, None, None, None)), [])
+    assert_equal(list(new_prop.compare(True, False)), [])
 
 
 class TestMetaschemaProperty(CisTestClassInfo):
@@ -37,6 +36,7 @@ class TestMetaschemaProperty(CisTestClassInfo):
         self._encode_errors = []
         self._valid_compare = [(0, 0)]
         self._invalid_compare = [(0, 1)]
+        self._valid_normalize_schema = []
         self.validator = get_validator()(get_metaschema())
 
     @property
@@ -56,12 +56,12 @@ class TestMetaschemaProperty(CisTestClassInfo):
             errors = list(self.import_cls.compare(x, value))
             assert(not errors)
         if self.import_cls.name == 'base':
-            nt.assert_raises(NotImplementedError, self.import_cls.encode, None)
+            self.assert_raises(NotImplementedError, self.import_cls.encode, None)
 
     def test_encode_errors(self):
         r"""Test errors raised by encode."""
         for instance in self._encode_errors:
-            nt.assert_raises(MetaschemaTypeError, self.import_cls.encode, instance)
+            self.assert_raises(MetaschemaTypeError, self.import_cls.encode, instance)
 
     def test_validate_valid(self):
         r"""Test validation method for the class on valid objects."""
@@ -97,3 +97,8 @@ class TestMetaschemaProperty(CisTestClassInfo):
         for x in self._invalid_compare:
             errors = list(self.import_cls.compare(*x))
             assert(errors)
+
+    def test_normalize_in_schema(self):
+        r"""Test normalization in schema."""
+        for x, y in self._valid_normalize_schema:
+            self.assert_equal(self.import_cls.normalize_in_schema(x), y)
