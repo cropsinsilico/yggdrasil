@@ -123,30 +123,6 @@ class ContainerMetaschemaType(MetaschemaType):
         return container
 
     @classmethod
-    def transform_type(cls, obj, typedef=None):
-        r"""Transform an object based on type info.
-
-        Args:
-            obj (object): Object to transform.
-            typedef (dict, optional): Type definition that should be used to
-                transform the object. Defaults to None and no transformation
-                is performed.
-
-        Returns:
-            object: Transformed object.
-
-        """
-        if typedef is None:
-            return obj
-        # if cls._json_property in typedef:
-        #     for k, v in cls._iterate(obj):
-        #         if cls._has_element(typedef[cls._json_property], k):
-        #             vtype = cls._get_element(typedef[cls._json_property], k, None)
-        #             vcls = get_type_class(vtype['type'])  # required
-        #             cls._assign(obj, k, vcls.transform_type(obj[k], typedef=vtype))
-        return obj
-
-    @classmethod
     def extract_typedef(cls, metadata):
         r"""Extract the minimum typedef required for this type from the provided
         metadata.
