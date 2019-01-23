@@ -183,12 +183,10 @@ def create(*args, **kwargs):
             for k, v in kwargs.items():
                 if k == 'normalizers':
                     for ik, iv in self.NORMALIZERS.items():
-                        if ik not in v:
-                            v[ik] = iv
+                        v.setdefault(ik, iv)
                 elif k == 'validators':
                     for ik, iv in self.VALIDATORS.items():
-                        if ik not in v:
-                            v[ik] = iv
+                        v.setdefault(ik, iv)
                 if hasattr(self, k.upper()):
                     ksub = k.upper()
                 else:
