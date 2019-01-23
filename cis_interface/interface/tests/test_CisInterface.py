@@ -76,6 +76,8 @@ class TestBase(CisTestClassInfo):
         self.test_comm_kwargs = {}
         # self._driver_kwargs = {}
         self._inst_args = [self.name]
+        self.fmt_str = b'%5s\t%d\t%f\n'
+        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
 
     @property
     def odriver_class(self):
@@ -241,6 +243,7 @@ class TestCisInput(TestBase):
         self.direction = 'input'
         if self.__class__ == TestCisInput:
             self.testing_option_kws = {'as_format': True}
+            self._inst_kwargs = {'format_str': self.fmt_str}
 
     def test_msg(self):
         r"""Test sending/receiving message."""
@@ -265,6 +268,8 @@ class TestCisInputMatlab(TestCisInput):
     def __init__(self, *args, **kwargs):
         super(TestCisInputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
+        self.testing_option_kws = {'as_format': True}
+        self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
 class TestCisOutput(TestBase):
@@ -275,6 +280,7 @@ class TestCisOutput(TestBase):
         self.direction = 'output'
         if self.__class__ == TestCisOutput:
             self.testing_option_kws = {'as_format': True}
+            self._inst_kwargs = {'format_str': self.fmt_str}
 
     def test_msg(self):
         r"""Test sending/receiving message."""
@@ -307,6 +313,8 @@ class TestCisOutputMatlab(TestCisOutput):
     def __init__(self, *args, **kwargs):
         super(TestCisOutputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
+        self.testing_option_kws = {'as_format': True}
+        self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
 class TestCisRpcClient(TestCisOutput):
@@ -314,8 +322,6 @@ class TestCisRpcClient(TestCisOutput):
     def __init__(self, *args, **kwargs):
         super(TestCisRpcClient, self).__init__(*args, **kwargs)
         self._cls = 'CisRpcClient'
-        self.fmt_str = b'%5s\t%d\t%f\n'
-        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ServerComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -355,8 +361,6 @@ class TestCisRpcServer(TestCisInput):
     def __init__(self, *args, **kwargs):
         super(TestCisRpcServer, self).__init__(*args, **kwargs)
         self._cls = 'CisRpcServer'
-        self.fmt_str = b'%5s\t%d\t%f\n'
-        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ClientComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
@@ -427,8 +431,6 @@ class TestCisAsciiTableOutput(TestCisAsciiFileOutput):
         self._cls = 'CisAsciiTableOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
-        self.fmt_str = b'%5s\t%d\t%f\n'
-        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
         self._inst_args = [self.name, self.fmt_str]
         self._inst_kwargs = {}
 
