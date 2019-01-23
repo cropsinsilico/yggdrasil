@@ -5,7 +5,8 @@ from cis_interface import platform, tools
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface.drivers.GCCModelDriver import (
-    GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags)
+    GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags,
+    build_datatypes, build_api)
 
 
 _driver_installed = GCCModelDriver.is_installed()
@@ -33,6 +34,14 @@ def test_get_flags():
     if not _driver_installed:  # pragma: windows
         nt.assert_equal(len(cc), 0)
         nt.assert_equal(len(ld), 0)
+
+
+def test_build_shared():
+    r"""Test building libraries as shared."""
+    build_datatypes(as_shared=False, overwrite=True)
+    build_datatypes(as_shared=True, overwrite=True)
+    build_api(cpp=False, as_shared=True, overwrite=True)
+    build_api(cpp=True, as_shared=True, overwrite=True)
 
 
 @unittest.skipIf(_driver_installed, "C Library installed")

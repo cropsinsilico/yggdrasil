@@ -16,13 +16,22 @@ _incl_regex = os.path.join(_top_dir, 'regex')
 _incl_dtype = os.path.join(_top_dir, 'metaschema', 'datatypes')
 _regex_win32_lib = os.path.join(_incl_regex, 'regex_win32.lib')
 if platform._is_win:  # pragma: windows
-    _datatypes_lib = os.path.join(_incl_dtype, 'datatypes.lib')
-    _api_shared_c = os.path.join(_incl_interface, 'cis.lib')
-    _api_shared_cpp = os.path.join(_incl_interface, 'cis++.lib')
+    _prefix = ''
+    _static_ext = '.lib'
+    _shared_ext = '.dll'
 else:
-    _datatypes_lib = os.path.join(_incl_dtype, 'libdatatypes.a')
-    _api_shared_c = os.path.join(_incl_interface, 'libcis.a')
-    _api_shared_cpp = os.path.join(_incl_interface, 'libcis++.a')
+    _prefix = 'lib'
+    _static_ext = '.a'
+    if platform._is_mac:
+        _shared_ext = '.dylib'
+    else:
+        _shared_ext = '.so'
+_datatypes_static_lib = os.path.join(_incl_dtype, _prefix + 'datatypes' + _static_ext)
+_api_static_c = os.path.join(_incl_interface, _prefix + 'cis' + _static_ext)
+_api_static_cpp = os.path.join(_incl_interface, _prefix + 'cis++' + _static_ext)
+_datatypes_shared_lib = os.path.join(_incl_dtype, _prefix + 'datatypes' + _shared_ext)
+_api_shared_c = os.path.join(_incl_interface, _prefix + 'cis' + _shared_ext)
+_api_shared_cpp = os.path.join(_incl_interface, _prefix + 'cis++' + _shared_ext)
 
 
 def get_zmq_flags(for_cmake=False):
@@ -118,7 +127,7 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
         _compile_flags += ["-I" + x]
     if not for_api:
         if for_cmake:
-            _linker_flags += [_api_shared_c, _api_shared_cpp]
+            _linker_flags += [_api_static_c, _api_static_cpp]
         else:
             _linker_flags += ["-L" + _incl_interface]
             if cpp:
@@ -329,7 +338,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
         args += ['/OUT:%s' % out]
     elif platform._is_mac:
         if shared:
-            args += ["-o", os.path.basename(out)]
+            args += ["-o", out]
         else:
             args += ["-o", out]
     else:
@@ -340,9 +349,6 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     args += obj
     if not (shared or static):
         args += flags
-    if platform._is_mac and shared:
-        args.append('-L' + os.path.dirname(out))
-        args.append('-l' + os.path.splitext(os.path.basename(out))[0].split('lib')[-1])
     # Call linker
     comp_process = tools.popen_nobuffer(args)
     output, err = comp_process.communicate()
@@ -356,15 +362,21 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     return out
 
 
-def build_api(cpp=False, overwrite=False):
+def build_api(cpp=False, overwrite=False, as_shared=False):
     r"""Build api library."""
     # Get paths
     api_src = os.path.join(_incl_interface, 'CisInterface')
     if cpp:
-        api_lib = _api_shared_cpp
+        if as_shared:
+            api_lib = _api_shared_cpp
+        else:
+            api_lib = _api_static_cpp
         api_src += '.cpp'
     else:
-        api_lib = _api_shared_c
+        if as_shared:
+            api_lib = _api_shared_c
+        else:
+            api_lib = _api_static_c
         api_src += '.c'
     # Get flags
     ccflags0, ldflags0 = get_flags(for_api=True, cpp=cpp)
@@ -384,9 +396,13 @@ def build_api(cpp=False, overwrite=False):
     return out
 
 
-def build_datatypes(just_obj=False, overwrite=False):
+def build_datatypes(just_obj=False, overwrite=False, as_shared=False):
     r"""Build the datatypes library."""
-    _datatypes_dir = os.path.dirname(_datatypes_lib)
+    if as_shared:
+        dtype_lib = _datatypes_shared_lib
+    else:
+        dtype_lib = _datatypes_static_lib
+    _datatypes_dir = os.path.dirname(dtype_lib)
     _datatypes_cpp = os.path.join(_datatypes_dir, 'datatypes.cpp')
     flags = []
     for x in [_datatypes_dir, _incl_regex]:
@@ -396,8 +412,7 @@ def build_datatypes(just_obj=False, overwrite=False):
                                   overwrite=overwrite)
     if just_obj:
         return _datatypes_obj
-    call_link(_datatypes_obj, _datatypes_lib, static=True,
-              overwrite=overwrite)
+    call_link(_datatypes_obj, dtype_lib, cpp=True, overwrite=overwrite)
     
 
 def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
@@ -438,9 +453,9 @@ def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
 # if platform._is_win:  # pragma: windows
 #     build_regex_win32(overwrite=False)
 # build_datatypes(overwrite=False)
-if not os.path.isfile(_api_shared_c):
+if not os.path.isfile(_api_static_c):
     build_api(cpp=False, overwrite=False)
-if not os.path.isfile(_api_shared_cpp):
+if not os.path.isfile(_api_static_cpp):
     build_api(cpp=True, overwrite=False)
 
 
