@@ -4,8 +4,11 @@ cis_interface/tests/scripts/gcc_model.out
 cis_interface/tests/scripts/Makefile
 
 # Library things
-cis_interface/interface/libcis.a
-cis_interface/interface/libcis++.a
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
 
 # Intermediate docs
 docs/build
