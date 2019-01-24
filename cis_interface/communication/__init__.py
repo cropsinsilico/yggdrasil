@@ -71,8 +71,6 @@ def get_comm(name, comm=None, new_comm_class=None, **kwargs):
         Comm: Communicator of given class.
 
     """
-    if comm is None:
-        comm = tools.get_default_comm()
     if new_comm_class is not None:
         comm = new_comm_class
     if isinstance(comm, list):
@@ -101,11 +99,6 @@ def new_comm(name, comm=None, **kwargs):
         Comm: Communicator of given class.
 
     """
-    if comm is None:
-        comm = tools.get_default_comm()
-    # elif comm == 'ErrorComm':
-    #     comm = kwargs.get('base_comm', tools.get_default_comm())
-    #     kwargs['new_comm_class'] = 'ErrorComm'
     if isinstance(comm, list):
         if len(comm) == 1:
             name = comm[0].pop('name', name)
