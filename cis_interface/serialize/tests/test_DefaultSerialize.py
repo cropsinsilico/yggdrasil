@@ -52,7 +52,7 @@ class TestDefaultSerialize(CisTestClassInfo):
     def empty_head(self, msg):
         r"""dict: Empty header for message only contains the size."""
         out = dict(size=len(msg), incomplete=False)
-        if msg == tools.CIS_MSG_EOF:
+        if msg == tools.CIS_MSG_EOF:  # pragma: debug
             out['eof'] = True
         return out
 
