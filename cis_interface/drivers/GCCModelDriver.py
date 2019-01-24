@@ -384,11 +384,13 @@ def build_api(cpp=False, overwrite=False, as_shared=False):
     fname_obj = []
     # Compile regex for windows
     if platform._is_win:  # pragma: windows
-        fname_obj.append(build_regex_win32(just_obj=True))
+        fname_obj.append(build_regex_win32(just_obj=True,
+                                           overwrite=overwrite))
     elif platform._is_linux:
         ccflags0.append('-fPIC')
     # Compile C++ wrapper for data types
-    fname_obj.append(build_datatypes(just_obj=True))
+    fname_obj.append(build_datatypes(just_obj=True,
+                                     overwrite=overwrite))
     # Compile object for the interface
     fname_api_base = api_src
     fname_api_out = call_compile(fname_api_base, flags=ccflags0,

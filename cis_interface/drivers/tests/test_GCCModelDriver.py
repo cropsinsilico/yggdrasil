@@ -42,6 +42,7 @@ def test_build_shared():
     build_datatypes(as_shared=True, overwrite=True)
     build_api(cpp=False, as_shared=True, overwrite=True)
     build_api(cpp=True, as_shared=True, overwrite=True)
+    build_api(cpp=True, as_shared=True, overwrite=False)
 
 
 @unittest.skipIf(_driver_installed, "C Library installed")
