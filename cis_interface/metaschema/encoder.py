@@ -8,7 +8,7 @@ _json_encoder = None
 class JSONReadableEncoder(json.JSONEncoder):
     r"""Encoder class for CiS messages."""
 
-    def default(self, o):
+    def default(self, o):  # pragma: no cover
         r"""Encoder that allows for expansion types."""
         for cls in get_registered_types().values():
             if (not cls._replaces_existing) and cls.validate(o):
