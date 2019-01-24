@@ -293,6 +293,13 @@ class CisRunner(CisClass):
 
         """
         yml['models'] = []
+        if yml['args'] not in self._outputchannels:
+            for x in yml['icomm_kws']['comm']:
+                if 'filetype' not in x:
+                    raise Exception(
+                        ("Input driver %s could not locate a "
+                         + "corresponding file or output channel %s") % (
+                             x["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
 
@@ -310,6 +317,13 @@ class CisRunner(CisClass):
         if yml['args'] in self._inputchannels:
             yml.setdefault('comm_env', {})
             yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
+        if yml['args'] not in self._inputchannels:
+            for x in yml['ocomm_kws']['comm']:
+                if 'filetype' not in x:
+                    raise Exception(
+                        ("Output driver %s could not locate a "
+                         + "corresponding file or input channel %s") % (
+                             x["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
         
