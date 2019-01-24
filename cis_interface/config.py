@@ -167,7 +167,7 @@ def update_config_matlab(config):
         pass
     for k in opts.keys():
         if not config.has_option('matlab', k):
-            if opts[k][1]:
+            if opts[k][1]:  # pragma: matlab
                 config.set('matlab', k, opts[k][1])
             else:
                 out.append(('matlab', k, opts[k][0]))

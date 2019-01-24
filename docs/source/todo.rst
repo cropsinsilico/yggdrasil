@@ -23,3 +23,4 @@ TODO
 * Update/replace io_drivers section of docs
 * Remove IOInfo test class as no longer used
 * Add example of each supported language (missing LPy, cmake, make)
+* Replace nose with unittest/pytest
