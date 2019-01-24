@@ -325,7 +325,6 @@ def call_link(obj, out=None, flags=[], overwrite=False,
             flags.append('-dynamiclib')
         else:
             flags.append('-shared')
-            # flags.append('-fPIC')
         args += flags
     elif static:
         if platform._is_win:  # pragma: windows
@@ -386,6 +385,8 @@ def build_api(cpp=False, overwrite=False, as_shared=False):
     # Compile regex for windows
     if platform._is_win:  # pragma: windows
         fname_obj.append(build_regex_win32(just_obj=True))
+    elif platform._is_linux:
+        ccflags0.append('-fPIC')
     # Compile C++ wrapper for data types
     fname_obj.append(build_datatypes(just_obj=True))
     # Compile object for the interface
@@ -409,6 +410,8 @@ def build_datatypes(just_obj=False, overwrite=False, as_shared=False):
     flags = []
     for x in [_datatypes_dir, _incl_regex]:
         flags += ['-I', x]
+    if platform._is_linux:
+        flags.append('-fPIC')
     _datatypes_obj = call_compile(_datatypes_cpp,
                                   flags=flags,
                                   overwrite=overwrite)
