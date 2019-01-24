@@ -79,6 +79,16 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
                     self._valid_normalize = [(str(self._value), self._value),
                                              ('hello', 'hello')]
 
+    def test_from_array(self):
+        r"""Test getting object from array."""
+        test_val = self._value
+        test_kws = {}
+        if 'units' in self._typedef:
+            test_val = units.add_units(test_val, self._typedef['units'])
+            test_kws['unit_str'] = self._typedef['units']
+        self.assert_equal(self.instance.from_array(self._array, **test_kws),
+                          test_val)
+
 
 # Dynamically create tests for dynamic and explicitly typed scalars
 for t in _valid_types.keys():
