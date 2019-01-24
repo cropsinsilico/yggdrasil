@@ -133,4 +133,4 @@ class TestFileComm_readline(TestFileComm):
 class TestFileComm_ascii(TestFileComm):
     r"""Test for FileComm communication class with open_as_binary = False."""
 
-    testing_option_kws = {'open_as_binary': True}
+    testing_option_kws = {'open_as_binary': False}
