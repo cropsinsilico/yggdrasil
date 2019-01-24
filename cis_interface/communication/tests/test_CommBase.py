@@ -117,12 +117,9 @@ class TestCommBase(CisTestClassInfo):
     @property
     def msg_long(self):
         r"""str: Small test message for sending."""
-        msg_short = self.test_msg
-        if isinstance(msg_short, backwards.bytes_type):
-            out = msg_short + (self.maxMsgSize * b'0')
-        else:
-            out = msg_short
-        # return self.testing_options['msg_long']
+        out = self.test_msg
+        if isinstance(out, backwards.bytes_type):
+            out += (self.maxMsgSize * b'0')
         return out
             
     def setup(self, *args, **kwargs):

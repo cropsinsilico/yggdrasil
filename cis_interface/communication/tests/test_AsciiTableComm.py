@@ -38,7 +38,7 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
     @unittest.skipIf(True, 'Table comm')
     def test_send_recv_comment(self):
         r"""Disabled: Test send/recv with commented message."""
-        pass
+        pass  # pragma: no cover
 
 
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):

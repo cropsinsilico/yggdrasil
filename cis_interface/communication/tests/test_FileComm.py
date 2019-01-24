@@ -31,12 +31,12 @@ class TestFileComm(parent.TestCommBase):
     @unittest.skipIf(True, 'File comm')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test send/recv of a large message."""
-        pass
+        pass  # pragma: no cover
 
     @unittest.skipIf(True, 'File comm')
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
-        pass
+        pass  # pragma: no cover
 
     def test_invalid_read_meth(self):
         r"""Test raise of error on invalid read_meth."""

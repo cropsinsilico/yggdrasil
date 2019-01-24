@@ -21,22 +21,22 @@ class TestServerComm(test_CommBase.TestCommBase):
     @unittest.skipIf(True, 'Server')
     def test_error_send(self):
         r"""Disabled: Test error on send."""
-        pass
+        pass  # pragma: no cover
         
     @unittest.skipIf(True, 'Server')
     def test_error_recv(self):
         r"""Disabled: Test error on recv."""
-        pass
+        pass  # pragma: no cover
         
     @unittest.skipIf(True, 'Server')
     def test_invalid_direction(self):
         r"""Disabled: Test of error on incorrect direction."""
-        pass
+        pass  # pragma: no cover
     
     @unittest.skipIf(True, 'Server')
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
-        pass
+        pass  # pragma: no cover
 
     def test_newcomm_server(self):
         r"""Test creation of server using newcomm."""
