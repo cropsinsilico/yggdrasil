@@ -7,7 +7,9 @@ model:
   output: LPy_mesh
 
 connections:
-  input: lpy_times.txt
-  output: LPy_time
-  input: LPy_mesh
-  output: lpy_mesh.ply  
+  - input: ../data/lpy_times.txt
+    output: LPy_time
+    filetype: table
+  - input: LPy_mesh
+    output: lpy_mesh.ply  
+    filetype: ply

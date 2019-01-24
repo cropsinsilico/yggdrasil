@@ -304,6 +304,16 @@ class PlyDict(dict):
         return self.count_elements('faces')
 
     @property
+    def bounds(self):
+        r"""tuple: Mins/maxs of vertices in each dimension."""
+        mins = np.empty(3, 'float64')
+        maxs = np.empty(3, 'float64')
+        for i, x in enumerate('xyz'):
+            mins[i] = min([v[x] for v in self['vertices']])
+            maxs[i] = max([v[x] for v in self['vertices']])
+        return mins, maxs
+
+    @property
     def mesh(self):
         r"""list: Vertices for each face in the structure."""
         mesh = []
@@ -359,7 +369,6 @@ class PlyDict(dict):
                                          for j in range(len(i3))])
             else:
                 for i3 in d.result.indexList:
-                    print(i3, type(i3), len(i3))
                     out['faces'].append({'vertex_index': [i3[j] for j in
                                                           range(len(i3))]})
         return out
@@ -594,7 +603,6 @@ class PlyDict(dict):
             vmin = vertex_scalar.min()
         if vmax is None:
             vmax = vertex_scalar.max()
-        # print(vmin, vmax)
         cmap = cm.get_cmap(color_map)
         if scaling == 'log':
             norm = mpl_colors.LogNorm(vmin=vmin, vmax=vmax)

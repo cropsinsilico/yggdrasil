@@ -59,17 +59,20 @@ while (flag):
     # Send output as just verts in each face
     if out_meth == 'ply':
         flag = out.send(ply_dict)
+        nface = ply_dict.nface
     elif out_meth == 'obj':
         obj_dict = ObjDict.from_ply(ply_dict)
         flag = out.send(obj_dict)
+        nface = ply_dict.nface
     else:
         mesh = ply_dict.mesh
         flag = out.send(mesh)
+        nface = len(mesh)
     if not flag:
         print('LPy: Failed to send mesh.')
         error_code = -1
         break
-    print('LPy: Sent mesh with %d triangles.' % len(mesh))
+    print('LPy: Sent mesh with %d faces.' % nface)
     print('LPy: \tmins: %f %f %f' % (mins[0], mins[1], mins[2]))
     print('LPy: \tmaxs: %f %f %f' % (maxs[0], maxs[1], maxs[2]))
 
