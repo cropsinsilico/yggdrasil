@@ -325,7 +325,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
             flags.append('-dynamiclib')
         else:
             flags.append('-shared')
-            flags.append('-fPIC')
+            # flags.append('-fPIC')
         args += flags
     elif static:
         if platform._is_win:  # pragma: windows
@@ -351,6 +351,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     if not (shared or static):
         args += flags
     # Call linker
+    print(args)
     comp_process = tools.popen_nobuffer(args)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
