@@ -1,5 +1,5 @@
 import json
-from cis_interface import backwards, platform
+from cis_interface import backwards  # , platform
 from cis_interface.serialize import (
     register_serializer, _default_delimiter, _default_newline)
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
@@ -107,5 +107,5 @@ class AsciiMapSerialize(DefaultSerialize):
                            + b'args2\t"this"\n'
                            + b'args3\t1.0\n'
                            + b'args4\t[1, 2]\n')
-        out['contents'] = out['contents'].replace(b'\n', platform._newline)
+        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out
