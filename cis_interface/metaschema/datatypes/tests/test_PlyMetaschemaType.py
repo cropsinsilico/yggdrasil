@@ -187,6 +187,7 @@ class TestPlyDict(CisTestClassInfo):
     def test_properties(self):
         r"""Test explicit exposure of specific element counts as properties
         against counts based on singular elements."""
+        self.instance.bounds
         assert_equal(self.instance.nvert, self.instance.count_elements('vertex'))
         assert_equal(self.instance.nface, self.instance.count_elements('face'))
 
