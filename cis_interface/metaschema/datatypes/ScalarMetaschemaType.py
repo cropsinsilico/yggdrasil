@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import warnings
 from cis_interface import units, backwards
 from cis_interface.metaschema.datatypes import register_type
 from cis_interface.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -121,16 +122,19 @@ class ScalarMetaschemaType(MetaschemaType):
         subtype = typedef.get('subtype', typedef.get('type', None))
         if (cls.name in ['1darray', 'ndarray']):
             return arr.tolist()
-        elif (arr.ndim > 0):
-            if subtype in ['int', 'uint']:
-                return int(arr[0])
-            elif subtype in ['float']:
-                return float(arr[0])
-            elif subtype in ['complex']:
-                return str(complex(arr[0]))
-            elif subtype in ['bytes', 'unicode']:
-                return backwards.as_str(arr[0])
-        return super(ScalarMetaschemaType, cls).encode_data_readable(obj, typedef)
+        assert(arr.ndim > 0)
+        if subtype in ['int', 'uint']:
+            return int(arr[0])
+        elif subtype in ['float']:
+            return float(arr[0])
+        elif subtype in ['complex']:
+            return str(complex(arr[0]))
+        elif subtype in ['bytes', 'unicode']:
+            return backwards.as_str(arr[0])
+        else:  # pragma: debug
+            warnings.warn(("No method for handling readable serialization of "
+                           + "subtype '%s', falling back to default.") % subtype)
+            return super(ScalarMetaschemaType, cls).encode_data_readable(obj, typedef)
 
     @classmethod
     def decode_data(cls, obj, typedef):
