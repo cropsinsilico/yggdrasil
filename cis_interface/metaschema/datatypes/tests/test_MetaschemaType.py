@@ -164,6 +164,8 @@ class TestMetaschemaType(CisTestClassInfo):
         if len(self._valid_encoded) > 0:
             assert_equal(self.import_cls.check_encoded(self._valid_encoded[0],
                                                        {}), False)
+            assert_raises(BaseException, self.import_cls.check_encoded,
+                          self._valid_encoded[0], {}, raise_errors=True)
         # Test valid
         for x in self._valid_encoded:
             assert_equal(self.import_cls.check_encoded(x, self.typedef), True)
@@ -191,6 +193,8 @@ class TestMetaschemaType(CisTestClassInfo):
             # Test invalid with incorrect typedef
             for x in self._valid_decoded:
                 assert_equal(self.import_cls.check_decoded(x, {}), False)
+                assert_raises(BaseException, self.import_cls.check_decoded,
+                              x, {}, raise_errors=True)
             # Test invalid
             for x in self._invalid_decoded:
                 assert_equal(self.import_cls.check_decoded(x, self.typedef), False)
