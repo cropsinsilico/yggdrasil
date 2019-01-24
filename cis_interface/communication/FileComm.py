@@ -433,10 +433,15 @@ class FileComm(CommBase.CommBase):
 
         """
         flag = True
-        if self.read_meth == 'read':
-            out = self.fd.read()
-        elif self.read_meth == 'readline':
-            out = self.fd.readline()
+        try:
+            if self.read_meth == 'read':
+                out = self.fd.read()
+            elif self.read_meth == 'readline':
+                out = self.fd.readline()
+        except BaseException:  # pragma: debug
+            # Use this to catch case where close called during receive.
+            # In the future this should be handled via a lock.
+            out = ''
         if len(out) == 0:
             if self.advance_in_series():
                 self.debug("Advanced to %d", self._series_index)
