@@ -128,7 +128,8 @@ class FileComm(CommBase.CommBase):
             out['recv'] = [b''.join(out['recv'])]
         if not open_as_binary:
             out['contents'] = out['contents'].replace(
-                '\n', backwards.as_str(platform._newline))
+                backwards.match_stype(out['contents'], '\n'),
+                backwards.match_stype(out['contents'], platform._newline))
         return out
         
     @classmethod
