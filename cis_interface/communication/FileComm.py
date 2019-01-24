@@ -107,7 +107,7 @@ class FileComm(CommBase.CommBase):
                 setattr(self, k, func_conv(v))
 
     @classmethod
-    def get_testing_options(cls, read_meth='read', **kwargs):
+    def get_testing_options(cls, read_meth='read', open_as_binary=True, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -123,8 +123,12 @@ class FileComm(CommBase.CommBase):
         """
         out = super(FileComm, cls).get_testing_options(**kwargs)
         out['kwargs']['read_meth'] = read_meth
+        out['kwargs']['open_as_binary'] = open_as_binary
         if (read_meth == 'read') and isinstance(out['recv'][0], backwards.bytes_type):
             out['recv'] = [b''.join(out['recv'])]
+        if not open_as_binary:
+            out['contents'] = out['contents'].replace(
+                '\n', backwards.as_str(platform._newline))
         return out
         
     @classmethod

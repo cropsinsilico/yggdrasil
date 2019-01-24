@@ -133,9 +133,4 @@ class TestFileComm_readline(TestFileComm):
 class TestFileComm_ascii(TestFileComm):
     r"""Test for FileComm communication class with open_as_binary = False."""
 
-    @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestFileComm_ascii, self).send_inst_kwargs
-        out['open_as_binary'] = False
-        return out
+    testing_option_kws = {'open_as_binary': True}
