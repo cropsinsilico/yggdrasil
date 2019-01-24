@@ -1,7 +1,7 @@
 import unittest
-import nose.tools as nt
 import zmq
 from cis_interface import platform
+from cis_interface.tests import assert_raises, assert_equal
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_AsyncComm
 from cis_interface.communication import ZMQComm, IPCComm
@@ -15,9 +15,9 @@ _ipc_installed = IPCComm.IPCComm.is_installed(language='python')
 def test_get_socket_type_mate():
     r"""Test socket type matching."""
     for s, r in ZMQComm._socket_type_pairs:
-        nt.assert_equal(ZMQComm.get_socket_type_mate(s), r)
-        nt.assert_equal(ZMQComm.get_socket_type_mate(r), s)
-    nt.assert_raises(ValueError, ZMQComm.get_socket_type_mate, 'INVALID')
+        assert_equal(ZMQComm.get_socket_type_mate(s), r)
+        assert_equal(ZMQComm.get_socket_type_mate(r), s)
+    assert_raises(ValueError, ZMQComm.get_socket_type_mate, 'INVALID')
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
@@ -28,18 +28,18 @@ def test_format_address():
     port = 5555
     address = ZMQComm.format_address(protocol, host, port)
     result = ZMQComm.parse_address(address)
-    nt.assert_equal(result['protocol'], protocol)
-    nt.assert_equal(result['host'], host)
-    nt.assert_equal(result['port'], port)
-    nt.assert_raises(ValueError, ZMQComm.parse_address, 'INVALID')
-    nt.assert_raises(ValueError, ZMQComm.parse_address, 'INVALID://')
+    assert_equal(result['protocol'], protocol)
+    assert_equal(result['host'], host)
+    assert_equal(result['port'], port)
+    assert_raises(ValueError, ZMQComm.parse_address, 'INVALID')
+    assert_raises(ValueError, ZMQComm.parse_address, 'INVALID://')
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
 def test_invalid_protocol():
     r"""Test raise of an error in the event of an invalid protocol."""
-    nt.assert_raises(ValueError, new_comm, 'test_invalid_protocol',
-                     comm='ZMQComm', protocol='invalid')
+    assert_raises(ValueError, new_comm, 'test_invalid_protocol',
+                  comm='ZMQComm', protocol='invalid')
 
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
@@ -52,9 +52,9 @@ def test_error_on_send_open_twice():
         name1 = 'test_%s' % s
         comm1 = new_comm(name1 + '_1', comm='ZMQComm', socket_type=s,
                          dont_open=True, socket_action='bind')
-        nt.assert_raises(zmq.ZMQError, ZMQComm.ZMQComm,
-                         name1 + '_2', socket_type=s,
-                         address=comm1.opp_address, socket_action='bind')
+        assert_raises(zmq.ZMQError, ZMQComm.ZMQComm,
+                      name1 + '_2', socket_type=s,
+                      address=comm1.opp_address, socket_action='bind')
         comm1.close()
 
         
@@ -113,7 +113,7 @@ class TestZMQComm_client(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
     
 # Tests for all the supported protocols
@@ -126,7 +126,7 @@ class TestZMQCommINPROC(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
     
 class TestZMQCommTCP(TestZMQComm):
@@ -138,7 +138,7 @@ class TestZMQCommTCP(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
     
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
@@ -151,7 +151,7 @@ class TestZMQCommIPC(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
     
 
 class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
@@ -169,7 +169,7 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 #     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
 #         r"""Disabled send/recv of large message."""
-#         pass
+#         pass  # pragma: no cover
 
 
 # class TestZMQCommPGM(TestZMQComm):
@@ -181,7 +181,7 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 #     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
 #         r"""Disabled send/recv of large message."""
-#         pass
+#         pass  # pragma: no cover
 
     
 # class TestZMQCommEPGM(TestZMQComm):
@@ -193,7 +193,7 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 #     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
 #         r"""Disabled send/recv of large message."""
-#         pass
+#         pass  # pragma: no cover
 
 
 # Tests for all the socket types
@@ -206,7 +206,7 @@ class TestZMQCommPAIR(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
     
 class TestZMQCommPUSH(TestZMQComm):
@@ -218,7 +218,7 @@ class TestZMQCommPUSH(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
     
 class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
@@ -230,7 +230,7 @@ class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
     
 class TestZMQCommPUB(TestZMQComm):
@@ -242,7 +242,7 @@ class TestZMQCommPUB(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
 
 class TestZMQCommREQ(TestZMQComm):
@@ -254,7 +254,7 @@ class TestZMQCommREQ(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
 
 class TestZMQCommROUTER(TestZMQComm):
@@ -277,11 +277,11 @@ class TestZMQCommROUTER(TestZMQComm):
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
-        pass
+        pass  # pragma: no cover
 
 
 # @unittest.skipIf(_zmq_installed, "ZMQ library installed")
 # def test_not_running():
 #     r"""Test raise of an error if a ZMQ library is not installed."""
 #     comm_kwargs = dict(comm='ZMQComm', direction='send', reverse_names=True)
-#     nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
+#     assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
