@@ -17,6 +17,8 @@ class TestAsyncComm(test_CommBase.TestCommBase):
         super(TestAsyncComm, self).test_send_recv_after_close()
         nt.assert_equal(self.send_instance.n_msg_direct_send, 0)
         nt.assert_equal(self.recv_instance.n_msg_direct_recv, 0)
+        nt.assert_equal(self.send_instance.n_msg_direct, 0)
+        nt.assert_equal(self.recv_instance.n_msg_direct, 0)
 
     def test_send_recv_direct(self):
         r"""Test send/recv direct."""
