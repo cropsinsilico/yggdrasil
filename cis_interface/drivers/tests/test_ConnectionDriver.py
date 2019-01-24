@@ -136,7 +136,7 @@ class TestConnectionParam(parent.TestParam):
         msg_short = self.test_msg
         if isinstance(msg_short, backwards.bytes_type):
             out = msg_short + (self.maxMsgSize * b'0')
-        else:
+        else:  # pragma: debug
             out = msg_short
         # return self.testing_options['msg_long']
         return out
