@@ -182,8 +182,11 @@ def create(*args, **kwargs):
             """
             for k, v in kwargs.items():
                 if k == 'normalizers':
-                    for ik, iv in self.NORMALIZERS.items():
-                        v.setdefault(ik, iv)
+                    if self.NORMALIZERS:  # pragma: debug
+                        raise Exception("Uncomment lines below to allow "
+                                        + "addition of default normalizers.")
+                    # for ik, iv in self.NORMALIZERS.items():
+                    #     v.setdefault(ik, iv)
                 elif k == 'validators':
                     for ik, iv in self.VALIDATORS.items():
                         v.setdefault(ik, iv)
