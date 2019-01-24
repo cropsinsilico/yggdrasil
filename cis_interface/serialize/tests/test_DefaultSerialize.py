@@ -170,6 +170,14 @@ class TestDefaultSerialize(CisTestClassInfo):
         self.assert_result_equal(out, self.testing_options['empty'])
         self.assert_equal(head, self.empty_head(self._empty_msg))
 
+    def test_invalid_update(self):
+        r"""Test error raised when serializer updated with type that isn't
+        compatible."""
+        if (len(self._inst_kwargs) == 0) and (self._cls == 'DefaultSerialize'):
+            self.instance.initialize_from_message(np.int64(1))
+            self.assert_raises(RuntimeError, self.instance.update_serializer,
+                               type='ply')
+        
 
 class TestDefaultSerialize_format(TestDefaultSerialize):
     r"""Test class for DefaultSerialize class with format."""

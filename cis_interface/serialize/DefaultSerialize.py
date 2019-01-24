@@ -430,7 +430,8 @@ class DefaultSerialize(object):
                 self.datatype = get_type_from_def(typedef)
             # Check to see if new datatype is compatible with new one
             if old_datatype is not None:
-                if not compare_schema(self.typedef, old_datatype._typedef):
+                errors = list(compare_schema(self.typedef, old_datatype._typedef) or ())
+                if errors:
                     raise RuntimeError(
                         ("Updated datatype is not compatible with the existing one."
                          + "    New:\n%s\nOld:\n%s\n") % (
