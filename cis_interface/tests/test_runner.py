@@ -1,10 +1,9 @@
 import os
-import nose.tools as nt
 import unittest
 import signal
 import uuid
 from cis_interface import runner, tools, platform
-from cis_interface.tests import CisTestBase
+from cis_interface.tests import CisTestBase, assert_raises
 # from cis_interface.tests import yamls as sc_yamls
 from cis_interface.examples import yamls as ex_yamls
 
@@ -55,8 +54,8 @@ def test_runner_terminate():
 
 def test_runner_error():
     r"""Test error on missing yaml."""
-    nt.assert_raises(IOError, runner.CisRunner,
-                     ['fake_yaml.yml'], 'test_cis_run')
+    assert_raises(IOError, runner.CisRunner,
+                  ['fake_yaml.yml'], 'test_cis_run')
     
 
 class TestCisRunner(CisTestBase):
@@ -73,6 +72,6 @@ class TestCisRunner(CisTestBase):
                'driver': 'InputDriver',
                'working_dir': os.getcwd(),
                'kwargs': {}}
-        nt.assert_raises(Exception, self.runner.createInputDriver, yml)
+        assert_raises(Exception, self.runner.createInputDriver, yml)
         yml['driver'] = 'OutputDriver'
-        nt.assert_raises(Exception, self.runner.createOutputDriver, yml)
+        assert_raises(Exception, self.runner.createOutputDriver, yml)
