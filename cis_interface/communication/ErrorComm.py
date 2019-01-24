@@ -2,7 +2,7 @@ from cis_interface.tests import ErrorClass
 from cis_interface.communication import get_comm_class
 
 
-def ErrorComm(name, base_comm='CommBase', **kwargs):
+def ErrorComm(name, base_comm='CommBase', **kwargs):  # pragma: debug
     r"""Wrapper to return errored version of a comm class.
 
     Args:
