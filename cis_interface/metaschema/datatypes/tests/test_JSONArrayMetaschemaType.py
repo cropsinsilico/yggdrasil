@@ -58,6 +58,10 @@ class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
         self._compatible_objects = [(self._value, self._value, None)]
         self._valid_normalize += [('1, 1 ', ['1', '1'])]
 
+    def test_encode_data_readable(self):
+        r"""Test corner case of encode_data_readable."""
+        self.import_cls.encode_data_readable(['1', '1'], {})
+
     def test_container_errors(self):
         r"""Test errors on container operations."""
         assert_raises(RuntimeError, self.import_cls._assign, [], 10, None)

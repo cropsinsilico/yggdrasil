@@ -2,7 +2,7 @@ import os
 import numpy as np
 import shutil
 import tempfile
-import nose.tools as nt
+from cis_interface.tests import assert_equal, assert_raises
 from cis_interface import metaschema
 
 
@@ -14,6 +14,7 @@ _valid_objects = {'unicode': u'hello',
                   'bytes': b'hello',
                   'float': float(1), 'int': int(1),
                   'uint': np.uint(1), 'complex': complex(1, 1),
+                  '1darray': np.zeros(5), 'ndarray': np.zeros((5, 5)),
                   'object': {'a': 'hello'}, 'array': ['hello', 1],
                   'ply': {'vertices': [{k: 0.0 for k in 'xyz'},
                                        {k: 0.0 for k in 'xyz'},
@@ -77,7 +78,7 @@ _normalize_objects = [
 def test_create_metaschema():
     r"""Test errors in create_metaschema."""
     assert(metaschema.get_metaschema())
-    nt.assert_raises(RuntimeError, metaschema.create_metaschema, overwrite=False)
+    assert_raises(RuntimeError, metaschema.create_metaschema, overwrite=False)
 
 
 def test_get_metaschema():
@@ -88,7 +89,7 @@ def test_get_metaschema():
         shutil.move(metaschema._metaschema_fname, temp)
         metaschema._metaschema = None
         new_metaschema = metaschema.get_metaschema()
-        nt.assert_equal(new_metaschema, old_metaschema)
+        assert_equal(new_metaschema, old_metaschema)
     except BaseException:  # pragma: debug
         shutil.move(temp, metaschema._metaschema_fname)
         raise
@@ -110,10 +111,10 @@ def test_normalize_instance():
     r"""Test normalize_instance."""
     for schema, x, y in _normalize_objects:
         z = metaschema.normalize_instance(x, schema, test_attr=1)
-        nt.assert_equal(z, y)
+        assert_equal(z, y)
 
 
 def test_create_normalizer():
     r"""Test create normalizer with default types."""
     cls = metaschema.normalizer.create(metaschema.get_metaschema())
-    nt.assert_equal(cls({'type': 'int'}).normalize('1'), '1')
+    assert_equal(cls({'type': 'int'}).normalize('1'), '1')

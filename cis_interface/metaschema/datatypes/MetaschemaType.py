@@ -77,6 +77,21 @@ class MetaschemaType(object):
         raise NotImplementedError("Method must be overridden by the subclass.")
 
     @classmethod
+    def encode_data_readable(cls, obj, typedef):
+        r"""Encode an object's data in a readable format.
+
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        return cls.encode_data(obj, typedef)
+
+    @classmethod
     def decode_data(cls, obj, typedef):
         r"""Decode an object.
 

@@ -306,6 +306,29 @@ def encode_data(obj, typedef=None):
     return cls.encode_data(obj, typedef=typedef)
 
 
+def encode_data_readable(obj, typedef=None):
+    r"""Encode an object into a JSON serializable object that is human readable
+    but dosn't guarantee identical deserialization.
+
+    Args:
+        obj (object): Python object to be encoded.
+        typedef (dict, optional): JSON schema describing the object. Defaults
+            to None and class is determined from the object.
+
+    Returns:
+        object: JSON serializable version of the object.
+
+    """
+    if isinstance(typedef, dict) and ('type' in typedef):
+        cls = get_type_class(typedef['type'])
+    else:
+        cls = guess_type_from_obj(obj)
+        if typedef is None:
+            metadata = cls.encode_type(obj)
+            typedef = cls.extract_typedef(metadata)
+    return cls.encode_data_readable(obj, typedef=typedef)
+
+
 def encode(obj):
     r"""Encode an object into a message.
 

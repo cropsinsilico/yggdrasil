@@ -104,6 +104,35 @@ class ScalarMetaschemaType(MetaschemaType):
         return out
 
     @classmethod
+    def encode_data_readable(cls, obj, typedef):
+        r"""Encode an object's data in a readable format that may not be
+        decoded in exactly the same way.
+
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        arr = cls.to_array(obj)
+        subtype = typedef.get('subtype', typedef.get('type', None))
+        if (cls.name in ['1darray', 'ndarray']):
+            return arr.tolist()
+        elif (arr.ndim > 0):
+            if subtype in ['int', 'uint']:
+                return int(arr[0])
+            elif subtype in ['float']:
+                return float(arr[0])
+            elif subtype in ['complex']:
+                return str(complex(arr[0]))
+            elif subtype in ['bytes', 'unicode']:
+                return backwards.as_str(arr[0])
+        return super(ScalarMetaschemaType, cls).encode_data_readable(obj, typedef)
+
+    @classmethod
     def decode_data(cls, obj, typedef):
         r"""Decode an object.
 

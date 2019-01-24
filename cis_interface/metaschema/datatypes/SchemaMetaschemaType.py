@@ -28,7 +28,6 @@ def _normalize_schema(validator, ref, instance, schema):
                 prop_class = get_metaschema_property(k, skip_generic=True)
                 if prop_class is None:
                     continue
-                print(valid_types, prop_class.types)
                 if valid_types is None:
                     valid_types = set(prop_class.types)
                 else:
