@@ -261,6 +261,8 @@ class PlyDict(dict):
 
     def __init__(self, *args, **kwargs):
         super(PlyDict, self).__init__(*args, **kwargs)
+        self.setdefault('vertices', [])
+        self.setdefault('faces', [])
         self._type_class.validate(self)
 
     @classmethod
@@ -353,11 +355,13 @@ class PlyDict(dict):
             # Faces
             if _as_obj:
                 for i3 in d.result.indexList:
-                    out['faces'].append([{'vertex_index': x}
-                                         for x in [i3[0], i3[1], i3[2]]])
+                    out['faces'].append([{'vertex_index': i3[j]}
+                                         for j in range(len(i3))])
             else:
                 for i3 in d.result.indexList:
-                    out['faces'].append({'vertex_index': [i3[0], i3[1], i3[2]]})
+                    print(i3, type(i3), len(i3))
+                    out['faces'].append({'vertex_index': [i3[j] for j in
+                                                          range(len(i3))]})
         return out
 
     @classmethod
@@ -439,10 +443,11 @@ class PlyDict(dict):
                                           np.float64(xarr[2])))
             c = [v.get(k, None) for k in ['red', 'green', 'blue']]
             if None not in c:
-                obj_colors.append(pgl.Color4(np.uint8(c[0]),
-                                             np.uint8(c[1]),
-                                             np.uint8(c[2]),
-                                             np.uint8(1)))
+                cast_type = int
+                obj_colors.append(pgl.Color4(cast_type(c[0]),
+                                             cast_type(c[1]),
+                                             cast_type(c[2]),
+                                             cast_type(1)))
         points = pgl.Point3Array(obj_points)
         if obj_colors:
             colors = pgl.Color4Array(obj_colors)
@@ -450,28 +455,13 @@ class PlyDict(dict):
             kwargs['colorPerVertex'] = True
         # Add indices
         obj_indices = []
-        nind = None
-        index_class = pgl.Index3
-        array_class = pgl.Index3Array
-        smb_class = pgl.TriangleSet
+        index_class = pgl.Index
+        array_class = pgl.IndexArray
+        smb_class = pgl.FaceSet
+        # index_class = pgl.Index3
+        # array_class = pgl.Index3Array
+        # smb_class = pgl.TriangleSet
         for f in self['faces']:
-            if nind is None:
-                if _as_obj:
-                    nind = len(f)
-                else:
-                    nind = len(f['vertex_index'])
-                if nind == 3:
-                    pass
-                else:
-                    raise ValueError("No PlantGL class for faces with %d vertices."
-                                     % nind)
-            else:
-                if _as_obj:
-                    if len(f) != nind:
-                        raise ValueError("Faces do not all contain %d vertices." % nind)
-                else:
-                    if len(f['vertex_index']) != nind:
-                        raise ValueError("Faces do not all contain %d vertices." % nind)
             if _as_obj:
                 f_int = [int(_f['vertex_index']) for _f in f]
             else:

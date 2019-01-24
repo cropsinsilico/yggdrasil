@@ -46,6 +46,12 @@ for i in range(len(eindexs)):
     _test_value['edges'].append(iedge)
 for f in _test_value['faces']:
     f['vertex_index'] = [np.int32(x) for x in f['vertex_index']]
+_test_value_simple = {'vertices': copy.deepcopy(_test_value['vertices']),
+                      'faces': [{'vertex_index': [0, 1, 2]},
+                                {'vertex_index': [0, 2, 3]}]}
+_test_value_int64 = copy.deepcopy(_test_value)
+for f in _test_value_int64['faces']:
+    f['vertex_index'] = [np.int64(x) for x in f['vertex_index']]
 
 
 def test_create_schema():
@@ -93,6 +99,7 @@ class TestPlyDict(CisTestClassInfo):
     
     _mod = 'PlyMetaschemaType'
     _cls = 'PlyDict'
+    _simple_test = _test_value_simple
 
     @property
     def mod(self):
@@ -107,7 +114,9 @@ class TestPlyDict(CisTestClassInfo):
     def test_count_elements(self):
         r"""Test count_elements."""
         assert_raises(ValueError, self.instance.count_elements, 'invalid')
-        self.instance.count_elements('vertices')
+        x = self.instance.count_elements('vertices')
+        y = self.instance.count_elements('vertex')
+        assert_equal(x, y)
 
     def test_mesh(self):
         r"""Test mesh."""
@@ -156,19 +165,18 @@ class TestPlyDict(CisTestClassInfo):
         cls = o1.__class__
         s = o1.to_scene(name='test')
         o2 = cls.from_scene(s)
+        # Direct equivalence won't happen unless test is just for simple mesh
+        # as faces with more than 3 vertices will be triangulated.
+        cls = self.import_cls
+        o1 = cls(self._simple_test)
+        s = o1.to_scene(name='test')
+        o2 = cls.from_scene(s)
+        # import pprint
+        # print('o2')
+        # pprint.pprint(o2)
+        # print('o1')
+        # pprint.pprint(o1)
         assert_equal(o2, o1)
-        if _as_obj:
-            o2['faces'] = [[{'vertex_index': x} for x in [0, 1, 2, 3]]]
-            o3 = copy.deepcopy(o2)
-            o3['faces'] = [[{'vertex_index': x} for x in [0, 1, 2]],
-                           [{'vertex_index': x} for x in [0, 1, 2, 3]]]
-        else:
-            o2['faces'] = [{'vertex_index': [0, 1, 2, 3]}]
-            o3 = copy.deepcopy(o2)
-            o3['faces'] = [{'vertex_index': [0, 1, 2]},
-                           {'vertex_index': [0, 1, 2, 3]}]
-        assert_raises(ValueError, o2.to_scene)
-        assert_raises(ValueError, o3.to_scene)
 
     def test_to_from_dict(self):
         r"""Test transformation to/from dict."""
@@ -198,7 +206,8 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
         self._valid_decoded = [self._value,
                                PlyMetaschemaType.PlyDict(**_test_value),
                                {'vertices': [], 'faces': [],
-                                'alt_verts': copy.deepcopy(_test_value['vertices'])}]
+                                'alt_verts': copy.deepcopy(_test_value['vertices'])},
+                               _test_value_int64]
         self._invalid_encoded = [{}]
         self._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
                                   'faces': [{'vertex_index': [0, 1, 2]}]}]

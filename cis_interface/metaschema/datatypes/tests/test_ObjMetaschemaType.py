@@ -37,10 +37,30 @@ _test_value['vertices'][0]['w'] = 1.0
 for f in old_value['faces']:
     new = [{'vertex_index': x, 'texcoord_index': 0} for x in f['vertex_index']]
     _test_value['faces'].append(new)
-_test_value['faces'][0][0]['normal_index'] = 0
+for fv in _test_value['faces'][0]:
+    fv['normal_index'] = 0
+_test_value['faces'][1][0].pop('texcoord_index')
+_test_value['faces'][1][0]['normal_index'] = 0
 for e in old_value['edges']:
     new = [{'vertex_index': e['vertex%d' % x]} for x in [1, 2]]
     _test_value['lines'].append(new)
+_test_value_simple = {'vertices': copy.deepcopy(_test_value['vertices']),
+                      'normals': copy.deepcopy(_test_value['normals']),
+                      'texcoords': copy.deepcopy(_test_value['texcoords']),
+                      'faces': [[{'vertex_index': 0, 'normal_index': 0},
+                                 {'vertex_index': 1, 'normal_index': 0},
+                                 {'vertex_index': 2, 'normal_index': 0}],
+                                [{'vertex_index': 0, 'normal_index': 1},
+                                 {'vertex_index': 2, 'normal_index': 1},
+                                 {'vertex_index': 3, 'normal_index': 1}]]}
+for f in _test_value_simple['faces']:
+    for fv in f:
+        fv['texcoord_index'] = 0
+for v in _test_value_simple['vertices']:
+    v.pop('w', None)
+for t in _test_value_simple['texcoords']:
+    t.pop('w', None)
+    t.setdefault('v', 0.0)
 
 
 def test_create_schema():
@@ -63,6 +83,7 @@ class TestObjDict(parent.TestPlyDict):
     
     _mod = 'ObjMetaschemaType'
     _cls = 'ObjDict'
+    _simple_test = _test_value_simple
 
     @property
     def inst_kwargs(self):
