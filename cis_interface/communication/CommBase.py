@@ -1566,9 +1566,9 @@ class CommBase(tools.CisClass):
         """
         metadata = kwargs.get('header_kwargs', {})
         if 'field_order' in kwargs:
-            metadata['key_order'] = kwargs.pop('field_order')
+            kwargs.setdefault('key_order', kwargs.pop('field_order'))
         if 'key_order' in kwargs:
-            metadata['key_order'] = kwargs['key_order']
+            metadata['key_order'] = kwargs.pop('key_order')
         metadata.setdefault('key_order', self.serializer.get_field_names())
         if (((metadata['key_order'] is None)
              and isinstance(args_dict, dict)
@@ -1599,14 +1599,17 @@ class CommBase(tools.CisClass):
         Raises:
 
         """
+        if 'field_order' in kwargs:
+            kwargs.setdefault('key_order', kwargs.pop('field_order'))
+        key_order = kwargs.pop('key_order', None)
         flag, msg = self.recv(*args, **kwargs)
         if flag and (not self.is_eof(msg)):
             if self.serializer.typedef['type'] == 'array':
                 metadata = copy.deepcopy(self._last_header)
                 if metadata is None:
                     metadata = {}
-                if 'key_order' in kwargs:
-                    metadata['key_order'] = kwargs['key_order']
+                if key_order is not None:
+                    metadata['key_order'] = key_order
                 metadata.setdefault('key_order', self.serializer.get_field_names())
                 msg_dict = JSONObjectMetaschemaType.coerce_type(msg, **metadata)
             else:

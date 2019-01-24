@@ -486,6 +486,12 @@ class TestCommBase(CisTestClassInfo):
         msg_send = self.testing_options['dict']
         self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
                           msg_send=msg_send)
+        field_order = self.testing_options['kwargs'].get('field_names', None)
+        if field_order is not None:
+            self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
+                              msg_send=msg_send,
+                              send_kwargs={'field_order': field_order},
+                              recv_kwargs={'field_order': field_order})
         
     def test_is_installed(self):
         r"""Test class is_installed method."""
