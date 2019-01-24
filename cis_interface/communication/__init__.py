@@ -57,34 +57,6 @@ def get_comm_class(comm=None):
     return comm_cls
 
 
-def get_comm(name, comm=None, new_comm_class=None, **kwargs):
-    r"""Return communicator for existing comm components.
-
-    Args:
-        name (str): Communicator name.
-        comm (str, optional): Name of communicator class.
-        new_comm_class (str, optional): Name of communicator class that will
-            override comm if set.
-        **kwargs: Additional keyword arguments are passed to communicator class.
-
-    Returns:
-        Comm: Communicator of given class.
-
-    """
-    if new_comm_class is not None:
-        comm = new_comm_class
-    if isinstance(comm, list):
-        if len(comm) == 1:
-            name = comm[0].pop('name', name)
-            kwargs.update(comm[0])
-            return new_comm(name, **kwargs)
-        else:
-            kwargs['comm'] = comm
-            comm = 'ForkComm'
-    comm_cls = get_comm_class(comm)
-    return comm_cls(name, **kwargs)
-    
-
 def new_comm(name, comm=None, **kwargs):
     r"""Return a new communicator, creating necessary components for
     communication (queues, sockets, channels, etc.).
@@ -110,6 +82,21 @@ def new_comm(name, comm=None, **kwargs):
     comm_cls = get_comm_class(comm)
     return comm_cls.new_comm(name, **kwargs)
 
+
+def get_comm(name, **kwargs):
+    r"""Return communicator for existing comm components.
+
+    Args:
+        name (str): Communicator name.
+        **kwargs: Additional keyword arguments are passed to new_comm.
+
+    Returns:
+        Comm: Communicator of given class.
+
+    """
+    kwargs['dont_create'] = True
+    return new_comm(name, **kwargs)
+    
 
 def DefaultComm(*args, **kwargs):
     r"""Construct a comm object of the default type."""
