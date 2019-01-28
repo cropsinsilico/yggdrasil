@@ -24,3 +24,5 @@ TODO
 * Remove IOInfo test class as no longer used
 * Add example of each supported language (missing LPy, cmake, make)
 * Replace nose with unittest/pytest
+* Create template model drivers for compiled/interpretted langauges
+* Update travis/appveyor to clone recursively to get rapidjson as git submodule

@@ -145,7 +145,7 @@ def update_config_matlab(config):
     opts = {
         'startup_waittime_s': [('The time allowed for a Matlab engine to start'
                                + 'before timing out and reporting an error.'),
-                               10],
+                               '10'],
         'release': ['The version (release number) of matlab that is installed.',
                     ''],
         'matlabroot': ['The path to the default installation of matlab.', '']}
@@ -208,6 +208,39 @@ def update_config_windows(config):  # pragma: windows
     return out
 
 
+def update_config_c(config):
+    r"""Update config options specific to C/C++.
+
+    Args:
+        config (CisConfigParser): Config class that options should be set for.
+
+    Returns:
+        list: Section, option, description tuples for options that could not be
+            set.
+
+    """
+    out = []
+    if not config.has_section('c'):
+        config.add_section('c')
+    # Find paths
+    clibs = [('rapidjson_include', 'rapidjson.h',
+              'The full path to the directory containing rapidjson headers.')]
+    for opt, fname, desc in clibs:
+        if not config.has_option('c', opt):
+            fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rapidjson',
+                                 'include', 'rapidjson', fname)
+            if not os.path.isfile(fpath):
+                fpath = locate_file(fname)
+            if fpath:
+                if opt == 'rapidjson_include':
+                    fpath = os.path.dirname(os.path.dirname(fpath))
+                print('located %s: %s' % (fname, fpath))
+                config.set('c', opt, fpath)
+            else:
+                out.append(('c', opt, desc))
+    return out
+
+
 def update_config(config_file, config_base=None):
     r"""Update config options for the current platform.
 
@@ -229,11 +262,12 @@ def update_config(config_file, config_base=None):
     miss = []
     if platform._is_win:  # pragma: windows
         miss += update_config_windows(cp)
+    miss += update_config_c(cp)
     miss += update_config_matlab(cp)
     with open(config_file, 'w') as fd:
         cp.write(fd)
     for sect, opt, desc in miss:  # pragma: windows
-        warnings.warn(("Could not set option %s in section %s."
+        warnings.warn(("Could not set option %s in section %s. "
                        + "Please set this in %s to: %s")
                       % (opt, sect, config_file, desc))
 

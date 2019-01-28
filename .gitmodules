@@ -1,0 +1,3 @@
+[submodule "cis_interface/rapidjson"]
+	path = cis_interface/rapidjson
+	url = https://github.com/Tencent/rapidjson/

@@ -32,6 +32,8 @@ _api_static_cpp = os.path.join(_incl_interface, _prefix + 'cis++' + _static_ext)
 _datatypes_shared_lib = os.path.join(_incl_dtype, _prefix + 'datatypes' + _shared_ext)
 _api_shared_c = os.path.join(_incl_interface, _prefix + 'cis' + _shared_ext)
 _api_shared_cpp = os.path.join(_incl_interface, _prefix + 'cis++' + _shared_ext)
+_c_installed = ((len(tools.get_installed_comm(language='c')) > 0)
+                and (cis_cfg.get('windows', 'rapidjson_include', None) is not None))
 
 
 def get_zmq_flags(for_cmake=False):
@@ -47,6 +49,7 @@ def get_zmq_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
+    # ZMQ library
     if tools.is_comm_installed('ZMQComm', language='c'):
         if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
@@ -103,7 +106,7 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if not (len(tools.get_installed_comm(language='c')) > 0):  # pragma: windows
+    if not _c_installed:  # pragma: windows
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
     if platform._is_win:  # pragma: windows
@@ -122,6 +125,7 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
         ipc_flags = get_ipc_flags(for_cmake=for_cmake)
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
+    # Rapidjson library
     for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri, _incl_regex,
               _incl_dtype]:
         _compile_flags += ["-I" + x]
@@ -241,7 +245,7 @@ def call_compile(src, out=None, flags=[], overwrite=False,
     if not platform._is_win:
         args += ["-o", out]
     else:  # pragma: windows
-        args += [out]
+        args.insert(1, '/Fo%s' % out)
     # Check for file
     if os.path.isfile(out):
         if overwrite:
@@ -257,7 +261,9 @@ def call_compile(src, out=None, flags=[], overwrite=False,
         tools.print_encoded(output, end="")
         raise RuntimeError("Compilation of %s failed with code %d." %
                            (out, exit_code))
-    assert(os.path.isfile(out))
+    if not os.path.isfile(out):  # pragma: debug
+        print(' '.join(args))
+        raise RuntimeError("Compilation failed to produce result '%s'" % out)
     return out
 
 
@@ -359,7 +365,9 @@ def call_link(obj, out=None, flags=[], overwrite=False,
         tools.print_encoded(output, end="")
         raise RuntimeError("Linking of %s failed with code %d." %
                            (out, exit_code))
-    assert(os.path.isfile(out))
+    if not os.path.isfile(out):  # pragma: debug
+        print(' '.join(args))
+        raise RuntimeError("Linking failed to produce result '%s'" % out)
     return out
 
 
@@ -410,7 +418,13 @@ def build_datatypes(just_obj=False, overwrite=False, as_shared=False):
     _datatypes_dir = os.path.dirname(dtype_lib)
     _datatypes_cpp = os.path.join(_datatypes_dir, 'datatypes.cpp')
     flags = []
-    for x in [_datatypes_dir, _incl_regex]:
+    pinc = cis_cfg.get('c', 'rapidjson_include', False)
+    if not pinc:  # pragma: debug
+        raise Exception("Could not locate rapidjson include directory.")
+    incl_dir = [_datatypes_dir, _incl_regex, pinc]
+    if platform._is_win:  # pragma: windows
+        incl_dir.append(_top_dir)
+    for x in incl_dir:
         flags += ['-I', x]
     if platform._is_linux:
         flags.append('-fPIC')
@@ -460,10 +474,11 @@ def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
 # if platform._is_win:  # pragma: windows
 #     build_regex_win32(overwrite=False)
 # build_datatypes(overwrite=False)
-if not os.path.isfile(_api_static_c):
-    build_api(cpp=False, overwrite=False)
-if not os.path.isfile(_api_static_cpp):
-    build_api(cpp=True, overwrite=False)
+if _c_installed:
+    if not os.path.isfile(_api_static_c):
+        build_api(cpp=False, overwrite=False)
+    if not os.path.isfile(_api_static_cpp):
+        build_api(cpp=True, overwrite=False)
 
 
 def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
@@ -598,7 +613,7 @@ class GCCModelDriver(ModelDriver):
                 machine.
 
         """
-        return (len(tools.get_installed_comm(language='c')) > 0)
+        return _c_installed
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax. Arguments ending with '.c' or
