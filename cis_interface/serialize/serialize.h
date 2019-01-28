@@ -116,10 +116,10 @@ int update_serializer(seri_t *s, const char* type, void *info) {
       return -1;
     }
     const char* new_type = get_type_name(new_info);
-    strcpy(s->type, new_type);
+    strncpy(s->type, new_type, COMMBUFFSIZ);
     s->info = new_info;
   } else {
-    strcpy(s->type, type);
+    strncpy(s->type, type, COMMBUFFSIZ);
     s->info = info;
   }
   return 0;

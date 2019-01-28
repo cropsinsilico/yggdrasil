@@ -37,13 +37,13 @@ public:
 
   // Encoding
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
-    if (not MetaschemaType::encode_type_prop(writer)) { return false; }
+    if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("properties");
     writer->StartObject();
     std::map<const char*, MetaschemaType*, strcomp>::iterator it = properties_.begin();
     for (it = properties_.begin(); it != properties_.end(); it++) {
       writer->Key(it->first);
-      if (not (it->second->encode_type(writer)))
+      if (!(it->second->encode_type(writer)))
 	return false;
     }
     writer->EndObject();
@@ -57,7 +57,7 @@ public:
     size_t i = 0;
     for (it = properties_.begin(); it != properties_.end(); it++, i++) {
       writer->Key(it->first);
-      if (not (it->second->encode_data(writer, nargs, ap)))
+      if (!(it->second->encode_data(writer, nargs, ap)))
 	return false;
     }
     writer->EndObject();
@@ -67,19 +67,19 @@ public:
   // Decoding
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
-    if (not data.IsObject()) {
+    if (!(data.IsObject())) {
       cislog_error("JSONObjectMetaschemaType::decode_data: Raw data is not an object.");
       return false;
     }
     std::map<const char*, MetaschemaType*, strcomp>::iterator it;
     size_t i = 0;
     for (it = properties_.begin(); it != properties_.end(); it++, i++) {
-      if (not data.HasMember(it->first)) {
+      if (!(data.HasMember(it->first))) {
 	cislog_error("JSONObjectMetaschemaType::decode_data: Data dosn't have member '%s'.",
 		     it->first);
 	return false;
       }
-      if (not (it->second->decode_data(data[it->first], allow_realloc, nargs, ap)))
+      if (!(it->second->decode_data(data[it->first], allow_realloc, nargs, ap)))
 	return false;
     }
     return true;

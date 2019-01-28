@@ -5,7 +5,20 @@
 
 #include <vector>
 #include <cstring>
+#ifdef _WIN32
+#include <complex>
+typedef std::complex<float> complex_float;
+typedef std::complex<double> complex_double;
+typedef std::complex<long double> complex_long_double;
+// using complex_float = complex<float>;
+// using complex_double = complex<double>;
+// using complex_long_double = complex<long double>;
+#else
 #include <complex.h>
+typedef float _Complex complex_float;
+typedef double _Complex complex_double;
+typedef long double _Complex complex_long_double;
+#endif
 
 #include "../../tools.h"
 #include "../../serialize/base64.h"
@@ -36,10 +49,10 @@ public:
     case T_NDARRAY:
     case T_SCALAR:
       // Subtype
-      if (not (type_doc.HasMember("subtype"))) {
+      if (!(type_doc.HasMember("subtype"))) {
 	cislog_throw_error("ScalarMetaschemaType: %s type must include 'subtype'.", type());
       }
-      if (not (type_doc["subtype"].IsString())) {
+      if (!(type_doc["subtype"].IsString())) {
 	cislog_throw_error("ScalarMetaschemaType: 'subtype' value must be a string.");
       }
       update_subtype(type_doc["subtype"].GetString());
@@ -49,15 +62,15 @@ public:
       update_type("scalar");
     }
     // Precision
-    if (not (type_doc.HasMember("precision")))
+    if (!(type_doc.HasMember("precision")))
       cislog_throw_error("ScalarMetaschemaType: Precision missing.");
-    if (not (type_doc["precision"].IsInt()))
+    if (!(type_doc["precision"].IsInt()))
       cislog_throw_error("ScalarMetaschemaType: Precision must be integer.");
     size_t *precision_modifier = const_cast<size_t*>(&precision_);
     *precision_modifier = (size_t)(type_doc["precision"].GetInt());
     // Units
     if (type_doc.HasMember("units")) {
-      if (not type_doc["units"].IsString())
+      if (!type_doc["units"].IsString())
 	cislog_throw_error("ScalarMetaschemaType: Units must be a string.");
       update_units(type_doc["units"].GetString());
     } else {
@@ -107,16 +120,16 @@ public:
   }
   void update_subtype(const char* new_subtype) {
     char **subtype_modifier = const_cast<char**>(&subtype_);
-    strcpy(*subtype_modifier, new_subtype);
+    strncpy(*subtype_modifier, new_subtype, STRBUFF);
     int* subtype_code_modifier = const_cast<int*>(&subtype_code_);
     *subtype_code_modifier = check_subtype();
   }
   void update_units(const char* new_units) {
     char **units_modifier = const_cast<char**>(&units_);
-    strcpy(*units_modifier, new_units);
+    strncpy(*units_modifier, new_units, STRBUFF);
   }
   void set_precision(const size_t new_precision) {
-    if ((strcmp(subtype_, "bytes") != 0) and (strcmp(subtype_, "unicode") != 0)) {
+    if ((strcmp(subtype_, "bytes") != 0) && (strcmp(subtype_, "unicode") != 0)) {
       cislog_throw_error("ScalarMetaschemaType::set_precision: Variable precision only allowed for bytes and unicode, not '%s'.", subtype_);
     }
     size_t *precision_modifier = const_cast<size_t*>(&precision_);
@@ -136,7 +149,7 @@ public:
 
   // Encoding
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
-    if (not MetaschemaType::encode_type_prop(writer)) { return false; }
+    if (!MetaschemaType::encode_type_prop(writer)) { return false; }
     writer->Key("subtype");
     writer->String(subtype_, strlen(subtype_));
     writer->Key("precision");
@@ -155,7 +168,7 @@ public:
     // TODO: case by case for scalar types
     size_t bytes_precision = nbytes();
     unsigned char* arg = (unsigned char*)malloc(bytes_precision + 1);
-    if ((strcmp(type(), "1darray") == 0) or (strcmp(type(), "ndarray") == 0)) {
+    if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)) {
       if (nelements() == 0) {
 	cislog_error("ScalarMetaschemaType::encode_data: Array types require the number of elements be non-zero.");
 	return false;
@@ -253,13 +266,13 @@ public:
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-	  float _Complex arg0 = (float _Complex)va_arg(ap.va, double _Complex);
+	  complex_float arg0 = (complex_float)va_arg(ap.va, complex_double);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
-	  double _Complex arg0 = va_arg(ap.va, double _Complex);
+	  complex_double arg0 = va_arg(ap.va, complex_double);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(long double) == (bytes_precision / 2)) {
-	  long double _Complex arg0 = va_arg(ap.va, long double _Complex);
+	  complex_long_double arg0 = va_arg(ap.va, complex_long_double);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else {
 	  cislog_error("ScalarMetaschemaType::encode_data: Unsupported complex precision '%lu'.",
@@ -307,7 +320,7 @@ public:
   // Decoding
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
-    if (not data.IsString()) {
+    if (!(data.IsString())) {
       cislog_error("ScalarMetaschemaType::decode_data: Raw data is not a string.");
       return false;
     }
@@ -317,13 +330,13 @@ public:
     unsigned char* decoded_bytes = base64_decode(encoded_bytes, encoded_len,
 						 &decoded_len);
     size_t nbytes_expected = nbytes();
-    if ((not _variable_precision) and (nbytes_expected != decoded_len)) {
+    if ((!(_variable_precision)) && (nbytes_expected != decoded_len)) {
 	cislog_error("ScalarMetaschemaType::decode_data: %lu bytes were expected, but %lu were decoded.",
 		     nbytes_expected, decoded_len);
       return false;
     }
     // Transfer data to array memory
-    if ((strcmp(type(), "1darray") == 0) or (strcmp(type(), "ndarray") == 0)) {
+    if ((strcmp(type(), "1darray") == 0) || (strcmp(type(), "ndarray") == 0)) {
       char **temp = (char**)va_arg(ap.va, unsigned char**);
       (*nargs)--;
       size_t temp_siz = 0;
@@ -352,7 +365,7 @@ public:
       (*nargs)--;
       //size_t 
       bool skip_terminal;
-      if ((strcmp(subtype(), "bytes") == 0) or (strcmp(subtype(), "unicode") == 0)) {
+      if ((strcmp(subtype(), "bytes") == 0) || (strcmp(subtype(), "unicode") == 0)) {
 	size_t * const arg_siz = va_arg(ap.va, size_t*);
 	(*nargs)--;
 	skip_terminal = false;
@@ -403,9 +416,9 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
   }
   OneDArrayMetaschemaType(const rapidjson::Value &type_doc) :
     ScalarMetaschemaType(type_doc) {
-    if (not (type_doc.HasMember("length")))
+    if (!(type_doc.HasMember("length")))
       cislog_throw_error("OneDArrayMetaschemaType: 1darray types must include 'length'.");
-    if (not (type_doc["length"].IsInt()))
+    if (!(type_doc["length"].IsInt()))
       cislog_throw_error("OneDArrayMetaschemaType: 1darray 'length' value must be an int.");
     length_ = type_doc["length"].GetInt();
     update_type("1darray");
@@ -429,7 +442,7 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     return out;
   }
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
-    if (not ScalarMetaschemaType::encode_type_prop(writer)) { return false; }
+    if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("length");
     writer->Int(length_);
     return true;
@@ -448,14 +461,14 @@ public:
   }
   NDArrayMetaschemaType(const rapidjson::Value &type_doc) :
     ScalarMetaschemaType(type_doc) {
-    if (not (type_doc.HasMember("shape")))
+    if (!(type_doc.HasMember("shape")))
       cislog_throw_error("NDArrayMetaschemaType: ndarray types must include 'shape'.");
-    if (not (type_doc["shape"].IsArray()))
+    if (!(type_doc["shape"].IsArray()))
       cislog_throw_error("NDArrayMetaschemaType: ndarray 'shape' value must be an array.");
     size_t ndim = type_doc["shape"].Size();
     size_t i;
     for (i = 0; i < ndim; i++) {
-      if (not type_doc["shape"][i].IsInt())
+      if (!(type_doc["shape"][i].IsInt()))
 	cislog_throw_error("NDArrayMetaschemaType: ndarray 'shape' elements must be integers.");
       shape_.push_back(type_doc["shape"][i].GetInt());
     }
@@ -489,12 +502,12 @@ public:
     return nelements;
   }
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
-    if (not ScalarMetaschemaType::encode_type_prop(writer)) { return false; }
+    if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("shape");
     writer->StartArray();
     size_t i;
     for (i = 0; i < ndim(); i++) {
-      writer->Int(shape_[i]);
+      writer->Int((int)(shape_[i]));
     }
     writer->EndArray();
     return true;

@@ -70,11 +70,11 @@ public:
     update_type(type);
   }
   MetaschemaType(const rapidjson::Value &type_doc) : type_((const char*)malloc(100)), type_code_(-1) {
-    if (not type_doc.IsObject())
+    if (!(type_doc.IsObject()))
       cislog_throw_error("MetaschemaType: Parsed document is not an object.");
-    if (not type_doc.HasMember("type"))
+    if (!(type_doc.HasMember("type")))
       cislog_throw_error("MetaschemaType: Parsed header dosn't contain a type.");
-    if (not type_doc["type"].IsString())
+    if (!(type_doc["type"].IsString()))
       cislog_throw_error("MetaschemaType: Type in parsed header is not a string.");
     update_type(type_doc["type"].GetString());
     /*
@@ -103,11 +103,15 @@ public:
   const int type_code() { return type_code_; }
   virtual void update_type(const char* new_type) {
     char** type_modifier = const_cast<char**>(&type_);
-    strcpy(*type_modifier, new_type);
+    strncpy(*type_modifier, new_type, 100);
     int* type_code_modifier = const_cast<int*>(&type_code_);
     *type_code_modifier = check_type();
   }
   virtual void set_length(size_t new_length) {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    new_length;
+#endif 
     cislog_throw_error("MetaschemaType::set_length: Cannot set length for type '%s'.", type_);
   }
   virtual size_t get_length() {
@@ -134,7 +138,7 @@ public:
   // Encoding
   bool encode_type(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
     writer->StartObject();
-    if (not encode_type_prop(writer))
+    if (!(encode_type_prop(writer)))
       return false;
     writer->EndObject();
     return true;
@@ -202,7 +206,7 @@ public:
 			     char **dst_buf, size_t &dst_buf_siz,
 			     const int allow_realloc, bool skip_terminal = false) {
     size_t src_buf_siz_term = src_buf_siz;
-    if (not skip_terminal)
+    if (!(skip_terminal))
       src_buf_siz_term++;
     if (src_buf_siz_term > dst_buf_siz) {
       if (allow_realloc == 1) {
@@ -217,7 +221,7 @@ public:
 	cislog_debug("MetaschemaType::copy_to_buffer: Reallocated to %lu bytes.",
 		     dst_buf_siz);
       } else {
-	if (not skip_terminal) {
+	if (!(skip_terminal)) {
 	  cislog_error("MetaschemaType::copy_to_buffer: Source with termination character (%lu + 1) exceeds size of destination buffer (%lu).",
 		       src_buf_siz, dst_buf_siz);
 	} else {
@@ -228,7 +232,7 @@ public:
       }
     }
     memcpy(*dst_buf, src_buf, src_buf_siz);
-    if (not skip_terminal) {
+    if (!(skip_terminal)) {
       size_t i;
       for (i = src_buf_siz; i < dst_buf_siz; i++)
 	(*dst_buf)[i] = '\0';
@@ -245,7 +249,7 @@ public:
     rapidjson::StringBuffer body_buf;
     rapidjson::Writer<rapidjson::StringBuffer> body_writer(body_buf);
     bool out = encode_data(&body_writer, nargs, ap);
-    if (not out) {
+    if (!(out)) {
       return -1;
     }
     if (*nargs != 0) {
@@ -266,7 +270,7 @@ public:
     }
     switch (type_code_) {
     case T_BOOLEAN: {
-      if (not data.IsBool())
+      if (!(data.IsBool()))
 	cislog_throw_error("MetaschemaType::decode_data: Data is not a bool.");
       bool *arg;
       bool **p;
@@ -284,7 +288,7 @@ public:
       return true;
     }
     case T_INTEGER: {
-      if (not data.IsInt())
+      if (!(data.IsInt()))
 	cislog_throw_error("MetaschemaType::decode_data: Data is not an int.");
       int *arg;
       int **p;
@@ -302,7 +306,7 @@ public:
       return true;
     }
     case T_NULL: {
-      if (not data.IsNull())
+      if (!(data.IsNull()))
 	cislog_throw_error("MetaschemaType::decode_data: Data is not null.");
       void **arg = va_arg(ap.va, void**);
       (*nargs)--;
@@ -310,7 +314,7 @@ public:
       return true;
     }
     case T_NUMBER: {
-      if (not data.IsDouble())
+      if (!(data.IsDouble()))
 	cislog_throw_error("MetaschemaType::decode_data: Data is not a double.");
       double *arg;
       double **p;
@@ -328,7 +332,7 @@ public:
       return true;
     }
     case T_STRING: {
-      if (not data.IsString())
+      if (!(data.IsString()))
 	cislog_throw_error("MetaschemaType::decode_data: Data is not a string.");
       char *arg;
       char **p;
@@ -365,7 +369,7 @@ public:
     rapidjson::Document body_doc;
     body_doc.Parse(buf, buf_siz);
     bool out = decode_data(body_doc, allow_realloc, nargs, ap);
-    if (not out) {
+    if (!(out)) {
       cislog_error("MetaschemaType::deserialize: One or more errors while parsing body.");
       return -1;
     }

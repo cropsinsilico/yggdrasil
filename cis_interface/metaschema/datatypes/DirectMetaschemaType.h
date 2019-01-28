@@ -15,7 +15,12 @@
 class DirectMetaschemaType : public MetaschemaType {
 public:
   DirectMetaschemaType() : MetaschemaType("direct") {}
-  DirectMetaschemaType(const rapidjson::Value &type_doc) : MetaschemaType("direct") {}
+  DirectMetaschemaType(const rapidjson::Value &type_doc) : MetaschemaType("direct") {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    type_doc;
+#endif
+  }
   DirectMetaschemaType* copy() { return (new DirectMetaschemaType()); }
   size_t nargs_exp() {
     return 2;
@@ -24,6 +29,12 @@ public:
   // Encoding
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    writer;
+    nargs;
+    ap;
+#endif
     cislog_error("DirectMetaschemaType::encode_data: Direct type cannot be JSON encoded.");
     return false;
   }
@@ -48,6 +59,13 @@ public:
   // Decoding
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    data;
+    allow_realloc;
+    nargs;
+    ap;
+#endif
     cislog_error("DirectMetaschemaType::decode_data: Direct type cannot be JSON decoded.");
     return false;
   }

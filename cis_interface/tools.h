@@ -14,7 +14,7 @@ extern "C" {
 
 // Platform specific
 #ifdef _WIN32
-#include "regex_win32.h"
+#include "regex/regex_win32.h"
 #include "stdint.h"  // Use local copy for MSVC support
 // Prevent windows.h from including winsock.h
 #ifndef WIN32_LEAN_AND_MEAN

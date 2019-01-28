@@ -147,7 +147,7 @@ int af_writeline_full(const asciiFile_t t, const char *line) {
 static inline
 int af_update(asciiFile_t *t, const char *filepath, const char *io_mode) {
   t->filepath = filepath;
-  strcpy(t->io_mode, io_mode);
+  strncpy(t->io_mode, io_mode, 64);
   return 0;
 };
 
@@ -170,13 +170,13 @@ asciiFile_t asciiFile(const char *filepath, const char *io_mode,
   af_update(&t, filepath, io_mode);
   // Set defaults for optional parameters
   if (comment == NULL)
-    strcpy(t.comment, "# ");
+    strncpy(t.comment, "# ", 64);
   else
-    strcpy(t.comment, comment);
+    strncpy(t.comment, comment, 64);
   if (newline == NULL)
-    strcpy(t.newline, "\n");
+    strncpy(t.newline, "\n", 64);
   else
-    strcpy(t.newline, newline);
+    strncpy(t.newline, newline, 64);
   return t;
 };
 

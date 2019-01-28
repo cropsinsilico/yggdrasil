@@ -2,8 +2,8 @@
 #ifndef CISCOMMBASE_H_
 #define CISCOMMBASE_H_
 
-#include <../tools.h>
-#include <../metaschema/datatypes/datatypes.h>
+#include "../tools.h"
+#include "../metaschema/datatypes/datatypes.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -94,11 +94,11 @@ comm_t* new_comm_base(char *address, const char *direction,
   ret->type = t;
   ret->valid = 1;
   if (address != NULL)
-    strcpy(ret->address, address);
+    strncpy(ret->address, address, COMM_ADDRESS_SIZE);
   if (direction == NULL) {
     ret->valid = 0;
   } else {
-    strcpy(ret->direction, direction);
+    strncpy(ret->direction, direction, COMM_DIR_SIZE);
   }
   ret->serializer = init_serializer("", seri_info);
   ret->maxMsgSize = CIS_MSG_MAX;
@@ -131,7 +131,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
   char full_name[COMM_NAME_SIZE];
   char *address = NULL;
   if (name != NULL) {
-    strcpy(full_name, name);
+    strncpy(full_name, name, COMM_NAME_SIZE);
     if ((direction != NULL) && (strlen(direction) > 0)) {
       if (is_send(direction))
 	strcat(full_name, "_OUT");
@@ -148,7 +148,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
   if (name == NULL) {
     ret->valid = 0;
   } else
-    strcpy(ret->name, full_name);
+    strncpy(ret->name, full_name, COMM_NAME_SIZE);
   if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
     cislog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);

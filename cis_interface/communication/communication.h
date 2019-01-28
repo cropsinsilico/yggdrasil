@@ -2,17 +2,17 @@
 #ifndef CISCOMMUNICATION_H_
 #define CISCOMMUNICATION_H_
 
-#include <../tools.h>
-#include <../metaschema/datatypes/datatypes.h>
-#include <../serialize/serialize.h>
-#include <CommBase.h>
-#include <IPCComm.h>
-#include <ZMQComm.h>
-#include <ServerComm.h>
-#include <ClientComm.h>
-#include <AsciiFileComm.h>
-#include <AsciiTableComm.h>
-#include <DefaultComm.h>
+#include "../tools.h"
+#include "../metaschema/datatypes/datatypes.h"
+#include "../serialize/serialize.h"
+#include "CommBase.h"
+#include "IPCComm.h"
+#include "ZMQComm.h"
+#include "ServerComm.h"
+#include "ClientComm.h"
+#include "AsciiFileComm.h"
+#include "AsciiTableComm.h"
+#include "DefaultComm.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {

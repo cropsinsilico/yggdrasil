@@ -136,7 +136,7 @@ public:
   // Decoded
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
-    if (not data.IsString())
+    if (!(data.IsString()))
       cislog_throw_error("PlyMetaschemaType::decode_data: Data is not a string.");
     // Get input data
     const char *buf = data.GetString();

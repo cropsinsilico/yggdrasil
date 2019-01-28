@@ -17,7 +17,7 @@ public:
   JSONArrayMetaschemaType(std::vector<MetaschemaType*> items,
 			  const char *format_str = "") :
     MetaschemaType("array"), items_(items) {
-    strcpy(format_str_, format_str);
+    strncpy(format_str_, format_str, 1000);
   }
   JSONArrayMetaschemaType* copy() { return (new JSONArrayMetaschemaType(items_, format_str_)); }
   void display() {
@@ -58,7 +58,7 @@ public:
 
   // Encoding
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
-    if (not MetaschemaType::encode_type_prop(writer)) { return false; }
+    if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     if (strlen(format_str_) > 0) {
       writer->Key("format_str");
       writer->String(format_str_, strlen(format_str_));
@@ -67,7 +67,7 @@ public:
     writer->StartArray();
     size_t i;
     for (i = 0; i < items_.size(); i++) {
-      if (not (items_[i]->encode_type(writer)))
+      if (!(items_[i]->encode_type(writer)))
 	return false;
     }
     writer->EndArray();
@@ -85,7 +85,7 @@ public:
     }
     writer->StartArray();
     for (i = 0; i < items_.size(); i++) {
-      if (not (items_[i]->encode_data(writer, nargs, ap)))
+      if (!(items_[i]->encode_data(writer, nargs, ap)))
 	return false;
     }
     writer->EndArray();
@@ -109,7 +109,7 @@ public:
 	}
       }
     }
-    if (not data.IsArray()) {
+    if (!(data.IsArray())) {
       cislog_error("JSONArrayMetaschemaType::decode_data: Raw data is not an array.");
       return false;
     }
@@ -118,8 +118,8 @@ public:
 		   items_.size(), data.Size());
       return false;
     }
-    for (i = 0; i < items_.size(); i++) {
-      if (not (items_[i]->decode_data(data[i], allow_realloc, nargs, ap)))
+    for (i = 0; i < (size_t)(items_.size()); i++) {
+      if (!(items_[i]->decode_data(data[i], allow_realloc, nargs, ap)))
 	return false;
     }
     return true;

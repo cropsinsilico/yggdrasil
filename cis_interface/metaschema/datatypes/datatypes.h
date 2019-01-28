@@ -201,11 +201,11 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   if (address == NULL)
     out.address[0] = '\0';
   else
-    strcpy(out.address, address);
+    strncpy(out.address, address, COMMBUFFSIZ);
   if (id == NULL)
     out.id[0] = '\0';
   else
-    strcpy(out.id, id);
+    strncpy(out.id, id, COMMBUFFSIZ);
   out.response_address[0] = '\0';
   out.request_id[0] = '\0';
   out.zmq_reply[0] = '\0';
@@ -213,7 +213,7 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   /* if (response_address == NULL) */
   /*   out.response_address[0] = '\0'; */
   /* else */
-  /*   strcpy(out.response_address, response_address); */
+  /*   strncpy(out.response_address, response_address, COMMBUFFSIZ); */
   // Parameters that will be removed
   out.serializer_type = -1;
   out.format_str[0] = '\0';

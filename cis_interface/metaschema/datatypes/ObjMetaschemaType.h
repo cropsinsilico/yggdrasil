@@ -142,7 +142,7 @@ public:
   // Decoded
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
-    if (not data.IsString())
+    if (!(data.IsString()))
       cislog_throw_error("ObjMetaschemaType::decode_data: Data is not a string.");
     // Get input data
     const char *buf = data.GetString();
@@ -186,7 +186,7 @@ public:
     if (nvert != 0) {
       do_colors = 1;
     } else {
-      strcpy(re_vert, "v ([^ \n]+) ([^ \n]+) ([^ \n]+)");
+      strncpy(re_vert, "v ([^ \n]+) ([^ \n]+) ([^ \n]+)", 100);
       n_re_vert = 4;
       nvert = count_matches(re_vert, buf);
     }

@@ -2,11 +2,11 @@
 #ifndef CISINTERFACE_H_
 #define CISINTERFACE_H_
 
-#include <../tools.h>
-#include <../metaschema/datatypes/datatypes.h>
-#include <../communication/communication.h>
-#include <../dataio/AsciiFile.h>
-#include <../dataio/AsciiTable.h>
+#include "../tools.h"
+#include "../metaschema/datatypes/datatypes.h"
+#include "../communication/communication.h"
+#include "../dataio/AsciiFile.h"
+#include "../dataio/AsciiTable.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
