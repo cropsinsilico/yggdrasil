@@ -26,3 +26,4 @@ TODO
 * Replace nose with unittest/pytest
 * Create template model drivers for compiled/interpretted langauges
 * Update travis/appveyor to clone recursively to get rapidjson as git submodule
+* Change verbose flag in GCCModelDriver to use logging levels

@@ -1,3 +1,7 @@
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS 1
+#endif
+
 #include <string>
 #include <regex>
 #include <cstdint>
@@ -26,6 +30,7 @@ int count_matches(const char *regex_text, const char *to_match) {
       ret++;
     return ret;
   } catch (const std::regex_error& rerr) {
+    rerr;
     return -1;
   }
 }
@@ -49,7 +54,7 @@ int find_matches(const char *regex_text, const char *to_match,
     std::cmatch m;
     int ret = 0;
     if (regex_search(to_match, to_match + strlen(to_match), m, r)) {
-      ret += m.size();
+      ret += (int)(m.size());
       *sind = (size_t*)realloc(*sind, ret*sizeof(size_t));
       *eind = (size_t*)realloc(*eind, ret*sizeof(size_t));
       int i;
@@ -60,6 +65,7 @@ int find_matches(const char *regex_text, const char *to_match,
     }
     return ret;
   } catch (const std::regex_error& rerr) {
+    rerr;
     return -1;
   }
 }
@@ -89,6 +95,7 @@ int find_match(const char *regex_text, const char *to_match,
     }
     return ret;
   } catch (const std::regex_error& rerr) {
+    rerr;
     return -1;
   }
 }
@@ -112,12 +119,12 @@ int regex_replace_nosub(char *buf, const size_t len_buf,
 			const size_t nreplace) {
   try {
     std::regex r(re);
-    int ret = 0;
     size_t len_rp = strlen(rp);
     size_t len_m, rem_s, rem_l, delta_siz;
     size_t cur_pos = 0;
     size_t cur_siz = strlen(buf);
     size_t creplace = 0;
+    int ret = 0;
     std::cmatch m;
     while (1) {
       if ((nreplace > 0) && (creplace >= nreplace)) {
@@ -135,7 +142,7 @@ int regex_replace_nosub(char *buf, const size_t len_buf,
       delta_siz = len_rp - len_m;
       if ((cur_siz + delta_siz + 1) > len_buf) {
 	printf("regex_replace_nosub: Relacement will exceed buffer.\n");
-	cur_siz = -1;
+	ret = -1;
 	break;
       }
       // Move trailing
@@ -151,8 +158,13 @@ int regex_replace_nosub(char *buf, const size_t len_buf,
       creplace += 1;
     }
     /* printf("regex_replace_nosub() = %s\n", buf); */
-    return cur_siz;
+    if (ret < 0) {
+      return -1;
+    } else {
+      return (int)cur_siz;
+    }
   } catch (const std::regex_error& rerr) {
+    rerr;
     return -1;
   }
 }
@@ -233,6 +245,7 @@ int get_subrefs(const char *buf, size_t **refs) {
     // printf("%d refs in %s\n", nref, buf);
     return nref;
   } catch (const std::regex_error& rerr) {
+    rerr;
     return -1;
   }
 }
@@ -286,14 +299,14 @@ int regex_replace_sub(char *buf, const size_t len_buf,
       int nref = get_subrefs(rp, &refs);
       if (nref < 0) {
 	printf("Error gettings subrefs\n");
-	cur_siz = -1;
+	ret = -1;
 	break;
       }
       // For each subref complete replacements
-      strcpy(rp_sub, rp);
+      strncpy(rp_sub, rp, 2*len_buf);
       for (j = 0; j < nref; j++) {
 	i = refs[j];
-	strcpy(igrp, buf + cur_pos + m.position(i));
+	strncpy(igrp, buf + cur_pos + m.position(i), len_buf);
 	igrp[m.length(i)] = '\0'; // terminate
 	sprintf(re_sub, "\\$%d", (int)i);
 	ret = regex_replace_nosub(rp_sub, 2*len_buf, re_sub, igrp, 0);
@@ -307,12 +320,12 @@ int regex_replace_sub(char *buf, const size_t len_buf,
 	}
       }
       // Ensure replacement will not exceed buffer
-      len_rp = ret;
+      len_rp = (size_t)ret;
       len_m = m.length();
       delta_siz = len_rp - len_m;
       if ((cur_siz + delta_siz + 1) > len_buf) {
 	printf("regex_replace_sub: Relacement will exceed buffer.\n");
-	cur_siz = -1;
+	ret = -1;
 	break;
       }
       // Move trailing
@@ -331,8 +344,13 @@ int regex_replace_sub(char *buf, const size_t len_buf,
     free(rp_sub);
     free(re_sub);
     free(igrp);
-    return cur_siz;
+    if (ret < 0) {
+      return -1;
+    } else {
+      return (int)(cur_siz);
+    }
   } catch (const std::regex_error& rerr) {
+    rerr;
     return -1;
   }
 }

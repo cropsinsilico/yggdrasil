@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <complex.h>
+#ifdef _WIN32
+typedef _Dcomplex complex_double;
+#else
+typedef double _Complex complex_double;
+#endif
 // Include interface methods
 #include "CisInterface.h"
 
 #define BSIZE 8192 // the max
+
 
 
 int main(int argc,char *argv[]){
@@ -57,7 +64,7 @@ int main(int argc,char *argv[]){
   size_t name_siz = BSIZE;
   long number;
   double value;
-  double _Complex comp;
+  complex_double comp;
   ret = 0;
   while (ret >= 0) {
     name_siz = BSIZE; // Reset to size of the buffer
@@ -91,7 +98,7 @@ int main(int argc,char *argv[]){
   char *name_arr = NULL;
   long *number_arr = NULL;
   double *value_arr = NULL;
-  double _Complex *comp_arr = NULL;
+  complex_double *comp_arr = NULL;
   ret = 0;
   while (ret >= 0) {
     ret = cisRecv(ArrayInput, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);

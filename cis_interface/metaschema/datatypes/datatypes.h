@@ -242,6 +242,8 @@ int split_head_body(const char *buf, const size_t buf_siz,
   // Split buffer into head and body
   int ret;
   size_t sind, eind, sind_head, eind_head, sind_body, eind_body;
+  sind = 0;
+  eind = 0;
 #ifdef _WIN32
   // Windows regex of newline is buggy
   size_t sind1, eind1, sind2, eind2;

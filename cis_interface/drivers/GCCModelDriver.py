@@ -198,7 +198,7 @@ def get_cc(cpp=False, shared=False, static=False, linking=False):
     return cc
 
 
-def call_compile(src, out=None, flags=[], overwrite=False,
+def call_compile(src, out=None, flags=[], overwrite=False, verbose=False,
                  cpp=None, working_dir=None):
     r"""Compile a source file, checking for errors.
 
@@ -211,6 +211,9 @@ def call_compile(src, out=None, flags=[], overwrite=False,
         overwrite (bool, optional): If True, the existing compile file will be
             overwritten. Otherwise, it will be kept and this function will
             return without recompiling the source file.
+        verbose (bool, optional): If True, the compilation command and any output
+            produced by the command will be displayed on success. Defaults to
+            False.
         cpp (bool, optional): If True, value is returned assuming the source
             is written in C++. Defaults to False.
         working_dir (str, optional): Working directory that input file paths are
@@ -233,6 +236,14 @@ def call_compile(src, out=None, flags=[], overwrite=False,
         cpp = False
         if src_ext in ['.hpp', '.cpp']:
             cpp = True
+    if platform._is_win:  # pragma: windows
+        if cpp:
+            flags.insert(2, '/TP')
+        else:
+            flags.insert(2, '/TP')
+            # TODO: Currently everything compiled as C++ on windows to allow use of
+            # complex types
+            # flags.insert(2, '/TC')
     # Add standard library flag
     std_flag = None
     for i, a in enumerate(flags):
@@ -280,10 +291,14 @@ def call_compile(src, out=None, flags=[], overwrite=False,
     if not os.path.isfile(out):  # pragma: debug
         print(' '.join(args))
         raise RuntimeError("Compilation failed to produce result '%s'" % out)
+    logging.info("Compiled %s" % out)
+    if verbose:  # pragma: debug
+        print(' '.join(args))
+        tools.print_encoded(output, end="")
     return out
 
 
-def call_link(obj, out=None, flags=[], overwrite=False,
+def call_link(obj, out=None, flags=[], overwrite=False, verbose=False,
               cpp=False, shared=False, static=False, working_dir=None):
     r"""Compile a source file, checking for errors.
 
@@ -296,6 +311,9 @@ def call_link(obj, out=None, flags=[], overwrite=False,
         overwrite (bool, optional): If True, the existing compile file will be
             overwritten. Otherwise, it will be kept and this function will
             return without recompiling the source file.
+        verbose (bool, optional): If True, the linking command and any output
+            produced by the command will be displayed on success. Defaults to
+            False.
         cpp (bool, optional): If True, value is returned assuming the source
             is written in C++. Defaults to False.
         shared (bool, optional): If True, the object files are combined into a
@@ -372,7 +390,6 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     if not (shared or static):
         args += flags
     # Call linker
-    print(args)
     comp_process = tools.popen_nobuffer(args)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
@@ -384,6 +401,10 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     if not os.path.isfile(out):  # pragma: debug
         print(' '.join(args))
         raise RuntimeError("Linking failed to produce result '%s'" % out)
+    logging.info("Linked %s" % out)
+    if verbose:  # pragma: debug
+        print(' '.join(args))
+        tools.print_encoded(output, end="")
     return out
 
 
@@ -453,7 +474,7 @@ def build_datatypes(just_obj=False, overwrite=False, as_shared=False):
     if platform._is_win:  # pragma: windows
         _regex_obj = build_regex_win32(just_obj=True,
                                        overwrite=overwrite)
-    call_link([_datatypes_obj, _regex_obj], dtype_lib, cpp=True, overwrite=overwrite)
+    call_link([_regex_obj, _datatypes_obj], dtype_lib, cpp=True, overwrite=overwrite)
     
 
 def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
@@ -502,7 +523,7 @@ if _c_installed:
 
 
 def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
-               working_dir=None, overwrite=False):
+               working_dir=None, overwrite=False, verbose=False):
     r"""Compile a C/C++ program with necessary interface libraries.
 
     Args:
@@ -518,6 +539,9 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
             relative to. Defaults to current working directory.
         overwrite (bool, optional): If True, any existing executable and object
             files are overwritten. Defaults to False.
+        verbose (bool, optional): If True, the compilation/linking commands and
+            any output produced by them will be displayed on success. Defaults
+            to False.
 
     Returns:
         list: Products produced by the compilation. The first element will be
@@ -544,12 +568,14 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
         fname_src_obj.append(call_compile(isrc,
                                           flags=copy.deepcopy(ccflags0 + ccflags),
                                           overwrite=overwrite,
-                                          working_dir=working_dir))
+                                          working_dir=working_dir,
+                                          verbose=verbose))
     fname_src_obj.append(fname_lib_out)
     # Link compile objects
     out = call_link(fname_src_obj, out, cpp=True,
                     flags=copy.deepcopy(ldflags0 + ldflags),
-                    overwrite=overwrite, working_dir=working_dir)
+                    overwrite=overwrite, working_dir=working_dir,
+                    verbose=verbose)
     return [out] + fname_src_obj
 
 

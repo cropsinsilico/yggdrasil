@@ -5,20 +5,6 @@
 
 #include <vector>
 #include <cstring>
-#ifdef _WIN32
-#include <complex>
-typedef std::complex<float> complex_float;
-typedef std::complex<double> complex_double;
-typedef std::complex<long double> complex_long_double;
-// using complex_float = complex<float>;
-// using complex_double = complex<double>;
-// using complex_long_double = complex<long double>;
-#else
-#include <complex.h>
-typedef float _Complex complex_float;
-typedef double _Complex complex_double;
-typedef long double _Complex complex_long_double;
-#endif
 
 #include "../../tools.h"
 #include "../../serialize/base64.h"
@@ -26,6 +12,19 @@ typedef long double _Complex complex_long_double;
 
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
+
+
+#ifdef _WIN32
+#include <complex.h>
+typedef _Fcomplex complex_float;
+typedef _Dcomplex complex_double;
+typedef _Lcomplex complex_long_double;
+#else
+#include <complex.h>
+typedef float _Complex complex_float;
+typedef double _Complex complex_double;
+typedef long double _Complex complex_long_double;
+#endif
 
 
 class ScalarMetaschemaType : public MetaschemaType {
@@ -266,7 +265,9 @@ public:
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-	  complex_float arg0 = (complex_float)va_arg(ap.va, complex_double);
+    complex_double arg00 = va_arg(ap.va, complex_double);
+    complex_float arg0 = {(float)creal(arg00), (float)cimag(arg00)};
+	  // complex_float arg0 = (complex_float)va_arg(ap.va, complex_double);
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
 	  complex_double arg0 = va_arg(ap.va, complex_double);

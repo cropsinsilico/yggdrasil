@@ -49,6 +49,12 @@ public:
   // Encoding
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    writer;
+    nargs;
+    ap;
+#endif
     cislog_error("AsciiTableMetaschemaType::encode_data: AsciiTable type cannot be JSON encoded.");
     return false;
   }
@@ -76,6 +82,13 @@ public:
   // Decoding
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
+    // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+    data;
+    allow_realloc;
+    nargs;
+    ap;
+#endif
     cislog_error("AsciiTableMetaschemaType::decode_data: AsciiTable type cannot be JSON decoded.");
     return false;
   }
