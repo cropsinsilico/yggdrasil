@@ -109,6 +109,7 @@ setup(
                             'cisldflags=cis_interface.command_line:ld_flags',
                             'cistest=cis_interface:run_nose',
                             'cisschema=cis_interface.command_line:regen_schema',
+                            'cisbuildapi_c=cis_interface.command_line:rebuild_c_api',
                             'cisconfig=cis_interface.command_line:update_config',
                             'cistime_comm=cis_interface.command_line:cistime_comm',
                             'cistime_lang=cis_interface.command_line:cistime_lang',
