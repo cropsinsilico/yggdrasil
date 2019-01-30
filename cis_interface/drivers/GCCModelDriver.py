@@ -67,8 +67,7 @@ def get_zmq_flags(for_cmake=False, for_api=False):
                 else:
                     _linker_flags += ['/LIBPATH:%s' % plib_d, plib_f]
         else:
-            if for_api:
-                _linker_flags += ["-lczmq", "-lzmq"]
+            _linker_flags += ["-lczmq", "-lzmq"]
         _compile_flags += ["-DZMQINSTALLED"]
     return _compile_flags, _linker_flags
 
