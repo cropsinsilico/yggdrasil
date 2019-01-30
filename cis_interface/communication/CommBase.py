@@ -628,41 +628,34 @@ class CommBase(tools.CisClass):
         r"""Close the connection."""
         pass
 
-    def close(self, skip_base=False, linger=False):
+    def close(self, linger=False):
         r"""Close the connection.
 
         Args:
-            skip_base (bool, optional): If True, don't drain messages or remove
-                work comms.
             linger (bool, optional): If True, drain messages before closing the
                 comm. Defaults to False.
 
         """
-        if (not skip_base):
-            self.debug('')
-            if linger and self.is_open:
-                self.linger()
-            else:
-                self._closing_thread.set_terminated_flag()
-                linger = False
-        if skip_base:
-            self._close(linger=linger)
-            return
+        self.debug('')
+        if linger and self.is_open:
+            self.linger()
+        else:
+            self._closing_thread.set_terminated_flag()
+            linger = False
         # Close with lock
         with self._closing_thread.lock:
             self._close(linger=linger)
-            if not skip_base:
-                self._n_sent = 0
-                self._n_recv = 0
-                if self.is_client:
-                    self.debug("Signing off from server")
-                    self.signoff_from_server()
-                if len(self._work_comms) > 0:
-                    self.debug("Cleaning up %d work comms", len(self._work_comms))
-                    keys = [k for k in self._work_comms.keys()]
-                    for c in keys:
-                        self.remove_work_comm(c, linger=linger)
-                    self.debug("Finished cleaning up work comms")
+            self._n_sent = 0
+            self._n_recv = 0
+            if self.is_client:
+                self.debug("Signing off from server")
+                self.signoff_from_server()
+            if len(self._work_comms) > 0:
+                self.debug("Cleaning up %d work comms", len(self._work_comms))
+                keys = [k for k in self._work_comms.keys()]
+                for c in keys:
+                    self.remove_work_comm(c, linger=linger)
+                self.debug("Finished cleaning up work comms")
         self.debug("done")
 
     def close_in_thread(self, no_wait=False, timeout=None):
