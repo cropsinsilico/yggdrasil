@@ -26,6 +26,8 @@ def create(*args, **kwargs):
             empty dictionary.
         no_defaults (bool, optional): If True, defaults will not be set during
             normalization. Defaults to False.
+        required_defaults (bool, optional): If True, defaults will be set for
+            required properties, even if no_defaults is True. Defaults to False.
         *args: Additional arguments are passed to jsonschema.validators.create.
         **kwargs: Additional keyword arguments are passed to
             jsonschema.validators.create.
@@ -33,6 +35,7 @@ def create(*args, **kwargs):
     """
     normalizers = kwargs.pop('normalizers', ())
     no_defaults = kwargs.pop('no_defaults', ())
+    required_defaults = kwargs.pop('required_defaults', ())
     validator_class = jsonschema.validators.create(*args, **kwargs)
 
     class Normalizer(validator_class):
@@ -50,10 +53,13 @@ def create(*args, **kwargs):
                 lists as their value counterparts should be executed.
             NO_DEFAULTS (bool): If True, defaults will not be set during
                 normalization.
+            REQUIRED_DEFAULTS (bool): If True, defaults will be set for required
+                properties, even if NO_DEFAULTS is True.
 
         """
         NORMALIZERS = dict(normalizers)
         NO_DEFAULTS = no_defaults
+        REQUIRED_DEFAULTS = required_defaults
 
         def __init__(self, *args, **kwargs):
             super(Normalizer, self).__init__(*args, **kwargs)
@@ -110,7 +116,8 @@ def create(*args, **kwargs):
                 self._normalized = instance
 
                 # Do defaults for required fields
-                if (((isinstance(_schema.get('required', None), list)
+                if (((((not self.NO_DEFAULTS) or self.REQUIRED_DEFAULTS)
+                      and isinstance(_schema.get('required', None), list)
                       and isinstance(_schema.get('properties', None), dict)
                       and self.is_type(self._normalized, "object")))):
                     for k in _schema['required']:

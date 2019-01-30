@@ -551,7 +551,8 @@ class SchemaRegistry(object):
 
         """
         kwargs.setdefault('normalizers', self._normalizers)
-        # kwargs.setdefault('no_defaults', True)
+        kwargs.setdefault('required_defaults', True)
+        kwargs.setdefault('no_defaults', True)
         kwargs.setdefault('schema_registry', self)
         return metaschema.normalize_instance(obj, self.full_schema, **kwargs)
 
