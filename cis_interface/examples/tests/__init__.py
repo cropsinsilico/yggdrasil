@@ -49,7 +49,7 @@ class TestExample(CisTestBase, tools.CisClass):
         if self.language not in yamls[self.name]:
             return None
         if not _matlab_installed:  # pragma: no matlab
-            if self.language is 'all':
+            if self.language == 'all':
                 return yamls[self.name].get('all_nomatlab', None)
         return yamls[self.name][self.language]
 

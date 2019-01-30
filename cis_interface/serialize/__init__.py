@@ -187,12 +187,12 @@ def nptype2cformat(nptype, asbytes=False):
         else:
             cfmt = "%llu"
     elif np.issubdtype(t, np.dtype("S")):
-        if t.itemsize is 0:
+        if t.itemsize == 0:
             cfmt = '%s'
         else:
             cfmt = "%" + str(t.itemsize) + "s"
     elif np.issubdtype(t, np.dtype("U")):
-        if t.itemsize is 0:
+        if t.itemsize == 0:
             cfmt = '%s'
         else:
             cfmt = "%" + str(t.itemsize) + "s"
