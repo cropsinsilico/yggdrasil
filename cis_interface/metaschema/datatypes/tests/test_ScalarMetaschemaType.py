@@ -29,9 +29,15 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
             self._array = np.ones(self._shape, dtype)
         else:
             self._array = np.array(self._array_contents, dtype)
+        if self._type in ['bytes', 'unicode']:
+            dtype_invalid = 'float'
+        else:
+            dtype_invalid = 'S10'
+        self._invalid_array = np.ones(self._shape, dtype_invalid)
         if 'Array' not in self._cls:
             self._value = self._array[0]
             self._invalid_decoded.append(self._array)
+            self._invalid_decoded.append(self._invalid_array[0])
         else:
             self._value = self._array
             if self._array.ndim == 1:
@@ -40,6 +46,7 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
             else:
                 self._invalid_decoded.append(self._array[0][0])
                 self._invalid_decoded.append(self._array[0])
+            self._invalid_decoded.append(self._invalid_array)
         self._valid_encoded = [{'type': self.import_cls.name,
                                 'precision': self._prec,
                                 'units': '',
@@ -78,6 +85,10 @@ class TestScalarMetaschemaType(parent.TestMetaschemaType):
                 else:
                     self._valid_normalize = [(str(self._value), self._value),
                                              ('hello', 'hello')]
+        if self._explicit and ('Array' not in self._cls):
+            self._invalid_encoded.append({'type': 'scalar',
+                                          'subtype': 'invalid'})
+        self._invalid_validate.append(np.array([None, 1, list()]))
 
     def test_from_array(self):
         r"""Test getting object from array."""

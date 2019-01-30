@@ -85,13 +85,11 @@ class FixedMetaschemaType(MetaschemaType):
         """
 
         out = copy.deepcopy(typedef)
-        # if cls.base().is_fixed:
-        #     out = cls.base().typedef_base2fixed(out)
         if out.get('type', None) == cls.base().name:
             typedef_base = copy.deepcopy(typedef)
             typedef_base.update(cls.fixed_properties)
             errors = [e for e in compare_schema(typedef, typedef_base)]
-            if errors:  # pragma: debug
+            if errors:
                 error_msg = "Error(s) in comparison with fixed properties.\n"
                 for e in errors:
                     error_msg += '\t%s\n' % e
@@ -246,9 +244,9 @@ class FixedMetaschemaType(MetaschemaType):
         """
         try:
             out = cls.typedef_base2fixed(metadata)
-        except Exception as e:
+        except Exception:
             if raise_errors:
-                raise e
+                raise
             return False
         return super(FixedMetaschemaType, cls).check_encoded(
             out, typedef=typedef, raise_errors=raise_errors, **kwargs)

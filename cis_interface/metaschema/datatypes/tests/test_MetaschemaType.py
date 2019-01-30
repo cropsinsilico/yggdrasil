@@ -17,10 +17,11 @@ class TestMetaschemaType(CisTestClassInfo):
         super(TestMetaschemaType, self).__init__(*args, **kwargs)
         self._empty_msg = b''
         self._typedef = {}
+        self._invalid_validate = [None]
         self._valid_encoded = []
         self._invalid_encoded = [{}]
         self._valid_decoded = ['nothing']
-        self._invalid_decoded = [None]
+        self._invalid_decoded = []
         self._compatible_objects = []
         self._encode_type_kwargs = {}
         self._encode_data_kwargs = {}
@@ -95,6 +96,11 @@ class TestMetaschemaType(CisTestClassInfo):
         else:
             for x in self._valid_decoded:
                 assert_equal(self.import_cls.validate(x), True)
+            for x in self._invalid_validate:
+                print(x, type(x))
+                assert_equal(self.import_cls.validate(x), False)
+                assert_raises(BaseException, self.import_cls.validate,
+                              x, raise_errors=True)
 
     def test_normalize(self):
         r"""Test normalization."""
@@ -196,7 +202,7 @@ class TestMetaschemaType(CisTestClassInfo):
                 assert_raises(BaseException, self.import_cls.check_decoded,
                               x, {}, raise_errors=True)
             # Test invalid
-            for x in self._invalid_decoded:
+            for x in (self._invalid_validate + self._invalid_decoded):
                 assert_equal(self.import_cls.check_decoded(x, self.typedef), False)
                 assert_raises(BaseException, self.import_cls.check_decoded,
                               x, self.typedef, raise_errors=True)
@@ -205,11 +211,11 @@ class TestMetaschemaType(CisTestClassInfo):
         r"""Test error on encode."""
         if self._cls == 'MetaschemaType':
             assert_raises(NotImplementedError, self.import_cls.encode,
-                          self._invalid_decoded[0], self.typedef)
+                          self._invalid_validate[0], self.typedef)
         else:
             assert_raises((ValueError, jsonschema.exceptions.ValidationError),
                           self.import_cls.encode,
-                          self._invalid_decoded[0], self.typedef)
+                          self._invalid_validate[0], self.typedef)
             assert_raises(RuntimeError, self.import_cls.encode,
                           self._valid_decoded[0], self.typedef, type='invalid')
 
