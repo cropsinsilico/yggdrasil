@@ -265,9 +265,12 @@ public:
       }
       case T_COMPLEX: {
 	if (sizeof(float) == (bytes_precision / 2)) {
-    complex_double arg00 = va_arg(ap.va, complex_double);
-    complex_float arg0 = {(float)creal(arg00), (float)cimag(arg00)};
-	  // complex_float arg0 = (complex_float)va_arg(ap.va, complex_double);
+#ifdef _WIN32
+	  complex_double arg00 = va_arg(ap.va, complex_double);
+	  complex_float arg0 = {(float)creal(arg00), (float)cimag(arg00)};
+#else
+	  complex_float arg0 = (complex_float)va_arg(ap.va, complex_double);
+#endif
 	  memcpy(arg, &arg0, bytes_precision);
 	} else if (sizeof(double) == (bytes_precision / 2)) {
 	  complex_double arg0 = va_arg(ap.va, complex_double);
