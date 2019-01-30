@@ -27,3 +27,5 @@ TODO
 * Create template model drivers for compiled/interpretted langauges
 * Update travis/appveyor to clone recursively to get rapidjson as git submodule
 * Change verbose flag in GCCModelDriver to use logging levels
+* Add map class for handling arbitrary objects in C/C++
+* Add serializers/file comms for JSON and YAML

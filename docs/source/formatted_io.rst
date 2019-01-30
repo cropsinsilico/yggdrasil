@@ -103,3 +103,45 @@ In Python the data is returned as a dictionary subclass
 (:class:`cis_interface.serialize.PlySerialize.PlyDict` or 
 :class:`cis_interface.serialize.ObjSerialize.ObjDict`) while in 
 C/C++ it is returned as a structure (:c:type:`ply_t` or :c:type:`obj_t`).
+
+
+Tables as Pandas Data Frames
+----------------------------
+
+In Python, tables can also be passed as `Pandas <https://pandas.pydata.org/>`_ 
+data frames.
+
+.. include:: examples/formatted_io4_src.rst
+
+The YAML specifies ``filetype: pandas`` for the 
+connections to files to indicate that the files should be interpreted as CSV 
+tables using Pandas.
+
+.. include:: examples/formatted_io4_yml.rst
+
+As Pandas data frames are a Python specific construction, they cannot be 
+used within models written in other languages. However, the files can 
+still be read using Pandas. The data format returned to models on the 
+receiving end of sent Pandas data frames will receive arrays in the 
+proper native data type. In addition, a model written in Python can 
+receive any array sent by another model (whether or not it is Python) 
+as a Pandas data frame.
+
+
+Config style Mappings
+---------------------
+
+Simple mapping (key/value) data can be passed around in a colon/tab
+delimited format.
+
+.. include:: examples/formatted_io7_src.rst
+
+The YAML specifies ``filetype: map`` for the 
+connections to files to indicate that the files should be interpreted as 
+config file formats with single, unique keys on each line followed by a 
+delimiter and then a value.
+
+.. include:: examples/formatted_io7_yml.rst
+
+In Python the data is returned as a dictionary with one key/value for each 
+line in the file.
