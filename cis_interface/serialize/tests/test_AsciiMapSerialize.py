@@ -22,6 +22,8 @@ class TestAsciiMapSerialize(parent.TestDefaultSerialize):
 
     def test_remove_quotes(self):
         r"""Test deserialization of message with single quotes."""
-        send_msg = b"a\t'a_value'\n"
+        send_msg_list = [b"a\t'a_value'\n", b'a\t"a_value"\n',
+                         b"a\ta_value\n"]
         recv_msg = {'a': 'a_value'}
-        self.assert_equal(self.instance.deserialize(send_msg)[0], recv_msg)
+        for send_msg in send_msg_list:
+            self.assert_equal(self.instance.deserialize(send_msg)[0], recv_msg)

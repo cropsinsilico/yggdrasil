@@ -102,15 +102,12 @@ class AsciiMapSerialize(DefaultSerialize):
 
         """
         out = super(AsciiMapSerialize, cls).get_testing_options()
-        out['objects'] = [{'args1': int(1),
-                           'args2a': 'this', 'args2b': 'this', 'args2c': 'this',
+        out['objects'] = [{'args1': int(1), 'args2': 'this',
                            # Should these be separate messages, allowing append?
                            'args3': float(1), 'args4': [int(1), int(2)]}]
         out['empty'] = dict()
         out['contents'] = (b'args1\t1\n'
-                           + b'args2a\t"this"\n'
-                           + b"args2b\t'this'\n"
-                           + b'args2c\tthis\n'
+                           + b'args2\t"this"\n'
                            + b'args3\t1.0\n'
                            + b'args4\t[1, 2]\n')
         # out['contents'] = out['contents'].replace(b'\n', platform._newline)
