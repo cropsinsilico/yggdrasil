@@ -71,7 +71,9 @@ class TestCisRunner(CisTestBase):
                'args': 'fake_channel',
                'driver': 'InputDriver',
                'working_dir': os.getcwd(),
+               'icomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
+               'ocomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
                'kwargs': {}}
-        assert_raises(Exception, self.runner.createInputDriver, yml)
+        assert_raises(ValueError, self.runner.createInputDriver, yml)
         yml['driver'] = 'OutputDriver'
-        assert_raises(Exception, self.runner.createOutputDriver, yml)
+        assert_raises(ValueError, self.runner.createOutputDriver, yml)
