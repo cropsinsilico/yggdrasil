@@ -29,3 +29,5 @@ TODO
 * Change verbose flag in GCCModelDriver to use logging levels
 * Add map class for handling arbitrary objects in C/C++
 * Add serializers/file comms for JSON and YAML
+* change gs_lesson/formatted_io series to have more descriptive names
+* Docs on how nested data objects are represented in C/C++.

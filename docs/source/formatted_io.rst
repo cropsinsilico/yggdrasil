@@ -145,3 +145,20 @@ delimiter and then a value.
 
 In Python the data is returned as a dictionary with one key/value for each 
 line in the file.
+
+
+JSON Files
+----------
+
+More complex nested structures can be passed around using JSON serialization.
+
+.. include:: examples/formatted_io8_src.rst
+
+The YAML specifies ``filetype: json`` for the 
+connections to files to indicate that the files should be interpreted as
+JSON files.
+
+.. include:: examples/formatted_io8_yml.rst
+
+In Python, the data is returned in the type determined by the
+`json <https://docs.python.org/3/library/json.html>`_ package.
