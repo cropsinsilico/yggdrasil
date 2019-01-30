@@ -102,6 +102,9 @@ class PandasFileComm(AsciiTableComm):
         for k in ['format_str', 'as_array']:
             if k in out['kwargs']:
                 del out['kwargs'][k]
+        print('pandas', type(out['contents']),
+              backwards.match_stype(out['contents'], '\n'),
+              backwards.match_stype(out['contents'], platform._newline))
         out['contents'] = out['contents'].replace(
             backwards.match_stype(out['contents'], '\n'),
             backwards.match_stype(out['contents'], platform._newline))
