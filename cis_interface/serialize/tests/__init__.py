@@ -376,7 +376,7 @@ def test_format2table():
 
 def test_array_to_table():
     r"""Test conversion of arrays to ASCII table and back."""
-    flist = ['%5s\t%ld\t%lf\t%g%+gj\n']
+    flist = ['# %5s\t%ld\t%lf\t%g%+gj\n']
     for use_astropy in [False, True]:
         for f in flist:
             dtype = serialize.cformat2nptype(f)

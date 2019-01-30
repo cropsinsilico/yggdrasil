@@ -721,6 +721,9 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
         use_astropy = False
     dtype = cformat2nptype(fmt_str)
     info = format2table(fmt_str)
+    comment = info.get('comment', None)
+    if comment is not None:
+        fmt_str = fmt_str.split(comment, 1)[-1]
     arr1 = consolidate_array(arrs, dtype=dtype)
     if use_astropy:
         fd = backwards.StringIO()
