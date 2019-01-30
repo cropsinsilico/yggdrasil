@@ -31,12 +31,12 @@ definitions:
     - anyOf:
       - properties:
           commtype:
-            enum: [zmq]
-        title: ZMQComm
-      - properties:
-          commtype:
             enum: [ipc]
         title: IPCComm
+      - properties:
+          commtype:
+            enum: [zmq]
+        title: ZMQComm
       - properties:
           commtype:
             enum: [rmq_async]
@@ -112,8 +112,10 @@ definitions:
         args: {type: string}
         as_array: {default: false, type: boolean}
         comment: {default: '# ', type: string}
-        delimiter: &id001 {type: string}
+        default_flow_style: &id003 {type: boolean}
+        delimiter: &id005 {type: string}
         driver: {type: string}
+        encoding: &id004 {type: string}
         field_names:
           items: {type: string}
           type: array
@@ -122,10 +124,12 @@ definitions:
           type: array
         filetype:
           default: binary
-          enum: [ascii, binary, map, mat, obj, pandas, pickle, ply, table]
+          enum: [ascii, binary, json, map, mat, obj, pandas, pickle, ply, table, yaml]
           type: string
-        format_str: &id002 {type: string}
+        format_str: &id006 {type: string}
         in_temp: {default: false, type: boolean}
+        indent: &id001
+          type: [string, int]
         is_series: {default: false, type: boolean}
         name: {type: string}
         newline: {default: '
@@ -133,7 +137,8 @@ definitions:
             ', type: string}
         recv_converter: {type: function}
         send_converter: {type: function}
-        use_astropy: &id003 {type: boolean}
+        sort_keys: &id002 {type: boolean}
+        use_astropy: &id007 {type: boolean}
         working_dir: {type: string}
       required: [name, filetype, working_dir]
       type: object
@@ -144,14 +149,27 @@ definitions:
         title: PickleFileComm
       - properties:
           filetype:
+            enum: [json]
+          indent: *id001
+          sort_keys: *id002
+        title: JSONFileComm
+      - properties:
+          default_flow_style: *id003
+          encoding: *id004
+          filetype:
+            enum: [yaml]
+          indent: {type: int}
+        title: YAMLFileComm
+      - properties:
+          filetype:
             enum: [obj]
         title: ObjFileComm
       - properties:
-          delimiter: *id001
+          delimiter: *id005
           filetype:
             enum: [pandas]
-          format_str: *id002
-          use_astropy: *id003
+          format_str: *id006
+          use_astropy: *id007
         title: PandasFileComm
       - properties:
           filetype:
@@ -193,13 +211,13 @@ definitions:
         args:
           items: {type: string}
           type: array
-        builddir: &id004 {type: string}
-        cc: &id010 {type: string}
+        builddir: &id008 {type: string}
+        cc: &id011 {type: string}
         client_of:
           default: []
           items: {type: string}
           type: array
-        cmakeargs: &id005
+        cmakeargs: &id009
           items: {type: string}
           type: array
         driver: {type: string}
@@ -211,16 +229,16 @@ definitions:
         language:
           enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
           type: string
-        make_command: &id007 {type: string}
-        makedir: &id008 {type: string}
-        makefile: &id009 {type: string}
+        make_command: {default: make, type: string}
+        makedir: {type: string}
+        makefile: {default: Makefile, type: string}
         name: {type: string}
         outputs:
           default: []
           items: {$ref: '#/definitions/comm'}
           type: array
-        overwrite: &id011 {type: boolean}
-        sourcedir: &id006 {type: string}
+        overwrite: &id012 {type: boolean}
+        sourcedir: &id010 {type: string}
         strace_flags:
           default: []
           items: {type: string}
@@ -237,36 +255,33 @@ definitions:
     - anyOf:
       - properties:
           language:
-            enum: [python]
-        title: PythonModelDriver
-      - properties:
-          builddir: *id004
-          cmakeargs: *id005
-          language:
-            enum: [cmake]
-          sourcedir: *id006
-        title: CMakeModelDriver
-      - properties:
-          language:
-            enum: [matlab]
-        title: MatlabModelDriver
-      - properties:
-          language:
             enum: [make]
-          make_command: *id007
-          makedir: *id008
-          makefile: *id009
         title: MakeModelDriver
       - properties:
-          cc: *id010
           language:
-            enum: [c, c++, cpp]
-          overwrite: *id011
-        title: GCCModelDriver
+            enum: [python]
+        title: PythonModelDriver
       - properties:
           language:
             enum: [lpy]
         title: LPyModelDriver
+      - properties:
+          builddir: *id008
+          cmakeargs: *id009
+          language:
+            enum: [cmake]
+          sourcedir: *id010
+        title: CMakeModelDriver
+      - properties:
+          cc: *id011
+          language:
+            enum: [c, c++, cpp]
+          overwrite: *id012
+        title: GCCModelDriver
+      - properties:
+          language:
+            enum: [matlab]
+        title: MatlabModelDriver
       - properties:
           language:
             enum: [executable]
