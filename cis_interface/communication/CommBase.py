@@ -1603,8 +1603,8 @@ class CommBase(tools.CisClass):
         if flag and (not self.is_eof(msg)):
             if self.serializer.typedef['type'] == 'array':
                 metadata = copy.deepcopy(self._last_header)
-                if metadata is None:
-                    metadata = {}
+                # if metadata is None:
+                #     metadata = {}
                 if key_order is not None:
                     metadata['key_order'] = key_order
                 metadata.setdefault('key_order', self.serializer.get_field_names())
