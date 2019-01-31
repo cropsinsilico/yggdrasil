@@ -51,6 +51,7 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
   - "SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
+  - "git submodule update --init --recursive"
 
   # Setup Visual C++ toolset
   # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
