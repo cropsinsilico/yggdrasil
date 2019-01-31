@@ -469,13 +469,14 @@ def build_datatypes(just_obj=False, overwrite=False, as_shared=False):
                                   overwrite=overwrite)
     if just_obj:
         return _datatypes_obj
-    obj_list = [_datatypes_obj]
     # Compile regex for windows
     if platform._is_win:  # pragma: windows
         _regex_obj = build_regex_win32(just_obj=True,
                                        overwrite=overwrite)
-        obj_list.insert(0, _regex_obj)
-    call_link(obj_list, dtype_lib, cpp=True, overwrite=overwrite)
+        call_link([_regex_obj, _datatypes_obj], dtype_lib, cpp=True,
+                  overwrite=overwrite)
+    else:
+        call_link(_datatypes_obj, dtype_lib, cpp=True, overwrite=overwrite)
     
 
 def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
