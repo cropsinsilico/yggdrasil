@@ -1,5 +1,4 @@
 import numpy as np
-from cis_interface import backwards, platform
 from cis_interface.communication.tests import test_AsciiTableComm as parent
 
 
