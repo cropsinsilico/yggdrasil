@@ -199,7 +199,7 @@ definitions:
           filetype:
             enum: [yaml]
           indent:
-            default: 4
+            default: "\t"
             type: [string, int]
         title: YAMLFileComm
     description: Schema for file components.
@@ -233,9 +233,9 @@ definitions:
         language:
           enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
           type: string
-        make_command: &id013 {default: make, type: string}
-        makedir: &id014 {type: string}
-        makefile: &id015 {default: Makefile, type: string}
+        make_command: {default: make, type: string}
+        makedir: {type: string}
+        makefile: {default: Makefile, type: string}
         name: {type: string}
         outputs:
           default: []
@@ -277,9 +277,6 @@ definitions:
       - properties:
           language:
             enum: [make]
-          make_command: *id013
-          makedir: *id014
-          makefile: *id015
         title: MakeModelDriver
       - properties:
           language:

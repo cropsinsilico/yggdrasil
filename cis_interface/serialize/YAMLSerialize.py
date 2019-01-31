@@ -12,7 +12,7 @@ class YAMLSerialize(DefaultSerialize):
     _seritype = 'yaml'
     _schema_properties = dict(
         DefaultSerialize._schema_properties,
-        indent={'type': ['string', 'int'], 'default': 4},
+        indent={'type': ['string', 'int'], 'default': '\t'},
         encoding={'type': 'string', 'default': 'utf-8'},
         default_flow_style={'type': 'boolean', 'default': False})
     _default_type = {'type': 'object'}
