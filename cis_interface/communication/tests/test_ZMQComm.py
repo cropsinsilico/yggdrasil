@@ -1,5 +1,6 @@
 import unittest
 import zmq
+import copy
 from cis_interface import platform
 from cis_interface.tests import assert_raises, assert_equal
 from cis_interface.communication import new_comm
@@ -63,13 +64,11 @@ class TestZMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for ZMQComm communication class."""
 
     comm = 'ZMQComm'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestZMQComm, self).__init__(*args, **kwargs)
-        self.protocol = None
-        self.socket_type = None
-        self.attr_list += ['context', 'socket', 'socket_type_name',
-                           'socket_type', 'protocol', 'host', 'port']
+    attr_list = (copy.deepcopy(test_AsyncComm.TestAsyncComm.attr_list)
+                 + ['context', 'socket', 'socket_type_name',
+                    'socket_type', 'protocol', 'host', 'port'])
+    protocol = None
+    socket_type = None
 
     @property
     def description_prefix(self):
@@ -100,8 +99,6 @@ class TestZMQComm(test_AsyncComm.TestAsyncComm):
 # Tests for server/client
 class TestZMQComm_client(TestZMQComm):
     r"""Test for ZMQComm communication class for client/server."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQComm_client, self).__init__(*args, **kwargs)
 
     @property
     def send_inst_kwargs(self):
@@ -119,10 +116,9 @@ class TestZMQComm_client(TestZMQComm):
 # Tests for all the supported protocols
 class TestZMQCommINPROC(TestZMQComm):
     r"""Test for ZMQComm communication class with INPROC socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommINPROC, self).__init__(*args, **kwargs)
-        self.protocol = 'inproc'
 
+    protocol = 'inproc'
+    
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
@@ -131,9 +127,8 @@ class TestZMQCommINPROC(TestZMQComm):
     
 class TestZMQCommTCP(TestZMQComm):
     r"""Test for ZMQComm communication class with TCP socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommTCP, self).__init__(*args, **kwargs)
-        self.protocol = 'tcp'
+
+    protocol = 'tcp'
 
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
@@ -144,9 +139,8 @@ class TestZMQCommTCP(TestZMQComm):
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
 class TestZMQCommIPC(TestZMQComm):
     r"""Test for ZMQComm communication class with IPC socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommIPC, self).__init__(*args, **kwargs)
-        self.protocol = 'ipc'
+
+    protocol = 'ipc'
 
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
@@ -162,9 +156,8 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 # Unsupported
 # class TestZMQCommUDP(TestZMQComm):
 #     r"""Test for ZMQComm communication class with UDP socket."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestZMQCommUDP, self).__init__(*args, **kwargs)
-#         self.protocol = 'udp'
+
+#     protocol = 'udp'
 
 #     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
@@ -174,9 +167,8 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 
 # class TestZMQCommPGM(TestZMQComm):
 #     r"""Test for ZMQComm communication class with PGM socket."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestZMQCommPGM, self).__init__(*args, **kwargs)
-#         self.protocol = 'pgm'
+
+#     protocol = 'pgm'
 
 #     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
@@ -186,9 +178,8 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
     
 # class TestZMQCommEPGM(TestZMQComm):
 #     r"""Test for ZMQComm communication class with EPGM socket."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestZMQCommEPGM, self).__init__(*args, **kwargs)
-#         self.protocol = 'epgm'
+
+#     protocol = 'epgm'
 
 #     @unittest.skipIf(True, 'Only test once')
 #     def test_send_recv_nolimit(self):
@@ -199,9 +190,8 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 # Tests for all the socket types
 class TestZMQCommPAIR(TestZMQComm):
     r"""Test for ZMQComm communication class with PAIR/PAIR socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPAIR, self).__init__(*args, **kwargs)
-        self.socket_type = 'PAIR'
+
+    socket_type = 'PAIR'
 
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
@@ -211,9 +201,8 @@ class TestZMQCommPAIR(TestZMQComm):
     
 class TestZMQCommPUSH(TestZMQComm):
     r"""Test for ZMQComm communication class with PUSH/PULL socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPUSH, self).__init__(*args, **kwargs)
-        self.socket_type = 'PUSH'
+
+    socket_type = 'PUSH'
 
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
@@ -223,9 +212,8 @@ class TestZMQCommPUSH(TestZMQComm):
     
 class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
     r"""Test for ZMQComm communication class with INPROC PUSH/PULL socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPUSH_INPROC, self).__init__(*args, **kwargs)
-        self.socket_type = 'PUSH'
+
+    socket_type = 'PUSH'
 
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
@@ -235,9 +223,8 @@ class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
     
 class TestZMQCommPUB(TestZMQComm):
     r"""Test for ZMQComm communication class with PUB/SUB socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPUB, self).__init__(*args, **kwargs)
-        self.socket_type = 'PUB'
+
+    socket_type = 'PUB'
 
     @unittest.skipIf(True, 'Only test once')
     def test_send_recv_nolimit(self):
@@ -259,9 +246,8 @@ class TestZMQCommREQ(TestZMQComm):
 
 class TestZMQCommROUTER(TestZMQComm):
     r"""Test for ZMQComm communication class with DEALER/ROUTER socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommROUTER, self).__init__(*args, **kwargs)
-        self.socket_type = 'ROUTER'
+
+    socket_type = 'ROUTER'
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair with sleep after setup to ensure

@@ -1,5 +1,6 @@
 import unittest
-import nose.tools as nt
+import copy
+from cis_interface.tests import assert_raises
 from cis_interface.communication import new_comm
 from cis_interface.communication.RMQComm import _rmq_server_running
 from cis_interface.communication.tests import test_RMQComm as parent
@@ -10,10 +11,8 @@ class TestRMQAsyncComm(parent.TestRMQComm):
     r"""Test for RMQAsyncComm communication class."""
 
     comm = 'RMQAsyncComm'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestRMQAsyncComm, self).__init__(*args, **kwargs)
-        self.attr_list += ['times_connected', 'rmq_thread', 'rmq_lock']
+    attr_list = (copy.deepcopy(parent.TestRMQComm.attr_list)
+                 + ['times_connected', 'rmq_thread', 'rmq_lock'])
 
     def test_reconnect(self):
         r"""Test reconnect after unexpected disconnect."""
@@ -33,4 +32,4 @@ class TestRMQAsyncComm(parent.TestRMQComm):
 def test_not_running():
     r"""Test raise of an error if a RMQ server is not running."""
     comm_kwargs = dict(comm='RMQAsyncComm', direction='send', reverse_names=True)
-    nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)
+    assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

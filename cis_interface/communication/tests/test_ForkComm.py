@@ -1,17 +1,15 @@
-from cis_interface.communication.tests import test_CommBase as parent
-import nose.tools as nt
 import uuid
+import copy
+from cis_interface.communication.tests import test_CommBase as parent
 
 
 class TestForkComm(parent.TestCommBase):
     r"""Tests for ForkComm communication class."""
 
     comm = 'ForkComm'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestForkComm, self).__init__(*args, **kwargs)
-        self.attr_list += ['comm_list', 'curr_comm_index']
-        self.ncomm = 2
+    attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
+                 + ['comm_list', 'curr_comm_index'])
+    ncomm = 2
 
     @property
     def cleanup_comm_classes(self):
@@ -27,7 +25,7 @@ class TestForkComm(parent.TestCommBase):
 
     def test_error_name(self):
         r"""Test error on missing address."""
-        nt.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
+        self.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
 
     def test_error_send(self):
         r"""Disabled: Test error on send."""

@@ -1,5 +1,6 @@
 import os
 import uuid
+import unittest
 from cis_interface import backwards
 from cis_interface.tests import CisTestClassInfo, assert_equal
 from cis_interface.communication import new_comm, get_comm, CommBase
@@ -33,14 +34,11 @@ class TestCommBase(CisTestClassInfo):
 
     comm = 'CommBase'
     testing_option_kws = {}
+    attr_list = ['name', 'address', 'direction',
+                 'serializer', 'recv_timeout',
+                 'close_on_eof_recv', 'opp_address', 'opp_comms',
+                 'maxMsgSize']
     
-    def __init__(self, *args, **kwargs):
-        super(TestCommBase, self).__init__(*args, **kwargs)
-        self.attr_list += ['name', 'address', 'direction',
-                           'serializer', 'recv_timeout',
-                           'close_on_eof_recv', 'opp_address', 'opp_comms',
-                           'maxMsgSize']
-
     @property
     def cleanup_comm_classes(self):
         r"""list: Comm classes that should be cleaned up following the test."""
@@ -184,12 +182,6 @@ class TestCommBase(CisTestClassInfo):
             assert(self.instance.is_empty_recv(msg))
             assert(not self.instance.is_empty_recv(self.instance.eof_msg))
             
-    def test_maxMsgSize(self):
-        r"""Print maxMsgSize."""
-        self.instance.debug('maxMsgSize: %d, %d, %d', self.maxMsgSize,
-                            self.send_instance.maxMsgSize,
-                            self.recv_instance.maxMsgSize)
-
     def test_error_name(self):
         r"""Test error on missing address."""
         self.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
@@ -219,13 +211,11 @@ class TestCommBase(CisTestClassInfo):
         recv_inst.close()
         self.fd_count
 
-    def test_double_open(self):
-        r"""Test that opening twice dosn't cause errors."""
+    def test_send_recv_after_close(self):
+        r"""Test that opening twice dosn't cause errors and that send/recv after
+        close returns false."""
         self.send_instance.open()
         self.recv_instance.open()
-
-    def test_send_recv_after_close(self):
-        r"""Test that send/recv after close returns false."""
         self.send_instance.close()
         self.recv_instance.close()
         assert(self.send_instance.is_closed)
@@ -242,6 +232,14 @@ class TestCommBase(CisTestClassInfo):
                 raise AttributeError("Send comm does not have attribute %s" % a)
             if not hasattr(self.recv_instance, a):  # pragma: debug
                 raise AttributeError("Recv comm does not have attribute %s" % a)
+        self.instance.debug('maxMsgSize: %d, %d, %d', self.maxMsgSize,
+                            self.send_instance.maxMsgSize,
+                            self.recv_instance.maxMsgSize)
+        self.instance.opp_comm_kwargs()
+        if self.import_cls.is_file:
+            assert(self.import_cls.is_installed(language='invalid'))
+        else:
+            assert(not self.import_cls.is_installed(language='invalid'))
 
     def test_invalid_direction(self):
         r"""Check that error raised for invalid direction."""
@@ -249,10 +247,6 @@ class TestCommBase(CisTestClassInfo):
         kwargs['direction'] = 'invalid'
         self.assert_raises(ValueError, new_comm, self.name + "_" + self.uuid,
                            **kwargs)
-
-    def test_opp_comm_kwargs(self):
-        r"""Test getting keyword arguments for the opposite comm."""
-        self.instance.opp_comm_kwargs()
 
     def test_work_comm(self):
         r"""Test creating/removing a work comm."""
@@ -431,14 +425,6 @@ class TestCommBase(CisTestClassInfo):
         assert(len(self.msg_long) > self.maxMsgSize)
         self.do_send_recv('send_nolimit', 'recv_nolimit', self.msg_long)
 
-    def test_send_recv_line(self):
-        r"""Test send/recv of a line message."""
-        self.do_send_recv('send_line', 'recv_line')
-        
-    def test_send_recv_row(self):
-        r"""Test send/recv of a row message."""
-        self.do_send_recv('send_row', 'recv_row')
-        
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""
         msg_send = getattr(self, 'test_msg_array', None)
@@ -451,10 +437,6 @@ class TestCommBase(CisTestClassInfo):
     def test_eof_no_close(self):
         r"""Test send/recv of EOF message with no close."""
         self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False)
-
-    def test_eof_nolimit(self):
-        r"""Test send/recv of EOF message through nolimit."""
-        self.do_send_recv(send_meth='send_nolimit_eof')
 
     def test_purge(self, nrecv=1):
         r"""Test purging messages from the comm."""
@@ -489,7 +471,3 @@ class TestCommBase(CisTestClassInfo):
                               msg_send=msg_send,
                               send_kwargs={'field_order': field_order},
                               recv_kwargs={'field_order': field_order})
-        
-    def test_is_installed(self):
-        r"""Test class is_installed method."""
-        assert(not self.import_cls.is_installed(language='invalid'))

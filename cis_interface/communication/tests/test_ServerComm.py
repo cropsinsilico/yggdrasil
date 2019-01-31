@@ -1,5 +1,6 @@
 import unittest
 import uuid
+import copy
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase
 
@@ -8,10 +9,8 @@ class TestServerComm(test_CommBase.TestCommBase):
     r"""Tests for ServerComm communication class."""
 
     comm = 'ServerComm'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestServerComm, self).__init__(*args, **kwargs)
-        self.attr_list += ['response_kwargs', 'icomm', 'ocomm']
+    attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
+                 + ['response_kwargs', 'icomm', 'ocomm'])
 
     @property
     def send_inst_kwargs(self):

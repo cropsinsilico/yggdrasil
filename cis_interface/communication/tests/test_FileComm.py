@@ -1,6 +1,7 @@
 import os
 import unittest
 import nose.tools as nt
+import copy
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
 
@@ -9,13 +10,11 @@ class TestFileComm(parent.TestCommBase):
     r"""Test for FileComm communication class."""
 
     comm = 'FileComm'
+    attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
+                 + ['fd', 'read_meth', 'append', 'in_temp',
+                    'open_as_binary', 'newline', 'is_series',
+                    'platform_newline'])
     
-    def __init__(self, *args, **kwargs):
-        super(TestFileComm, self).__init__(*args, **kwargs)
-        self.attr_list += ['fd', 'read_meth', 'append', 'in_temp',
-                           'open_as_binary', 'newline', 'is_series',
-                           'platform_newline']
-
     def teardown(self):
         r"""Remove the file."""
         super(TestFileComm, self).teardown()
@@ -106,10 +105,6 @@ class TestFileComm(parent.TestCommBase):
         flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
         assert(not flag)
         nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
-
-    def test_is_installed(self):
-        r"""Test class is_installed method."""
-        assert(self.import_cls.is_installed(language='invalid'))
 
 
 class TestFileComm_readline(TestFileComm):
