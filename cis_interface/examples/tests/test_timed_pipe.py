@@ -17,7 +17,8 @@ class ExampleTimedPipeTestBase(TestExample):
                                          _default_comm)
         self.env = {'PIPE_MSG_COUNT': '10',
                     'PIPE_MSG_SIZE': '1024'}
-        # self.debug_flag = True
+        if self._new_default_comm == 'IPCComm':
+            self.debug_flag = True
         
     def run_example(self):
         r"""This runs an example in the correct language."""
