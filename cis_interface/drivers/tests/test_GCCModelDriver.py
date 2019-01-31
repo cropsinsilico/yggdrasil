@@ -39,7 +39,8 @@ def test_get_flags():
 @unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_build_shared():
     r"""Test building libraries as shared."""
-    build_regex_win32(overwrite=True)
+    if platform._is_win:  # pragma: windows
+        build_regex_win32(overwrite=True)
     build_datatypes(as_shared=False, overwrite=True)
     build_datatypes(as_shared=True, overwrite=True)
     build_api(cpp=False, as_shared=True, overwrite=True)
