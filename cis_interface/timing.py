@@ -1032,7 +1032,7 @@ class TimedRun(CisTestBase, tools.CisClass):
             if ibench is None:  # pragma: debug
                 raise Exception("Could not find run '%s'" % name)
             del data_out._benchmarks[ibench]
-            if len(data_out) is 0:
+            if len(data_out) == 0:
                 data_out = None
                 if os.path.isfile(self.filename):
                     os.remove(self.filename)

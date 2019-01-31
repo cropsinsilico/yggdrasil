@@ -39,7 +39,7 @@ for k, lang in ex_dict.items():
     isrcdir = os.path.join(idir, 'src')
     for ilang in lang:
         # Get list of yaml & source files
-        if k is 'rpcFib':
+        if k == 'rpcFib':
             if ilang == 'all':
                 cli_l = 'python'
                 par_l = 'matlab'
@@ -58,7 +58,7 @@ for k, lang in ex_dict.items():
             src_names = ['%sCli%s' % (k, ext_map[cli_l]),
                          '%sCliPar%s' % (k, ext_map[par_l]),
                          '%sSrv%s' % (k, ext_map[srv_l])]
-        elif k is 'maxMsg':
+        elif k == 'maxMsg':
             if ilang == 'all':
                 cli_l = 'python'
                 srv_l = 'matlab'
