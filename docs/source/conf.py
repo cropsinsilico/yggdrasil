@@ -57,14 +57,16 @@ fasciiio = ['AsciiTable.h', # 'AsciiTable.hpp', 'AsciiTable.m',
 ]
 fserialize = [os.path.basename(f) for f in glob.glob(
     os.path.join(srcdir, 'serialize', '*.h'))]
+fdatatypes = [os.path.basename(f) for f in glob.glob(
+    os.path.join(srcdir, 'metaschema', 'datatypes', '*.h'))]
 
 breathe_projects = {"cis_interface": doxydir}
 breathe_default_project = "cis_interface"
 breathe_projects_source = {"cis_interface": (
     srcdir,
     ([os.path.join('interface', f) for f in finterface] +
-     [os.path.join('dataio', f) for f in fasciiio] +
-     [os.path.join('serialize', f) for f in fserialize]))
+     [os.path.join('serialize', f) for f in fserialize] +
+     [os.path.join('metaschema', 'datatypes', f) for f in fdatatypes]))
     }
 
 # Napoleon settings

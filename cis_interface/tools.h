@@ -89,7 +89,9 @@ unsigned long ptr2seed(void *ptr) {
 };
 
 
-/*! @brief Structure used to wrap va_list and allow pointer passing.*/
+/*! @brief Structure used to wrap va_list and allow pointer passing.
+@param va va_list Wrapped variable argument list.
+*/
 typedef struct va_list_t {
   va_list va;
 } va_list_t;

@@ -880,6 +880,7 @@ char *set_reply_send(const comm_t *comm) {
 /*!
   @brief Add reply socket information to a recv comm.
   @param[in] comm comm_t* Comm that confirmation is for.
+  @param[in] address const char* Comm address.
   @returns int Index of the reply socket.
 */
 static inline

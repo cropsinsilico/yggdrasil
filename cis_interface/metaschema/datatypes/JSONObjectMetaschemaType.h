@@ -27,6 +27,10 @@ public:
   */
   JSONObjectMetaschemaType(std::map<const char*, MetaschemaType*, strcomp> properties) :
     MetaschemaType("object"), properties_(properties) {}
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new JSONObjectMetaschemaType instance with the same data.
+   */
   JSONObjectMetaschemaType* copy() { return (new JSONObjectMetaschemaType(properties_)); }
   /*!
     @brief Print information about the type to stdout.
