@@ -25,6 +25,11 @@ class JSONSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
+        # Convert bytes to str because JSON cannot serialize bytes by default
+        if not backwards.PY2:  # pragma: Python 3
+            args = backwards.as_str(args, recurse=True,
+                                    convert_types=(backwards.bytes_type,),
+                                    allow_pass=True)
         indent = self.indent
         if backwards.PY2:  # pragma: Python 2
             if isinstance(indent, str):

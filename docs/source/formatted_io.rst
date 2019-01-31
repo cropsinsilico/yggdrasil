@@ -162,3 +162,20 @@ JSON files.
 
 In Python, the data is returned in the type determined by the
 `json <https://docs.python.org/3/library/json.html>`_ package.
+
+
+YAML Files
+----------
+
+More complex nested structures can also be represented using the YAML syntax.
+
+.. include:: examples/formatted_io9_src.rst
+
+The YAML input file options specifies ``filetype: yaml`` for the 
+connections to files to indicate that the files should be interpreted as
+YAML files.
+
+.. include:: examples/formatted_io9_yml.rst
+
+In Python, the data is returned in the type determined by the
+`PyYAML <https://pyyaml.org/wiki/PyYAMLDocumentation>`_ package.

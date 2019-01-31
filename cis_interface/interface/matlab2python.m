@@ -4,6 +4,9 @@ function x_py = matlab2python(x_ml)
   elseif isa(x_ml, 'containers.Map');
     keys = matlab2python(x_ml.keys);
     vals = matlab2python(x_ml.values);
+    for i = 1:length(keys)
+      keys{i} = py.str(keys{i}.decode('utf-8'));
+    end
     x_py = py.dict(py.zip(keys, vals));
   elseif isscalar(x_ml);
     if isa(x_ml, 'complex');
