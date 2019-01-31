@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from cis_interface import serialize, backwards, platform
+from cis_interface import serialize
 from cis_interface.communication.AsciiTableComm import AsciiTableComm
 from cis_interface.schema import register_component
 from cis_interface.serialize.PandasSerialize import PandasSerialize
@@ -102,9 +102,9 @@ class PandasFileComm(AsciiTableComm):
         for k in ['format_str', 'as_array']:
             if k in out['kwargs']:
                 del out['kwargs'][k]
-        out['contents'] = out['contents'].replace(
-            backwards.match_stype(out['contents'], '\n'),
-            backwards.match_stype(out['contents'], platform._newline))
+        # out['contents'] = out['contents'].replace(
+        #     backwards.match_stype(out['contents'], '\n'),
+        #     backwards.match_stype(out['contents'], platform._newline))
         return out
         
     @property
