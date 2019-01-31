@@ -18,12 +18,16 @@ class ExampleTimedPipeTestBase(TestExample):
         self.env = {'PIPE_MSG_COUNT': '10',
                     'PIPE_MSG_SIZE': '1024'}
         # self.debug_flag = True
+        
+    def run_example(self):
+        r"""This runs an example in the correct language."""
         if self._new_default_comm == 'IPCComm':
             from cis_interface.communication.IPCComm import ipcrm_queues, ipc_queues
             qlist = ipc_queues()
             if qlist:  # pragma: debug
                 print('Existing queues:', qlist)
                 ipcrm_queues()
+        super(ExampleTimedPipeTestBase, self).run_example()
 
     @property
     def description_prefix(self):
