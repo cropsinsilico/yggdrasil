@@ -48,7 +48,7 @@ typedef struct comm_head_t {
 
 /*!
   @brief Get the name of the type from the class.
-  @param[in] MetaschemaType* Type structure/class.
+  @param[in] type_class MetaschemaType* Type structure/class.
   @returns const char* Type name.
 */
 const char* get_type_name(MetaschemaType* type_class);
@@ -56,7 +56,7 @@ const char* get_type_name(MetaschemaType* type_class);
 
 /*!
   @brief Get the subtype of the type.
-  @param[in] MetaschemaType* Type structure/class.
+  @param[in] type_class MetaschemaType* Type structure/class.
   @returns const char* The subtype of the class, "" if there is an error.
 */
 const char* get_type_subtype(MetaschemaType* type_class);
@@ -64,7 +64,7 @@ const char* get_type_subtype(MetaschemaType* type_class);
 
 /*!
   @brief Get the precision of the type.
-  @param[in] MetaschemaType* Type structure/class.
+  @param[in] type_class MetaschemaType* Type structure/class.
   @returns const size_t The precision of the class, 0 if there is an error.
 */
 const size_t get_type_precision(MetaschemaType* type_class);
@@ -231,7 +231,7 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   @param[in] buf_siz size_t Size of buf.
   @param[out] head const char** pointer to buffer where the extracted header
   should be stored.
-  @param[out] headout size_t reference to memory where size of extracted header
+  @param[out] headsiz size_t reference to memory where size of extracted header
   should be stored.
   @returns: int 0 if split is successful, -1 if there was an error.
 */
@@ -297,7 +297,7 @@ int split_head_body(const char *buf, const size_t buf_siz,
   @brief Format header to a string.
   @param[in] head comm_head_t Header to be formatted.
   @param[out] buf char * Buffer where header should be written.
-  @param[in] bufsiz size_t Size of buf.
+  @param[in] buf_siz size_t Size of buf.
   @returns: int Size of header written.
 */
 int format_comm_header(const comm_head_t head, char *buf, const size_t buf_siz);
@@ -306,7 +306,7 @@ int format_comm_header(const comm_head_t head, char *buf, const size_t buf_siz);
 /*!
   @brief Extract header information from a string.
   @param[in] buf const char* Message that header should be extracted from.
-  @param[in] bufsiz size_t Size of buf.
+  @param[in] buf_siz size_t Size of buf.
   @returns: comm_head_t Header information structure.
 */
 comm_head_t parse_comm_header(const char *buf, const size_t buf_siz);

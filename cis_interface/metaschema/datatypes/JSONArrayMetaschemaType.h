@@ -12,14 +12,33 @@
 #include "rapidjson/writer.h"
 
 
+/*!
+  @brief Class for describing JSON arrays.
+
+  The JSONArrayMetaschemaType provides basic functionality for encoding/decoding
+  JSON array datatypes from/to JSON style strings.
+ */
 class JSONArrayMetaschemaType : public MetaschemaType {
 public:
+  /*!
+    @brief Constructor for JSONArrayMetaschemaType.
+    @param[in] items std::vector<MetaschemaType*> Type classes for array items.
+    @param[in] format_str const char * (optional) Format string describing the
+    item types. Defaults to empty string.
+  */
   JSONArrayMetaschemaType(std::vector<MetaschemaType*> items,
 			  const char *format_str = "") :
     MetaschemaType("array"), items_(items) {
     strncpy(format_str_, format_str, 1000);
   }
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new JSONArrayMetaschemaType instance with the same data.
+   */
   JSONArrayMetaschemaType* copy() { return (new JSONArrayMetaschemaType(items_, format_str_)); }
+  /*!
+    @brief Print information about the type to stdout.
+  */
   void display() {
     MetaschemaType::display();
     if (strlen(format_str_) > 0) {
@@ -32,8 +51,20 @@ public:
       items_[i]->display();
     }
   }
+  /*!
+    @brief Get number of items in type.
+    @returns size_t Number of items in type.
+   */
   size_t nitems() { return items_.size(); }
+  /*!
+    @brief Get types for items.
+    @returns std::vector<MetaschemaType*> Array item types.
+   */
   std::vector<MetaschemaType*> items() { return items_; }
+  /*!
+    @brief Determine if the items are all arrays.
+    @returns bool true if all items are arrays, false otherwise.
+   */
   bool all_arrays() {
     bool out = true;
     size_t i;
@@ -45,6 +76,10 @@ public:
     }
     return out;
   }
+  /*!
+    @brief Get the number of arguments expected to be filled/used by the type.
+    @returns size_t Number of arguments.
+   */
   size_t nargs_exp() {
     size_t nargs = 0;
     if (all_arrays())
@@ -57,6 +92,11 @@ public:
   }
 
   // Encoding
+  /*!
+    @brief Encode the type's properties in a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     if (strlen(format_str_) > 0) {
@@ -73,6 +113,15 @@ public:
     writer->EndArray();
     return true;
   }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in,out] nargs size_t * Pointer to the number of arguments contained in
+    ap. On return it will be set to the number of arguments used.
+    @param[in] ap va_list_t Variable number of arguments that should be encoded
+    as a JSON string.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
     size_t i;
@@ -93,6 +142,18 @@ public:
   }
 
   // Decoding
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
     size_t i;

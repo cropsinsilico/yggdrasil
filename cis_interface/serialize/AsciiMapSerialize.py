@@ -87,18 +87,7 @@ class AsciiMapSerialize(DefaultSerialize):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
-            dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                empty (object): Object produced from deserializing an empty
-                    message.
-                objects (list): List of objects to be serialized/deserialized.
-                extra_kwargs (dict): Extra keyword arguments not used to
-                    construct type definition.
-                typedef (dict): Type definition resulting from the supplied
-                    kwargs.
-                dtype (np.dtype): Numpy data types that is consistent with the
-                    determined type definition.
+            dict: Dictionary of variables to use for testing.
 
         """
         out = super(AsciiMapSerialize, cls).get_testing_options()
@@ -110,5 +99,4 @@ class AsciiMapSerialize(DefaultSerialize):
                            + b'args2\t"this"\n'
                            + b'args3\t1.0\n'
                            + b'args4\t[1, 2]\n')
-        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

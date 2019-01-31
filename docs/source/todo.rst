@@ -27,7 +27,7 @@ TODO
 * Create template model drivers for compiled/interpretted langauges
 * Update travis/appveyor to clone recursively to get rapidjson as git submodule
 * Change verbose flag in GCCModelDriver to use logging levels
-* Add map class for handling arbitrary objects in C/C++
-* Add serializers/file comms for JSON and YAML
+* Add map class for handling arbitrary objects in C/C++ and then update formatted_io 7, 8, and 9
 * change gs_lesson/formatted_io series to have more descriptive names
 * Docs on how nested data objects are represented in C/C++.
+* Add docstrings to metaschema classes

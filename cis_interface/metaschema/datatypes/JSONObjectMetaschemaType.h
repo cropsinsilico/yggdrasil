@@ -12,11 +12,25 @@
 #include "rapidjson/writer.h"
 
 
+/*!
+  @brief Class for describing JSON objects.
+
+  The JSONObjectMetaschemaType provides basic functionality for encoding/decoding
+  JSON object datatypes from/to JSON style strings.
+ */
 class JSONObjectMetaschemaType : public MetaschemaType {
 public:
+  /*!
+    @brief Constructor for JSONObjectMetaschemaType.
+    @param[in] properties std::map<const char*, MetaschemaType*, strcomp> Map from
+    property names to types.
+  */
   JSONObjectMetaschemaType(std::map<const char*, MetaschemaType*, strcomp> properties) :
     MetaschemaType("object"), properties_(properties) {}
   JSONObjectMetaschemaType* copy() { return (new JSONObjectMetaschemaType(properties_)); }
+  /*!
+    @brief Print information about the type to stdout.
+  */
   void display() {
     MetaschemaType::display();
     std::map<const char*, MetaschemaType*, strcomp>::iterator it;
@@ -25,7 +39,16 @@ public:
       it->second->display();
     }
   }
+  /*!
+    @brief Get types for properties.
+    @returns std::map<const char*, MetaschemaType*, strcomp> Map from property
+    names to types.
+   */
   std::map<const char*, MetaschemaType*, strcomp> properties() { return properties_; }
+  /*!
+    @brief Get the number of arguments expected to be filled/used by the type.
+    @returns size_t Number of arguments.
+   */
   size_t nargs_exp() {
     size_t nargs = 0;
     std::map<const char*, MetaschemaType*, strcomp>::iterator it;
@@ -36,6 +59,11 @@ public:
   }
 
   // Encoding
+  /*!
+    @brief Encode the type's properties in a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
     if (!(MetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("properties");
@@ -49,6 +77,15 @@ public:
     writer->EndObject();
     return true;
   }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in,out] nargs size_t * Pointer to the number of arguments contained in
+    ap. On return it will be set to the number of arguments used.
+    @param[in] ap va_list_t Variable number of arguments that should be encoded
+    as a JSON string.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
     // TODO: Handle case of single map argument for encoding
@@ -65,6 +102,18 @@ public:
   }
 
   // Decoding
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
     if (!(data.IsObject())) {

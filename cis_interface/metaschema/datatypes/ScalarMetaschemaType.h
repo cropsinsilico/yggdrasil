@@ -27,8 +27,20 @@ typedef long double _Complex complex_long_double;
 #endif
 
 
+/*!
+  @brief Base class for scalar type definition.
+
+  The ScalarMetaschemaType provides basic functionality for encoding/decoding
+  scalar datatypes from/to JSON style strings.
+ */
 class ScalarMetaschemaType : public MetaschemaType {
 public:
+  /*!
+    @brief Constructor for ScalarMetaschemaType.
+    @param[in] subtype const character pointer to the name of the subtype.
+    @param[in] precision size_t Type precision in bits.
+    @param[in] units const char * (optional) Type units.
+   */
   ScalarMetaschemaType(const char *subtype, const size_t precision,
 		       const char *units="") :
     MetaschemaType("scalar"), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
@@ -40,6 +52,11 @@ public:
     update_subtype(subtype);
     update_units(units);
   }
+  /*!
+    @brief Constructor for ScalarMetaschemaType from a JSON type defintion.
+    @param[in] type_doc rapidjson::Value rapidjson object containing the type
+    definition from a JSON encoded header.
+   */
   ScalarMetaschemaType(const rapidjson::Value &type_doc) :
     MetaschemaType(type_doc), subtype_((const char*)malloc(STRBUFF)), subtype_code_(-1),
     precision_(0), units_((const char*)malloc(STRBUFF)) {
@@ -81,11 +98,22 @@ public:
     else
       _variable_precision = false;
   }
+  /*!
+    @brief Destructor for ScalarMetaschemaType.
+    Free the type string malloc'd during constructor.
+   */
   ~ScalarMetaschemaType() {
     free((char*)subtype_);
     free((char*)units_);
   }
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new ScalarMetaschemaType instance with the same data.
+   */
   ScalarMetaschemaType* copy() { return (new ScalarMetaschemaType(subtype_, precision_, units_)); }
+  /*!
+    @brief Print information about the type to stdout.
+  */
   void display() {
     MetaschemaType::display();
     printf("%-15s = %s\n", "subtype", subtype_);
@@ -93,6 +121,10 @@ public:
     printf("%-15s = %lu\n", "precision", precision_);
     printf("%-15s = %s\n", "units", units_);
   }
+  /*!
+    @brief Check that the subtype is correct and get the corresponding code.
+    @returns int Type code for the instance's subtype.
+   */
   int check_subtype() {
     std::map<const char*, int, strcomp> type_map = get_type_map();
     std::map<const char*, int, strcomp>::iterator it = type_map.find(subtype_);
@@ -101,32 +133,72 @@ public:
     }
     return it->second;
   }
+  /*!
+    @brief Get the subtype string.
+    @returns const char pointer to the subtype string.
+   */
   const char* subtype() { return subtype_; }
+  /*!
+    @brief Get the type precision.
+    @returns size_t Type precision in bytes.
+   */
   const size_t precision() { return precision_; }
+  /*!
+    @brief Get the type units.
+    @returns const char* Type units string.
+   */
   const char* units() { return units_; }
+  /*!
+    @brief Get the number of elements in the type.
+    @returns size_t Number of elements (1 for scalar).
+   */
   virtual const size_t nelements() { return 1; }
+  /*!
+    @brief Get the size of the type in bits.
+    @returns size_t Type size.
+   */
   const size_t nbits() {
     return precision_ * nelements();
   }
+  /*!
+    @brief Get the size of the type in bytes.
+    @returns size_t Type size.
+   */
   const size_t nbytes() {
     return nbits() / 8;
   }
+  /*!
+    @brief Update the instance's type.
+    @param[in] new_type const char * String for new type.
+   */
   void update_type(const char* new_type) {
     MetaschemaType::update_type(new_type);
     if (strcmp(type(), "scalar") == 0) {
       _variable_precision = false;
     }
   }
+  /*!
+    @brief Update the instance's subtype.
+    @param[in] new_subtype const char * String for new subtype.
+   */
   void update_subtype(const char* new_subtype) {
     char **subtype_modifier = const_cast<char**>(&subtype_);
     strncpy(*subtype_modifier, new_subtype, STRBUFF);
     int* subtype_code_modifier = const_cast<int*>(&subtype_code_);
     *subtype_code_modifier = check_subtype();
   }
+  /*!
+    @brief Update the instance's units.
+    @param[in] new_units const char * String for new units.
+   */
   void update_units(const char* new_units) {
     char **units_modifier = const_cast<char**>(&units_);
     strncpy(*units_modifier, new_units, STRBUFF);
   }
+  /*!
+    @brief Update the instance's precision.
+    @param[in] new_precision size_t New precision.
+   */
   void set_precision(const size_t new_precision) {
     if ((strcmp(subtype_, "bytes") != 0) && (strcmp(subtype_, "unicode") != 0)) {
       cislog_throw_error("ScalarMetaschemaType::set_precision: Variable precision only allowed for bytes and unicode, not '%s'.", subtype_);
@@ -134,6 +206,10 @@ public:
     size_t *precision_modifier = const_cast<size_t*>(&precision_);
     *precision_modifier = new_precision;
   }
+  /*!
+    @brief Get the number of arguments expected to be filled/used by the type.
+    @returns size_t Number of arguments.
+   */
   size_t nargs_exp() {
     switch (subtype_code_) {
     case T_BYTES:
@@ -147,6 +223,11 @@ public:
   }    
 
   // Encoding
+  /*!
+    @brief Encode the type's properties in a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
     if (!MetaschemaType::encode_type_prop(writer)) { return false; }
     writer->Key("subtype");
@@ -162,6 +243,15 @@ public:
     }
     return true;
   }
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in,out] nargs size_t * Pointer to the number of arguments contained in
+    ap. On return it will be set to the number of arguments used.
+    @param[in] ap va_list_t Variable number of arguments that should be encoded
+    as a JSON string.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
     // TODO: case by case for scalar types
@@ -322,6 +412,18 @@ public:
   }
 
   // Decoding
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
     if (!(data.IsString())) {
@@ -411,13 +513,31 @@ private:
 };
 
 
+/*!
+  @brief Base class for 1D array type definition.
+
+  The OneDArrayMetaschemaType provides basic functionality for encoding/decoding
+  1D array datatypes from/to JSON style strings.
+ */
 class OneDArrayMetaschemaType : public ScalarMetaschemaType {
  public:
+  /*!
+    @brief Constructor for OneDArrayMetaschemaType.
+    @param[in] subtype const character pointer to the name of the subtype.
+    @param[in] precision size_t Type precision in bits.
+    @param[in] length size_t Number of elements in the array.
+    @param[in] units const char * (optional) Type units.
+   */
   OneDArrayMetaschemaType(const char *subtype, const size_t precision,
 			  const size_t length, const char *units="") :
     ScalarMetaschemaType(subtype, precision, units), length_(length) {
     update_type("1darray");
   }
+  /*!
+    @brief Constructor for OneDArrayMetaschemaType from a JSON type defintion.
+    @param[in] type_doc rapidjson::Value rapidjson object containing the type
+    definition from a JSON encoded header.
+   */
   OneDArrayMetaschemaType(const rapidjson::Value &type_doc) :
     ScalarMetaschemaType(type_doc) {
     if (!(type_doc.HasMember("length")))
@@ -427,24 +547,48 @@ class OneDArrayMetaschemaType : public ScalarMetaschemaType {
     length_ = type_doc["length"].GetInt();
     update_type("1darray");
   }
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new OneDArrayMetaschemaType instance with the same data.
+   */
   OneDArrayMetaschemaType* copy() {
     return (new OneDArrayMetaschemaType(subtype(), precision(), length_, units()));
   }
+  /*!
+    @brief Print information about the type to stdout.
+  */
   void display() {
     ScalarMetaschemaType::display();
     printf("%-15s = %lu\n", "length", length_);
   }
+  /*!
+    @brief Get the number of elements in the type.
+    @returns size_t Number of elements.
+   */
   const size_t nelements() {
     return length_;
   }
+  /*!
+    @brief Update the instance's length.
+    @param[in] new_length size_t New length.
+   */
   void set_length(size_t new_length) {
     size_t* length_modifier = const_cast<size_t*>(&length_);
     *length_modifier = new_length;
   }
+  /*!
+    @brief Get type length.
+    @returns size_t Number of elements in the array.
+  */
   size_t get_length() {
     size_t out = length_;
     return out;
   }
+  /*!
+    @brief Encode the type's properties in a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
     if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("length");
@@ -456,13 +600,31 @@ private:
 };
 
 
+/*!
+  @brief Base class for ND array type definition.
+
+  The NDArrayMetaschemaType provides basic functionality for encoding/decoding
+  ND array datatypes from/to JSON style strings.
+ */
 class NDArrayMetaschemaType : public ScalarMetaschemaType {
 public:
+  /*!
+    @brief Constructor for NDArrayMetaschemaType.
+    @param[in] subtype const character pointer to the name of the subtype.
+    @param[in] precision size_t Type precision in bits.
+    @param[in] shape std::vector<size_t> Shape of type array in each dimension.
+    @param[in] units const char * (optional) Type units.
+   */
   NDArrayMetaschemaType(const char *subtype, const size_t precision,
 			const std::vector<size_t> shape, const char *units="") :
     ScalarMetaschemaType(subtype, precision, units), shape_(shape) {
     update_type("ndarray");
   }
+  /*!
+    @brief Constructor for NDArrayMetaschemaType from a JSON type defintion.
+    @param[in] type_doc rapidjson::Value rapidjson object containing the type
+    definition from a JSON encoded header.
+   */
   NDArrayMetaschemaType(const rapidjson::Value &type_doc) :
     ScalarMetaschemaType(type_doc) {
     if (!(type_doc.HasMember("shape")))
@@ -478,9 +640,16 @@ public:
     }
     update_type("ndarray");
   }
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new NDArrayMetaschemaType instance with the same data.
+   */
   NDArrayMetaschemaType* copy() {
     return (new NDArrayMetaschemaType(subtype(), precision(), shape(), units()));
   }
+  /*!
+    @brief Print information about the type to stdout.
+  */
   void display() {
     ScalarMetaschemaType::display();
     printf("%-15s = [ ", "shape");
@@ -493,8 +662,20 @@ public:
     }
     printf(" ]\n");
   }
+  /*!
+    @brief Get the number of dimensions in the array.
+    @returns size_t Number of dimensions in type.
+   */
   const size_t ndim() { return shape_.size(); }
+  /*!
+    @brief Get the shape of the array type.
+    @returns std::vector<size_t> Shape of type in each dimension.
+   */
   std::vector<size_t> shape() { return shape_; }
+  /*!
+    @brief Get the number of elements in the type.
+    @returns size_t Number of elements.
+   */
   const size_t nelements() {
     size_t nelements = 0;
     if (ndim() > 0) {
@@ -505,6 +686,11 @@ public:
     }
     return nelements;
   }
+  /*!
+    @brief Encode the type's properties in a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_type_prop(rapidjson::Writer<rapidjson::StringBuffer> *writer) {
     if (!(ScalarMetaschemaType::encode_type_prop(writer))) { return false; }
     writer->Key("shape");
