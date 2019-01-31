@@ -114,14 +114,12 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
     if platform._is_win:  # pragma: windows
-        assert(os.path.isfile(_regex_win32_lib))
         _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS"]
         _compile_flags += ['-I' + _top_dir]
         _compile_flags += ['-I' + _incl_interface]
         if not for_cmake:
             _regex_win32 = os.path.split(_regex_win32_lib)
             _compile_flags += ['-I' + _regex_win32[0]]
-        #     _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
     if tools.is_comm_installed('ZMQComm', language='c'):
         zmq_flags = get_zmq_flags(for_cmake=for_cmake, for_api=for_api)
         _compile_flags += zmq_flags[0]
@@ -489,34 +487,11 @@ def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
                                     overwrite=overwrite)
     if just_obj:
         return _regex_win32_obj
-    # cmd = ['cl', '/c', '/Zi', '/EHsc',
-    #        '/I', '%s' % _regex_win32_dir, _regex_win32_cpp]
-    # # '/out:%s' % _regex_win32_obj,
-    # comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
-    # output, err = comp_process.communicate()
-    # exit_code = comp_process.returncode
-    # if exit_code != 0:  # pragma: debug
-    #     print(' '.join(cmd))
-    #     tools.print_encoded(output, end="")
-    #     raise RuntimeError("Could not create regex_win32.obj")
-    # assert(os.path.isfile(_regex_win32_obj))
     # Create library
     call_link(_regex_win32_obj, _regex_win32_lib, static=True,
               overwrite=overwrite)
-    # cmd = ['lib', '/out:%s' % _regex_win32_lib, _regex_win32_obj]
-    # comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
-    # output, err = comp_process.communicate()
-    # exit_code = comp_process.returncode
-    # if exit_code != 0:  # pragma: debug
-    #     print(' '.join(cmd))
-    #     tools.print_encoded(output, end="")
-    #     raise RuntimeError("Could not build regex_win32.lib")
-    # assert(os.path.isfile(_regex_win32_lib))
 
 
-# if platform._is_win:  # pragma: windows
-#     build_regex_win32(overwrite=False)
-# build_datatypes(overwrite=False)
 if _c_installed:
     if not os.path.isfile(_api_static_c):
         build_api(cpp=False, overwrite=False)
