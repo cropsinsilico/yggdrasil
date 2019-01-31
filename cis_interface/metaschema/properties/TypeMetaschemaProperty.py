@@ -71,5 +71,14 @@ class TypeMetaschemaProperty(MetaschemaProperty):
             object: Normalized object.
 
         """
-        type_cls = get_type_class(value)
+        if isinstance(value, (list, tuple)):
+            v0 = value[0]
+            for v in value:
+                t = get_type_class(v)
+                if t.validate(v):
+                    v0 = v
+                    break
+            type_cls = get_type_class(v0)
+        else:
+            type_cls = get_type_class(value)
         return type_cls.normalize(instance)

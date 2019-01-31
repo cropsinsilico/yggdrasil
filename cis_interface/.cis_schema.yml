@@ -31,12 +31,12 @@ definitions:
     - anyOf:
       - properties:
           commtype:
-            enum: [ipc]
-        title: IPCComm
+            enum: [default]
+        title: DefaultComm
       - properties:
           commtype:
-            enum: [zmq]
-        title: ZMQComm
+            enum: [ipc]
+        title: IPCComm
       - properties:
           commtype:
             enum: [rmq_async]
@@ -47,8 +47,8 @@ definitions:
         title: RMQComm
       - properties:
           commtype:
-            enum: [default]
-        title: DefaultComm
+            enum: [zmq]
+        title: ZMQComm
     description: Schema for comm components.
     title: comm
   connection:
@@ -89,12 +89,12 @@ definitions:
         title: FileInputDriver
       - properties:
           connection_type:
-            enum: [input]
-        title: InputDriver
-      - properties:
-          connection_type:
             enum: [file_output]
         title: FileOutputDriver
+      - properties:
+          connection_type:
+            enum: [input]
+        title: InputDriver
       - properties:
           connection_type:
             enum: [output]
@@ -112,10 +112,10 @@ definitions:
         args: {type: string}
         as_array: {default: false, type: boolean}
         comment: {default: '# ', type: string}
-        default_flow_style: &id003 {type: boolean}
-        delimiter: &id005 {type: string}
+        default_flow_style: &id006 {default: false, type: boolean}
+        delimiter: &id001 {default: "\t", type: string}
         driver: {type: string}
-        encoding: &id004 {type: string}
+        encoding: &id007 {default: utf-8, type: string}
         field_names:
           items: {type: string}
           type: array
@@ -126,9 +126,10 @@ definitions:
           default: binary
           enum: [ascii, binary, json, map, mat, obj, pandas, pickle, ply, table, yaml]
           type: string
-        format_str: &id006 {type: string}
+        format_str: &id002 {type: string}
         in_temp: {default: false, type: boolean}
-        indent: &id001
+        indent: &id004
+          default: "\t"
           type: [string, int]
         is_series: {default: false, type: boolean}
         name: {type: string}
@@ -137,68 +138,68 @@ definitions:
             ', type: string}
         recv_converter: {type: function}
         send_converter: {type: function}
-        sort_keys: &id002 {type: boolean}
-        use_astropy: &id007 {type: boolean}
+        sort_keys: &id005 {default: true, type: boolean}
+        use_astropy: &id003 {default: false, type: boolean}
         working_dir: {type: string}
       required: [name, filetype, working_dir]
       type: object
     - anyOf:
       - properties:
           filetype:
-            enum: [pickle]
-        title: PickleFileComm
+            enum: [ascii]
+        title: AsciiFileComm
+      - properties:
+          delimiter: *id001
+          filetype:
+            enum: [map]
+        title: AsciiMapComm
+      - properties:
+          delimiter: {default: "\t", type: string}
+          filetype:
+            enum: [table]
+          format_str: *id002
+          use_astropy: *id003
+        title: AsciiTableComm
+      - properties:
+          filetype:
+            enum: [binary]
+        title: FileComm
       - properties:
           filetype:
             enum: [json]
-          indent: *id001
-          sort_keys: *id002
+          indent: *id004
+          sort_keys: *id005
         title: JSONFileComm
-      - properties:
-          default_flow_style: *id003
-          encoding: *id004
-          filetype:
-            enum: [yaml]
-          indent: {type: int}
-        title: YAMLFileComm
-      - properties:
-          filetype:
-            enum: [obj]
-        title: ObjFileComm
-      - properties:
-          delimiter: *id005
-          filetype:
-            enum: [pandas]
-          format_str: *id006
-          use_astropy: *id007
-        title: PandasFileComm
       - properties:
           filetype:
             enum: [mat]
         title: MatFileComm
       - properties:
-          delimiter: {type: string}
           filetype:
-            enum: [table]
+            enum: [obj]
+        title: ObjFileComm
+      - properties:
+          delimiter: {default: "\t", type: string}
+          filetype:
+            enum: [pandas]
           format_str: {type: string}
-          use_astropy: {type: boolean}
-        title: AsciiTableComm
+          use_astropy: {default: false, type: boolean}
+        title: PandasFileComm
       - properties:
           filetype:
-            enum: [ascii]
-        title: AsciiFileComm
+            enum: [pickle]
+        title: PickleFileComm
       - properties:
           filetype:
             enum: [ply]
         title: PlyFileComm
       - properties:
-          delimiter: {type: string}
+          default_flow_style: *id006
+          encoding: *id007
           filetype:
-            enum: [map]
-        title: AsciiMapComm
-      - properties:
-          filetype:
-            enum: [binary]
-        title: FileComm
+            enum: [yaml]
+          indent: {default: 4, type: int}
+        title: YAMLFileComm
     description: Schema for file components.
     title: file
   model:
@@ -218,6 +219,7 @@ definitions:
           items: {type: string}
           type: array
         cmakeargs: &id009
+          default: []
           items: {type: string}
           type: array
         driver: {type: string}
@@ -229,15 +231,15 @@ definitions:
         language:
           enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
           type: string
-        make_command: {default: make, type: string}
-        makedir: {type: string}
-        makefile: {default: Makefile, type: string}
+        make_command: &id013 {default: make, type: string}
+        makedir: &id014 {type: string}
+        makefile: &id015 {default: Makefile, type: string}
         name: {type: string}
         outputs:
           default: []
           items: {$ref: '#/definitions/comm'}
           type: array
-        overwrite: &id012 {type: boolean}
+        overwrite: &id012 {default: true, type: boolean}
         sourcedir: &id010 {type: string}
         strace_flags:
           default: []
@@ -254,18 +256,6 @@ definitions:
       type: object
     - anyOf:
       - properties:
-          language:
-            enum: [make]
-        title: MakeModelDriver
-      - properties:
-          language:
-            enum: [python]
-        title: PythonModelDriver
-      - properties:
-          language:
-            enum: [lpy]
-        title: LPyModelDriver
-      - properties:
           builddir: *id008
           cmakeargs: *id009
           language:
@@ -280,12 +270,27 @@ definitions:
         title: GCCModelDriver
       - properties:
           language:
+            enum: [lpy]
+        title: LPyModelDriver
+      - properties:
+          language:
+            enum: [make]
+          make_command: *id013
+          makedir: *id014
+          makefile: *id015
+        title: MakeModelDriver
+      - properties:
+          language:
             enum: [matlab]
         title: MatlabModelDriver
       - properties:
           language:
             enum: [executable]
         title: ModelDriver
+      - properties:
+          language:
+            enum: [python]
+        title: PythonModelDriver
     description: Schema for model components.
     title: model
 description: Schema for cis_interface YAML input files.

@@ -195,7 +195,7 @@ class ComponentSchema(object):
             prop_default[subt]['enum'] = []
         # Get list of properties for each subtype and move properties to
         # base for brevity
-        for k in self._storage.keys():
+        for k in sorted(self._storage.keys()):
             v0 = self._storage[k]
             v = copy.deepcopy(v0)
             combo['allOf'][1]['anyOf'].append(v)
@@ -375,11 +375,18 @@ class ComponentSchema(object):
             #     new_schema['required'].append(k)
         for k, v in comp_cls._schema_properties.items():
             if k in self._base_schema['properties']:
-                assert(self._base_schema['properties'][k] == v)
+                if self._base_schema['properties'][k] != v:  # pragma: debug
+                    raise ValueError(("Schema for property '%s' of class '%s' "
+                                      "is %s, which differs from the base class "
+                                      "value (%s).") % (
+                                          k, comp_cls, v,
+                                          self._base_schema['properties'][k]))
             else:
                 new_schema['properties'][k] = copy.deepcopy(v)
-                if 'default' in new_schema['properties'][k]:
-                    del new_schema['properties'][k]['default']
+                # This was used to prevent properties that are not part
+                # of the base schema from having defaults.
+                # if 'default' in new_schema['properties'][k]:
+                #     del new_schema['properties'][k]['default']
         if not new_schema['required']:
             del new_schema['required']
         for subt in self.subtype_keys:
