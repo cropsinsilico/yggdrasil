@@ -229,14 +229,14 @@ def update_config_c(config):
         if not config.has_option('c', opt):
             fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rapidjson',
                                  'include', 'rapidjson', fname)
-            if not os.path.isfile(fpath):
+            if not os.path.isfile(fpath):  # pragma: debug
                 fpath = locate_file(fname)
             if fpath:
                 if opt == 'rapidjson_include':
                     fpath = os.path.dirname(os.path.dirname(fpath))
                 print('located %s: %s' % (fname, fpath))
                 config.set('c', opt, fpath)
-            else:
+            else:  # pragma: debug
                 out.append(('c', opt, desc))
     return out
 
