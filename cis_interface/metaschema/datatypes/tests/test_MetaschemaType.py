@@ -97,7 +97,6 @@ class TestMetaschemaType(CisTestClassInfo):
             for x in self._valid_decoded:
                 assert_equal(self.import_cls.validate(x), True)
             for x in self._invalid_validate:
-                print(x, type(x))
                 assert_equal(self.import_cls.validate(x), False)
                 assert_raises(BaseException, self.import_cls.validate,
                               x, raise_errors=True)

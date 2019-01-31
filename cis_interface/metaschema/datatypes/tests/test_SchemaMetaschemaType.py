@@ -28,4 +28,5 @@ class TestSchemaMetaschemaType(parent.TestJSONObjectMetaschemaType):
                                   ({'title': 'a', 'units': 'g'},
                                    {'title': 'a', 'units': 'g',
                                     'type': 'scalar', 'subtype': 'float',
-                                    'precision': 64})]
+                                    'precision': 64}),
+                                  ({}, {})]
