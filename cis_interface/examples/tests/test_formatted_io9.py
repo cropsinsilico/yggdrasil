@@ -1,5 +1,4 @@
 import os
-from cis_interface import backwards
 from cis_interface.examples.tests import TestExample
 
 
@@ -13,11 +12,7 @@ class TestExampleFIO9(TestExample):
     @property
     def input_files(self):
         r"""Input file."""
-        if backwards.PY2:  # pragma: Python 2
-            out = [os.path.join(self.yamldir, 'Input', 'input_py2.txt')]
-        else:   # pragma: Python 3
-            out = [os.path.join(self.yamldir, 'Input', 'input.txt')]
-        return out
+        return [os.path.join(self.yamldir, 'Input', 'input.txt')]
 
     @property
     def output_files(self):

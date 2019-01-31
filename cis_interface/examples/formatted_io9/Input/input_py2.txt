@@ -1,6 +1,0 @@
-!!python/unicode 'a':
-- b
-- 1
-- 1.0
-!!python/unicode 'c':
-    !!python/unicode 'z': hello

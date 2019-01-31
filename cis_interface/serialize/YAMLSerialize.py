@@ -26,11 +26,9 @@ class YAMLSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
-        # Convert bytes to str because JSON cannot serialize bytes by default
-        if not backwards.PY2:  # pragma: Python 3
-            args = backwards.as_str(args, recurse=True,
-                                    convert_types=(backwards.bytes_type,),
-                                    allow_pass=True)
+        # Convert bytes to str because YAML can't process unicode by default
+        args = backwards.as_str(args, recurse=True,
+                                allow_pass=True)
         out = yaml.dump(args, indent=self.indent, encoding=self.encoding,
                         default_flow_style=self.default_flow_style)
         return out
