@@ -1,4 +1,5 @@
 import numpy as np
+from cis_interface import backwards, platform
 from cis_interface.communication.tests import test_AsciiTableComm as parent
 
 
@@ -29,6 +30,9 @@ class TestPandasFileComm_single(TestPandasFileComm):
                'dict': {'f0': arr['f0']}}
         out['msg'] = out['send'][0]
         out['msg_array'] = arr
+        out['contents'] = out['contents'].replace(
+            backwards.match_stype(out['contents'], '\n'),
+            backwards.match_stype(out['contents'], platform._newline))
         return out
 
     def test_send_dict_default(self):
