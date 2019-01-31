@@ -378,7 +378,9 @@ class ComponentSchema(object):
                 if self._base_schema['properties'][k] != v:  # pragma: debug
                     raise ValueError(("Schema for property '%s' of class '%s' "
                                       "is %s, which differs from the base class "
-                                      "value (%s).") % (
+                                      "value (%s). Check that another class dosn't "
+                                      "have a conflicting definition of the same "
+                                      "property.") % (
                                           k, comp_cls, v,
                                           self._base_schema['properties'][k]))
             else:

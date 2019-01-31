@@ -198,7 +198,9 @@ definitions:
           encoding: *id007
           filetype:
             enum: [yaml]
-          indent: {default: 4, type: int}
+          indent:
+            default: 4
+            type: [string, int]
         title: YAMLFileComm
     description: Schema for file components.
     title: file

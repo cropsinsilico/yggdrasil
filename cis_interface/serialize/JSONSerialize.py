@@ -4,6 +4,22 @@ from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
+def indent_char2int(indent):
+    r"""Convert a character indent into a number of spaces that should be used.
+    Tabs are set to be equivalent to 4 spaces.
+
+    Args:
+        indent (str): String indent.
+
+    Returns:
+        int: Number of whitespaces that is equivalent to the provided string.
+
+    """
+    if isinstance(indent, str):
+        indent = len(indent.replace('\t', '    '))
+    return indent
+
+
 @register_serializer
 class JSONSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message using JSON."""
@@ -26,15 +42,12 @@ class JSONSerialize(DefaultSerialize):
 
         """
         # Convert bytes to str because JSON cannot serialize bytes by default
-        args = backwards.as_str(args, recurse=True,
-                                allow_pass=True)
+        args = backwards.as_str(args, recurse=True, allow_pass=True)
         indent = self.indent
         if backwards.PY2:  # pragma: Python 2
-            if isinstance(indent, str):
-                indent = len(indent.replace('\t', '    '))
-            out = json.dumps(args, sort_keys=True, indent=indent)
-        else:  # pragma: Python 3
-            out = json.dumps(args, sort_keys=True, indent=indent)
+            # Character indents not allowed in Python 2 json
+            indent = indent_char2int(indent)
+        out = json.dumps(args, sort_keys=True, indent=indent)
         return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):

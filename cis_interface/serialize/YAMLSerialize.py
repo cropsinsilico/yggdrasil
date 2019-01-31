@@ -2,6 +2,7 @@ import yaml
 from cis_interface import backwards
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.serialize.JSONSerialize import indent_char2int
 
 
 @register_serializer
@@ -11,7 +12,7 @@ class YAMLSerialize(DefaultSerialize):
     _seritype = 'yaml'
     _schema_properties = dict(
         DefaultSerialize._schema_properties,
-        indent={'type': 'int', 'default': 4},
+        indent={'type': ['string', 'int'], 'default': 4},
         encoding={'type': 'string', 'default': 'utf-8'},
         default_flow_style={'type': 'boolean', 'default': False})
     _default_type = {'type': 'object'}
@@ -27,9 +28,10 @@ class YAMLSerialize(DefaultSerialize):
 
         """
         # Convert bytes to str because YAML can't process unicode by default
-        args = backwards.as_str(args, recurse=True,
-                                allow_pass=True)
-        out = yaml.dump(args, indent=self.indent, encoding=self.encoding,
+        args = backwards.as_str(args, recurse=True, allow_pass=True)
+        # Convert character indent to an integer (tabs are 4 spaces)
+        indent = indent_char2int(self.indent)
+        out = yaml.dump(args, indent=indent, encoding=self.encoding,
                         default_flow_style=self.default_flow_style)
         return out
 
