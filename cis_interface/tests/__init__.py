@@ -2,6 +2,7 @@
 import os
 import shutil
 import uuid
+import difflib
 import importlib
 import unittest
 import numpy as np
@@ -61,6 +62,10 @@ if platform._is_win:  # pragma: windows
 else:
     makefile0 = os.path.join(script_dir, "Makefile_linux")
 shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
+
+
+# Flag for enabling tests that take a long time
+enable_long_tests = os.environ.get("CIS_ENABLE_LONG_TESTS", False)
 
 
 def assert_raises(exception, callable, *args, **kwargs):
@@ -358,7 +363,8 @@ class CisTestBase(unittest.TestCase):
         while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
-        assert(os.path.isfile(fname))
+        if not os.path.isfile(fname):  # pragma: debug
+            raise AssertionError("File '%s' dosn't exist." % fname)
 
     def check_file_size(self, fname, fsize):
         r"""Check that file is the correct size.
@@ -375,7 +381,9 @@ class CisTestBase(unittest.TestCase):
                and (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
-        self.assert_equal(os.stat(fname).st_size, fsize)
+        if os.stat(fname).st_size != fsize:  # pragma: debug
+            raise AssertionError("File size (%d), dosn't match expected size (%d)."
+                                 % (os.stat(fname).st_size, fsize))
 
     def check_file_contents(self, fname, result):
         r"""Check that the contents of a file are correct.
@@ -387,7 +395,10 @@ class CisTestBase(unittest.TestCase):
         """
         with open(fname, 'r') as fd:
             ocont = fd.read()
-        self.assert_equal(ocont, result)
+        if ocont != result:  # pragma: debug
+            odiff = '\n'.join(list(difflib.Differ().compare(ocont, result)))
+            raise AssertionError(('File contents do not match expected result.'
+                                  'Diff:\n%s') % odiff)
 
     def check_file(self, fname, result):
         r"""Check that a file exists, is the correct size, and has the correct

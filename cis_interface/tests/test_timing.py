@@ -64,6 +64,7 @@ class TimedRunTestBase(CisTestClass):
     count = 1
     size = 1
     nrep = 1
+    max_errors = 5
 
     @property
     def inst_args(self):
@@ -75,7 +76,8 @@ class TimedRunTestBase(CisTestClass):
         r"""dict: Keyword arguments for creating a class instance."""
         return {'test_name': self.test_name, 'filename': self._filename,
                 'platform': self.platform, 'python_ver': self.python_ver,
-                'comm_type': self.comm_type, 'dont_use_perf': self.dont_use_perf}
+                'comm_type': self.comm_type, 'dont_use_perf': self.dont_use_perf,
+                'max_errors': self.max_errors}
 
     @property
     def time_run_args(self):
@@ -127,7 +129,7 @@ class TestTimedRun(TimedRunTestBase):
     def size(self):
         r"""int: Size of messages to use for tests."""
         return self.instance.base_msg_size
-    
+
     def test_json(self):
         r"""Test loading/saving perf data as json."""
         old_text = self.get_raw_data()
@@ -286,7 +288,7 @@ class TestTimedRunTemp(TimedRunTestBase):
 
     def test_perf_func(self):
         r"""Test perf_func."""
-        timing.perf_func(1, self.instance, self.count, self.size)
+        timing.perf_func(1, self.instance, self.count, self.size, 0)
 
     def test_run_overwrite(self):
         r"""Test performing a run twice, the second time with ovewrite."""

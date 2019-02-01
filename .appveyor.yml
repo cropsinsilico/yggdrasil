@@ -41,8 +41,10 @@ environment:
       INSTALLZMQ: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
+      CIS_ENABLE_LONG_TESTS: 1
     - platform: x64
       PYTHON_VERSION: "3.6"
+      CIS_ENABLE_LONG_TESTS: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
