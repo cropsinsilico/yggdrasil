@@ -169,7 +169,7 @@ before_script:
 
 script:
   - |
-    nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface/examples/tests/test_timed_pipe.py
+    nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface
 
 after_success:
   - coveralls
