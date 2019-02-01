@@ -31,3 +31,5 @@ TODO
 * change gs_lesson/formatted_io series to have more descriptive names
 * Docs on how nested data objects are represented in C/C++.
 * Add docstrings to metaschema classes
+* Preprocessor macro for dynamically determine message type?
+* Try to setup comm/connection at class level
