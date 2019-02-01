@@ -1307,6 +1307,10 @@ class CommBase(tools.CisClass):
             self.special_debug('Failed to send %d bytes', msg_len)
         return flag
 
+    def send_nolimit(self, *args, **kwargs):
+        r"""Alias for send."""
+        return self.send(*args, **kwargs)
+
     def send_eof(self, *args, **kwargs):
         r"""Send the EOF message as a short message.
         
@@ -1324,10 +1328,6 @@ class CommBase(tools.CisClass):
         #         self._eof_sent.set()
         #         return self.send(self.eof_msg, *args, **kwargs)
         # return False
-        
-    def send_nolimit_eof(self, *args, **kwargs):
-        r"""Alias for send_eof."""
-        return self.send_eof(*args, **kwargs)
 
     # RECV METHODS
     def _safe_recv(self, *args, **kwargs):
