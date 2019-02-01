@@ -543,8 +543,10 @@ class CisClass(logging.LoggerAdapter):
 
     """
 
-    def __init__(self, name, uuid=None, working_dir=None,
+    def __init__(self, name=None, uuid=None, working_dir=None,
                  timeout=60.0, sleeptime=0.01, **kwargs):
+        if name is None:
+            name = ''
         self._name = name
         if uuid is None:
             uuid = str(uuid_gen.uuid4())

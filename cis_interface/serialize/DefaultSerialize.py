@@ -15,7 +15,7 @@ from cis_interface.metaschema.datatypes.ArrayMetaschemaType import (
 
 
 @register_serializer
-class DefaultSerialize(object):
+class DefaultSerialize(tools.CisClass):
     r"""Default class for serializing/deserializing a python object into/from
     a bytes message.
 
@@ -69,6 +69,7 @@ class DefaultSerialize(object):
     def __init__(self, func_serialize=None, func_deserialize=None,
                  encode_func_serialize=None, decode_func_deserialize=None,
                  func_typedef=None, **kwargs):
+        super(DefaultSerialize, self).__init__()
         self._alias = None
         self.is_user_defined = False
         self.extra_kwargs = {}
