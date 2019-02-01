@@ -939,7 +939,7 @@ def _normalize_connio_first(normalizer, value, instance, schema):
             pruned = []
             pruned_names = []
             for x in instance[io]:
-                if ':' in x['name']:
+                if (':' in x['name']) and (not os.path.isabs(x['name'])):
                     name = x['name'].split(':')[0]
                     x['name'] = name
                 if x['name'] not in pruned_names:
