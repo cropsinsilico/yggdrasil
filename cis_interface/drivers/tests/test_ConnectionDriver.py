@@ -58,7 +58,7 @@ class TestConnectionParam(parent.TestParam):
         r"""Assert that two messages are equivalent."""
         self.assert_equal(x, y)
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         if self.is_output:
             out = self.ocomm_import_cls.get_testing_options(
@@ -67,13 +67,6 @@ class TestConnectionParam(parent.TestParam):
             out = self.icomm_import_cls.get_testing_options(
                 **self.testing_option_kws)
         return out
-
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
     
     @property
     def cleanup_comm_classes(self):

@@ -1,6 +1,5 @@
 import os
 import uuid
-import unittest
 from cis_interface import backwards
 from cis_interface.tests import CisTestClassInfo, assert_equal
 from cis_interface.communication import new_comm, get_comm, CommBase
@@ -33,7 +32,6 @@ class TestCommBase(CisTestClassInfo):
     """
 
     comm = 'CommBase'
-    testing_option_kws = {}
     attr_list = ['name', 'address', 'direction',
                  'serializer', 'recv_timeout',
                  'close_on_eof_recv', 'opp_address', 'opp_comms',
@@ -90,17 +88,6 @@ class TestCommBase(CisTestClassInfo):
     def maxMsgSize(self):
         r"""int: Maximum message size."""
         return self.instance.maxMsgSize
-
-    def get_testing_options(self):
-        r"""Get testing options."""
-        return self.import_cls.get_testing_options(**self.testing_option_kws)
-
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
 
     @property
     def test_msg_array(self):

@@ -17,7 +17,7 @@ class TestPandasFileComm_nonames(TestPandasFileComm):
 class TestPandasFileComm_single(TestPandasFileComm):
     r"""Test for PandasFileComm communication class with field names sent."""
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         nele = 5
         dtype = np.dtype(dict(formats=['float'], names=['f0']))

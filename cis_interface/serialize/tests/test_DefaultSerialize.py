@@ -17,8 +17,6 @@ def test_demote_string():
 class TestDefaultSerialize(CisTestClassInfo):
     r"""Test class for DefaultSerialize class."""
 
-    testing_option_kws = {}
-
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize, self).__init__(*args, **kwargs)
         self._cls = 'DefaultSerialize'
@@ -31,17 +29,6 @@ class TestDefaultSerialize(CisTestClassInfo):
         r"""Module for class to be tested."""
         return 'cis_interface.serialize.%s' % self.cls
 
-    def get_testing_options(self):
-        r"""Get testing options."""
-        return self.import_cls.get_testing_options(**self.testing_option_kws)
-
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
-    
     @property
     def inst_kwargs(self):
         r"""Keyword arguments for creating the test instance."""
@@ -194,7 +181,7 @@ class TestDefaultSerialize_array(TestDefaultSerialize_format):
 class TestDefaultSerialize_uniform(TestDefaultSerialize):
     r"""Test class for items as dictionary."""
     
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {'kwargs': {'type': 'array', 'items': {'type': '1darray',
                                                      'subtype': 'float',
@@ -215,9 +202,9 @@ class TestDefaultSerialize_uniform(TestDefaultSerialize):
 class TestDefaultSerialize_uniform_names(TestDefaultSerialize_uniform):
     r"""Test class for items as dictionary."""
     
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
-        out = super(TestDefaultSerialize_uniform_names, self).get_testing_options()
+        out = super(TestDefaultSerialize_uniform_names, self).get_options()
         out['kwargs']['field_names'] = [b'a', b'b']
         out['kwargs']['field_units'] = [b'cm', b'g']
         out['field_names'] = ['a', 'b']
@@ -247,7 +234,7 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
         self.func_serialize = self._func_serialize
         self.func_deserialize = self._func_deserialize
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {'kwargs': {'func_serialize': self.func_serialize,
                           'func_deserialize': self.func_deserialize},
@@ -289,11 +276,11 @@ class FakeSerializer(DefaultSerialize.DefaultSerialize):
 class TestDefaultSerialize_class(TestDefaultSerialize_func):
     r"""Test class for DefaultSerialize class with classes."""
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         temp_seri = FakeSerializer()
         assert(issubclass(temp_seri.__class__, DefaultSerialize.DefaultSerialize))
-        out = super(TestDefaultSerialize_class, self).get_testing_options()
+        out = super(TestDefaultSerialize_class, self).get_options()
         out['kwargs'] = {'func_serialize': temp_seri,
                          'func_deserialize': temp_seri,
                          'func_typedef': {'type': 'bytes'},
@@ -316,7 +303,7 @@ class TestDefaultSerialize_alias(TestDefaultSerialize_format):
 class TestDefaultSerialize_type(TestDefaultSerialize):
     r"""Test class for DefaultSerialize class with types."""
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {'kwargs': {'type': 'float'},
                'empty': b'',

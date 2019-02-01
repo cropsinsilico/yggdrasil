@@ -406,6 +406,7 @@ class CisTestBase(unittest.TestCase):
 class CisTestClass(CisTestBase):
     r"""Test class for a CisClass."""
 
+    testing_option_kws = {}
     _mod = None
     _cls = None
 
@@ -463,6 +464,19 @@ class CisTestClass(CisTestBase):
         mod = importlib.import_module(self.mod)
         cls = getattr(mod, self.cls)
         return cls
+
+    def get_options(self):
+        r"""Get testing options."""
+        if self.mod is None:
+            return {}
+        return self.import_cls.get_testing_options(**self.testing_option_kws)
+
+    @property
+    def testing_options(self):
+        r"""dict: Testing options."""
+        if getattr(self, '_testing_options', None) is None:
+            self._testing_options = self.get_options()
+        return self._testing_options
 
     @property
     def instance(self):

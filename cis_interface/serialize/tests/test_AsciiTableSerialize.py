@@ -55,7 +55,7 @@ class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
         self._empty_obj = []
         self._objects = [(1, )]
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {'kwargs': {'format_str': b'%d\n'},
                'empty': [],

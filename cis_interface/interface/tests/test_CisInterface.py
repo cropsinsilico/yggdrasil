@@ -140,7 +140,7 @@ class TestBase(CisTestClassInfo):
         out['matlab'] = self.matlab
         return out
         
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {}
         if self.is_file:
@@ -151,13 +151,6 @@ class TestBase(CisTestClassInfo):
             out = get_comm_class().get_testing_options(
                 **self.testing_option_kws)
         return out
-
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
 
     @property
     def messages(self):

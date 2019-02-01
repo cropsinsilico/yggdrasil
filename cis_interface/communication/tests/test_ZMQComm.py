@@ -75,18 +75,6 @@ class TestZMQComm(test_AsyncComm.TestAsyncComm):
         r"""String prefix to prepend docstr test message with."""
         return '%s(%s, %s)' % (self.comm, self.protocol, self.socket_type)
 
-    # Unclear why this was modified
-    # @property
-    # def inst_kwargs(self):
-    #     r"""dict: Keyword arguments for tested class."""
-    #     args, kwargs = ZMQComm.ZMQComm.new_comm_kwargs(
-    #         self.name, protocol=self.protocol,
-    #         port=self.send_instance.port,
-    #         direction=out['direction'])
-    #     out = super(TestZMQComm, self).inst_kwargs
-    #     out.update(**kwargs)
-    #     return out
-        
     @property
     def send_inst_kwargs(self):
         r"""Keyword arguments for send instance."""
@@ -95,6 +83,18 @@ class TestZMQComm(test_AsyncComm.TestAsyncComm):
         out['socket_type'] = self.socket_type
         return out
 
+    def test_send_recv_nolimit(self):
+        r"""Send/recv of large message."""
+        if self.__class__ != TestZMQComm:
+            raise unittest.SkipTest('Only test once')
+        super(TestZMQComm, self).test_send_recv_nolimit()
+
+    def test_eof_no_close(self):
+        r"""Test send/recv of EOF message with no close."""
+        if self.__class__ != TestZMQComm:
+            raise unittest.SkipTest('Only test once')
+        super(TestZMQComm, self).test_eof_no_close()
+        
     
 # Tests for server/client
 class TestZMQComm_client(TestZMQComm):
@@ -106,11 +106,6 @@ class TestZMQComm_client(TestZMQComm):
         out = super(TestZMQComm_client, self).send_inst_kwargs
         out['is_client'] = True
         return out
-        
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
 
     
 # Tests for all the supported protocols
@@ -118,22 +113,12 @@ class TestZMQCommINPROC(TestZMQComm):
     r"""Test for ZMQComm communication class with INPROC socket."""
 
     protocol = 'inproc'
-    
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
 
     
 class TestZMQCommTCP(TestZMQComm):
     r"""Test for ZMQComm communication class with TCP socket."""
 
     protocol = 'tcp'
-
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
 
     
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
@@ -142,11 +127,6 @@ class TestZMQCommIPC(TestZMQComm):
 
     protocol = 'ipc'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
-    
 
 class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
     r"""Test for ZMQComm communication class with IPC socket."""
@@ -159,32 +139,17 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 
 #     protocol = 'udp'
 
-#     @unittest.skipIf(True, 'Only test once')
-#     def test_send_recv_nolimit(self):
-#         r"""Disabled send/recv of large message."""
-#         pass  # pragma: no cover
-
 
 # class TestZMQCommPGM(TestZMQComm):
 #     r"""Test for ZMQComm communication class with PGM socket."""
 
 #     protocol = 'pgm'
 
-#     @unittest.skipIf(True, 'Only test once')
-#     def test_send_recv_nolimit(self):
-#         r"""Disabled send/recv of large message."""
-#         pass  # pragma: no cover
-
     
 # class TestZMQCommEPGM(TestZMQComm):
 #     r"""Test for ZMQComm communication class with EPGM socket."""
 
 #     protocol = 'epgm'
-
-#     @unittest.skipIf(True, 'Only test once')
-#     def test_send_recv_nolimit(self):
-#         r"""Disabled send/recv of large message."""
-#         pass  # pragma: no cover
 
 
 # Tests for all the socket types
@@ -193,21 +158,11 @@ class TestZMQCommPAIR(TestZMQComm):
 
     socket_type = 'PAIR'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
-
     
 class TestZMQCommPUSH(TestZMQComm):
     r"""Test for ZMQComm communication class with PUSH/PULL socket."""
 
     socket_type = 'PUSH'
-
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
 
     
 class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
@@ -215,21 +170,11 @@ class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
 
     socket_type = 'PUSH'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
-
     
 class TestZMQCommPUB(TestZMQComm):
     r"""Test for ZMQComm communication class with PUB/SUB socket."""
 
     socket_type = 'PUB'
-
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
 
 
 class TestZMQCommREQ(TestZMQComm):
@@ -237,11 +182,6 @@ class TestZMQCommREQ(TestZMQComm):
     def __init__(self, *args, **kwargs):
         super(TestZMQCommREQ, self).__init__(*args, **kwargs)
         self.socket_type = 'REQ'
-
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
 
 
 class TestZMQCommROUTER(TestZMQComm):
@@ -259,11 +199,6 @@ class TestZMQCommROUTER(TestZMQComm):
         r"""Test router receipt of message from the dealer with an identity."""
         self.do_send_recv(reverse_comms=True, send_kwargs=dict(
             identity=self.recv_instance.dealer_identity))
-
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass  # pragma: no cover
 
 
 # @unittest.skipIf(_zmq_installed, "ZMQ library installed")

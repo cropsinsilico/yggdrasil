@@ -1,5 +1,5 @@
 import copy
-from cis_interface.tests import assert_raises, assert_equal
+from cis_interface.tests import assert_equal
 from cis_interface.communication.tests import test_CommBase
 
 
