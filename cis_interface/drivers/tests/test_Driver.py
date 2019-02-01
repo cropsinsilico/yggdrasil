@@ -1,5 +1,4 @@
 import os
-import nose.tools as nt
 from cis_interface.tests import CisTestClassInfo
 from cis_interface import drivers
 
@@ -162,42 +161,3 @@ class TestDriverNoStart(TestParam):
         for a in self.attr_list:
             if not hasattr(self.instance, a):  # pragma: debug
                 raise AttributeError("Driver does not have attribute %s" % a)
-
-    def test_prints(self):
-        r"""Test logging at various levels."""
-        self.instance.display(1)
-        self.instance.info(1)
-        self.instance.debug(1)
-        self.instance.verbose_debug(1)
-        self.instance.critical(1)
-        self.instance.warning(1)
-        self.instance.error(1)
-        self.instance.exception(1)
-        try:
-            raise Exception("Test exception")
-        except Exception:
-            self.instance.exception(1)
-        self.instance.printStatus()
-        self.instance.special_debug(1)
-        self.instance.suppress_special_debug = True
-        self.instance.special_debug(1)
-        self.instance.suppress_special_debug = False
-
-    def test_timeout(self):
-        r"""Test functionality of timeout."""
-        # Test w/o timeout
-        self.instance.start_timeout(10, key='fake_key')
-        assert(not self.instance.check_timeout(key='fake_key'))
-        # Test errors
-        nt.assert_raises(KeyError, self.instance.start_timeout,
-                         0.1, key='fake_key')
-        self.instance.stop_timeout(key='fake_key')
-        nt.assert_raises(KeyError, self.instance.check_timeout)
-        nt.assert_raises(KeyError, self.instance.check_timeout, key='fake_key')
-        nt.assert_raises(KeyError, self.instance.stop_timeout, key='fake_key')
-        # Test w/ timeout
-        T = self.instance.start_timeout(0.001)  # self.instance.sleeptime)
-        while not T.is_out:
-            self.instance.sleep()
-        assert(self.instance.check_timeout())
-        self.instance.stop_timeout(quiet=True)
