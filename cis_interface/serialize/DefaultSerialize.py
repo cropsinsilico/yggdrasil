@@ -401,7 +401,8 @@ class DefaultSerialize(object):
                             (self._seritype, seritype))
         # Remove metadata keywords unrelated to serialization
         # TODO: Find a better way of tracking these
-        _remove_kws = ['size', 'id', 'incomplete', 'raw', 'commtype', 'filetype',
+        _remove_kws = ['body', 'address', 'size', 'id', 'incomplete', 'raw',
+                       'commtype', 'filetype',
                        'append', 'in_temp', 'is_series', 'working_dir', 'fmts',
                        'model_driver', 'env', 'send_converter', 'recv_converter']
         kws = list(kwargs.keys())
@@ -557,6 +558,7 @@ class DefaultSerialize(object):
         self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata}
         if add_serializer_info:
+            self.info("serializer_info = %s", str(self.serializer_info))
             metadata.update(self.serializer_info)
             metadata['typedef_base'] = self.typedef
         if header_kwargs is not None:
