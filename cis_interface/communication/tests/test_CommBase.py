@@ -203,6 +203,9 @@ class TestCommBase(CisTestClassInfo):
         close returns false."""
         self.send_instance.open()
         self.recv_instance.open()
+        if self.comm in ['RMQComm', 'RMQAsyncComm']:
+            self.send_instance.bind()
+            self.recv_instance.bind()
         self.send_instance.close()
         self.recv_instance.close()
         assert(self.send_instance.is_closed)

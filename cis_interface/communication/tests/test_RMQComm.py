@@ -14,12 +14,6 @@ class TestRMQComm(test_AsyncComm.TestAsyncComm):
     timeout = 10.0
     attr_list = (copy.deepcopy(test_AsyncComm.TestAsyncComm.attr_list)
                  + ['connection', 'channel'])
-    
-    def test_double_open(self):
-        r"""test that opening/binding twice dosn't cause errors."""
-        super(TestRMQComm, self).test_double_open()
-        self.send_instance.bind()
-        self.recv_instance.bind()
 
 
 @unittest.skipIf(_rmq_server_running, "RMQ Server running")
