@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import threading
 import psutil
+import copy
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import get_default_comm, CisClass
@@ -140,13 +141,15 @@ class CisTestBase(unittest.TestCase):
 
     """
 
+    attr_list = list()
+
     def __init__(self, *args, **kwargs):
         self._description_prefix = kwargs.pop('description_prefix',
                                               str(self.__class__).split("'")[1])
         self.uuid = str(uuid.uuid4())
-        self.attr_list = list()
         self.timeout = 10.0
         self.sleeptime = 0.01
+        self.attr_list = copy.deepcopy(self.__class__.attr_list)
         self._teardown_complete = False
         self._new_default_comm = None
         self._old_default_comm = None
@@ -478,7 +481,7 @@ class CisTestClass(CisTestBase):
 
     def get_options(self):
         r"""Get testing options."""
-        if self.mod is None:
+        if self.mod is None:  # pragma: debug
             return {}
         return self.import_cls.get_testing_options(**self.testing_option_kws)
 

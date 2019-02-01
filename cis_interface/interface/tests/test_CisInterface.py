@@ -161,7 +161,7 @@ class TestBase(CisTestClassInfo):
 
     def setup(self):
         r"""Start driver and instance."""
-        if self.direction is None:
+        if self.direction is None:  # pragma: debug
             return
         nprev_comm = self.comm_count
         nprev_thread = self.thread_count
@@ -215,7 +215,7 @@ class TestBase(CisTestClassInfo):
             self.test_comm.close()
         if self.is_file and os.path.isfile(self.filename):
             os.remove(self.filename)
-        if self.direction is None:
+        if self.direction is None:  # pragma: debug
             return
         super(TestBase, self).teardown()
         self.cleanup_comms()

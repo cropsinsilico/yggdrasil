@@ -222,6 +222,8 @@ class TestCommBase(CisTestClassInfo):
                 raise AttributeError("Send comm does not have attribute %s" % a)
             if not hasattr(self.recv_instance, a):  # pragma: debug
                 raise AttributeError("Recv comm does not have attribute %s" % a)
+            getattr(self.send_instance, a)
+            getattr(self.recv_instance, a)
         self.instance.debug('maxMsgSize: %d, %d, %d', self.maxMsgSize,
                             self.send_instance.maxMsgSize,
                             self.recv_instance.maxMsgSize)
