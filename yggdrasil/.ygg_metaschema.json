@@ -31,19 +31,19 @@
 				"number",
 				"object",
 				"string",
-				"scalar",
-				"int",
-				"uint",
-				"float",
-				"complex",
-				"bytes",
-				"unicode",
 				"1darray",
+				"bytes",
+				"complex",
+				"float",
+				"function",
+				"int",
 				"ndarray",
-				"ply",
 				"obj",
+				"ply",
+				"scalar",
 				"schema",
-				"function"
+				"uint",
+				"unicode"
 			]
 		},
 		"stringArray": {
