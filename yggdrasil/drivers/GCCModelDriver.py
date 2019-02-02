@@ -16,21 +16,34 @@ _incl_regex = os.path.join(_top_dir, 'regex')
 _incl_dtype = os.path.join(_top_dir, 'metaschema', 'datatypes')
 _regex_win32_lib = os.path.join(_incl_regex, 'regex_win32.lib')
 if platform._is_win:  # pragma: windows
-    _datatypes_lib = os.path.join(_incl_dtype, 'datatypes.lib')
-    _api_shared_c = os.path.join(_incl_interface, 'ygg.lib')
-    _api_shared_cpp = os.path.join(_incl_interface, 'ygg++.lib')
+    _prefix = ''
+    _static_ext = '.lib'
+    _shared_ext = '.dll'
 else:
-    _datatypes_lib = os.path.join(_incl_dtype, 'libdatatypes.a')
-    _api_shared_c = os.path.join(_incl_interface, 'libygg.a')
-    _api_shared_cpp = os.path.join(_incl_interface, 'libygg++.a')
+    _prefix = 'lib'
+    _static_ext = '.a'
+    if platform._is_mac:
+        _shared_ext = '.dylib'
+    else:
+        _shared_ext = '.so'
+_datatypes_static_lib = os.path.join(_incl_dtype, _prefix + 'datatypes' + _static_ext)
+_api_static_c = os.path.join(_incl_interface, _prefix + 'ygg' + _static_ext)
+_api_static_cpp = os.path.join(_incl_interface, _prefix + 'ygg++' + _static_ext)
+_datatypes_shared_lib = os.path.join(_incl_dtype, _prefix + 'datatypes' + _shared_ext)
+_api_shared_c = os.path.join(_incl_interface, _prefix + 'ygg' + _shared_ext)
+_api_shared_cpp = os.path.join(_incl_interface, _prefix + 'ygg++' + _shared_ext)
+_c_installed = ((len(tools.get_installed_comm(language='c')) > 0)
+                and (ygg_cfg.get('c', 'rapidjson_include', None) is not None))
 
 
-def get_zmq_flags(for_cmake=False):
+def get_zmq_flags(for_cmake=False, for_api=False):
     r"""Get the necessary flags for compiling & linking with zmq libraries.
 
     Args:
         for_cmake (bool, optional): If True, the returned flags will match the
             format required by cmake. Defaults to False.
+        for_api (bool, optional): If True, the returned flags will match those
+            required for compiling the API static library. Defaults to False.
 
     Returns:
         tuple(list, list): compile and linker flags.
@@ -38,6 +51,7 @@ def get_zmq_flags(for_cmake=False):
     """
     _compile_flags = []
     _linker_flags = []
+    # ZMQ library
     if tools.is_comm_installed('ZMQComm', language='c'):
         if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
@@ -51,19 +65,21 @@ def get_zmq_flags(for_cmake=False):
                 if for_cmake:
                     _linker_flags.append(plib)
                 else:
-                    _linker_flags += [plib_f, '/LIBPATH:"%s"' % plib_d]
+                    _linker_flags += ['/LIBPATH:%s' % plib_d, plib_f]
         else:
             _linker_flags += ["-lczmq", "-lzmq"]
         _compile_flags += ["-DZMQINSTALLED"]
     return _compile_flags, _linker_flags
 
 
-def get_ipc_flags(for_cmake=False):
+def get_ipc_flags(for_cmake=False, for_api=False):
     r"""Get the necessary flags for compiling & linking with ipc libraries.
 
     Args:
         for_cmake (bool, optional): If True, the returned flags will match the
             format required by cmake. Defaults to False.
+        for_api (bool, optional): If True, the returned flags will match those
+            required for compiling the API static library. Defaults to False.
 
     Returns:
         tuple(list, list): compile and linker flags.
@@ -94,52 +110,60 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
     """
     _compile_flags = []
     _linker_flags = []
-    if not (len(tools.get_installed_comm(language='c')) > 0):  # pragma: windows
+    if not _c_installed:  # pragma: windows
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
     if platform._is_win:  # pragma: windows
-        assert(os.path.isfile(_regex_win32_lib))
         _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS"]
+        _compile_flags += ['-I' + _top_dir]
         _compile_flags += ['-I' + _incl_interface]
-        # _compile_flags += ['-I' + _top_dir]
-        # if not for_cmake:
-        #     _regex_win32 = os.path.split(_regex_win32_lib)
-        #     _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
+        if not for_cmake:
+            _regex_win32 = os.path.split(_regex_win32_lib)
+            _compile_flags += ['-I' + _regex_win32[0]]
     if tools.is_comm_installed('ZMQComm', language='c'):
-        zmq_flags = get_zmq_flags(for_cmake=for_cmake)
+        zmq_flags = get_zmq_flags(for_cmake=for_cmake, for_api=for_api)
         _compile_flags += zmq_flags[0]
         _linker_flags += zmq_flags[1]
     if tools.is_comm_installed('IPCComm', language='c'):
-        ipc_flags = get_ipc_flags(for_cmake=for_cmake)
+        ipc_flags = get_ipc_flags(for_cmake=for_cmake, for_api=for_api)
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
+    # Include dir
     for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri, _incl_regex,
               _incl_dtype]:
         _compile_flags += ["-I" + x]
+    # Interface library
     if not for_api:
-        if for_cmake:
-            _linker_flags += [_api_shared_c, _api_shared_cpp]
+        if cpp:
+            plib = _api_static_cpp
         else:
-            _linker_flags += ["-L" + _incl_interface]
-            if cpp:
-                _linker_flags += ["-lygg++"]
-            else:
-                _linker_flags += ["-lygg"]
+            plib = _api_static_c
+        plib_d, plib_f = os.path.split(plib)
+        if for_cmake:
+            _linker_flags.append(plib)
+            # _linker_flags += [_api_static_c, _api_static_cpp]
+        elif platform._is_win:  # pragma: windows
+            _linker_flags += ['/LIBPATH:%s' % plib_d, plib_f]
+        else:
+            _linker_flags += ["-L" + plib_d]
+            _linker_flags += ["-l" + os.path.splitext(plib_f)[0].split(_prefix)[-1]]
     if tools.get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]
     return _compile_flags, _linker_flags
 
 
-def get_cc(cpp=False, shared=False, static=False):
+def get_cc(cpp=False, shared=False, static=False, linking=False):
     r"""Get command line compiler utility.
 
     Args:
         cpp (bool, optional): If True, value is returned assuming the source
             is written in C++. Defaults to False.
-        shared (bool, optional): If True, the object files are combined into a
-            shared library. Defaults to False.
-        static (bool, optional): If True, the object files are combined into a
-            static library. Defaults to False.
+        shared (bool, optional): If True, the command line utility will be used
+            to combine object files into a shared library. Defaults to False.
+        static (bool, optional): If True, the command line utility will be used
+            to combine object files into a static library. Defaults to False.
+        linking (bool, optional): If True, the command line utility will be used
+            for linking. Defaults to False.
 
     Returns:
         str: Command line compiler.
@@ -147,9 +171,11 @@ def get_cc(cpp=False, shared=False, static=False):
     """
     if platform._is_win:  # pragma: windows
         if shared:
-            cc = 'cl'  # 'LINK'?
+            cc = 'LINK'
         elif static:
             cc = 'LIB'
+        elif linking:
+            cc = 'LINK'
         else:
             cc = 'cl'
     elif platform._is_mac:
@@ -169,7 +195,7 @@ def get_cc(cpp=False, shared=False, static=False):
     return cc
 
 
-def call_compile(src, out=None, flags=[], overwrite=False,
+def call_compile(src, out=None, flags=[], overwrite=False, verbose=False,
                  cpp=None, working_dir=None):
     r"""Compile a source file, checking for errors.
 
@@ -182,6 +208,9 @@ def call_compile(src, out=None, flags=[], overwrite=False,
         overwrite (bool, optional): If True, the existing compile file will be
             overwritten. Otherwise, it will be kept and this function will
             return without recompiling the source file.
+        verbose (bool, optional): If True, the compilation command and any output
+            produced by the command will be displayed on success. Defaults to
+            False.
         cpp (bool, optional): If True, value is returned assuming the source
             is written in C++. Defaults to False.
         working_dir (str, optional): Working directory that input file paths are
@@ -204,6 +233,14 @@ def call_compile(src, out=None, flags=[], overwrite=False,
         cpp = False
         if src_ext in ['.hpp', '.cpp']:
             cpp = True
+    if platform._is_win:  # pragma: windows
+        if cpp:
+            flags.insert(2, '/TP')
+        else:
+            flags.insert(2, '/TP')
+            # TODO: Currently everything compiled as C++ on windows to allow use of
+            # complex types
+            # flags.insert(2, '/TC')
     # Add standard library flag
     std_flag = None
     for i, a in enumerate(flags):
@@ -232,7 +269,7 @@ def call_compile(src, out=None, flags=[], overwrite=False,
     if not platform._is_win:
         args += ["-o", out]
     else:  # pragma: windows
-        args += [out]
+        args.insert(1, '/Fo%s' % out)
     # Check for file
     if os.path.isfile(out):
         if overwrite:
@@ -248,11 +285,17 @@ def call_compile(src, out=None, flags=[], overwrite=False,
         tools.print_encoded(output, end="")
         raise RuntimeError("Compilation of %s failed with code %d." %
                            (out, exit_code))
-    assert(os.path.isfile(out))
+    if not os.path.isfile(out):  # pragma: debug
+        print(' '.join(args))
+        raise RuntimeError("Compilation failed to produce result '%s'" % out)
+    logging.info("Compiled %s" % out)
+    if verbose:  # pragma: debug
+        print(' '.join(args))
+        tools.print_encoded(output, end="")
     return out
 
 
-def call_link(obj, out=None, flags=[], overwrite=False,
+def call_link(obj, out=None, flags=[], overwrite=False, verbose=False,
               cpp=False, shared=False, static=False, working_dir=None):
     r"""Compile a source file, checking for errors.
 
@@ -265,6 +308,9 @@ def call_link(obj, out=None, flags=[], overwrite=False,
         overwrite (bool, optional): If True, the existing compile file will be
             overwritten. Otherwise, it will be kept and this function will
             return without recompiling the source file.
+        verbose (bool, optional): If True, the linking command and any output
+            produced by the command will be displayed on success. Defaults to
+            False.
         cpp (bool, optional): If True, value is returned assuming the source
             is written in C++. Defaults to False.
         shared (bool, optional): If True, the object files are combined into a
@@ -306,7 +352,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     elif out.endswith('.a') or out.endswith('.lib'):
         static = True
     # Get compiler
-    cc = get_cc(shared=shared, static=static, cpp=cpp)
+    cc = get_cc(shared=shared, static=static, cpp=cpp, linking=True)
     # Construct arguments
     args = [cc]
     if shared:
@@ -329,7 +375,7 @@ def call_link(obj, out=None, flags=[], overwrite=False,
         args += ['/OUT:%s' % out]
     elif platform._is_mac:
         if shared:
-            args += ["-o", os.path.basename(out)]
+            args += ["-o", out]
         else:
             args += ["-o", out]
     else:
@@ -340,9 +386,6 @@ def call_link(obj, out=None, flags=[], overwrite=False,
     args += obj
     if not (shared or static):
         args += flags
-    if platform._is_mac and shared:
-        args.append('-L' + os.path.dirname(out))
-        args.append('-l' + os.path.splitext(os.path.basename(out))[0].split('lib')[-1])
     # Call linker
     comp_process = tools.popen_nobuffer(args)
     output, err = comp_process.communicate()
@@ -352,28 +395,44 @@ def call_link(obj, out=None, flags=[], overwrite=False,
         tools.print_encoded(output, end="")
         raise RuntimeError("Linking of %s failed with code %d." %
                            (out, exit_code))
-    assert(os.path.isfile(out))
+    if not os.path.isfile(out):  # pragma: debug
+        print(' '.join(args))
+        raise RuntimeError("Linking failed to produce result '%s'" % out)
+    logging.info("Linked %s" % out)
+    if verbose:  # pragma: debug
+        print(' '.join(args))
+        tools.print_encoded(output, end="")
     return out
 
 
-def build_api(cpp=False, overwrite=False):
+def build_api(cpp=False, overwrite=False, as_shared=False):
     r"""Build api library."""
     # Get paths
     api_src = os.path.join(_incl_interface, 'YggInterface')
     if cpp:
-        api_lib = _api_shared_cpp
+        if as_shared:
+            api_lib = _api_shared_cpp
+        else:
+            api_lib = _api_static_cpp
         api_src += '.cpp'
     else:
-        api_lib = _api_shared_c
+        if as_shared:
+            api_lib = _api_shared_c
+        else:
+            api_lib = _api_static_c
         api_src += '.c'
-    # Get flags
-    ccflags0, ldflags0 = get_flags(for_api=True, cpp=cpp)
     fname_obj = []
     # Compile regex for windows
     if platform._is_win:  # pragma: windows
-        fname_obj.append(build_regex_win32(just_obj=True))
+        fname_obj.append(build_regex_win32(just_obj=True,
+                                           overwrite=overwrite))
+    # Get flags (after regex to allow dependencies)
+    ccflags0, ldflags0 = get_flags(for_api=True, cpp=cpp)
+    if platform._is_linux:
+        ccflags0.append('-fPIC')
     # Compile C++ wrapper for data types
-    fname_obj.append(build_datatypes(just_obj=True))
+    fname_obj.append(build_datatypes(just_obj=True,
+                                     overwrite=overwrite))
     # Compile object for the interface
     fname_api_base = api_src
     fname_api_out = call_compile(fname_api_base, flags=ccflags0,
@@ -384,20 +443,38 @@ def build_api(cpp=False, overwrite=False):
     return out
 
 
-def build_datatypes(just_obj=False, overwrite=False):
+def build_datatypes(just_obj=False, overwrite=False, as_shared=False):
     r"""Build the datatypes library."""
-    _datatypes_dir = os.path.dirname(_datatypes_lib)
+    if as_shared:
+        dtype_lib = _datatypes_shared_lib
+    else:
+        dtype_lib = _datatypes_static_lib
+    _datatypes_dir = os.path.dirname(dtype_lib)
     _datatypes_cpp = os.path.join(_datatypes_dir, 'datatypes.cpp')
     flags = []
-    for x in [_datatypes_dir, _incl_regex]:
+    pinc = ygg_cfg.get('c', 'rapidjson_include', False)
+    if not pinc:  # pragma: debug
+        raise Exception("Could not locate rapidjson include directory.")
+    incl_dir = [_datatypes_dir, _incl_regex, pinc]
+    if platform._is_win:  # pragma: windows
+        incl_dir.append(_top_dir)
+    for x in incl_dir:
         flags += ['-I', x]
+    if platform._is_linux:
+        flags.append('-fPIC')
     _datatypes_obj = call_compile(_datatypes_cpp,
                                   flags=flags,
                                   overwrite=overwrite)
     if just_obj:
         return _datatypes_obj
-    call_link(_datatypes_obj, _datatypes_lib, static=True,
-              overwrite=overwrite)
+    # Compile regex for windows
+    if platform._is_win:  # pragma: windows
+        _regex_obj = build_regex_win32(just_obj=True,
+                                       overwrite=overwrite)
+        call_link([_regex_obj, _datatypes_obj], dtype_lib, cpp=True,
+                  overwrite=overwrite)
+    else:
+        call_link(_datatypes_obj, dtype_lib, cpp=True, overwrite=overwrite)
     
 
 def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
@@ -410,42 +487,20 @@ def build_regex_win32(just_obj=False, overwrite=False):  # pragma: windows
                                     overwrite=overwrite)
     if just_obj:
         return _regex_win32_obj
-    # cmd = ['cl', '/c', '/Zi', '/EHsc',
-    #        '/I', '%s' % _regex_win32_dir, _regex_win32_cpp]
-    # # '/out:%s' % _regex_win32_obj,
-    # comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
-    # output, err = comp_process.communicate()
-    # exit_code = comp_process.returncode
-    # if exit_code != 0:  # pragma: debug
-    #     print(' '.join(cmd))
-    #     tools.print_encoded(output, end="")
-    #     raise RuntimeError("Could not create regex_win32.obj")
-    # assert(os.path.isfile(_regex_win32_obj))
     # Create library
     call_link(_regex_win32_obj, _regex_win32_lib, static=True,
               overwrite=overwrite)
-    # cmd = ['lib', '/out:%s' % _regex_win32_lib, _regex_win32_obj]
-    # comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
-    # output, err = comp_process.communicate()
-    # exit_code = comp_process.returncode
-    # if exit_code != 0:  # pragma: debug
-    #     print(' '.join(cmd))
-    #     tools.print_encoded(output, end="")
-    #     raise RuntimeError("Could not build regex_win32.lib")
-    # assert(os.path.isfile(_regex_win32_lib))
 
 
-# if platform._is_win:  # pragma: windows
-#     build_regex_win32(overwrite=False)
-# build_datatypes(overwrite=False)
-if not os.path.isfile(_api_shared_c):
-    build_api(cpp=False, overwrite=False)
-if not os.path.isfile(_api_shared_cpp):
-    build_api(cpp=True, overwrite=False)
+if _c_installed:
+    if not os.path.isfile(_api_static_c):
+        build_api(cpp=False, overwrite=False)
+    if not os.path.isfile(_api_static_cpp):
+        build_api(cpp=True, overwrite=False)
 
 
 def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
-               working_dir=None, overwrite=False):
+               working_dir=None, overwrite=False, verbose=False):
     r"""Compile a C/C++ program with necessary interface libraries.
 
     Args:
@@ -461,6 +516,9 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
             relative to. Defaults to current working directory.
         overwrite (bool, optional): If True, any existing executable and object
             files are overwritten. Defaults to False.
+        verbose (bool, optional): If True, the compilation/linking commands and
+            any output produced by them will be displayed on success. Defaults
+            to False.
 
     Returns:
         list: Products produced by the compilation. The first element will be
@@ -487,12 +545,14 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
         fname_src_obj.append(call_compile(isrc,
                                           flags=copy.deepcopy(ccflags0 + ccflags),
                                           overwrite=overwrite,
-                                          working_dir=working_dir))
+                                          working_dir=working_dir,
+                                          verbose=verbose))
     fname_src_obj.append(fname_lib_out)
     # Link compile objects
     out = call_link(fname_src_obj, out, cpp=True,
                     flags=copy.deepcopy(ldflags0 + ldflags),
-                    overwrite=overwrite, working_dir=working_dir)
+                    overwrite=overwrite, working_dir=working_dir,
+                    verbose=verbose)
     return [out] + fname_src_obj
 
 
@@ -576,7 +636,7 @@ class GCCModelDriver(ModelDriver):
                 machine.
 
         """
-        return (len(tools.get_installed_comm(language='c')) > 0)
+        return _c_installed
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax. Arguments ending with '.c' or
@@ -641,7 +701,7 @@ class GCCModelDriver(ModelDriver):
             return
         products = self.products
         if platform._is_win:  # pragma: windows
-            for x in products:
+            for x in copy.deepcopy(products):
                 base = os.path.splitext(x)[0]
                 products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
         for p in products:

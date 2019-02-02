@@ -296,10 +296,10 @@ class YggRunner(YggClass):
         if yml['args'] not in self._outputchannels:
             for x in yml['icomm_kws']['comm']:
                 if 'filetype' not in x:
-                    raise Exception(
+                    raise ValueError(
                         ("Input driver %s could not locate a "
                          + "corresponding file or output channel %s") % (
-                            x["name"], yml["args"]))
+                             x["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
 
@@ -320,10 +320,10 @@ class YggRunner(YggClass):
         if yml['args'] not in self._inputchannels:
             for x in yml['ocomm_kws']['comm']:
                 if 'filetype' not in x:
-                    raise Exception(
+                    raise ValueError(
                         ("Output driver %s could not locate a "
                          + "corresponding file or input channel %s") % (
-                            x["name"], yml["args"]))
+                             x["name"], yml["args"]))
         drv = self.createDriver(yml)
         return drv
         

@@ -179,6 +179,7 @@ class IPCComm(AsyncComm.AsyncComm):
     """
 
     _commtype = 'ipc'
+    _maxMsgSize = 2048  # Based on IPC limit on MacOS
 
     def _init_before_open(self, **kwargs):
         r"""Initialize empty queue and server class."""
@@ -206,12 +207,6 @@ class IPCComm(AsyncComm.AsyncComm):
             out = super(IPCComm, cls).is_installed(language=language)
         return out
 
-    @property
-    def maxMsgSize(self):
-        r"""int: Maximum size of a single message that should be sent."""
-        # Based on IPC limit on MacOS
-        return 2048
-    
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""

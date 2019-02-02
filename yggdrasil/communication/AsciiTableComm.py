@@ -74,6 +74,8 @@ class AsciiTableComm(AsciiFileComm):
         else:
             out['recv'] = out['send']
             out['dict'] = {k: v for k, v in zip(field_names, out['send'][0])}
+        out['field_names'] = field_names
+        out['field_units'] = field_units
         return out
     
     def read_header(self):

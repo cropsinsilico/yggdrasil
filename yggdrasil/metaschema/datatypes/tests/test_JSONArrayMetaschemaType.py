@@ -1,9 +1,35 @@
 import copy
-from yggdrasil.tests import assert_raises
+import numpy as np
+from yggdrasil import serialize
+from yggdrasil.tests import assert_equal
+from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
+    JSONArrayMetaschemaType)
 from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 from yggdrasil.metaschema.datatypes.tests import (
     test_ContainerMetaschemaType as container_utils)
 
+
+def test_coerce():
+    r"""Test serialization of coerced types."""
+    typedef = {'type': 'array', 'items': [{'type': '1darray',
+                                           'subtype': 'float',
+                                           'title': 'a',
+                                           'precision': 64}]}
+    x = JSONArrayMetaschemaType(**typedef)
+    key_order = ['a']
+    msg_recv = [np.zeros(3, 'float64')]
+    msg_send_list = [msg_recv[0],
+                     serialize.list2numpy(msg_recv, names=key_order),
+                     serialize.list2pandas(msg_recv, names=key_order),
+                     serialize.list2dict(msg_recv, names=key_order)]
+
+    def do_send_recv(msg_send):
+        msg_seri = x.serialize(msg_send, tyepdef=typedef, key_order=key_order)
+        assert_equal(x.deserialize(msg_seri)[0], msg_recv)
+
+    for y in msg_send_list:
+        do_send_recv(y)
+    
 
 class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
     r"""Test class for JSONArrayMetaschemaType class with float."""
@@ -32,9 +58,13 @@ class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
         self._compatible_objects = [(self._value, self._value, None)]
         self._valid_normalize += [('1, 1 ', ['1', '1'])]
 
+    def test_encode_data_readable(self):
+        r"""Test corner case of encode_data_readable."""
+        self.import_cls.encode_data_readable(['1', '1'], {})
+
     def test_container_errors(self):
         r"""Test errors on container operations."""
-        assert_raises(RuntimeError, self.import_cls._assign, [], 10, None)
+        self.assert_raises(RuntimeError, self.import_cls._assign, [], 10, None)
 
     def test_item_dictionary(self):
         r"""Test dictionary as items value."""
@@ -42,3 +72,8 @@ class TestJSONArrayMetaschemaType(parent.TestMetaschemaType):
         typedef = {'type': 'array', 'items': {'type': 'int'}}
         self.import_cls.validate_instance(x, typedef)
         self.import_cls.encode_data(x, typedef)
+
+    def test_validate_errors(self):
+        r"""Test error on validation of non-structured array."""
+        self.assert_raises(ValueError, self.import_cls.validate,
+                           np.zeros(5), raise_errors=True)

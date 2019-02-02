@@ -4,8 +4,11 @@ yggdrasil/tests/scripts/gcc_model.out
 yggdrasil/tests/scripts/Makefile
 
 # Library things
-yggdrasil/interface/libygg.a
-yggdrasil/interface/libygg++.a
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
 
 # Intermediate docs
 docs/build

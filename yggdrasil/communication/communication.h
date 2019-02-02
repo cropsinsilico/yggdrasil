@@ -2,17 +2,17 @@
 #ifndef YGGCOMMUNICATION_H_
 #define YGGCOMMUNICATION_H_
 
-#include <../tools.h>
-#include <../metaschema/datatypes/datatypes.h>
-#include <../serialize/serialize.h>
-#include <CommBase.h>
-#include <IPCComm.h>
-#include <ZMQComm.h>
-#include <ServerComm.h>
-#include <ClientComm.h>
-#include <AsciiFileComm.h>
-#include <AsciiTableComm.h>
-#include <DefaultComm.h>
+#include "../tools.h"
+#include "../metaschema/datatypes/datatypes.h"
+#include "../serialize/serialize.h"
+#include "CommBase.h"
+#include "IPCComm.h"
+#include "ZMQComm.h"
+#include "ServerComm.h"
+#include "ClientComm.h"
+#include "AsciiFileComm.h"
+#include "AsciiTableComm.h"
+#include "DefaultComm.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -405,7 +405,7 @@ int comm_send_single(const comm_t x, const char *data, const size_t len) {
 /*!
   @brief Create header for multipart message.
   @param[in] x comm_t structure that header will be sent to.
-  @param[in] const char * Message to be sent.
+  @param[in] data const char * Message to be sent.
   @param[in] len size_t Size of message body.
   @returns comm_head_t Header info that should be sent before the message
   body.
@@ -995,6 +995,7 @@ int vcommSend(const comm_t x, size_t nargs, va_list_t ap) {
   Use the format string to create a message from the input arguments that
   is then sent to the specified output comm.
   @param[in] x comm_t structure for comm that message should be sent to.
+  @param[in] nargs size_t Number of variable arguments provided.
   @param[in] ... Arguments to be formatted into a message using sprintf.
   @returns int Number of arguments formatted if send succesfull, -1 if send
   unsuccessful.
@@ -1003,6 +1004,7 @@ static
 int ncommSend(const comm_t x, size_t nargs, ...) {
   va_list_t ap;
   va_start(ap.va, nargs);
+  cislog_debug("ncommSend: nargs = %d", nargs);
   int ret = vcommSend(x, nargs, ap);
   va_end(ap.va);
   return ret;
@@ -1075,6 +1077,7 @@ int vcommRecv(const comm_t x, const int allow_realloc, size_t nargs, va_list_t a
   pointers to pointers for heap memory. If 0, variables are assumed to be pointers
   to stack memory. If allow_realloc is set to 1, but stack variables are passed,
   a segfault can occur.
+  @param[in] nargs size_t Number of variable arguments provided.
   @param[out] ... arguments that should be assigned by parsing the
   received message using sscanf. As these are being assigned, they should be
   pointers to memory that has already been allocated.
@@ -1086,6 +1089,7 @@ static
 int ncommRecv(const comm_t x, const int allow_realloc, size_t nargs, ...) {
   va_list_t ap;
   va_start(ap.va, nargs);
+  cislog_debug("ncommRecv: nargs = %d", nargs);
   int ret = vcommRecv(x, allow_realloc, nargs, ap);
   va_end(ap.va);
   return ret;

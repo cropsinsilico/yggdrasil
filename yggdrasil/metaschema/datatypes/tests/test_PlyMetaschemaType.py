@@ -46,6 +46,12 @@ for i in range(len(eindexs)):
     _test_value['edges'].append(iedge)
 for f in _test_value['faces']:
     f['vertex_index'] = [np.int32(x) for x in f['vertex_index']]
+_test_value_simple = {'vertices': copy.deepcopy(_test_value['vertices']),
+                      'faces': [{'vertex_index': [0, 1, 2]},
+                                {'vertex_index': [0, 2, 3]}]}
+_test_value_int64 = copy.deepcopy(_test_value)
+for f in _test_value_int64['faces']:
+    f['vertex_index'] = [np.int64(x) for x in f['vertex_index']]
 
 
 def test_create_schema():
@@ -78,11 +84,22 @@ def test_translate_py2ply_errors():
     assert_raises(ValueError, PlyMetaschemaType.translate_py2ply, 'float128')
 
 
+def test_singular2plural():
+    r"""Test conversion from singular element names to plural ones and back."""
+    pairs = [('face', 'faces'), ('vertex', 'vertices'),
+             ('vertex_index', 'vertex_indices')]
+    for s, p in pairs:
+        assert_equal(PlyMetaschemaType.singular2plural(s), p)
+        assert_equal(PlyMetaschemaType.plural2singular(p), s)
+    assert_raises(ValueError, PlyMetaschemaType.plural2singular, 'invalid')
+
+
 class TestPlyDict(YggTestClassInfo):
     r"""Test for PlyDict class."""
     
     _mod = 'PlyMetaschemaType'
     _cls = 'PlyDict'
+    _simple_test = _test_value_simple
 
     @property
     def mod(self):
@@ -96,8 +113,10 @@ class TestPlyDict(YggTestClassInfo):
 
     def test_count_elements(self):
         r"""Test count_elements."""
-        assert_raises(ValueError, self.instance.count_elements, 'invalid')
-        self.instance.count_elements('vertices')
+        self.assert_raises(ValueError, self.instance.count_elements, 'invalid')
+        x = self.instance.count_elements('vertices')
+        y = self.instance.count_elements('vertex')
+        self.assert_equal(x, y)
 
     def test_mesh(self):
         r"""Test mesh."""
@@ -108,7 +127,7 @@ class TestPlyDict(YggTestClassInfo):
         ply1 = copy.deepcopy(self.instance)
         ply2 = ply1.merge(self.instance)
         ply1.merge([self.instance], no_copy=True)
-        assert_equal(ply1, ply2)
+        self.assert_equal(ply1, ply2)
 
     def test_append(self):
         r"""Test appending ply objects."""
@@ -120,8 +139,8 @@ class TestPlyDict(YggTestClassInfo):
         r"""Test applying a scalar colormap."""
         o = copy.deepcopy(self.instance)
         scalar_arr = np.arange(o.count_elements('faces')).astype('float')
-        assert_raises(NotImplementedError, o.apply_scalar_map,
-                      scalar_arr, scale_by_area=True)
+        self.assert_raises(NotImplementedError, o.apply_scalar_map,
+                           scalar_arr, scale_by_area=True)
         new_faces = []
         if _as_obj:
             for f in o['faces']:
@@ -137,7 +156,7 @@ class TestPlyDict(YggTestClassInfo):
             o1 = o.apply_scalar_map(scalar_arr, scaling=scale, scale_by_area=True)
             o2.apply_scalar_map(scalar_arr, scaling=scale, scale_by_area=True,
                                 no_copy=True)
-            assert_equal(o1, o2)
+            self.assert_equal(o1, o2)
 
     @unittest.skipIf(not _lpy_installed, "LPy library not installed.")
     def test_to_from_scene(self, _as_obj=False):  # pragma: lpy
@@ -146,19 +165,31 @@ class TestPlyDict(YggTestClassInfo):
         cls = o1.__class__
         s = o1.to_scene(name='test')
         o2 = cls.from_scene(s)
-        assert_equal(o2, o1)
-        if _as_obj:
-            o2['faces'] = [[{'vertex_index': x} for x in [0, 1, 2, 3]]]
-            o3 = copy.deepcopy(o2)
-            o3['faces'] = [[{'vertex_index': x} for x in [0, 1, 2]],
-                           [{'vertex_index': x} for x in [0, 1, 2, 3]]]
-        else:
-            o2['faces'] = [{'vertex_index': [0, 1, 2, 3]}]
-            o3 = copy.deepcopy(o2)
-            o3['faces'] = [{'vertex_index': [0, 1, 2]},
-                           {'vertex_index': [0, 1, 2, 3]}]
-        assert_raises(ValueError, o2.to_scene)
-        assert_raises(ValueError, o3.to_scene)
+        # Direct equivalence won't happen unless test is just for simple mesh
+        # as faces with more than 3 vertices will be triangulated.
+        cls = self.import_cls
+        o1 = cls(self._simple_test)
+        s = o1.to_scene(name='test')
+        o2 = cls.from_scene(s)
+        # import pprint
+        # print('o2')
+        # pprint.pprint(o2)
+        # print('o1')
+        # pprint.pprint(o1)
+        self.assert_equal(o2, o1)
+
+    def test_to_from_dict(self):
+        r"""Test transformation to/from dict."""
+        x = self.instance.as_dict()
+        y = self.import_cls.from_dict(x)
+        self.assert_equal(y, self.instance)
+
+    def test_properties(self):
+        r"""Test explicit exposure of specific element counts as properties
+        against counts based on singular elements."""
+        self.instance.bounds
+        self.assert_equal(self.instance.nvert, self.instance.count_elements('vertex'))
+        self.assert_equal(self.instance.nface, self.instance.count_elements('face'))
 
 
 class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
@@ -176,7 +207,8 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
         self._valid_decoded = [self._value,
                                PlyMetaschemaType.PlyDict(**_test_value),
                                {'vertices': [], 'faces': [],
-                                'alt_verts': copy.deepcopy(_test_value['vertices'])}]
+                                'alt_verts': copy.deepcopy(_test_value['vertices'])},
+                               _test_value_int64]
         self._invalid_encoded = [{}]
         self._invalid_decoded = [{'vertices': [{k: 0.0 for k in 'xyz'}],
                                   'faces': [{'vertex_index': [0, 1, 2]}]}]
@@ -185,4 +217,4 @@ class TestPlyMetaschemaType(parent.TestJSONObjectMetaschemaType):
 
     def test_decode_data_errors(self):
         r"""Test errors in decode_data."""
-        assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
+        self.assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)

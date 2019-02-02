@@ -14,7 +14,7 @@ def run(args):
     print("pipe_src(P): Created I/O channels")
 
     # Send test message multiple times
-    test_msg = '0' * msg_size
+    test_msg = b'0' * msg_size
     count = 0
     for i in range(msg_count):
         ret = outq.send(test_msg)

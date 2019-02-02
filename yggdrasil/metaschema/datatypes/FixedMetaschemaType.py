@@ -85,13 +85,11 @@ class FixedMetaschemaType(MetaschemaType):
         """
 
         out = copy.deepcopy(typedef)
-        # if cls.base().is_fixed:
-        #     out = cls.base().typedef_base2fixed(out)
         if out.get('type', None) == cls.base().name:
             typedef_base = copy.deepcopy(typedef)
             typedef_base.update(cls.fixed_properties)
             errors = [e for e in compare_schema(typedef, typedef_base)]
-            if errors:  # pragma: debug
+            if errors:
                 error_msg = "Error(s) in comparison with fixed properties.\n"
                 for e in errors:
                     error_msg += '\t%s\n' % e
@@ -185,43 +183,45 @@ class FixedMetaschemaType(MetaschemaType):
             return False
         return True
 
-    @classmethod
-    def encode_type(cls, obj, typedef=None, **kwargs):
-        r"""Encode an object's type definition.
+    # This code was unused by any of the test cases, but is kept in case it is
+    # needed in the future
+    # @classmethod
+    # def encode_type(cls, obj, typedef=None, **kwargs):
+    #     r"""Encode an object's type definition.
 
-        Args:
-            obj (object): Object to encode.
-            typedef (dict, optional): Type properties that should be used to
-                initialize the encoded type definition in certain cases.
-                Defaults to None and is ignored.
-            **kwargs: Additional keyword arguments are treated as additional
-                schema properties.
+    #     Args:
+    #         obj (object): Object to encode.
+    #         typedef (dict, optional): Type properties that should be used to
+    #             initialize the encoded type definition in certain cases.
+    #             Defaults to None and is ignored.
+    #         **kwargs: Additional keyword arguments are treated as additional
+    #             schema properties.
 
-        Raises:
-            YggTypeError: If the object is not the correct type.
+    #     Raises:
+    #         YggTypeError: If the object is not the correct type.
 
-        Returns:
-            dict: Encoded type definition.
+    #     Returns:
+    #         dict: Encoded type definition.
 
-        """
-        type_from_base = False
-        if typedef is None:
-            typedef = {}
-        for k, v in cls.fixed_properties.items():
-            if (k == 'type'):
-                continue
-            elif (typedef.get(k, v) != v) or (kwargs.get(k, v) != v):
-                type_from_base = True
-                break
-        if not type_from_base:
-            return super(FixedMetaschemaType, cls).encode_type(
-                obj, typedef=typedef, **kwargs)
-        if isinstance(typedef, dict):
-            typedef = cls.typedef_fixed2base(typedef)
-        kwargs = cls.typedef_fixed2base(kwargs)
-        out = cls.base().encode_type(obj, typedef=typedef, **kwargs)
-        out = cls.typedef_base2fixed(out)
-        return out
+    #     """
+    #     type_from_base = False
+    #     if typedef is None:
+    #         typedef = {}
+    #     for k, v in cls.fixed_properties.items():
+    #         if (k == 'type'):
+    #             continue
+    #         elif (typedef.get(k, v) != v) or (kwargs.get(k, v) != v):
+    #             type_from_base = True
+    #             break
+    #     if not type_from_base:
+    #         return super(FixedMetaschemaType, cls).encode_type(
+    #             obj, typedef=typedef, **kwargs)
+    #     if isinstance(typedef, dict):
+    #         typedef = cls.typedef_fixed2base(typedef)
+    #     kwargs = cls.typedef_fixed2base(kwargs)
+    #     out = cls.base().encode_type(obj, typedef=typedef, **kwargs)
+    #     out = cls.typedef_base2fixed(out)
+    #     return out
 
     @classmethod
     def check_encoded(cls, metadata, typedef=None, raise_errors=False, **kwargs):
@@ -246,9 +246,9 @@ class FixedMetaschemaType(MetaschemaType):
         """
         try:
             out = cls.typedef_base2fixed(metadata)
-        except Exception as e:
+        except Exception:
             if raise_errors:
-                raise e
+                raise
             return False
         return super(FixedMetaschemaType, cls).check_encoded(
             out, typedef=typedef, raise_errors=raise_errors, **kwargs)

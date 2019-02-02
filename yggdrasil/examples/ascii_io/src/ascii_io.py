@@ -27,11 +27,11 @@ if __name__ == '__main__':
     ret = True
     while ret:
         # Receive a single line
-        (ret, line) = in_file.recv_line()
+        (ret, line) = in_file.recv()
         if ret:
             # If the receive was succesful, send the line to output
             print("File: %s" % line)
-            ret = out_file.send_line(line)
+            ret = out_file.send(line)
             if not ret:
                 raise RuntimeError("ascii_io(P): ERROR SENDING LINE")
         else:
@@ -46,13 +46,13 @@ if __name__ == '__main__':
     ret = True
     while ret:
         # Receive a single row
-        (ret, line) = in_table.recv_row()
+        (ret, line) = in_table.recv()
         if ret:
             # If the receive was succesful, send the values to output.
             # Formatting is taken care of on the output driver side.
             print_encoded("Table: %s, %d, %3.1f, %s" % tuple(line))
             # print("Table: %s, %d, %3.1f, %s" % line)
-            ret = out_table.send_row(*line)
+            ret = out_table.send(*line)
             if not ret:
                 raise RuntimeError("ascii_io(P): ERROR SENDING ROW")
         else:

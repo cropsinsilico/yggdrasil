@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+import warnings
 from yggdrasil import units, backwards
 from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
@@ -101,13 +102,12 @@ class ScalarMetaschemaType(MetaschemaType):
         arr = cls.to_array(obj)
         bytes = arr.tobytes()
         out = backwards.base64_encode(bytes).decode('ascii')
-        if len(out) < 100:
-            print('encode', arr, arr.dtype, bytes, out)
         return out
 
     @classmethod
     def encode_data_readable(cls, obj, typedef):
-        r"""Encode an object's data in a readable format.
+        r"""Encode an object's data in a readable format that may not be
+        decoded in exactly the same way.
 
         Args:
             obj (object): Object to encode.
@@ -119,15 +119,22 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         arr = cls.to_array(obj)
-        dtype = arr.dtype
-        if (cls.name not in ['1darray', 'ndarray']) and (arr.ndim > 0):
-            if dtype.name.startswith('int'):
-                return int(arr[0])
-            elif dtype.name.startswith('float'):
-                return float(arr[0])
-            elif dtype.name.startswith('bytes'):
-                return backwards.as_unicode(arr[0])
-        return super(ScalarMetaschemaType, cls).encode_data_readable(obj, typedef)
+        subtype = typedef.get('subtype', typedef.get('type', None))
+        if (cls.name in ['1darray', 'ndarray']):
+            return arr.tolist()
+        assert(arr.ndim > 0)
+        if subtype in ['int', 'uint']:
+            return int(arr[0])
+        elif subtype in ['float']:
+            return float(arr[0])
+        elif subtype in ['complex']:
+            return str(complex(arr[0]))
+        elif subtype in ['bytes', 'unicode']:
+            return backwards.as_str(arr[0])
+        else:  # pragma: debug
+            warnings.warn(("No method for handling readable serialization of "
+                           + "subtype '%s', falling back to default.") % subtype)
+            return super(ScalarMetaschemaType, cls).encode_data_readable(obj, typedef)
 
     @classmethod
     def decode_data(cls, obj, typedef):
@@ -146,8 +153,6 @@ class ScalarMetaschemaType(MetaschemaType):
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
         # arr = np.frombuffer(bytes, dtype=dtype)
         arr = np.fromstring(bytes, dtype=dtype)
-        if len(obj) < 100:
-            print('decode', arr, arr.dtype, bytes, obj)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
         out = cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)
@@ -161,8 +166,8 @@ class ScalarMetaschemaType(MetaschemaType):
 
         Args:
             obj (object): Object to transform.
-            typedef (dict): Type definition that should be used to transform the
-                object.
+            typedef (dict, optional): Type definition that should be used to
+                transform the object. Defaults to None.
 
         Returns:
             object: Transformed object.
@@ -174,7 +179,7 @@ class ScalarMetaschemaType(MetaschemaType):
         typedef1 = copy.deepcopy(typedef0)
         typedef1.update(**typedef)
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef1)
-        arr = cls.to_array(obj).astype(dtype)
+        arr = cls.to_array(obj).astype(dtype, casting='same_kind')
         out = cls.from_array(arr, unit_str=typedef0.get('units', None), dtype=dtype)
         out = cls.as_python_type(out, typedef)
         return units.convert_to(out, typedef1.get('units', None))

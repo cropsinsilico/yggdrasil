@@ -1,7 +1,34 @@
 import copy
+import numpy as np
+from yggdrasil import serialize
+from yggdrasil.tests import assert_equal
+from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
+    JSONObjectMetaschemaType)
 from yggdrasil.metaschema.datatypes.tests import test_MetaschemaType as parent
 from yggdrasil.metaschema.datatypes.tests import (
     test_ContainerMetaschemaType as container_utils)
+
+
+def test_coerce():
+    r"""Test serialization of coerced types."""
+    typedef = {'type': 'object',
+               'properties': {'a': {'type': '1darray',
+                                    'subtype': 'float',
+                                    'title': 'a',
+                                    'precision': 64}}}
+    x = JSONObjectMetaschemaType(**typedef)
+    key_order = ['a']
+    msg_recv = {'a': np.zeros(3, 'float64')}
+    msg_send_list = [serialize.dict2numpy(msg_recv, order=key_order),
+                     serialize.dict2pandas(msg_recv, order=key_order),
+                     serialize.dict2list(msg_recv, order=key_order)]
+
+    def do_send_recv(msg_send):
+        msg_seri = x.serialize(msg_send, tyepdef=typedef, key_order=key_order)
+        assert_equal(x.deserialize(msg_seri)[0], msg_recv)
+
+    for y in msg_send_list:
+        do_send_recv(y)
 
 
 class TestJSONObjectMetaschemaType(parent.TestMetaschemaType):

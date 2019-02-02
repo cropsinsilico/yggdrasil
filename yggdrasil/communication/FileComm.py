@@ -75,6 +75,7 @@ class FileComm(CommBase.CommBase):
     _attr_conv = ['newline', 'platform_newline']
     _default_extension = '.txt'
     is_file = True
+    _maxMsgSize = 0
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
@@ -106,7 +107,7 @@ class FileComm(CommBase.CommBase):
                 setattr(self, k, func_conv(v))
 
     @classmethod
-    def get_testing_options(cls, read_meth='read', **kwargs):
+    def get_testing_options(cls, read_meth='read', open_as_binary=True, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
@@ -122,8 +123,13 @@ class FileComm(CommBase.CommBase):
         """
         out = super(FileComm, cls).get_testing_options(**kwargs)
         out['kwargs']['read_meth'] = read_meth
+        out['kwargs']['open_as_binary'] = open_as_binary
         if (read_meth == 'read') and isinstance(out['recv'][0], backwards.bytes_type):
             out['recv'] = [b''.join(out['recv'])]
+        if not open_as_binary:
+            out['contents'] = out['contents'].replace(
+                backwards.match_stype(out['contents'], '\n'),
+                backwards.match_stype(out['contents'], platform._newline))
         return out
         
     @classmethod
@@ -142,11 +148,6 @@ class FileComm(CommBase.CommBase):
         """
         # Filesystem is implied
         return True
-
-    @property
-    def maxMsgSize(self):
-        r"""int: Maximum size of a single message that should be sent."""
-        return 0
 
     @classmethod
     def underlying_comm_class(self):
@@ -437,10 +438,15 @@ class FileComm(CommBase.CommBase):
 
         """
         flag = True
-        if self.read_meth == 'read':
-            out = self.fd.read()
-        elif self.read_meth == 'readline':
-            out = self.fd.readline()
+        try:
+            if self.read_meth == 'read':
+                out = self.fd.read()
+            elif self.read_meth == 'readline':
+                out = self.fd.readline()
+        except BaseException:  # pragma: debug
+            # Use this to catch case where close called during receive.
+            # In the future this should be handled via a lock.
+            out = ''
         if len(out) == 0:
             if self.advance_in_series():
                 self.debug("Advanced to %d", self._series_index)

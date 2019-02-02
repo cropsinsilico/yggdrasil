@@ -4,7 +4,8 @@ from yggdrasil import platform, tools
 from yggdrasil.tests import scripts, assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_ModelDriver as parent
 from yggdrasil.drivers.GCCModelDriver import (
-    GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags)
+    GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags,
+    build_datatypes, build_api, build_regex_win32)
 
 
 _driver_installed = GCCModelDriver.is_installed()
@@ -32,6 +33,18 @@ def test_get_flags():
     if not _driver_installed:  # pragma: windows
         assert_equal(len(cc), 0)
         assert_equal(len(ld), 0)
+
+
+@unittest.skipIf(not _driver_installed, "C Library not installed")
+def test_build_shared():
+    r"""Test building libraries as shared."""
+    if platform._is_win:  # pragma: windows
+        build_regex_win32(overwrite=True)
+    build_datatypes(as_shared=False, overwrite=True)
+    build_datatypes(as_shared=True, overwrite=True)
+    build_api(cpp=False, as_shared=True, overwrite=True)
+    build_api(cpp=True, as_shared=True, overwrite=True)
+    build_api(cpp=True, as_shared=True, overwrite=False)
 
 
 @unittest.skipIf(_driver_installed, "C Library installed")

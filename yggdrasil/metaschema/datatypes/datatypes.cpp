@@ -16,11 +16,11 @@
 
 // C++ functions
 MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
-  if (not type_doc.IsObject())
+  if (!(type_doc.IsObject()))
     ygglog_throw_error("type_from_doc: Parsed document is not an object.");
-  if (not type_doc.HasMember("type"))
+  if (!(type_doc.HasMember("type")))
     ygglog_throw_error("type_from_doc: Parsed header dosn't contain a type.");
-  if (not type_doc["type"].IsString())
+  if (!(type_doc["type"].IsString()))
     ygglog_throw_error("type_from_doc: Type in parsed header is not a string.");
   const char *type = type_doc["type"].GetString();
   std::map<const char*, int, strcomp> type_map = get_type_map();
@@ -36,21 +36,21 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
       return (new MetaschemaType(type_doc));
       // Enhanced types
     case T_ARRAY: {
-      if (not (type_doc.HasMember("items")))
+      if (!(type_doc.HasMember("items")))
 	ygglog_throw_error("JSONArrayMetaschemaType: Items missing.");
-      if (not (type_doc["items"].IsArray()))
+      if (!(type_doc["items"].IsArray()))
 	ygglog_throw_error("JSONArrayMetaschemaType: Items must be an array.");
       std::vector<MetaschemaType*> items;
       size_t i;
-      for (i = 0; i < type_doc["items"].Size(); i++) {
+      for (i = 0; i < (size_t)(type_doc["items"].Size()); i++) {
 	items.push_back(type_from_doc(type_doc["items"][i]));
       }
       return (new JSONArrayMetaschemaType(items));
     }
     case T_OBJECT: {
-      if (not (type_doc.HasMember("properties")))
+      if (!(type_doc.HasMember("properties")))
 	ygglog_throw_error("JSONObjectMetaschemaType: Properties missing.");
-      if (not (type_doc["properties"].IsObject()))
+      if (!(type_doc["properties"].IsObject()))
 	ygglog_throw_error("JSONObjectMetaschemaType: Properties must be an object.");
       std::map<const char*, MetaschemaType*, strcomp> properties;
       for (rapidjson::Value::ConstMemberIterator itr = type_doc.MemberBegin(); itr != type_doc.MemberEnd(); ++itr) {
@@ -86,16 +86,16 @@ MetaschemaType* type_from_doc(const rapidjson::Value &type_doc) {
 
 bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
   // Type
-  if (not head_doc.IsObject()) {
+  if (!(head_doc.IsObject())) {
     ygglog_error("update_header_from_doc: head document must be an object.");
     return false;
   }
   // Size
-  if (not head_doc.HasMember("size")) {
+  if (!(head_doc.HasMember("size"))) {
     ygglog_error("update_header_from_doc: No size information in the header.");
     return false;
   }
-  if (not head_doc["size"].IsInt()) {
+  if (!(head_doc["size"].IsInt())) {
     ygglog_error("update_header_from_doc: Size is not integer.");
     return false;
   }
@@ -112,7 +112,7 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
   n = string_fields;
   while (strcmp(*n, "") != 0) {
     if (head_doc.HasMember(*n)) {
-      if (not head_doc[*n].IsString()) {
+      if (!(head_doc[*n].IsString())) {
 	ygglog_error("update_header_from_doc: '%s' is not a string.", *n);
 	return false;
       }
@@ -141,7 +141,7 @@ bool update_header_from_doc(comm_head_t &head, rapidjson::Value &head_doc) {
 		     *n, len, target_size);
 	return false;
       }
-      strcpy(target, str);
+      strncpy(target, str, target_size);
     }
     n++;
   }
@@ -321,7 +321,7 @@ extern "C" {
 	ifmt[end-beg] = '\0';
 	// String
 	if (find_match("%.*s", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "bytes"); // or unicode
+	  strncpy(isubtype, "bytes", FMT_LEN); // or unicode
 	  mres = regex_replace_sub(ifmt, FMT_LEN,
 				   "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
 	  iprecision = 8 * atoi(ifmt);
@@ -331,12 +331,12 @@ extern "C" {
 #else
 	} else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
 #endif
-	  strcpy(isubtype, "complex");
+	  strncpy(isubtype, "complex", FMT_LEN);
 	  iprecision = 8 * 2 * sizeof(double);
 	}
 	// Floats
 	else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "float");
+	  strncpy(isubtype, "float", FMT_LEN);
 	  iprecision = 8 * sizeof(double);
 	  /* } else if (find_match("%.*l[fFeEgG]", ifmt, &sind, &eind)) { */
 	  /*   isubtype = "float"; */
@@ -347,46 +347,48 @@ extern "C" {
 	}
 	// Integers
 	else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "int");
+	  strncpy(isubtype, "int", FMT_LEN);
 	  iprecision = 8 * sizeof(char);
 	} else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "int");
+	  strncpy(isubtype, "int", FMT_LEN);
 	  iprecision = 8 * sizeof(short);
 	} else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "int");
+	  strncpy(isubtype, "int", FMT_LEN);
 	  iprecision = 8 * sizeof(long long);
 	} else if (find_match("%.*l64[id]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "int");
+	  strncpy(isubtype, "int", FMT_LEN);
 	  iprecision = 8 * sizeof(long long);
 	} else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "int");
+	  strncpy(isubtype, "int", FMT_LEN);
 	  iprecision = 8 * sizeof(long);
 	} else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "int");
+	  strncpy(isubtype, "int", FMT_LEN);
 	  iprecision = 8 * sizeof(int);
 	}
 	// Unsigned integers
 	else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "uint");
+	  strncpy(isubtype, "uint", FMT_LEN);
 	  iprecision = 8 * sizeof(unsigned char);
 	} else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "uint");
+	  strncpy(isubtype, "uint", FMT_LEN);
 	  iprecision = 8 * sizeof(unsigned short);
 	} else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "uint");
+	  strncpy(isubtype, "uint", FMT_LEN);
 	  iprecision = 8 * sizeof(unsigned long long);
 	} else if (find_match("%.*l64[uoxX]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "uint");
+	  strncpy(isubtype, "uint", FMT_LEN);
 	  iprecision = 8 * sizeof(unsigned long long);
 	} else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "uint");
+	  strncpy(isubtype, "uint", FMT_LEN);
 	  iprecision = 8 * sizeof(unsigned long);
 	} else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
-	  strcpy(isubtype, "uint");
+	  strncpy(isubtype, "uint", FMT_LEN);
 	  iprecision = 8 * sizeof(unsigned int);
 	} else {
 	  ygglog_throw_error("get_format_type: Could not parse format string: %s", ifmt);
 	}
+  cislog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
+               isubtype, iprecision, ifmt);
 	if (as_array == 1) {
 	  items.push_back(new OneDArrayMetaschemaType(isubtype, iprecision, 0));
 	} else {
@@ -471,12 +473,12 @@ extern "C" {
       head_writer.StartObject();
       if (head.serializer_info != NULL) {
 	MetaschemaType* type = type_from_void(head.type, head.serializer_info);
-	if (not type->encode_type_prop(&head_writer)) {
+	if (!(type->encode_type_prop(&head_writer))) {
 	  return -1;
 	}
       }
       head_writer.Key("size");
-      head_writer.Int(head.size);
+      head_writer.Int((int)(head.size));
       // Strings
       const char **n;
       const char *string_fields[] = {"address", "id", "request_id", "response_address",
@@ -550,7 +552,7 @@ extern "C" {
       // Parse header
       rapidjson::Document head_doc;
       head_doc.Parse(head, headsiz);
-      if (not head_doc.IsObject())
+      if (!(head_doc.IsObject()))
 	ygglog_throw_error("parse_comm_header: Parsed header document is not an object.");
       MetaschemaType* type;
       if (head_doc.HasMember("type")) {
@@ -558,12 +560,12 @@ extern "C" {
       } else {
 	type = get_direct_type();
       }
-      strcpy(out.type, type->type());
+      strncpy(out.type, type->type(), COMMBUFFSIZ);
       out.serializer_info = (void*)type;
-      if (not update_header_from_doc(out, head_doc)) {
+      if (!(update_header_from_doc(out, head_doc))) {
 	ygglog_error("parse_comm_header: Error updating header from JSON doc.");
 	out.valid = 0;
-	strcpy(out.type, "");
+	strncpy(out.type, "", COMMBUFFSIZ);
 	out.serializer_info = NULL;
 	free(head);
 	delete(type);

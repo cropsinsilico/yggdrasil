@@ -1,6 +1,12 @@
 #ifndef YGGTOOLS_H_
 #define YGGTOOLS_H_
 
+#ifdef _WIN32
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS 1
+#endif
+#endif
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,13 +14,14 @@
 #include <errno.h>
 #include <time.h>
 
+
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
 #endif
 
 // Platform specific
 #ifdef _WIN32
-#include "regex_win32.h"
+#include "regex/regex_win32.h"
 #include "stdint.h"  // Use local copy for MSVC support
 // Prevent windows.h from including winsock.h
 #ifndef WIN32_LEAN_AND_MEAN
@@ -57,9 +64,17 @@ static int _ygg_error_flag = 0;
 
 /*! @brief Define macros to allow counts of variables. */
 // https://codecraft.co/2014/11/25/variadic-macros-tricks/
+#ifdef _WIN32
+// https://stackoverflow.com/questions/48710758/how-to-fix-variadic-macro-related-issues-with-macro-overloading-in-msvc-mic
+#define MSVC_BUG(MACRO, ARGS) MACRO ARGS  // name to remind that bug fix is due to MSVC :-)
+#define _GET_NTH_ARG_2(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N, ...) N
+#define _GET_NTH_ARG(...) MSVC_BUG(_GET_NTH_ARG_2, (__VA_ARGS__))
+#define COUNT_VARARGS(...) _GET_NTH_ARG("ignored", ##__VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+#define VA_MACRO(MACRO, ...) MSVC_BUG(CONCATE, (MACRO, COUNT_VARARGS(__VA_ARGS__)))(__VA_ARGS__)
+#else
 #define _GET_NTH_ARG(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N, ...) N
 #define COUNT_VARARGS(...) _GET_NTH_ARG("ignored", ##__VA_ARGS__, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-
+#endif
 
 /*!
   @brief Get an unsigned long seed from the least significant 32bits of a pointer.
@@ -74,7 +89,9 @@ unsigned long ptr2seed(void *ptr) {
 };
 
 
-/*! @brief Structure used to wrap va_list and allow pointer passing.*/
+/*! @brief Structure used to wrap va_list and allow pointer passing.
+@param va va_list Wrapped variable argument list.
+*/
 typedef struct va_list_t {
   va_list va;
 } va_list_t;

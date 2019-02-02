@@ -1,16 +1,21 @@
 import copy
 import numpy as np
 import unittest
-from yggdrasil.tests import YggTestClassInfo
+from yggdrasil.tests import YggTestClassInfo, assert_equal
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.serialize import DefaultSerialize
 from yggdrasil.metaschema.datatypes import encode_type
 
 
+def test_demote_string():
+    r"""Test format str creation of typedef."""
+    x = DefaultSerialize.DefaultSerialize(format_str='%s')
+    assert_equal(x.typedef, {'type': 'array',
+                             'items': [{'type': 'bytes'}]})
+
+
 class TestDefaultSerialize(YggTestClassInfo):
     r"""Test class for DefaultSerialize class."""
-
-    testing_option_kws = {}
 
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize, self).__init__(*args, **kwargs)
@@ -24,17 +29,6 @@ class TestDefaultSerialize(YggTestClassInfo):
         r"""Module for class to be tested."""
         return 'yggdrasil.serialize.%s' % self.cls
 
-    def get_testing_options(self):
-        r"""Get testing options."""
-        return self.import_cls.get_testing_options(**self.testing_option_kws)
-
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
-    
     @property
     def inst_kwargs(self):
         r"""Keyword arguments for creating the test instance."""
@@ -45,7 +39,7 @@ class TestDefaultSerialize(YggTestClassInfo):
     def empty_head(self, msg):
         r"""dict: Empty header for message only contains the size."""
         out = dict(size=len(msg), incomplete=False)
-        if msg == tools.YGG_MSG_EOF:
+        if msg == tools.YGG_MSG_EOF:  # pragma: debug
             out['eof'] = True
         return out
 
@@ -63,10 +57,18 @@ class TestDefaultSerialize(YggTestClassInfo):
                           self.testing_options.get('is_user_defined', False))
         self.assert_equal(self.instance.numpy_dtype,
                           self.testing_options['dtype'])
-        self.assert_equal(self.instance.typedef,
-                          self.testing_options['typedef'])
         self.assert_equal(self.instance.extra_kwargs,
                           self.testing_options['extra_kwargs'])
+        self.assert_equal(self.instance.typedef,
+                          self.testing_options['typedef'])
+        if isinstance(self.instance.typedef.get('items', []), dict):
+            self.assert_raises(Exception, self.instance.get_field_names)
+            self.assert_raises(Exception, self.instance.get_field_units)
+        else:
+            self.assert_equal(self.instance.get_field_names(),
+                              self.testing_options.get('field_names', None))
+            self.assert_equal(self.instance.get_field_units(),
+                              self.testing_options.get('field_units', None))
         
     def test_serialize(self):
         r"""Test serialize/deserialize."""
@@ -75,6 +77,11 @@ class TestDefaultSerialize(YggTestClassInfo):
             iout, ihead = self.instance.deserialize(msg)
             self.assert_result_equal(iout, iobj)
             # self.assert_equal(ihead, self.empty_head(msg))
+
+    def test_serialize_no_metadata(self):
+        r"""Test serializing without metadata."""
+        self.instance.serialize(self.testing_options['objects'][0],
+                                no_metadata=True)
 
     def test_deserialize_error(self):
         r"""Test error when deserializing message that is not bytes."""
@@ -150,6 +157,14 @@ class TestDefaultSerialize(YggTestClassInfo):
         self.assert_result_equal(out, self.testing_options['empty'])
         self.assert_equal(head, self.empty_head(self._empty_msg))
 
+    def test_invalid_update(self):
+        r"""Test error raised when serializer updated with type that isn't
+        compatible."""
+        if (len(self._inst_kwargs) == 0) and (self._cls == 'DefaultSerialize'):
+            self.instance.initialize_from_message(np.int64(1))
+            self.assert_raises(RuntimeError, self.instance.update_serializer,
+                               type='ply')
+        
 
 class TestDefaultSerialize_format(TestDefaultSerialize):
     r"""Test class for DefaultSerialize class with format."""
@@ -163,6 +178,52 @@ class TestDefaultSerialize_array(TestDefaultSerialize_format):
     testing_option_kws = {'as_format': True, 'as_array': True}
 
 
+class TestDefaultSerialize_uniform(TestDefaultSerialize):
+    r"""Test class for items as dictionary."""
+    
+    def get_options(self):
+        r"""Get testing options."""
+        out = {'kwargs': {'type': 'array', 'items': {'type': '1darray',
+                                                     'subtype': 'float',
+                                                     'precision': 64}},
+               # 'field_units': ['cm', 'g']},
+               'empty': [],
+               'objects': [[np.zeros(3, 'float'), np.zeros(3, 'float')],
+                           [np.ones(3, 'float'), np.ones(3, 'float')]],
+               'extra_kwargs': {},
+               'typedef': {'type': 'array', 'items': {'type': '1darray',
+                                                      'subtype': 'float',
+                                                      'precision': 64}},
+               'dtype': np.dtype("float64"),  # np.dtype([('f0', '<f8'), ('f1', '<f8')]),
+               'is_user_defined': False}
+        return out
+
+
+class TestDefaultSerialize_uniform_names(TestDefaultSerialize_uniform):
+    r"""Test class for items as dictionary."""
+    
+    def get_options(self):
+        r"""Get testing options."""
+        out = super(TestDefaultSerialize_uniform_names, self).get_options()
+        out['kwargs']['field_names'] = [b'a', b'b']
+        out['kwargs']['field_units'] = [b'cm', b'g']
+        out['field_names'] = ['a', 'b']
+        out['field_units'] = ['cm', 'g']
+        out['dtype'] = np.dtype([('a', '<f8'), ('b', '<f8')])
+        out['typedef'] = {'type': 'array',
+                          'items': [{'type': '1darray',
+                                     'subtype': 'float',
+                                     'precision': 64,
+                                     'title': 'a',
+                                     'units': 'cm'},
+                                    {'type': '1darray',
+                                     'subtype': 'float',
+                                     'precision': 64,
+                                     'title': 'b',
+                                     'units': 'g'}]}
+        return out
+
+
 class TestDefaultSerialize_func(TestDefaultSerialize):
     r"""Test class for DefaultSerialize class with functions."""
 
@@ -173,7 +234,7 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
         self.func_serialize = self._func_serialize
         self.func_deserialize = self._func_deserialize
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {'kwargs': {'func_serialize': self.func_serialize,
                           'func_deserialize': self.func_deserialize},
@@ -186,11 +247,11 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
                'is_user_defined': True}
         return out
         
-    def _func_serialize(self, args):
+    def _func_serialize(self, args):  # pragma: no cover
         r"""Method that serializes using repr."""
         return backwards.as_bytes(repr(args))
 
-    def _func_deserialize(self, args):
+    def _func_deserialize(self, args):  # pragma: no cover
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return self.testing_options['empty']
@@ -200,11 +261,11 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
 
 class FakeSerializer(DefaultSerialize.DefaultSerialize):
 
-    def func_serialize(self, args):
+    def func_serialize(self, args):  # pragma: no cover
         r"""Method that serializes using repr."""
         return backwards.as_bytes(repr(args))
 
-    def func_deserialize(self, args):
+    def func_deserialize(self, args):  # pragma: no cover
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return []
@@ -215,13 +276,16 @@ class FakeSerializer(DefaultSerialize.DefaultSerialize):
 class TestDefaultSerialize_class(TestDefaultSerialize_func):
     r"""Test class for DefaultSerialize class with classes."""
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         temp_seri = FakeSerializer()
         assert(issubclass(temp_seri.__class__, DefaultSerialize.DefaultSerialize))
-        out = super(TestDefaultSerialize_class, self).get_testing_options()
+        out = super(TestDefaultSerialize_class, self).get_options()
         out['kwargs'] = {'func_serialize': temp_seri,
-                         'func_deserialize': temp_seri}
+                         'func_deserialize': temp_seri,
+                         'func_typedef': {'type': 'bytes'},
+                         'encode_func_serialize': True,
+                         'decode_func_deserialize': True}
         return out
         
 
@@ -239,7 +303,7 @@ class TestDefaultSerialize_alias(TestDefaultSerialize_format):
 class TestDefaultSerialize_type(TestDefaultSerialize):
     r"""Test class for DefaultSerialize class with types."""
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {'kwargs': {'type': 'float'},
                'empty': b'',
@@ -262,16 +326,21 @@ class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
         self.assert_raises(TypeError, self.instance.serialize, (1,))
 
     @unittest.skipIf(True, 'Error testing')
+    def test_serialize_no_metadata(self):
+        r"""Test serializing without metadata."""
+        pass  # pragma: no cover
+        
+    @unittest.skipIf(True, 'Error testing')
     def test_serialize_header(self):
         r"""Disabled: Test serialize/deserialize with header."""
-        pass
+        pass  # pragma: no cover
 
     @unittest.skipIf(True, 'Error testing')
     def test_serialize_sinfo(self):
         r"""Disabled: Test serialize/deserialize with serializer info."""
-        pass
+        pass  # pragma: no cover
 
     @unittest.skipIf(True, 'Error testing')
     def test_field_specs(self):
         r"""Disabled: Test field specifiers."""
-        pass
+        pass  # pragma: no cover

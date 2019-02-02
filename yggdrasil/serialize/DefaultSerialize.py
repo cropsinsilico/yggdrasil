@@ -2,10 +2,9 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from yggdrasil import backwards, tools, units, platform
+from yggdrasil import backwards, tools, units
 from yggdrasil.serialize import (
-    register_serializer, get_serializer, extract_formats, cformat2nptype,
-    consolidate_array)
+    register_serializer, extract_formats, cformat2nptype, consolidate_array)
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
@@ -16,7 +15,7 @@ from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
 
 
 @register_serializer
-class DefaultSerialize(object):
+class DefaultSerialize(tools.YggClass):
     r"""Default class for serializing/deserializing a python object into/from
     a bytes message.
 
@@ -27,6 +26,17 @@ class DefaultSerialize(object):
         func_deserialize (func, optional): Callable object that takes a bytes
             string as input and returns a deserialized python object. Defaults
             to None.
+        encode_func_serialize (bool, optional): If True, the data returned by
+            func_serialize (if provided) will be encoded. If False, the data
+            returned by func_serialize will not be encoded. Defaults to None
+            and is not used.
+        decode_func_deserialize (bool, optional): If True, the data passed to
+            func_deserialize (if provided) will be decoded first. If False, the
+            data passed to func_deserialize will not be decoded. Defaults to
+            None and is not used.
+        func_typedef (dict, optional): Type definition for encoding/decoding
+            messages returned/passed by/to func_serialize/func_deserialize.
+            Defaults to None and is not used.
         **kwargs: Additional keyword args are processed as part of the type
             definition.
 
@@ -35,6 +45,14 @@ class DefaultSerialize(object):
             and returns a bytes string representation.
         func_deserialize (func): Callable object that takes a bytes string as
             input and returns a deserialized python object.
+        encode_func_serialize (bool): If True, the data returned by
+            func_serialize (if provided) will be encoded. If False, the data
+            returned by func_serialize will not be encoded.
+        decode_func_deserialize (bool): If True, the data passed to
+            func_deserialize (if provided) will be decoded first. If False, the
+            data passed to func_deserialize will not be decoded.
+        func_typedef (dict): Type definition for encoding/decoding messages
+            returned/passed by/to func_serialize/func_deserialize.
 
     """
 
@@ -44,8 +62,14 @@ class DefaultSerialize(object):
     _schema_properties = {}
     _default_type = {'type': 'bytes'}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
-
-    def __init__(self, func_serialize=None, func_deserialize=None, **kwargs):
+    encode_func_serialize = False
+    decode_func_deserialize = False
+    func_typedef = {'type': 'bytes'}
+    
+    def __init__(self, func_serialize=None, func_deserialize=None,
+                 encode_func_serialize=None, decode_func_deserialize=None,
+                 func_typedef=None, **kwargs):
+        super(DefaultSerialize, self).__init__()
         self._alias = None
         self.is_user_defined = False
         self.extra_kwargs = {}
@@ -64,6 +88,12 @@ class DefaultSerialize(object):
             else:
                 self.func_deserialize = func_deserialize
             self.is_user_defined = True
+        if encode_func_serialize is not None:
+            self.encode_func_serialize = encode_func_serialize
+        if decode_func_deserialize is not None:
+            self.decode_func_deserialize = decode_func_deserialize
+        if func_typedef is not None:
+            self.func_typedef = func_typedef
         # Set properties to None
         for k, v in self._schema_properties.items():
             setattr(self, k, v.get('default', None))
@@ -71,8 +101,8 @@ class DefaultSerialize(object):
         self._initialized = False
         self.datatype = get_type_from_def(self._default_type,
                                           dont_complete=True)
-        self.str_datatype = get_type_from_def({'type': 'bytes'},
-                                              dont_complete=True)
+        self.func_datatype = get_type_from_def(self.func_typedef,
+                                               dont_complete=True)
         self.update_serializer(**kwargs)
         self._initialized = (self.typedef != self._default_type)
 
@@ -82,17 +112,18 @@ class DefaultSerialize(object):
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                empty (object): Object produced from deserializing an empty
-                    message.
-                objects (list): List of objects to be serialized/deserialized.
-                extra_kwargs (dict): Extra keyword arguments not used to
-                    construct type definition.
-                typedef (dict): Type definition resulting from the supplied
-                    kwargs.
-                dtype (np.dtype): Numpy data types that is consistent with the
-                    determined type definition.
+
+            * kwargs (dict): Keyword arguments for comms tested with the
+              provided content.
+            * empty (object): Object produced from deserializing an empty
+              message.
+            * objects (list): List of objects to be serialized/deserialized.
+              extra_kwargs (dict): Extra keyword arguments not used to
+              construct type definition.
+            * typedef (dict): Type definition resulting from the supplied
+              kwargs.
+            * dtype (np.dtype): Numpy data types that is consistent with the
+              determined type definition.
 
         """
         if as_array:
@@ -119,22 +150,22 @@ class DefaultSerialize(object):
                                 + b'  one\t1\t1.000000\n'
                                 + b'  two\t2\t2.000000\n'
                                 + b'three\t3\t3.000000\n')}
-            field_names = [backwards.as_str(x) for
-                           x in out['kwargs']['field_names']]
-            field_units = [backwards.as_str(x) for
-                           x in out['kwargs']['field_units']]
+            out['field_names'] = [backwards.as_str(x) for
+                                  x in out['kwargs']['field_names']]
+            out['field_units'] = [backwards.as_str(x) for
+                                  x in out['kwargs']['field_units']]
             rows = [(b'one', np.int32(1), 1.0),
                     (b'two', np.int32(2), 2.0),
                     (b'three', np.int32(3), 3.0)]
             if as_array:
                 out['kwargs']['as_array'] = as_array
                 dtype = np.dtype(
-                    {'names': field_names,
+                    {'names': out['field_names'],
                      'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
                 out['dtype'] = dtype
                 arr = np.array(rows, dtype=dtype)
                 lst = [units.add_units(arr[n], u) for n, u
-                       in zip(field_names, field_units)]
+                       in zip(out['field_names'], out['field_units'])]
                 out['objects'] = [lst, lst]
                 for x in out['typedef']['items']:
                     x['subtype'] = x['type']
@@ -149,7 +180,7 @@ class DefaultSerialize(object):
                    'extra_kwargs': {}}
             out['objects'] = [b'Test message\n', b'Test message 2\n']
             out['contents'] = b''.join(out['objects'])
-        out['contents'] = out['contents'].replace(b'\n', platform._newline)
+        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out
         
     @classmethod
@@ -161,7 +192,7 @@ class DefaultSerialize(object):
     def typedef(self):
         r"""dict: Type definition."""
         if self.is_user_defined:
-            return copy.deepcopy(self.str_datatype._typedef)
+            return copy.deepcopy(self.func_datatype._typedef)
         return copy.deepcopy(self.datatype._typedef)
 
     def __getattribute__(self, name):
@@ -193,10 +224,7 @@ class DefaultSerialize(object):
             elif isinstance(v, (list, tuple)):
                 out[k] = []
                 for x in v:
-                    if isinstance(x, backwards.string_types):
-                        out[k].append(backwards.as_str(x))
-                    else:
-                        out[k].append(x)
+                    out[k].append(backwards.as_str(x, allow_pass=True))
             else:
                 out[k] = v
         return out
@@ -341,22 +369,6 @@ class DefaultSerialize(object):
         self._initialized = (self.typedef != self._default_type)
         # self._initialized = True
 
-    def update_from_message(self, msg, **kwargs):
-        r"""Update serializer information based on the message.
-
-        Args:
-            msg (obj): Python object being sent as a message.
-            **kwargs: Additional keyword arguments are assumed to be typedef
-                options and are passed to update_serializer.
-
-        """
-        out = copy.deepcopy(self.typedef)
-        out.update(kwargs)
-        cls = guess_type_from_obj(msg)
-        typedef = cls.encode_type(msg, **out)
-        typedef.update(**kwargs)
-        self.update_serializer(extract=True, **typedef)
-
     def update_serializer(self, extract=False, skip_type=False, **kwargs):
         r"""Update serializer with provided information.
 
@@ -381,16 +393,20 @@ class DefaultSerialize(object):
         _metaschema = get_metaschema()
         # Create alias if another seritype is needed
         seritype = kwargs.pop('seritype', self._seritype)
-        if (seritype != self._seritype) and (seritype != 'default'):
-            kwargs.update(extract=extract, seritype=seritype)
-            self._alias = get_serializer(**kwargs)
-            assert(self._seritype == seritype)
-            return
+        if (seritype != self._seritype) and (seritype != 'default'):  # pragma: debug
+            # kwargs.update(extract=extract, seritype=seritype)
+            # self._alias = get_serializer(**kwargs)
+            # assert(self._seritype == seritype)
+            # return
+            raise Exception("Cannot change types form %s to %s." %
+                            (self._seritype, seritype))
         # Remove metadata keywords unrelated to serialization
         # TODO: Find a better way of tracking these
-        _remove_kws = ['size', 'id', 'incomplete', 'raw', 'commtype', 'filetype',
+        _remove_kws = ['body', 'address', 'size', 'id', 'incomplete', 'raw',
+                       'commtype', 'filetype', 'response_address', 'request_id',
                        'append', 'in_temp', 'is_series', 'working_dir', 'fmts',
-                       'model_driver', 'env', 'send_converter', 'recv_converter']
+                       'model_driver', 'env', 'send_converter', 'recv_converter',
+                       'typedef_base']
         kws = list(kwargs.keys())
         for k in kws:
             if (k in _remove_kws) or k.startswith('zmq'):
@@ -407,6 +423,7 @@ class DefaultSerialize(object):
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
+            self.info("Extra kwargs: %s" % str(self.extra_kwargs))
         # Update type
         if not skip_type:
             # Update typedef from oldstyle keywords in extra_kwargs
@@ -418,7 +435,8 @@ class DefaultSerialize(object):
                 self.datatype = get_type_from_def(typedef)
             # Check to see if new datatype is compatible with new one
             if old_datatype is not None:
-                if not compare_schema(self.typedef, old_datatype._typedef):
+                errors = list(compare_schema(self.typedef, old_datatype._typedef) or ())
+                if errors:
                     raise RuntimeError(
                         ("Updated datatype is not compatible with the existing one."
                          + "    New:\n%s\nOld:\n%s\n") % (
@@ -452,10 +470,11 @@ class DefaultSerialize(object):
                 fmts = extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
-                        if len(typedef.get('items', [])) != len(fmts):
-                            warnings.warn(("Number of items in typedef (%d) doesn't"
-                                           + "match the number of formats (%d).")
-                                          % (len(typedef.get('items', [])), len(fmts)))
+                        assert(len(typedef.get('items', [])) == len(fmts))
+                        # if len(typedef.get('items', [])) != len(fmts):
+                        #     warnings.warn(("Number of items in typedef (%d) doesn't"
+                        #                    + "match the number of formats (%d).")
+                        #                   % (len(typedef.get('items', [])), len(fmts)))
                     continue
                 as_array = self.extra_kwargs.get('as_array',
                                                  getattr(self, 'as_array', False))
@@ -488,10 +507,11 @@ class DefaultSerialize(object):
                 if isinstance(typedef['items'], dict):
                     typedef['items'] = [copy.deepcopy(typedef['items'])
                                         for _ in range(len(v))]
-                if len(v) != len(typedef.get('items', [])):
-                    warnings.warn('%d %ss provided, but only %d items in typedef.'
-                                  % (len(v), k, len(typedef.get('items', []))))
-                    continue
+                assert(len(v) == len(typedef.get('items', [])))
+                # if len(v) != len(typedef.get('items', [])):
+                #     warnings.warn('%d %ss provided, but only %d items in typedef.'
+                #                   % (len(v), k, len(typedef.get('items', []))))
+                #     continue
                 all_updated = True
                 for iv, itype in zip(v, typedef.get('items', [])):
                     if tk in itype:
@@ -541,6 +561,7 @@ class DefaultSerialize(object):
         self.initialize_from_message(args, **header_kwargs)
         metadata = {'no_metadata': no_metadata}
         if add_serializer_info:
+            self.debug("serializer_info = %s", str(self.serializer_info))
             metadata.update(self.serializer_info)
             metadata['typedef_base'] = self.typedef
         if header_kwargs is not None:
@@ -548,21 +569,20 @@ class DefaultSerialize(object):
         if hasattr(self, 'func_serialize'):
             if header_kwargs.get('raw', False):
                 data = args
-                if no_metadata:
-                    return data
             else:
                 data = self.func_serialize(args)
-                if not isinstance(data, backwards.bytes_type):
-                    raise TypeError("Serialization function did not yield bytes type.")
-                if no_metadata:
-                    return data
-                metadata['metadata'] = self.datatype.encode_type(
-                    args, typedef=self.typedef)
-            out = self.str_datatype.serialize(data, **metadata)
+                if not self.encode_func_serialize:
+                    if not isinstance(data, backwards.bytes_type):
+                        raise TypeError(("Serialization function returned object "
+                                         + "of type '%s', not required '%s' type.")
+                                        % (type(data), backwards.bytes_type))
+                    metadata['dont_encode'] = True
+                    if not no_metadata:
+                        metadata['metadata'] = self.datatype.encode_type(
+                            args, typedef=self.typedef)
+            out = self.func_datatype.serialize(data, **metadata)
         else:
             out = self.datatype.serialize(args, **metadata)
-        if not isinstance(out, backwards.bytes_type):
-            raise TypeError("Serialization function did not yield bytes type.")
         return out
 
     def deserialize(self, msg, **kwargs):
@@ -581,7 +601,9 @@ class DefaultSerialize(object):
 
         """
         if hasattr(self, 'func_deserialize'):
-            out, metadata = self.str_datatype.deserialize(msg, **kwargs)
+            if not self.decode_func_deserialize:
+                kwargs['dont_decode'] = True
+            out, metadata = self.func_datatype.deserialize(msg, **kwargs)
             if metadata['size'] == 0:
                 out = self.empty_msg
             elif not (metadata.get('incomplete', False)

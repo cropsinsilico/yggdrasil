@@ -31,7 +31,7 @@ def test_register_metaschema_property():
     assert_raises(ValueError, properties.register_metaschema_property, x)
     # Error when validate set
 
-    def fake_validate(*args, **kwargs):
+    def fake_validate(*args, **kwargs):  # pragma: no cover
         return
 
     x = type('ReplacementClassSchema', (MetaschemaProperty, ),

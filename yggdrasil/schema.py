@@ -195,7 +195,7 @@ class ComponentSchema(object):
             prop_default[subt]['enum'] = []
         # Get list of properties for each subtype and move properties to
         # base for brevity
-        for k in self._storage.keys():
+        for k in sorted(self._storage.keys()):
             v0 = self._storage[k]
             v = copy.deepcopy(v0)
             combo['allOf'][1]['anyOf'].append(v)
@@ -375,11 +375,20 @@ class ComponentSchema(object):
             #     new_schema['required'].append(k)
         for k, v in comp_cls._schema_properties.items():
             if k in self._base_schema['properties']:
-                assert(self._base_schema['properties'][k] == v)
+                if self._base_schema['properties'][k] != v:  # pragma: debug
+                    raise ValueError(("Schema for property '%s' of class '%s' "
+                                      "is %s, which differs from the base class "
+                                      "value (%s). Check that another class dosn't "
+                                      "have a conflicting definition of the same "
+                                      "property.") % (
+                                          k, comp_cls, v,
+                                          self._base_schema['properties'][k]))
             else:
                 new_schema['properties'][k] = copy.deepcopy(v)
-                if 'default' in new_schema['properties'][k]:
-                    del new_schema['properties'][k]['default']
+                # This was used to prevent properties that are not part
+                # of the base schema from having defaults.
+                # if 'default' in new_schema['properties'][k]:
+                #     del new_schema['properties'][k]['default']
         if not new_schema['required']:
             del new_schema['required']
         for subt in self.subtype_keys:
@@ -551,7 +560,8 @@ class SchemaRegistry(object):
 
         """
         kwargs.setdefault('normalizers', self._normalizers)
-        # kwargs.setdefault('no_defaults', True)
+        kwargs.setdefault('required_defaults', True)
+        kwargs.setdefault('no_defaults', True)
         kwargs.setdefault('schema_registry', self)
         return metaschema.normalize_instance(obj, self.full_schema, **kwargs)
 
@@ -929,7 +939,7 @@ def _normalize_connio_first(normalizer, value, instance, schema):
             pruned = []
             pruned_names = []
             for x in instance[io]:
-                if ':' in x['name']:
+                if (':' in x['name']) and (not os.path.isabs(x['name'])):
                     name = x['name'].split(':')[0]
                     x['name'] = name
                 if x['name'] not in pruned_names:
@@ -986,10 +996,6 @@ def _normalize_connio_elements_comm(normalizer, value, instance, schema):
                     for k in comm_keys:
                         if k in opp_comm:
                             instance.setdefault(k, opp_comm[k])
-                if ('commtype' not in instance):
-                    instance['commtype'] = schema['properties']['commtype']['default']
-                # if ('commtype' not in opp_comm):
-                #     opp_comm['commtype'] = schema['properties']['commtype']['default']
     return instance
 
 

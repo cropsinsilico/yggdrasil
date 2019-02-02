@@ -9,9 +9,9 @@ from yggdrasil.schema import get_schema
 
 
 def _translate_list2element(arr):
-    if not isinstance(arr, (list, tuple)):
-        raise Exception("List of field required.")
-    return arr[0]
+    if isinstance(arr, (list, tuple)):
+        arr = arr[0]
+    return arr
 
 
 class ConnectionDriver(Driver):
@@ -117,11 +117,11 @@ class ConnectionDriver(Driver):
         # Add comms and print debug info
         self._init_comms(name, **kwargs)
         # self.debug('    env: %s', str(self.env))
-        self.debug('\n' + 80 * '=' + '\n',
-                   'class = %s\n',
-                   '    input: name = %s, address = %s\n'
-                   + '    output: name = %s, address = %s\n'
-                   + (80 * '='), self.__class__,
+        self.debug(('\n' + 80 * '=' + '\n'
+                    + 'class = %s\n'
+                    + '    input: name = %s, address = %s\n'
+                    + '    output: name = %s, address = %s\n'
+                    + (80 * '=')), self.__class__,
                    self.icomm.name, self.icomm.address,
                    self.ocomm.name, self.ocomm.address)
 

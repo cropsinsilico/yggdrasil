@@ -1,6 +1,6 @@
 import uuid
 import unittest
-from yggdrasil import tools
+from yggdrasil import tools, backwards
 from yggdrasil.tests import MagicTestError, assert_raises
 from yggdrasil.schema import get_schema
 from yggdrasil.drivers import import_driver
@@ -58,7 +58,7 @@ class TestConnectionParam(parent.TestParam):
         r"""Assert that two messages are equivalent."""
         self.assert_equal(x, y)
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         if self.is_output:
             out = self.ocomm_import_cls.get_testing_options(
@@ -67,13 +67,6 @@ class TestConnectionParam(parent.TestParam):
             out = self.icomm_import_cls.get_testing_options(
                 **self.testing_option_kws)
         return out
-
-    @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
     
     @property
     def cleanup_comm_classes(self):
@@ -125,11 +118,22 @@ class TestConnectionParam(parent.TestParam):
         out['ocomm_kws'] = self.ocomm_kws
         return out
 
-    # @property
-    # def comm_cls(self):
-    #     r"""Connection class."""
-    #     return get_comm_class(self.comm_name)
+    @property
+    def test_msg(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return self.testing_options['msg']
 
+    @property
+    def msg_long(self):
+        r"""str: Small test message for sending."""
+        msg_short = self.test_msg
+        if isinstance(msg_short, backwards.bytes_type):
+            out = msg_short + (self.maxMsgSize * b'0')
+        else:  # pragma: debug
+            out = msg_short
+        # return self.testing_options['msg_long']
+        return out
+    
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         super(TestConnectionParam, self).setup(*args, **kwargs)
@@ -168,13 +172,13 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         flag = self.instance.recv_message()
         assert(not flag)
         # Short
-        flag = self.send_comm.send(self.msg_short)
+        flag = self.send_comm.send(self.test_msg)
         assert(not flag)
         flag, ret = self.recv_comm.recv()
         assert(not flag)
         self.assert_equal(ret, None)
         # Long
-        flag = self.send_comm.send_nolimit(self.msg_short)
+        flag = self.send_comm.send_nolimit(self.test_msg)
         assert(not flag)
         flag, ret = self.recv_comm.recv_nolimit()
         assert(not flag)
@@ -280,7 +284,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
 
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
-        flag = self.send_comm.send(self.msg_short)
+        flag = self.send_comm.send(self.test_msg)
         if self.comm_name != 'CommBase':
             assert(flag)
         # self.instance.sleep()
@@ -290,7 +294,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             flag, msg_recv = self.recv_comm.recv(self.timeout)
             if self.comm_name != 'CommBase':
                 assert(flag)
-                self.assert_msg_equal(msg_recv, self.msg_short)
+                self.assert_msg_equal(msg_recv, self.test_msg)
         if self.comm_name != 'CommBase':
             self.assert_equal(self.instance.n_msg, 0)
 
@@ -316,7 +320,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         r"""Commands to run while the instance is running, before terminate."""
         super(TestConnectionDriver, self).run_before_terminate()
         # TODO: This fails with ZMQ
-        # self.send_comm.send(self.msg_short)
+        # self.send_comm.send(self.test_msg)
 
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""

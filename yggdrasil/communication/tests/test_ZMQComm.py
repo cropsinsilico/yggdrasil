@@ -1,5 +1,6 @@
 import unittest
 import zmq
+import copy
 from yggdrasil import platform
 from yggdrasil.tests import assert_raises, assert_equal
 from yggdrasil.communication import new_comm
@@ -63,31 +64,17 @@ class TestZMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for ZMQComm communication class."""
 
     comm = 'ZMQComm'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestZMQComm, self).__init__(*args, **kwargs)
-        self.protocol = None
-        self.socket_type = None
-        self.attr_list += ['context', 'socket', 'socket_type_name',
-                           'socket_type', 'protocol', 'host', 'port']
+    attr_list = (copy.deepcopy(test_AsyncComm.TestAsyncComm.attr_list)
+                 + ['context', 'socket', 'socket_type_name',
+                    'socket_type', 'protocol', 'host', 'port'])
+    protocol = None
+    socket_type = None
 
     @property
     def description_prefix(self):
         r"""String prefix to prepend docstr test message with."""
         return '%s(%s, %s)' % (self.comm, self.protocol, self.socket_type)
 
-    # Unclear why this was modified
-    # @property
-    # def inst_kwargs(self):
-    #     r"""dict: Keyword arguments for tested class."""
-    #     args, kwargs = ZMQComm.ZMQComm.new_comm_kwargs(
-    #         self.name, protocol=self.protocol,
-    #         port=self.send_instance.port,
-    #         direction=out['direction'])
-    #     out = super(TestZMQComm, self).inst_kwargs
-    #     out.update(**kwargs)
-    #     return out
-        
     @property
     def send_inst_kwargs(self):
         r"""Keyword arguments for send instance."""
@@ -96,12 +83,22 @@ class TestZMQComm(test_AsyncComm.TestAsyncComm):
         out['socket_type'] = self.socket_type
         return out
 
+    def test_send_recv_nolimit(self):
+        r"""Send/recv of large message."""
+        if self.__class__ != TestZMQComm:
+            raise unittest.SkipTest('Only test once')
+        super(TestZMQComm, self).test_send_recv_nolimit()
+
+    def test_eof_no_close(self):
+        r"""Test send/recv of EOF message with no close."""
+        if self.__class__ != TestZMQComm:
+            raise unittest.SkipTest('Only test once')
+        super(TestZMQComm, self).test_eof_no_close()
+        
     
 # Tests for server/client
 class TestZMQComm_client(TestZMQComm):
     r"""Test for ZMQComm communication class for client/server."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQComm_client, self).__init__(*args, **kwargs)
 
     @property
     def send_inst_kwargs(self):
@@ -109,50 +106,27 @@ class TestZMQComm_client(TestZMQComm):
         out = super(TestZMQComm_client, self).send_inst_kwargs
         out['is_client'] = True
         return out
-        
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
 
     
 # Tests for all the supported protocols
 class TestZMQCommINPROC(TestZMQComm):
     r"""Test for ZMQComm communication class with INPROC socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommINPROC, self).__init__(*args, **kwargs)
-        self.protocol = 'inproc'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
+    protocol = 'inproc'
 
     
 class TestZMQCommTCP(TestZMQComm):
     r"""Test for ZMQComm communication class with TCP socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommTCP, self).__init__(*args, **kwargs)
-        self.protocol = 'tcp'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
+    protocol = 'tcp'
 
     
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
 class TestZMQCommIPC(TestZMQComm):
     r"""Test for ZMQComm communication class with IPC socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommIPC, self).__init__(*args, **kwargs)
-        self.protocol = 'ipc'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
-    
+    protocol = 'ipc'
+
 
 class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
     r"""Test for ZMQComm communication class with IPC socket."""
@@ -162,87 +136,45 @@ class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
 # Unsupported
 # class TestZMQCommUDP(TestZMQComm):
 #     r"""Test for ZMQComm communication class with UDP socket."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestZMQCommUDP, self).__init__(*args, **kwargs)
-#         self.protocol = 'udp'
 
-#     @unittest.skipIf(True, 'Only test once')
-#     def test_send_recv_nolimit(self):
-#         r"""Disabled send/recv of large message."""
-#         pass
+#     protocol = 'udp'
 
 
 # class TestZMQCommPGM(TestZMQComm):
 #     r"""Test for ZMQComm communication class with PGM socket."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestZMQCommPGM, self).__init__(*args, **kwargs)
-#         self.protocol = 'pgm'
 
-#     @unittest.skipIf(True, 'Only test once')
-#     def test_send_recv_nolimit(self):
-#         r"""Disabled send/recv of large message."""
-#         pass
+#     protocol = 'pgm'
 
     
 # class TestZMQCommEPGM(TestZMQComm):
 #     r"""Test for ZMQComm communication class with EPGM socket."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestZMQCommEPGM, self).__init__(*args, **kwargs)
-#         self.protocol = 'epgm'
 
-#     @unittest.skipIf(True, 'Only test once')
-#     def test_send_recv_nolimit(self):
-#         r"""Disabled send/recv of large message."""
-#         pass
+#     protocol = 'epgm'
 
 
 # Tests for all the socket types
 class TestZMQCommPAIR(TestZMQComm):
     r"""Test for ZMQComm communication class with PAIR/PAIR socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPAIR, self).__init__(*args, **kwargs)
-        self.socket_type = 'PAIR'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
+    socket_type = 'PAIR'
 
     
 class TestZMQCommPUSH(TestZMQComm):
     r"""Test for ZMQComm communication class with PUSH/PULL socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPUSH, self).__init__(*args, **kwargs)
-        self.socket_type = 'PUSH'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
+    socket_type = 'PUSH'
 
     
 class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
     r"""Test for ZMQComm communication class with INPROC PUSH/PULL socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPUSH_INPROC, self).__init__(*args, **kwargs)
-        self.socket_type = 'PUSH'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
+    socket_type = 'PUSH'
 
     
 class TestZMQCommPUB(TestZMQComm):
     r"""Test for ZMQComm communication class with PUB/SUB socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommPUB, self).__init__(*args, **kwargs)
-        self.socket_type = 'PUB'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
+    socket_type = 'PUB'
 
 
 class TestZMQCommREQ(TestZMQComm):
@@ -251,17 +183,11 @@ class TestZMQCommREQ(TestZMQComm):
         super(TestZMQCommREQ, self).__init__(*args, **kwargs)
         self.socket_type = 'REQ'
 
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
-
 
 class TestZMQCommROUTER(TestZMQComm):
     r"""Test for ZMQComm communication class with DEALER/ROUTER socket."""
-    def __init__(self, *args, **kwargs):
-        super(TestZMQCommROUTER, self).__init__(*args, **kwargs)
-        self.socket_type = 'ROUTER'
+
+    socket_type = 'ROUTER'
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair with sleep after setup to ensure
@@ -273,11 +199,6 @@ class TestZMQCommROUTER(TestZMQComm):
         r"""Test router receipt of message from the dealer with an identity."""
         self.do_send_recv(reverse_comms=True, send_kwargs=dict(
             identity=self.recv_instance.dealer_identity))
-
-    @unittest.skipIf(True, 'Only test once')
-    def test_send_recv_nolimit(self):
-        r"""Disabled send/recv of large message."""
-        pass
 
 
 # @unittest.skipIf(_zmq_installed, "ZMQ library installed")

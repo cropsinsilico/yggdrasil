@@ -21,3 +21,15 @@ TODO
 * Write docs on units
 * Docs on datatypes w/ example of user defined data type
 * Update/replace io_drivers section of docs
+* Remove IOInfo test class as no longer used
+* Add example of each supported language (missing LPy, cmake, make)
+* Replace nose with unittest/pytest
+* Create template model drivers for compiled/interpretted langauges
+* Update travis/appveyor to clone recursively to get rapidjson as git submodule
+* Change verbose flag in GCCModelDriver to use logging levels
+* Add map class for handling arbitrary objects in C/C++ and then update formatted_io 7, 8, and 9
+* change gs_lesson/formatted_io series to have more descriptive names
+* Docs on how nested data objects are represented in C/C++.
+* Add docstrings to metaschema classes
+* Preprocessor macro for dynamically determine message type?
+* Try to setup comm/connection at class level

@@ -2,11 +2,11 @@
 #ifndef YGGINTERFACE_H_
 #define YGGINTERFACE_H_
 
-#include <../tools.h>
-#include <../metaschema/datatypes/datatypes.h>
-#include <../communication/communication.h>
-#include <../dataio/AsciiFile.h>
-#include <../dataio/AsciiTable.h>
+#include "../tools.h"
+#include "../metaschema/datatypes/datatypes.h"
+#include "../communication/communication.h"
+#include "../dataio/AsciiFile.h"
+#include "../dataio/AsciiTable.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -192,7 +192,7 @@ int ygg_send_nolimit_eof(const yggOutput_t yggQ) {
   @param[out] data character pointer to pointer for allocated buffer where the
   message should be stored. A pointer to a pointer is used so that the buffer
   may be reallocated as necessary for the incoming message.
-  @param[in] len0 size_t length of the initial allocated message buffer in bytes.
+  @param[in] len size_t length of the initial allocated message buffer in bytes.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
@@ -367,6 +367,7 @@ comm_t yggRpcServer(const char *name, const char *inFormat, const char *outForma
   input queue format string to extract parameters and assign them to the
   arguments.
   @param[in] rpc yggRpc_t structure with RPC information.
+  @param[in] nargs int Number of arguments contained in ap.
   @param[out] ap va_list variable list of arguments that should be assigned
   parameters extracted using the format string. Since these will be assigned,
   they should be pointers to memory that has already been allocated.
@@ -410,6 +411,11 @@ comm_t yggRpcServer(const char *name, const char *inFormat, const char *outForma
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
   @param[in] rpc yggRpc_t structure with RPC information.
+  @param[in] allow_realloc int If 1, output arguments are assumed to be pointers
+  to pointers such that they can be reallocated as necessary to receive incoming
+  data. If 0, output arguments are assumed to be preallocated.
+  @param[in] nargs size_t Number of arguments contained in ap including both
+  input and output arguments.
   @param[in,out] ap va_list mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will
@@ -462,6 +468,11 @@ int vrpcCallBase(const yggRpc_t rpc, const int allow_realloc,
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
   @param[in] rpc yggRpc_t structure with RPC information.
+  @param[in] allow_realloc int If 1, output arguments are assumed to be pointers
+  to pointers such that they can be reallocated as necessary to receive incoming
+  data. If 0, output arguments are assumed to be preallocated.
+  @param[in] nargs size_t Number of arguments contained in ap including both
+  input and output arguments.
   @param[in,out] ... mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will

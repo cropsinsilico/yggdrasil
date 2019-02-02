@@ -139,7 +139,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""
         if msg_send is None:
-            msg_send = self.msg_short
+            msg_send = self.test_msg
         T = self.instance.start_timeout()
         while ((not T.is_out) and ((not self.instance.is_valid)
                                    or (not self.cli_drv.is_valid))):

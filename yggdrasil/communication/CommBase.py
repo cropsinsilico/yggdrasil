@@ -5,7 +5,7 @@ import atexit
 import threading
 from logging import info
 from yggdrasil import backwards, tools, serialize
-from yggdrasil.tools import get_YGG_MSG_MAX, YGG_MSG_EOF
+from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
 from yggdrasil.schema import register_component
@@ -287,6 +287,7 @@ class CommBase(tools.YggClass):
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
         matlab (bool): True if the comm will be accessed by Matlab code.
+        maxMsgSize (int): Maximum size of a single message that should be sent.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -311,6 +312,7 @@ class CommBase(tools.YggClass):
                           'as_array': {'type': 'boolean', 'default': False}}
     _default_serializer = DefaultSerialize
     is_file = False
+    _maxMsgSize = 0
 
     def __init__(self, name, address=None, direction='send',
                  dont_open=False, is_interface=False, recv_timeout=0.0,
@@ -438,6 +440,10 @@ class CommBase(tools.YggClass):
                'contents': out['contents']}
         out['recv'] = copy.deepcopy(out['send'])
         out['dict'] = {'f0': out['msg']}
+        if isinstance(out['msg'], backwards.bytes_type):
+            out['msg_long'] = out['msg'] + (cls._maxMsgSize * b'0')
+        else:
+            out['msg_long'] = out['msg']
         return out
 
     def printStatus(self, nindent=0):
@@ -502,8 +508,8 @@ class CommBase(tools.YggClass):
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        return get_YGG_MSG_MAX()
-
+        return self._maxMsgSize
+        
     @property
     def empty_msg(self):
         r"""str: Empty message."""
@@ -564,13 +570,17 @@ class CommBase(tools.YggClass):
     @classmethod
     def new_comm(cls, name, *args, **kwargs):
         r"""Initialize communication with new queue."""
+        dont_create = kwargs.pop('dont_create', False)
         env = kwargs.get('env', {})
         if name in env:
             kwargs.setdefault('address', env[name])
         elif name in os.environ:
             kwargs.setdefault('address', os.environ[name])
         new_comm_class = kwargs.pop('new_comm_class', None)
-        args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
+        if dont_create:
+            args = tuple([name] + list(args))
+        else:
+            args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
         if new_comm_class is not None:
             new_cls = get_comm_class(new_comm_class)
             return new_cls(*args, **kwargs)
@@ -618,41 +628,34 @@ class CommBase(tools.YggClass):
         r"""Close the connection."""
         pass
 
-    def close(self, skip_base=False, linger=False):
+    def close(self, linger=False):
         r"""Close the connection.
 
         Args:
-            skip_base (bool, optional): If True, don't drain messages or remove
-                work comms.
             linger (bool, optional): If True, drain messages before closing the
                 comm. Defaults to False.
 
         """
-        if (not skip_base):
-            self.debug('')
-            if linger and self.is_open:
-                self.linger()
-            else:
-                self._closing_thread.set_terminated_flag()
-                linger = False
-        if skip_base:
-            self._close(linger=linger)
-            return
+        self.debug('')
+        if linger and self.is_open:
+            self.linger()
+        else:
+            self._closing_thread.set_terminated_flag()
+            linger = False
         # Close with lock
         with self._closing_thread.lock:
             self._close(linger=linger)
-            if not skip_base:
-                self._n_sent = 0
-                self._n_recv = 0
-                if self.is_client:
-                    self.debug("Signing off from server")
-                    self.signoff_from_server()
-                if len(self._work_comms) > 0:
-                    self.debug("Cleaning up %d work comms", len(self._work_comms))
-                    keys = [k for k in self._work_comms.keys()]
-                    for c in keys:
-                        self.remove_work_comm(c, linger=linger)
-                    self.debug("Finished cleaning up work comms")
+            self._n_sent = 0
+            self._n_recv = 0
+            if self.is_client:
+                self.debug("Signing off from server")
+                self.signoff_from_server()
+            if len(self._work_comms) > 0:
+                self.debug("Cleaning up %d work comms", len(self._work_comms))
+                keys = [k for k in self._work_comms.keys()]
+                for c in keys:
+                    self.remove_work_comm(c, linger=linger)
+                self.debug("Finished cleaning up work comms")
         self.debug("done")
 
     def close_in_thread(self, no_wait=False, timeout=None):
@@ -1074,13 +1077,14 @@ class CommBase(tools.YggClass):
     def serialize(self, *args, **kwargs):
         r"""Serialize a message using the associated serializer."""
         # Don't send metadata for files
+        # kwargs.setdefault('dont_encode', self.is_file)
         kwargs.setdefault('no_metadata', self.is_file)
         return self.serializer.serialize(*args, **kwargs)
 
     def deserialize(self, *args, **kwargs):
         r"""Deserialize a message using the associated deserializer."""
         # Don't serialize files using JSON
-        kwargs.setdefault('no_json', self.is_file)
+        # kwargs.setdefault('dont_decode', self.is_file)
         return self.serializer.deserialize(*args, **kwargs)
 
     # SEND METHODS
@@ -1324,10 +1328,6 @@ class CommBase(tools.YggClass):
         #         self._eof_sent.set()
         #         return self.send(self.eof_msg, *args, **kwargs)
         # return False
-        
-    def send_nolimit_eof(self, *args, **kwargs):
-        r"""Alias for send_eof."""
-        return self.send_eof(*args, **kwargs)
 
     # RECV METHODS
     def _safe_recv(self, *args, **kwargs):
@@ -1559,9 +1559,9 @@ class CommBase(tools.YggClass):
         """
         metadata = kwargs.get('header_kwargs', {})
         if 'field_order' in kwargs:
-            metadata['key_order'] = kwargs.pop('field_order')
+            kwargs.setdefault('key_order', kwargs.pop('field_order'))
         if 'key_order' in kwargs:
-            metadata['key_order'] = kwargs['key_order']
+            metadata['key_order'] = kwargs.pop('key_order')
         metadata.setdefault('key_order', self.serializer.get_field_names())
         if (((metadata['key_order'] is None)
              and isinstance(args_dict, dict)
@@ -1592,14 +1592,17 @@ class CommBase(tools.YggClass):
         Raises:
 
         """
+        if 'field_order' in kwargs:
+            kwargs.setdefault('key_order', kwargs.pop('field_order'))
+        key_order = kwargs.pop('key_order', None)
         flag, msg = self.recv(*args, **kwargs)
         if flag and (not self.is_eof(msg)):
             if self.serializer.typedef['type'] == 'array':
                 metadata = copy.deepcopy(self._last_header)
-                if metadata is None:
-                    metadata = {}
-                if 'key_order' in kwargs:
-                    metadata['key_order'] = kwargs['key_order']
+                # if metadata is None:
+                #     metadata = {}
+                if key_order is not None:
+                    metadata['key_order'] = key_order
                 metadata.setdefault('key_order', self.serializer.get_field_names())
                 msg_dict = JSONObjectMetaschemaType.coerce_type(msg, **metadata)
             else:
@@ -1641,22 +1644,6 @@ class CommBase(tools.YggClass):
     #     return flag, field_msg
 
     # ALIASES
-    def send_line(self, *args, **kwargs):
-        r"""Alias for send."""
-        return self.send(*args, **kwargs)
-
-    def recv_line(self, *args, **kwargs):
-        r"""Alias for recv."""
-        return self.recv(*args, **kwargs)
-
-    def send_row(self, *args, **kwargs):
-        r"""Alias for send."""
-        return self.send(*args, **kwargs)
-
-    def recv_row(self, *args, **kwargs):
-        r"""Alias for recv."""
-        return self.recv(*args, **kwargs)
-
     def send_array(self, *args, **kwargs):
         r"""Alias for send."""
         # TODO: Maybe explicitly handle transformation from array

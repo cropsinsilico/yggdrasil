@@ -101,10 +101,16 @@ class PandasSerialize(AsciiTableSerialize):
                     args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
         args_ = self.apply_field_names(args_)
         args_.to_csv(fd, index=False,
+                     # Not in pandas <0.24
+                     # line_terminator=backwards.as_str(self.newline),
                      sep=backwards.as_str(self.delimiter),
                      mode='wb', encoding='utf8', header=self.write_header)
         out = fd.getvalue()
         fd.close()
+        # Required to change out \r\n for \n on windows
+        out = out.replace(
+            backwards.match_stype(out, platform._newline),
+            backwards.match_stype(out, self.newline))
         return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
@@ -163,18 +169,7 @@ class PandasSerialize(AsciiTableSerialize):
                 names are not provided to the deserializer. Defaults to False.
 
         Returns:
-            dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                empty (object): Object produced from deserializing an empty
-                    message.
-                objects (list): List of objects to be serialized/deserialized.
-                extra_kwargs (dict): Extra keyword arguments not used to
-                    construct type definition.
-                typedef (dict): Type definition resulting from the supplied
-                    kwargs.
-                dtype (np.dtype): Numpy data types that is consistent with the
-                    determined type definition.
+            dict: Dictionary of variables to use for testing.
 
         """
         out = super(PandasSerialize, cls).get_testing_options(as_array=True)
@@ -205,5 +200,4 @@ class PandasSerialize(AsciiTableSerialize):
                                + b'two\t2\t2.0\n'
                                + b'three\t3\t3.0\n')
         out['kwargs'].update(out['typedef'])
-        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

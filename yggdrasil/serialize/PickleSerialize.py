@@ -1,4 +1,4 @@
-from yggdrasil import backwards, platform
+from yggdrasil import backwards
 from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
@@ -43,18 +43,7 @@ class PickleSerialize(DefaultSerialize):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
-            dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                empty (object): Object produced from deserializing an empty
-                    message.
-                objects (list): List of objects to be serialized/deserialized.
-                extra_kwargs (dict): Extra keyword arguments not used to
-                    construct type definition.
-                typedef (dict): Type definition resulting from the supplied
-                    kwargs.
-                dtype (np.dtype): Numpy data types that is consistent with the
-                    determined type definition.
+            dict: Dictionary of variables to use for testing.
 
         """
         out = super(PickleSerialize, cls).get_testing_options()
@@ -64,5 +53,4 @@ class PickleSerialize(DefaultSerialize):
         else:  # pragma: Python 3
             out['contents'] = (b'\x80\x03C\rTest message\nq\x00.'
                                + b'\x80\x03C\x0fTest message 2\nq\x00.')
-        out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

@@ -94,7 +94,7 @@ def create_include(fname, target, compile_flags=None, linker_flags=None):
         elif os.path.isfile(x):
             xd, xf = os.path.split(x)
             xl, xe = os.path.splitext(xf)
-            if xe in ['.so', '.dll']:
+            if xe.lower() in ['.so', '.dll', '.dylib']:
                 lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
             else:
                 lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
@@ -211,7 +211,7 @@ class CMakeModelDriver(ModelDriver):
                 machine.
 
         """
-        return (len(tools.get_installed_comm(language='c')) > 0)
+        return GCCModelDriver.GCCModelDriver.is_installed()
 
     def run_cmake(self, target=None):
         r"""Run the cmake command on the source.
@@ -251,7 +251,7 @@ class CMakeModelDriver(ModelDriver):
         comp_process = tools.popen_nobuffer(build_cmd)
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
-        if exit_code != 0:
+        if exit_code != 0:  # pragma: debug
             os.chdir(curdir)
             self.error(backwards.as_unicode(output))
             self.cleanup()

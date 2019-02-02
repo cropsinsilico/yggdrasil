@@ -17,7 +17,7 @@ def test_deserialize_nofmt():
     r"""Test error on deserialization without a format."""
     inst = AsciiTableSerialize.AsciiTableSerialize()
     test_msg = b'lskdbjs;kfbj'
-    test_msg = inst.str_datatype.serialize(test_msg, metadata={})
+    test_msg = inst.func_datatype.serialize(test_msg, metadata={})
     assert_raises(RuntimeError, inst.deserialize, test_msg)
 
 
@@ -55,7 +55,7 @@ class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
         self._empty_obj = []
         self._objects = [(1, )]
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {'kwargs': {'format_str': b'%d\n'},
                'empty': [],

@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from yggdrasil.serialize import pandas2dict, numpy2dict, list2dict
 from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -25,11 +24,13 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
     _empty_msg = {}
 
     @classmethod
-    def coerce_type(cls, obj, key_order=None, **kwargs):
+    def coerce_type(cls, obj, typedef=None, key_order=None, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
             obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
             key_order (list, optional): Order or keys correpsonding to elements in
                 a provided list or tuple. Defaults to None.
             **kwargs: Additional keyword arguments are metadata entries that may
@@ -42,15 +43,12 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
             RuntimeError: If obj is a list or tuple, but key_order is not provided.
 
         """
+        from yggdrasil.serialize import pandas2dict, numpy2dict, list2dict
         if isinstance(obj, pd.DataFrame):
             obj = pandas2dict(obj)
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
             obj = numpy2dict(obj)
-        elif isinstance(obj, (list, tuple)):
-            if key_order is None:
-                # key_order = ['f%d' % i for i in range(len(obj))]
-                raise RuntimeError("Key order must be provided to coerce %s."
-                                   % type(obj))
+        elif isinstance(obj, (list, tuple)) and (key_order is not None):
             obj = list2dict(obj, names=key_order)
         return obj
 

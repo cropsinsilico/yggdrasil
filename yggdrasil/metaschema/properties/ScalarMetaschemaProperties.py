@@ -40,6 +40,9 @@ for t, t_np in _valid_types.items():
     _python_scalars[t].append(np.dtype(t_np).type)
     for p in prec_list:
         _python_scalars[t].append(np.dtype(t_np + str(p)).type)
+# For some reason windows fails to check types on ints in some cases
+_python_scalars['int'].append(np.signedinteger)
+_python_scalars['uint'].append(np.unsignedinteger)
 _all_python_scalars = [units._unit_quantity]
 for k in _python_scalars.keys():
     _python_scalars[k].append(units._unit_quantity)

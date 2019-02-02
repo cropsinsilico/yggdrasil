@@ -187,12 +187,12 @@ def nptype2cformat(nptype, asbytes=False):
         else:
             cfmt = "%llu"
     elif np.issubdtype(t, np.dtype("S")):
-        if t.itemsize is 0:
+        if t.itemsize == 0:
             cfmt = '%s'
         else:
             cfmt = "%" + str(t.itemsize) + "s"
     elif np.issubdtype(t, np.dtype("U")):
-        if t.itemsize is 0:
+        if t.itemsize == 0:
             cfmt = '%s'
         else:
             cfmt = "%" + str(t.itemsize) + "s"
@@ -721,6 +721,9 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
         use_astropy = False
     dtype = cformat2nptype(fmt_str)
     info = format2table(fmt_str)
+    comment = info.get('comment', None)
+    if comment is not None:
+        fmt_str = fmt_str.split(comment, 1)[-1]
     arr1 = consolidate_array(arrs, dtype=dtype)
     if use_astropy:
         fd = backwards.StringIO()
@@ -999,13 +1002,10 @@ def format_header(format_str=None, dtype=None,
     # Create lines
     out = []
     for x in [field_names, field_units, fmts]:
-        if (x is None) or (len(max(x, key=len)) == 0):
-            continue
-        # if (len(x) == 0) or (x[0] == 'None'):
-        #     continue
-        assert(len(x) == nfld)
-        out.append(comment
-                   + delimiter.join([backwards.as_bytes(ix) for ix in x]))
+        if (x is not None) and (len(max(x, key=len)) > 0):
+            assert(len(x) == nfld)
+            out.append(comment
+                       + delimiter.join([backwards.as_bytes(ix) for ix in x]))
     out = newline.join(out) + newline
     return out
 
@@ -1276,6 +1276,8 @@ def dict2numpy(d, order=None):
     """
     if not isinstance(d, dict):
         raise TypeError("d must be a dictionary, not %s." % type(d))
+    if len(d) == 0:
+        return np.array([])
     if order is None:
         order = sorted([k for k in d.keys()])
     dtypes = [d[k].dtype for k in order]

@@ -1,4 +1,5 @@
 import unittest
+import copy
 from yggdrasil.tests import assert_raises, assert_equal
 from yggdrasil.communication import new_comm
 from yggdrasil.communication import IPCComm, CommBase
@@ -55,10 +56,8 @@ class TestIPCComm(test_AsyncComm.TestAsyncComm):
     r"""Test for IPCComm communication class."""
 
     comm = 'IPCComm'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestIPCComm, self).__init__(*args, **kwargs)
-        self.attr_list += ['q']
+    attr_list = (copy.deepcopy(test_AsyncComm.TestAsyncComm.attr_list)
+                 + ['q'])
 
 
 @unittest.skipIf(_ipc_installed, "IPC library installed")

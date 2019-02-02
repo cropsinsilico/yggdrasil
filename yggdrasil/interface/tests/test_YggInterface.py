@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import unittest
 from yggdrasil.communication import get_comm, get_comm_class
 from yggdrasil.interface import YggInterface
@@ -75,12 +76,14 @@ class TestBase(YggTestClassInfo):
         self.test_comm_kwargs = {}
         # self._driver_kwargs = {}
         self._inst_args = [self.name]
+        self.fmt_str = b'%5s\t%d\t%f\n'
+        self.fmt_str_matlab = b'%5s\\t%d\\t%f\\n'
 
     @property
     def odriver_class(self):
         r"""class: Output driver class."""
         if self.direction is None:
-            return None
+            return None  # pragma: no cover
         elif (self.direction == 'output') and self.is_file:
             return import_driver('FileOutputDriver')
         elif (self.direction == 'input') and self.is_file:
@@ -91,7 +94,7 @@ class TestBase(YggTestClassInfo):
     def idriver_class(self):
         r"""class: Input driver class."""
         if self.direction is None:
-            return None
+            return None  # pragma: no cover
         elif (self.direction == 'output') and self.is_file:
             return None
         elif (self.direction == 'input') and self.is_file:
@@ -107,7 +110,7 @@ class TestBase(YggTestClassInfo):
             return ([self.name, self.filename],
                     {'ocomm_kws': filecomm_kwargs})
         elif (self.direction == 'input') and self.is_file:
-            return None, None
+            return None, None  # pragma: no cover
         elif (self.direction == 'output'):
             return [self.name, self.name + '_link'], {}
         elif (self.direction == 'input'):
@@ -118,7 +121,7 @@ class TestBase(YggTestClassInfo):
     def idriver_args(self):
         r"""list: Input driver arguments."""
         if (self.direction == 'output') and self.is_file:
-            return None, None
+            return None, None  # pragma: no cover
         elif (self.direction == 'input') and self.is_file:
             filecomm_kwargs = self.testing_options['kwargs']
             filecomm_kwargs['comm'] = self.filecomm
@@ -137,7 +140,7 @@ class TestBase(YggTestClassInfo):
         out['matlab'] = self.matlab
         return out
         
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         out = {}
         if self.is_file:
@@ -150,13 +153,6 @@ class TestBase(YggTestClassInfo):
         return out
 
     @property
-    def testing_options(self):
-        r"""dict: Testing options."""
-        if getattr(self, '_testing_options', None) is None:
-            self._testing_options = self.get_testing_options()
-        return self._testing_options
-
-    @property
     def messages(self):
         r"""list: Messages that should be sent/received."""
         if getattr(self, '_messages', None) is not None:
@@ -165,7 +161,7 @@ class TestBase(YggTestClassInfo):
 
     def setup(self):
         r"""Start driver and instance."""
-        if self.direction is None:
+        if self.direction is None:  # pragma: debug
             return
         nprev_comm = self.comm_count
         nprev_thread = self.thread_count
@@ -219,7 +215,7 @@ class TestBase(YggTestClassInfo):
             self.test_comm.close()
         if self.is_file and os.path.isfile(self.filename):
             os.remove(self.filename)
-        if self.direction is None:
+        if self.direction is None:  # pragma: debug
             return
         super(TestBase, self).teardown()
         self.cleanup_comms()
@@ -238,6 +234,9 @@ class TestYggInput(TestBase):
         super(TestYggInput, self).__init__(*args, **kwargs)
         self._cls = 'YggInput'
         self.direction = 'input'
+        if self.__class__ == TestCisInput:
+            self.testing_option_kws = {'as_format': True}
+            self._inst_kwargs = {'format_str': self.fmt_str}
 
     def test_msg(self):
         r"""Test sending/receiving message."""
@@ -262,6 +261,8 @@ class TestYggInputMatlab(TestYggInput):
     def __init__(self, *args, **kwargs):
         super(TestYggInputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
+        self.testing_option_kws = {'as_format': True}
+        self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
 class TestYggOutput(TestBase):
@@ -270,6 +271,9 @@ class TestYggOutput(TestBase):
         super(TestYggOutput, self).__init__(*args, **kwargs)
         self._cls = 'YggOutput'
         self.direction = 'output'
+        if self.__class__ == TestCisOutput:
+            self.testing_option_kws = {'as_format': True}
+            self._inst_kwargs = {'format_str': self.fmt_str}
 
     def test_msg(self):
         r"""Test sending/receiving message."""
@@ -302,6 +306,8 @@ class TestYggOutputMatlab(TestYggOutput):
     def __init__(self, *args, **kwargs):
         super(TestYggOutputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
+        self.testing_option_kws = {'as_format': True}
+        self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
 class TestYggRpcClient(TestYggOutput):
@@ -312,7 +318,7 @@ class TestYggRpcClient(TestYggOutput):
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ServerComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
-        self._messages = [self.file_rows[0]]
+        self._messages = [(b'one', np.int32(1), 1.0)]
         
     @property
     def odriver_class(self):
@@ -351,7 +357,7 @@ class TestYggRpcServer(TestYggInput):
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
         self.test_comm_kwargs = {'comm': 'ClientComm',
                                  'response_kwargs': {'format_str': self.fmt_str}}
-        self._messages = [self.file_rows[0]]
+        self._messages = [(b'one', np.int32(1), 1.0)]
         
     @property
     def odriver_class(self):

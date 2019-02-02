@@ -9,16 +9,47 @@
 #include "rapidjson/writer.h"
 
 
+/*!
+  @brief Class for OBJ type definition.
+
+  The ObjMetaschemaType provides basic functionality for encoding/decoding
+  Obj structures from/to JSON style strings.
+ */
 class ObjMetaschemaType : public MetaschemaType {
 public:
+  /*!
+    @brief Constructor for ObjMetaschemaType.
+   */
   ObjMetaschemaType() : MetaschemaType("obj") {}
+  /*!
+    @brief Constructor for ObjMetaschemaType from a JSON type defintion.
+    @param[in] type_doc rapidjson::Value rapidjson object containing the type
+    definition from a JSON encoded header.
+   */
   ObjMetaschemaType(const rapidjson::Value &type_doc) : MetaschemaType(type_doc) {}
+  /*!
+    @brief Create a copy of the type.
+    @returns pointer to new ObjMetaschemaType instance with the same data.
+   */
   ObjMetaschemaType* copy() { return (new ObjMetaschemaType()); }
+  /*!
+    @brief Get the number of arguments expected to be filled/used by the type.
+    @returns size_t Number of arguments.
+   */
   virtual size_t nargs_exp() {
     return 1;
   }
 
   // Encoding
+  /*!
+    @brief Encode arguments describine an instance of this type into a JSON string.
+    @param[in] writer rapidjson::Writer<rapidjson::StringBuffer> rapidjson writer.
+    @param[in,out] nargs size_t * Pointer to the number of arguments contained in
+    ap. On return it will be set to the number of arguments used.
+    @param[in] ap va_list_t Variable number of arguments that should be encoded
+    as a JSON string.
+    @returns bool true if the encoding was successful, false otherwise.
+   */
   bool encode_data(rapidjson::Writer<rapidjson::StringBuffer> *writer,
 		   size_t *nargs, va_list_t &ap) {
     // Get argument
@@ -140,9 +171,21 @@ public:
   }
 
   // Decoded
+  /*!
+    @brief Decode variables from a JSON string.
+    @param[in] data rapidjson::Value Reference to entry in JSON string.
+    @param[in] allow_realloc int If 1, the passed variables will be reallocated
+    to contain the deserialized data.
+    @param[in,out] nargs size_t Number of arguments contained in ap. On return,
+    the number of arguments assigned from the deserialized data will be assigned
+    to this address.
+    @param[out] ap va_list_t Reference to variable argument list containing
+    address where deserialized data should be assigned.
+    @returns bool true if the data was successfully decoded, false otherwise.
+   */
   bool decode_data(rapidjson::Value &data, const int allow_realloc,
 		   size_t *nargs, va_list_t &ap) {
-    if (not data.IsString())
+    if (!(data.IsString()))
       ygglog_throw_error("ObjMetaschemaType::decode_data: Data is not a string.");
     // Get input data
     const char *buf = data.GetString();
@@ -186,7 +229,7 @@ public:
     if (nvert != 0) {
       do_colors = 1;
     } else {
-      strcpy(re_vert, "v ([^ \n]+) ([^ \n]+) ([^ \n]+)");
+      strncpy(re_vert, "v ([^ \n]+) ([^ \n]+) ([^ \n]+)", 100);
       n_re_vert = 4;
       nvert = count_matches(re_vert, buf);
     }

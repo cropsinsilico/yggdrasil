@@ -21,6 +21,6 @@ class InputDriver(ConnectionDriver):
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('icomm_kws', {})
         kwargs['icomm_kws']['name'] = args
-        if self._icomm_type == 'RMQComm':
+        if kwargs['icomm_kws'].get('comm', self._icomm_type) == 'RMQComm':
             kwargs['icomm_kws']['queue'] = args
         super(InputDriver, self).__init__(name, **kwargs)

@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from yggdrasil.serialize import pandas2list, numpy2list, dict2list
 from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
@@ -37,12 +36,12 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
-        out = super(JSONArrayMetaschemaType, cls).validate(obj,
-                                                           raise_errors=raise_errors)
+        out = super(JSONArrayMetaschemaType, cls).validate(
+            obj, raise_errors=raise_errors)
         if out and isinstance(obj, np.ndarray):
             out = (len(obj.dtype) > 0)
             if (not out) and raise_errors:
-                raise ValueError("Array dosn't have a structured data types.")
+                raise ValueError("Array dosn't have a structured data type.")
         return out
 
     @classmethod
@@ -61,11 +60,13 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         return obj
 
     @classmethod
-    def coerce_type(cls, obj, key_order=None, **kwargs):
+    def coerce_type(cls, obj, typedef=None, key_order=None, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
             obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
             key_order (list, optional): Order that keys from a dictionary should
                 be used to compose an array. Defaults to None.
             **kwargs: Additional keyword arguments are metadata entries that may
@@ -78,27 +79,20 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
             RuntimeError: If obj is a dictionary, but key_order is not provided.
 
         """
+        from yggdrasil.serialize import pandas2list, numpy2list, dict2list
         if isinstance(obj, pd.DataFrame):
             obj = pandas2list(obj)
         elif isinstance(obj, np.ndarray) and (len(obj.dtype) > 0):
             obj = numpy2list(obj)
-            # return [obj[n] for n in obj.dtype.names]
         elif isinstance(obj, dict):
-            if (key_order is None) and (len(obj) > 1):
-                raise RuntimeError("Key order must be provided to coerce dictionary.")
-            obj = dict2list(obj, order=key_order)
-        return obj
-
-    @classmethod
-    def encode(cls, obj, typedef=None, **kwargs):
-        r"""Encode an object first checking if it should be encapsulated."""
-        if isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
+            if (key_order is not None) or (len(obj) == 1):
+                obj = dict2list(obj, order=key_order)
+        elif isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
             typedef_validated = kwargs.get('typedef_validated', False)
             if cls.check_decoded([obj], typedef,
                                  typedef_validated=typedef_validated):
                 obj = [obj]
-        return super(JSONArrayMetaschemaType, cls).encode(obj, typedef=typedef,
-                                                          **kwargs)
+        return obj
 
     @classmethod
     def _iterate(cls, container):

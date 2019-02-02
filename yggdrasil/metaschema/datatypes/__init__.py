@@ -433,10 +433,9 @@ def compare_schema(schema1, schema2, root1=None, root2=None):
             type_cls1 = get_type_class(schema1['type'])
             if type_cls1.is_fixed:
                 schema1 = type_cls1.typedef_fixed2base(schema1)
-            if isinstance(schema2['type'], list):
-                type_list = schema2['type']
-            else:
-                type_list = [schema2['type']]
+            type_list = schema2['type']
+            if not isinstance(schema2['type'], list):
+                type_list = [type_list]
             all_errors = []
             for itype in type_list:
                 itype_cls2 = get_type_class(itype)

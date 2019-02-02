@@ -1,4 +1,5 @@
 import unittest
+import copy
 from yggdrasil.tests import assert_raises
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.RMQComm import _rmq_server_running
@@ -10,10 +11,8 @@ class TestRMQAsyncComm(parent.TestRMQComm):
     r"""Test for RMQAsyncComm communication class."""
 
     comm = 'RMQAsyncComm'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestRMQAsyncComm, self).__init__(*args, **kwargs)
-        self.attr_list += ['times_connected', 'rmq_thread', 'rmq_lock']
+    attr_list = (copy.deepcopy(parent.TestRMQComm.attr_list)
+                 + ['times_connected', 'rmq_thread', 'rmq_lock'])
 
     def test_reconnect(self):
         r"""Test reconnect after unexpected disconnect."""

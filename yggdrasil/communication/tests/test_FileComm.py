@@ -1,6 +1,6 @@
 import os
+import copy
 import unittest
-from yggdrasil.tests import assert_equal, assert_raises
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.tests import test_CommBase as parent
 
@@ -9,13 +9,11 @@ class TestFileComm(parent.TestCommBase):
     r"""Test for FileComm communication class."""
 
     comm = 'FileComm'
+    attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
+                 + ['fd', 'read_meth', 'append', 'in_temp',
+                    'open_as_binary', 'newline', 'is_series',
+                    'platform_newline'])
     
-    def __init__(self, *args, **kwargs):
-        super(TestFileComm, self).__init__(*args, **kwargs)
-        self.attr_list += ['fd', 'read_meth', 'append', 'in_temp',
-                           'open_as_binary', 'newline', 'is_series',
-                           'platform_newline']
-
     def teardown(self):
         r"""Remove the file."""
         super(TestFileComm, self).teardown()
@@ -31,18 +29,18 @@ class TestFileComm(parent.TestCommBase):
     @unittest.skipIf(True, 'File comm')
     def test_send_recv_nolimit(self):
         r"""Disabled: Test send/recv of a large message."""
-        pass
+        pass  # pragma: no cover
 
     @unittest.skipIf(True, 'File comm')
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
-        pass
+        pass  # pragma: no cover
 
     def test_invalid_read_meth(self):
         r"""Test raise of error on invalid read_meth."""
         kwargs = self.send_inst_kwargs
         kwargs['read_meth'] = 'invalid'
-        assert_raises(ValueError, new_comm, self.name, **kwargs)
+        self.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
     def test_append(self):
         r"""Test open of file comm with append."""
@@ -67,15 +65,15 @@ class TestFileComm(parent.TestCommBase):
             if flag:
                 msg_list.append(msg_recv)
             else:
-                assert_equal(msg_recv, self.recv_instance.eof_msg)
-        assert_equal(len(msg_list), len(recv_objects))
+                self.assert_equal(msg_recv, self.recv_instance.eof_msg)
+        self.assert_equal(len(msg_list), len(recv_objects))
         for x, y in zip(msg_list, recv_objects):
             self.assert_msg_equal(x, y)
         # Check file contents
         if self.testing_options.get('exact_contents', True):
             with open(self.send_instance.address, 'rb') as fd:
                 contents = fd.read()
-            assert_equal(contents, self.testing_options['contents'])
+            self.assert_equal(contents, self.testing_options['contents'])
 
     def test_series(self):
         r"""Test sending/receiving to/from a series of files."""
@@ -96,20 +94,16 @@ class TestFileComm(parent.TestCommBase):
         
     def test_remaining_bytes(self):
         r"""Test remaining_bytes."""
-        assert_equal(self.send_instance.remaining_bytes, 0)
+        self.assert_equal(self.send_instance.remaining_bytes, 0)
         self.recv_instance.close()
         assert(self.recv_instance.is_closed)
-        assert_equal(self.recv_instance.remaining_bytes, 0)
+        self.assert_equal(self.recv_instance.remaining_bytes, 0)
 
     def test_recv_nomsg(self):
         r"""Test recieve when there is no waiting message."""
         flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
         assert(not flag)
-        assert_equal(msg_recv, self.recv_instance.eof_msg)
-
-    def test_is_installed(self):
-        r"""Test class is_installed method."""
-        assert(self.import_cls.is_installed(language='invalid'))
+        self.assert_equal(msg_recv, self.recv_instance.eof_msg)
 
 
 class TestFileComm_readline(TestFileComm):
@@ -133,9 +127,4 @@ class TestFileComm_readline(TestFileComm):
 class TestFileComm_ascii(TestFileComm):
     r"""Test for FileComm communication class with open_as_binary = False."""
 
-    @property
-    def send_inst_kwargs(self):
-        r"""dict: Keyword arguments for send instance."""
-        out = super(TestFileComm_ascii, self).send_inst_kwargs
-        out['open_as_binary'] = False
-        return out
+    testing_option_kws = {'open_as_binary': False}

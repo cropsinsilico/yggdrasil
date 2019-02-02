@@ -17,7 +17,7 @@ class TestPandasFileComm_nonames(TestPandasFileComm):
 class TestPandasFileComm_single(TestPandasFileComm):
     r"""Test for PandasFileComm communication class with field names sent."""
 
-    def get_testing_options(self):
+    def get_options(self):
         r"""Get testing options."""
         nele = 5
         dtype = np.dtype(dict(formats=['float'], names=['f0']))
@@ -30,3 +30,8 @@ class TestPandasFileComm_single(TestPandasFileComm):
         out['msg'] = out['send'][0]
         out['msg_array'] = arr
         return out
+
+    def test_send_dict_default(self):
+        r"""Test automated conversion of dictionary to pandas data frame."""
+        self.do_send_recv(msg_send=self.testing_options['dict'],
+                          msg_recv=self.testing_options['msg'])

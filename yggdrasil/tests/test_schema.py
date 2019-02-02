@@ -12,7 +12,6 @@ _normalize_objects = [
                   'outputs': [{'name': 'outputA',
                                'column_names': ['a', 'b'],
                                'column_units': ['cm', 'g']}],
-                  # 'column': '\t'}],
                   'working_dir': os.getcwd()}],
       'connections': [{'inputs': 'outputA',
                        'outputs': 'fileA.txt',
@@ -21,29 +20,17 @@ _normalize_objects = [
                   'language': 'c',
                   'args': ['model.c'],
                   'inputs': [], 'outputs': [{'name': 'outputA',
-                                             'as_array': False,
                                              'commtype': 'default',
                                              'datatype': {'type': 'bytes'}}],
-                  'working_dir': os.getcwd(),
-                  'client_of': [],
-                  'is_server': False,
-                  'strace_flags': [], 'valgrind_flags': ['--leak-check=full'],
-                  'with_strace': False, 'with_valgrind': False}],
+                  'working_dir': os.getcwd()}],
       'connections': [{'inputs': [{'name': 'outputA',
-                                   'as_array': False,
                                    'datatype': {'type': 'bytes'},
                                    'commtype': 'default'}],
                        'outputs': [{'name': 'fileA.txt',
                                     'filetype': 'binary',
-                                    'comment': '# ',
                                     'working_dir': os.getcwd(),
                                     'field_names': ['a', 'b'],
-                                    'field_units': ['cm', 'g'],
-                                    'append': False,
-                                    'as_array': False,
-                                    'in_temp': False,
-                                    'is_series': False,
-                                    'newline': '\n'}]}]})]
+                                    'field_units': ['cm', 'g']}]}]})]
                                     
 
 def test_SchemaRegistry():
@@ -125,3 +112,8 @@ def test_normalize():
             pprint.pprint(a)
             pprint.pprint(y)
             raise
+
+
+def test_cdriver2commtype_error():
+    r"""Test error when invalid driver supplied."""
+    assert_raises(ValueError, schema.cdriver2commtype, 'invalid')

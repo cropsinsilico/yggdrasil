@@ -1,4 +1,4 @@
-from yggdrasil import backwards, platform
+from yggdrasil import backwards
 from yggdrasil.serialize import register_serializer, _default_newline
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import PlyDict
@@ -65,18 +65,7 @@ class PlySerialize(DefaultSerialize):
         r"""Method to return a dictionary of testing options for this class.
 
         Returns:
-            dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                empty (object): Object produced from deserializing an empty
-                    message.
-                objects (list): List of objects to be serialized/deserialized.
-                extra_kwargs (dict): Extra keyword arguments not used to
-                    construct type definition.
-                typedef (dict): Type definition resulting from the supplied
-                    kwargs.
-                dtype (np.dtype): Numpy data types that is consistent with the
-                    determined type definition.
+            dict: Dictionary of variables to use for testing.
 
         """
         out = super(PlySerialize, cls).get_testing_options()
@@ -104,5 +93,5 @@ class PlySerialize(DefaultSerialize):
                              + b'0.0000 1.0000 1.0000\n'
                              + b'3 0 1 2\n'
                              + b'3 3 4 5\n'))
-        out['contents'] = out['contents'].replace(b'\n', platform._newline)
+        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

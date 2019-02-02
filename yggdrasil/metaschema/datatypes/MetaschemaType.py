@@ -89,7 +89,7 @@ class MetaschemaType(object):
             string: Encoded object.
 
         """
-        raise NotImplementedError("Method must be overridden by the subclass.")
+        return cls.encode_data(obj, typedef)
 
     @classmethod
     def decode_data(cls, obj, typedef):
@@ -122,11 +122,13 @@ class MetaschemaType(object):
         return obj
 
     @classmethod
-    def coerce_type(cls, obj, **kwargs):
+    def coerce_type(cls, obj, typedef=None, **kwargs):
         r"""Coerce objects of specific types to match the data type.
 
         Args:
             obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
             **kwargs: Additional keyword arguments are metadata entries that may
                 aid in coercing the type.
 
@@ -204,7 +206,7 @@ class MetaschemaType(object):
             dict: Encoded type definition.
 
         """
-        obj = cls.coerce_type(obj)
+        obj = cls.coerce_type(obj, typedef=typedef)
         if typedef is None:
             typedef = {}
         if not cls.validate(obj):
@@ -254,7 +256,6 @@ class MetaschemaType(object):
         out = copy.deepcopy(metadata)
         if reqkeys is None:
             reqkeys = cls.get_extract_properties(metadata)
-            # reqkeys = cls.definition_schema().get('required', [])
         keylist = [k for k in out.keys()]
         for k in keylist:
             if k not in reqkeys:
@@ -298,10 +299,7 @@ class MetaschemaType(object):
     @classmethod
     def metaschema(cls):
         r"""JSON meta schema for validating schemas for this type."""
-        out = get_metaschema()
-        if cls.name == 'base':  # This is patch to allow tests to run
-            out['definitions']['simpleTypes']['enum'].append('base')
-        return out
+        return get_metaschema()
 
     @classmethod
     def validator(cls):
@@ -499,8 +497,9 @@ class MetaschemaType(object):
             TypeError: If the encoded data is not of bytes type.
 
         """
-        # Coerce, then transform
-        obj = cls.coerce_type(obj, **kwargs)
+        # Coerce, then check object, then transform
+        obj = cls.coerce_type(obj, typedef=typedef,
+                              typedef_validated=typedef_validated, **kwargs)
         cls.check_decoded(obj, typedef, raise_errors=True,
                           typedef_validated=typedef_validated)
         obj_t = cls.transform_type(obj, typedef)
@@ -564,13 +563,16 @@ class MetaschemaType(object):
         out = cls.transform_type(out, typedef)
         return out
 
-    def serialize(self, obj, no_metadata=False, **kwargs):
+    def serialize(self, obj, no_metadata=False, dont_encode=False, **kwargs):
         r"""Serialize a message.
 
         Args:
             obj (object): Python object to be formatted.
             no_metadata (bool, optional): If True, no metadata will be added to
                 the serialized message. Defaults to False.
+            dont_encode (bool, optional): If True, the input message will not
+                be encoded using type specific or JSON encoding. Defaults to
+                False.
             **kwargs: Additional keyword arguments are added to the metadata.
 
         Returns:
@@ -578,7 +580,8 @@ class MetaschemaType(object):
 
         """
         if ((isinstance(obj, backwards.bytes_type)
-             and ((obj == tools.YGG_MSG_EOF) or kwargs.get('raw', False)))):
+             and ((obj == tools.YGG_MSG_EOF) or kwargs.get('raw', False)
+                  or dont_encode))):
             metadata = kwargs
             data = obj
             is_raw = True
@@ -599,7 +602,7 @@ class MetaschemaType(object):
         msg = YGG_MSG_HEAD + metadata + YGG_MSG_HEAD + data
         return msg
     
-    def deserialize(self, msg, no_data=False, metadata=None, no_json=False):
+    def deserialize(self, msg, no_data=False, metadata=None, dont_decode=False):
         r"""Deserialize a message.
 
         Args:
@@ -609,8 +612,9 @@ class MetaschemaType(object):
             metadata (dict, optional): Metadata that should be used to deserialize
                 the message instead of the current header content. Defaults to
                 None and is not used.
-            no_json (bool, optional): If True, the raw data is returned without
-                deserializing with json.
+            dont_decode (bool, optional): If True, type specific and JSON
+                decoding will not be used to decode the message. Defaults to
+                False.
 
         Returns:
             tuple(obj, dict): Deserialized message and header information.
@@ -636,7 +640,8 @@ class MetaschemaType(object):
             if metadata is None:
                 metadata = dict(size=len(msg))
                 if (((len(msg) > 0) and (msg != tools.YGG_MSG_EOF)
-                     and (self._typedef != {'type': 'bytes'}))):
+                     and (self._typedef != {'type': 'bytes'})
+                     and (not dont_decode))):
                     raise ValueError("Header marker not in message.")
         # Set flags based on data
         metadata['incomplete'] = (len(data) < metadata['size'])
@@ -647,8 +652,8 @@ class MetaschemaType(object):
             return metadata
         elif len(data) == 0:
             return self._empty_msg, metadata
-        elif (metadata['incomplete'] or metadata.get('raw', False) or no_json
-              or (metadata.get('type', None) == 'direct')):
+        elif (metadata['incomplete'] or metadata.get('raw', False)
+              or (metadata.get('type', None) == 'direct') or dont_decode):
             return data, metadata
         else:
             data = json.loads(backwards.as_unicode(data))

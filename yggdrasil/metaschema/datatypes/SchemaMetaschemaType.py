@@ -75,8 +75,10 @@ def _validate_schema(validator, ref, instance, schema):
         validator, ref, instance, schema) or ()
     for e in errors:
         yield e
-    
+    if validator._normalizing and (ref == '#'):
+        instance = validator._normalizing
 
+        
 @register_type
 class SchemaMetaschemaType(JSONObjectMetaschemaType):
     r"""Schema type."""
@@ -137,6 +139,9 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
             return False
         try:
             x = copy.deepcopy(cls.metaschema())
+            x.setdefault('required', [])
+            if 'type' not in x['required']:
+                x['required'].append('type')
             x['additionalProperties'] = False
             jsonschema.validate(obj, x, cls=cls.validator())
         except jsonschema.exceptions.ValidationError:

@@ -1,6 +1,8 @@
 import os
 import json
 import copy
+import numpy as np
+import warnings
 from yggdrasil import backwards
 from yggdrasil.metaschema.datatypes import register_type_from_file, _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -258,6 +260,7 @@ class ObjDict(PlyDict):
         if iobj is not None:
             # Texcoords
             if d.result.texCoordList:
+                iobj.setdefault('texcoords', [])
                 for t in d.result.texCoordList:
                     # TODO: Should the coords be scaled?
                     iobj['texcoords'].append({'u': t.x, 'v': t.y})
@@ -268,6 +271,7 @@ class ObjDict(PlyDict):
                                 iobj['faces'][i][j]['texcoord_index'] = t[j]
             # Normals
             if d.result.normalList:
+                iobj.setdefault('normals', [])
                 for n in d.result.normalList:
                     iobj['normals'].append({'i': n.x, 'j': n.y, 'k': n.z})
                 if d.result.normalIndexList:
@@ -293,23 +297,32 @@ class ObjDict(PlyDict):
         import openalea.plantgl.all as pgl
         smb_class, args, kwargs = super(ObjDict, self).to_geom_args(
             conversion=conversion, name=name, _as_obj=True)
-        index_class = pgl.Index3
-        array_class = pgl.Index3Array
+        index_class = pgl.Index
+        array_class = pgl.IndexArray
         # Texture coords
         if self.get('texcoords', []):
             obj_texcoords = []
             for t in self['texcoords']:
                 obj_texcoords.append(pgl.Vector2(np.float64(t['u']),
-                                                 np.float64(t['v'])))
+                                                 np.float64(t.get('v', 0.0))))
             kwargs['texCoordList'] = pgl.Point2Array(obj_texcoords)
             obj_ftexcoords = []
             for i, f in enumerate(self['faces']):
                 entry = []
                 for _f in f:
                     if 'texcoord_index' not in _f:
-                        raise ValueError("'texcoord_index' missing from face %d" % i)
-                    entry.append(_f['texcoord_index'])
+                        if i > 0:
+                            warnings.warn(("'texcoord_index' missing from face"
+                                           + "%d, texcoord indices will be "
+                                           + "ignored.") % i)
+                        obj_ftexcoords = []
+                        entry = []
+                        break
+                    entry.append(int(_f['texcoord_index']))
+                if not entry:
+                    break
                 obj_ftexcoords.append(index_class(*entry))
+            if obj_ftexcoords:
                 kwargs['texCoordIndexList'] = array_class(obj_ftexcoords)
         # Normals
         if self.get('normals', []):
@@ -324,9 +337,18 @@ class ObjDict(PlyDict):
                 entry = []
                 for _f in f:
                     if 'normal_index' not in _f:
-                        raise ValueError("'normal_index' missing from face %d" % i)
-                    entry.append(_f['normal_index'])
-                    obj_fnormals.append(index_class(*entry))
+                        if i > 0:
+                            warnings.warn(("'normal_index' missing from face"
+                                           + "%d, normal indices will be "
+                                           + "ignored.") % i)
+                        obj_fnormals = []
+                        entry = []
+                        break
+                    entry.append(int(_f['normal_index']))
+                if not entry:
+                    break
+                obj_fnormals.append(index_class(*entry))
+            if obj_fnormals:
                 kwargs['normalIndexList'] = array_class(obj_fnormals)
         return smb_class, args, kwargs
 

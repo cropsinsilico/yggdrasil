@@ -71,6 +71,8 @@ class TestYggRunner(YggTestBase):
                'args': 'fake_channel',
                'driver': 'InputDriver',
                'working_dir': os.getcwd(),
+               'icomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
+               'ocomm_kws': {'comm': [{'name': 'fake_IODriver'}]},
                'kwargs': {}}
         assert_raises(Exception, self.runner.createInputDriver, yml)
         yml['driver'] = 'OutputDriver'
