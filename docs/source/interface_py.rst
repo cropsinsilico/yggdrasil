@@ -1,7 +1,7 @@
 Python Interface
 ================
 
-.. automodule:: cis_interface.interface.CisInterface
+.. automodule:: yggdrasil.interface.YggInterface
     :members:
     :undoc-members:
     :show-inheritance:

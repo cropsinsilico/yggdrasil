@@ -2,7 +2,7 @@ C DataIO API
 ============
 
 .. autodoxygenfile:: AsciiFile.h
-   :project: cis_interface
+   :project: yggdrasil
 
 .. autodoxygenfile:: AsciiTable.h
-   :project: cis_interface
+   :project: yggdrasil
