@@ -25,16 +25,16 @@ additional information about the package and directions for installing
 it.
 
 .. note:: This will be the last release of the Crops in Silico 
-	  framework under the name `cis_interface`. Moving forward, 
-	  the package will be refered to as `yggdrasil`. The new 
-	  Github repository can be found 
-	  `here <https://github.com/cropsinsilico/yggdrasil>`__ 
-	  and the new documentation can be found 
-	  `here <https://cropsinsilico.github.io/yggdrasil/>`__. 
-	  Future versions of the `yggdrasil` can be installed from 
-	  PyPI via `pip install yggdrasil-framework`. We apologize for 
-	  any inconvenince this change causes, but feel the new name 
-	  better reflects the spirit of the project.
+   framework under the name `cis_interface`. Moving forward, 
+   the package will be refered to as `yggdrasil`. The new 
+   Github repository can be found 
+   `here <https://github.com/cropsinsilico/yggdrasil>`__ 
+   and the new documentation can be found 
+   `here <https://cropsinsilico.github.io/yggdrasil/>`__. 
+   Future versions of the `yggdrasil` can be installed from 
+   PyPI via `pip install yggdrasil-framework`. We apologize for 
+   any inconvenince this change causes, but feel the new name 
+   better reflects the spirit of the project.
 
 .. |PyPI version| image:: https://badge.fury.io/py/cis_interface.svg
    :target: https://badge.fury.io/py/cis_interface
