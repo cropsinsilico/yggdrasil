@@ -106,7 +106,7 @@ if '--user' in sys.argv:
                   "'%s' to your PATH." % script_dir)
     
 setup(
-    name="yggdrasil",
+    name="yggdrasil-framework",
     packages=find_packages(),
     include_package_data=True,
     version=ygg_ver,

@@ -9,7 +9,6 @@ TODO
 * Fix import order/build_api placement such that there is not a circular import if the api has not been build and the schema/metaschema needs to be generated
 * Update pip to reflect name change
 * Update conda to reflect name change
-* Update docs to reflect name change
 * Change client/server use of direction/serializer info to be more transparent
 * Update docs with information about installing rapidjson
 * Update docs with information about installing from pip/conda
@@ -25,14 +24,10 @@ TODO
 * Add example of each supported language (missing LPy, cmake, make)
 * Replace nose with unittest/pytest
 * Create template model drivers for compiled/interpretted langauges
-* Update travis/appveyor to clone recursively to get rapidjson as git submodule
 * Change verbose flag in GCCModelDriver to use logging levels
 * Add map class for handling arbitrary objects in C/C++ and then update formatted_io 7, 8, and 9
 * change gs_lesson/formatted_io series to have more descriptive names
 * Docs on how nested data objects are represented in C/C++.
-* Add docstrings to metaschema classes
 * Preprocessor macro for dynamically determine message type?
 * Try to setup comm/connection at class level
-* Redirect old docs to new ones (See https://shoehornwithteeth.com/ramblings/2016/12/redirecting-github-pages-after-renaming-a-repository/)
 * Init new PyPI entry and update SHA in .travis.yml
-* Update README for cis_interface on PyPI to reference yggdrasil and point to correct badges

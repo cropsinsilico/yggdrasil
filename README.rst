@@ -24,11 +24,11 @@ Please refer to the package
 additional information about the package and directions for installing
 it.
 
-.. |PyPI version| image:: https://badge.fury.io/py/yggdrasil.svg
-   :target: https://badge.fury.io/py/yggdrasil
-.. |Build Status| image:: https://travis-ci.org/cropsinsilico/yggdrasil.svg?branch=master
+.. |PyPI version| image:: https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat
+   :target: https://pypi.org/project/yggdrasil-framework
+.. |Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil.svg?style=flat
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
-.. |Build status| image:: https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/master?svg=true
+.. |Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat
    :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/master
 .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
    :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
