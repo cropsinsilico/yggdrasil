@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.properties.ScalarMetaschemaProperties &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+          <li><a href="../properties.html">cis_interface.metaschema.properties</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.properties.ScalarMetaschemaProperties</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.properties.ScalarMetaschemaProperties</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">units</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">MetaschemaTypeError</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.properties</span> <span class="k">import</span> <span class="n">register_metaschema_property</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.properties.MetaschemaProperty</span> <span class="k">import</span> <span class="n">MetaschemaProperty</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+
+<span class="n">_valid_numpy_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;uint&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;complex&#39;</span><span class="p">]</span>
+<span class="n">_valid_types</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_valid_numpy_types</span><span class="p">])</span>
+<span class="n">_flexible_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]</span>
+<span class="n">_python_scalars</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">float</span><span class="p">]),</span>
+                               <span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">int</span><span class="p">]),</span> <span class="p">(</span><span class="s1">&#39;uint&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+                               <span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">complex</span><span class="p">])])</span>
+<span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+    <span class="kn">from</span> <span class="nn">__builtin__</span> <span class="k">import</span> <span class="n">unicode</span>
+    <span class="n">_valid_numpy_types</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">]</span>
+    <span class="n">_valid_types</span><span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;string&#39;</span>
+    <span class="n">_valid_types</span><span class="p">[</span><span class="s1">&#39;unicode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;unicode&#39;</span>
+    <span class="n">_python_scalars</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">]),</span> <span class="p">(</span><span class="s1">&#39;unicode&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">unicode</span><span class="p">])])</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+    <span class="n">_valid_numpy_types</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">]</span>
+    <span class="n">_valid_types</span><span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bytes&#39;</span>
+    <span class="n">_valid_types</span><span class="p">[</span><span class="s1">&#39;unicode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;str&#39;</span>
+    <span class="n">_python_scalars</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="s1">&#39;bytes&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">bytes</span><span class="p">]),</span> <span class="p">(</span><span class="s1">&#39;unicode&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">])])</span>
+<span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">t_np</span> <span class="ow">in</span> <span class="n">_valid_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">prec_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;float&#39;</span><span class="p">]:</span>
+        <span class="n">prec_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+            <span class="n">prec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>  <span class="c1"># Not available on windows</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;uint&#39;</span><span class="p">]:</span>
+        <span class="n">prec_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;complex&#39;</span><span class="p">]:</span>
+        <span class="n">prec_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
+            <span class="n">prec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>  <span class="c1"># Not available on windows</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">t_np</span><span class="p">):</span>
+        <span class="n">_python_scalars</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">np</span><span class="p">,</span> <span class="n">t_np</span><span class="p">))</span>
+    <span class="n">_python_scalars</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">t_np</span><span class="p">)</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prec_list</span><span class="p">:</span>
+        <span class="n">_python_scalars</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">t_np</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">))</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+<span class="c1"># For some reason windows fails to check types on ints in some cases</span>
+<span class="n">_python_scalars</span><span class="p">[</span><span class="s1">&#39;int&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">signedinteger</span><span class="p">)</span>
+<span class="n">_python_scalars</span><span class="p">[</span><span class="s1">&#39;uint&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unsignedinteger</span><span class="p">)</span>
+<span class="n">_all_python_scalars</span> <span class="o">=</span> <span class="p">[</span><span class="n">units</span><span class="o">.</span><span class="n">_unit_quantity</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_python_scalars</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="n">_python_scalars</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">_unit_quantity</span><span class="p">)</span>
+    <span class="n">_all_python_scalars</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_python_scalars</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">_python_scalars</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_python_scalars</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+<span class="n">_all_python_arrays</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">_unit_array</span><span class="p">]))</span>
+<span class="n">_all_python_scalars</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_all_python_scalars</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="data2dtype"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.data2dtype">[docs]</a><span class="k">def</span> <span class="nf">data2dtype</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for an object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (object): Python object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.dtype: Numpy data type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_nounits</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">data_nounits</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">MetaschemaTypeError</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">_valid_types</span><span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">type</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_nounits</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">data_nounits</span><span class="p">])</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">return</span> <span class="n">dtype</span></div>
+
+
+<div class="viewcode-block" id="definition2dtype"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.definition2dtype">[docs]</a><span class="k">def</span> <span class="nf">definition2dtype</span><span class="p">(</span><span class="n">props</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get numpy data type for a type definition.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        props (dict): Type definition properties.</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        np.dtype: Numpy data type.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">typename</span> <span class="o">=</span> <span class="n">props</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">typename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">typename</span> <span class="o">=</span> <span class="n">props</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Could not find type in dictionary&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;precision&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">props</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">typename</span> <span class="ow">in</span> <span class="n">_flexible_types</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">_valid_types</span><span class="p">[</span><span class="n">typename</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Precision required for type: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">typename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">typename</span> <span class="o">==</span> <span class="s1">&#39;unicode&#39;</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">_valid_types</span><span class="p">[</span><span class="n">typename</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">32</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="n">typename</span> <span class="ow">in</span> <span class="n">_flexible_types</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">_valid_types</span><span class="p">[</span><span class="n">typename</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">8</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_valid_types</span><span class="p">[</span><span class="n">typename</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">props</span><span class="p">[</span><span class="s1">&#39;precision&#39;</span><span class="p">])))</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="SubtypeMetaschemaProperty"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty">[docs]</a><span class="nd">@register_metaschema_property</span>
+<span class="k">class</span> <span class="nc">SubtypeMetaschemaProperty</span><span class="p">(</span><span class="n">MetaschemaProperty</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Property class for &#39;subtype&#39; property.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;subtype&#39;</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The base type for each item.&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_valid_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())]}</span>
+
+<div class="viewcode-block" id="SubtypeMetaschemaProperty.encode"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.encode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder for the &#39;subtype&#39; scalar property.&quot;&quot;&quot;</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">data2dtype</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_valid_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MetaschemaTypeError</span><span class="p">(</span><span class="s1">&#39;Cannot find subtype string for dtype </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                      <span class="o">%</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="SubtypeMetaschemaProperty.normalize_in_schema"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.SubtypeMetaschemaProperty.normalize_in_schema">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize_in_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalization for the &#39;subtype&#39; scalar property in a schema.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">schema</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">is_null_unit</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)):</span>
+            <span class="n">schema</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">schema</span></div></div>
+    
+
+<div class="viewcode-block" id="PrecisionMetaschemaProperty"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty">[docs]</a><span class="nd">@register_metaschema_property</span>
+<span class="k">class</span> <span class="nc">PrecisionMetaschemaProperty</span><span class="p">(</span><span class="n">MetaschemaProperty</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Property class for &#39;precision&#39; property.&quot;&quot;&quot;</span>
+    
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;precision&#39;</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;The size (in bits) of each item.&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;minimum&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+<div class="viewcode-block" id="PrecisionMetaschemaProperty.encode"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.encode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder for the &#39;precision&#39; scalar property.&quot;&quot;&quot;</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">data2dtype</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">dtype</span><span class="o">.</span><span class="n">itemsize</span> <span class="o">*</span> <span class="mi">8</span>  <span class="c1"># in bits</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="PrecisionMetaschemaProperty.compare"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.compare">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">,</span> <span class="n">root1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Comparison for the &#39;precision&#39; scalar property.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">prop1</span> <span class="o">&gt;</span> <span class="n">prop2</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is greater than </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PrecisionMetaschemaProperty.normalize_in_schema"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.PrecisionMetaschemaProperty.normalize_in_schema">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize_in_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalization for the &#39;precision&#39; scalar property in a schema.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">schema</span>
+        <span class="n">subtype</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;subtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;uint&#39;</span><span class="p">]:</span>
+            <span class="n">schema</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">subtype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;complex&#39;</span><span class="p">]:</span>
+            <span class="n">schema</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">128</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">schema</span></div></div>
+            
+
+<div class="viewcode-block" id="UnitsMetaschemaProperty"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty">[docs]</a><span class="nd">@register_metaschema_property</span>
+<span class="k">class</span> <span class="nc">UnitsMetaschemaProperty</span><span class="p">(</span><span class="n">MetaschemaProperty</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Property class for &#39;units&#39; property.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;units&#39;</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Physical units.&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="UnitsMetaschemaProperty.encode"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.encode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder for the &#39;units&#39; scalar property.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">out</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">typedef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">typedef</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="UnitsMetaschemaProperty.compare"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.ScalarMetaschemaProperties.UnitsMetaschemaProperty.compare">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">,</span> <span class="n">root1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Comparision for the &#39;units&#39; scalar property.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="s2">&quot;Unit &#39;</span><span class="si">%s</span><span class="s2">&#39; is not compatible with unit &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

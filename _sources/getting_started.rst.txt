@@ -145,7 +145,7 @@ args      A string matching the args field of an opposing ``input`` /
 A list of possible Input/Output drivers can be found :ref:`here <io_drivers_rst>`.
 
 ..
-   This example uses the standard input/output drivers (IPC for Linux and OSX,
+   This example uses the standard input/output drivers (IPC for Linux and MacOS,
    ZeroMQ for Windows) which only work for communication between models that
    are on the same system. However, these can be replaced with RMQ input and output
    drivers (RMQInputDriver/RMQOutputDriver), which allow for message passing

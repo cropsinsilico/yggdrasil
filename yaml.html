@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Files &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
+  <title>YAML Files &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
   
 
   
@@ -24,29 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="index.html"/>
-        <link rel="next" title="Configuration Files" href="config.html"/>
-        <link rel="prev" title="Server/Client I/O" href="server_client_io.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration Files" href="config.html" />
+    <link rel="prev" title="Server/Client I/O" href="server_client_io.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -133,7 +124,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -141,9 +132,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -199,21 +191,21 @@ are needed to create a YAML file for use with the cis_interface framework.</p>
 of a sequence collection. Members of a sequence can be text, collections,
 or a mix of both.</li>
 <li>Mappings: Mapping entries use a colon and a space (: ) to seperate a
-<code class="docutils literal"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</li>
+<code class="docutils literal notranslate"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</li>
 </ul>
 <div class="section" id="model-options">
 <h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this headline">¶</a></h2>
-<p>At the root level of a cis_interface YAML, should be a mapping key <code class="docutils literal"><span class="pre">model:</span></code>
-or <code class="docutils literal"><span class="pre">models:</span></code>. This denotes information pertaining to the model(s) that should
+<p>At the root level of a cis_interface YAML, should be a mapping key <code class="docutils literal notranslate"><span class="pre">model:</span></code>
+or <code class="docutils literal notranslate"><span class="pre">models:</span></code>. This denotes information pertaining to the model(s) that should
 be run. The value for this key can be a single model entry:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
   <span class="n">name</span><span class="p">:</span> <span class="n">modelA</span>
   <span class="n">language</span><span class="p">:</span> <span class="n">python</span>
   <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelA</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>or a sequence of model entries:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
   <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">modelA</span>
     <span class="n">language</span><span class="p">:</span> <span class="n">python</span>
     <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelA</span><span class="o">.</span><span class="n">py</span>
@@ -300,7 +292,7 @@ to another model, this may be ommitted.</td>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>is_server</td>
-<td>If <code class="docutils literal"><span class="pre">True</span></code>, this model will be considered to function as a
+<td>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, this model will be considered to function as a
 server for one or more models. The corresponding channel that
 should be passed to the cis_interface API will be the name of
 the model.</td>
@@ -311,7 +303,7 @@ server. If there are more than one, this should be specified as
 a sequence collection. The corresponding channel(s) that should
 be passed to the cis_interface API will be the name of the
 server model joined with the name of the client model with an
-underscore <code class="docutils literal"><span class="pre">&lt;server_model&gt;_&lt;client_model&gt;</span></code>. There will be one
+underscore <code class="docutils literal notranslate"><span class="pre">&lt;server_model&gt;_&lt;client_model&gt;</span></code>. There will be one
 channel created for each server the model is a client of.</td>
 </tr>
 </tbody>
@@ -327,11 +319,11 @@ explicitly specifying the drivers.</p>
 <p>To specify communication via connections, each input/output entry for the models
 need only contain a unique name for the communication channel. This can be
 specified as text:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span> <span class="n">channel_name</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span> <span class="n">channel_name</span>
 </pre></div>
 </div>
 <p>or a key, value mapping:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span>
   <span class="n">name</span><span class="p">:</span> <span class="n">channel_name</span>
 </pre></div>
 </div>
@@ -339,13 +331,13 @@ specified as text:</p>
 communication channel needs to be provided (e.g. message format, field names,
 units).</p>
 <p>When using the connection format for specifying communication patterns, the
-YAML also needs to contains a <code class="docutils literal"><span class="pre">connections</span></code> key at the same level as the
-<code class="docutils literal"><span class="pre">models</span></code> key.</p>
+YAML also needs to contains a <code class="docutils literal notranslate"><span class="pre">connections</span></code> key at the same level as the
+<code class="docutils literal notranslate"><span class="pre">models</span></code> key.</p>
 </div>
 </div>
 <div class="section" id="connection-options">
 <h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
-<p>The coordesponding value for the <code class="docutils literal"><span class="pre">connections</span></code> key should be one or more
+<p>The coordesponding value for the <code class="docutils literal notranslate"><span class="pre">connections</span></code> key should be one or more
 mapping collections with the following keys:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -361,16 +353,16 @@ mapping collections with the following keys:</p>
 <tr class="row-even"><td>input/input_file</td>
 <td>The channel/file that messages should be recieved from. To
 specify a model channel, this should be the name of an
-entry in a model&#8217;s <code class="docutils literal"><span class="pre">outputs</span></code> section. If this is a file,
+entry in a model’s <code class="docutils literal notranslate"><span class="pre">outputs</span></code> section. If this is a file,
 it should be the absolute path to the file or the relative
 path to the file from the directory containing the YAML.</td>
 </tr>
 <tr class="row-odd"><td>output/output_file</td>
-<td>The channel/file that messages recieved from the <code class="docutils literal"><span class="pre">input</span></code>
-channel/file should be sent to. If the <code class="docutils literal"><span class="pre">input</span></code> value is
-a file, the <code class="docutils literal"><span class="pre">output</span></code> value cannot be a file. To specify
+<td>The channel/file that messages recieved from the <code class="docutils literal notranslate"><span class="pre">input</span></code>
+channel/file should be sent to. If the <code class="docutils literal notranslate"><span class="pre">input</span></code> value is
+a file, the <code class="docutils literal notranslate"><span class="pre">output</span></code> value cannot be a file. To specify
 a model channel, this should be the name of an entry in a
-model&#8217;s <code class="docutils literal"><span class="pre">inputs</span></code> section.</td>
+model’s <code class="docutils literal notranslate"><span class="pre">inputs</span></code> section.</td>
 </tr>
 </tbody>
 </table>
@@ -391,7 +383,7 @@ model&#8217;s <code class="docutils literal"><span class="pre">inputs</span></co
 <td colspan="2">One or more functions that should be used to tranlate messages
 from the connection input before passing it alone to the
 connection output. Translators should be specified as strings
-with the format &#8220;&lt;package.module&gt;:&lt;function&gt;&#8221; such that
+with the format “&lt;package.module&gt;:&lt;function&gt;” such that
 &lt;function&gt; can be imported from &lt;package&gt;.</td>
 </tr>
 <tr class="row-odd"><td>format_str</td>
@@ -409,7 +401,7 @@ format string (see <a class="reference internal" href="units.html#units-rst"><sp
 </tr>
 <tr class="row-even"><td>as_array</td>
 <td colspan="2">True or False. If True and filetype is table, the table will
-be read in it&#8217;s entirety and passed as an array.</td>
+be read in it’s entirety and passed as an array.</td>
 </tr>
 <tr class="row-odd"><td rowspan="8">filetype</td>
 <td colspan="2">Only valid for connections that direct messages from a file to
@@ -478,7 +470,7 @@ A list of available input/output drivers can be found
 </tr>
 <tr class="row-even"><td>args</td>
 <td>For connections made to other models, this should be text that matches
-that of the other model&#8217;s corresponding driver. For connections made
+that of the other model’s corresponding driver. For connections made
 to files, this should be the path to the file, relative to the
 location of the YAML file.</td>
 </tr>
@@ -493,9 +485,7 @@ arguments can be found <a class="reference internal" href="io_drivers.html#io-dr
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -513,11 +503,11 @@ arguments can be found <a class="reference internal" href="io_drivers.html#io-dr
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -532,37 +522,24 @@ arguments can be found <a class="reference internal" href="io_drivers.html#io-dr
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.6.1+1.g81b8e90',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

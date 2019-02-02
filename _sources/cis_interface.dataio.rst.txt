@@ -1,5 +1,5 @@
-cis_interface.dataio package
-============================
+cis\_interface.dataio package
+=============================
 
 Subpackages
 -----------
@@ -11,16 +11,16 @@ Subpackages
 Submodules
 ----------
 
-cis_interface.dataio.AsciiFile module
--------------------------------------
+cis\_interface.dataio.AsciiFile module
+--------------------------------------
 
 .. automodule:: cis_interface.dataio.AsciiFile
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.dataio.AsciiTable module
---------------------------------------
+cis\_interface.dataio.AsciiTable module
+---------------------------------------
 
 .. automodule:: cis_interface.dataio.AsciiTable
     :members:

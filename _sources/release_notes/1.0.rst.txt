@@ -1,0 +1,15 @@
+
+1.0
+===
+
+* Changes to C and C++ interface calls that make string sizes explicit.
+* Stricter enforcement of direct type mapping (e.g. Python int is not compatible with int32 because default is int64 and precision could be lost).
+* Creation of schemas for validating YAMLs and metaschema for validating datatype schemas.
+* Addition of datatype option in YAML.
+* Support user defined data types via JSON schema.
+* Changes to the internal structure of Ply and Obj data structures.
+* Tables are no longer automatically consolidated into structure numpy arrays in Python/Matlab on recv. Instead, use 'recv_array' to do so.
+* Removed generic RPComm. Instead use the ServerComm or ClientComm
+* Removed deprecated functions beginning with "Psi"
+* Removed send_line/recv_line methods (these were aliases for regular send/recv)
+* Removed send_row/recv_row methods (these were aliases for regular send/recv)

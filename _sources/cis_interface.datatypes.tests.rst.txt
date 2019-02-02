@@ -1,19 +1,19 @@
-cis_interface.datatypes.tests package
-=====================================
+cis\_interface.datatypes.tests package
+======================================
 
 Submodules
 ----------
 
-cis_interface.datatypes.tests.test_CisArrayType module
-------------------------------------------------------
+cis\_interface.datatypes.tests.test\_CisArrayType module
+--------------------------------------------------------
 
 .. automodule:: cis_interface.datatypes.tests.test_CisArrayType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.datatypes.tests.test_CisBaseType module
------------------------------------------------------
+cis\_interface.datatypes.tests.test\_CisBaseType module
+-------------------------------------------------------
 
 .. automodule:: cis_interface.datatypes.tests.test_CisBaseType
     :members:

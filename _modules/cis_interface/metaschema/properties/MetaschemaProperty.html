@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.properties.MetaschemaProperty &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+          <li><a href="../properties.html">cis_interface.metaschema.properties</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.properties.MetaschemaProperty</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.properties.MetaschemaProperty</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">jsonschema</span>
+
+
+<div class="viewcode-block" id="MetaschemaProperty"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty">[docs]</a><span class="k">class</span> <span class="nc">MetaschemaProperty</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for adding properties to the metaschema.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        name (str): Name of the property.</span>
+<span class="sd">        schema (dict): JSON schema describing valid values for the property.</span>
+<span class="sd">        types (list): Types of instances that the property is valid for.</span>
+<span class="sd">        python_types (list): Python types of instances that the property is</span>
+<span class="sd">            valid for.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;base&#39;</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+    <span class="n">python_types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+    <span class="n">_encode</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_validate</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_compare</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_replaces_existing</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="MetaschemaProperty.encode"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty.encode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to encode the property given the object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            instance (object): Object to get property for.</span>
+<span class="sd">            typedef (object, None): Template value in type definition to use</span>
+<span class="sd">                for initializing encoding some cases. Defaults to None and</span>
+<span class="sd">                is ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Encoded property for instance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_encode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_encode</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Encode method not set.&quot;</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="MetaschemaProperty.validate"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty.validate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validator for JSON schema validation of an instance by this property.</span>
+<span class="sd">        If there is not a user provided validate function, the instance will be</span>
+<span class="sd">        encoded and then the encoded value will be checked against the provided</span>
+<span class="sd">        value using cls.compare.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            validator (jsonschmea.Validator): JSON schema validator.</span>
+<span class="sd">            value (object): Value of the property in the schema.</span>
+<span class="sd">            instance (object): Instance to validate.</span>
+<span class="sd">            schema (dict): Schema that instance should be validated against.</span>
+<span class="sd">            </span>
+<span class="sd">        Yields:</span>
+<span class="sd">            str: Error messages associated with failed validation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validate</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_validate</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">is_type</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">validator</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+                    <span class="n">is_type</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">is_type</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">e</span></div>
+
+<div class="viewcode-block" id="MetaschemaProperty.compare"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty.compare">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">,</span> <span class="n">root1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to determine compatiblity of one property value with another.</span>
+<span class="sd">        This method is not necessarily symmetric in that the second value may</span>
+<span class="sd">        not be compatible with the first even if the first is compatible with</span>
+<span class="sd">        the second.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prop1 (object): Property value to compare against prop2.</span>
+<span class="sd">            prop2 (object): Property value to compare against.</span>
+<span class="sd">            </span>
+<span class="sd">        Yields:</span>
+<span class="sd">            str: Comparision failure messages.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_compare</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_compare</span><span class="p">(</span><span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">prop1</span> <span class="o">!=</span> <span class="n">prop2</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not equal to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prop1</span><span class="p">,</span> <span class="n">prop2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaschemaProperty.normalize"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to normalize the instance based on the property value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            validator (Validator): Validator class.</span>
+<span class="sd">            value (object): Property value.</span>
+<span class="sd">            instance (object): Object to normalize.</span>
+<span class="sd">            schema (dict): Schema containing this property.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Normalized object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">validator</span><span class="o">.</span><span class="n">_normalized</span></div>
+
+<div class="viewcode-block" id="MetaschemaProperty.normalize_in_schema"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty.normalize_in_schema">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize_in_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to normalize the entry for this property in a schema.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            schema (dict): Schema to normalize.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Normalized schema.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">schema</span></div>
+
+<div class="viewcode-block" id="MetaschemaProperty.post_validate"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty.post_validate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">post_validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed after validation if normalizing.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="MetaschemaProperty.wrapped_validate"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.MetaschemaProperty.wrapped_validate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">wrapped_validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrapped validator that handles errors produced by the native</span>
+<span class="sd">        validate method and ensures that the property is parsed by the base</span>
+<span class="sd">        validator and raises the correct error if necessary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: All arguments are passed to the validate class method.</span>
+<span class="sd">            **kwargs: All keyword arguments are passed to the validate class</span>
+<span class="sd">                method.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">validator</span><span class="o">.</span><span class="n">_normalizing</span><span class="p">:</span>
+            <span class="n">validator</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">_normalized</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">failed</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">yield</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">failed</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">validator</span><span class="o">.</span><span class="n">_base_validator</span><span class="o">.</span><span class="n">VALIDATORS</span><span class="p">):</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">_base_validator</span><span class="o">.</span><span class="n">VALIDATORS</span><span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">](</span>
+                    <span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+                <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                    <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">yield</span> <span class="n">e</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">validator</span><span class="o">.</span><span class="n">_normalizing</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">failed</span><span class="p">):</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">post_validate</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="create_property"><a class="viewcode-back" href="../../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.MetaschemaProperty.create_property">[docs]</a><span class="k">def</span> <span class="nf">create_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">encode</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new property class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Name of the property.</span>
+<span class="sd">        schema (dict): JSON schema describing valid values for the property.</span>
+<span class="sd">        encode (function): Function to encode the property based on a provided</span>
+<span class="sd">            instance. The function must take an instance as input and return</span>
+<span class="sd">            the value of the property for that instance.</span>
+<span class="sd">        validate (function, optional): Function to determine if an instance</span>
+<span class="sd">            is valid under the contraint of this property. The function must</span>
+<span class="sd">            take as input a jsonschema validator, a property value, an</span>
+<span class="sd">            instance to evaluate, and the schema. The function must return</span>
+<span class="sd">            a boolean: True if the instance is valid, False otherwise. See</span>
+<span class="sd">            cls.validate for additional information and default behavior.</span>
+<span class="sd">        compare (function, optional): Function to determine if two property</span>
+<span class="sd">            values are compatible. The function must take as input two</span>
+<span class="sd">            property values and return a boolean: True if the first property</span>
+<span class="sd">            is compatible with the second, False otherwise. See cls.compare</span>
+<span class="sd">            for additional information and default behavior.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">attr_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="n">schema</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="s1">&#39;_encode&#39;</span><span class="p">,</span> <span class="s1">&#39;_validate&#39;</span><span class="p">,</span> <span class="s1">&#39;_compare&#39;</span><span class="p">],</span>
+                    <span class="p">[</span><span class="n">encode</span><span class="p">,</span> <span class="n">validate</span><span class="p">,</span> <span class="n">compare</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attr_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">MetaschemaProperty</span><span class="p">,</span> <span class="p">),</span> <span class="n">attr_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

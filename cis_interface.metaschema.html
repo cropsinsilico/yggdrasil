@@ -1,0 +1,513 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema package &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.metaschema.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-metaschema-package">
+<h1>cis_interface.metaschema package<a class="headerlink" href="#cis-interface-metaschema-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.metaschema.datatypes.html">cis_interface.metaschema.datatypes package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html">cis_interface.metaschema.datatypes.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType">cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType">cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType">cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType">cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType">cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_MetaschemaType">cis_interface.metaschema.datatypes.tests.test_MetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType">cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType">cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests.test_conversions">cis_interface.metaschema.datatypes.tests.test_conversions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.datatypes.tests.html#module-cis_interface.metaschema.datatypes.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.ArrayMetaschemaType">cis_interface.metaschema.datatypes.ArrayMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.ContainerMetaschemaType">cis_interface.metaschema.datatypes.ContainerMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.FixedMetaschemaType">cis_interface.metaschema.datatypes.FixedMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.FunctionMetaschemaType">cis_interface.metaschema.datatypes.FunctionMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.JSONArrayMetaschemaType">cis_interface.metaschema.datatypes.JSONArrayMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.JSONMetaschemaType">cis_interface.metaschema.datatypes.JSONMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.JSONObjectMetaschemaType">cis_interface.metaschema.datatypes.JSONObjectMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.MetaschemaType">cis_interface.metaschema.datatypes.MetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.ObjMetaschemaType">cis_interface.metaschema.datatypes.ObjMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.PlyMetaschemaType">cis_interface.metaschema.datatypes.PlyMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.ScalarMetaschemaType">cis_interface.metaschema.datatypes.ScalarMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.SchemaMetaschemaType">cis_interface.metaschema.datatypes.SchemaMetaschemaType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes.conversions">cis_interface.metaschema.datatypes.conversions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.datatypes.html#module-cis_interface.metaschema.datatypes">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.metaschema.properties.html">cis_interface.metaschema.properties package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html">cis_interface.metaschema.properties.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#module-cis_interface.metaschema.properties.tests.test_ArrayMetaschemaProperties">cis_interface.metaschema.properties.tests.test_ArrayMetaschemaProperties module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#module-cis_interface.metaschema.properties.tests.test_JSONArrayMetaschemaProperties">cis_interface.metaschema.properties.tests.test_JSONArrayMetaschemaProperties module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#module-cis_interface.metaschema.properties.tests.test_JSONObjectMetaschemaProperties">cis_interface.metaschema.properties.tests.test_JSONObjectMetaschemaProperties module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#module-cis_interface.metaschema.properties.tests.test_MetaschemaProperty">cis_interface.metaschema.properties.tests.test_MetaschemaProperty module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#module-cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties">cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#module-cis_interface.metaschema.properties.tests.test_TypeMetaschemaProperty">cis_interface.metaschema.properties.tests.test_TypeMetaschemaProperty module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.metaschema.properties.tests.html#module-cis_interface.metaschema.properties.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.ArrayMetaschemaProperties">cis_interface.metaschema.properties.ArrayMetaschemaProperties module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.DefaultProperty">cis_interface.metaschema.properties.DefaultProperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.JSONArrayMetaschemaProperties">cis_interface.metaschema.properties.JSONArrayMetaschemaProperties module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.JSONObjectMetaschemaProperties">cis_interface.metaschema.properties.JSONObjectMetaschemaProperties module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.MetaschemaProperty">cis_interface.metaschema.properties.MetaschemaProperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.ScalarMetaschemaProperties">cis_interface.metaschema.properties.ScalarMetaschemaProperties module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.TitleMetaschemaProperty">cis_interface.metaschema.properties.TitleMetaschemaProperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties.TypeMetaschemaProperty">cis_interface.metaschema.properties.TypeMetaschemaProperty module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.properties.html#module-cis_interface.metaschema.properties">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.metaschema.tests.html">cis_interface.metaschema.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.metaschema.tests.html#module-cis_interface.metaschema.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.metaschema.encoder">
+<span id="cis-interface-metaschema-encoder-module"></span><h2>cis_interface.metaschema.encoder module<a class="headerlink" href="#module-cis_interface.metaschema.encoder" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.encoder.JSONReadableEncoder">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.encoder.</code><code class="descname">JSONReadableEncoder</code><span class="sig-paren">(</span><em>*</em>, <em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/encoder.html#JSONReadableEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.encoder.JSONReadableEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<p>Encoder class for CiS messages.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.encoder.JSONReadableEncoder.default">
+<code class="descname">default</code><span class="sig-paren">(</span><em>o</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/encoder.html#JSONReadableEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.encoder.JSONReadableEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encoder that allows for expansion types.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.normalizer">
+<span id="cis-interface-metaschema-normalizer-module"></span><h2>cis_interface.metaschema.normalizer module<a class="headerlink" href="#module-cis_interface.metaschema.normalizer" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.normalizer.UndefinedProperty">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.normalizer.</code><code class="descname">UndefinedProperty</code><a class="reference internal" href="_modules/cis_interface/metaschema/normalizer.html#UndefinedProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.normalizer.UndefinedProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to be used as a flag for undefined properties.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.normalizer.UninitializedNormalized">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.normalizer.</code><code class="descname">UninitializedNormalized</code><a class="reference internal" href="_modules/cis_interface/metaschema/normalizer.html#UninitializedNormalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.normalizer.UninitializedNormalized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class to be used as a flag for uninitialized normalized value.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.normalizer.create">
+<code class="descclassname">cis_interface.metaschema.normalizer.</code><code class="descname">create</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/normalizer.html#create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.normalizer.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamically create a validation/normalization class that subclasses
+the jsonschema validation class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Keys are tuples representing paths that
+exist within the schema at which the normalization functions stored
+in lists as their value counterparts should be executed. Defaults to
+empty dictionary.</li>
+<li><strong>no_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will not be set during
+normalization. Defaults to False.</li>
+<li><strong>required_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will be set for
+required properties, even if no_defaults is True. Defaults to False.</li>
+<li><strong>*args</strong> – Additional arguments are passed to jsonschema.validators.create.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to
+jsonschema.validators.create.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.metaschema" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.metaschema.create_metaschema">
+<code class="descclassname">cis_interface.metaschema.</code><code class="descname">create_metaschema</code><span class="sig-paren">(</span><em>overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema.html#create_metaschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.create_metaschema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the meta schema for validating cis schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing meta schema will be
+overwritten. If False and the metaschema exists, an error will be
+raised. Defaults to False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Meta schema specifying rules for cis type schema. This includes</dt>
+<dd>all original JSON schema rules with the addition of types and
+property definitions.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If the file already exists and overwrite is False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.get_metaschema">
+<code class="descclassname">cis_interface.metaschema.</code><code class="descname">get_metaschema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema.html#get_metaschema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.get_metaschema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the meta schema for validating cis schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Meta schema specifying rules for cis type schema. This includes</dt>
+<dd>all original JSON schema rules with the addition of types and
+property definitions.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function should not be called at the module level as it can
+cause the metaschema (if it dosn’t exist) to be generated before
+all of the necessary modules have been loaded.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.get_validator">
+<code class="descclassname">cis_interface.metaschema.</code><code class="descname">get_validator</code><span class="sig-paren">(</span><em>overwrite=False</em>, <em>normalizers=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema.html#get_validator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.get_validator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the validator that includes cis expansion types.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing validator will be
+overwritten. Defaults to False.</li>
+<li><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional normalizers to add.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to normalizer.create.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">JSON schema validator.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">jsonschema.IValidator</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.import_all_classes">
+<code class="descclassname">cis_interface.metaschema.</code><code class="descname">import_all_classes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema.html#import_all_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.import_all_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import all metaschema classes (types and properties).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.normalize_instance">
+<code class="descclassname">cis_interface.metaschema.</code><code class="descname">normalize_instance</code><span class="sig-paren">(</span><em>obj</em>, <em>schema</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema.html#normalize_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.normalize_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize an object using the provided schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Object to be normalized using the provided schema.</li>
+<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to use to normalize the provided object.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to normalize.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Normalized instance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.validate_instance">
+<code class="descclassname">cis_interface.metaschema.</code><code class="descname">validate_instance</code><span class="sig-paren">(</span><em>obj</em>, <em>schema</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema.html#validate_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.validate_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate an instance against a schema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Object to be validated using the provided schema.</li>
+<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to use to validate the provided object.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to validate.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValidationError</span></code> – If the object is not valid.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.validate_schema">
+<code class="descclassname">cis_interface.metaschema.</code><code class="descname">validate_schema</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema.html#validate_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.validate_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate a schema against the metaschema.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to be validated.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValidationError</span></code> – If the schema is not valid.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

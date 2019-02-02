@@ -1,0 +1,10 @@
+cis\_interface.metaschema.tests package
+=======================================
+
+Module contents
+---------------
+
+.. automodule:: cis_interface.metaschema.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

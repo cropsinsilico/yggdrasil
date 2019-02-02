@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.scanf &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
+  <title>cis_interface.scanf &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -121,7 +111,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">cis_interface</a>
@@ -129,9 +119,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -242,7 +233,7 @@
 
 
 <span class="k">def</span> <span class="nf">no_cast</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Dummy function to cast a string to a string.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy function to cast a string to a string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -255,7 +246,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_str</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Cast a string value to a string, stripping whitespace.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a string, stripping whitespace.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -268,7 +259,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_hex</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Cast a string value to a hex integer.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a hex integer.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -281,7 +272,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_oct</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Cast a string value to an octal.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to an octal.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -294,7 +285,7 @@
 
 
 <span class="k">def</span> <span class="nf">cformat2regex</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">specifier</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get regex substring that will match the given cformat components.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get regex substring that will match the given cformat components.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        flags (str): Format flags.</span>
@@ -307,7 +298,7 @@
 <span class="sd">        str: Regex expression that will match the provided components.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">pat_dec</span> <span class="o">=</span> <span class="s1">&#39;[-+]?\d+(?:\.\d+)?&#39;</span>
+    <span class="n">pat_dec</span> <span class="o">=</span> <span class="s1">&#39;[-+]?</span><span class="se">\\</span><span class="s1">d+(?:</span><span class="se">\\</span><span class="s1">.</span><span class="se">\\</span><span class="s1">d+)?&#39;</span>
     <span class="n">pat_sub</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">pad_zero</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># Left padding specified in flags</span>
@@ -318,7 +309,7 @@
             <span class="n">pad_zero</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">)</span> <span class="ow">and</span> <span class="n">width</span> <span class="ow">and</span> <span class="p">(</span><span class="n">specifier</span> <span class="o">!=</span> <span class="s1">&#39;s&#39;</span><span class="p">):</span>
-            <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s2">&quot;\s{,</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="n">width</span>
+            <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s{,</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="n">width</span>
         <span class="k">if</span> <span class="s1">&#39;+&#39;</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>
             <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;[-+]&#39;</span>
     <span class="k">if</span> <span class="n">precision</span> <span class="ow">and</span> <span class="n">specifier</span> <span class="ow">in</span> <span class="s1">&#39;diuoxX&#39;</span><span class="p">:</span>
@@ -329,17 +320,17 @@
     <span class="k">if</span> <span class="n">specifier</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
         <span class="n">pat_sub</span> <span class="o">+=</span> <span class="n">pat_dec</span>
     <span class="k">elif</span> <span class="n">specifier</span> <span class="ow">in</span> <span class="s1">&#39;eE&#39;</span><span class="p">:</span>
-        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">[+-]\d+&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pat_dec</span><span class="p">,</span> <span class="n">specifier</span><span class="p">)</span>
+        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">[+-]</span><span class="se">\\</span><span class="s1">d+&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pat_dec</span><span class="p">,</span> <span class="n">specifier</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">specifier</span> <span class="ow">in</span> <span class="s1">&#39;gG&#39;</span><span class="p">:</span>
-        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(?:[eE][+-]\d+)?&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pat_dec</span><span class="p">)</span>
+        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(?:[eE][+-]</span><span class="se">\\</span><span class="s1">d+)?&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pat_dec</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">specifier</span> <span class="ow">in</span> <span class="s1">&#39;diu&#39;</span><span class="p">:</span>
-        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;\d+&#39;</span>
+        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">d+&#39;</span>
     <span class="k">elif</span> <span class="n">specifier</span> <span class="ow">in</span> <span class="s1">&#39;cs&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">width</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">specifier</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
                 <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;.&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;\S+&#39;</span>
+                <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">S+&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;.{</span><span class="si">%s</span><span class="s1">}&#39;</span> <span class="o">%</span> <span class="n">width</span>
     <span class="k">elif</span> <span class="n">specifier</span> <span class="ow">in</span> <span class="s1">&#39;xX&#39;</span><span class="p">:</span>
@@ -347,7 +338,7 @@
             <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;0</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">specifier</span>
         <span class="k">if</span> <span class="n">pad_zero</span><span class="p">:</span>
             <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;0{,</span><span class="si">%d</span><span class="s1">}&#39;</span> <span class="o">%</span> <span class="n">pad_zero</span>
-        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;[\dA-Za-f]+&#39;</span>
+        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;[</span><span class="se">\\</span><span class="s1">dA-Za-f]+&#39;</span>
     <span class="k">elif</span> <span class="n">specifier</span> <span class="o">==</span> <span class="s1">&#39;o&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">&#39;#&#39;</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>
             <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;0&#39;</span>
@@ -355,7 +346,7 @@
             <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;0{,</span><span class="si">%d</span><span class="s1">}&#39;</span> <span class="o">%</span> <span class="n">pad_zero</span>
         <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s1">&#39;[0-7]*&#39;</span>
     <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;-&#39;</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;0&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">)</span> <span class="ow">and</span> <span class="n">width</span><span class="p">:</span>
-        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s2">&quot;\s{,</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="n">width</span>
+        <span class="n">pat_sub</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s{,</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="n">width</span>
     <span class="k">return</span> <span class="n">pat_sub</span>
 
 
@@ -363,10 +354,10 @@
     <span class="n">pattern</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">cast</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1"># %[flags][width][.precision][length]specifier</span>
-    <span class="c1"># float_format = &quot;%([ -\+0]{,4})(\d*)((?:\.\d+)?)(L?)([eEfgG])&quot;</span>
+    <span class="c1"># float_format = &quot;%([ -\\+0]{,4})(\\d*)((?:\\.\\d+)?)(L?)([eEfgG])&quot;</span>
     <span class="c1"># First check for match to complex</span>
-    <span class="n">complex_format</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;%([ -0]{,3})(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])&quot;</span> <span class="o">+</span>
-                      <span class="s2">&quot;%(\+?[ -0]{,3}\+?)(\d*)((?:\.\d+)?)([hlL]{,2})([eEfgG])j&quot;</span><span class="p">)</span>
+    <span class="n">complex_format</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;%([ -0]{,3})(</span><span class="se">\\</span><span class="s2">d*)((?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)?)([hlL]{,2})([eEfgG])&quot;</span>
+                      <span class="o">+</span> <span class="s2">&quot;%(</span><span class="se">\\</span><span class="s2">+?[ -0]{,3}</span><span class="se">\\</span><span class="s2">+?)(</span><span class="se">\\</span><span class="s2">d*)((?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)?)([hlL]{,2})([eEfgG])j&quot;</span><span class="p">)</span>
     <span class="n">token</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">complex_format</span><span class="p">)</span>
     <span class="n">found</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
@@ -377,7 +368,7 @@
         <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;(</span><span class="si">%s%s</span><span class="s2">j)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">pat_sub1</span><span class="p">,</span> <span class="n">pat_sub2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">found</span><span class="p">,</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">cast</span>
     <span class="c1"># Then check for generic</span>
-    <span class="n">any_format</span> <span class="o">=</span> <span class="s2">&quot;%([\* \-\+#0]{,6})(\d*)((?:\.\d+)?)([hlL]{,2})([cdieEfgGosuxX])&quot;</span>
+    <span class="n">any_format</span> <span class="o">=</span> <span class="s2">&quot;%([</span><span class="se">\\</span><span class="s2">* </span><span class="se">\\</span><span class="s2">-</span><span class="se">\\</span><span class="s2">+#0]{,6})(</span><span class="se">\\</span><span class="s2">d*)((?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)?)([hlL]{,2})([cdieEfgGosuxX])&quot;</span>
     <span class="n">token</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">any_format</span><span class="p">)</span>
     <span class="n">found</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
@@ -415,54 +406,54 @@
 <span class="n">scanf_translate</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">_token</span><span class="p">),</span> <span class="n">_pattern</span><span class="p">,</span> <span class="n">_cast</span><span class="p">)</span> <span class="k">for</span> <span class="n">_token</span><span class="p">,</span> <span class="n">_pattern</span><span class="p">,</span> <span class="n">_cast</span> <span class="ow">in</span> <span class="p">[</span>
         <span class="p">(</span><span class="s2">&quot;</span><span class="si">%c</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;(.)&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*c&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*c&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
-        <span class="p">(</span><span class="s2">&quot;%(\d)c&quot;</span><span class="p">,</span> <span class="s2">&quot;(.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*(\d)c&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%(</span><span class="se">\\</span><span class="s2">d)c&quot;</span><span class="p">,</span> <span class="s2">&quot;(.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*(</span><span class="se">\\</span><span class="s2">d)c&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
-        <span class="p">(</span><span class="s2">&quot;%(\d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;([+-]?\d{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*(\d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:[+-]?\d{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%(</span><span class="se">\\</span><span class="s2">d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;([+-]?</span><span class="se">\\</span><span class="s2">d{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*(</span><span class="se">\\</span><span class="s2">d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:[+-]?</span><span class="se">\\</span><span class="s2">d{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
-        <span class="p">(</span><span class="s2">&quot;%-(\d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*-(\d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%-(</span><span class="se">\\</span><span class="s2">d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*-(</span><span class="se">\\</span><span class="s2">d)[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
-        <span class="p">(</span><span class="s2">&quot;%[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;([+-]?\d+)&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:[+-]?\d+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;([+-]?</span><span class="se">\\</span><span class="s2">d+)&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*[di]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:[+-]?</span><span class="se">\\</span><span class="s2">d+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
-        <span class="p">(</span><span class="s2">&quot;</span><span class="si">%u</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;(\d+)&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*u&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:\d+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="si">%u</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;(</span><span class="se">\\</span><span class="s2">d+)&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*u&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:</span><span class="se">\\</span><span class="s2">d+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
         <span class="c1"># langmm: complex</span>
         <span class="p">(</span><span class="s2">&quot;%[fgeE]%[+-][fgeE]j&quot;</span><span class="p">,</span>
-         <span class="s2">&quot;(&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;[+-]&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;j)&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;(&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;(?:[-+]?(?:</span><span class="se">\\</span><span class="s2">d+(?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d*)?|</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)(?:[eE][-+]?</span><span class="se">\\</span><span class="s2">d+)?)&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;[+-]&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;(?:(?:</span><span class="se">\\</span><span class="s2">d+(?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d*)?|</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)(?:[eE][-+]?</span><span class="se">\\</span><span class="s2">d+)?)&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;j)&quot;</span><span class="p">,</span>
          <span class="nb">complex</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*[fgeE]%[+-][fgeE]j&quot;</span><span class="p">,</span>
-         <span class="s2">&quot;(?:&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;[+-]&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)&quot;</span> <span class="o">+</span>
-         <span class="s2">&quot;j)&quot;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*[fgeE]%[+-][fgeE]j&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;(?:&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;(?:[-+]?(?:</span><span class="se">\\</span><span class="s2">d+(?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d*)?|</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)(?:[eE][-+]?</span><span class="se">\\</span><span class="s2">d+)?)&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;[+-]&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;(?:(?:</span><span class="se">\\</span><span class="s2">d+(?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d*)?|</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)(?:[eE][-+]?</span><span class="se">\\</span><span class="s2">d+)?)&quot;</span>
+         <span class="o">+</span> <span class="s2">&quot;j)&quot;</span><span class="p">,</span>
          <span class="kc">None</span><span class="p">),</span>
 
-        <span class="p">(</span><span class="s2">&quot;%[fgeE]&quot;</span><span class="p">,</span> <span class="s2">&quot;([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*[fgeE]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%[fgeE]&quot;</span><span class="p">,</span> <span class="s2">&quot;([-+]?(?:</span><span class="se">\\</span><span class="s2">d+(?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d*)?|</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)(?:[eE][-+]?</span><span class="se">\\</span><span class="s2">d+)?)&quot;</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*[fgeE]&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:[-+]?(?:</span><span class="se">\\</span><span class="s2">d+(?:</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d*)?|</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">d+)(?:[eE][-+]?</span><span class="se">\\</span><span class="s2">d+)?)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
         <span class="c1"># langmm: Added to allows matching of %5s</span>
-        <span class="p">(</span><span class="s2">&quot;%(\d)s&quot;</span><span class="p">,</span> <span class="s2">&quot;(.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*(\d)s&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%(</span><span class="se">\\</span><span class="s2">d)s&quot;</span><span class="p">,</span> <span class="s2">&quot;(.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*(</span><span class="se">\\</span><span class="s2">d)s&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:.{</span><span class="si">%s</span><span class="s2">})&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
-        <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;(\S+)&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*s&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:\S+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;(</span><span class="se">\\</span><span class="s2">S+)&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*s&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:</span><span class="se">\\</span><span class="s2">S+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
-        <span class="p">(</span><span class="s2">&quot;%([xX])&quot;</span><span class="p">,</span> <span class="s2">&quot;(0</span><span class="si">%s</span><span class="s2">[\dA-Za-f]+)&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">16</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*([xX])&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:0</span><span class="si">%s</span><span class="s2">[\dA-Za-f]+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%([xX])&quot;</span><span class="p">,</span> <span class="s2">&quot;(0</span><span class="si">%s</span><span class="s2">[</span><span class="se">\\</span><span class="s2">dA-Za-f]+)&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">16</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*([xX])&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:0</span><span class="si">%s</span><span class="s2">[</span><span class="se">\\</span><span class="s2">dA-Za-f]+)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         
         <span class="p">(</span><span class="s2">&quot;</span><span class="si">%o</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;(0[0-7]*)&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span>
-        <span class="p">(</span><span class="s2">&quot;%\*o&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:0[0-7]*)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;%</span><span class="se">\\</span><span class="s2">*o&quot;</span><span class="p">,</span> <span class="s2">&quot;(?:0[0-7]*)&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="p">]]</span>
 
 
@@ -478,7 +469,7 @@
 <span class="sd">    For example:</span>
 <span class="sd">    &gt;&gt;&gt; format_re, casts = _scanf_compile(&#39;%s - %d errors, %d warnings&#39;)</span>
 <span class="sd">    &gt;&gt;&gt; print format_re.pattern</span>
-<span class="sd">    (\S+) \- ([+-]?\d+) errors, ([+-]?\d+) warnings</span>
+<span class="sd">    (\\S+) \\- ([+-]?\\d+) errors, ([+-]?\\d+) warnings</span>
 
 <span class="sd">    Translated formats are cached for faster reuse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -520,7 +511,7 @@
     <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: </span><span class="si">%r</span><span class="s2"> -&gt; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">collapseWhitespace</span><span class="p">:</span>
-        <span class="n">format_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="s1">r&#39;</span><span class="se">\\</span><span class="s1">s+&#39;</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">)</span>
+        <span class="n">format_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">s+&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">s+&#39;</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">)</span>
 
     <span class="n">format_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">format_pat</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scanf_cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SCANF_CACHE_SIZE</span><span class="p">:</span>
@@ -602,15 +593,13 @@
     <span class="k">return</span> <span class="n">y</span>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">doctest</span>
     <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -619,11 +608,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -638,37 +627,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.6.1+1.g81b8e90',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Release Steps &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
+  <title>Release Steps &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
   
 
   
@@ -24,29 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="index.html"/>
-        <link rel="next" title="Welcome to the 2018 Crops in Silico Hackathon!" href="hackathon2018/index.html"/>
-        <link rel="prev" title="rpc_lesson2 Example" href="examples/rpc_lesson2.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Welcome to the 2018 Crops in Silico Hackathon!" href="hackathon2018/index.html" />
+    <link rel="prev" title="rpc_lesson2 Example" href="examples/rpc_lesson2.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -122,7 +113,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -130,9 +121,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -178,7 +170,7 @@
 <h1>Release Steps<a class="headerlink" href="#release-steps" title="Permalink to this headline">¶</a></h1>
 <ol class="arabic">
 <li><p class="first">[on branch] Regenerate schema:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ cisschema
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cisschema
 $ git add cis_interface/.cis_schema.yml
 $ git commit -m &quot;Updated .cis_schema.yml&quot;
 $ git push origin [BRANCH]
@@ -188,7 +180,7 @@ $ git push origin [BRANCH]
 <li><p class="first">[on branch] Open pull request to merge changes into master</p>
 </li>
 <li><p class="first">[on branch] Update docs to reflect new features and make sure they build locally:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd docs
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
 $ make autodoc
 </pre></div>
 </div>
@@ -196,19 +188,19 @@ $ make autodoc
 <li><p class="first">Merge branch into master after tests pass and code review complete</p>
 </li>
 <li><p class="first">Create tag with new version on master:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ git tag x.x.x
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git tag x.x.x
 </pre></div>
 </div>
 </li>
 <li><p class="first">Push to github (this triggers deployment of source distribution and wheels to PyPI):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ git push; git push --tags
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git push; git push --tags
 </pre></div>
 </div>
 </li>
 <li><p class="first">Update conda-forge build</p>
 </li>
-<li><p class="first">Checkout <code class="docutils literal"><span class="pre">gh-pages</span></code> branch if it dosn&#8217;t already exist (See below), regenerate docs and push to gh-pages branch:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd docs
+<li><p class="first">Checkout <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch if it dosn’t already exist (See below), regenerate docs and push to gh-pages branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd docs
 $ make ghpages
 </pre></div>
 </div>
@@ -217,10 +209,10 @@ $ make ghpages
 </div>
 <div class="section" id="docs-checkout">
 <h1>Docs Checkout<a class="headerlink" href="#docs-checkout" title="Permalink to this headline">¶</a></h1>
-<p>Before running <code class="docutils literal"><span class="pre">make</span> <span class="pre">ghpages</span></code>, you must first checkout the &#8216;ghpages&#8217; branch
+<p>Before running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">ghpages</span></code>, you must first checkout the ‘ghpages’ branch
 in the appropriate location. This only has to be done once on each machine you
-publish docs from. From the <code class="docutils literal"><span class="pre">cis_interface</span></code> source directory:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd ../
+publish docs from. From the <code class="docutils literal notranslate"><span class="pre">cis_interface</span></code> source directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ../
 $ git clone https://github.com/cropsinsilico/cis_interface.git cis_interface_docs
 $ cd cis_interface_docs
 $ git checkout gh-pages
@@ -230,9 +222,7 @@ $ git checkout gh-pages
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -250,11 +240,11 @@ $ git checkout gh-pages
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -269,37 +259,24 @@ $ git checkout gh-pages
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.6.1+1.g81b8e90',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

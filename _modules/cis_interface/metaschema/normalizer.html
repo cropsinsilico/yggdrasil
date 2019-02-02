@@ -1,0 +1,559 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.normalizer &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.normalizer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.normalizer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Normalizer adapated from the jsonschema validator</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">jsonschema</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span>
+
+
+<div class="viewcode-block" id="UndefinedProperty"><a class="viewcode-back" href="../../../cis_interface.metaschema.html#cis_interface.metaschema.normalizer.UndefinedProperty">[docs]</a><span class="k">class</span> <span class="nc">UndefinedProperty</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for undefined properties.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="UninitializedNormalized"><a class="viewcode-back" href="../../../cis_interface.metaschema.html#cis_interface.metaschema.normalizer.UninitializedNormalized">[docs]</a><span class="k">class</span> <span class="nc">UninitializedNormalized</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for uninitialized normalized value.&quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="create"><a class="viewcode-back" href="../../../cis_interface.metaschema.html#cis_interface.metaschema.normalizer.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically create a validation/normalization class that subclasses</span>
+<span class="sd">    the jsonschema validation class.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        normalizers (dict, optional): Keys are tuples representing paths that</span>
+<span class="sd">            exist within the schema at which the normalization functions stored</span>
+<span class="sd">            in lists as their value counterparts should be executed. Defaults to</span>
+<span class="sd">            empty dictionary.</span>
+<span class="sd">        no_defaults (bool, optional): If True, defaults will not be set during</span>
+<span class="sd">            normalization. Defaults to False.</span>
+<span class="sd">        required_defaults (bool, optional): If True, defaults will be set for</span>
+<span class="sd">            required properties, even if no_defaults is True. Defaults to False.</span>
+<span class="sd">        *args: Additional arguments are passed to jsonschema.validators.create.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to</span>
+<span class="sd">            jsonschema.validators.create.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">normalizers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;normalizers&#39;</span><span class="p">,</span> <span class="p">())</span>
+    <span class="n">no_defaults</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;no_defaults&#39;</span><span class="p">,</span> <span class="p">())</span>
+    <span class="n">required_defaults</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;required_defaults&#39;</span><span class="p">,</span> <span class="p">())</span>
+    <span class="n">validator_class</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">Normalizer</span><span class="p">(</span><span class="n">validator_class</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that can be used to normalize (or validate) objects against</span>
+<span class="sd">        JSON schemas.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *args: Additional arguments are passed to the base validator class.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the base</span>
+<span class="sd">                validator class.</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">            NORMALIZERS (dict): Keys are tuples representing paths that exist</span>
+<span class="sd">                within the schema at which the normalization functions stored in</span>
+<span class="sd">                lists as their value counterparts should be executed.</span>
+<span class="sd">            NO_DEFAULTS (bool): If True, defaults will not be set during</span>
+<span class="sd">                normalization.</span>
+<span class="sd">            REQUIRED_DEFAULTS (bool): If True, defaults will be set for required</span>
+<span class="sd">                properties, even if NO_DEFAULTS is True.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">NORMALIZERS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">normalizers</span><span class="p">)</span>
+        <span class="n">NO_DEFAULTS</span> <span class="o">=</span> <span class="n">no_defaults</span>
+        <span class="n">REQUIRED_DEFAULTS</span> <span class="o">=</span> <span class="n">required_defaults</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">UninitializedNormalized</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_old_settings</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_path_stack</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_schema_path_stack</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_stack</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">iter_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterate through all of the errors encountered during validation</span>
+<span class="sd">            of an instance at the current level or lower against properties in a</span>
+<span class="sd">            schema.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                instance (object): Instance that will be validated.</span>
+<span class="sd">                _schema (dict, optional): Schema that the instance will be</span>
+<span class="sd">                    validated against. Defaults to the schema used to initialize</span>
+<span class="sd">                    the class.</span>
+
+<span class="sd">            Yields:</span>
+<span class="sd">                ValidationError: Errors encountered during validation of the</span>
+<span class="sd">                    instance.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">_schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">,</span> <span class="n">UninitializedNormalized</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+                <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span> <span class="ow">and</span> <span class="p">(</span><span class="sa">u</span><span class="s2">&quot;$ref&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">):</span>
+
+                <span class="c1"># Path based normalization</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># print(self.current_schema_path, instance, type(instance), _schema)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_schema_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">NORMALIZERS</span><span class="p">:</span>
+                        <span class="n">normalizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">NORMALIZERS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">normalizers</span><span class="p">:</span>
+                            <span class="n">instance</span> <span class="o">=</span> <span class="n">n</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">error</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                    <span class="c1"># set details if not already set by the called fn</span>
+                    <span class="n">error</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span>
+                        <span class="n">validator</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+                        <span class="n">validator_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span>
+                        <span class="n">schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">)</span>
+                    <span class="k">yield</span> <span class="n">error</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">instance</span>
+
+                <span class="c1"># Do defaults for required fields</span>
+                <span class="k">if</span> <span class="p">(((((</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">NO_DEFAULTS</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRED_DEFAULTS</span><span class="p">)</span>
+                      <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">list</span><span class="p">)</span>
+                      <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;properties&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="nb">dict</span><span class="p">)</span>
+                      <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">,</span> <span class="s2">&quot;object&quot;</span><span class="p">)))):</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="p">(((</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">])</span>
+                             <span class="ow">or</span> <span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">))):</span>
+                            <span class="k">continue</span>
+                        <span class="n">default</span> <span class="o">=</span> <span class="n">_schema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span>
+                    <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
+
+                <span class="c1"># Do default and type first so normalization can be validated</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="p">(((</span><span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+                         <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">UndefinedProperty</span><span class="p">))):</span>
+                        <span class="k">return</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">_schema</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="n">validator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VALIDATORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">validator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">errors</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="p">)</span> <span class="ow">or</span> <span class="p">()</span>
+                    <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                        <span class="c1"># set details if not already set by the called fn</span>
+                        <span class="n">error</span><span class="o">.</span><span class="n">_set</span><span class="p">(</span>
+                            <span class="n">validator</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                            <span class="n">validator_value</span><span class="o">=</span><span class="n">v</span><span class="p">,</span>
+                            <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span>
+                            <span class="n">schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="sa">u</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span>
+                            <span class="n">error</span><span class="o">.</span><span class="n">schema_path</span><span class="o">.</span><span class="n">appendleft</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                        <span class="k">yield</span> <span class="n">error</span>
+
+                    <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">instance</span>
+
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">iter_errors</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">e</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">current_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the instance to the current</span>
+<span class="sd">            instance being validated/normalized.&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path_stack</span><span class="p">)</span>
+
+        <span class="nd">@property</span>
+        <span class="k">def</span> <span class="nf">current_schema_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the schema to the current</span>
+<span class="sd">            schema being used for validation/normalization.&quot;&quot;&quot;</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema_path_stack</span><span class="p">)</span>
+
+        <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+        <span class="k">def</span> <span class="nf">normalizing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context for normalization that records normalizers before</span>
+<span class="sd">            context is initialized so that they can be restored once the context</span>
+<span class="sd">            exist.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                **kwargs: Keyword arguments are treated as attributes that</span>
+<span class="sd">                    should be added to the class in the context. If the class</span>
+<span class="sd">                    already has an attribute of the same name, it is stored</span>
+<span class="sd">                    for restoration after the context exits.</span>
+
+<span class="sd">            Yields:</span>
+<span class="sd">                ValidationError: Errors encountered during validation.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;normalizers&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">NORMALIZERS</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Uncomment lines below to allow &quot;</span>
+                                        <span class="o">+</span> <span class="s2">&quot;addition of default normalizers.&quot;</span><span class="p">)</span>
+                    <span class="c1"># for ik, iv in self.NORMALIZERS.items():</span>
+                    <span class="c1">#     v.setdefault(ik, iv)</span>
+                <span class="k">elif</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;validators&#39;</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">ik</span><span class="p">,</span> <span class="n">iv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">VALIDATORS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">v</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">ik</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()):</span>
+                    <span class="n">ksub</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ksub</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_old_settings</span><span class="p">[</span><span class="n">ksub</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ksub</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ksub</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">yield</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_old_settings</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">def</span> <span class="nf">descend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Descend along a path in the schema/instance, recording</span>
+<span class="sd">            information about the normalization state so that it can be replaced</span>
+<span class="sd">            with the original value if there is a validation error along the</span>
+<span class="sd">            descent path.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                instance (object): Current instance being validated against the</span>
+<span class="sd">                    schema.</span>
+<span class="sd">                schema (dict): Current schema that the instance is being</span>
+<span class="sd">                    validated against.</span>
+<span class="sd">                path (str, int, optional): Path that resulted in the current</span>
+<span class="sd">                    instance. Defaults to None.</span>
+<span class="sd">                schema_path (str, int, optional): Path that resulted in the</span>
+<span class="sd">                    current schema. Defaults to None.</span>
+
+<span class="sd">            Yields:</span>
+<span class="sd">                ValidationError: Errors raised during validation of the instance.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">UninitializedNormalized</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_path_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">schema_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_schema_path_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">schema_path</span><span class="p">)</span>
+            <span class="n">failed</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">descend</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span>
+                                                             <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
+                                                             <span class="n">schema_path</span><span class="o">=</span><span class="n">schema_path</span><span class="p">):</span>
+                    <span class="n">failed</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">yield</span> <span class="n">error</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span><span class="p">:</span>
+                    <span class="n">old_normalized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">failed</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span><span class="p">,</span> <span class="n">UndefinedProperty</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">old_normalized</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">old_normalized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">old_normalized</span>
+                <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_path_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">schema_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_schema_path_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an instance against a schema.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                instance (object): Object to be validated.</span>
+<span class="sd">                _schema (dict, optional): Schema by which the instance should be</span>
+<span class="sd">                    validated. Defaults to None and will be set to the schema</span>
+<span class="sd">                    used to create the class.</span>
+<span class="sd">                normalize (bool, optional): If True, the instance will also be</span>
+<span class="sd">                    normalized as it is validated. Defaults to False.</span>
+<span class="sd">                **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                    &#39;normalizing&#39; context if normalize is True, otherwise they</span>
+<span class="sd">                    are ignored.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                object: Normalized instance if normalize == True.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizing</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                    <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
+                <span class="k">return</span> <span class="n">out</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an instance during validation, allowing for aliases,</span>
+<span class="sd">            defaults, or simple type conversions.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                instance (object): Object to be normalized and validated.</span>
+<span class="sd">                _schema (dict, optional): Schema by which the instance should be</span>
+<span class="sd">                    normalized and validated. Defaults to None and will be set</span>
+<span class="sd">                    to the schema used to create the class.</span>
+<span class="sd">                **kwargs: Additional keyword arguments are passed to the</span>
+<span class="sd">                    &#39;normalizing&#39; context.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                object: Normalized instance.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizing</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_errors</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">))</span>
+                <span class="c1"># for e in errors[::-1]:</span>
+                <span class="c1">#     print(80 * &#39;-&#39;)</span>
+                <span class="c1">#     print(e)</span>
+                <span class="c1"># print(80 * &#39;-&#39;)</span>
+            <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">instance</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
+
+        <span class="k">def</span> <span class="nf">is_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if an object is an example of the given type.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                instance (object): Object to test against to the type.</span>
+<span class="sd">                type (str): Name of type that object should be tested against.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                bool: True if the instance is of the specified type. False</span>
+<span class="sd">                    otherwise.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">return</span> <span class="n">Normalizer</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

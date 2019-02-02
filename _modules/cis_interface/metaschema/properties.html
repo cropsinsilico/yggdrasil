@@ -1,0 +1,308 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.properties &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.properties</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.properties</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.properties</span> <span class="k">import</span> <span class="n">MetaschemaProperty</span>
+
+
+<span class="n">_metaschema_properties</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="register_metaschema_property"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.register_metaschema_property">[docs]</a><span class="k">def</span> <span class="nf">register_metaschema_property</span><span class="p">(</span><span class="n">prop_class</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a schema property.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prop_class (class): Class to be registered.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If a property class has already been registered under the</span>
+<span class="sd">            same name.</span>
+<span class="sd">        ValueError: If the base validator already has a validator function for</span>
+<span class="sd">            the property and the new property class has a schema defined.</span>
+<span class="sd">        ValueError: If the base validator already has a validator function for</span>
+<span class="sd">            the property and the validate method on the new property class is</span>
+<span class="sd">            not disabled.</span>
+<span class="sd">        ValueError: If the property class does not have an entry in the existing</span>
+<span class="sd">            metaschema.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">cis_interface.metaschema</span> <span class="k">import</span> <span class="n">_metaschema</span><span class="p">,</span> <span class="n">_base_validator</span>
+    <span class="k">global</span> <span class="n">_metaschema_properties</span>
+    <span class="n">prop_name</span> <span class="o">=</span> <span class="n">prop_class</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">if</span> <span class="n">prop_name</span> <span class="ow">in</span> <span class="n">_metaschema_properties</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Property &#39;</span><span class="si">%s</span><span class="s2">&#39; already registered.&quot;</span> <span class="o">%</span> <span class="n">prop_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">prop_name</span> <span class="ow">in</span> <span class="n">_base_validator</span><span class="o">.</span><span class="n">VALIDATORS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">prop_class</span><span class="o">.</span><span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Replacement property &#39;</span><span class="si">%s</span><span class="s2">&#39; modifies the default schema.&quot;</span>
+                             <span class="o">%</span> <span class="n">prop_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(((</span><span class="n">prop_class</span><span class="o">.</span><span class="n">_validate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+             <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;validate&#39;</span> <span class="ow">in</span> <span class="n">prop_class</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">))):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Replacement property &#39;</span><span class="si">%s</span><span class="s2">&#39; modifies the default validator.&quot;</span>
+                             <span class="o">%</span> <span class="n">prop_name</span><span class="p">)</span>
+        <span class="n">prop_class</span><span class="o">.</span><span class="n">_validate</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># prop_class.types = []  # To ensure base class not modified by all</span>
+    <span class="c1"># prop_class.python_types = []</span>
+    <span class="c1"># Check metaschema if it exists</span>
+    <span class="k">if</span> <span class="n">_metaschema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">prop_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_metaschema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Property &#39;</span><span class="si">%s</span><span class="s2">&#39; not in pre-loaded metaschema.&quot;</span> <span class="o">%</span> <span class="n">prop_name</span><span class="p">)</span>
+    <span class="n">_metaschema_properties</span><span class="p">[</span><span class="n">prop_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">prop_class</span>
+    <span class="k">return</span> <span class="n">prop_class</span></div>
+
+
+<div class="viewcode-block" id="get_registered_properties"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.get_registered_properties">[docs]</a><span class="k">def</span> <span class="nf">get_registered_properties</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a dictionary of registered properties.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Registered property/class pairs.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_metaschema_properties</span></div>
+
+
+<div class="viewcode-block" id="get_metaschema_property"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.get_metaschema_property">[docs]</a><span class="k">def</span> <span class="nf">get_metaschema_property</span><span class="p">(</span><span class="n">property_name</span><span class="p">,</span> <span class="n">skip_generic</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the property class associated with a metaschema property.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        property_name (str): Name of property to get class for.</span>
+<span class="sd">        skip_generic (bool, optional): If True and the property dosn&#39;t have a</span>
+<span class="sd">            class, None is returned. Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        MetaschemaProperty: Associated property class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">property_name</span> <span class="ow">in</span> <span class="n">_metaschema_properties</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_metaschema_properties</span><span class="p">[</span><span class="n">property_name</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">skip_generic</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MetaschemaProperty</span><span class="o">.</span><span class="n">MetaschemaProperty</span></div>
+
+
+<div class="viewcode-block" id="import_all_properties"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.import_all_properties">[docs]</a><span class="k">def</span> <span class="nf">import_all_properties</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
+            <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;cis_interface.metaschema.properties.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mod</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

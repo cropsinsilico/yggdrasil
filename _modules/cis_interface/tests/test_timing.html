@@ -1,0 +1,562 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.tests.test_timing &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../tests.html">cis_interface.tests</a> &raquo;</li>
+        
+      <li>cis_interface.tests.test_timing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.tests.test_timing</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">tools</span><span class="p">,</span> <span class="n">timing</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">cis_interface.tests</span> <span class="k">import</span> <span class="n">CisTestClass</span>
+
+
+<span class="n">_test_size</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">_test_count</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">_test_nrep</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">_test_lang</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span>
+<span class="c1"># On windows, it&#39;s possible to not have a C/C++ communication library installed</span>
+<span class="k">if</span> <span class="s1">&#39;c&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">timing</span><span class="o">.</span><span class="n">_lang_list</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+    <span class="n">_test_lang</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
+<span class="c1"># _test_run = timing.TimedRun(_test_lang, _test_lang)</span>
+<span class="c1"># _test_run.time_run(_test_count, _test_size, nrep=_test_nrep)</span>
+<span class="n">_this_platform</span> <span class="o">=</span> <span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_platform</span><span class="p">,</span>
+                  <span class="n">backwards</span><span class="o">.</span><span class="n">_python_version</span><span class="p">,</span>
+                  <span class="n">tools</span><span class="o">.</span><span class="n">get_default_comm</span><span class="p">())</span>
+<span class="n">_base_environment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;platform&#39;</span><span class="p">:</span> <span class="s1">&#39;Linux&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;python_ver&#39;</span><span class="p">:</span> <span class="s1">&#39;2.7&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;comm_type&#39;</span><span class="p">:</span> <span class="s1">&#39;ZMQComm&#39;</span><span class="p">}</span>
+<span class="n">_valid_platforms</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;ZMQComm&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;IPCComm&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;Linux&#39;</span><span class="p">,</span> <span class="s1">&#39;3.5&#39;</span><span class="p">,</span> <span class="s1">&#39;ZMQComm&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;MacOS&#39;</span><span class="p">,</span> <span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;ZMQComm&#39;</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;Windows&#39;</span><span class="p">,</span> <span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;ZMQComm&#39;</span><span class="p">)]</span>
+<span class="n">_testfile_json</span> <span class="o">=</span> <span class="s1">&#39;test_run123.json&#39;</span>
+<span class="n">_testfile_dat</span> <span class="o">=</span> <span class="s1">&#39;test_run123.dat&#39;</span>
+
+
+<div class="viewcode-block" id="test_get_source"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.test_get_source">[docs]</a><span class="k">def</span> <span class="nf">test_get_source</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test getting source file for test.&quot;&quot;&quot;</span>
+    <span class="n">lang_list</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">_lang_list</span>
+    <span class="n">dir_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="s1">&#39;dst&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lang_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dir_list</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">get_source</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_platform_error"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.test_platform_error">[docs]</a><span class="k">def</span> <span class="nf">test_platform_error</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when test cannot be performed.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
+        <span class="n">test_platform</span> <span class="o">=</span> <span class="s1">&#39;Linux&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">test_platform</span> <span class="o">=</span> <span class="s1">&#39;MacOS&#39;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">TimedRun</span><span class="p">(</span><span class="n">_test_lang</span><span class="p">,</span> <span class="n">_test_lang</span><span class="p">,</span> <span class="n">platform</span><span class="o">=</span><span class="n">test_platform</span><span class="p">)</span>
+    <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">can_run</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TimedRunTestBase"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TimedRunTestBase">[docs]</a><span class="k">class</span> <span class="nc">TimedRunTestBase</span><span class="p">(</span><span class="n">CisTestClass</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base test class for the TimedRun class.&quot;&quot;&quot;</span>
+
+    <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;cis_interface.timing&#39;</span>
+    <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;TimedRun&#39;</span>
+    <span class="n">test_name</span> <span class="o">=</span> <span class="s1">&#39;timed_pipe&#39;</span>
+    <span class="n">_filename</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">platform</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">python_ver</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">comm_type</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dont_use_perf</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="n">_test_lang</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">nrep</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">max_errors</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inst_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Arguments for creating a class instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;test_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_name</span><span class="p">,</span> <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span>
+                <span class="s1">&#39;platform&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="s1">&#39;python_ver&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">python_ver</span><span class="p">,</span>
+                <span class="s1">&#39;comm_type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_type</span><span class="p">,</span> <span class="s1">&#39;dont_use_perf&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_use_perf</span><span class="p">,</span>
+                <span class="s1">&#39;max_errors&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_errors</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time_run_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Arguments for time_run.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time_run_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for time_run.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;nrep&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nrep</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">entry_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the entry for the provided time_run_args.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">entry_name</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">time_run_args</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the file where data is stored.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">filename</span>
+
+<div class="viewcode-block" id="TimedRunTestBase.get_raw_data"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TimedRunTestBase.get_raw_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_raw_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the raw contents of the data file.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="TimedRunTestBase.time_run"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TimedRunTestBase.time_run">[docs]</a>    <span class="k">def</span> <span class="nf">time_run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform a timed run.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">time_run</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">time_run_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">time_run_kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestTimedRun"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun">[docs]</a><span class="k">class</span> <span class="nc">TestTimedRun</span><span class="p">(</span><span class="n">TimedRunTestBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the TimedRun class using existing data.&quot;&quot;&quot;</span>
+
+    <span class="n">platform</span> <span class="o">=</span> <span class="n">_base_environment</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span>
+    <span class="n">python_ver</span> <span class="o">=</span> <span class="n">_base_environment</span><span class="p">[</span><span class="s1">&#39;python_ver&#39;</span><span class="p">]</span>
+    <span class="n">comm_type</span> <span class="o">=</span> <span class="n">_base_environment</span><span class="p">[</span><span class="s1">&#39;comm_type&#39;</span><span class="p">]</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages to use for tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">base_msg_count</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Size of messages to use for tests.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">base_msg_size</span>
+
+<div class="viewcode-block" id="TestTimedRun.test_json"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_json">[docs]</a>    <span class="k">def</span> <span class="nf">test_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test loading/saving perf data as json.&quot;&quot;&quot;</span>
+        <span class="n">old_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_data</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">as_json</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">new_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_data</span><span class="p">()</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">new_text</span><span class="p">,</span> <span class="n">old_text</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_save"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_save">[docs]</a>    <span class="k">def</span> <span class="nf">test_save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test save with/without overwrite.&quot;&quot;&quot;</span>
+        <span class="n">old_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_data</span><span class="p">()</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">new_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_raw_data</span><span class="p">()</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">new_text</span><span class="p">,</span> <span class="n">old_text</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_scaling_count"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_scaling_count">[docs]</a>    <span class="k">def</span> <span class="nf">test_scaling_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test running scaling with number of messages.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">min_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">max_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span>
+                      <span class="n">nsamples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nrep</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nrep</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">scaling_count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">scaling_count</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                                    <span class="n">per_message</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">scaling_count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                         <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_scaling_size"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_scaling_size">[docs]</a>    <span class="k">def</span> <span class="nf">test_scaling_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test running scaling with size of messages.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">min_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                      <span class="n">nsamples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nrep</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nrep</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">scaling_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">scaling_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                                   <span class="n">per_message</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">scaling_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span>
+                         <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_plot_scaling_joint"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_plot_scaling_joint">[docs]</a>    <span class="k">def</span> <span class="nf">test_plot_scaling_joint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test plot_scaling_joint.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">msg_size0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">msg_count0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span>
+                      <span class="n">msg_size</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="n">msg_count</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">],</span>
+                      <span class="n">per_message</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">time_method</span><span class="o">=</span><span class="s1">&#39;bestof&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling_joint</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_plot_scaling"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_plot_scaling">[docs]</a>    <span class="k">def</span> <span class="nf">test_plot_scaling</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test plot_scaling corner cases not covered by test_plot_scaling_joint.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">],</span> <span class="n">per_message</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                   <span class="n">time_method</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">per_message</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                   <span class="n">time_method</span><span class="o">=</span><span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="n">yscale</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="c1"># Test with msg_count on x linear/linear axs</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">])</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;axs&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;nrep&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nrep</span><span class="p">,</span>
+                      <span class="s1">&#39;time_method&#39;</span><span class="p">:</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span> <span class="s1">&#39;per_message&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;axs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;time_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bestof&#39;</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;axs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># Test with msg_size on x log/log axes</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;axs&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;nrep&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nrep</span><span class="p">,</span> <span class="s1">&#39;time_method&#39;</span><span class="p">:</span> <span class="s1">&#39;average&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;xscale&#39;</span><span class="p">:</span> <span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="s1">&#39;yscale&#39;</span><span class="p">:</span> <span class="s1">&#39;log&#39;</span><span class="p">}</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;axs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;time_method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bestof&#39;</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;axs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Errors</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">,</span>
+                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">])</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">plot_scaling</span><span class="p">,</span>
+                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="n">nrep</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nrep</span><span class="p">,</span>
+                         <span class="n">time_method</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_perfjson_to_pandas"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_perfjson_to_pandas">[docs]</a>    <span class="k">def</span> <span class="nf">test_perfjson_to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test perfjson_to_pandas.&quot;&quot;&quot;</span>
+        <span class="n">timing</span><span class="o">.</span><span class="n">perfjson_to_pandas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_fits"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_fits">[docs]</a>    <span class="k">def</span> <span class="nf">test_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test fits to scaling on one platform.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">time_per_byte</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">time_per_message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">startup_time</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_plot_scalings"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_plot_scalings">[docs]</a>    <span class="k">def</span> <span class="nf">test_plot_scalings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test plot_scalings corner cases on test platform.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">msg_size</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">],</span> <span class="n">msg_size0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+                      <span class="n">msg_count</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">],</span> <span class="n">msg_count0</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span>
+                      <span class="n">cleanup_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;comm_type&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;platform&#39;</span><span class="p">,</span> <span class="s1">&#39;python_ver&#39;</span><span class="p">]:</span>
+            <span class="n">ikws</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">ikws</span><span class="p">[</span><span class="s1">&#39;compare&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">ikws</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">ikws</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span>
+                <span class="n">ikws</span><span class="p">[</span><span class="s1">&#39;per_message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">ikws</span><span class="p">[</span><span class="s1">&#39;compare_values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">]</span>
+            <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="o">**</span><span class="n">ikws</span><span class="p">)</span>
+        <span class="c1"># Errors</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">,</span> <span class="n">compare</span><span class="o">=</span><span class="s1">&#39;comm_type&#39;</span><span class="p">,</span>
+                         <span class="n">comm_type</span><span class="o">=</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRun.test_production_runs"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRun.test_production_runs">[docs]</a>    <span class="k">def</span> <span class="nf">test_production_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test production tests (those used in paper).&quot;&quot;&quot;</span>
+        <span class="c1"># Limit language list for tests</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;comm_type&#39;</span><span class="p">,</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;platform&#39;</span><span class="p">,</span> <span class="s1">&#39;python_ver&#39;</span><span class="p">]:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">cleanup_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_paper_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># Also do MacOS plot w/ Matlab</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;language&#39;</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;platform&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;MacOS&#39;</span>
+                <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestTimedRunTemp"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp">[docs]</a><span class="k">class</span> <span class="nc">TestTimedRunTemp</span><span class="p">(</span><span class="n">TimedRunTestBase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the TimedRun class using temporary data.&quot;&quot;&quot;</span>
+
+    <span class="n">_filename</span> <span class="o">=</span> <span class="s1">&#39;test_run123.json&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;String prefix to prepend docstr test message with.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestTimedRunTemp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">description_prefix</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39; Temporary&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="TestTimedRunTemp.cleanup_files"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp.cleanup_files">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the temporary file if it exists.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">perfscript</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">perfscript</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRunTemp.setup"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup the file if it exists and then reload.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestTimedRunTemp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_files</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestTimedRunTemp.teardown"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup temporary files before destroying instance.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_files</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestTimedRunTemp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time_run_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for time_run.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestTimedRunTemp</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">time_run_kwargs</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;overwrite&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="TestTimedRunTemp.test_perf_func"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp.test_perf_func">[docs]</a>    <span class="k">def</span> <span class="nf">test_perf_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test perf_func.&quot;&quot;&quot;</span>
+        <span class="n">timing</span><span class="o">.</span><span class="n">perf_func</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRunTemp.test_run_overwrite"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp.test_run_overwrite">[docs]</a>    <span class="k">def</span> <span class="nf">test_run_overwrite</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test performing a run twice, the second time with ovewrite.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_run</span><span class="p">()</span>
+        <span class="c1"># Reload instance to test load for existing file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_instance</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_run</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">remove_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_name</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">has_entry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry_name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="TestTimedRunTemp.test_languages"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp.test_languages">[docs]</a>    <span class="k">def</span> <span class="nf">test_languages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test different combinations of source/destination languages.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l1</span> <span class="ow">in</span> <span class="n">timing</span><span class="o">.</span><span class="n">_lang_list</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l1</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">TimedRun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">time_run</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">time_run_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">time_run_kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestTimedRunTemp.test_comm_types"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTemp.test_comm_types">[docs]</a>    <span class="k">def</span> <span class="nf">test_comm_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test different comm types.&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_args</span><span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">timing</span><span class="o">.</span><span class="n">_comm_list</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;comm_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">TimedRun</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">time_run</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">time_run_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">time_run_kwargs</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestTimedRunTempNoPerf"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTempNoPerf">[docs]</a><span class="k">class</span> <span class="nc">TestTimedRunTempNoPerf</span><span class="p">(</span><span class="n">TestTimedRunTemp</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the TimedRun class using temporary data without perf.&quot;&quot;&quot;</span>
+
+    <span class="n">_filename</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># This forces use of standard name with .dat extension</span>
+    <span class="n">dont_use_perf</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;String prefix to prepend docstr test message with.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestTimedRunTempNoPerf</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">description_prefix</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39; (w/o perf)&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="TestTimedRunTempNoPerf.test_perf_func"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTempNoPerf.test_perf_func">[docs]</a>    <span class="k">def</span> <span class="nf">test_perf_func</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test perf_func.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestTimedRunTempNoPerf.test_languages"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTempNoPerf.test_languages">[docs]</a>    <span class="k">def</span> <span class="nf">test_languages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test different combinations of source/destination languages.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestTimedRunTempNoPerf.test_comm_types"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_timing.TestTimedRunTempNoPerf.test_comm_types">[docs]</a>    <span class="k">def</span> <span class="nf">test_comm_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test different comm types.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

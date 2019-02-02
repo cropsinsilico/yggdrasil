@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>rpc_lesson1 Example &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
+  <title>rpc_lesson1 Example &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
   
 
   
@@ -24,30 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../genindex.html"/>
-        <link rel="search" title="Search" href="../search.html"/>
-    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="../index.html"/>
-        <link rel="up" title="Examples" href="examples_toc.html"/>
-        <link rel="next" title="rpc_lesson2 Example" href="rpc_lesson2.html"/>
-        <link rel="prev" title="formatted_io5 Example" href="formatted_io5.html"/> 
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rpc_lesson2 Example" href="rpc_lesson2.html" />
+    <link rel="prev" title="formatted_io9 Example" href="formatted_io9.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -119,11 +109,15 @@
 <li class="toctree-l2"><a class="reference internal" href="formatted_io3.html">formatted_io3 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="formatted_io4.html">formatted_io4 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="formatted_io5.html">formatted_io5 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formatted_io6.html">formatted_io6 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formatted_io7.html">formatted_io7 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formatted_io8.html">formatted_io8 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formatted_io9.html">formatted_io9 Example</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rpc_lesson1 Example</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#python-version">Python Version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#c-version">C++ Version</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id1">C Version</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#matlab-version">Matlab Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#c-version">C Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">C++ Version</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
@@ -143,7 +137,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">cis_interface</a>
@@ -151,9 +145,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -202,7 +197,7 @@
 <div class="section" id="python-version">
 <h2>Python Version<a class="headerlink" href="#python-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -261,22 +256,12 @@
 57
 58
 59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -299,14 +284,8 @@
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        int: Exit code. Negative if an error occurred.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
@@ -328,22 +307,18 @@
         <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
-            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="k">break</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -386,33 +361,21 @@
 41
 42
 43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+44</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisRpcClient</span><span class="p">,</span> <span class="n">CisOutput</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
 <span class="sd">    numbers in the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        iterations (int): The number of Fibonacci numbers to log.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        int: Exit code. Negative if an error occurred.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">iterations</span><span class="p">)</span>
 
     <span class="c1"># Set up connections matching yaml</span>
@@ -425,33 +388,27 @@
         
         <span class="c1"># Call the server and receive response</span>
         <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
-        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
-            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="k">break</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
         <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
 
         <span class="c1"># Log result by sending it to the log connection</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fib</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): SEND ERROR&#39;</span><span class="p">)</span>
-            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="k">break</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;client(Python): SEND ERROR&#39;</span><span class="p">)</span>
 
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="c1"># Take number of iterations from the first argument</span>
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+    <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -466,7 +423,7 @@
   <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -498,10 +455,10 @@
 </pre></div>
 </td></tr></table></div>
 </div>
-<div class="section" id="c-version">
-<h2>C++ Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="matlab-version">
+<h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -560,22 +517,12 @@
 57
 58
 59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -598,14 +545,8 @@
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        int: Exit code. Negative if an error occurred.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
@@ -627,22 +568,18 @@
         <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
-            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="k">break</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-c++"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -673,72 +610,42 @@
 29
 30
 31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+32</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span>iterations<span class="p">)</span><span class="w"></span>
+<span class="w">  </span>
+<span class="w">  </span><span class="n">iterations</span> <span class="p">=</span> <span class="n">str2num</span><span class="p">(</span><span class="n">iterations</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab client: iterations = %d\n&#39;</span><span class="p">,</span> <span class="n">iterations</span><span class="p">);</span>
 
+  <span class="c">% Set up connections matching yaml</span>
+  <span class="c">% RPC client-side connection will be $(server_name)_$(client_name)</span>
+  <span class="n">rpc</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisRpcClient&#39;</span><span class="p">,</span> <span class="s">&#39;server_client&#39;</span><span class="p">,</span> <span class="s">&#39;%d&#39;</span><span class="p">,</span> <span class="s">&#39;%d&#39;</span><span class="p">);</span>
+  <span class="nb">log</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;output_log&#39;</span><span class="p">,</span> <span class="s">&#39;fib(%-2d) = %-2d\n&#39;</span><span class="p">);</span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-   
-  <span class="kt">int</span> <span class="n">iterations</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
-  <span class="kt">int</span> <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ client: iterations %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">iterations</span><span class="p">);</span>
-  
-  <span class="c1">// Set up connections matching yaml</span>
-  <span class="c1">// RPC client-side connection will be $(server_name)_$(client_name)</span>
-  <span class="n">CisRpcClient</span> <span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">);</span>
-  <span class="n">CisOutput</span> <span class="n">log</span><span class="p">(</span><span class="s">&quot;output_log&quot;</span><span class="p">,</span> <span class="s">&quot;fib(%-2d) = %-2d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-  
-  <span class="c1">// Initialize variables</span>
-  <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="kt">int</span> <span class="n">fib</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-  <span class="kt">char</span> <span class="o">*</span><span class="n">logmsg</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">CIS_MSG_MAX</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
-  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
-
-  <span class="c1">// Iterate over Fibonacci sequence</span>
-  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">iterations</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c">% Iterate over Fibonacci sequence</span>
+  <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">iterations</span>
     
-    <span class="c1">// Call the server and receive response</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Calling fib(%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
+    <span class="c">% Call the server and receive response</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Calling fib(%d)\n&#39;</span><span class="p">,</span> <span class="nb">i</span><span class="p">);</span>
+    <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span> <span class="p">=</span> <span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="n">int32</span><span class="p">(</span><span class="nb">i</span><span class="p">));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+      <span class="n">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): RPC CALL ERROR&#39;</span><span class="p">);</span>
+    <span class="k">end</span><span class="p">;</span>
+    <span class="n">fib</span> <span class="p">=</span> <span class="n">result</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Response fib(%d) = %d\n&#39;</span><span class="p">,</span> <span class="nb">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
 
-    <span class="c1">// Log result by sending it to the log connection</span>
-    <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
+    <span class="c">% Log result by sending it to the log connection</span>
+    <span class="n">ret</span> <span class="p">=</span> <span class="nb">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">int32</span><span class="p">(</span><span class="nb">i</span><span class="p">),</span> <span class="n">fib</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
+      <span class="n">error</span><span class="p">(</span><span class="s">&#39;client(Matlab): SEND ERROR&#39;</span><span class="p">);</span>
+    <span class="k">end</span><span class="p">;</span>
+  <span class="k">end</span><span class="p">;</span>
 
-  <span class="n">free</span><span class="p">(</span><span class="n">logmsg</span><span class="p">);</span>
-  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ client</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
-  <span class="k">return</span> <span class="n">exit_code</span><span class="p">;</span>
-<span class="p">}</span>
+  <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab client&#39;</span><span class="p">);</span>
+  
+<span class="k">end</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -753,7 +660,7 @@
   <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -771,9 +678,9 @@
 
 <span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-  <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
+  <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
   <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.cpp</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.m</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
   <span class="l l-Scalar l-Scalar-Plain">client_of</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
   <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
@@ -785,10 +692,10 @@
 </pre></div>
 </td></tr></table></div>
 </div>
-<div class="section" id="id1">
-<h2>C Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="c-version">
+<h2>C Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -847,22 +754,12 @@
 57
 58
 59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -885,14 +782,8 @@
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        int: Exit code. Negative if an error occurred.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
@@ -914,22 +805,18 @@
         <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
-            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="k">break</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-c"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1029,7 +916,7 @@
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -1044,7 +931,7 @@
   <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1076,10 +963,10 @@
 </pre></div>
 </td></tr></table></div>
 </div>
-<div class="section" id="matlab-version">
-<h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h2>C++ Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1138,22 +1025,12 @@
 57
 58
 59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -1176,14 +1053,8 @@
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.&quot;&quot;&quot;</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        int: Exit code. Negative if an error occurred.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
@@ -1205,22 +1076,18 @@
         <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
 
         <span class="c1"># Send response back</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
-            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-            <span class="k">break</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
 
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-matlab"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1257,48 +1124,66 @@
 35
 36
 37
-38</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="nf">client</span><span class="p">(</span>iterations<span class="p">)</span><span class="w"></span>
-<span class="w">  </span>
-<span class="w">  </span><span class="n">iterations</span> <span class="p">=</span> <span class="n">str2num</span><span class="p">(</span><span class="n">iterations</span><span class="p">);</span>
-  <span class="n">exit_code</span> <span class="p">=</span> <span class="mi">0</span><span class="p">;</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Hello from Matlab client: iterations = %d\n&#39;</span><span class="p">,</span> <span class="n">iterations</span><span class="p">);</span>
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 
-  <span class="c">% Set up connections matching yaml</span>
-  <span class="c">% RPC client-side connection will be $(server_name)_$(client_name)</span>
-  <span class="n">rpc</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisRpcClient&#39;</span><span class="p">,</span> <span class="s">&#39;server_client&#39;</span><span class="p">,</span> <span class="s">&#39;%d&#39;</span><span class="p">,</span> <span class="s">&#39;%d&#39;</span><span class="p">);</span>
-  <span class="nb">log</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;output_log&#39;</span><span class="p">,</span> <span class="s">&#39;fib(%-2d) = %-2d\n&#39;</span><span class="p">);</span>
 
-  <span class="c">% Iterate over Fibonacci sequence</span>
-  <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">iterations</span>
-    
-    <span class="c">% Call the server and receive response</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Calling fib(%d)\n&#39;</span><span class="p">,</span> <span class="nb">i</span><span class="p">);</span>
-    <span class="p">[</span><span class="n">ret</span><span class="p">,</span> <span class="n">result</span><span class="p">]</span> <span class="p">=</span> <span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="nb">i</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
-      <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;client(Matlab): RPC CALL ERROR&#39;</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="k">end</span><span class="p">;</span>
-    <span class="n">fib</span> <span class="p">=</span> <span class="n">result</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;client(Matlab): Response fib(%d) = %d\n&#39;</span><span class="p">,</span> <span class="nb">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
-
-    <span class="c">% Log result by sending it to the log connection</span>
-    <span class="n">ret</span> <span class="p">=</span> <span class="nb">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="nb">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">ret</span><span class="p">);</span>
-      <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;client(Matlab): SEND ERROR&#39;</span><span class="p">);</span>
-      <span class="n">exit_code</span> <span class="p">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="k">end</span><span class="p">;</span>
-  <span class="k">end</span><span class="p">;</span>
-
-  <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Goodbye from Matlab client&#39;</span><span class="p">);</span>
-  <span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+   
+  <span class="kt">int</span> <span class="n">iterations</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+  <span class="kt">int</span> <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello from C++ client: iterations %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">iterations</span><span class="p">);</span>
   
-<span class="k">end</span>
+  <span class="c1">// Set up connections matching yaml</span>
+  <span class="c1">// RPC client-side connection will be $(server_name)_$(client_name)</span>
+  <span class="n">CisRpcClient</span> <span class="n">rpc</span><span class="p">(</span><span class="s">&quot;server_client&quot;</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">,</span> <span class="s">&quot;%d&quot;</span><span class="p">);</span>
+  <span class="n">CisOutput</span> <span class="n">log</span><span class="p">(</span><span class="s">&quot;output_log&quot;</span><span class="p">,</span> <span class="s">&quot;fib(%-2d) = %-2d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+  
+  <span class="c1">// Initialize variables</span>
+  <span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">fib</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">logmsg</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">CIS_MSG_MAX</span><span class="o">*</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">));</span>
+  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+  <span class="c1">// Iterate over Fibonacci sequence</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">iterations</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    
+    <span class="c1">// Call the server and receive response</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Calling fib(%d)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">rpc</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fib</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): RPC CALL ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): Response fib(%d) = %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
+
+    <span class="c1">// Log result by sending it to the log connection</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;client(C++): SEND ERROR</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+      <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+      <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">free</span><span class="p">(</span><span class="n">logmsg</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Goodbye from C++ client</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">exit_code</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -1313,7 +1198,7 @@
   <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1331,9 +1216,9 @@
 
 <span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
   <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
-  <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
+  <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
   <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.m</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.cpp</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
   <span class="l l-Scalar l-Scalar-Plain">client_of</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
   <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
@@ -1349,9 +1234,7 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1360,7 +1243,7 @@
         <a href="rpc_lesson2.html" class="btn btn-neutral float-right" title="rpc_lesson2 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="formatted_io5.html" class="btn btn-neutral" title="formatted_io5 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="formatted_io9.html" class="btn btn-neutral" title="formatted_io9 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1369,11 +1252,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1388,37 +1271,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.6.1+1.g81b8e90',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

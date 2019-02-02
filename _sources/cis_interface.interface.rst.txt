@@ -1,5 +1,5 @@
-cis_interface.interface package
-===============================
+cis\_interface.interface package
+================================
 
 Subpackages
 -----------
@@ -11,18 +11,10 @@ Subpackages
 Submodules
 ----------
 
-cis_interface.interface.CisInterface module
--------------------------------------------
+cis\_interface.interface.CisInterface module
+--------------------------------------------
 
 .. automodule:: cis_interface.interface.CisInterface
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cis_interface.interface.PsiInterface module
--------------------------------------------
-
-.. automodule:: cis_interface.interface.PsiInterface
     :members:
     :undoc-members:
     :show-inheritance:

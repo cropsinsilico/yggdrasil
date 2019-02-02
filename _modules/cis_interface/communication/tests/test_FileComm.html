@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.tests.test_FileComm &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
+  <title>cis_interface.communication.tests.test_FileComm &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="../../../../index.html"/>
-        <link rel="up" title="cis_interface.communication" href="../../communication.html"/> 
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -121,7 +111,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">cis_interface</a>
@@ -129,9 +119,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -175,72 +166,64 @@
             
   <h1>Source code for cis_interface.communication.tests.test_FileComm</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">new_comm</span>
 <span class="kn">from</span> <span class="nn">cis_interface.communication.tests</span> <span class="k">import</span> <span class="n">test_CommBase</span> <span class="k">as</span> <span class="n">parent</span>
 
 
 <div class="viewcode-block" id="TestFileComm"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm">[docs]</a><span class="k">class</span> <span class="nc">TestFileComm</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestCommBase</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test for FileComm communication class.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;FileComm&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;fd&#39;</span><span class="p">,</span> <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;append&#39;</span><span class="p">,</span> <span class="s1">&#39;in_temp&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;open_as_binary&#39;</span><span class="p">,</span> <span class="s1">&#39;newline&#39;</span><span class="p">,</span> <span class="s1">&#39;is_series&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;platform_newline&#39;</span><span class="p">]</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for FileComm communication class.&quot;&quot;&quot;</span>
 
+    <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;FileComm&#39;</span>
+    <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestCommBase</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
+                 <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;fd&#39;</span><span class="p">,</span> <span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;append&#39;</span><span class="p">,</span> <span class="s1">&#39;in_temp&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;open_as_binary&#39;</span><span class="p">,</span> <span class="s1">&#39;newline&#39;</span><span class="p">,</span> <span class="s1">&#39;is_series&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;platform_newline&#39;</span><span class="p">])</span>
+    
 <div class="viewcode-block" id="TestFileComm.teardown"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Remove the file.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the file.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">remove_file</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestFileComm.test_invalid_read_meth"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_invalid_read_meth">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_read_meth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test raise of error on invalid read_meth.&quot;&quot;&quot;</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;read_meth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;invalid&#39;</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;in_temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">out</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">append_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Message that should be sent by second comm.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span>
-    
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">double_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Message that should result from writing two test messages.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge_messages</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">append_msg</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">out</span>
+<div class="viewcode-block" id="TestFileComm.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_send_recv_nolimit">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File comm&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test send/recv of a large message.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
 
-<div class="viewcode-block" id="TestFileComm.merge_messages"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.merge_messages">[docs]</a>    <span class="k">def</span> <span class="nf">merge_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_list</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Merge multiple messages to produce the expected total message.</span>
+<div class="viewcode-block" id="TestFileComm.test_work_comm"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_work_comm">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File comm&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test creating/removing a work comm.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
 
-<span class="sd">        Args:</span>
-<span class="sd">            msg_list (list): Messages to be merged.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            obj: Merged message.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">empty_msg</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msg_list</span><span class="p">)</span></div>
+<div class="viewcode-block" id="TestFileComm.test_invalid_read_meth"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_invalid_read_meth">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_read_meth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test raise of error on invalid read_meth.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;read_meth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;invalid&#39;</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestFileComm.test_append"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_append">[docs]</a>    <span class="k">def</span> <span class="nf">test_append</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test open of file comm with append.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test open of file comm with append.&quot;&quot;&quot;</span>
+        <span class="n">send_objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">]</span>
+        <span class="n">recv_objects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]</span>
         <span class="c1"># Write to file</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">send_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="c1"># Open file in append</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;append&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">new_inst</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;append</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">flag</span> <span class="o">=</span> <span class="n">new_inst</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">append_msg</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">send_objects</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">flag</span> <span class="o">=</span> <span class="n">new_inst</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">new_inst</span><span class="p">)</span>
         <span class="c1"># Read entire contents</span>
         <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
@@ -251,14 +234,17 @@
                 <span class="n">msg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">merge_messages</span><span class="p">(</span><span class="n">msg_list</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">double_msg</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="TestFileComm.test_work_comm"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">test_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Disabled: Test creating/removing a work comm.&quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">msg_list</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">recv_objects</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">msg_list</span><span class="p">,</span> <span class="n">recv_objects</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="c1"># Check file contents</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exact_contents&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="n">contents</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="TestFileComm.test_series"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_series">[docs]</a>    <span class="k">def</span> <span class="nf">test_series</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test sending/receiving to/from a series of files.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving to/from a series of files.&quot;&quot;&quot;</span>
         <span class="c1"># Set up series</span>
         <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">address</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -275,45 +261,45 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="TestFileComm.test_remaining_bytes"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_remaining_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">test_remaining_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test remaining_bytes.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test remaining_bytes.&quot;&quot;&quot;</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">remaining_bytes</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">remaining_bytes</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestFileComm.test_recv_nomsg"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm.test_recv_nomsg">[docs]</a>    <span class="k">def</span> <span class="nf">test_recv_nomsg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test recieve when there is no waiting message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test recieve when there is no waiting message.&quot;&quot;&quot;</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TestFileComm_readline"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm_readline">[docs]</a><span class="k">class</span> <span class="nc">TestFileComm_readline</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test for FileComm communication class with read_meth = &#39;readline&#39;.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for FileComm communication class with read_meth = &#39;readline&#39;.&quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;read_meth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;readline&#39;</span>
-        <span class="k">return</span> <span class="n">out</span></div>
-
-
-<div class="viewcode-block" id="TestFileComm_ascii"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm_ascii">[docs]</a><span class="k">class</span> <span class="nc">TestFileComm_ascii</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test for FileComm communication class with open_as_binary = False.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">send_inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestFileComm_ascii</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;open_as_binary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">def</span> <span class="nf">testing_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Testing options.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestFileComm_readline</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">testing_options</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;recv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;send&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">out</span></div>
+
+    
+<div class="viewcode-block" id="TestFileComm_ascii"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_FileComm.TestFileComm_ascii">[docs]</a><span class="k">class</span> <span class="nc">TestFileComm_ascii</span><span class="p">(</span><span class="n">TestFileComm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for FileComm communication class with open_as_binary = False.&quot;&quot;&quot;</span>
+
+    <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;open_as_binary&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -322,11 +308,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -341,37 +327,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.6.1+1.g81b8e90',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

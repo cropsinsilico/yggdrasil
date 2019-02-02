@@ -1,0 +1,898 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.datatypes.ObjMetaschemaType &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+          <li><a href="../datatypes.html">cis_interface.metaschema.datatypes</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.datatypes.ObjMetaschemaType</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.datatypes.ObjMetaschemaType</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">register_type_from_file</span><span class="p">,</span> <span class="n">_schema_dir</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes.JSONObjectMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">JSONObjectMetaschemaType</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes.PlyMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">PlyDict</span><span class="p">,</span>
+    <span class="n">_index_type</span><span class="p">,</span> <span class="n">_color_type</span><span class="p">,</span> <span class="n">_coord_type</span><span class="p">,</span>
+    <span class="n">_index_conv</span><span class="p">,</span> <span class="n">_color_conv</span><span class="p">,</span> <span class="n">_coord_conv</span><span class="p">,</span>
+    <span class="n">_index_fmt</span><span class="p">,</span> <span class="n">_color_fmt</span><span class="p">,</span> <span class="n">_coord_fmt</span><span class="p">)</span>
+    
+
+<span class="n">_schema_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_schema_dir</span><span class="p">,</span> <span class="s1">&#39;obj.json&#39;</span><span class="p">)</span>
+<span class="n">_default_element_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="s1">&#39;normals&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoords&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;lines&#39;</span><span class="p">,</span> <span class="s1">&#39;faces&#39;</span><span class="p">,</span> <span class="s1">&#39;curves&#39;</span><span class="p">,</span> <span class="s1">&#39;curve2Ds&#39;</span><span class="p">,</span> <span class="s1">&#39;surfaces&#39;</span><span class="p">]</span>
+<span class="c1"># TODO: Unclear what standard puts colors after coords and how that is</span>
+<span class="c1"># reconciled with the weight (i.e. do colors go before or after weight)</span>
+<span class="n">_default_property_order</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;normals&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;texcoords&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="s1">&#39;vertex_indices&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoord_index&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;curves&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;starting_param&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">]],</span>
+    <span class="s1">&#39;curve2Ds&#39;</span><span class="p">:</span> <span class="s1">&#39;param_indices&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;surfaces&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;starting_param_u&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param_u&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;starting_param_v&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param_v&#39;</span><span class="p">,</span>
+                 <span class="p">{</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">]}]}</span>
+<span class="n">_index_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">,</span> <span class="s1">&#39;vertex_index&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;normal_index&#39;</span><span class="p">,</span> <span class="s1">&#39;param_indices&#39;</span><span class="p">]</span>
+<span class="n">_default_property_formats</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">_default_property_converters</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">,</span> <span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;starting_param&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;starting_param_u&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param_u&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;starting_param_v&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param_v&#39;</span><span class="p">]:</span>
+    <span class="n">_default_property_formats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_coord_fmt</span>
+    <span class="n">_default_property_converters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_coord_conv</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">]:</span>
+    <span class="n">_default_property_formats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_color_fmt</span>
+    <span class="n">_default_property_converters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_color_conv</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">,</span> <span class="s1">&#39;param_index&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;vertex_indices&#39;</span><span class="p">,</span> <span class="s1">&#39;param_indices&#39;</span><span class="p">]:</span>
+    <span class="n">_default_property_formats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_index_fmt</span>
+    <span class="n">_default_property_converters</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_index_conv</span>
+<span class="n">_map_element2code</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;material&#39;</span><span class="p">:</span> <span class="s1">&#39;usemtl&#39;</span><span class="p">,</span> <span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="s1">&#39;vp&#39;</span><span class="p">,</span> <span class="s1">&#39;normals&#39;</span><span class="p">:</span> <span class="s1">&#39;vn&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoords&#39;</span><span class="p">:</span> <span class="s1">&#39;vt&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;curves&#39;</span><span class="p">:</span> <span class="s1">&#39;curv&#39;</span><span class="p">,</span> <span class="s1">&#39;curve2Ds&#39;</span><span class="p">:</span> <span class="s1">&#39;curv2&#39;</span><span class="p">,</span> <span class="s1">&#39;surfaces&#39;</span><span class="p">:</span> <span class="s1">&#39;surf&#39;</span><span class="p">}</span>
+<span class="n">_map_code2element</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_map_element2code</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+
+<div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Creates a file containing the Obj schema.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        overwrite (bool, optional): If True and a file already exists, the</span>
+<span class="sd">            existing file will be replaced. If False, an error will be raised</span>
+<span class="sd">            if the file already exists.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">overwrite</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_schema_file</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Schema file already exists.&quot;</span><span class="p">)</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;A mapping container for Obj 3D data.&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="s1">&#39;faces&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;definitions&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;vertex&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Map describing a single vertex.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;red&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_color_type</span><span class="p">},</span>
+                               <span class="s1">&#39;blue&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_color_type</span><span class="p">},</span>
+                               <span class="s1">&#39;green&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_color_type</span><span class="p">},</span>
+                               <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}}},</span>
+            <span class="s1">&#39;param&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Map describing a single parameter space point.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}}},</span>
+            <span class="s1">&#39;normal&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Map describing a single normal.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">}}},</span>
+            <span class="s1">&#39;texcoord&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Map describing a single texture vertex.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                               <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+                               <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}}},</span>
+            <span class="s1">&#39;point&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of vertex indices describing a set of points.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;minItems&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">}},</span>
+            <span class="s1">&#39;line&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Array of vertex indices and texture indices &#39;</span>
+                                <span class="o">+</span> <span class="s1">&#39;describing a line.&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;minItems&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">],</span>
+                          <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="s1">&#39;properties&#39;</span><span class="p">:</span>
+                              <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">},</span>
+                               <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">}}}},</span>
+            <span class="s1">&#39;face&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Array of vertex, texture, and normal indices &#39;</span>
+                                <span class="o">+</span> <span class="s1">&#39;describing a face.&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;minItems&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">],</span>
+                          <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                          <span class="s1">&#39;properties&#39;</span><span class="p">:</span>
+                              <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">},</span>
+                               <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">},</span>
+                               <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">}}}},</span>
+            <span class="s1">&#39;curve&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Properties of describing a curve.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;starting_param&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;vertex_indices&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;starting_param&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                    <span class="s1">&#39;ending_param&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                    <span class="s1">&#39;vertex_indices&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;minItems&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">}}}},</span>
+            <span class="s1">&#39;curve2D&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Array of parameter indices describine a 2D curve on &#39;</span>
+                                <span class="o">+</span> <span class="s1">&#39;a surface.&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;minItems&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">}},</span>
+            <span class="s1">&#39;surface&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Properties describing a surface.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;starting_param_u&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param_u&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;starting_param_v&#39;</span><span class="p">,</span> <span class="s1">&#39;ending_param_v&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;vertex_indices&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;starting_param_u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                    <span class="s1">&#39;ending_param_u&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                    <span class="s1">&#39;starting_param_v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                    <span class="s1">&#39;ending_param_v&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_coord_type</span><span class="p">},</span>
+                    <span class="s1">&#39;vertex_indices&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;minItems&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">],</span>
+                                  <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                                  <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                                      <span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">},</span>
+                                      <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">},</span>
+                                      <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">_index_type</span><span class="p">}}}}}}},</span>
+        <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;material&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Name of the material to use.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;unicode&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">]},</span>
+            <span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of vertices.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/vertex&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of parameter coordinates.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/param&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;normals&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of normals.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/normal&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;texcoords&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of texture vertices.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/texcoord&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of points.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/point&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of lines.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/line&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of faces.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/face&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;curves&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of curves.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/curve&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;curve2Ds&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of curve2Ds.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/curve2D&#39;</span><span class="p">}},</span>
+            <span class="s1">&#39;surfaces&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Array of surfaces.&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="s1">&#39;#/definitions/surface&#39;</span><span class="p">}}},</span>
+        <span class="s1">&#39;dependencies&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;curves&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;curve2Ds&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;surfaces&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]}}</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_schema_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the Obj schema, initializing it if necessary.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Obj schema.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_schema_file</span><span class="p">):</span>
+        <span class="n">create_schema</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_schema_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">_schema_file</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+    <span class="n">create_schema</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="ObjDict"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjDict">[docs]</a><span class="k">class</span> <span class="nc">ObjDict</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Enhanced dictionary class for storing Obj information.&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Vertices for each face in the structure.&quot;&quot;&quot;</span>
+        <span class="n">mesh</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">count_elements</span><span class="p">(</span><span class="s1">&#39;faces&#39;</span><span class="p">)):</span>
+            <span class="n">imesh</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">imesh</span> <span class="o">+=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">]][</span><span class="n">k</span><span class="p">]</span>
+                              <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">]]</span>
+            <span class="n">mesh</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imesh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mesh</span>
+
+<div class="viewcode-block" id="ObjDict.from_shape"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjDict.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scene (openalea.plantgl.scene): Scene that should be descritized.</span>
+<span class="sd">            d (openalea.plantgl.descritizer): Descritizer.</span>
+<span class="sd">            conversion (float, optional): Conversion factor that should be</span>
+<span class="sd">                applied to the vertex positions. Defaults to 1.0.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iobj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">,</span>
+                                              <span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">iobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Texcoords</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordList</span><span class="p">:</span>
+                <span class="n">iobj</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;texcoords&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordList</span><span class="p">:</span>
+                    <span class="c1"># TODO: Should the coords be scaled?</span>
+                    <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">y</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordIndexList</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordIndexList</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]):</span>
+                            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                                <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="c1"># Normals</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalList</span><span class="p">:</span>
+                <span class="n">iobj</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;normals&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalList</span><span class="p">:</span>
+                    <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">n</span><span class="o">.</span><span class="n">z</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalIndexList</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">normalIndexList</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">]):</span>
+                            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                                <span class="n">iobj</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="s1">&#39;normal_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">iobj</span></div>
+
+<div class="viewcode-block" id="ObjDict.to_geom_args"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjDict.to_geom_args">[docs]</a>    <span class="k">def</span> <span class="nf">to_geom_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            conversion (float, optional): Conversion factor that should be</span>
+<span class="sd">                applied to the vertices. Defaults to 1.0.</span>
+<span class="sd">            name (str, optional): Name that should be given to the created</span>
+<span class="sd">                PlantGL symbol. Defaults to None and is ignored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: Class, arguments and keyword arguments for PlantGL geometry.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">openalea.plantgl.all</span> <span class="k">as</span> <span class="nn">pgl</span>
+        <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_geom_args</span><span class="p">(</span>
+            <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">index_class</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">Index</span>
+        <span class="n">array_class</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">IndexArray</span>
+        <span class="c1"># Texture coords</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;texcoords&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">obj_texcoords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]:</span>
+                <span class="n">obj_texcoords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pgl</span><span class="o">.</span><span class="n">Vector2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]),</span>
+                                                 <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))))</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;texCoordList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">Point2Array</span><span class="p">(</span><span class="n">obj_texcoords</span><span class="p">)</span>
+            <span class="n">obj_ftexcoords</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]):</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">_f</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;texcoord_index&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_f</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;&#39;texcoord_index&#39; missing from face&quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">, texcoord indices will be &quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;ignored.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="n">obj_ftexcoords</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">break</span>
+                    <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_f</span><span class="p">[</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">obj_ftexcoords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_class</span><span class="p">(</span><span class="o">*</span><span class="n">entry</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">obj_ftexcoords</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;texCoordIndexList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_class</span><span class="p">(</span><span class="n">obj_ftexcoords</span><span class="p">)</span>
+        <span class="c1"># Normals</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;normals&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="n">obj_normals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">]:</span>
+                <span class="n">obj_normals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pgl</span><span class="o">.</span><span class="n">Vector3</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="s1">&#39;i&#39;</span><span class="p">]),</span>
+                                               <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="s1">&#39;j&#39;</span><span class="p">]),</span>
+                                               <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="s1">&#39;k&#39;</span><span class="p">])))</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgl</span><span class="o">.</span><span class="n">Point3Array</span><span class="p">(</span><span class="n">obj_normals</span><span class="p">)</span>
+            <span class="n">obj_fnormals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]):</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">_f</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;normal_index&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_f</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">((</span><span class="s2">&quot;&#39;normal_index&#39; missing from face&quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">, normal indices will be &quot;</span>
+                                           <span class="o">+</span> <span class="s2">&quot;ignored.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="n">obj_fnormals</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="n">entry</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">break</span>
+                    <span class="n">entry</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">_f</span><span class="p">[</span><span class="s1">&#39;normal_index&#39;</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">obj_fnormals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_class</span><span class="p">(</span><span class="o">*</span><span class="n">entry</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">obj_fnormals</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;normalIndexList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">array_class</span><span class="p">(</span><span class="n">obj_fnormals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="ObjDict.append"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjDict.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append new ply information to this dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            solf (ObjDict): Another ply to append to this one.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exist_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="p">[])),</span>
+                     <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;texcoords&#39;</span><span class="p">,</span> <span class="p">[])),</span>
+                     <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;normals&#39;</span><span class="p">,</span> <span class="p">[])),</span>
+                     <span class="s1">&#39;param_index&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;params&#39;</span><span class="p">,</span> <span class="p">[]))}</span>
+        <span class="n">exist_map</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">exist_map</span><span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">],</span>
+                         <span class="n">curve2Ds</span><span class="o">=</span><span class="n">exist_map</span><span class="p">[</span><span class="s1">&#39;param_index&#39;</span><span class="p">])</span>
+        <span class="c1"># Vertex fields</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="s1">&#39;texcoords&#39;</span><span class="p">,</span> <span class="s1">&#39;normals&#39;</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">solf</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="c1"># Points/2D curves</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;points&#39;</span><span class="p">,</span> <span class="s1">&#39;curve2Ds&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v</span> <span class="o">+</span> <span class="n">exist_map</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">])</span>
+        <span class="c1"># Face/line fields</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;lines&#39;</span><span class="p">,</span> <span class="s1">&#39;faces&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                    <span class="n">iele</span> <span class="o">=</span> <span class="p">[{</span><span class="n">ik</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span> <span class="o">+</span> <span class="n">exist_map</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span> <span class="k">for</span> <span class="n">ik</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iele</span><span class="p">)</span>
+        <span class="c1"># Curves</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="s1">&#39;curves&#39;</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                <span class="n">iele</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">iele</span><span class="p">[</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="o">+</span> <span class="n">exist_map</span><span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">]</span>
+                                          <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">]]</span>
+        <span class="c1"># Surfaces</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="s1">&#39;surfaces&#39;</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">solf</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                <span class="n">iele</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">iele</span><span class="p">[</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="n">ik</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span> <span class="o">+</span> <span class="n">exist_map</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span> <span class="k">for</span> <span class="n">ik</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+                                          <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">]]</span>
+        <span class="c1"># Merge material using first in list</span>
+        <span class="n">material</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">material</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">material</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">material</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ObjDict.apply_scalar_map"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjDict.apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the color of faces in a 3D object based on a scalar map.</span>
+<span class="sd">        This creates a copy unless no_copy is True.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            scalar_arr (arr): Scalar values that should be mapped to colors</span>
+<span class="sd">                for each face.</span>
+<span class="sd">            color_map (str, optional): The name of the color map that should</span>
+<span class="sd">                be used. Defaults to &#39;plasma&#39;.</span>
+<span class="sd">            vmin (float, optional): Value that should map to the minimum of the</span>
+<span class="sd">                colormap. Defaults to min(scalar_arr).</span>
+<span class="sd">            vmax (float, optional): Value that should map to the maximum of the</span>
+<span class="sd">                colormap. Defaults to max(scalar_arr).</span>
+<span class="sd">            scaling (str, optional): Scaling that should be used to map the scalar</span>
+<span class="sd">                array onto the colormap. Defaults to &#39;linear&#39;.</span>
+<span class="sd">            scale_by_area (bool, optional): If True, the elements of the scalar</span>
+<span class="sd">                array will be multiplied by the area of the corresponding face.</span>
+<span class="sd">                If True, vmin and vmax should be in terms of the scaled array.</span>
+<span class="sd">                Defaults to False.</span>
+<span class="sd">            no_copy (bool, optional): If True, the returned object will not be a</span>
+<span class="sd">                copy. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Obj with updated vertex colors.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;_as_obj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">apply_scalar_map</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+    
+
+<span class="c1"># The base class could be anything since it is discarded during registration,</span>
+<span class="c1"># but is set to JSONObjectMetaschemaType here for transparancy since this is</span>
+<span class="c1"># what the base class is determined to be on loading the schema</span>
+<div class="viewcode-block" id="ObjMetaschemaType"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType">[docs]</a><span class="nd">@register_type_from_file</span><span class="p">(</span><span class="n">_schema_file</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ObjMetaschemaType</span><span class="p">(</span><span class="n">JSONObjectMetaschemaType</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Obj 3D structure map.&quot;&quot;&quot;</span>
+
+    <span class="n">_empty_msg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="n">python_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">ObjDict</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_encode_object_property</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">req_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">req_keys</span><span class="p">:</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span>
+        <span class="n">plist</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                <span class="n">plist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_encode_object_property</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">req_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plist</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">order</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">ksub</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">ksub</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                        <span class="n">plist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_encode_object_property</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">ksub</span><span class="p">],</span> <span class="n">k</span><span class="p">[</span><span class="n">ksub</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">ksub</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">ksub</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                        <span class="n">plist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_encode_object_property</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">ksub</span><span class="p">],</span> <span class="n">ksub</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+                        <span class="n">plist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_encode_object_property</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">k</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="n">req_keys</span><span class="p">:</span>
+                        <span class="n">plist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plist</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">_index_properties</span><span class="p">:</span>
+                <span class="c1"># Add one at write to indexes as .obj is not zero indexed</span>
+                <span class="k">return</span> <span class="n">_default_property_formats</span><span class="p">[</span><span class="n">order</span><span class="p">]</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_default_property_formats</span><span class="p">[</span><span class="n">order</span><span class="p">]</span> <span class="o">%</span> <span class="n">obj</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_decode_object_property</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">order</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;/&#39;</span> <span class="ow">in</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">values</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">osub</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">osub</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="n">o</span><span class="p">[</span><span class="n">osub</span><span class="p">])</span>
+                        <span class="k">break</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">osub</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">osub</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">:],</span> <span class="n">osub</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">ftranslate</span> <span class="o">=</span> <span class="n">_default_property_converters</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">ftranslate</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">order</span> <span class="ow">in</span> <span class="n">_index_properties</span><span class="p">:</span>
+                    <span class="c1"># Subtract 1 from indexes because .obj is not zero indexed</span>
+                    <span class="n">out</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="s1">&#39;/&#39;</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span>
+                <span class="n">subvalues</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">order</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">subvalues</span><span class="p">))</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">(</span><span class="n">subvalues</span><span class="p">,</span> <span class="n">order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="ObjMetaschemaType.encode_data"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="p">[],</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (object): Object to encode.</span>
+<span class="sd">            typedef (dict): Type definition that should be used to encode the</span>
+<span class="sd">                object.</span>
+<span class="sd">            comments (list, optional): List of comments that should be included in</span>
+<span class="sd">                the file header. Defaults to lines describing the automated origin</span>
+<span class="sd">                of the file.</span>
+<span class="sd">            newline (str, optional): String that should be used to delineated end</span>
+<span class="sd">                of lines. Defaults to &#39;\n&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes, str: Serialized message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Encode header</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;# Author cis_auto&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;# Generated by cis_interface&#39;</span><span class="p">]</span>
+        <span class="n">header</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;# &#39;</span> <span class="o">+</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">comments</span><span class="p">]</span>
+        <span class="n">header</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+        <span class="c1"># Encode body</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">_default_element_order</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;material&#39;</span><span class="p">):</span>
+                <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_map_element2code</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]))</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">ie</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">]:</span>
+                <span class="n">ivalue</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_encode_object_property</span><span class="p">(</span><span class="n">ie</span><span class="p">,</span> <span class="n">_default_property_order</span><span class="p">[</span><span class="n">e</span><span class="p">])</span>
+                <span class="n">iline</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">_map_element2code</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="n">ivalue</span><span class="p">)</span>
+                <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iline</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>  <span class="c1"># Ensure trailing spaces are removed</span>
+        <span class="k">return</span> <span class="n">newline</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span> <span class="o">+</span> <span class="n">body</span><span class="p">)</span> <span class="o">+</span> <span class="n">newline</span></div>
+
+<div class="viewcode-block" id="ObjMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (string): Encoded object to decode.</span>
+<span class="sd">            typedef (dict): Type definition that should be used to decode the</span>
+<span class="sd">                object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Decoded object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;comments&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Parse</span>
+        <span class="k">for</span> <span class="n">line_count</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+                <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;comments&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_map_code2element</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Type code &#39;</span><span class="si">%s</span><span class="s2">&#39; on line </span><span class="si">%d</span><span class="s2"> not understood&quot;</span>
+                                 <span class="o">%</span> <span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line_count</span><span class="p">))</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">_map_code2element</span><span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_decode_object_property</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">_default_property_order</span><span class="p">[</span><span class="n">e</span><span class="p">]))</span>
+        <span class="c1"># Return</span>
+        <span class="c1"># out.update(**metadata)</span>
+        <span class="k">return</span> <span class="n">ObjDict</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ObjMetaschemaType.updated_fixed_properties"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.ObjMetaschemaType.ObjMetaschemaType.updated_fixed_properties">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">updated_fixed_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
+<span class="sd">        from the object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (object): Object to use to put constraints on the fixed properties</span>
+<span class="sd">                schema.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Fixed properties schema with object dependent constraints.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">updated_fixed_properties</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="c1"># Constrain dependencies for indexes into other elements</span>
+        <span class="n">depend_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="s1">&#39;vertices&#39;</span><span class="p">,</span> <span class="s1">&#39;vertex_indices&#39;</span><span class="p">:</span> <span class="s1">&#39;vertices&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="s1">&#39;texcoords&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="s1">&#39;normals&#39;</span><span class="p">}</span>
+        <span class="n">check_depends</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">],</span>
+                         <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">],</span>
+                         <span class="s1">&#39;surfaces:vertex_indices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">]}</span>
+        <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">props</span> <span class="ow">in</span> <span class="n">check_depends</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">sube</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">e</span><span class="p">,</span> <span class="n">sube</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">e</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))):</span>
+                <span class="k">continue</span>
+            <span class="n">req_flags</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="kc">False</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">props</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="n">e</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">req_flags</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">props</span><span class="p">):</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="n">sube</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(((</span><span class="n">sube</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">o</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="n">sube</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)))</span>
+                         <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="n">sube</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="n">sube</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)))):</span>
+                        <span class="k">continue</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">o</span><span class="p">[</span><span class="n">sube</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                            <span class="n">req_flags</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">o</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)):</span>
+                        <span class="k">continue</span>
+                    <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                            <span class="n">req_flags</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># Set dependencies</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">req_flags</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">req_flags</span><span class="p">[</span><span class="n">p</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">depend_map</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;dependencies&#39;</span><span class="p">][</span><span class="n">e</span><span class="p">]:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;dependencies&#39;</span><span class="p">][</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">depend_map</span><span class="p">[</span><span class="n">p</span><span class="p">])</span>
+        <span class="c1"># Contrain indices on number of elements refered to</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;vertices&#39;</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;curve&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">][</span>
+                <span class="s1">&#39;maximum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;params&#39;</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="s1">&#39;curve2D&#39;</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="s1">&#39;maximum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;line&#39;</span><span class="p">,</span> <span class="s1">&#39;face&#39;</span><span class="p">,</span> <span class="s1">&#39;surface&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;surface&#39;</span><span class="p">:</span>
+                <span class="n">iprop</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">e</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">][</span>
+                    <span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">iprop</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;definitions&#39;</span><span class="p">][</span><span class="n">e</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">e_depends</span> <span class="ow">in</span> <span class="n">depend_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">iprop</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">e_depends</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e_depends</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                        <span class="n">iprop</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;maximum&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">e_depends</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+
+
+<span class="n">ObjDict</span><span class="o">.</span><span class="n">_type_class</span> <span class="o">=</span> <span class="n">ObjMetaschemaType</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

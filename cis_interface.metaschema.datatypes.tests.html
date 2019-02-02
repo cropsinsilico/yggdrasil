@@ -1,0 +1,907 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.datatypes.tests package &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.datatypes.tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.metaschema.datatypes.tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-metaschema-datatypes-tests-package">
+<h1>cis_interface.metaschema.datatypes.tests package<a class="headerlink" href="#cis-interface-metaschema-datatypes-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-arraymetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestNDArrayMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.</code><code class="descname">TestNDArrayMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ArrayMetaschemaType.html#TestNDArrayMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestNDArrayMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+<p>Test class for ArrayMetaschemaType class with 2D array.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestNDArrayMetaschemaType.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ArrayMetaschemaType.html#TestNDArrayMetaschemaType.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestNDArrayMetaschemaType.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestOneDArrayMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.</code><code class="descname">TestOneDArrayMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ArrayMetaschemaType.html#TestOneDArrayMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestOneDArrayMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+<p>Test class for ArrayMetaschemaType class.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestOneDArrayMetaschemaType.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ArrayMetaschemaType.html#TestOneDArrayMetaschemaType.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ArrayMetaschemaType.TestOneDArrayMetaschemaType.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-containermetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType.test_container_errors">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType.</code><code class="descname">test_container_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ContainerMetaschemaType.html#test_container_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ContainerMetaschemaType.test_container_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test implementation errors on bare container class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-functionmetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.TestFunctionMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.</code><code class="descname">TestFunctionMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_FunctionMetaschemaType.html#TestFunctionMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.TestFunctionMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType</span></code></a></p>
+<p>Test class for FunctionMetaschemaType class with float.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.TestFunctionMetaschemaType.test_decode_data_errors">
+<code class="descname">test_decode_data_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_FunctionMetaschemaType.html#TestFunctionMetaschemaType.test_decode_data_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.TestFunctionMetaschemaType.test_decode_data_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in decode_data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.valid_function">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.</code><code class="descname">valid_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_FunctionMetaschemaType.html#valid_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_FunctionMetaschemaType.valid_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Valid function for testing.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-jsonarraymetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.</code><code class="descname">TestJSONArrayMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONArrayMetaschemaType.html#TestJSONArrayMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType</span></code></a></p>
+<p>Test class for JSONArrayMetaschemaType class with float.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_container_errors">
+<code class="descname">test_container_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONArrayMetaschemaType.html#TestJSONArrayMetaschemaType.test_container_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_container_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors on container operations.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_encode_data_readable">
+<code class="descname">test_encode_data_readable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONArrayMetaschemaType.html#TestJSONArrayMetaschemaType.test_encode_data_readable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_encode_data_readable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test corner case of encode_data_readable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_item_dictionary">
+<code class="descname">test_item_dictionary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONArrayMetaschemaType.html#TestJSONArrayMetaschemaType.test_item_dictionary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_item_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test dictionary as items value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_validate_errors">
+<code class="descname">test_validate_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONArrayMetaschemaType.html#TestJSONArrayMetaschemaType.test_validate_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.TestJSONArrayMetaschemaType.test_validate_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on validation of non-structured array.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.test_coerce">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.</code><code class="descname">test_coerce</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONArrayMetaschemaType.html#test_coerce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONArrayMetaschemaType.test_coerce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialization of coerced types.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-jsonmetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.</code><code class="descname">TestJSONBooleanMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONMetaschemaType.html#TestJSONBooleanMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType</span></code></a></p>
+<p>Test class for JSONBooleanMetaschemaType class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONIntegerMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.</code><code class="descname">TestJSONIntegerMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONMetaschemaType.html#TestJSONIntegerMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONIntegerMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType</span></code></a></p>
+<p>Test class for JSONIntegerMetaschemaType class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONNullMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.</code><code class="descname">TestJSONNullMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONMetaschemaType.html#TestJSONNullMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONNullMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType</span></code></a></p>
+<p>Test class for JSONNullMetaschemaType class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONNumberMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.</code><code class="descname">TestJSONNumberMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONMetaschemaType.html#TestJSONNumberMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONNumberMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType</span></code></a></p>
+<p>Test class for JSONNumberMetaschemaType class.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONStringMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.</code><code class="descname">TestJSONStringMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONMetaschemaType.html#TestJSONStringMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONStringMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_JSONMetaschemaType.TestJSONBooleanMetaschemaType</span></code></a></p>
+<p>Test class for JSONStringMetaschemaType class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-jsonobjectmetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.</code><code class="descname">TestJSONObjectMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONObjectMetaschemaType.html#TestJSONObjectMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType</span></code></a></p>
+<p>Test class for JSONObjectMetaschemaType class.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.test_coerce">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.</code><code class="descname">test_coerce</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_JSONObjectMetaschemaType.html#test_coerce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.test_coerce" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialization of coerced types.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_MetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-metaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_MetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_MetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_MetaschemaType.</code><code class="descname">TestMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
+<p>Test class for MetaschemaType class.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for creating a class instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.mod">
+<code class="descname">mod</code><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.mod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute name of module containing class to be tested.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_check_decoded">
+<code class="descname">test_check_decoded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_check_decoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_check_decoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test check_decoded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_check_encoded">
+<code class="descname">test_check_encoded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_check_encoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_check_encoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test check_encoded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_decode_errors">
+<code class="descname">test_decode_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_decode_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_decode_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on decode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_definition_schema">
+<code class="descname">test_definition_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_definition_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_definition_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test definition schema.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_empty">
+<code class="descname">test_deserialize_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_deserialize_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test call for empty string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_error">
+<code class="descname">test_deserialize_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_deserialize_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test deserialization errors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_incomplete">
+<code class="descname">test_deserialize_incomplete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_deserialize_incomplete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_incomplete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test call for incomplete message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_encode_data">
+<code class="descname">test_encode_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_encode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_encode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test encode/decode data &amp; type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_encode_errors">
+<code class="descname">test_encode_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_encode_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_encode_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on encode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_extract_typedef">
+<code class="descname">test_extract_typedef</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_extract_typedef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_extract_typedef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test extract_typedef.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_fixed2base">
+<code class="descname">test_fixed2base</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_fixed2base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_fixed2base" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of type definition from fixed type to the base.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_metadata_schema">
+<code class="descname">test_metadata_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_metadata_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_metadata_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test metadata schema.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_normalize">
+<code class="descname">test_normalize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test normalization.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_serialize">
+<code class="descname">test_serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_serialize_error">
+<code class="descname">test_serialize_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_serialize_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_serialize_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialization errors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_transform_type">
+<code class="descname">test_transform_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_transform_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_transform_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test transform_type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_update_typedef">
+<code class="descname">test_update_typedef</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_update_typedef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_update_typedef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test update_typedef raises error on non-matching typename.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_validate">
+<code class="descname">test_validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_MetaschemaType.html#TestMetaschemaType.test_validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test validation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.typedef">
+<code class="descname">typedef</code><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.typedef" title="Permalink to this definition">¶</a></dt>
+<dd><p>Type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-objmetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.</code><code class="descname">TestObjDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ObjMetaschemaType.html#TestObjDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict" title="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict</span></code></a></p>
+<p>Test for ObjDict class.</p>
+<dl class="attribute">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for creating a class instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_apply_scalar_map">
+<code class="descname">test_apply_scalar_map</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ObjMetaschemaType.html#TestObjDict.test_apply_scalar_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_apply_scalar_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test applying a scalar colormap.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_to_from_scene">
+<code class="descname">test_to_from_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ObjMetaschemaType.html#TestObjDict.test_to_from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_to_from_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion to/from PlantGL scene.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.</code><code class="descname">TestObjMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ObjMetaschemaType.html#TestObjMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyMetaschemaType</span></code></a></p>
+<p>Test class for ObjMetaschemaType class with float.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.test_create_schema">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.</code><code class="descname">test_create_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ObjMetaschemaType.html#test_create_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.test_create_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test create_schema.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-plymetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.</code><code class="descname">TestPlyDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
+<p>Test for PlyDict class.</p>
+<dl class="attribute">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for creating a class instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.mod">
+<code class="descname">mod</code><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.mod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Absolute name of module containing class to be tested.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_append">
+<code class="descname">test_append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test appending ply objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_apply_scalar_map">
+<code class="descname">test_apply_scalar_map</code><span class="sig-paren">(</span><em>_as_obj=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_apply_scalar_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_apply_scalar_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test applying a scalar colormap.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_count_elements">
+<code class="descname">test_count_elements</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_count_elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_count_elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test count_elements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_merge">
+<code class="descname">test_merge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test merging two ply objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_mesh">
+<code class="descname">test_mesh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test mesh.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_properties">
+<code class="descname">test_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test explicit exposure of specific element counts as properties
+against counts based on singular elements.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_to_from_dict">
+<code class="descname">test_to_from_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_to_from_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_to_from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test transformation to/from dict.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_to_from_scene">
+<code class="descname">test_to_from_scene</code><span class="sig-paren">(</span><em>_as_obj=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyDict.test_to_from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyDict.test_to_from_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion to/from PlantGL scene.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.</code><code class="descname">TestPlyMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType</span></code></a></p>
+<p>Test class for PlyMetaschemaType class.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyMetaschemaType.test_decode_data_errors">
+<code class="descname">test_decode_data_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#TestPlyMetaschemaType.test_decode_data_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.TestPlyMetaschemaType.test_decode_data_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in decode_data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_create_schema">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.</code><code class="descname">test_create_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#test_create_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_create_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test create_schema.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_singular2plural">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.</code><code class="descname">test_singular2plural</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#test_singular2plural"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_singular2plural" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion from singular element names to plural ones and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_translate_ply2fmt_errors">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.</code><code class="descname">test_translate_ply2fmt_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#test_translate_ply2fmt_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_translate_ply2fmt_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in translate_ply2fmt.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_translate_ply2py_errors">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.</code><code class="descname">test_translate_ply2py_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#test_translate_ply2py_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_translate_ply2py_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in translate_ply2py.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_translate_py2ply_errors">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.</code><code class="descname">test_translate_py2ply_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_PlyMetaschemaType.html#test_translate_py2ply_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_PlyMetaschemaType.test_translate_py2ply_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in translate_py2ply.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-scalarmetaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestBytesMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestBytesMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestBytesMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestComplexMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestComplexMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestComplexMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestFloatMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestFloatMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestFloatMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestIntMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestIntMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestIntMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ScalarMetaschemaType.html#TestScalarMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType</span></code></a></p>
+<p>Test class for ScalarMetaschemaType class with float.</p>
+<dl class="method">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType.test_from_array">
+<code class="descname">test_from_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ScalarMetaschemaType.html#TestScalarMetaschemaType.test_from_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType.test_from_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test getting object from array.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_bytes">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_bytes</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_complex">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_complex</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_complex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_float">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_float</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_int">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_int</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_prec">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_prec</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ScalarMetaschemaType.html#TestScalarMetaschemaType_prec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_prec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+<p>Test class for ScalarMetaschemaType class with precision.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_uint">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_uint</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_uint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_unicode">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_unicode</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_units">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestScalarMetaschemaType_units</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_ScalarMetaschemaType.html#TestScalarMetaschemaType_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+<p>Test class for ScalarMetaschemaType class with units.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestUintMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestUintMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestUintMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestUnicodeMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.</code><code class="descname">TestUnicodeMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestUnicodeMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_ScalarMetaschemaType.TestScalarMetaschemaType</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType">
+<span id="cis-interface-metaschema-datatypes-tests-test-schemametaschematype-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType.TestSchemaMetaschemaType">
+<em class="property">class </em><code class="descclassname">cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType.</code><code class="descname">TestSchemaMetaschemaType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_SchemaMetaschemaType.html#TestSchemaMetaschemaType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType.TestSchemaMetaschemaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType" title="cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.metaschema.datatypes.tests.test_JSONObjectMetaschemaType.TestJSONObjectMetaschemaType</span></code></a></p>
+<p>Test class for SchemaMetaschemaType class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests.test_conversions">
+<span id="cis-interface-metaschema-datatypes-tests-test-conversions-module"></span><h2>cis_interface.metaschema.datatypes.tests.test_conversions module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests.test_conversions" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_conversions.test_ply2obj">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_conversions.</code><code class="descname">test_ply2obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_conversions.html#test_ply2obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_conversions.test_ply2obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion between ply and obj objects.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_conversions.test_register_conversion_errors">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.test_conversions.</code><code class="descname">test_register_conversion_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests/test_conversions.html#test_register_conversion_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_conversions.test_register_conversion_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in register_conversion.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.metaschema.datatypes.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_add_type_from_schema_errors">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_add_type_from_schema_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_add_type_from_schema_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_add_type_from_schema_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in add_type_from_schema.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_compare_schema">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_compare_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_compare_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_compare_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test for compare_schema.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_encode_decode">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_encode_decode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_encode_decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_encode_decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test encode/decode for valid objects.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_encode_decode_readable">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_encode_decode_readable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_encode_decode_readable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_encode_decode_readable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test encode_data_reable/decode for valid objects.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_get_type_class">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_get_type_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_get_type_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_get_type_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_type_class.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_get_type_from_def">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_get_type_from_def</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_get_type_from_def"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_get_type_from_def" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_type_from_def.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_guess_type_from_msg">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_guess_type_from_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_guess_type_from_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_guess_type_from_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test guess_type_from_msg.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_guess_type_from_obj">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_guess_type_from_obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_guess_type_from_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_guess_type_from_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test guess_type_from_obj.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.metaschema.datatypes.tests.test_register_type_errors">
+<code class="descclassname">cis_interface.metaschema.datatypes.tests.</code><code class="descname">test_register_type_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/metaschema/datatypes/tests.html#test_register_type_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.metaschema.datatypes.tests.test_register_type_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in register_type for duplicate.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

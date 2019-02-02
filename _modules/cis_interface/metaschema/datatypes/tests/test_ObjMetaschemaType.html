@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+          <li><a href="../../datatypes.html">cis_interface.metaschema.datatypes</a> &raquo;</li>
+        
+          <li><a href="../tests.html">cis_interface.metaschema.datatypes.tests</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes.tests</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">test_PlyMetaschemaType</span> <span class="k">as</span> <span class="n">parent</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">ObjMetaschemaType</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.LPyModelDriver</span> <span class="k">import</span> <span class="n">_lpy_installed</span>
+
+
+<span class="n">old_value</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">_test_value</span>
+<span class="n">_test_value</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="p">[],</span>
+               <span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+                          <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}],</span>
+               <span class="s1">&#39;normals&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+                           <span class="p">{</span><span class="s1">&#39;i&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}],</span>
+               <span class="s1">&#39;texcoords&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+                             <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>
+                             <span class="p">{</span><span class="s1">&#39;u&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}],</span>
+               <span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+               <span class="s1">&#39;curves&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;starting_param&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;ending_param&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                           <span class="s1">&#39;vertex_indices&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]}],</span>
+               <span class="s1">&#39;curve2Ds&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+               <span class="s1">&#39;surfaces&#39;</span><span class="p">:</span> <span class="p">[{</span>
+                   <span class="s1">&#39;starting_param_u&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;ending_param_u&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                   <span class="s1">&#39;starting_param_v&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;ending_param_v&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                   <span class="s1">&#39;vertex_indices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                       <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                                      <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                                       <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                                       <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]}]}</span>
+<span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_value</span><span class="p">[</span><span class="s1">&#39;material&#39;</span><span class="p">]</span>
+<span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">old_value</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">])</span>
+<span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">old_value</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]:</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">]]</span>
+    <span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">fv</span> <span class="ow">in</span> <span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+    <span class="n">fv</span><span class="p">[</span><span class="s1">&#39;normal_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">)</span>
+<span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;normal_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">old_value</span><span class="p">[</span><span class="s1">&#39;edges&#39;</span><span class="p">]:</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;vertex</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x</span><span class="p">]}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+    <span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;lines&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+<span class="n">_test_value_simple</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]),</span>
+                      <span class="s1">&#39;normals&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">]),</span>
+                      <span class="s1">&#39;texcoords&#39;</span><span class="p">:</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_test_value</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]),</span>
+                      <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                                 <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                                 <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span>
+                                <span class="p">[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                                 <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                                 <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]]}</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_test_value_simple</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">fv</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">fv</span><span class="p">[</span><span class="s1">&#39;texcoord_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_test_value_simple</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]:</span>
+    <span class="n">v</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_test_value_simple</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">]:</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="test_create_schema"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.datatypes.tests.html#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.test_create_schema">[docs]</a><span class="k">def</span> <span class="nf">test_create_schema</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test create_schema.&quot;&quot;&quot;</span>
+    <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">create_schema</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s1">&#39;temp_schema&#39;</span><span class="p">)</span>
+    <span class="n">old_schema</span> <span class="o">=</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">_schema_file</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+        <span class="n">new_schema</span> <span class="o">=</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">get_schema</span><span class="p">()</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">old_schema</span><span class="p">,</span> <span class="n">new_schema</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">_schema_file</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">_schema_file</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestObjDict"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.datatypes.tests.html#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict">[docs]</a><span class="k">class</span> <span class="nc">TestObjDict</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestPlyDict</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for ObjDict class.&quot;&quot;&quot;</span>
+    
+    <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;ObjMetaschemaType&#39;</span>
+    <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;ObjDict&#39;</span>
+    <span class="n">_simple_test</span> <span class="o">=</span> <span class="n">_test_value_simple</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_test_value</span>
+
+<div class="viewcode-block" id="TestObjDict.test_apply_scalar_map"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.datatypes.tests.html#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">test_apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test applying a scalar colormap.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_apply_scalar_map</span><span class="p">(</span><span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestObjDict.test_to_from_scene"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.datatypes.tests.html#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjDict.test_to_from_scene">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_lpy_installed</span><span class="p">,</span> <span class="s2">&quot;LPy library not installed.&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_to_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: lpy</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion to/from PlantGL scene.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_to_from_scene</span><span class="p">(</span><span class="n">_as_obj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestObjMetaschemaType"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.datatypes.tests.html#cis_interface.metaschema.datatypes.tests.test_ObjMetaschemaType.TestObjMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">TestObjMetaschemaType</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestPlyMetaschemaType</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for ObjMetaschemaType class with float.&quot;&quot;&quot;</span>
+
+    <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;ObjMetaschemaType&#39;</span>
+    <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;ObjMetaschemaType&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestObjMetaschemaType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">_test_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fulldef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">name</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_fulldef</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span>
+                               <span class="n">ObjMetaschemaType</span><span class="o">.</span><span class="n">ObjDict</span><span class="p">(</span><span class="o">**</span><span class="n">_test_value</span><span class="p">),</span>
+                               <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span>
+                                <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                                           <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                                           <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]]}]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_encoded</span> <span class="o">=</span> <span class="p">[{}]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_decoded</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="n">k</span><span class="p">:</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="s1">&#39;xyz&#39;</span><span class="p">}],</span>
+                                  <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+                                             <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                                             <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]]},</span>
+                                 <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                                  <span class="s1">&#39;lines&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]],</span>
+                                  <span class="s1">&#39;surfaces&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;vertex_indices&#39;</span><span class="p">:</span> <span class="p">[[]]}]},</span>
+                                 <span class="p">{</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span>
+                                  <span class="s1">&#39;texcoords&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="s1">&#39;texcoords&#39;</span><span class="p">],</span>
+                                  <span class="s1">&#39;normals&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">[</span><span class="s1">&#39;normals&#39;</span><span class="p">],</span>
+                                  <span class="s1">&#39;faces&#39;</span><span class="p">:</span> <span class="p">[[{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                              <span class="s1">&#39;texcoord_index&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                                              <span class="s1">&#39;normal_index&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">},</span>
+                                             <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                                             <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}]]},</span>
+                                 <span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compatible_objects</span> <span class="o">=</span> <span class="p">[(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

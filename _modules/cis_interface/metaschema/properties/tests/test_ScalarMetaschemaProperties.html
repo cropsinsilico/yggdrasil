@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+          <li><a href="../../properties.html">cis_interface.metaschema.properties</a> &raquo;</li>
+        
+          <li><a href="../tests.html">cis_interface.metaschema.properties.tests</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">units</span>
+<span class="kn">from</span> <span class="nn">cis_interface.tests</span> <span class="k">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.properties</span> <span class="k">import</span> <span class="n">ScalarMetaschemaProperties</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.properties.tests</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">test_MetaschemaProperty</span> <span class="k">as</span> <span class="n">parent</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">MetaschemaTypeError</span>
+
+
+<div class="viewcode-block" id="test_data2dtype_errors"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.properties.tests.html#cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties.test_data2dtype_errors">[docs]</a><span class="k">def</span> <span class="nf">test_data2dtype_errors</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that error is raised for list, dict, &amp; tuple objects.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">data2dtype</span><span class="p">,</span> <span class="p">[])</span></div>
+
+
+<div class="viewcode-block" id="test_definition2dtype_errors"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.properties.tests.html#cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties.test_definition2dtype_errors">[docs]</a><span class="k">def</span> <span class="nf">test_definition2dtype_errors</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that error raised if type not specified.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">definition2dtype</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">definition2dtype</span><span class="p">,</span>
+                  <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">})</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">definition2dtype</span><span class="p">({</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}),</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">((</span><span class="n">ScalarMetaschemaProperties</span><span class="o">.</span><span class="n">_valid_types</span><span class="p">[</span><span class="s1">&#39;bytes&#39;</span><span class="p">])))</span></div>
+
+
+<div class="viewcode-block" id="TestSubtypeMetaschemaProperty"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.properties.tests.html#cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties.TestSubtypeMetaschemaProperty">[docs]</a><span class="k">class</span> <span class="nc">TestSubtypeMetaschemaProperty</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestMetaschemaProperty</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for SubtypeMetaschemaProperty class.&quot;&quot;&quot;</span>
+    
+    <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;ScalarMetaschemaProperties&#39;</span>
+    <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;SubtypeMetaschemaProperty&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestSubtypeMetaschemaProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;int&#39;</span><span class="p">),</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;float&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;int&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_compare</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_compare</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_normalize_schema</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">({</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">}),</span>
+            <span class="p">({</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;g&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">}),</span>
+            <span class="p">({</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">})]</span>
+
+<div class="viewcode-block" id="TestSubtypeMetaschemaProperty.test_invalid_encode"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.properties.tests.html#cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties.TestSubtypeMetaschemaProperty.test_invalid_encode">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_encode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test invalid encode for object dtype.&quot;&quot;&quot;</span>
+        <span class="n">assert_raises</span><span class="p">(</span><span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TestPrecisionMetaschemaProperty"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.properties.tests.html#cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties.TestPrecisionMetaschemaProperty">[docs]</a><span class="k">class</span> <span class="nc">TestPrecisionMetaschemaProperty</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestMetaschemaProperty</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for PrecisionMetaschemaProperty class.&quot;&quot;&quot;</span>
+    
+    <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;ScalarMetaschemaProperties&#39;</span>
+    <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;PrecisionMetaschemaProperty&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestPrecisionMetaschemaProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">32</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float16</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">16</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid</span> <span class="o">=</span> <span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">16</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_compare</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">),</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_compare</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">16</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_normalize_schema</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">({</span><span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}),</span>
+            <span class="p">({</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}),</span>
+            <span class="p">({</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;complex&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;complex&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">128</span><span class="p">})]</span></div>
+
+
+<div class="viewcode-block" id="TestUnitsMetaschemaProperty"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.properties.tests.html#cis_interface.metaschema.properties.tests.test_ScalarMetaschemaProperties.TestUnitsMetaschemaProperty">[docs]</a><span class="k">class</span> <span class="nc">TestUnitsMetaschemaProperty</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestMetaschemaProperty</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for UnitsMetaschemaProperty class.&quot;&quot;&quot;</span>
+    
+    <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;ScalarMetaschemaProperties&#39;</span>
+    <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;UnitsMetaschemaProperty&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestUnitsMetaschemaProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">),</span> <span class="s1">&#39;m&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid</span> <span class="o">=</span> <span class="p">[(</span><span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">),</span> <span class="s1">&#39;kg&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_compare</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">),</span>
+                               <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_compare</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)]</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

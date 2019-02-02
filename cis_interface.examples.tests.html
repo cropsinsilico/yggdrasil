@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.examples.tests package &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
+  <title>cis_interface.examples.tests package &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
   
 
   
@@ -24,30 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="index.html"/>
-        <link rel="up" title="cis_interface.examples package" href="cis_interface.examples.html"/>
-        <link rel="next" title="C Code" href="code_c.html"/>
-        <link rel="prev" title="cis_interface.examples package" href="cis_interface.examples.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="C Code" href="code_c.html" />
+    <link rel="prev" title="cis_interface.examples package" href="cis_interface.examples.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -120,12 +110,12 @@
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.backwards">cis_interface.backwards module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.command_line">cis_interface.command_line module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.components">cis_interface.components module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.config">cis_interface.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.platform">cis_interface.platform module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.runner">cis_interface.runner module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.scanf">cis_interface.scanf module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.schema">cis_interface.schema module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.timing">cis_interface.timing module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.tools">cis_interface.tools module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.units">cis_interface.units module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
@@ -152,7 +142,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -160,9 +150,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -220,18 +211,34 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_SaM.TestExampleSaM">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_SaM.</code><code class="descname">TestExampleSaM</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_SaM.html#TestExampleSaM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_SaM.TestExampleSaM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the SaM example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_SaM.TestExampleSaM.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_SaM.TestExampleSaM.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_SaM.TestExampleSaM.results">
 <code class="descname">results</code><a class="headerlink" href="#cis_interface.examples.tests.test_SaM.TestExampleSaM.results" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Results that should be found in the output files.</p>
+<dd><p>Results that should be found in the output files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -242,7 +249,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_ascii_io.</code><code class="descname">TestExampleAsciiIO</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_ascii_io.html#TestExampleAsciiIO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the AsciiIO example.</p>
 <dl class="method">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.check_table">
@@ -253,49 +260,113 @@
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.input_array">
 <code class="descname">input_array</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.input_array" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Input array file.</p>
+<dd><p>Input array file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.input_file">
 <code class="descname">input_file</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.input_file" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Input file.</p>
+<dd><p>Input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.input_table">
 <code class="descname">input_table</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.input_table" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Input table file.</p>
+<dd><p>Input table file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_array">
 <code class="descname">output_array</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_array" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output array for the run.</p>
+<dd><p>Output array for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_file">
 <code class="descname">output_file</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_file" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output file for the run.</p>
+<dd><p>Output file for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_table">
 <code class="descname">output_table</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.output_table" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output table for the run.</p>
+<dd><p>Output table for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.results">
 <code class="descname">results</code><a class="headerlink" href="#cis_interface.examples.tests.test_ascii_io.TestExampleAsciiIO.results" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Results that should be found in the output files.</p>
+<dd><p>Results that should be found in the output files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -306,7 +377,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_fakeplant.TestExampleFakeplant">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_fakeplant.</code><code class="descname">TestExampleFakeplant</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_fakeplant.html#TestExampleFakeplant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_fakeplant.TestExampleFakeplant" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Fakeplant example.</p>
 <dl class="method">
 <dt id="cis_interface.examples.tests.test_fakeplant.TestExampleFakeplant.check_results">
@@ -317,13 +388,29 @@
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_fakeplant.TestExampleFakeplant.output_dir">
 <code class="descname">output_dir</code><a class="headerlink" href="#cis_interface.examples.tests.test_fakeplant.TestExampleFakeplant.output_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output directory.</p>
+<dd><p>Output directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_fakeplant.TestExampleFakeplant.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_fakeplant.TestExampleFakeplant.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -340,7 +427,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_formatted_io1.TestExampleFIO1">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io1.</code><code class="descname">TestExampleFIO1</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io1.html#TestExampleFIO1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io1.TestExampleFIO1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 1 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_formatted_io1.TestExampleFIO1.input_files">
@@ -362,7 +449,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_formatted_io2.TestExampleFIO2">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io2.</code><code class="descname">TestExampleFIO2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io2.html#TestExampleFIO2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io2.TestExampleFIO2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 2 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_formatted_io2.TestExampleFIO2.input_files">
@@ -384,7 +471,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_formatted_io3.TestExampleFIO3">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io3.</code><code class="descname">TestExampleFIO3</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io3.html#TestExampleFIO3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io3.TestExampleFIO3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 3 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_formatted_io3.TestExampleFIO3.input_files">
@@ -406,7 +493,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_formatted_io4.TestExampleFIO4">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io4.</code><code class="descname">TestExampleFIO4</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io4.html#TestExampleFIO4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io4.TestExampleFIO4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 4 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_formatted_io4.TestExampleFIO4.input_files">
@@ -428,7 +515,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_formatted_io5.TestExampleFIO5">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io5.</code><code class="descname">TestExampleFIO5</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io5.html#TestExampleFIO5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io5.TestExampleFIO5" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 5 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_formatted_io5.TestExampleFIO5.input_files">
@@ -450,7 +537,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_formatted_io6.TestExampleFIO6">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io6.</code><code class="descname">TestExampleFIO6</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io6.html#TestExampleFIO6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io6.TestExampleFIO6" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 6 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_formatted_io6.TestExampleFIO6.input_files">
@@ -467,12 +554,78 @@
 </dd></dl>
 
 </div>
+<div class="section" id="module-cis_interface.examples.tests.test_formatted_io7">
+<span id="cis-interface-examples-tests-test-formatted-io7-module"></span><h2>cis_interface.examples.tests.test_formatted_io7 module<a class="headerlink" href="#module-cis_interface.examples.tests.test_formatted_io7" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.examples.tests.test_formatted_io7.TestExampleFIO7">
+<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io7.</code><code class="descname">TestExampleFIO7</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io7.html#TestExampleFIO7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io7.TestExampleFIO7" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<p>Test the Formatted I/O lesson 7 example.</p>
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_formatted_io7.TestExampleFIO7.input_files">
+<code class="descname">input_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io7.TestExampleFIO7.input_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_formatted_io7.TestExampleFIO7.output_files">
+<code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io7.TestExampleFIO7.output_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.examples.tests.test_formatted_io8">
+<span id="cis-interface-examples-tests-test-formatted-io8-module"></span><h2>cis_interface.examples.tests.test_formatted_io8 module<a class="headerlink" href="#module-cis_interface.examples.tests.test_formatted_io8" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.examples.tests.test_formatted_io8.TestExampleFIO8">
+<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io8.</code><code class="descname">TestExampleFIO8</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io8.html#TestExampleFIO8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io8.TestExampleFIO8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<p>Test the Formatted I/O lesson 8 example.</p>
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_formatted_io8.TestExampleFIO8.input_files">
+<code class="descname">input_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io8.TestExampleFIO8.input_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_formatted_io8.TestExampleFIO8.output_files">
+<code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io8.TestExampleFIO8.output_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.examples.tests.test_formatted_io9">
+<span id="cis-interface-examples-tests-test-formatted-io9-module"></span><h2>cis_interface.examples.tests.test_formatted_io9 module<a class="headerlink" href="#module-cis_interface.examples.tests.test_formatted_io9" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.examples.tests.test_formatted_io9.TestExampleFIO9">
+<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_formatted_io9.</code><code class="descname">TestExampleFIO9</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_formatted_io9.html#TestExampleFIO9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io9.TestExampleFIO9" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<p>Test the Formatted I/O lesson 9 example.</p>
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_formatted_io9.TestExampleFIO9.input_files">
+<code class="descname">input_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io9.TestExampleFIO9.input_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Input file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_formatted_io9.TestExampleFIO9.output_files">
+<code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_formatted_io9.TestExampleFIO9.output_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-cis_interface.examples.tests.test_gs_lesson1">
 <span id="cis-interface-examples-tests-test-gs-lesson1-module"></span><h2>cis_interface.examples.tests.test_gs_lesson1 module<a class="headerlink" href="#module-cis_interface.examples.tests.test_gs_lesson1" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_gs_lesson1.TestExampleGS1">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_gs_lesson1.</code><code class="descname">TestExampleGS1</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_gs_lesson1.html#TestExampleGS1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_gs_lesson1.TestExampleGS1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 1 example.</p>
 </dd></dl>
 
@@ -482,7 +635,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_gs_lesson2.TestExampleGS2">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_gs_lesson2.</code><code class="descname">TestExampleGS2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_gs_lesson2.html#TestExampleGS2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_gs_lesson2.TestExampleGS2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 2 example.</p>
 </dd></dl>
 
@@ -492,7 +645,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_gs_lesson3.TestExampleGS3">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_gs_lesson3.</code><code class="descname">TestExampleGS3</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_gs_lesson3.html#TestExampleGS3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_gs_lesson3.TestExampleGS3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 3 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_gs_lesson3.TestExampleGS3.input_files">
@@ -514,7 +667,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_gs_lesson4.TestExampleGS4">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_gs_lesson4.</code><code class="descname">TestExampleGS4</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_gs_lesson4.html#TestExampleGS4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_gs_lesson4.TestExampleGS4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 4 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_gs_lesson4.TestExampleGS4.input_files">
@@ -536,7 +689,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_gs_lesson4b.TestExampleGS4b">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_gs_lesson4b.</code><code class="descname">TestExampleGS4b</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_gs_lesson4b.html#TestExampleGS4b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_gs_lesson4b.TestExampleGS4b" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 4b example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_gs_lesson4b.TestExampleGS4b.input_files">
@@ -558,7 +711,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_hello.TestExampleHello">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_hello.</code><code class="descname">TestExampleHello</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_hello.html#TestExampleHello"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_hello.TestExampleHello" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the Hello example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_hello.TestExampleHello.input_files">
@@ -580,7 +733,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_maxMsg.TestExampleMaxMsg">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_maxMsg.</code><code class="descname">TestExampleMaxMsg</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_maxMsg.html#TestExampleMaxMsg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_maxMsg.TestExampleMaxMsg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the MaxMsg example.</p>
 </dd></dl>
 
@@ -590,7 +743,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_model_error.TestExampleModelError">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_model_error.</code><code class="descname">TestExampleModelError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_model_error.html#TestExampleModelError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_model_error.TestExampleModelError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the model_error example.</p>
 <dl class="method">
 <dt id="cis_interface.examples.tests.test_model_error.TestExampleModelError.cleanup">
@@ -601,7 +754,65 @@
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_model_error.TestExampleModelError.core_dump">
 <code class="descname">core_dump</code><a class="headerlink" href="#cis_interface.examples.tests.test_model_error.TestExampleModelError.core_dump" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Pattern for core dump that may be produced.</p>
+<dd><p>Pattern for core dump that may be produced.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.examples.tests.test_root_to_shoot">
+<span id="cis-interface-examples-tests-test-root-to-shoot-module"></span><h2>cis_interface.examples.tests.test_root_to_shoot module<a class="headerlink" href="#module-cis_interface.examples.tests.test_root_to_shoot" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot">
+<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_root_to_shoot.</code><code class="descname">TestExampleRootToShoot</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_root_to_shoot.html#TestExampleRootToShoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<p>Test the Root to Shoot example.</p>
+<dl class="method">
+<dt id="cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.check_results">
+<code class="descname">check_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_root_to_shoot.html#TestExampleRootToShoot.check_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.check_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>This should be overridden with checks for the result.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_dir">
+<code class="descname">output_dir</code><a class="headerlink" href="#cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_files">
+<code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.run_example">
+<code class="descname">run_example</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_root_to_shoot.html#TestExampleRootToShoot.run_example"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_root_to_shoot.TestExampleRootToShoot.run_example" title="Permalink to this definition">¶</a></dt>
+<dd><p>This runs an example in the correct language.</p>
 </dd></dl>
 
 </dd></dl>
@@ -612,7 +823,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_rpcFib.TestExampleRpcFib">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_rpcFib.</code><code class="descname">TestExampleRpcFib</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_rpcFib.html#TestExampleRpcFib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_rpcFib.TestExampleRpcFib" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the rpcFib example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_rpcFib.TestExampleRpcFib.output_files">
@@ -634,7 +845,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_rpc_lesson1.TestExampleRPC1">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_rpc_lesson1.</code><code class="descname">TestExampleRPC1</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_rpc_lesson1.html#TestExampleRPC1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_rpc_lesson1.TestExampleRPC1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the rpc_lesson1 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_rpc_lesson1.TestExampleRPC1.output_files">
@@ -656,7 +867,7 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.test_rpc_lesson2.TestExampleRPC2">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_rpc_lesson2.</code><code class="descname">TestExampleRPC2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_rpc_lesson2.html#TestExampleRPC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_rpc_lesson2.TestExampleRPC2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
 <p>Test the rpc_lesson2 example.</p>
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.test_rpc_lesson2.TestExampleRPC2.output_files">
@@ -676,29 +887,40 @@
 <div class="section" id="module-cis_interface.examples.tests.test_timed_pipe">
 <span id="cis-interface-examples-tests-test-timed-pipe-module"></span><h2>cis_interface.examples.tests.test_timed_pipe module<a class="headerlink" href="#module-cis_interface.examples.tests.test_timed_pipe" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeIPC">
-<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_timed_pipe.</code><code class="descname">TestExampleTimedPipeIPC</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_timed_pipe.html#TestExampleTimedPipeIPC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeIPC" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ" title="cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ</span></code></a></p>
-<p>Test the TimedPipe example with IPC message passing.</p>
+<dt id="cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase">
+<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_timed_pipe.</code><code class="descname">ExampleTimedPipeTestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_timed_pipe.html#ExampleTimedPipeTestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
+<p>Base class for testing TimedPipe example with various comm types.</p>
+<dl class="attribute">
+<dt id="cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.description_prefix">
+<code class="descname">description_prefix</code><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.description_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prefix message with test name.</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ">
-<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_timed_pipe.</code><code class="descname">TestExampleTimedPipeZMQ</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_timed_pipe.html#TestExampleTimedPipeZMQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.TestExample" title="cis_interface.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.examples.tests.TestExample</span></code></a></p>
-<p>Test the TimedPipe example with ZMQ message passing.</p>
 <dl class="attribute">
-<dt id="cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ.output_files">
-<code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ.output_files" title="Permalink to this definition">¶</a></dt>
+<dt id="cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.output_files">
+<code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.output_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Output file.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ.results">
-<code class="descname">results</code><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeZMQ.results" title="Permalink to this definition">¶</a></dt>
+<dt id="cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.results">
+<code class="descname">results</code><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Result that should be found in output files.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.run_example">
+<code class="descname">run_example</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests/test_timed_pipe.html#ExampleTimedPipeTestBase.run_example"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.run_example" title="Permalink to this definition">¶</a></dt>
+<dd><p>This runs an example in the correct language.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeIPCComm">
+<em class="property">class </em><code class="descclassname">cis_interface.examples.tests.test_timed_pipe.</code><code class="descname">TestExampleTimedPipeIPCComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.examples.tests.test_timed_pipe.TestExampleTimedPipeIPCComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase" title="cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase</span></code></a></p>
 </dd></dl>
 
 </div>
@@ -707,26 +929,8 @@
 <dl class="class">
 <dt id="cis_interface.examples.tests.TestExample">
 <em class="property">class </em><code class="descclassname">cis_interface.examples.tests.</code><code class="descname">TestExample</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests.html#TestExample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.TestExample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestBase" title="cis_interface.tests.CisTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestBase</span></code></a>, <a class="reference internal" href="code_python.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestBase" title="cis_interface.tests.CisTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tests.CisTestBase</span></code></a>, <a class="reference internal" href="code_python.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
 <p>Base class for running examples.</p>
-<dl class="method">
-<dt id="cis_interface.examples.tests.TestExample.check_file_contents">
-<code class="descname">check_file_contents</code><span class="sig-paren">(</span><em>fname</em>, <em>result</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests.html#TestExample.check_file_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.TestExample.check_file_contents" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that the contents of a file are correct.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.examples.tests.TestExample.check_file_exists">
-<code class="descname">check_file_exists</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests.html#TestExample.check_file_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.TestExample.check_file_exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that a file exists.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.examples.tests.TestExample.check_file_size">
-<code class="descname">check_file_size</code><span class="sig-paren">(</span><em>fname</em>, <em>fsize</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests.html#TestExample.check_file_size"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.TestExample.check_file_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that file is the correct size.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="cis_interface.examples.tests.TestExample.check_results">
 <code class="descname">check_results</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/examples/tests.html#TestExample.check_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.examples.tests.TestExample.check_results" title="Permalink to this definition">¶</a></dt>
@@ -754,19 +958,43 @@
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.TestExample.namespace">
 <code class="descname">namespace</code><a class="headerlink" href="#cis_interface.examples.tests.TestExample.namespace" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Namespace for the example.</p>
+<dd><p>Namespace for the example.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.TestExample.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#cis_interface.examples.tests.TestExample.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.TestExample.results">
 <code class="descname">results</code><a class="headerlink" href="#cis_interface.examples.tests.TestExample.results" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Results that should be found in the output files.</p>
+<dd><p>Results that should be found in the output files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -778,7 +1006,15 @@
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.TestExample.tempdir">
 <code class="descname">tempdir</code><a class="headerlink" href="#cis_interface.examples.tests.TestExample.tempdir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Temporary directory.</p>
+<dd><p>Temporary directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -814,13 +1050,29 @@
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.TestExample.yaml">
 <code class="descname">yaml</code><a class="headerlink" href="#cis_interface.examples.tests.TestExample.yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; The full path to the yaml file for this example.</p>
+<dd><p>The full path to the yaml file for this example.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.examples.tests.TestExample.yamldir">
 <code class="descname">yamldir</code><a class="headerlink" href="#cis_interface.examples.tests.TestExample.yamldir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Full path to the directory containing the yaml file.</p>
+<dd><p>Full path to the directory containing the yaml file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -830,9 +1082,7 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -850,11 +1100,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -869,37 +1119,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.6.1+1.g81b8e90',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

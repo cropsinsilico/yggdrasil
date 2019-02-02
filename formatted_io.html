@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Formatted I/O &mdash; cis_interface 0.6.1+1.g81b8e90 documentation</title>
+  <title>Formatted I/O &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
   
 
   
@@ -24,29 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="cis_interface 0.6.1+1.g81b8e90 documentation" href="index.html"/>
-        <link rel="next" title="Server/Client I/O" href="server_client_io.html"/>
-        <link rel="prev" title="Getting started" href="getting_started.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Server/Client I/O" href="server_client_io.html" />
+    <link rel="prev" title="Getting started" href="getting_started.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -103,6 +94,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#tables-as-arrays">Tables as Arrays</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tables-as-pandas-data-frames">Tables as Pandas Data Frames</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#d-structures-as-ply-obj">3D Structures as Ply/Obj</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Tables as Pandas Data Frames</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-style-mappings">Config style Mappings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#json-files">JSON Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#yaml-files">YAML Files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
@@ -129,7 +124,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">cis_interface</a>
@@ -137,9 +132,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -190,12 +186,12 @@ support for formatting/processing messages from/to language native objects.</p>
 <p>The format of messages containing scalar variables (strings, integers, and
 floating point numbers) can be specified using a C-style format string
 (See <a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a> for details). In
-the example below, the format string <code class="docutils literal"><span class="pre">&quot;%6s\t%d\t%f\n&quot;</span></code> indicates that each
+the example below, the format string <code class="docutils literal notranslate"><span class="pre">&quot;%6s\t%d\t%f\n&quot;</span></code> indicates that each
 message will contain a 6 character string, an integer, and a float. In addition
 to providing a format string, the C API requires the use of different functions
 for initializing channels and sending/receiving to/from them.</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -219,14 +215,12 @@ for initializing channels and sending/receiving to/from them.</p>
 22
 23
 24
-25
-26
-27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -237,20 +231,18 @@ for initializing channels and sending/receiving to/from them.</p>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">msg</span>
 
     <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">, </span><span class="si">%d</span><span class="s1">, </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -274,14 +266,12 @@ for initializing channels and sending/receiving to/from them.</p>
 22
 23
 24
-25
-26
-27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -292,26 +282,24 @@ for initializing channels and sending/receiving to/from them.</p>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">msg</span>
 
     <span class="c1"># Print received message</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">, </span><span class="si">%d</span><span class="s1">, </span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">msg</span><span class="p">)</span>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io1.html">Example in other languages</a>)</p>
 <p>The same YAML can be used as was used for the example from
 <a class="reference internal" href="getting_started.html#getting-started-rst"><span class="std std-ref">Getting started</span></a> with the modification that
-the files are now read/written line-by-line (<code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">ascii</span></code>)
+the files are now read/written line-by-line (<code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">ascii</span></code>)
 rather than all at once:</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -363,10 +351,10 @@ rather than all at once:</p>
 <p>Tables can also be passed in a similar manner. For input from a table, the format
 string does not need to be provided and will be determined by the source of the
 table. There are different API classes/functions for I/O from/to table channels
-versus standard channels in each language. (e.g. <code class="docutils literal"><span class="pre">CisInput</span></code> vs.
-<code class="docutils literal"><span class="pre">CisAsciiTableInput</span></code> in Python)</p>
+versus standard channels in each language. (e.g. <code class="docutils literal notranslate"><span class="pre">CisInput</span></code> vs.
+<code class="docutils literal notranslate"><span class="pre">CisAsciiTableInput</span></code> in Python)</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -392,8 +380,7 @@ versus standard channels in each language. (e.g. <code class="docutils literal">
 24
 25
 26
-27
-28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisAsciiTableInput</span><span class="p">,</span> <span class="n">CisAsciiTableOutput</span><span class="p">)</span>
 
@@ -419,11 +406,10 @@ versus standard channels in each language. (e.g. <code class="docutils literal">
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -449,8 +435,7 @@ versus standard channels in each language. (e.g. <code class="docutils literal">
 24
 25
 26
-27
-28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisAsciiTableInput</span><span class="p">,</span> <span class="n">CisAsciiTableOutput</span><span class="p">)</span>
 
@@ -476,16 +461,15 @@ versus standard channels in each language. (e.g. <code class="docutils literal">
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io2.html">Example in other languages</a>)</p>
-<p>The <code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">table</span></code> options in the YAML tell the
+<p>The <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">table</span></code> options in the YAML tell the
 cis_interface framework that the file should be read/written as a table
 row-by-row including verification that each row conforms with the table.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -535,10 +519,10 @@ row-by-row including verification that each row conforms with the table.</p>
 <div class="section" id="tables-as-arrays">
 <h2>Tables as Arrays<a class="headerlink" href="#tables-as-arrays" title="Permalink to this headline">¶</a></h2>
 <p>Tables can also be passed as arrays. In Python and Matlab, this is done using
-separate classes/functions. In C and C++, this is done by passing 1 to the <code class="docutils literal"><span class="pre">as_array</span></code>
+separate classes/functions. In C and C++, this is done by passing 1 to the <code class="docutils literal notranslate"><span class="pre">as_array</span></code>
 arguments of the table API classes/functions.</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -565,8 +549,7 @@ arguments of the table API classes/functions.</p>
 25
 26
 27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisAsciiArrayInput</span><span class="p">,</span> <span class="n">CisAsciiArrayOutput</span><span class="p">)</span>
 
@@ -579,7 +562,7 @@ arguments of the table API classes/functions.</p>
 
     <span class="c1"># Receive input from input channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span><span class="p">,</span> <span class="n">arr</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">arr</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv_array</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
@@ -591,13 +574,12 @@ arguments of the table API classes/functions.</p>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -624,8 +606,7 @@ arguments of the table API classes/functions.</p>
 25
 26
 27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisAsciiArrayInput</span><span class="p">,</span> <span class="n">CisAsciiArrayOutput</span><span class="p">)</span>
 
@@ -638,7 +619,7 @@ arguments of the table API classes/functions.</p>
 
     <span class="c1"># Receive input from input channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span><span class="p">,</span> <span class="n">arr</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">arr</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv_array</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
         <span class="k">break</span>
@@ -650,18 +631,17 @@ arguments of the table API classes/functions.</p>
 
     <span class="c1"># Send output to output channel</span>
     <span class="c1"># If there is an error, the flag will be False</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io3.html">Example in other languages</a>)</p>
-<p>The YAML only differs in that <code class="docutils literal"><span class="pre">as_array:</span> <span class="pre">True</span></code> for the connections to the files
+<p>The YAML only differs in that <code class="docutils literal notranslate"><span class="pre">as_array:</span> <span class="pre">True</span></code> for the connections to the files
 to indicate that the files should be interpreted as tables and that the tables
 should be read/written in their entirety as arrays.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -725,7 +705,7 @@ should be read/written in their entirety as arrays.</p>
 <p>In Python, tables can also be passed as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
 data frames.</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -752,8 +732,7 @@ data frames.</p>
 25
 26
 27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
 
@@ -780,11 +759,10 @@ data frames.</p>
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -811,8 +789,7 @@ data frames.</p>
 25
 26
 27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
 
@@ -839,16 +816,15 @@ data frames.</p>
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io4.html">Example in other languages</a>)</p>
-<p>The YAML specifies <code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">pandas</span></code> for the
+<p>The YAML specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">pandas</span></code> for the
 connections to files to indicate that the files should be interpreted as CSV
 tables using Pandas.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -915,7 +891,7 @@ as a Pandas data frame.</p>
 <p>3D structures can be passed around in <a class="reference external" href="http://paulbourke.net/dataformats/ply/">Ply</a>
 or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">Obj</a> formats.</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -942,8 +918,7 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
 25
 26
 27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisPlyInput</span><span class="p">,</span> <span class="n">CisPlyOutput</span><span class="p">)</span>
@@ -970,11 +945,10 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">ply</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1001,8 +975,7 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
 25
 26
 27
-28
-29</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="c1"># Import classes for input/output channels</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CisPlyInput</span><span class="p">,</span> <span class="n">CisPlyOutput</span><span class="p">)</span>
@@ -1029,16 +1002,15 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
     <span class="c1"># If there is an error, the flag will be False</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">ply</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io5.html">Example in other languages</a>)</p>
-<p>The YAML specifies <code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">ply</span></code> (<code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">obj</span></code> for Obj) for the
+<p>The YAML specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">ply</span></code> (<code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">obj</span></code> for Obj) for the
 connections to files to indicate that the files should be interpreted as
 Ply/Obj file formats.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1085,17 +1057,731 @@ Ply/Obj file formats.</p>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io5.html">Example in other languages</a>)</p>
 <p>In Python the data is returned as a dictionary subclass
-(<a class="reference internal" href="cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict" title="cis_interface.serialize.PlySerialize.PlyDict"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.PlySerialize.PlyDict</span></code></a> or
-<a class="reference internal" href="cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict" title="cis_interface.serialize.ObjSerialize.ObjDict"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.ObjSerialize.ObjDict</span></code></a>) while in
-C/C++ it is returned as a structure (<code class="xref c c-type docutils literal"><span class="pre">ply_t</span></code> or <code class="xref c c-type docutils literal"><span class="pre">obj_t</span></code>).</p>
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.PlySerialize.PlyDict</span></code> or
+<code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.ObjSerialize.ObjDict</span></code>) while in
+C/C++ it is returned as a structure (<code class="xref c c-type docutils literal notranslate"><span class="pre">ply_t</span></code> or <code class="xref c c-type docutils literal notranslate"><span class="pre">obj_t</span></code>).</p>
+</div>
+<div class="section" id="id1">
+<h2>Tables as Pandas Data Frames<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>In Python, tables can also be passed as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
+data frames.</p>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPandasInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: (</span><span class="si">%d</span><span class="s1"> rows)&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPandasInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: (</span><span class="si">%d</span><span class="s1"> rows)&#39;</span> <span class="o">%</span> <span class="n">nrows</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io4.html">Example in other languages</a>)</p>
+<p>The YAML specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">pandas</span></code> for the
+connections to files to indicate that the files should be interpreted as CSV
+tables using Pandas.</p>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelA.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+      <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name,count,size</span>
+
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelB.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+      <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name,count,size</span>
+
+<span class="l l-Scalar l-Scalar-Plain">connections</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io4.html">Example in other languages</a>)</p>
+<p>As Pandas data frames are a Python specific construction, they cannot be
+used within models written in other languages. However, the files can
+still be read using Pandas. The data format returned to models on the
+receiving end of sent Pandas data frames will receive arrays in the
+proper native data type. In addition, a model written in Python can
+receive any array sent by another model (whether or not it is Python)
+as a Pandas data frame.</p>
+</div>
+<div class="section" id="config-style-mappings">
+<h2>Config style Mappings<a class="headerlink" href="#config-style-mappings" title="Permalink to this headline">¶</a></h2>
+<p>Simple mapping (key/value) data can be passed around in a colon/tab
+delimited format.</p>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io7.html">Example in other languages</a>)</p>
+<p>The YAML specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">map</span></code> for the
+connections to files to indicate that the files should be interpreted as
+config file formats with single, unique keys on each line followed by a
+delimiter and then a value.</p>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io7_modelA.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io7_modelB.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+
+<span class="l l-Scalar l-Scalar-Plain">connections</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">map</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">map</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io7.html">Example in other languages</a>)</p>
+<p>In Python the data is returned as a dictionary with one key/value for each
+line in the file.</p>
+</div>
+<div class="section" id="json-files">
+<h2>JSON Files<a class="headerlink" href="#json-files" title="Permalink to this headline">¶</a></h2>
+<p>More complex nested structures can be passed around using JSON serialization.</p>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io8.html">Example in other languages</a>)</p>
+<p>The YAML specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">json</span></code> for the
+connections to files to indicate that the files should be interpreted as
+JSON files.</p>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io8_modelA.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io8_modelB.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+
+<span class="l l-Scalar l-Scalar-Plain">connections</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">json</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">json</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io8.html">Example in other languages</a>)</p>
+<p>In Python, the data is returned in the type determined by the
+<a class="reference external" href="https://docs.python.org/3/library/json.html">json</a> package.</p>
+</div>
+<div class="section" id="yaml-files">
+<h2>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this headline">¶</a></h2>
+<p>More complex nested structures can also be represented using the YAML syntax.</p>
+<p>Model Code:</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model A: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+
+<span class="c1"># Initialize input/output channels</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+
+<span class="c1"># Loop until there is no longer input or the queues are closed</span>
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+
+    <span class="c1"># Receive input from input channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.&quot;</span><span class="p">)</span>
+        <span class="k">break</span>
+
+    <span class="c1"># Print received message</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Model B: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+    <span class="c1"># Send output to output channel</span>
+    <span class="c1"># If there is an error, the flag will be False</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io9.html">Example in other languages</a>)</p>
+<p>The YAML input file options specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">yaml</span></code> for the
+connections to files to indicate that the files should be interpreted as
+YAML files.</p>
+<p>Model YAML:</p>
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io9_modelA.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io9_modelB.py</span>
+    <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>
+        <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+
+<span class="l l-Scalar l-Scalar-Plain">connections</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputA</span>  <span class="c1"># Connection between model A output &amp; model B input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">yaml</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/formatted_io9.html">Example in other languages</a>)</p>
+<p>In Python, the data is returned in the type determined by the
+<a class="reference external" href="https://pyyaml.org/wiki/PyYAMLDocumentation">PyYAML</a> package.</p>
 </div>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1113,11 +1799,11 @@ C/C++ it is returned as a structure (<code class="xref c c-type docutils literal
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1132,37 +1818,24 @@ C/C++ it is returned as a structure (<code class="xref c c-type docutils literal
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.6.1+1.g81b8e90',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

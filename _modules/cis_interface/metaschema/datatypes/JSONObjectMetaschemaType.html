@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.metaschema.datatypes.JSONObjectMetaschemaType &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../metaschema.html">cis_interface.metaschema</a> &raquo;</li>
+        
+          <li><a href="../datatypes.html">cis_interface.metaschema.datatypes</a> &raquo;</li>
+        
+      <li>cis_interface.metaschema.datatypes.JSONObjectMetaschemaType</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.metaschema.datatypes.JSONObjectMetaschemaType</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">register_type</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes.ContainerMetaschemaType</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">ContainerMetaschemaType</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="JSONObjectMetaschemaType"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.JSONObjectMetaschemaType.JSONObjectMetaschemaType">[docs]</a><span class="nd">@register_type</span>
+<span class="k">class</span> <span class="nc">JSONObjectMetaschemaType</span><span class="p">(</span><span class="n">ContainerMetaschemaType</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Type associated with a map.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;A container mapping between keys and values.&#39;</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
+    <span class="n">definition_properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">definition_properties</span>
+    <span class="n">metadata_properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">metadata_properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
+    <span class="n">extract_properties</span> <span class="o">=</span> <span class="n">ContainerMetaschemaType</span><span class="o">.</span><span class="n">extract_properties</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span>
+    <span class="n">python_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="p">)</span>
+    <span class="n">_replaces_existing</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="n">_container_type</span> <span class="o">=</span> <span class="nb">dict</span>
+    <span class="n">_json_type</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
+    <span class="n">_json_property</span> <span class="o">=</span> <span class="s1">&#39;properties&#39;</span>
+    <span class="n">_empty_msg</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="JSONObjectMetaschemaType.coerce_type"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.JSONObjectMetaschemaType.JSONObjectMetaschemaType.coerce_type">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">coerce_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Coerce objects of specific types to match the data type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            obj (object): Object to be coerced.</span>
+<span class="sd">            typedef (dict, optional): Type defintion that object should be</span>
+<span class="sd">                coerced to. Defaults to None.</span>
+<span class="sd">            key_order (list, optional): Order or keys correpsonding to elements in</span>
+<span class="sd">                a provided list or tuple. Defaults to None.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are metadata entries that may</span>
+<span class="sd">                aid in coercing the type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: Coerced object.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If obj is a list or tuple, but key_order is not provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.serialize</span> <span class="k">import</span> <span class="n">pandas2dict</span><span class="p">,</span> <span class="n">numpy2dict</span><span class="p">,</span> <span class="n">list2dict</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">pandas2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">numpy2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key_order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">list2dict</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">key_order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_iterate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterate over the contents of the container. Each element returned</span>
+<span class="sd">        should be a tuple including an index and a value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            container (obj): Object to be iterated over.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            iterator: Iterator over elements in the container.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_assign</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assign an element in the container to the specified value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            container (obj): Object that element will be assigned to.</span>
+<span class="sd">            index (obj): Index in the container object where element will be</span>
+<span class="sd">                assigned.</span>
+<span class="sd">            value (obj): Value that will be assigned to the element in the</span>
+<span class="sd">                container object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">container</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_has_element</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check to see if an index is in the container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            container (obj): Object that should be checked for index.</span>
+<span class="sd">            index (obj): Index that should be checked for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the index is in the container.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">index</span> <span class="ow">in</span> <span class="n">container</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
