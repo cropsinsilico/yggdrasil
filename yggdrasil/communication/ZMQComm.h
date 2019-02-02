@@ -507,7 +507,7 @@ int new_zmq_address(comm_t *comm) {
     _last_port = port;
     sprintf(address, "%s://%s:%d", protocol, host, port);
   }
-  strcpy(comm->address, address, COMM_ADDRESS_SIZE);
+  strncpy(comm->address, address, COMM_ADDRESS_SIZE);
   ygglog_debug("new_zmq_address: Bound socket to %s", comm->address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
