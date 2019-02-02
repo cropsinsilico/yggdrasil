@@ -1,8 +1,8 @@
 import yaml
-from cis_interface import backwards
-from cis_interface.serialize import register_serializer
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.serialize.JSONSerialize import indent_char2int
+from yggdrasil import backwards
+from yggdrasil.serialize import register_serializer
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.JSONSerialize import indent_char2int
 
 
 @register_serializer

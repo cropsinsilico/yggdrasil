@@ -1,4 +1,4 @@
-from cis_interface.serialize.tests import test_DefaultSerialize as parent
+from yggdrasil.serialize.tests import test_DefaultSerialize as parent
 
 
 class TestJSONSerialize(parent.TestDefaultSerialize):

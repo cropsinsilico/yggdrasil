@@ -1004,7 +1004,7 @@ static
 int ncommSend(const comm_t x, size_t nargs, ...) {
   va_list_t ap;
   va_start(ap.va, nargs);
-  cislog_debug("ncommSend: nargs = %d", nargs);
+  ygglog_debug("ncommSend: nargs = %d", nargs);
   int ret = vcommSend(x, nargs, ap);
   va_end(ap.va);
   return ret;
@@ -1089,7 +1089,7 @@ static
 int ncommRecv(const comm_t x, const int allow_realloc, size_t nargs, ...) {
   va_list_t ap;
   va_start(ap.va, nargs);
-  cislog_debug("ncommRecv: nargs = %d", nargs);
+  ygglog_debug("ncommRecv: nargs = %d", nargs);
   int ret = vcommRecv(x, allow_realloc, nargs, ap);
   va_end(ap.va);
   return ret;

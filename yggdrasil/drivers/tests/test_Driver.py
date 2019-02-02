@@ -1,5 +1,5 @@
 import os
-from yggdrasil.tests import YggTestClassInfo, assert_raises
+from yggdrasil.tests import YggTestClassInfo
 from yggdrasil import drivers
 
 

@@ -30,7 +30,7 @@ else:
 
 
 # Determine if rapidjson installed and parse user defined location
-rj_include_dir0 = os.path.join(ROOT_PATH, 'cis_interface', 'rapidjson', 'include')
+rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
 for idx, arg in enumerate(sys.argv[:]):
     if ((arg.startswith('--rj-include-dir=')
          or arg.startswith('--rapidjson-include-dir'))):
@@ -46,7 +46,7 @@ if not os.path.isdir(rj_include_dir):
                        "'git submodule update --init --recursive' "
                        "from inside the repository.")
 if rj_include_dir != rj_include_dir0:
-    def_config_file = os.path.join(ROOT_PATH, 'cis_interface', 'defaults.cfg')
+    def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
     try:
         import ConfigParser as configparser
     except ImportError:

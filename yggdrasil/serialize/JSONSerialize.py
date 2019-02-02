@@ -1,7 +1,7 @@
 import json
-from cis_interface import backwards
-from cis_interface.serialize import register_serializer
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil import backwards
+from yggdrasil.serialize import register_serializer
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
 def indent_char2int(indent):

@@ -1,11 +1,11 @@
-from cis_interface.communication import FileComm
-from cis_interface.schema import register_component, inherit_schema
-from cis_interface.serialize.JSONSerialize import JSONSerialize
+from yggdrasil.communication import FileComm
+from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.serialize.YAMLSerialize import YAMLSerialize
 
 
 @register_component
-class JSONFileComm(FileComm.FileComm):
-    r"""Class for handling I/O from/to a JSON file on disk.
+class YAMLFileComm(FileComm.FileComm):
+    r"""Class for handling I/O from/to a YAML file on disk.
 
     Args:
         name (str): The environment variable where file path is stored.
@@ -13,11 +13,11 @@ class JSONFileComm(FileComm.FileComm):
 
     """
 
-    _filetype = 'json'
+    _filetype = 'yaml'
     _schema_properties = inherit_schema(
         FileComm.FileComm._schema_properties,
-        **JSONSerialize._schema_properties)
-    _default_serializer = JSONSerialize
+        **YAMLSerialize._schema_properties)
+    _default_serializer = YAMLSerialize
 
     @classmethod
     def get_testing_options(cls):
@@ -34,6 +34,6 @@ class JSONFileComm(FileComm.FileComm):
                     the messages in 'send'.
 
         """
-        out = super(JSONFileComm, cls).get_testing_options()
+        out = super(YAMLFileComm, cls).get_testing_options()
         out['recv'] = out['send']
         return out

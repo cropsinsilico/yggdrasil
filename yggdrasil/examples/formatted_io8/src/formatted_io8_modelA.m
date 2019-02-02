@@ -1,6 +1,6 @@
 % Initialize input/output channels 
-in_channel = CisInterface('CisInput', 'inputB');
-out_channel = CisInterface('CisOutput', 'outputB');
+in_channel = YggInterface('YggInput', 'inputA');
+out_channel = YggInterface('YggOutput', 'outputA');
 
 flag = true;
 
@@ -11,19 +11,19 @@ while flag
   % If there is an error, the flag will be False.
   [flag, obj] = in_channel.recv();
   if (~flag)
-    disp('Model B: No more input.');
+    disp('Model A: No more input.');
     break;
   end;
 
   % Print received message
-  fprintf('Model B:');
+  fprintf('Model A:');
   disp(obj);
 
   % Send output to output channel
   % If there is an error, the flag will be False
   flag = out_channel.send(obj);
   if (~flag)
-    error('Model B: Error sending output.');
+    error('Model A: Error sending output.');
     break;
   end;
   

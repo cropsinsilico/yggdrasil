@@ -128,7 +128,7 @@ class TestMetaschemaType(YggTestClassInfo):
         r"""Test update_typedef raises error on non-matching typename."""
         self.instance.update_typedef(**self.typedef)
         self.assert_raises(MetaschemaTypeError, self.instance.update_typedef,
-                      type='invalid')
+                           type='invalid')
         if self._explicit:
             typedef_base = self.import_cls.typedef_fixed2base(self.typedef)
             self.instance.update_typedef(**typedef_base)
@@ -168,7 +168,7 @@ class TestMetaschemaType(YggTestClassInfo):
         # Test invalid for incorrect typedef
         if len(self._valid_encoded) > 0:
             self.assert_equal(self.import_cls.check_encoded(self._valid_encoded[0],
-                                                       {}), False)
+                                                            {}), False)
             self.assert_raises(BaseException, self.import_cls.check_encoded,
                                self._valid_encoded[0], {}, raise_errors=True)
         # Test valid
@@ -186,7 +186,7 @@ class TestMetaschemaType(YggTestClassInfo):
         if self._cls == 'MetaschemaType':
             for x in self._valid_decoded:
                 self.assert_raises(NotImplementedError, self.import_cls.check_decoded,
-                              x, self.typedef)
+                                   x, self.typedef)
         else:
             # Test object alone
             if len(self._valid_decoded) > 0:
@@ -221,8 +221,8 @@ class TestMetaschemaType(YggTestClassInfo):
     def test_decode_errors(self):
         r"""Test error on decode."""
         self.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
-                      self.import_cls.decode,
-                      self._invalid_encoded[0], self.typedef)
+                           self.import_cls.decode,
+                           self._invalid_encoded[0], self.typedef)
 
     def test_transform_type(self):
         r"""Test transform_type."""
@@ -245,7 +245,7 @@ class TestMetaschemaType(YggTestClassInfo):
         r"""Test serialization errors."""
         if (self._cls != 'MetaschemaType') and (len(self._valid_decoded) > 0):
             self.assert_raises(RuntimeError, self.instance.serialize,
-                          self._valid_decoded[0], data='something')
+                               self._valid_decoded[0], data='something')
 
     def test_deserialize_error(self):
         r"""Test deserialization errors."""

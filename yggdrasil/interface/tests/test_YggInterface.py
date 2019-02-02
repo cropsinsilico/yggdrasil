@@ -234,7 +234,7 @@ class TestYggInput(TestBase):
         super(TestYggInput, self).__init__(*args, **kwargs)
         self._cls = 'YggInput'
         self.direction = 'input'
-        if self.__class__ == TestCisInput:
+        if self.__class__ == TestYggInput:
             self.testing_option_kws = {'as_format': True}
             self._inst_kwargs = {'format_str': self.fmt_str}
 
@@ -271,7 +271,7 @@ class TestYggOutput(TestBase):
         super(TestYggOutput, self).__init__(*args, **kwargs)
         self._cls = 'YggOutput'
         self.direction = 'output'
-        if self.__class__ == TestCisOutput:
+        if self.__class__ == TestYggOutput:
             self.testing_option_kws = {'as_format': True}
             self._inst_kwargs = {'format_str': self.fmt_str}
 

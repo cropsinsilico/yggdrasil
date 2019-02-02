@@ -387,7 +387,7 @@ extern "C" {
 	} else {
 	  ygglog_throw_error("get_format_type: Could not parse format string: %s", ifmt);
 	}
-  cislog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
+  ygglog_debug("isubtype = %s, iprecision = %lu, ifmt = %s",
                isubtype, iprecision, ifmt);
 	if (as_array == 1) {
 	  items.push_back(new OneDArrayMetaschemaType(isubtype, iprecision, 0));

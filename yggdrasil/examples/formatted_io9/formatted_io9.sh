@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export CIS_DEBUG="INFO"
-export CIS_NAMESPACE="formatted_io9"
+export YGG_DEBUG="INFO"
+export YGG_NAMESPACE="formatted_io9"
 
 yaml= 
 
@@ -25,4 +25,4 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml
+yggrun $yaml
