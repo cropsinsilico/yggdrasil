@@ -33,3 +33,5 @@ TODO
 * Add docstrings to metaschema classes
 * Preprocessor macro for dynamically determine message type?
 * Try to setup comm/connection at class level
+* Redirect old docs to new ones (See https://shoehornwithteeth.com/ramblings/2016/12/redirecting-github-pages-after-renaming-a-repository/)
+* Init new PyPI entry and update SHA in .travis.yml

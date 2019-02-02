@@ -1,7 +1,7 @@
 |PyPI version| |Build Status| |Build status| |Coverage Status| |codecov|
 |PEP8|
 
-The CiS framework provides support for combining scientific models
+The CiS framework, yggdrasil, provides support for combining scientific models
 written in different programming languages. To combine two models,
 modelers add simple communications interfaces to the model code and
 provide simple declarative specification files that identfy the models
@@ -29,7 +29,7 @@ it.
 .. |Build Status| image:: https://travis-ci.org/cropsinsilico/yggdrasil.svg?branch=master
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
 .. |Build status| image:: https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/langmm/cis-interface/branch/master
+   :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/master
 .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
    :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
 .. |codecov| image:: https://codecov.io/gh/cropsinsilico/yggdrasil/branch/master/graph/badge.svg
