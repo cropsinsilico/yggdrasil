@@ -7,8 +7,7 @@ SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = cis_interface
 SOURCEDIR     = source
 BUILDDIR      = build
-REPODIR       = ../cropsinsilico.github.io/cis_interface/
-# REPODIR       = ../../cis_interface_docs
+REPODIR       = ../../cropsinsilico.github.io/cis_interface/
 DOXYDIR       = doxy
 
 # Put it first so that "make" without argument is like "make help".
