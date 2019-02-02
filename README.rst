@@ -24,6 +24,10 @@ Please refer to the package
 additional information about the package and directions for installing
 it.
 
+.. note:: yggdrasil was previously known as cis_interface. While cis_interface
+   can be installed from PyPI `here <https://pypi.org/project/cis-interface/>`__,
+   cis_interface will no longer be updated.
+
 .. |PyPI version| image:: https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat
    :target: https://pypi.org/project/yggdrasil-framework
 .. |Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil.svg?style=flat

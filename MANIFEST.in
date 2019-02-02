@@ -14,6 +14,7 @@ recursive-include yggdrasil *.lpy
 recursive-include yggdrasil *.ply
 recursive-include yggdrasil *.obj
 recursive-include yggdrasil *.txt
+recursive-include yggdrasil *.json
 recursive-include yggdrasil/examples *.py
 recursive-include yggdrasil/tests/scripts *.py
 include yggdrasil/drivers/matlab_screenrc
