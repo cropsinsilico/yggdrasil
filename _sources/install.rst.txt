@@ -27,10 +27,10 @@ Manual Installation
    ZeroMQ C and C++ libraries (see below).
 
 If you do not want to use conda, |yggdrasil| can also be installed 
-from either `PyPI <https://pypi.org/project/yggdrasil/>`_ 
+from either `PyPI <https://pypi.org/project/yggdrasil-framework/>`_ 
 using ``pip``::
 
-  $ pip install yggdrasil
+  $ pip install yggdrasil-framework
 
 or by cloning the `Git <https://git-scm.com/>`_ repository on
 `Github <https://github.com/cropsinsilico/yggdrasil>`_::

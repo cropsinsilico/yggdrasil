@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.interface.tests package &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>cis_interface.interface.tests package &mdash; yggdrasil 0.8 documentation</title>
   
 
   
@@ -28,9 +28,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface.serialize package" href="cis_interface.serialize.html" />
-    <link rel="prev" title="cis_interface.interface package" href="cis_interface.interface.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -49,7 +47,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +57,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.8
               </div>
             
           
@@ -84,7 +82,7 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -97,36 +95,8 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="code_python.html">Python Code</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cis_interface.serialize.html">cis_interface.serialize package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.backwards">cis_interface.backwards module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.command_line">cis_interface.command_line module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.config">cis_interface.config module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.platform">cis_interface.platform module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.runner">cis_interface.runner module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.scanf">cis_interface.scanf module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.schema">cis_interface.schema module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.timing">cis_interface.timing module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.tools">cis_interface.tools module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.units">cis_interface.units module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
@@ -145,7 +115,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -176,12 +146,6 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-          <li><a href="code.html">Code</a> &raquo;</li>
-        
-          <li><a href="code_python.html">Python Code</a> &raquo;</li>
-        
-          <li><a href="cis_interface.interface.html">cis_interface.interface package</a> &raquo;</li>
-        
       <li>cis_interface.interface.tests package</li>
     
     
@@ -206,404 +170,11 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-cis_interface.interface.tests.test_CisInterface">
-<span id="cis-interface-interface-tests-test-cisinterface-module"></span><h2>cis_interface.interface.tests.test_CisInterface module<a class="headerlink" href="#module-cis_interface.interface.tests.test_CisInterface" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
-<p>Test class for interface classes.</p>
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.get_options">
-<code class="descname">get_options</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.get_options" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get testing options.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.idriver_args">
-<code class="descname">idriver_args</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.idriver_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Input driver arguments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.idriver_class">
-<code class="descname">idriver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.idriver_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Input driver class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.inst_kwargs">
-<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.inst_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Arguments for the interface instance.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.messages">
-<code class="descname">messages</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.messages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Messages that should be sent/received.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.odriver_args">
-<code class="descname">odriver_args</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.odriver_args" title="Permalink to this definition">¶</a></dt>
-<dd><p>Output driver arguments.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.odriver_class">
-<code class="descname">odriver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.odriver_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Output driver class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.remove_instance">
-<code class="descname">remove_instance</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.remove_instance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Remove an instance.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.setup">
-<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start driver and instance.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.teardown">
-<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.teardown" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop the driver.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiArrayInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput</span></code></a></p>
-<p>Test input from an ASCII table.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiArrayOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput</span></code></a></p>
-<p>Test input from an ASCII table.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiFileInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
-<p>Test input from an unformatted text file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiFileOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
-<p>Test output to an unformatted text file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput</span></code></a></p>
-<p>Test input from an ascii table.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput</span></code></a></p>
-<p>Test output from an ascii table.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutputMatlab">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutputMatlab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput</span></code></a></p>
-<p>Test output from an ascii table as passed through Matlab.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
-<p>Test basic input to python.</p>
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInput.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInput.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput.test_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test sending/receiving message.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInputMatlab">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisInputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInputMatlab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
-<p>Test basic input to python as passed from matlab.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisObjInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
-<p>Test input from a obj file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisObjOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
-<p>Test output from a obj.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
-<p>Test basic output to python.</p>
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutput.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test sending/receiving message.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutputMatlab">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutputMatlab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
-<p>Test basic output to python as passed from matlab.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPandasInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
-<p>Test input from a pandas file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPandasOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
-<p>Test output from a pandas.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPickleInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
-<p>Test input from a pickle file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPickleOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
-<p>Test output from a pickle.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPlyInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
-<p>Test input from a ply file.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPlyOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
-<p>Test output from a ply.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcClient</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
-<p>Test client-side RPC communication with Python.</p>
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.idriver_class">
-<code class="descname">idriver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.idriver_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Input driver class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.odriver_class">
-<code class="descname">odriver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.odriver_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Output driver class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcClient.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.test_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test sending/receiving message.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClientMatlab">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcClientMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcClientMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClientMatlab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient" title="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpcClient</span></code></a></p>
-<p>Test client-side RPC communication with Python as passed through Matlab.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcServer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
-<p>Test server-side RPC communication with Python.</p>
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.idriver_class">
-<code class="descname">idriver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.idriver_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Input driver class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.odriver_class">
-<code class="descname">odriver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.odriver_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Output driver class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.test_msg">
-<code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcServer.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.test_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test sending/receiving message.</p>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServerMatlab">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcServerMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcServerMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServerMatlab" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer" title="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpcServer</span></code></a></p>
-<p>Test server-side RPC communication with Python as passed through Matlab.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.interface.tests.test_CisInterface.test_CisMatlab_class">
-<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_CisMatlab_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_CisMatlab_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_CisMatlab_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test Matlab interface for classes.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.interface.tests.test_CisInterface.test_CisMatlab_variables">
-<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_CisMatlab_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_CisMatlab_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_CisMatlab_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test Matlab interface for variables.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.interface.tests.test_CisInterface.test_bufMsgSize">
-<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_bufMsgSize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test buf message size.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.interface.tests.test_CisInterface.test_eof_msg">
-<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_eof_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test eof message signal.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.interface.tests.test_CisInterface.test_init">
-<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_init" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error on init.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.interface.tests.test_CisInterface.test_maxMsgSize">
-<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_maxMsgSize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test max message size.</p>
-</dd></dl>
-
+<div class="section" id="cis-interface-interface-tests-test-cisinterface-module">
+<h2>cis_interface.interface.tests.test_CisInterface module<a class="headerlink" href="#cis-interface-interface-tests-test-cisinterface-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-cis_interface.interface.tests">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.interface.tests" title="Permalink to this headline">¶</a></h2>
-<p>Tests for interface sub-package.</p>
 </div>
 </div>
 
@@ -612,15 +183,6 @@
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="cis_interface.serialize.html" class="btn btn-neutral float-right" title="cis_interface.serialize package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="cis_interface.interface.html" class="btn btn-neutral" title="cis_interface.interface package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
