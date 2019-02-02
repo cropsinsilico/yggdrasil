@@ -36,15 +36,15 @@ it.
    any inconvenince this change causes, but feel the new name 
    better reflects the spirit of the project.
 
-.. |PyPI version| image:: https://badge.fury.io/py/cis_interface.svg
-   :target: https://badge.fury.io/py/cis_interface
+.. |PyPI version| image:: https://img.shields.io/pypi/v/cis_interface.svg?colorB=g&style=flat
+   :target: https://pypi.org/project/cis-interface/
 .. |Build Status| image:: https://travis-ci.org/cropsinsilico/yggdrasil.svg?branch=cis_interface
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
 .. |Build status| image:: https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/cis_interface?svg=true
-   :target: https://ci.appveyor.com/project/langmm/cis-interface/branch/cis_interface
-.. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/cis_interface/badge.svg?branch=cis_interface
-   :target: https://coveralls.io/github/cropsinsilico/cis_interface?branch=cis_interface
-.. |codecov| image:: https://codecov.io/gh/cropsinsilico/cis_interface/branch/cis_interface/graph/badge.svg
-   :target: https://codecov.io/gh/cropsinsilico/cis_interface
+   :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/cis_interface
+.. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=cis_interface
+   :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=cis_interface
+.. |codecov| image:: https://codecov.io/gh/cropsinsilico/yggdrasil/branch/cis_interface/graph/badge.svg
+   :target: https://codecov.io/gh/cropsinsilico/yggdrasil
 .. |PEP8| image:: https://img.shields.io/badge/code%20style-pep8-orange.svg
    :target: https://www.python.org/dev/peps/pep-0008/
