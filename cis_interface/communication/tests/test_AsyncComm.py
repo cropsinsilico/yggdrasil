@@ -1,21 +1,23 @@
-import nose.tools as nt
+import copy
+from cis_interface.tests import assert_equal
 from cis_interface.communication.tests import test_CommBase
 
 
 class TestAsyncComm(test_CommBase.TestCommBase):
     r"""Tests for AsyncComm communication class."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestAsyncComm, self).__init__(*args, **kwargs)
-        self.comm = 'AsyncComm'
-        self.attr_list += ['dont_backlog', 'backlog_send_ready',
-                           'backlog_recv_ready']
+    comm = 'AsyncComm'
+    attr_list = (copy.deepcopy(test_CommBase.TestCommBase.attr_list)
+                 + ['dont_backlog', 'backlog_send_ready',
+                    'backlog_recv_ready'])
 
     def test_send_recv_after_close(self):
         r"""Test that send/recv after close returns false."""
         super(TestAsyncComm, self).test_send_recv_after_close()
-        nt.assert_equal(self.send_instance.n_msg_direct_send, 0)
-        nt.assert_equal(self.recv_instance.n_msg_direct_recv, 0)
+        assert_equal(self.send_instance.n_msg_direct_send, 0)
+        assert_equal(self.recv_instance.n_msg_direct_recv, 0)
+        assert_equal(self.send_instance.n_msg_direct, 0)
+        assert_equal(self.recv_instance.n_msg_direct, 0)
 
     def test_send_recv_direct(self):
         r"""Test send/recv direct."""

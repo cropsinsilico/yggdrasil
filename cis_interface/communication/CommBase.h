@@ -2,7 +2,8 @@
 #ifndef CISCOMMBASE_H_
 #define CISCOMMBASE_H_
 
-#include <../tools.h>
+#include "../tools.h"
+#include "../metaschema/datatypes/datatypes.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -10,7 +11,7 @@ extern "C" {
 
 /*! @brief Communicator types. */
 enum comm_enum { NULL_COMM, IPC_COMM, ZMQ_COMM,
-		 RPC_COMM, SERVER_COMM, CLIENT_COMM,
+		 SERVER_COMM, CLIENT_COMM,
 		 ASCII_FILE_COMM, ASCII_TABLE_COMM, ASCII_TABLE_ARRAY_COMM };
 typedef enum comm_enum comm_type;
 #define COMM_NAME_SIZE 100
@@ -60,7 +61,7 @@ comm_t empty_comm_base() {
   ret.serializer = NULL;
   ret.maxMsgSize = 0;
   ret.msgBufSize = 0;
-  ret.always_send_header = 0;
+  ret.always_send_header = 1;
   ret.index_in_register = -1;
   ret.last_send = NULL;
   ret.sent_eof = NULL;
@@ -82,8 +83,8 @@ comm_t empty_comm_base() {
   @returns comm_t* Address of comm structure.
 */
 static inline
-comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
-		      const void *seri_info) {
+comm_t* new_comm_base(char *address, const char *direction,
+		      const comm_type t, void *seri_info) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
   if (ret == NULL) {
     cislog_error("new_comm_base: Failed to malloc comm.");
@@ -93,13 +94,13 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
   ret->type = t;
   ret->valid = 1;
   if (address != NULL)
-    strcpy(ret->address, address);
+    strncpy(ret->address, address, COMM_ADDRESS_SIZE);
   if (direction == NULL) {
     ret->valid = 0;
   } else {
-    strcpy(ret->direction, direction);
+    strncpy(ret->direction, direction, COMM_DIR_SIZE);
   }
-  ret->serializer = init_serializer(-1, seri_info);
+  ret->serializer = init_serializer("", seri_info);
   ret->maxMsgSize = CIS_MSG_MAX;
   ret->last_send = (time_t*)malloc(sizeof(time_t));
   ret->last_send[0] = 0;
@@ -126,18 +127,16 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
  */
 static inline
 comm_t* init_comm_base(const char *name, const char *direction,
-		       const comm_type t, const void *seri_info) {
+		       const comm_type t, void *seri_info) {
   char full_name[COMM_NAME_SIZE];
   char *address = NULL;
   if (name != NULL) {
-    strcpy(full_name, name);
-    if (t != RPC_COMM) {
-      if ((direction != NULL) && (strlen(direction) > 0)) {
-        if (is_send(direction))
-          strcat(full_name, "_OUT");
-        else if (is_recv(direction))
-          strcat(full_name, "_IN");
-      }
+    strncpy(full_name, name, COMM_NAME_SIZE);
+    if ((direction != NULL) && (strlen(direction) > 0)) {
+      if (is_send(direction))
+	strcat(full_name, "_OUT");
+      else if (is_recv(direction))
+	strcat(full_name, "_IN");
     }
     address = getenv(full_name);
   }
@@ -149,7 +148,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
   if (name == NULL) {
     ret->valid = 0;
   } else
-    strcpy(ret->name, full_name);
+    strncpy(ret->name, full_name, COMM_NAME_SIZE);
   if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
     cislog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);

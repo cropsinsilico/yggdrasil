@@ -5,15 +5,15 @@ import os
 import psutil
 import warnings
 import weakref
+from cis_interface import backwards, tools, platform, config
 try:  # pragma: matlab
     import matlab.engine
-    _matlab_installed = True
+    _matlab_installed = (config.cis_cfg.get('matlab', 'disable', 'False') == 'False')
 except ImportError:  # pragma: no matlab
     debug("Could not import matlab.engine. "
           + "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface import backwards, tools, platform, config
 from cis_interface.tools import TimeOut, sleep
 from cis_interface.schema import register_component
 
@@ -21,6 +21,11 @@ from cis_interface.schema import register_component
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
+_compat_map = {
+    'R2015b': ['2.7', '3.3', '3.4'],
+    'R2017a': ['2.7', '3.3', '3.4', '3.5'],
+    'R2017b': ['2.7', '3.3', '3.4', '3.5', '3.6'],
+    'R2018b': ['2.7', '3.3', '3.4', '3.5', '3.6']}
 
 
 def kill_all():
@@ -39,7 +44,8 @@ def locate_matlab_engine_processes():  # pragma: matlab
 
     """
     out = []
-    for p in psutil.process_iter(attrs=['name', 'pid', 'cmdline']):
+    for p in psutil.process_iter():
+        p.info = p.as_dict(attrs=['name', 'pid', 'cmdline'])
         if (((p.info['name'] == 'MATLAB')
              and ('matlab.engine.shareEngine' in p.info['cmdline']))):
             out.append(p)  # p.info['pid'])
@@ -60,6 +66,29 @@ def is_matlab_running():
     return out
 
 
+def get_matlab_version():  # pragma: matlab
+    r"""Determine the version of matlab that is installed, if at all.
+
+    Returns:
+        str: Matlab version string.
+    
+    """
+    mtl_id = '=MATLABROOT='
+    cmd = "fprintf('" + mtl_id + "R%s" + mtl_id + "', version('-release')); exit();"
+    mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
+               '-r', '%s' % cmd]
+    try:
+        mtl_proc = subprocess.check_output(mtl_cmd)
+    except subprocess.CalledProcessError:  # pragma: no matlab
+        raise RuntimeError("Could not run matlab.")
+    mtl_id = backwards.match_stype(mtl_proc, mtl_id)
+    if mtl_id not in mtl_proc:  # pragma: debug
+        print(mtl_proc)
+        raise RuntimeError("Could not locate matlab root id (%s) in output." % mtl_id)
+    mtl_root = mtl_proc.split(mtl_id)[-2]
+    return backwards.as_str(mtl_root)
+
+
 def locate_matlabroot():  # pragma: matlab
     r"""Find directory that servers as matlab root.
 
@@ -77,12 +106,12 @@ def locate_matlabroot():  # pragma: matlab
         mtl_proc = subprocess.check_output(mtl_cmd)
     except subprocess.CalledProcessError:  # pragma: no matlab
         raise RuntimeError("Could not run matlab.")
-    mtl_id = backwards.unicode2bytes(mtl_id)
+    mtl_id = backwards.match_stype(mtl_proc, mtl_id)
     if mtl_id not in mtl_proc:  # pragma: debug
         print(mtl_proc)
         raise RuntimeError("Could not locate matlab root id (%s) in output." % mtl_id)
     mtl_root = mtl_proc.split(mtl_id)[-2]
-    return backwards.bytes2unicode(mtl_root)
+    return backwards.as_str(mtl_root)
 
 
 def install_matlab_engine():  # pragma: matlab
@@ -231,9 +260,10 @@ def stop_matlab(screen_session, matlab_engine, matlab_session, matlab_process,
             debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
-            matlab_process.terminate()
-            error("stop_matlab timed out at %f s. " % T.elapsed
-                  + "Killed Matlab sharedEngine process.")
+            if matlab_process is not None:
+                matlab_process.terminate()
+                error("stop_matlab timed out at %f s. " % T.elapsed
+                      + "Killed Matlab sharedEngine process.")
 
 
 class MatlabProcess(tools.CisClass):  # pragma: matlab

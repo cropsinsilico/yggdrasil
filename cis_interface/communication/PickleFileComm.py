@@ -1,6 +1,7 @@
 from cis_interface import backwards
 from cis_interface.communication import FileComm
 from cis_interface.schema import register_component
+from cis_interface.serialize.PickleSerialize import PickleSerialize
 
 
 @register_component
@@ -14,12 +15,31 @@ class PickleFileComm(FileComm.FileComm):
     """
 
     _filetype = 'pickle'
+    _default_serializer = PickleSerialize
 
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')
-        kwargs['serializer_kwargs'] = dict(stype=4)
         super(PickleFileComm, self).__init__(name, **kwargs)
 
+    @classmethod
+    def get_testing_options(cls):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = super(PickleFileComm, cls).get_testing_options()
+        out['recv'] = out['send']
+        return out
+        
     def _recv(self, timeout=0):
         r"""Reads message from a file.
 

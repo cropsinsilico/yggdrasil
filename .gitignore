@@ -3,6 +3,13 @@
 cis_interface/tests/scripts/gcc_model.out
 cis_interface/tests/scripts/Makefile
 
+# Library things
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
 # Intermediate docs
 docs/build
 docs/source/cis_interface.inc

@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <complex.h>
+#ifdef _WIN32
+typedef _Dcomplex complex_double;
+#else
+typedef double _Complex complex_double;
+#endif
 // Include interface methods
 #include "CisInterface.h"
 
 #define BSIZE 8192 // the max
+
 
 
 int main(int argc,char *argv[]){
@@ -25,15 +32,18 @@ int main(int argc,char *argv[]){
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
   printf("ascii_io(C): Receiving/sending ASCII file.\n");
-  char *line = (char*)malloc(LINE_SIZE_MAX);
+  size_t line_size = LINE_SIZE_MAX;
+  char *line = (char*)malloc(line_size);
   ret = 0;
   while (ret >= 0) {
+    line_size = LINE_SIZE_MAX; // Reset to size of buffer
+
     // Receive a single line
-    ret = cisRecv(FileInput, &line);
+    ret = cisRecvRealloc(FileInput, &line, &line_size);
     if (ret >= 0) {
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
-      ret = cisSend(FileOutput, line);
+      ret = cisSend(FileOutput, line, line_size);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING LINE\n");
 	error_code = -1;
@@ -51,20 +61,23 @@ int main(int argc,char *argv[]){
   // As each row is received, it is then sent to the output ASCII table
   printf("ascii_io(C): Receiving/sending ASCII table.\n");
   char name[BSIZE];
+  size_t name_siz = BSIZE;
   long number;
   double value;
-  double comp_real, comp_imag;
+  complex_double comp;
   ret = 0;
   while (ret >= 0) {
+    name_siz = BSIZE; // Reset to size of the buffer
+
     // Receive a single row with values stored in scalars declared locally
-    ret = cisRecv(TableInput, &name, &number, &value, &comp_real, &comp_imag);
+    ret = cisRecv(TableInput, &name, &name_siz, &number, &value, &comp);
 		      
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %.5s, %ld, %3.1f, %g%+gj\n",
-	     name, number, value, comp_real, comp_imag);
-      ret = cisSend(TableOutput, name, number, value, comp_real, comp_imag);
+	     name, number, value, creal(comp), cimag(comp));
+      ret = cisSend(TableOutput, name, name_siz, number, value, comp);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ROW\n");
 	error_code = -1;
@@ -81,26 +94,24 @@ int main(int argc,char *argv[]){
   // allocated. The returned values tells us the number of elements in the
   // columns.
   printf("Receiving/sending ASCII table as array.\n");
+  size_t nrows;
   char *name_arr = NULL;
   long *number_arr = NULL;
   double *value_arr = NULL;
-  double *comp_real_arr = NULL;
-  double *comp_imag_arr = NULL;
+  complex_double *comp_arr = NULL;
   ret = 0;
   while (ret >= 0) {
-    ret = cisRecv(ArrayInput, &name_arr, &number_arr, &value_arr,
-		  &comp_real_arr, &comp_imag_arr);
+    ret = cisRecv(ArrayInput, &nrows, &name_arr, &number_arr, &value_arr, &comp_arr);
     if (ret >= 0) {
-      printf("Array: (%d rows)\n", ret);
+      printf("Array: (%lu rows)\n", nrows);
       // Print each line in the array
       int i;
-      for (i = 0; i < ret; i++)
+      for (i = 0; i < nrows; i++)
 	printf("%.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
-	       value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
+	       value_arr[i], creal(comp_arr[i]), cimag(comp_arr[i]));
       // Send the columns in the array to output. Formatting is handled on the
       // output driver side.
-      ret = cisSend(ArrayOutput, ret, name_arr, number_arr, value_arr,
-		    comp_real_arr, comp_imag_arr);
+      ret = cisSend(ArrayOutput, nrows, name_arr, number_arr, value_arr, comp_arr);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ARRAY\n");
 	error_code = -1;
@@ -115,8 +126,7 @@ int main(int argc,char *argv[]){
   if (name_arr) free(name_arr);
   if (number_arr) free(number_arr);
   if (value_arr) free(value_arr);
-  if (comp_real_arr) free(comp_real_arr);
-  if (comp_imag_arr) free(comp_imag_arr);
+  if (comp_arr) free(comp_arr);
   
   return error_code;
 }

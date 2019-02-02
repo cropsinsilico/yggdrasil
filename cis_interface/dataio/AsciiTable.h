@@ -156,7 +156,7 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf,
       return ret;
     }
   }
-  strcpy(*buf, line);
+  strncpy(*buf, line, len_buf);
   free(line);
   return ret;
 };
@@ -200,7 +200,7 @@ static inline
 int at_vbytes_to_row(const asciiTable_t t, const char* line, va_list ap) {
   // Simplify format for vsscanf
   char fmt[LINE_SIZE_MAX];
-  strcpy(fmt, t.format_str);
+  strncpy(fmt, t.format_str, LINE_SIZE_MAX);
   int sret = simplify_formats(fmt, LINE_SIZE_MAX);
   if (sret < 0) {
     cislog_debug("at_vbytes_to_row: simplify_formats returned %d", sret);
@@ -345,7 +345,7 @@ int at_discover_format_str(asciiTable_t *t) {
   while (getline(&line, &nread, (*t).f.fd) >= 0) {
     if (af_is_comment((*t).f, line) == 1) {
       if (count_formats(line) > 0) {
-  	strcpy((*t).format_str, line + strlen((*t).f.comment));
+  	strncpy((*t).format_str, line + strlen((*t).f.comment), LINE_SIZE_MAX);
   	ret = 0;
   	break;
       }
@@ -691,7 +691,7 @@ asciiTable_t asciiTable(const char *filepath, const char *io_mode,
 			const char *format_str, const char *comment,
 			const char *column, const char *newline) {
   asciiTable_t t;
-  strcpy(t.format_str, "\0");
+  strncpy(t.format_str, "\0", LINE_SIZE_MAX);
   t.ncols = 0;
   t.format_typ = NULL;
   t.format_siz = NULL;
@@ -700,9 +700,9 @@ asciiTable_t asciiTable(const char *filepath, const char *io_mode,
   t.f = asciiFile(filepath, io_mode, comment, newline);
   // Set defaults for optional parameters
   if (column == NULL)
-    strcpy(t.column, "\t");
+    strncpy(t.column, "\t", 64);
   else
-    strcpy(t.column, column);
+    strncpy(t.column, column, 64);
   // Guess format string from file
   if (format_str == NULL) {
     if (strcmp(io_mode, "r") == 0) {
@@ -711,7 +711,7 @@ asciiTable_t asciiTable(const char *filepath, const char *io_mode,
       t.status = -1;
     }
   } else {
-    strcpy(t.format_str, format_str);
+    strncpy(t.format_str, format_str, LINE_SIZE_MAX);
   }
   // Get number of columns & types
   if (t.status >= 0)

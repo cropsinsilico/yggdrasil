@@ -3,6 +3,11 @@ from cis_interface import tools, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
 from cis_interface.schema import register_component, inherit_schema
+if platform._is_win:  # pragma: windows
+    _default_make_command = 'nmake'
+else:
+    _default_make_command = 'make'
+_default_makefile = 'Makefile'
 
 
 def setup_environ(compile_flags=[], linker_flags=[]):
@@ -34,12 +39,13 @@ class MakeModelDriver(ModelDriver):
             any arguments for the executable.
         make_command (str, optional): Command that should be used for make.
             Defaults to 'make' on Linux/MacOS and 'nmake' on windows.
-        makefile (str, optional): Path to make file either relative to makedir
-            or absolute. Defaults to Makefile.
+        makefile (str, optional): Path to make file either absolute, relative to
+            makedir (if provided), or relative to working_dir. Defaults to
+            Makefile.
         makedir (str, optional): Directory where make should be invoked from
             if it is not the same as the directory containing the makefile.
-            Defaults to directory containing makefile if an absolute path is
-            provided, otherwise self.working_dir.
+            Defaults to directory containing makefile if provided, otherwise
+            self.working_dir.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -55,34 +61,28 @@ class MakeModelDriver(ModelDriver):
     """
 
     _language = 'make'
-    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
-                             make_command={'type': 'string', 'required': False},
-                             makefile={'type': 'string', 'required': False},
-                             makedir={'type': 'string', 'required': False})
+    _schema_properties = inherit_schema(
+        ModelDriver._schema_properties,
+        {'make_command': {'type': 'string', 'default': _default_make_command},
+         'makefile': {'type': 'string', 'default': _default_makefile},
+         'makedir': {'type': 'string'}})  # default will depend on makefile
 
-    def __init__(self, name, args, make_command=None, makedir=None,
-                 makefile=None, **kwargs):
+    def __init__(self, name, args, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
         if not self.is_installed():  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.compiled = False
-        if make_command is None:
-            if platform._is_win:  # pragma: windows
-                make_command = 'nmake'
-            else:
-                make_command = 'make'
         self.target = self.args[0]
-        if makedir is None:
-            if (makefile is not None) and os.path.isabs(makefile):
-                makedir = os.path.dirname(makefile)
+        if not os.path.isabs(self.makefile):
+            if self.makedir is not None:
+                self.makefile = os.path.normpath(
+                    os.path.join(self.makedir, self.makefile))
             else:
-                makedir = self.working_dir
-        if makefile is None:
-            makefile = 'Makefile'
-        self.make_command = make_command
-        self.makedir = makedir
-        self.makefile = makefile
+                self.makefile = os.path.normpath(
+                    os.path.join(self.working_dir, self.makefile))
+        if self.makedir is None:
+            self.makedir = os.path.dirname(self.makefile)
         self.target_file = os.path.join(self.makedir, self.target)
         self.args[0] = self.target_file
         # Set environment variables

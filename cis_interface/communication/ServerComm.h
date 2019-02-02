@@ -4,7 +4,7 @@
 
 #include <CommBase.h>
 #include <DefaultComm.h>
-#include <comm_header.h>
+#include "../metaschema/datatypes/datatypes.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -38,19 +38,17 @@ int init_server_comm(comm_t *comm) {
     return init_default_comm(comm);
   }
   // Called to initialize/create server comm
-  char *seri_in = (char*)malloc(strlen(comm->direction) + 1);
+  void *seri_in = (void*)get_format_type(comm->direction, 0);
   if (seri_in == NULL) {
-    cislog_error("init_server_comm: Failed to malloc seri_in.");
+    cislog_error("init_server_comm: Failed to create seri_in.");
     return -1;
   }
-  strcpy(seri_in, comm->direction);
-  // printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in);
   comm_t *handle;
   if (strlen(comm->name) == 0) {
-    handle = new_comm_base(comm->address, "recv", _default_comm, (void*)seri_in);
+    handle = new_comm_base(comm->address, "recv", _default_comm, seri_in);
     sprintf(handle->name, "server_request.%s", comm->address);
   } else {
-    handle = init_comm_base(comm->name, "recv", _default_comm, (void*)seri_in);
+    handle = init_comm_base(comm->name, "recv", _default_comm, seri_in);
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
@@ -61,7 +59,7 @@ int init_server_comm(comm_t *comm) {
   if (_default_comm == ZMQ_COMM) {
     comm->always_send_header = 1;
   } else {
-    comm->always_send_header = 0;
+    comm->always_send_header = 1; // Always send header.
   }
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   if (info == NULL) {
@@ -185,12 +183,11 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
     return -1;
   }
   strcpy(x.address, head.id);
-  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer->info)) + 1);
+  void *seri_copy = (void*)copy_from_void(x.serializer->type, x.serializer->info);
   if (seri_copy == NULL) {
-    cislog_error("server_comm_recv(%s): Failed to malloc seri_copy.");
+    cislog_error("server_comm_recv(%s): Failed to create seri_copy.");
     return -1;
   }
-  strcpy(seri_copy, (char*)(x.serializer->info));
   comm_t **res_comm = (comm_t**)(x.info);
   res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
 			      seri_copy);

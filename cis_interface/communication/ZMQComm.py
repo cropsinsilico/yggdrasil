@@ -20,12 +20,12 @@ _socket_type_pairs = [('PUSH', 'PULL'),
 _socket_send_types = [t[0] for t in _socket_type_pairs]
 _socket_recv_types = [t[1] for t in _socket_type_pairs]
 _socket_protocols = ['tcp', 'inproc', 'ipc', 'udp', 'pgm', 'epgm']
-_flag_zmq_filter = backwards.unicode2bytes('_ZMQFILTER_')
+_flag_zmq_filter = b'_ZMQFILTER_'
 _default_socket_type = 4
 _default_protocol = 'tcp'
 _wait_send_t = 0  # 0.0001
-_reply_msg = backwards.unicode2bytes('CIS_REPLY')
-_purge_msg = backwards.unicode2bytes('CIS_PURGE')
+_reply_msg = b'CIS_REPLY'
+_purge_msg = b'CIS_PURGE'
 _global_context = zmq.Context.instance()
 
 
@@ -56,7 +56,7 @@ def check_czmq():
         # except subprocess.TimeoutExpired:
         #     process.kill()
         #     outs, errs = process.communicate()
-        return (backwards.unicode2bytes('zmq') not in errs)
+        return (b'zmq' not in errs)
 
 
 _zmq_installed_c = check_czmq()
@@ -354,6 +354,9 @@ class ZMQComm(AsyncComm.AsyncComm):
     """
 
     _commtype = 'zmq'
+    # Based on limit of 32bit int, this could be 2**30, but this is
+    # too large for stack allocation in C so 2**20 will be used.
+    _maxMsgSize = 2**20
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
@@ -403,10 +406,10 @@ class ZMQComm(AsyncComm.AsyncComm):
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
         self.socket.setsockopt(zmq.LINGER, 0)
-        self.topic_filter = backwards.unicode2bytes(topic_filter)
+        self.topic_filter = backwards.as_bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
-        self.dealer_identity = backwards.unicode2bytes(dealer_identity)
+        self.dealer_identity = backwards.as_bytes(dealer_identity)
         self._openned = False
         self._bound = False
         self._connected = False
@@ -457,13 +460,6 @@ class ZMQComm(AsyncComm.AsyncComm):
         else:
             out = super(ZMQComm, cls).is_installed(language=language)
         return out
-
-    @property
-    def maxMsgSize(self):
-        r"""int: Maximum size of a single message that should be sent."""
-        # Based on limit of 32bit int, this could be 2**30, but this is
-        # too large for stack allocation in C so 2**20 will be used.
-        return 2**20
 
     @classmethod
     def underlying_comm_class(self):
@@ -676,7 +672,7 @@ class ZMQComm(AsyncComm.AsyncComm):
             s = self.context.socket(zmq.REQ)
             s.setsockopt(zmq.LINGER, 0)
             s.connect(address)
-            self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address), s)
+            self.register_comm('REPLY_RECV_' + backwards.as_str(address), s)
             with self.reply_socket_lock:
                 self._n_reply_recv[address] = 0
                 self._n_zmq_recv[address] = 0
@@ -709,7 +705,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         """
         if self.direction == 'send':
             return msg, None
-        header = self.serializer.parse_header(msg)
+        header = self.serializer.parse_header(msg.split(_flag_zmq_filter)[-1])
         address = header.get('zmq_reply', None)
         if (address is None):
             address = self.reply_socket_address
@@ -822,7 +818,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         else:
             for k, socket in self.reply_socket_recv.items():
                 socket.close(linger=0)
-                self.unregister_comm("REPLY_RECV_" + backwards.bytes2unicode(k))
+                self.unregister_comm("REPLY_RECV_" + backwards.as_str(k))
 
     def server_exists(self, srv_address):
         r"""Determine if a server exists.
@@ -956,9 +952,9 @@ class ZMQComm(AsyncComm.AsyncComm):
 
         """
         flag, msg_s = super(ZMQComm, self).on_send_eof()
-        header = dict(zmq_reply=self.set_reply_socket_send(),
-                      size=len(msg_s), id=str(uuid.uuid4()))
-        return flag, self.serializer.format_header(header) + msg_s
+        header_kwargs = dict(zmq_reply=self.set_reply_socket_send())
+        out = self.serialize(msg_s, header_kwargs=header_kwargs)
+        return flag, out
         
     def on_send(self, msg, header_kwargs=None):
         r"""Process message to be sent including handling serializing
@@ -1018,8 +1014,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             return False
         if identity is None:
             identity = self.dealer_identity
-        topic = backwards.unicode2bytes(topic)
-        identity = backwards.unicode2bytes(identity)
+        topic = backwards.as_bytes(topic)
+        identity = backwards.as_bytes(identity)
         if self.socket_type_name == 'PUB':
             total_msg = topic + _flag_zmq_filter + msg
         else:

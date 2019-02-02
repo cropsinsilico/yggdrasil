@@ -89,6 +89,9 @@ class RMQComm(AsyncComm.AsyncComm):
     """
 
     _commtype = 'rmq'
+    # Based on limit of 32bit int, this could be 2**30, but this is
+    # too large for stack allocation in C so 2**20 will be used.
+    _maxMsgSize = 2**20
     
     def _init_before_open(self, **kwargs):
         r"""Set null connection and channel."""

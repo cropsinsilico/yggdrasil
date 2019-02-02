@@ -1,15 +1,30 @@
 function x_py = matlab2python(x_ml)
   if isa(x_ml, 'py.object')
     x_py = x_ml;
+  elseif isa(x_ml, 'containers.Map');
+    keys = matlab2python(x_ml.keys);
+    vals = matlab2python(x_ml.values);
+    for i = 1:length(keys)
+      keys{i} = py.str(keys{i}.decode('utf-8'));
+    end
+    x_py = py.dict(py.zip(keys, vals));
   elseif isscalar(x_ml);
     if isa(x_ml, 'complex');
       x_py = x_ml;
+    elseif isa(x_ml, 'single');
+      x_py = py.numpy.float32(py.float(double(x_ml)));
+    elseif isa(x_ml, 'double');
+      x_py = py.numpy.float64(py.float(x_ml));
     elseif isa(x_ml, 'float');
       if isreal(x_ml)
 	x_py = py.float(x_ml);
       else
 	x_py = x_ml;
       end
+    elseif isa(x_ml, 'int32');
+      x_py = py.numpy.int32(py.int(x_ml));
+    elseif isa(x_ml, 'int64');
+      x_py = py.numpy.int64(py.int(x_ml));
     elseif isa(x_ml, 'integer');
       x_py = py.int(x_ml);
     elseif isa(x_ml, 'string');

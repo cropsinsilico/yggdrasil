@@ -54,6 +54,16 @@ def ld_flags():
     print(' '.join(GCCModelDriver.get_flags()[1]))
 
 
+def rebuild_c_api():
+    r"""Rebuild the C/C++ API."""
+    if GCCModelDriver._c_installed:
+        GCCModelDriver.build_api(cpp=False, overwrite=True)
+        GCCModelDriver.build_api(cpp=True, overwrite=True)
+    else:
+        raise Exception("The libraries necessary for running models written in "
+                        "C/C++ could not be located.")
+
+
 def regen_schema():
     r"""Regenerate the cis_interface schema."""
     if os.path.isfile(schema._schema_fname):

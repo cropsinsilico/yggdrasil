@@ -1,0 +1,32 @@
+connections:
+  # Root input connections
+  - input: ./Input/root_growth_rate.txt
+    output: root_growth_rate
+    filetype: table
+  - input: ./Input/init_root_mass.txt
+    output: init_root_mass
+    filetype: table
+  - input: ./Input/timesteps.txt
+    output: root_time_step
+    filetype: table
+
+  # Root-to-shoot connection
+  - input: next_root_mass
+    output: next_root_mass
+
+  # Shoot input connections
+  - input: ./Input/shoot_growth_rate.txt
+    output: shoot_growth_rate
+    filetype: table
+  - input: ./Input/init_shoot_mass.txt
+    output: init_shoot_mass
+    filetype: table
+  - input: ./Input/timesteps.txt
+    output: shoot_time_step
+    filetype: table
+
+  # Shoot output connection
+  - input: next_shoot_mass
+    output: ./Output/shoot_output.txt
+    filetype: table
+    field_names: shoot_mass

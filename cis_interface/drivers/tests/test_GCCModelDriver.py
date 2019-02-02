@@ -5,7 +5,8 @@ from cis_interface import platform, tools
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface.drivers.GCCModelDriver import (
-    GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags)
+    GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags,
+    build_datatypes, build_api, build_regex_win32)
 
 
 _driver_installed = GCCModelDriver.is_installed()
@@ -35,6 +36,18 @@ def test_get_flags():
         nt.assert_equal(len(ld), 0)
 
 
+@unittest.skipIf(not _driver_installed, "C Library not installed")
+def test_build_shared():
+    r"""Test building libraries as shared."""
+    if platform._is_win:  # pragma: windows
+        build_regex_win32(overwrite=True)
+    build_datatypes(as_shared=False, overwrite=True)
+    build_datatypes(as_shared=True, overwrite=True)
+    build_api(cpp=False, as_shared=True, overwrite=True)
+    build_api(cpp=True, as_shared=True, overwrite=True)
+    build_api(cpp=True, as_shared=True, overwrite=False)
+
+
 @unittest.skipIf(_driver_installed, "C Library installed")
 def test_GCCModelDriver_no_C_library():  # pragma: windows
     r"""Test GCCModelDriver error when C library not installed."""
@@ -51,9 +64,10 @@ def test_GCCModelDriver_errors():
 class TestGCCModelParam(parent.TestModelParam):
     r"""Test parameters for GCCModelDriver."""
 
+    driver = 'GCCModelDriver'
+    
     def __init__(self, *args, **kwargs):
         super(TestGCCModelParam, self).__init__(*args, **kwargs)
-        self.driver = 'GCCModelDriver'
         self.attr_list += []
         src = scripts['c']
         script_dir = os.path.dirname(src[0])

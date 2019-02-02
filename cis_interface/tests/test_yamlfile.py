@@ -1,6 +1,7 @@
 import tempfile
 import os
 import nose.tools as nt
+from jsonschema.exceptions import ValidationError
 from cis_interface import yamlfile
 from cis_interface.tests import CisTestClass
 _yaml_env = 'TEST_YAML_FILE'
@@ -22,11 +23,6 @@ def test_parse_component_error():
                      1, 'invalid', 'invalid')
     nt.assert_raises(ValueError, yamlfile.parse_component,
                      {}, 'invalid', 'invalid')
-
-
-def test_cdriver2filetype_error():
-    r"""Test errors in cdriver2filetype."""
-    nt.assert_raises(ValueError, yamlfile.cdriver2filetype, 'invalid')
 
 
 class YamlTestBase(CisTestClass):
@@ -146,7 +142,18 @@ class TestYamlIODrivers(YamlTestBase):
                   '        driver: FileInputDriver',
                   '        translator: %s:direct_translate' % __name__,
                   '        onexit: printStatus',
-                  '        args: {{ %s }}' % _yaml_env],
+                  '        args: {{ %s }}' % _yaml_env,
+                  '    outputs:',
+                  '      - name: outputA',
+                  '        driver: FileOutputDriver',
+                  '        translator: %s:direct_translate' % __name__,
+                  '        onexit: printStatus',
+                  '        args: fileA.txt',
+                  '      - name: outputA2',
+                  '        driver: OutputDriver',
+                  '        translator: %s:direct_translate' % __name__,
+                  '        onexit: printStatus',
+                  '        args: A_to_B'],
                  ['model:',
                   '  - name: modelB',
                   '    driver: GCCModelDriver',
@@ -154,7 +161,10 @@ class TestYamlIODrivers(YamlTestBase):
                   '    input:',
                   '      - name: inputB',
                   '        driver: FileInputDriver',
-                  '        args: {{ %s }}' % _yaml_env],
+                  '        args: {{ %s }}' % _yaml_env,
+                  '      - name: inputB2',
+                  '        driver: InputDriver',
+                  '        args: A_to_B'],
                  ['model:',
                   '  name: modelC',
                   '  driver: GCCModelDriver',
@@ -191,6 +201,31 @@ class TestYamlConnection(YamlTestBase):
                   '    args: ./src/modelB.c',
                   '    outputs:',
                   '      - outputB'],)
+
+
+class TestYamlIODatatype(YamlTestBase):
+    r"""Test specification of datatype via schema."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - name: inputA',
+                  '        type: object',
+                  '        properties:',
+                  '          a: int',
+                  "          b: {'type': float, 'units': 'cm'}",
+                  '',
+                  'connections:',
+                  "  - from: ['outputB:0', 'outputB:1']",
+                  "    to: ['inputA:a', 'inputA:b']"],
+                 ['models:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    outputs:',
+                  '      - name: outputB',
+                  '        type: [int, float]'],)
 
 
 class TestYamlConnectionFork(YamlTestBase):
@@ -444,7 +479,7 @@ class TestYamlConnectionInputObj(YamlTestBase):
 
 class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
-    _error = TypeError
+    _error = ValidationError
     _contents = (['models: error'],)
 
 
@@ -484,28 +519,29 @@ class TestYamlConnectionError_forkin(YamlTestBaseError):
                   '  - input:',
                   '      - output1',
                   '      - output2',
-                  '  - output: inputA'],)
+                  '    output: inputA'],)
 
 
-class TestYamlConnectionError_forkout(YamlTestBaseError):
-    r"""Test error when there is not connection for a fork output channel."""
-    _error = RuntimeError
-    _contents = (['models:',
-                  '  - name: modelA',
-                  '    driver: GCCModelDriver',
-                  '    args: ./src/modelA.c',
-                  '    outputs:',
-                  '      - outputA',
-                  'connections:',
-                  '  - input: outputA',
-                  '  - output:',
-                  '      - input1',
-                  '      - input2'],)
+# Error not raised as both outputs could be files
+# class TestYamlConnectionError_forkout(YamlTestBaseError):
+#     r"""Test error when there is not connection for a fork output channel."""
+#     _error = RuntimeError
+#     _contents = (['models:',
+#                   '  - name: modelA',
+#                   '    driver: GCCModelDriver',
+#                   '    args: ./src/modelA.c',
+#                   '    outputs:',
+#                   '      - outputA',
+#                   'connections:',
+#                   '  - input: outputA',
+#                   '    output:',
+#                   '      - input1',
+#                   '      - input2'],)
 
 
 class TestYamlConnectionError_readmeth(YamlTestBaseError):
     r"""Test error when read_meth is specified for non-file."""
-    _error = ValueError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -527,7 +563,7 @@ class TestYamlConnectionError_readmeth(YamlTestBaseError):
 
 class TestYamlConnectionError_writemeth(YamlTestBaseError):
     r"""Test error when write_meth is specified for non-file."""
-    _error = ValueError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -549,19 +585,19 @@ class TestYamlConnectionError_writemeth(YamlTestBaseError):
 
 class TestYamlMissingModelArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a model."""
-    _error = ValueError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    args: ./src/modelA.c',
                   '    inputs:',
                   '      name: inputA',
                   '      driver: FileInputDriver',
-                  '      args: fileA.txt'],)
+                  '      args: {{ %s }}' % _yaml_env],)
 
 
-class TestYamlMissingIOArgsError(YamlTestBaseError):
-    r"""Test error when there is a missing arguments to an I/O driver."""
-    _error = ValueError
+class TestYamlMissingIOArgsError_input(YamlTestBaseError):
+    r"""Test error when there is a missing arguments to an input driver."""
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -571,9 +607,21 @@ class TestYamlMissingIOArgsError(YamlTestBaseError):
                   '      driver: FileInputDriver'],)
 
 
+class TestYamlMissingIOArgsError_output(YamlTestBaseError):
+    r"""Test error when there is a missing arguments to an output driver."""
+    _error = ValidationError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    outputs:',
+                  '      name: outputA',
+                  '      driver: FileOutputDriver'],)
+
+
 class TestYamlMissingConnArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a connection."""
-    _error = ValueError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -612,7 +660,7 @@ class TestYamlMissingConnInputError(YamlTestBaseError):
 
 class TestYamlMissingConnInputFileError(YamlTestBaseError):
     r"""Test error when there is no file for missing connection input."""
-    _error = RuntimeError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -629,7 +677,7 @@ class TestYamlMissingConnInputFileError(YamlTestBaseError):
 
 class TestYamlMissingConnIOError(YamlTestBaseError):
     r"""Test error when there is no model input/output matching connection."""
-    _error = RuntimeError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -642,7 +690,7 @@ class TestYamlMissingConnIOError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
     r"""Test error for invalid read_meth."""
-    _error = ValueError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -662,7 +710,7 @@ class TestYamlConnectionInputFileReadMethError(YamlTestBaseError):
 
 class TestYamlConnectionInputFileWriteMethError(YamlTestBaseError):
     r"""Test error for invalid write_meth."""
-    _error = ValueError
+    _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',

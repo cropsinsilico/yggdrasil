@@ -1,15 +1,19 @@
 import os
+import copy
 import uuid
 import atexit
 import threading
-import numpy as np
-import pandas as pd
 from logging import info
 from cis_interface import backwards, tools, serialize
-from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
+from cis_interface.tools import CIS_MSG_EOF
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
 from cis_interface.schema import register_component
+from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.metaschema.datatypes.JSONArrayMetaschemaType import (
+    JSONArrayMetaschemaType)
+from cis_interface.metaschema.datatypes.JSONObjectMetaschemaType import (
+    JSONObjectMetaschemaType)
 
 
 _registered_servers = dict()
@@ -283,6 +287,7 @@ class CommBase(tools.CisClass):
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
         matlab (bool): True if the comm will be accessed by Matlab code.
+        maxMsgSize (int): Maximum size of a single message that should be sent.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -292,18 +297,22 @@ class CommBase(tools.CisClass):
 
     """
 
+    # TODO: Add serializer to comm schema
     _commtype = 'default'
     _schema_type = 'comm'
-    _schema = {'name': {'type': 'string', 'required': True},
-               'dtype': {'type': 'string', 'required': False},  # TODO: add values
-               'units': {'type': 'string', 'required': False},  # TODO: add values
-               'format_str': {'type': 'string', 'required': False},
-               'as_array': {'type': 'boolean', 'required': False},
-               'field_names': {'type': 'list', 'required': False,
-                               'schema': {'type': 'string'}},
-               'field_units': {'type': 'list', 'required': False,
-                               'schema': {'type': 'string'}},  # TODO: coerce units
-               'stype': {'type': 'integer', 'required': False}}
+    _schema_required = ['name', 'commtype', 'datatype']
+    _schema_properties = {'name': {'type': 'string'},
+                          'commtype': {'type': 'string', 'default': _commtype},
+                          'datatype': {'type': 'schema',
+                                       'default': {'type': 'bytes'}},
+                          'recv_converter': {'type': 'function'},
+                          'send_converter': {'type': 'function'},
+                          'field_names': {'type': 'array', 'items': {'type': 'string'}},
+                          'field_units': {'type': 'array', 'items': {'type': 'string'}},
+                          'as_array': {'type': 'boolean', 'default': False}}
+    _default_serializer = DefaultSerialize
+    is_file = False
+    _maxMsgSize = 0
 
     def __init__(self, name, address=None, direction='send',
                  dont_open=False, is_interface=False, recv_timeout=0.0,
@@ -311,7 +320,6 @@ class CommBase(tools.CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 recv_converter=None, send_converter=None,
                  comm=None, matlab=False, **kwargs):
         self._comm_class = None
         if comm is not None:
@@ -336,10 +344,7 @@ class CommBase(tools.CisClass):
         self.is_server = is_server
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
-        self.is_file = False
         self.matlab = matlab
-        self.recv_converter = recv_converter
-        self.send_converter = send_converter
         self._server = None
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
@@ -388,22 +393,58 @@ class CommBase(tools.CisClass):
         else:
             self.open()
 
-    def _init_before_open(self, serializer=None, serializer_kwargs=None,
-                          serializer_type=None, **kwargs):
+    def _init_before_open(self, serializer=None, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
-        seri_kws = ['format_str', 'as_array', 'field_names', 'field_units',
-                    'stype']
+        datatype = kwargs.get('datatype', None)
+        if datatype is None:
+            datatype = {}
+        datatype.update(kwargs.pop('serializer_kwargs', {}))
         if serializer is not None:
             self.serializer = serializer
         else:
-            if serializer_kwargs is None:
-                serializer_kwargs = {}
-            serializer_kwargs.setdefault('stype', serializer_type)
-            for k in seri_kws:
-                if serializer_kwargs.get(k, None) is None:
-                    serializer_kwargs[k] = kwargs.pop(k, None)
-            self.serializer = serialize.get_serializer(**serializer_kwargs)
+            cls = kwargs.pop('serializer_class', self._default_serializer)
+            for k in cls.seri_kws():
+                if k in kwargs:
+                    # TODO: Change to pop once old seri keywords not in comm
+                    # schema directly
+                    datatype[k] = kwargs[k]
+            self.debug('datatype = %s', str(datatype))
+            self.serializer = cls(**datatype)
+        # Transfer keywords form the schema
+        for k, v in self._schema_properties.items():
+            if k in ['name']:
+                continue
+            default = v.get('default', None)
+            setattr(self, k, kwargs.get(k, default))
+
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class.
+
+        Returns:
+            dict: Dictionary of variables to use for testing. Key/value pairs:
+                kwargs (dict): Keyword arguments for comms tested with the
+                    provided content.
+                send (list): List of objects to send to test file.
+                recv (list): List of objects that will be received from a test
+                    file that was sent the messages in 'send'.
+                contents (bytes): Bytes contents of test file created by sending
+                    the messages in 'send'.
+
+        """
+        out = cls._default_serializer.get_testing_options(**kwargs)
+        out = {'kwargs': out['kwargs'],
+               'send': copy.deepcopy(out['objects']),
+               'msg': out['objects'][0],
+               'contents': out['contents']}
+        out['recv'] = copy.deepcopy(out['send'])
+        out['dict'] = {'f0': out['msg']}
+        if isinstance(out['msg'], backwards.bytes_type):
+            out['msg_long'] = out['msg'] + (cls._maxMsgSize * b'0')
+        else:
+            out['msg_long'] = out['msg']
+        return out
 
     def printStatus(self, nindent=0):
         r"""Print status of the communicator."""
@@ -467,12 +508,12 @@ class CommBase(tools.CisClass):
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        return get_CIS_MSG_MAX()
-
+        return self._maxMsgSize
+        
     @property
     def empty_msg(self):
         r"""str: Empty message."""
-        return backwards.unicode2bytes('')
+        return b''
 
     @property
     def comm_class(self):
@@ -529,13 +570,17 @@ class CommBase(tools.CisClass):
     @classmethod
     def new_comm(cls, name, *args, **kwargs):
         r"""Initialize communication with new queue."""
+        dont_create = kwargs.pop('dont_create', False)
         env = kwargs.get('env', {})
         if name in env:
             kwargs.setdefault('address', env[name])
         elif name in os.environ:
             kwargs.setdefault('address', os.environ[name])
         new_comm_class = kwargs.pop('new_comm_class', None)
-        args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
+        if dont_create:
+            args = tuple([name] + list(args))
+        else:
+            args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
         if new_comm_class is not None:
             new_cls = get_comm_class(new_comm_class)
             return new_cls(*args, **kwargs)
@@ -566,6 +611,8 @@ class CommBase(tools.CisClass):
             kwargs['direction'] = 'recv'
         else:
             kwargs['direction'] = 'send'
+        for k in self.serializer._schema_properties.keys():
+            kwargs[k] = getattr(self.serializer, k)
         return kwargs
 
     def bind(self):
@@ -581,41 +628,34 @@ class CommBase(tools.CisClass):
         r"""Close the connection."""
         pass
 
-    def close(self, skip_base=False, linger=False):
+    def close(self, linger=False):
         r"""Close the connection.
 
         Args:
-            skip_base (bool, optional): If True, don't drain messages or remove
-                work comms.
             linger (bool, optional): If True, drain messages before closing the
                 comm. Defaults to False.
 
         """
-        if (not skip_base):
-            self.debug('')
-            if linger and self.is_open:
-                self.linger()
-            else:
-                self._closing_thread.set_terminated_flag()
-                linger = False
-        if skip_base:
-            self._close(linger=linger)
-            return
+        self.debug('')
+        if linger and self.is_open:
+            self.linger()
+        else:
+            self._closing_thread.set_terminated_flag()
+            linger = False
         # Close with lock
         with self._closing_thread.lock:
             self._close(linger=linger)
-            if not skip_base:
-                self._n_sent = 0
-                self._n_recv = 0
-                if self.is_client:
-                    self.debug("Signing off from server")
-                    self.signoff_from_server()
-                if len(self._work_comms) > 0:
-                    self.debug("Cleaning up %d work comms", len(self._work_comms))
-                    keys = [k for k in self._work_comms.keys()]
-                    for c in keys:
-                        self.remove_work_comm(c, linger=linger)
-                    self.debug("Finished cleaning up work comms")
+            self._n_sent = 0
+            self._n_recv = 0
+            if self.is_client:
+                self.debug("Signing off from server")
+                self.signoff_from_server()
+            if len(self._work_comms) > 0:
+                self.debug("Cleaning up %d work comms", len(self._work_comms))
+                keys = [k for k in self._work_comms.keys()]
+                for c in keys:
+                    self.remove_work_comm(c, linger=linger)
+                self.debug("Finished cleaning up work comms")
         self.debug("done")
 
     def close_in_thread(self, no_wait=False, timeout=None):
@@ -772,7 +812,7 @@ class CommBase(tools.CisClass):
     @property
     def eof_msg(self):
         r"""str: Message indicating EOF."""
-        return backwards.unicode2bytes(CIS_MSG_EOF)
+        return CIS_MSG_EOF
 
     def is_eof(self, msg):
         r"""Determine if a message is an EOF.
@@ -786,13 +826,36 @@ class CommBase(tools.CisClass):
         """
         out = (isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg))
         return out
-    
+
+    def apply_recv_converter(self, msg_in):
+        r"""Apply recv_converter.
+
+        Args:
+            msg_in (object): Message to convert.
+        
+        Returns:
+            object: Converted message.
+ 
+        """
+        if (self.recv_converter is None):
+            return msg_in
+        elif isinstance(self.recv_converter, str):
+            if self.recv_converter in ['array', 'pandas']:
+                msg_out = self.serializer.consolidate_array(msg_in)
+                if self.recv_converter == 'pandas':
+                    msg_out = serialize.numpy2pandas(msg_out)
+                return msg_out
+            else:  # pragma: debug
+                raise RuntimeError("Unrecognized recv_converter string: '%s'" %
+                                   self.recv_converter)
+        else:
+            return self.recv_converter(msg_in)
+        
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        emsg, _ = self.serializer.deserialize(self.empty_msg)
-        if (self.recv_converter is not None):
-            emsg = self.recv_converter(emsg)
+        emsg, _ = self.deserialize(self.empty_msg)
+        emsg = self.apply_recv_converter(emsg)
         return emsg
 
     def is_empty_recv(self, msg):
@@ -1010,6 +1073,20 @@ class CommBase(tools.CisClass):
         c = get_comm(work_comm_name, **kws)
         return c
 
+    # SERIALIZATION/DESERIALIZATION METHODS
+    def serialize(self, *args, **kwargs):
+        r"""Serialize a message using the associated serializer."""
+        # Don't send metadata for files
+        # kwargs.setdefault('dont_encode', self.is_file)
+        kwargs.setdefault('no_metadata', self.is_file)
+        return self.serializer.serialize(*args, **kwargs)
+
+    def deserialize(self, *args, **kwargs):
+        r"""Deserialize a message using the associated deserializer."""
+        # Don't serialize files using JSON
+        # kwargs.setdefault('dont_decode', self.is_file)
+        return self.serializer.deserialize(*args, **kwargs)
+
     # SEND METHODS
     def _safe_send(self, *args, **kwargs):
         r"""Send message checking if is 1st message and then waiting."""
@@ -1103,7 +1180,7 @@ class CommBase(tools.CisClass):
 
         """
         self.debug('')
-        msg_s = backwards.unicode2bytes(self.eof_msg)
+        msg_s = self.eof_msg
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
@@ -1135,19 +1212,17 @@ class CommBase(tools.CisClass):
             flag, msg_s = self.on_send_eof()
         else:
             flag = True
-            add_sinfo = (self._send_serializer and (not self.is_file))
             # Covert object
             if self.send_converter is not None:
                 msg_ = self.send_converter(msg)
             else:
                 msg_ = msg
-            # Guess at serializer if not yet set
-            if add_sinfo:
-                self.serializer.update_from_message(msg_)
-                self.debug('Sending sinfo: %s', self.serializer.serializer_info)
             # Serialize
-            msg_s = self.serializer.serialize(msg_, header_kwargs=header_kwargs,
-                                              add_serializer_info=add_sinfo)
+            add_sinfo = (self._send_serializer and (not self.is_file))
+            if add_sinfo:
+                self.debug('Sending sinfo: %s', self.serializer.serializer_info)
+            msg_s = self.serialize(msg_, header_kwargs=header_kwargs,
+                                   add_serializer_info=add_sinfo)
             # Create work comm if message too large to be sent all at once
             if (len(msg_s) > self.maxMsgSize) and (self.maxMsgSize != 0):
                 if header_kwargs is None:
@@ -1158,9 +1233,7 @@ class CommBase(tools.CisClass):
                 # else:
                 #     work_comm = self.get_work_comm(header_kwargs)
                 header_kwargs = self.workcomm2header(work_comm, **header_kwargs)
-                msg_s = self.serializer.serialize(
-                    msg_, header_kwargs=header_kwargs,
-                    add_serializer_info=add_sinfo)
+                msg_s = self.serialize(msg_, header_kwargs=header_kwargs)
         return flag, msg_s, header_kwargs
 
     def send(self, *args, **kwargs):
@@ -1180,7 +1253,8 @@ class CommBase(tools.CisClass):
             ret = self.send_multipart(args, **kwargs)
             if ret:
                 self._used = True
-                self._send_serializer = False
+                if self.serializer._initialized:
+                    self._send_serializer = False
         except BaseException:
             self.exception('Failed to send.')
             return False
@@ -1254,10 +1328,6 @@ class CommBase(tools.CisClass):
         #         self._eof_sent.set()
         #         return self.send(self.eof_msg, *args, **kwargs)
         # return False
-        
-    def send_nolimit_eof(self, *args, **kwargs):
-        r"""Alias for send_eof."""
-        return self.send_eof(*args, **kwargs)
 
     # RECV METHODS
     def _safe_recv(self, *args, **kwargs):
@@ -1301,7 +1371,7 @@ class CommBase(tools.CisClass):
             # if len(payload[1]) == 0:
             #     self.sleep()
         payload = (ret, data)
-        self.debug("Read %d bytes", len(data))
+        self.info("Read %d/%d bytes", len(data), leng_exp)
         return payload
 
     def _recv_multipart_worker(self, info, **kwargs):
@@ -1353,25 +1423,25 @@ class CommBase(tools.CisClass):
 
         """
         flag = True
-        msg_, header = self.serializer.deserialize(s_msg)
+        metadata = None
+        if second_pass:
+            metadata = self._last_header
+        msg_, header = self.deserialize(s_msg, metadata=metadata)
         if self.is_eof(msg_):
             flag = self.on_recv_eof()
             msg = msg_
         elif ((self.recv_converter is not None)
               and (not header.get('incomplete', False))):
             self.debug("Converting message")
-            msg = self.recv_converter(msg_)
+            msg = self.apply_recv_converter(msg_)
         else:
             msg = msg_
-        if second_pass:
-            header = self._last_header
-            header['incomplete'] = False
-        else:
+        if not second_pass:
             self._last_header = header
         if not header.get('incomplete', False):
             # if not self._used:
             #     self.serializer = serialize.get_serializer(**header)
-            #     msg, _ = self.serializer.deserialize(s_msg)
+            #     msg, _ = self.deserialize(s_msg)
             self._used = True
         return flag, msg, header
 
@@ -1423,7 +1493,7 @@ class CommBase(tools.CisClass):
         # Parse message
         flag, msg, header = self.on_recv(s_msg)
         if not flag:
-            if not header.get('eof', False):  # pragma: debug
+            if not header.get('raw', False):  # pragma: debug
                 self.debug("Failed to receive message header.")
             return flag, msg
         # Receive remainder of message that was not received
@@ -1473,15 +1543,11 @@ class CommBase(tools.CisClass):
         self._last_recv = None
 
     # Send/recv dictionary of fields
-    def send_dict(self, args_dict, field_order=None, **kwargs):
+    def send_dict(self, args_dict, **kwargs):
         r"""Send a message with fields specified in the input dictionary.
 
         Args:
-            args_dict (dict): Dictionary with fields specifying output fields.
-            field_order (list, optional): List of fields in the order they
-                should be passed to send. If not provided, the fields from
-                the serializer are used. If the serializer dosn't have
-                field names an error will be raised.
+            args_dict (dict): Dictionary of arguments to send.
             **kwargs: Additiona keyword arguments are passed to send.
 
         Returns:
@@ -1491,23 +1557,23 @@ class CommBase(tools.CisClass):
             RuntimeError: If the field order can not be determined.
 
         """
-        if field_order is None:
-            if self.serializer.field_names is not None:
-                field_order = [
-                    backwards.bytes2unicode(n) for n in self.serializer.field_names]
-            elif len(args_dict) <= 1:
-                field_order = [k for k in args_dict.keys()]
-            else:  # pragma: debug
-                raise RuntimeError("Could not determine the field order.")
-        as_array = True
-        for v in args_dict.values():
-            if not isinstance(v, np.ndarray):
-                as_array = False
-                break
-        if as_array:
-            args = (serialize.dict2numpy(args_dict, order=field_order), )
-        else:
-            args = tuple([args_dict[k] for k in field_order])
+        metadata = kwargs.get('header_kwargs', {})
+        if 'field_order' in kwargs:
+            kwargs.setdefault('key_order', kwargs.pop('field_order'))
+        if 'key_order' in kwargs:
+            metadata['key_order'] = kwargs.pop('key_order')
+        metadata.setdefault('key_order', self.serializer.get_field_names())
+        if (((metadata['key_order'] is None)
+             and isinstance(args_dict, dict)
+             and (len(args_dict) <= 1))):
+            metadata['key_order'] = [k for k in args_dict.keys()]
+        if not self.serializer._initialized:
+            if (metadata['key_order'] is None) and isinstance(args_dict, dict):
+                metadata['key_order'] = sorted(list(args_dict.keys()))
+            metadata['field_names'] = metadata['key_order']
+        args = JSONArrayMetaschemaType.coerce_type(args_dict, **metadata)
+        # Add field order to kwargs so it can be reconstructed
+        kwargs['header_kwargs'] = metadata
         return self.send(*args, **kwargs)
 
     def recv_dict(self, *args, **kwargs):
@@ -1526,19 +1592,19 @@ class CommBase(tools.CisClass):
         Raises:
 
         """
+        if 'field_order' in kwargs:
+            kwargs.setdefault('key_order', kwargs.pop('field_order'))
+        key_order = kwargs.pop('key_order', None)
         flag, msg = self.recv(*args, **kwargs)
-        if flag and not self.is_eof(msg):
-            if isinstance(msg, np.ndarray):
-                msg_dict = serialize.numpy2dict(msg)
-            elif isinstance(msg, pd.DataFrame):
-                msg_dict = serialize.pandas2dict(msg)
-            elif isinstance(msg, tuple):
-                if self.serializer.field_names is None:  # pragma: debug
-                    field_names = ['f%d' % i for i in range(len(msg))]
-                else:
-                    field_names = [
-                        backwards.bytes2unicode(n) for n in self.serializer.field_names]
-                msg_dict = {k: v for k, v in zip(field_names, msg)}
+        if flag and (not self.is_eof(msg)):
+            if self.serializer.typedef['type'] == 'array':
+                metadata = copy.deepcopy(self._last_header)
+                # if metadata is None:
+                #     metadata = {}
+                if key_order is not None:
+                    metadata['key_order'] = key_order
+                metadata.setdefault('key_order', self.serializer.get_field_names())
+                msg_dict = JSONObjectMetaschemaType.coerce_type(msg, **metadata)
             else:
                 msg_dict = {'f0': msg}
         else:
@@ -1578,26 +1644,14 @@ class CommBase(tools.CisClass):
     #     return flag, field_msg
 
     # ALIASES
-    def send_line(self, *args, **kwargs):
-        r"""Alias for send."""
-        return self.send(*args, **kwargs)
-
-    def recv_line(self, *args, **kwargs):
-        r"""Alias for recv."""
-        return self.recv(*args, **kwargs)
-
-    def send_row(self, *args, **kwargs):
-        r"""Alias for send."""
-        return self.send(*args, **kwargs)
-
-    def recv_row(self, *args, **kwargs):
-        r"""Alias for recv."""
-        return self.recv(*args, **kwargs)
-
     def send_array(self, *args, **kwargs):
         r"""Alias for send."""
+        # TODO: Maybe explicitly handle transformation from array
         return self.send(*args, **kwargs)
 
     def recv_array(self, *args, **kwargs):
         r"""Alias for recv."""
-        return self.recv(*args, **kwargs)
+        flag, out = self.recv(*args, **kwargs)
+        if flag:
+            out = self.serializer.consolidate_array(out)
+        return flag, out

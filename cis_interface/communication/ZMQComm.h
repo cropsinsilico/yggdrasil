@@ -3,7 +3,7 @@
 #define CISZMQCOMM_H_
 
 #include <CommBase.h>
-#include "comm_header.h"
+#include "../metaschema/datatypes/datatypes.h"
 
 #ifdef ZMQINSTALLED
 #include <czmq.h>
@@ -293,7 +293,7 @@ char *set_reply_send(const comm_t *comm) {
     char protocol[50] = "tcp";
     char host[50] = "localhost";
     if (strcmp(host, "localhost") == 0)
-      strcpy(host, "127.0.0.1");
+      strncpy(host, "127.0.0.1", 50);
     char address[100];
     if (_last_port_set == 0) {
       cislog_debug("model_index = %s", getenv("CIS_MODEL_INDEX"));
@@ -304,7 +304,7 @@ char *set_reply_send(const comm_t *comm) {
     sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
     int port = zsock_bind(zrep->sockets[0], "%s", address);
     if (port == -1) {
-      cislog_error("check_reply_send(%s): Could not bind socket to address = %s",
+      cislog_error("set_reply_send(%s): Could not bind socket to address = %s",
 		   comm->name, address);
       return out;
     }
@@ -312,8 +312,8 @@ char *set_reply_send(const comm_t *comm) {
     sprintf(address, "%s://%s:%d", protocol, host, port);
     zrep->addresses = (char**)malloc(sizeof(char*));
     zrep->addresses[0] = (char*)malloc((strlen(address) + 1)*sizeof(char));
-    strcpy(zrep->addresses[0], address);
-    cislog_debug("check_reply_send(%s): New reply socket: %s", comm->name, address);
+    strncpy(zrep->addresses[0], address, strlen(address) + 1);
+    cislog_debug("set_reply_send(%s): New reply socket: %s", comm->name, address);
   }
   out = zrep->addresses[0];
   return out;
@@ -369,7 +369,7 @@ int set_reply_recv(const comm_t *comm, const char* address) {
 		   comm->name);
       return out;
     }
-    strcpy(zrep->addresses[isock], address);
+    strncpy(zrep->addresses[isock], address, strlen(address) + 1);
     int ret = zsock_connect(zrep->sockets[isock], "%s", address);
     if (ret < 0) {
       cislog_error("set_reply_recv(%s): Could not connect to socket.",
@@ -465,7 +465,7 @@ int new_zmq_address(comm_t *comm) {
   char address[100];
   comm->msgBufSize = 100;
   if (strcmp(host, "localhost") == 0)
-    strcpy(host, "127.0.0.1");
+    strncpy(host, "127.0.0.1", 50);
   if ((strcmp(protocol, "inproc") == 0) ||
       (strcmp(protocol, "ipc") == 0)) {
     // TODO: small chance of reusing same number
@@ -507,7 +507,7 @@ int new_zmq_address(comm_t *comm) {
     _last_port = port;
     sprintf(address, "%s://%s:%d", protocol, host, port);
   }
-  strcpy(comm->address, address);
+  strncpy(comm->address, address, COMM_ADDRESS_SIZE);
   cislog_debug("new_zmq_address: Bound socket to %s", comm->address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
@@ -880,6 +880,7 @@ char *set_reply_send(const comm_t *comm) {
 /*!
   @brief Add reply socket information to a recv comm.
   @param[in] comm comm_t* Comm that confirmation is for.
+  @param[in] address const char* Comm address.
   @returns int Index of the reply socket.
 */
 static inline

@@ -21,19 +21,19 @@ matrix:
     - python: 2.7
       env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - python: 2.7
-      env: INSTALLRMQ=1 INSTALLLPY=1
+      env: INSTALLRMQ=1 INSTALLLPY=1 CIS_ENABLE_LONG_TESTS=1
     - python: 3.4
     - python: 3.5
       env: INSTALLAPY=1
     - python: 3.6
       env: INSTALLZMQ=0 INSTALLRMQ=0
     - python: 3.6
-      env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1
+      env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
     - python: 3.7
       dist: xenial
       sudo: true
     - os: osx
-      env: INSTALLRMQ=0 INSTALLZMQ=0
+      env: INSTALLRMQ=0 INSTALLZMQ=0 TRAVIS_PYTHON_VERSION=2.7 CIS_ENABLE_LONG_TESTS=1
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -43,7 +43,7 @@ matrix:
           # `cache` does not support `env`-like `global` so copy-paste from top
           # - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
     - os: osx
-      env: INSTALLRMQ=0 DEPLOYPYPI=1
+      env: INSTALLRMQ=0 DEPLOYPYPI=1 TRAVIS_PYTHON_VERSION=3.6 CIS_ENABLE_LONG_TESTS=1
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -78,6 +78,15 @@ before_install:
     conda update -q conda
     # Useful for debugging any issues with conda
     conda info -a
+    
+    # Install rapid-json
+    echo Installing rapidjson...;
+    # conda install rapidjson -c conda-forge
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+       sh ci/install-rapidjson-osx.sh
+    else
+       sh ci/install-rapidjson-linux.sh
+    fi
 
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
        brew update
@@ -160,7 +169,7 @@ before_script:
 
 script:
   - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx
+    nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface
 
 after_success:
   - coveralls

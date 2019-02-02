@@ -26,12 +26,12 @@ int init_ascii_table_comm(comm_t *comm) {
   comm->type = ASCII_TABLE_COMM;
   strcpy(comm->address, comm->name);
   // Initialize table as handle
-  flag = update_serializer(comm->serializer, ASCII_TABLE_SERI, NULL);
-  if (flag != 0) {
-    cislog_error("init_ascii_table_comm: Could not update serializer.");
+  asciiTable_t *handle = (asciiTable_t*)(get_ascii_table_from_void(comm->serializer->type,
+								   comm->serializer->info));
+  if (handle == NULL) {
+    cislog_error("init_ascii_table_comm: Could not get table.");
     return -1;
   }
-  asciiTable_t *handle = (asciiTable_t*)(comm->serializer->info);
   if (strcmp(comm->direction, "send") == 0)
     flag = at_update(handle, comm->address, "w");
   else
@@ -59,9 +59,6 @@ int init_ascii_table_comm(comm_t *comm) {
   // Write format to file if "send"
   if (strcmp(comm->direction, "send") == 0)
     at_writeformat(handle[0]);
-  // Set AsciiTable serializer
-  /* comm->serializer.type = ASCII_TABLE_SERI; */
-  /* comm->serializer.info = (void*)handle; */
   return 0;
 };
 
@@ -87,7 +84,6 @@ int new_ascii_table_address(comm_t *comm) {
 static inline
 int init_ascii_table_array_comm(comm_t *comm) {
   int ret = init_ascii_table_comm(comm);
-  comm->serializer->type = ASCII_TABLE_ARRAY_SERI;
   return ret;
 };
 
@@ -114,10 +110,7 @@ int free_ascii_table_comm(comm_t *x) {
   if (x->handle != NULL) {
     asciiTable_t *table = (asciiTable_t*)x->handle;
     at_close(table);
-    at_cleanup(table);
-    x->serializer->info = NULL; // Duplicate pointer to handle
-    free(x->handle);
-    x->handle = NULL;
+    x->handle = NULL; // Handle will be freed in serializer
   }
   return 0;
 };

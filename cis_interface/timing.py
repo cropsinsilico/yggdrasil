@@ -50,7 +50,7 @@ if ((len(_lang_list) == 0) or (len(_comm_list) == 0)):  # pragma: debug
 
 def write_perf_script(script_file, nmsg, msg_size,
                       lang_src, lang_dst, comm_type,
-                      nrep=10, matlab_running=False):
+                      nrep=10, max_errors=5, matlab_running=False):
     r"""Write a script to run perf.
 
     Args:
@@ -65,6 +65,8 @@ def write_perf_script(script_file, nmsg, msg_size,
             for the test.
         nrep (int, optional): The number of times the test run should be
             repeated. Defaults to 3.
+        max_errors (int, optional): Maximum number of errors that should be
+            retried. Defaults to 5.
         matlab_running (bool, optional): If True, the test will assert that
             there is an existing Matlab engine before starting, otherwise the
             test will assert that there is not an existing Matlab engine.
@@ -84,6 +86,7 @@ def write_perf_script(script_file, nmsg, msg_size,
         'nmsg = %d' % nmsg,
         'warmups = %d' % _perf_warmups,
         'msg_size = %d' % msg_size,
+        'max_errors = %d' % max_errors,
         'lang_src = "%s"' % lang_src,
         'lang_dst = "%s"' % lang_dst,
         'comm_type = "%s"' % comm_type,
@@ -98,13 +101,13 @@ def write_perf_script(script_file, nmsg, msg_size,
         'runner = perf.Runner(values=1, processes=nrep, warmups=warmups)',
         'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
         '                             timing.perf_func,',
-        '                             timer, nmsg, msg_size)']
+        '                             timer, nmsg, msg_size, max_errors)']
     assert(not os.path.isfile(script_file))
     with open(script_file, 'w') as fd:
         fd.write('\n'.join(lines))
 
 
-def perf_func(loops, timer, nmsg, msg_size):
+def perf_func(loops, timer, nmsg, msg_size, max_errors):
     r"""Function to do perf loops over function.
 
     Args:
@@ -113,6 +116,7 @@ def perf_func(loops, timer, nmsg, msg_size):
             required for setup/teardown.
         nmsg (int): Number of messages that should be sent in the test.
         msg_size (int): Size of messages that should be sent in the test.
+        max_errors (int): Maximum number of errors that should be retried.
 
     Returns:
         float: Time (in seconds) required to perform the test the required
@@ -124,6 +128,7 @@ def perf_func(loops, timer, nmsg, msg_size):
     for i in range_it:
         run_uuid = timer.before_run(nmsg, msg_size)
         flag = False
+        nerrors = 0
         while not flag:
             try:
                 t0 = perf.perf_counter()
@@ -134,7 +139,12 @@ def perf_func(loops, timer, nmsg, msg_size):
                 ttot += tdif
                 flag = True
             except AssertionError as e:  # pragma: debug
-                warnings.warn("Error '%s'. Trying again." % e)
+                nerrors += 1
+                if nerrors >= max_errors:
+                    raise
+                else:
+                    warnings.warn("Error %d/%d. Trying again. (error = '%s')" % (
+                        nerrors, max_errors, e))
     return ttot
 
 
@@ -175,6 +185,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             with. If the data doesn't already exist and this doesn't match the
             current version of python, an error will be raised. Defaults to the
             current version of python.
+        max_errors (int, optional): Maximum number of errors that should be
+            retried. Defaults to 5.
         matlab_running (bool, optional): If True, the test will assert that
             there is an existing Matlab engine before starting, otherwise the
             test will assert that there is not an existing Matlab engine.
@@ -191,6 +203,7 @@ class TimedRun(CisTestBase, tools.CisClass):
            saved. This can be a perf json or a Python pickle of run data.
         comm_type (str): Name of communication class that should be used for
             tests.
+        max_errors (int): Maximum number of errors that should be retried.
         matlab_running (bool): True if there was a Matlab engine running when
             the test was created. False otherwise.
         dont_use_perf (bool): If True, the timings will be run without using the
@@ -199,7 +212,7 @@ class TimedRun(CisTestBase, tools.CisClass):
     """
 
     def __init__(self, lang_src, lang_dst, test_name='timed_pipe', filename=None,
-                 comm_type=None, platform=None, python_ver=None,
+                 comm_type=None, platform=None, python_ver=None, max_errors=5,
                  matlab_running=False, dont_use_perf=False, **kwargs):
         if comm_type is None:
             comm_type = tools.get_default_comm()
@@ -219,6 +232,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.comm_type = comm_type
         self.platform = platform
         self.python_ver = python_ver
+        self.max_errors = max_errors
         self.program_name = test_name
         name = '%s_%s_%s' % (test_name, lang_src, lang_dst)
         tools.CisClass.__init__(self, name)
@@ -588,7 +602,8 @@ class TimedRun(CisTestBase, tools.CisClass):
         """
         write_perf_script(self.perfscript, nmsg, msg_size,
                           self.lang_src, self.lang_dst, self.comm_type,
-                          nrep=nrep, matlab_running=self.matlab_running)
+                          nrep=nrep, matlab_running=self.matlab_running,
+                          max_errors=self.max_errors)
         copy_env = ['TMPDIR']
         if platform._is_win:  # pragma: windows
             copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
@@ -646,7 +661,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         """
         cls_kwargs_keys = ['test_name', 'filename', 'matlab_running',
                            'comm_type', 'platform', 'python_ver',
-                           'dont_use_perf']
+                           'dont_use_perf', 'max_errors']
         cls_kwargs = {}
         for k in cls_kwargs_keys:
             if k in kwargs:

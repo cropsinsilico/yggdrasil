@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import numpy as np
 from cis_interface.interface.CisInterface import CisRpcServer
 from cis_interface.tools import sleep
 
@@ -37,7 +38,7 @@ def fibServer(args):
 
         # Sleep and then send response back
         sleep(float(sleeptime))
-        flag = rpc.rpcSend(arg, result)
+        flag = rpc.rpcSend(arg, np.int32(result))
         if not flag:
             raise RuntimeError('rpcFibSrv(P): ERROR sending')
 

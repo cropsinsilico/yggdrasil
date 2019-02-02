@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
   cisAsciiArrayOutput_t out_channel = cisAsciiArrayOutput("outputB", "%6s\t%ld\t%f\n");
 
   // Declare resulting variables and create buffer for received message
+  size_t nrows;
   int flag = 1;
   char *name = NULL;
   long *count = NULL;
@@ -19,16 +20,15 @@ int main(int argc, char *argv[]) {
     // Receive input from input channel
     // If there is an error, the flag will be negative
     // Otherwise, it is the size of the received message
-    flag = cisRecv(in_channel, &name, &count, &size);
+    flag = cisRecv(in_channel, &nrows, &name, &count, &size);
     if (flag < 0) {
       printf("Model B: No more input.\n");
       break;
     }
 
     // Print received message
-    int nrows = flag;
-    printf("Model B: (%d rows)\n", nrows);
-    int i;
+    printf("Model B: (%lu rows)\n", nrows);
+    size_t i;
     for (i = 0; i < nrows; i++)
       printf("   %.6s, %ld, %f\n", &name[6*i], count[i], size[i]);
 

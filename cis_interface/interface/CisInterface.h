@@ -2,10 +2,11 @@
 #ifndef CISINTERFACE_H_
 #define CISINTERFACE_H_
 
-#include <../tools.h>
-#include <../communication/communication.h>
-#include <../dataio/AsciiFile.h>
-#include <../dataio/AsciiTable.h>
+#include "../tools.h"
+#include "../metaschema/datatypes/datatypes.h"
+#include "../communication/communication.h"
+#include "../dataio/AsciiFile.h"
+#include "../dataio/AsciiTable.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -51,9 +52,7 @@ extern "C" {
  */
 static inline
 cisOutput_t cisOutputFmt(const char *name, const char *fmtString){
-  cisOutput_t ret = init_comm(name, "send", _default_comm,
-			      (void*)fmtString);
-  return ret;
+  return init_comm_format(name, "send", _default_comm, fmtString, 0);
 };
 
 /*!
@@ -67,9 +66,7 @@ cisOutput_t cisOutputFmt(const char *name, const char *fmtString){
  */
 static inline
 cisInput_t cisInputFmt(const char *name, const char *fmtString){
-  cisInput_t ret = init_comm(name, "recv", _default_comm,
-			     (void*)fmtString);
-  return ret;
+  return init_comm_format(name, "recv", _default_comm, fmtString, 0);
 };
 
 /*!
@@ -109,7 +106,15 @@ cisInput_t cisInput(const char *name){
  */
 static inline
 int cis_send(const cisOutput_t cisQ, const char *data, const size_t len) {
-  return comm_send(cisQ, data, len);
+  int nargs_exp = 2;
+  int nargs_used = commSend(cisQ, data, len);
+  if (nargs_used == nargs_exp) {
+    return 0;
+  } else {
+    cislog_error("cis_send(%s): %d arguments expected, but %d used.",
+		 nargs_exp, nargs_used);
+    return -1;
+  }
 };
 
 /*!
@@ -134,7 +139,22 @@ int cis_send_eof(const cisOutput_t cisQ) {
  */
 static inline
 int cis_recv(const cisInput_t cisQ, char *data, const size_t len){
-  return comm_recv(cisQ, data, len);
+  char* temp = NULL;
+  int ret = -1;
+  size_t len_used = len;
+  int nargs_exp = 2;
+  int nargs_used = commRecv(cisQ, data, &len_used);
+  if (nargs_used == nargs_exp) {
+    ret = (int)len_used;
+  } else if (nargs_used >= 0) {
+    cislog_error("cis_recv: nargs_used = %d, nargs_exp = %d", nargs_used, nargs_exp);
+    ret = -1;
+  } else {
+    ret = nargs_used;
+  }
+  if (temp != NULL)
+    free(temp);
+  return ret;
 };
 
 /*!
@@ -150,7 +170,7 @@ int cis_recv(const cisInput_t cisQ, char *data, const size_t len){
  */
 static inline
 int cis_send_nolimit(const cisOutput_t cisQ, const char *data, const size_t len){
-  return comm_send_nolimit(cisQ, data, len);
+  return cis_send(cisQ, data, len);
 };
 
 /*!
@@ -172,13 +192,25 @@ int cis_send_nolimit_eof(const cisOutput_t cisQ) {
   @param[out] data character pointer to pointer for allocated buffer where the
   message should be stored. A pointer to a pointer is used so that the buffer
   may be reallocated as necessary for the incoming message.
-  @param[in] len0 size_t length of the initial allocated message buffer in bytes.
+  @param[in] len size_t length of the initial allocated message buffer in bytes.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len0){
-  return comm_recv_nolimit(cisQ, data, len0);
+int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len){
+  int ret = -1;
+  size_t len_used = 0; // Send 0 to indicate data can be realloced
+  int nargs_used = commRecvRealloc(cisQ, data, &len_used);
+  int nargs_exp = 2;
+  if (nargs_used == nargs_exp) {
+    ret = (int)len_used;
+  } else if (nargs_used >= 0) {
+    cislog_error("cis_recv_nolimit: nargs_used = %d, nargs_exp = %d", nargs_used, nargs_exp);
+    ret = -1;
+  } else {
+    ret = nargs_used;
+  }
+  return ret;
 };
 
 
@@ -210,48 +242,10 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len0){
   is then sent to the specified output queue. If the message is larger than
   CIS_MSG_MAX or cannot be encoded, it will not be sent.  
   @param[in] cisQ cisOutput_t structure that queue should be sent to.
-  @param[in] ap va_list arguments to be formatted into a message using sprintf.
-  @returns int 0 if send succesfull, -1 if send unsuccessful.
- */
-static inline
-int vcisSend(const cisOutput_t cisQ, va_list ap) {
-  return vcommSend(cisQ, ap);
-};
-
-/*!
-  @brief Assign arguments by receiving and parsing a message from an input queue.
-  Receive a message smaller than CIS_MSG_MAX bytes from an input queue and parse
-  it using the associated format string.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
-  @param[out] ap va_list arguments that should be assigned by parsing the
-  received message using sscanf. As these are being assigned, they should be
-  pointers to memory that has already been allocated.
-  @returns int -1 if message could not be received or could not be parsed.
-  Length of the received message if message was received and parsed. -2 is
-  returned if EOF is received.
- */
-static inline
-int vcisRecv(const cisInput_t cisQ, va_list ap) {
-  return vcommRecv(cisQ, ap);
-};
-
-/*!
-  @brief Send arguments as a small formatted message to an output queue.
-  Use the format string to create a message from the input arguments that
-  is then sent to the specified output queue. If the message is larger than
-  CIS_MSG_MAX or cannot be encoded, it will not be sent.  
-  @param[in] cisQ cisOutput_t structure that queue should be sent to.
   @param[in] ... arguments to be formatted into a message using sprintf.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
-static inline
-int cisSend(const cisOutput_t cisQ, ...){
-  va_list ap;
-  va_start(ap, cisQ);
-  int ret = vcommSend(cisQ, ap);
-  va_end(ap);
-  return ret;
-};
+#define cisSend commSend
 
 /*!
   @brief Assign arguments by receiving and parsing a message from an input queue.
@@ -264,85 +258,17 @@ int cisSend(const cisOutput_t cisQ, ...){
   @returns int -1 if message could not be received or could not be parsed.
   Length of the received message if message was received and parsed.
  */
-static inline
-int cisRecv(const cisInput_t cisQ, ...){
-  va_list ap;
-  va_start(ap, cisQ);
-  int ret = vcommRecv(cisQ, ap);
-  va_end(ap);
-  return ret;
-};
+#define cisRecv commRecv
+#define cisRecvRealloc commRecvRealloc
 
-/*!
-  @brief Send arguments as a large formatted message to an output queue.
-  Use the format string to create a message from the input arguments that
-  is then sent to the specified output queue. The message can be larger than
-  CIS_MSG_MAX. If it cannot be encoded, it will not be sent.  
-  @param[in] cisQ cisOutput_t structure that queue should be sent to.
-  @param[in] ap va_list arguments to be formatted into a message using sprintf.
-  @returns int 0 if formatting and send succesfull, -1 if formatting or send
-  unsuccessful.
- */
-static inline
-int vcisSend_nolimit(const cisOutput_t cisQ, va_list ap) {
-  return vcommSend_nolimit(cisQ, ap);
-};
 
-/*!
-  @brief Assign arguments by receiving and parsing a message from an input queue.
-  Receive a message larger than CIS_MSG_MAX bytes in chunks from an input queue
-  and parse it using the associated format string.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
-  @param[out] ap va_list arguments that should be assigned by parsing the
-  received message using sscanf. As these are being assigned, they should be
-  pointers to memory that has already been allocated.
-  @returns int -1 if message could not be received or could not be parsed.
-  Length of the received message if message was received and parsed. -2 is
-  returned if EOF is received.
- */
-static inline
-int vcisRecv_nolimit(const cisInput_t cisQ, va_list ap) {
-  return vcommRecv_nolimit(cisQ, ap);
-};
-
-/*!
-  @brief Send arguments as a large formatted message to an output queue.
-  Use the format string to create a message from the input arguments that
-  is then sent to the specified output queue. The message can be larger than
-  CIS_MSG_MAX. If it cannot be encoded, it will not be sent.  
-  @param[in] cisQ cisOutput_t structure that queue should be sent to.
-  @param[in] ... arguments to be formatted into a message using sprintf.
-  @returns int 0 if formatting and send succesfull, -1 if formatting or send
-  unsuccessful.
- */
-static inline
-int cisSend_nolimit(const cisOutput_t cisQ, ...) {
-  va_list ap;
-  va_start(ap, cisQ);
-  int ret = vcommSend_nolimit(cisQ, ap);
-  va_end(ap);
-  return ret;
-};
-
-/*!
-  @brief Assign arguments by receiving and parsing a message from an input queue.
-  Receive a message larger than CIS_MSG_MAX bytes in chunks from an input queue
-  and parse it using the associated format string.
-  @param[in] cisQ cisInput_t structure that message should be sent to.
-  @param[out] ... arguments that should be assigned by parsing the
-  received message using sscanf. As these are being assigned, they should be
-  pointers to memory that has already been allocated.
-  @returns int -1 if message could not be received or could not be parsed.
-  Length of the received message if message was received and parsed.
- */
-static inline
-int cisRecv_nolimit(const cisInput_t cisQ, ...) {
-  va_list ap;
-  va_start(ap, cisQ);
-  int ret = vcommRecv_nolimit(cisQ, ap);
-  va_end(ap);
-  return ret;
-};
+/*! @brief Definitions for symmetry, but there is no difference. */
+#define vcisSend vcommSend
+#define vcisRecv vcommRecv
+#define vcisSend_nolimit vcommSend
+#define vcisRecv_nolimit vcommRecv
+#define cisSend_nolimit commSend
+#define cisRecv_nolimit commRecv
 
  
 //==============================================================================
@@ -393,21 +319,6 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
 #define cisRpc_t comm_t
 
 /*!
-  @brief Constructor for RPC structure.
-  Creates an instance of cisRpc_t with provided information.
-  @param[in] name constant character pointer name of the output queue.
-  @param[in] outFormat character pointer to format that should be used for
-  formatting output.
-  @param[in] inFormat character pointer to format that should be used for
-  parsing input.
-  @return cisRpc_t structure with provided info.
- */
-static inline 
-cisRpc_t cisRpc(const char *name, const char *outFormat, const char *inFormat) {
-  return init_comm(name, outFormat, RPC_COMM, inFormat);
-};
-
-/*!
   @brief Constructor for client side RPC structure.
   Creates an instance of cisRpc_t with provided information.  
   @param[in] name constant character pointer to name for queues.
@@ -419,7 +330,7 @@ cisRpc_t cisRpc(const char *name, const char *outFormat, const char *inFormat) {
  */
 static inline
 comm_t cisRpcClient(const char *name, const char *outFormat, const char *inFormat){
-  return init_comm(name, outFormat, CLIENT_COMM, inFormat);
+  return init_comm_format(name, outFormat, CLIENT_COMM, inFormat, 0);
 };
 
 /*!
@@ -434,7 +345,7 @@ comm_t cisRpcClient(const char *name, const char *outFormat, const char *inForma
  */
 static inline
 comm_t cisRpcServer(const char *name, const char *inFormat, const char *outFormat){
-  return init_comm(name, inFormat, SERVER_COMM, outFormat);
+  return init_comm_format(name, inFormat, SERVER_COMM, outFormat, 0);
 };
 
 /*!
@@ -447,11 +358,7 @@ comm_t cisRpcServer(const char *name, const char *inFormat, const char *outForma
   @return integer specifying if the send was succesful. Values >= 0 indicate
   success.
  */
-static inline
-int vrpcSend(const cisRpc_t rpc, va_list ap) {
-  int ret = vcommSend_nolimit(rpc, ap);
-  return ret;
-};
+#define vrpcSend vcommSend
 
 /*!
   @brief Receive and parse a message from an RPC input queue.
@@ -460,17 +367,15 @@ int vrpcSend(const cisRpc_t rpc, va_list ap) {
   input queue format string to extract parameters and assign them to the
   arguments.
   @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] nargs int Number of arguments contained in ap.
   @param[out] ap va_list variable list of arguments that should be assigned
   parameters extracted using the format string. Since these will be assigned,
   they should be pointers to memory that has already been allocated.
   @return integer specifying if the receive was succesful. Values >= 0 indicate
   success.
 */
-static inline
-int vrpcRecv(const cisRpc_t rpc, va_list ap) {
-  int ret = vcommRecv_nolimit(rpc, ap);
-  return ret;
-};
+#define vrpcRecv(rpc, nargs, ap) vcommRecv(rpc, 0, nargs, ap)
+#define vrpcRecvRealloc(rpc, nargs, ap) vcommRecv(rpc, 1, nargs, ap)
 
 /*!
   @brief Format and send a message to an RPC output queue.
@@ -482,14 +387,7 @@ int vrpcRecv(const cisRpc_t rpc, va_list ap) {
   @return integer specifying if the send was succesful. Values >= 0 indicate
   success.
  */
-static inline
-int rpcSend(const cisRpc_t rpc, ...){
-  va_list ap;
-  va_start(ap, rpc);
-  int ret = vrpcSend(rpc, ap);
-  va_end(ap);
-  return ret;
-};
+#define rpcSend commSend
 
 /*!
   @brief Receive and parse a message from an RPC input queue.
@@ -504,14 +402,8 @@ int rpcSend(const cisRpc_t rpc, ...){
   @return integer specifying if the receive was succesful. Values >= 0 indicate
   success.
 */
-static inline
-int rpcRecv(const cisRpc_t rpc, ...) {
-  va_list ap;
-  va_start(ap, rpc);
-  int ret = vrpcRecv(rpc, ap);
-  va_end(ap);
-  return ret;
-};
+#define rpcRecv commRecv
+#define rpcRecvRealloc commRecvRealloc
 
 /*!
   @brief Send request to an RPC server from the client and wait for a response.
@@ -519,6 +411,11 @@ int rpcRecv(const cisRpc_t rpc, ...) {
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
   @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] allow_realloc int If 1, output arguments are assumed to be pointers
+  to pointers such that they can be reallocated as necessary to receive incoming
+  data. If 0, output arguments are assumed to be preallocated.
+  @param[in] nargs size_t Number of arguments contained in ap including both
+  input and output arguments.
   @param[in,out] ap va_list mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will
@@ -527,18 +424,22 @@ int rpcRecv(const cisRpc_t rpc, ...) {
   success.
  */
 static inline
-int vrpcCall(const cisRpc_t rpc, va_list ap) {
+int vrpcCallBase(const cisRpc_t rpc, const int allow_realloc,
+		 size_t nargs, va_list_t ap) {
   int sret, rret;
   rret = 0;
 
   // Create copy for receiving
-  va_list op;
-  va_copy(op, ap);
+  va_list_t op;
+  va_copy(op.va, ap.va);
   
   // pack the args and call
-  sret = vcommSend_nolimit(rpc, ap);
+  comm_t *send_comm = (comm_t*)(rpc.handle);
+  size_t send_nargs = nargs_exp_from_void(send_comm->serializer->type,
+					  send_comm->serializer->info);
+  sret = vcommSend(rpc, send_nargs, ap);
   if (sret < 0) {
-    cislog_error("vrpcCall: vcisSend_nolimit error: ret %d: %s", sret, strerror(errno));
+    cislog_error("vrpcCall: vcommSend error: ret %d: %s", sret, strerror(errno));
     return -1;
   }
 
@@ -546,17 +447,20 @@ int vrpcCall(const cisRpc_t rpc, va_list ap) {
   cislog_debug("vrpcCall: Used %d arguments in send", sret);
   int i;
   for (i = 0; i < sret; i++) {
-    va_arg(op, void*);
+    va_arg(op.va, void*);
   }
+  nargs = nargs - sret;
 
   // unpack the messages into the remaining variable arguments
-  // va_list op;
-  // va_copy(op, ap);
-  rret = vcommRecv_nolimit(rpc, op);
-  va_end(op);
+  // va_list_t op;
+  // va_copy(op.va, ap.va);
+  rret = vcommRecv(rpc, allow_realloc, nargs, op);
+  va_end(op.va);
   
   return rret;
 };
+#define vrpcCall(rpc, nargs, ap) vrpcCallBase(rpc, 0, nargs, ap)
+#define vrpcCallRealloc(rpc, nargs, ap) vrpcCallBase(rpc, 1, nargs, ap)
 
 /*!
   @brief Send request to an RPC server from the client and wait for a response.
@@ -564,6 +468,11 @@ int vrpcCall(const cisRpc_t rpc, va_list ap) {
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
   @param[in] rpc cisRpc_t structure with RPC information.
+  @param[in] allow_realloc int If 1, output arguments are assumed to be pointers
+  to pointers such that they can be reallocated as necessary to receive incoming
+  data. If 0, output arguments are assumed to be preallocated.
+  @param[in] nargs size_t Number of arguments contained in ap including both
+  input and output arguments.
   @param[in,out] ... mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will
@@ -572,14 +481,16 @@ int vrpcCall(const cisRpc_t rpc, va_list ap) {
   success.
  */
 static inline
-int rpcCall(const cisRpc_t rpc,  ...){
+int nrpcCallBase(const cisRpc_t rpc, const int allow_realloc, size_t nargs, ...){
   int ret;
-  va_list ap;
-  va_start(ap, rpc);
-  ret = vrpcCall(rpc, ap);
-  va_end(ap);
+  va_list_t ap;
+  va_start(ap.va, nargs);
+  ret = vrpcCallBase(rpc, allow_realloc, nargs, ap);
+  va_end(ap.va);
   return ret;
 };
+#define rpcCall(rpc, ...) nrpcCallBase(rpc, 0, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
+#define rpcCallRealloc(rpc, ...) nrpcCallBase(rpc, 1, COUNT_VARARGS(__VA_ARGS__), __VA_ARGS__)
 
 
 //==============================================================================
@@ -767,26 +678,7 @@ comm_t cisAsciiFileInput_local(const char *name) {
  */
 static inline
 comm_t cisAsciiTableOutput(const char *name, const char *format_str) {
-  int flag = 0;
-  comm_t out = init_comm(name, "send", _default_comm, NULL);
-  if (out.valid) {
-    flag = update_serializer(out.serializer, ASCII_TABLE_SERI,
-			     (void*)format_str);
-    if (flag == 0) {
-      asciiTable_t *table = (asciiTable_t*)(out.serializer->info);
-      flag = at_update(table, name, "0");
-    }
-  }
-  // TODO: Make sure this is freed.
-  /* asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t)); */
-  /* table[0] = asciiTable(name, "0", format_str, */
-  /* 			NULL, NULL, NULL); */
-  /* out.serializer.type = ASCII_TABLE_SERI; */
-  /* out.serializer.info = (void*)table; */
-  if (flag < 0) {
-    out.valid = 0;
-  }
-  return out;
+  return init_comm_format(name, "send", _default_comm, format_str, 0);
 };
 
 /*!
@@ -808,7 +700,8 @@ comm_t cisAsciiTableInput(const char *name) {
  */
 static inline
 comm_t cisAsciiTableOutput_local(const char *name, const char *format_str) {
-  return init_comm(name, "send", ASCII_TABLE_COMM, (void*)format_str);
+  void* seri_info = get_ascii_table_type(format_str, 0);
+  return init_comm(name, "send", ASCII_TABLE_COMM, seri_info);
 };
 
 /*!
@@ -818,7 +711,8 @@ comm_t cisAsciiTableOutput_local(const char *name, const char *format_str) {
  */
 static inline
 comm_t cisAsciiTableInput_local(const char *name) {
-  return init_comm(name, "recv", ASCII_TABLE_COMM, NULL);
+  void* seri_info = get_ascii_table_type(NULL, 0);
+  return init_comm(name, "recv", ASCII_TABLE_COMM, seri_info);
 };
 
 /*!
@@ -830,9 +724,7 @@ comm_t cisAsciiTableInput_local(const char *name) {
  */
 static inline
 comm_t cisAsciiArrayOutput(const char *name, const char *format_str) {
-  comm_t out = cisAsciiTableOutput(name, format_str);
-  out.serializer->type = ASCII_TABLE_ARRAY_SERI;
-  return out;
+  return init_comm_format(name, "send", _default_comm, format_str, 1);
 };
 
 /*!
@@ -842,10 +734,7 @@ comm_t cisAsciiArrayOutput(const char *name, const char *format_str) {
  */
 static inline
 comm_t cisAsciiArrayInput(const char *name) {
-  comm_t out = cisAsciiTableInput(name);
-  // Don't set this so it is updated when it is received.
-  // out.serializer->type = ASCII_TABLE_ARRAY_SERI;
-  return out;
+  return cisAsciiTableInput(name);
 };
 
 /*!
@@ -857,9 +746,8 @@ comm_t cisAsciiArrayInput(const char *name) {
  */
 static inline
 comm_t cisAsciiArrayOutput_local(const char *name, const char *format_str) {
-  comm_t out = init_comm(name, "send", ASCII_TABLE_COMM, (void*)format_str);
-  out.serializer->type = ASCII_TABLE_ARRAY_SERI;
-  return out;
+  void* seri_info = get_ascii_table_type(format_str, 1);
+  return init_comm(name, "send", ASCII_TABLE_COMM, seri_info);
 };
 
 /*!
@@ -869,9 +757,8 @@ comm_t cisAsciiArrayOutput_local(const char *name, const char *format_str) {
  */
 static inline
 comm_t cisAsciiArrayInput_local(const char *name) {
-  comm_t out = init_comm(name, "recv", ASCII_TABLE_COMM, NULL);
-  out.serializer->type = ASCII_TABLE_ARRAY_SERI;
-  return out;
+  void* seri_info = get_ascii_table_type(NULL, 1);
+  return init_comm(name, "recv", ASCII_TABLE_COMM, seri_info);
 };
 
 //==============================================================================
@@ -918,12 +805,8 @@ comm_t cisAsciiArrayInput_local(const char *name) {
  */
 static inline
 comm_t cisPlyOutput(const char *name) {
-  int flag = 0;
-  comm_t out = init_comm(name, "send", _default_comm, NULL);
-  if (out.valid) {
-    flag = update_serializer(out.serializer, PLY_SERI, NULL);
-  }
-  if (flag < 0) {
+  comm_t out = init_comm(name, "send", _default_comm, get_ply_type());
+  if ((out.valid) && (out.serializer->info == NULL)) {
     out.valid = 0;
   }
   return out;
@@ -984,12 +867,8 @@ comm_t cisPlyInput(const char *name) {
  */
 static inline
 comm_t cisObjOutput(const char *name) {
-  int flag = 0;
-  comm_t out = init_comm(name, "send", _default_comm, NULL);
-  if (out.valid) {
-    flag = update_serializer(out.serializer, OBJ_SERI, NULL);
-  }
-  if (flag < 0) {
+  comm_t out = init_comm(name, "send", _default_comm, get_obj_type());
+  if ((out.valid) && (out.serializer->info == NULL)) {
     out.valid = 0;
   }
   return out;

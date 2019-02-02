@@ -1,6 +1,7 @@
 import os
 import tempfile
-import nose.tools as nt
+import unittest
+from cis_interface.schema import get_schema
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
 
@@ -12,13 +13,17 @@ class TestFileInputParam(parent.TestConnectionParam):
 
     """
 
+    icomm_name = 'FileComm'
+    testing_option_kws = {}
+
     def __init__(self, *args, **kwargs):
         super(TestFileInputParam, self).__init__(*args, **kwargs)
         self.driver = 'FileInputDriver'
         self.filepath = os.path.join(tempfile.gettempdir(),
-                                     '%s_input.txt' % self.name)
+                                     '%s_input%s' %
+                                     (self.name,
+                                      self.icomm_import_cls._default_extension))
         self.args = self.filepath
-        self.icomm_name = 'FileComm'
 
     @property
     def send_comm_kwargs(self):
@@ -30,7 +35,7 @@ class TestFileInputParam(parent.TestConnectionParam):
     @property
     def contents_to_write(self):
         r"""str: Contents that should be written to the file."""
-        return self.file_contents
+        return self.testing_options['contents']
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
@@ -60,13 +65,18 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
         super(TestFileInputDriver, self).assert_before_stop(check_open=False)
         self.instance.sleep()
         # File contents
-        flag, msg_recv = self.recv_comm.recv(self.timeout)
-        assert(flag)
-        nt.assert_equal(msg_recv, self.file_contents)
-        # EOF
-        flag, msg_recv = self.recv_comm.recv(self.timeout)
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_comm.eof_msg)
+        flag = True
+        msg_list = []
+        while flag:
+            flag, msg_recv = self.recv_comm.recv(self.timeout)
+            if flag:
+                msg_list.append(msg_recv)
+            else:
+                self.assert_equal(msg_recv, self.recv_comm.eof_msg)
+        recv_objects = self.testing_options['recv']
+        self.assert_equal(len(msg_list), len(recv_objects))
+        for x, y in zip(msg_list, recv_objects):
+            self.assert_msg_equal(x, y)
 
     def assert_after_terminate(self):
         r"""Assertions to make after stopping the driver instance."""
@@ -78,11 +88,28 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
         r"""Commands to run while the instance is running, before terminate."""
         # Don't send any messages to the file
         pass
-    
-    def test_send_recv(self):
-        r"""Test sending/receiving small message."""
-        pass
 
+    @unittest.skipIf(True, 'File driver')
+    def test_send_recv(self):
+        r"""Disabled: Test sending/receiving small message."""
+        pass  # pragma: no cover
+
+    @unittest.skipIf(True, 'File driver')
     def test_send_recv_nolimit(self):
-        r"""Test sending/receiving large message."""
-        pass
+        r"""Disabled: Test sending/receiving large message."""
+        pass  # pragma: no cover
+
+
+# Dynamically create tests based on registered file classes
+s = get_schema()
+file_types = list(s['file'].schema_subtypes.keys())
+for k in file_types:
+    cls_exp = type('Test%sInputDriver' % k,
+                   (TestFileInputDriver, ), {'icomm_name': k})
+    globals()[cls_exp.__name__] = cls_exp
+    if k == 'AsciiTableComm':
+        cls_exp2 = type('Test%sArrayInputDriver' % k,
+                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+        globals()[cls_exp2.__name__] = cls_exp2
+        del cls_exp2
+    del cls_exp

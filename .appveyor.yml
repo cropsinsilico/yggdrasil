@@ -41,8 +41,10 @@ environment:
       INSTALLZMQ: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
+      CIS_ENABLE_LONG_TESTS: 1
     - platform: x64
       PYTHON_VERSION: "3.6"
+      CIS_ENABLE_LONG_TESTS: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
@@ -51,6 +53,7 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
   - "SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
+  - "git submodule update --init --recursive"
 
   # Setup Visual C++ toolset
   # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
@@ -97,6 +100,7 @@ install:
   # - "conda install --yes -c conda-forge numpy nose coverage coveralls codecov flake8"
   # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy pika"
   # - "pip install zmq"
+  - "conda install --yes -c conda-forge rapidjson"
 
   # Install cis_interface allowing pip to resolve requirements
   - "pip install -e ."

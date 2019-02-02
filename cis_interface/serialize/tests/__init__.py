@@ -1,6 +1,7 @@
 import numpy as np
-import nose.tools as nt
 from cis_interface import serialize, backwards, platform
+from cis_interface.tests import assert_raises, assert_equal
+from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
 unsupported_nptype = ['bool_']
@@ -60,45 +61,20 @@ map_cformat2nptype.append(
      'complex128'))
 
 
-def test_guess_serializer():
-    r"""Test guess_serializer."""
-    nele = 5
-    names = ["name", "number", "value", "complex"]
-    field_names = [backwards.unicode2bytes(n) for n in names]
-    dtypes = ['S5', 'i8', 'f8', 'c16']
-    dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
-    arr_mix = np.zeros(nele, dtype)
-    arr_mix['name'][0] = 'hello'
-    fmt_arr = serialize._default_delimiter.join(
-        serialize.nptype2cformat(arr_mix.dtype, asbytes=True))
-    fmt_arr += serialize._default_newline
-    if platform._is_win:  # pragma: windows
-        x = arr_mix[0].tolist()
-        for i in x:
-            print(type(i))
-        if backwards.PY2:  # pragma: Python 2
-            # tolist maps to long on python 2, but int on python 3?!
-            fmt = backwards.unicode2bytes('%s\t%l64d\t%g\t%g%+gj\n')
-        else:  # pragma: Python 3
-            fmt = backwards.unicode2bytes('%s\t%d\t%g\t%g%+gj\n')
-    else:
-        fmt = backwards.unicode2bytes('%s\t%ld\t%g\t%g%+gj\n')
-    test_list = [(arr_mix, dict(field_names=field_names, format_str=fmt_arr,
-                                stype=2, as_array=1)),
-                 (arr_mix[0].tolist(), dict(format_str=fmt, stype=1)),
-                 ('hello', dict(stype=0))]
-    for obj, sinfo_ans in test_list:
-        sinfo_res = serialize.guess_serializer(obj)
-        s = serialize.get_serializer(**sinfo_res)
-        nt.assert_equal(s.serializer_info, sinfo_ans)
+def test_get_registered_serializers():
+    r"""Test get_registered_serializers."""
+    registry = serialize.get_registered_serializers()
+    assert_equal(registry[DefaultSerialize._seritype], DefaultSerialize)
 
 
-def test_get_serializer():
-    r"""Test get_serializer."""
-    max_code = 9
-    for x in range(max_code + 1):
-        serialize.get_serializer(stype=x, format_str='%s\n')
-    nt.assert_raises(RuntimeError, serialize.get_serializer, stype=max_code + 1)
+def test_register_serializer_errors():
+    r"""Test errors in register_serializer for duplicate."""
+    assert_raises(ValueError, serialize.register_serializer, DefaultSerialize)
+
+
+def test_get_serializer_class_errors():
+    r"""Test errors in get_serializer_class for invalid serializer."""
+    assert_raises(ValueError, serialize.get_serializer_class, 'invalid')
 
 
 def test_extract_formats():
@@ -106,9 +82,9 @@ def test_extract_formats():
     test_str = ['%10s\t%5.2f\t%4d\t%g%+gj']
     test_fmt = [['%10s', '%5.2f', '%4d', '%g%+gj']]
     for s, f in zip(test_str, test_fmt):
-        nt.assert_equal(serialize.extract_formats(s), f)
-        nt.assert_equal(serialize.extract_formats(backwards.unicode2bytes(s)),
-                        [backwards.unicode2bytes(i) for i in f])
+        assert_equal(serialize.extract_formats(s), f)
+        assert_equal(serialize.extract_formats(backwards.as_bytes(s)),
+                     [backwards.as_bytes(i) for i in f])
 
 
 def test_nptype2cformat():
@@ -117,10 +93,10 @@ def test_nptype2cformat():
         if isinstance(a, str):
             a = [a]
         for ia in a:
-            nt.assert_equal(serialize.nptype2cformat(ia), b)
-    nt.assert_raises(TypeError, serialize.nptype2cformat, 0)
+            assert_equal(serialize.nptype2cformat(ia), b)
+    assert_raises(TypeError, serialize.nptype2cformat, 0)
     for a in unsupported_nptype:
-        nt.assert_raises(ValueError, serialize.nptype2cformat, a)
+        assert_raises(ValueError, serialize.nptype2cformat, a)
 
 
 def test_nptype2cformat_structured():
@@ -137,9 +113,9 @@ def test_nptype2cformat_structured():
     alist = [dtype0, dtype1]
     blist = [fmts, fmts]
     for a, b in zip(alist, blist):
-        nt.assert_equal(serialize.nptype2cformat(a), b)
-        nt.assert_equal(serialize.nptype2cformat(a, asbytes=True),
-                        [backwards.unicode2bytes(ib) for ib in b])
+        assert_equal(serialize.nptype2cformat(a), b)
+        assert_equal(serialize.nptype2cformat(a, asbytes=True),
+                     [backwards.as_bytes(ib) for ib in b])
 
 
 def test_cformat2nptype():
@@ -148,22 +124,20 @@ def test_cformat2nptype():
         if isinstance(a, str):
             a = [a]
         for _ia in a:
-            if _ia.startswith(backwards.bytes2unicode(serialize._fmt_char)):
-                ia = backwards.unicode2bytes(_ia)
+            if _ia.startswith(backwards.as_str(serialize._fmt_char)):
+                ia = backwards.as_bytes(_ia)
             else:
-                ia = serialize._fmt_char + backwards.unicode2bytes(_ia)
-            nt.assert_equal(serialize.cformat2nptype(ia), np.dtype(b))  # .str)
-            # nt.assert_equal(serialize.cformat2nptype(ia), np.dtype(b).str)
-    nt.assert_raises(TypeError, serialize.cformat2nptype, 0)
-    nt.assert_raises(ValueError, serialize.cformat2nptype,
-                     backwards.unicode2bytes('s'))
-    nt.assert_raises(ValueError, serialize.cformat2nptype,
-                     backwards.unicode2bytes('%'))
-    nt.assert_raises(ValueError, serialize.cformat2nptype,
-                     '%d\t%f', names=['one'])
+                ia = serialize._fmt_char + backwards.as_bytes(_ia)
+            assert_equal(serialize.cformat2nptype(ia), np.dtype(b))  # .str)
+            # assert_equal(serialize.cformat2nptype(ia), np.dtype(b).str)
+    assert_raises(TypeError, serialize.cformat2nptype, 0)
+    assert_raises(ValueError, serialize.cformat2nptype, b's')
+    assert_raises(ValueError, serialize.cformat2nptype, b'%')
+    assert_raises(ValueError, serialize.cformat2nptype,
+                  '%d\t%f', names=['one'])
     for a in unsupported_nptype:
-        nt.assert_raises(ValueError, serialize.cformat2nptype,
-                         backwards.unicode2bytes('%' + a))
+        assert_raises(ValueError, serialize.cformat2nptype,
+                      backwards.as_bytes('%' + a))
 
 
 def test_cformat2nptype_structured():
@@ -181,9 +155,9 @@ def test_cformat2nptype_structured():
     alist = ["\t".join(fmts) + "\n", ''.join(fmts), fmts]
     for a in alist:
         b0 = serialize.cformat2nptype(a)
-        nt.assert_equal(b0, dtype0)
+        assert_equal(b0, dtype0)
         b1 = serialize.cformat2nptype(a, names=names1)
-        nt.assert_equal(b1, dtype1)
+        assert_equal(b1, dtype1)
 
 
 def test_cformat2pyscanf():
@@ -194,43 +168,40 @@ def test_cformat2pyscanf():
         if isinstance(a, str):
             a = [a]
         for _ia in a:
-            ia = backwards.unicode2bytes(_ia)
-            ib = backwards.unicode2bytes(b)
+            ia = backwards.as_bytes(_ia)
+            ib = backwards.as_bytes(b)
             all_a.append(ia)
             all_b.append(ib)
-            nt.assert_equal(serialize.cformat2pyscanf(ia), ib)
-    nt.assert_raises(TypeError, serialize.cformat2pyscanf, 0)
-    nt.assert_raises(ValueError, serialize.cformat2pyscanf,
-                     backwards.unicode2bytes('s'))
-    nt.assert_raises(ValueError, serialize.cformat2pyscanf,
-                     backwards.unicode2bytes('%'))
-    fmt_a = backwards.unicode2bytes('\t').join(all_a)
-    fmt_b = backwards.unicode2bytes('\t').join(all_b)
-    nt.assert_equal(serialize.cformat2pyscanf(all_a), all_b)
-    nt.assert_equal(serialize.cformat2pyscanf(fmt_a), fmt_b)
+            assert_equal(serialize.cformat2pyscanf(ia), ib)
+    assert_raises(TypeError, serialize.cformat2pyscanf, 0)
+    assert_raises(ValueError, serialize.cformat2pyscanf, b's')
+    assert_raises(ValueError, serialize.cformat2pyscanf, b'%')
+    fmt_a = b'\t'.join(all_a)
+    fmt_b = b'\t'.join(all_b)
+    assert_equal(serialize.cformat2pyscanf(all_a), all_b)
+    assert_equal(serialize.cformat2pyscanf(fmt_a), fmt_b)
 
 
 def test_format_message():
     r"""Test formatting message from a list or arguments and back."""
-    fmt = backwards.unicode2bytes("%5s\t%ld\t%lf\t%g%+gj\n")
+    fmt = b'%5s\t%ld\t%lf\t%g%+gj\n'
     dtype = serialize.cformat2nptype(fmt)
     x_arr = np.ones(1, dtype)
     x_tup = [x_arr[n][0] for n in x_arr.dtype.names]
-    # x_tup[0] = backwards.bytes2unicode(x_tup[0])
+    # x_tup[0] = backwards.as_str(x_tup[0])
     flist = [fmt, "%ld"]
     alist = [tuple(x_tup), 0]
     for a, f in zip(alist, flist):
         msg = serialize.format_message(a, f)
         b = serialize.process_message(msg, f)
         if not isinstance(a, tuple):
-            nt.assert_equal(b, (a, ))
+            assert_equal(b, (a, ))
         else:
-            nt.assert_equal(b, a)
+            assert_equal(b, a)
     # Errors
-    nt.assert_raises(RuntimeError, serialize.format_message, (0, ), "%d %d")
-    nt.assert_raises(TypeError, serialize.process_message, 0, "%d")
-    nt.assert_raises(ValueError, serialize.process_message,
-                     backwards.unicode2bytes("hello"), "%d")
+    assert_raises(RuntimeError, serialize.format_message, (0, ), "%d %d")
+    assert_raises(TypeError, serialize.process_message, 0, "%d")
+    assert_raises(ValueError, serialize.process_message, b'hello', "%d")
 
 
 def test_combine_flds():
@@ -247,9 +218,9 @@ def test_combine_flds():
                                   np.zeros(nele, dtype0))
     np.testing.assert_array_equal(serialize.combine_flds(arrs, dtype=dtype1),
                                   np.zeros(nele, dtype1))
-    nt.assert_raises(ValueError, serialize.combine_flds, arrs[:-1], dtype=dtype0)
+    assert_raises(ValueError, serialize.combine_flds, arrs[:-1], dtype=dtype0)
     arrs[0] = np.zeros(nele - 1, dtype=dtype0[0])
-    nt.assert_raises(ValueError, serialize.combine_flds, arrs)
+    assert_raises(ValueError, serialize.combine_flds, arrs)
 
 
 def test_combine_eles():
@@ -267,7 +238,7 @@ def test_combine_eles():
     res0['f0'][0] = 'hello'
     res1['name'][0] = 'hello'
     arrs = [np.zeros(1, dtype=dtype0) for i in range(nele)]
-    arrs[0]['f0'] = backwards.unicode2bytes('hello')
+    arrs[0]['f0'] = b'hello'
     arrs_list = [a.tolist()[0] for a in arrs]
     arrs_void = [res1[i] for i in range(nele)]
     arrs_mixd = [a.tolist() for a in res1]
@@ -295,12 +266,12 @@ def test_combine_eles():
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list, dtype=dtype1),
                                   res1)
     arrs_list[0] = arrs_list[0][:-1]
-    nt.assert_raises(ValueError, serialize.combine_eles, arrs_list, dtype=dtype1)
-    nt.assert_raises(ValueError, serialize.combine_eles, arrs_list)
+    assert_raises(ValueError, serialize.combine_eles, arrs_list, dtype=dtype1)
+    assert_raises(ValueError, serialize.combine_eles, arrs_list)
     arrs_list[0] = None
-    nt.assert_raises(TypeError, serialize.combine_eles, arrs_list)
-    nt.assert_raises(ValueError, serialize.combine_eles, arrs_void,
-                     dtype=dtype_short)
+    assert_raises(TypeError, serialize.combine_eles, arrs_list)
+    assert_raises(ValueError, serialize.combine_eles, arrs_void,
+                  dtype=dtype_short)
 
 
 def test_consolidate_array():
@@ -372,45 +343,45 @@ def test_consolidate_array():
         x2 = serialize.consolidate_array(x1)
         np.testing.assert_array_equal(x0, x2)
     # Error on incorrect data format
-    nt.assert_raises(ValueError, serialize.consolidate_array,
-                     np.zeros((4, 1)), dtype=dtype2)
+    assert_raises(ValueError, serialize.consolidate_array,
+                  np.zeros((4, 1)), dtype=dtype2)
     # Error on incorrect type
-    nt.assert_raises(TypeError, serialize.consolidate_array, None)
+    assert_raises(TypeError, serialize.consolidate_array, None)
     # Error on dtypes with differing numbers of fields
-    nt.assert_raises(ValueError, serialize.consolidate_array,
-                     np.zeros(3, dtype0), dtype=dtype3)
+    assert_raises(ValueError, serialize.consolidate_array,
+                  np.zeros(3, dtype0), dtype=dtype3)
                      
 
 def test_format2table():
     r"""Test getting table information from a format string."""
-    out = {'delimiter': backwards.unicode2bytes('\t'),
-           'newline': backwards.unicode2bytes('\n'),
-           'comment': backwards.unicode2bytes('# '),
+    out = {'delimiter': b'\t',
+           'newline': b'\n',
+           'comment': b'# ',
            'fmts': ["%5s", "%ld", "%lf", "%g%+gj"]}
-    out['fmts'] = [backwards.unicode2bytes(f) for f in out['fmts']]
+    out['fmts'] = [backwards.as_bytes(f) for f in out['fmts']]
     sfmt = out['fmts'][0]
     sout = dict(**out)
     sout['fmts'] = [sfmt]
     del sout['newline'], sout['comment']
-    fmt = backwards.unicode2bytes("# %5s\t%ld\t%lf\t%g%+gj\n")
-    fmt2 = backwards.unicode2bytes("# %5s\t\t%ld\t%lf\t%g%+gj\n")
-    nt.assert_equal(dict(fmts=[]), serialize.format2table('hello'))
-    nt.assert_equal(sout, serialize.format2table(sfmt))
-    nt.assert_equal(fmt, serialize.table2format(**out))
-    nt.assert_equal(out, serialize.format2table(fmt))
-    nt.assert_equal(fmt, serialize.table2format(fmts=out['fmts']))
-    nt.assert_equal(out, serialize.format2table(fmt2))
-    nt.assert_raises(RuntimeError, serialize.format2table, "%5s,%ld\t%g\n")
+    fmt = b'# %5s\t%ld\t%lf\t%g%+gj\n'
+    fmt2 = b'# %5s\t\t%ld\t%lf\t%g%+gj\n'
+    assert_equal(dict(fmts=[]), serialize.format2table('hello'))
+    assert_equal(sout, serialize.format2table(sfmt))
+    assert_equal(fmt, serialize.table2format(**out))
+    assert_equal(out, serialize.format2table(fmt))
+    assert_equal(fmt, serialize.table2format(fmts=out['fmts']))
+    assert_equal(out, serialize.format2table(fmt2))
+    assert_raises(RuntimeError, serialize.format2table, "%5s,%ld\t%g\n")
 
 
 def test_array_to_table():
     r"""Test conversion of arrays to ASCII table and back."""
-    flist = [backwards.unicode2bytes("%5s\t%ld\t%lf\t%g%+gj\n")]
+    flist = ['# %5s\t%ld\t%lf\t%g%+gj\n']
     for use_astropy in [False, True]:
         for f in flist:
             dtype = serialize.cformat2nptype(f)
             arr0 = np.ones(5, dtype)
-            arr0['f0'][0] = backwards.unicode2bytes('hello')
+            arr0['f0'][0] = b'hello'
             tab = serialize.array_to_table(arr0, f, use_astropy=use_astropy)
             arr1 = serialize.table_to_array(tab, f, use_astropy=use_astropy)
             np.testing.assert_array_equal(arr1, arr0)
@@ -444,10 +415,10 @@ def test_array_to_bytes():
         b0 = serialize.array_to_bytes(np.zeros(nrow, dtype2), order=order)
         b1 = serialize.array_to_bytes(np.zeros((nrow, ncol)), dtype=dtype2,
                                       order=order)
-        nt.assert_equal(b1, b0)
+        assert_equal(b1, b0)
         # Error on incomplete serial array
-        nt.assert_raises(RuntimeError, serialize.bytes_to_array,
-                         b0[:-1], dtype2, order=order)
+        assert_raises(RuntimeError, serialize.bytes_to_array,
+                      b0[:-1], dtype2, order=order)
 
 
 def test_format_header():
@@ -469,9 +440,9 @@ def test_format_header():
     for x in [kws_all, res_all]:
         for k, v in x.items():
             if isinstance(v, str):
-                x[k] = backwards.unicode2bytes(v)
+                x[k] = backwards.as_bytes(v)
             elif isinstance(v, list):
-                x[k] = [backwards.unicode2bytes(iv) for iv in v]
+                x[k] = [backwards.as_bytes(iv) for iv in v]
     test_list = [(['format_str', 'field_names', 'field_units'],
                   ['names', 'units', 'format']),
                  (['field_names', 'field_units', 'dtype'],
@@ -482,9 +453,9 @@ def test_format_header():
                  (['field_units'], ['units'])]
     for kws_keys, res_keys in test_list:
         kws = {k: kws_all[k] for k in kws_keys}
-        res = backwards.unicode2bytes('').join([res_all[k] for k in res_keys])
-        nt.assert_equal(serialize.format_header(**kws), res)
-    nt.assert_raises(ValueError, serialize.format_header)
+        res = b''.join([res_all[k] for k in res_keys])
+        assert_equal(serialize.format_header(**kws), res)
+    assert_raises(ValueError, serialize.format_header)
 
 
 def test_parse_header():
@@ -498,34 +469,42 @@ def test_parse_header():
                field_names=['name', 'number', 'value', 'complex'],
                field_units=['n/a', 'g', 'cm', 'n/a'])
     for i in range(len(header)):
-        header[i] = backwards.unicode2bytes(header[i])
+        header[i] = backwards.as_bytes(header[i])
     for k, v in res.items():
         if isinstance(v, str):
-            res[k] = backwards.unicode2bytes(v)
+            res[k] = backwards.as_bytes(v)
         elif isinstance(v, list):
-            res[k] = [backwards.unicode2bytes(s) for s in v]
-    nt.assert_equal(serialize.parse_header(header), res)
-    nt.assert_equal(serialize.parse_header(header[::-1]), res)
-    _empty = backwards.unicode2bytes('')
-    nt.assert_equal(serialize.parse_header(_empty.join(header)), res)
+            res[k] = [backwards.as_bytes(s) for s in v]
+    assert_equal(serialize.parse_header(header), res)
+    assert_equal(serialize.parse_header(header[::-1]), res)
+    _empty = b''
+    assert_equal(serialize.parse_header(_empty.join(header)), res)
     # Test without formats
     header2 = header[:2]
     res2 = dict(**res)
     del res2['format_str']
     res2['fmts'] = []
-    nt.assert_equal(serialize.parse_header(header2), res2)
+    assert_equal(serialize.parse_header(header2), res2)
     # Test with explicit line numbers
-    nt.assert_equal(serialize.parse_header(header, lineno_names=0, lineno_units=1),
-                    res)
+    assert_equal(serialize.parse_header(header, lineno_names=0, lineno_units=1),
+                 res)
     # Test errors
     header3 = [header[0], header[0]]
-    nt.assert_raises(RuntimeError, serialize.parse_header, header3)
+    assert_raises(RuntimeError, serialize.parse_header, header3)
     header4 = [header[1], header[1]]
-    nt.assert_raises(RuntimeError, serialize.parse_header, header4)
+    assert_raises(RuntimeError, serialize.parse_header, header4)
+
+
+def test_dict2list():
+    r"""Test conversion of a dictionary to a list and back."""
+    assert_raises(TypeError, serialize.dict2list, None)
+    assert_raises(TypeError, serialize.list2dict, None)
 
 
 def test_numpy2pandas():
     r"""Test conversion of a numpy array to a pandas data frame and back."""
+    assert_raises(TypeError, serialize.numpy2pandas, None)
+    assert_raises(TypeError, serialize.pandas2numpy, None)
     nele = 5
     names = ["name", "number", "value", "complex"]
     dtypes = ['S5', 'i8', 'f8', 'c16']
@@ -536,15 +515,36 @@ def test_numpy2pandas():
     test_arrs = [arr_mix,
                  np.zeros(nele, 'float'),
                  arr_mix['name'],
-                 arr_obj]
+                 arr_obj,
+                 np.array([])]
     for ans in test_arrs:
         frame = serialize.numpy2pandas(ans)
         res = serialize.pandas2numpy(frame)
         np.testing.assert_array_equal(ans, res)
 
 
+def test_numpy2list():
+    r"""Test conversion of a numpy array to a list and back."""
+    assert_raises(TypeError, serialize.numpy2list, None)
+    assert_raises(TypeError, serialize.list2numpy, None)
+    nele = 5
+    names = ["complex", "name", "number", "value"]
+    dtypes = ['c16', 'S5', 'i8', 'f8']
+    dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
+    arr_mix = np.zeros(nele, dtype)
+    arr_mix['name'][0] = 'hello'
+    test_arrs = [arr_mix]
+    for ans in test_arrs:
+        d = serialize.numpy2list(ans)
+        # Name provided
+        res = serialize.list2numpy(d, names=names)
+        np.testing.assert_array_equal(ans, res)
+
+
 def test_numpy2dict():
     r"""Test conversion of a numpy array to a dictionary and back."""
+    assert_raises(TypeError, serialize.numpy2dict, None)
+    assert_raises(TypeError, serialize.dict2numpy, None)
     nele = 5
     names = ["complex", "name", "number", "value"]
     dtypes = ['c16', 'S5', 'i8', 'f8']
@@ -564,6 +564,8 @@ def test_numpy2dict():
 
 def test_pandas2dict():
     r"""Test conversion of a Pandas data frame to a dictionary and back."""
+    assert_raises(TypeError, serialize.dict2pandas, None)
+    assert_raises(TypeError, serialize.pandas2dict, None)
     nele = 5
     names = ["complex", "name", "number", "value"]
     dtypes = ['c16', 'S5', 'i8', 'f8']
@@ -574,7 +576,8 @@ def test_pandas2dict():
     test_arrs = [arr_mix,
                  np.zeros(nele, 'float'),
                  arr_mix['name'],
-                 arr_obj]
+                 arr_obj,
+                 np.array([])]
     for ans in test_arrs:
         frame = serialize.numpy2pandas(ans)
         # Sorted

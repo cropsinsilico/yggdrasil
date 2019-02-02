@@ -1,5 +1,6 @@
 from __future__ import print_function
 import sys
+import numpy as np
 from cis_interface.interface.CisInterface import CisRpcClient
 
 
@@ -15,7 +16,7 @@ def fibClient(args):
     # Send all of the requests to the server
     for i in range(1, iterations + 1):
         print('rpcFibCliPar(P): fib(->%-2d) ::: ' % i)
-        ret = rpc.rpcSend(i)
+        ret = rpc.rpcSend(np.int32(i))
         if not ret:
             raise RuntimeError('rpcFibCliPar(P): SEND FAILED')
 
@@ -24,7 +25,7 @@ def fibClient(args):
         ret, fib = rpc.rpcRecv()
         if not ret:
             raise RuntimeError('rpcFibCliPar(P): RECV FAILED')
-        print('rpcFibCliPar(P): fib(%2d<-) = %-2d<-' % fib)
+        print('rpcFibCliPar(P): fib(%2d<-) = %-2d<-' % tuple(fib))
 
     print('Goodbye from Python rpcFibCliPar')
 
