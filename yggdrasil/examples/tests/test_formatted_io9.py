@@ -1,13 +1,13 @@
 import os
-from cis_interface.examples.tests import TestExample
+from yggdrasil.examples.tests import TestExample
 
 
-class TestExampleFIO7(TestExample):
-    r"""Test the Formatted I/O lesson 7 example."""
+class TestExampleFIO9(TestExample):
+    r"""Test the Formatted I/O lesson 9 example."""
 
     def __init__(self, *args, **kwargs):
-        super(TestExampleFIO7, self).__init__(*args, **kwargs)
-        self._name = 'formatted_io7'
+        super(TestExampleFIO9, self).__init__(*args, **kwargs)
+        self._name = 'formatted_io9'
 
     @property
     def input_files(self):

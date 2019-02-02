@@ -1,6 +1,6 @@
 import os
-from cis_interface import backwards
-from cis_interface.examples.tests import TestExample
+from yggdrasil import backwards
+from yggdrasil.examples.tests import TestExample
 
 
 class TestExampleFIO8(TestExample):
