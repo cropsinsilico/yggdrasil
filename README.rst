@@ -38,9 +38,9 @@ it.
 
 .. |PyPI version| image:: https://img.shields.io/pypi/v/cis_interface.svg?colorB=g&style=flat
    :target: https://pypi.org/project/cis-interface/
-.. |Build Status| image:: https://travis-ci.org/cropsinsilico/yggdrasil.svg?branch=cis_interface
+.. |Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil/cis_interface.svg?style=flat
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
-.. |Build status| image:: https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/cis_interface?svg=true
+.. |Build status| image:: https://img.shields.io/appveyor/ci/cropsinsilico/yggdrasil/cis_interface.svg?style=flat
    :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/cis_interface
 .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=cis_interface
    :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=cis_interface
