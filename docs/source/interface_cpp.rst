@@ -1,5 +1,5 @@
 C++ Interface
 =============
 
-.. autodoxygenfile:: CisInterface.hpp
-   :project: cis_interface
+.. autodoxygenfile:: YggInterface.hpp
+   :project: yggdrasil

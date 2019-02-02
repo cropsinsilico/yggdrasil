@@ -1,0 +1,306 @@
+additionalProperties: false
+definitions:
+  comm:
+    $id: '#comm'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver: [args]
+      properties:
+        args: {type: string}
+        as_array: {default: false, type: boolean}
+        commtype:
+          default: default
+          enum: [default, ipc, rmq, rmq_async, zmq]
+          type: string
+        datatype:
+          default: {type: bytes}
+          type: schema
+        driver: {type: string}
+        field_names:
+          items: {type: string}
+          type: array
+        field_units:
+          items: {type: string}
+          type: array
+        name: {type: string}
+        recv_converter: {type: function}
+        send_converter: {type: function}
+      required: [name, commtype, datatype]
+      type: object
+    - anyOf:
+      - properties:
+          commtype:
+            enum: [default]
+        title: DefaultComm
+      - properties:
+          commtype:
+            enum: [ipc]
+        title: IPCComm
+      - properties:
+          commtype:
+            enum: [rmq_async]
+        title: RMQAsyncComm
+      - properties:
+          commtype:
+            enum: [rmq]
+        title: RMQComm
+      - properties:
+          commtype:
+            enum: [zmq]
+        title: ZMQComm
+    description: Schema for comm components.
+    title: comm
+  connection:
+    $id: '#connection'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver: [args]
+      properties:
+        args: {type: string}
+        connection_type:
+          enum: [file_input, file_output, input, output]
+        driver: {type: string}
+        inputs:
+          items:
+            anyOf:
+            - {$ref: '#/definitions/comm'}
+            - {$ref: '#/definitions/file'}
+          minItems: 1
+          type: array
+        onexit: {type: string}
+        outputs:
+          items:
+            anyOf:
+            - {$ref: '#/definitions/comm'}
+            - {$ref: '#/definitions/file'}
+          minItems: 1
+          type: array
+        translator:
+          items: {type: function}
+          type: array
+      required: [inputs, outputs]
+      type: object
+    - anyOf:
+      - properties:
+          connection_type:
+            enum: [file_input]
+        title: FileInputDriver
+      - properties:
+          connection_type:
+            enum: [file_output]
+        title: FileOutputDriver
+      - properties:
+          connection_type:
+            enum: [input]
+        title: InputDriver
+      - properties:
+          connection_type:
+            enum: [output]
+        title: OutputDriver
+    description: Schema for connection components.
+    title: connection
+  file:
+    $id: '#file'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver: [args]
+      properties:
+        append: {default: false, type: boolean}
+        args: {type: string}
+        as_array: {default: false, type: boolean}
+        comment: {default: '# ', type: string}
+        default_flow_style: &id006 {default: false, type: boolean}
+        delimiter: &id001 {default: "\t", type: string}
+        driver: {type: string}
+        encoding: &id007 {default: utf-8, type: string}
+        field_names:
+          items: {type: string}
+          type: array
+        field_units:
+          items: {type: string}
+          type: array
+        filetype:
+          default: binary
+          enum: [ascii, binary, json, map, mat, obj, pandas, pickle, ply, table, yaml]
+          type: string
+        format_str: &id002 {type: string}
+        in_temp: {default: false, type: boolean}
+        indent: &id004
+          default: "\t"
+          type: [string, int]
+        is_series: {default: false, type: boolean}
+        name: {type: string}
+        newline: {default: '
+
+            ', type: string}
+        recv_converter: {type: function}
+        send_converter: {type: function}
+        sort_keys: &id005 {default: true, type: boolean}
+        use_astropy: &id003 {default: false, type: boolean}
+        working_dir: {type: string}
+      required: [name, filetype, working_dir]
+      type: object
+    - anyOf:
+      - properties:
+          filetype:
+            enum: [ascii]
+        title: AsciiFileComm
+      - properties:
+          delimiter: *id001
+          filetype:
+            enum: [map]
+        title: AsciiMapComm
+      - properties:
+          delimiter: {default: "\t", type: string}
+          filetype:
+            enum: [table]
+          format_str: *id002
+          use_astropy: *id003
+        title: AsciiTableComm
+      - properties:
+          filetype:
+            enum: [binary]
+        title: FileComm
+      - properties:
+          filetype:
+            enum: [json]
+          indent: *id004
+          sort_keys: *id005
+        title: JSONFileComm
+      - properties:
+          filetype:
+            enum: [mat]
+        title: MatFileComm
+      - properties:
+          filetype:
+            enum: [obj]
+        title: ObjFileComm
+      - properties:
+          delimiter: {default: "\t", type: string}
+          filetype:
+            enum: [pandas]
+          format_str: {type: string}
+          use_astropy: {default: false, type: boolean}
+        title: PandasFileComm
+      - properties:
+          filetype:
+            enum: [pickle]
+        title: PickleFileComm
+      - properties:
+          filetype:
+            enum: [ply]
+        title: PlyFileComm
+      - properties:
+          default_flow_style: *id006
+          encoding: *id007
+          filetype:
+            enum: [yaml]
+          indent:
+            default: "\t"
+            type: [string, int]
+        title: YAMLFileComm
+    description: Schema for file components.
+    title: file
+  model:
+    $id: '#model'
+    allOf:
+    - additionalProperties: false
+      dependencies:
+        driver: [args]
+      properties:
+        args:
+          items: {type: string}
+          type: array
+        builddir: &id008 {type: string}
+        cc: &id011 {type: string}
+        client_of:
+          default: []
+          items: {type: string}
+          type: array
+        cmakeargs: &id009
+          default: []
+          items: {type: string}
+          type: array
+        driver: {type: string}
+        inputs:
+          default: []
+          items: {$ref: '#/definitions/comm'}
+          type: array
+        is_server: {default: false, type: boolean}
+        language:
+          enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
+          type: string
+        make_command: {default: make, type: string}
+        makedir: {type: string}
+        makefile: {default: Makefile, type: string}
+        name: {type: string}
+        outputs:
+          default: []
+          items: {$ref: '#/definitions/comm'}
+          type: array
+        overwrite: &id012 {default: true, type: boolean}
+        sourcedir: &id010 {type: string}
+        strace_flags:
+          default: []
+          items: {type: string}
+          type: array
+        valgrind_flags:
+          default: [--leak-check=full]
+          items: {type: string}
+          type: array
+        with_strace: {default: false, type: boolean}
+        with_valgrind: {default: false, type: boolean}
+        working_dir: {type: string}
+      required: [name, language, args, working_dir]
+      type: object
+    - anyOf:
+      - properties:
+          builddir: *id008
+          cmakeargs: *id009
+          language:
+            enum: [cmake]
+          sourcedir: *id010
+        title: CMakeModelDriver
+      - properties:
+          cc: *id011
+          language:
+            enum: [c, c++, cpp]
+          overwrite: *id012
+        title: GCCModelDriver
+      - properties:
+          language:
+            enum: [lpy]
+        title: LPyModelDriver
+      - properties:
+          language:
+            enum: [make]
+        title: MakeModelDriver
+      - properties:
+          language:
+            enum: [matlab]
+        title: MatlabModelDriver
+      - properties:
+          language:
+            enum: [executable]
+        title: ModelDriver
+      - properties:
+          language:
+            enum: [python]
+        title: PythonModelDriver
+    description: Schema for model components.
+    title: model
+description: Schema for yggdrasil YAML input files.
+properties:
+  models:
+    items: {$ref: '#/definitions/model'}
+    minItems: 1
+    type: array
+  connections:
+    items: {$ref: '#/definitions/connection'}
+    type: array
+required: [models]
+title: YAML Schema
+type: object

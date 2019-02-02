@@ -1,5 +1,5 @@
 import os
-from cis_interface.examples import source, yamls
+from yggdrasil.examples import source, yamls
 
 
 rst_dir = os.path.dirname(os.path.abspath(__file__))

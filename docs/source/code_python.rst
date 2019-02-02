@@ -7,12 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 1
 	   
-   cis_interface.interface
-   cis_interface.serialize
-   cis_interface.dataio
-   cis_interface.drivers
-   cis_interface.examples
+   yggdrasil.interface
+   yggdrasil.serialize
+   yggdrasil.dataio
+   yggdrasil.drivers
+   yggdrasil.examples
 	      
-.. include:: cis_interface.inc
+.. include:: yggdrasil.inc
    :start-line: 16
 	     

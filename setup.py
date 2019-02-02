@@ -6,7 +6,7 @@ from distutils.sysconfig import get_python_lib
 import versioneer
 import install_matlab_engine
 import create_coveragerc
-cis_ver = versioneer.get_version()
+ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -30,7 +30,7 @@ else:
 
 
 # Determine if rapidjson installed and parse user defined location
-rj_include_dir0 = os.path.join(ROOT_PATH, 'cis_interface', 'rapidjson', 'include')
+rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
 for idx, arg in enumerate(sys.argv[:]):
     if ((arg.startswith('--rj-include-dir=')
          or arg.startswith('--rapidjson-include-dir'))):
@@ -46,7 +46,7 @@ if not os.path.isdir(rj_include_dir):
                        "'git submodule update --init --recursive' "
                        "from inside the repository.")
 if rj_include_dir != rj_include_dir0:
-    def_config_file = os.path.join(ROOT_PATH, 'cis_interface', 'defaults.cfg')
+    def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
     try:
         import ConfigParser as configparser
     except ImportError:
@@ -101,24 +101,24 @@ if '--user' in sys.argv:
                                                '../../../bin/'))
     warnings.warn("When installing locally, you may need to add the script " +
                   "directory to your path manually in order to have access " +
-                  "to the command line entry points (e.g. cisrun). " +
-                  "If 'cisrun' is not a recognized command, try adding " +
+                  "to the command line entry points (e.g. yggrun). " +
+                  "If 'yggrun' is not a recognized command, try adding " +
                   "'%s' to your PATH." % script_dir)
     
 setup(
-    name="cis_interface",
+    name="yggdrasil-framework",
     packages=find_packages(),
     include_package_data=True,
-    version=cis_ver,
+    version=ygg_ver,
     cmdclass=versioneer.get_cmdclass(),
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,
     author="Meagan Lang",
     author_email="langmm.astro@gmail.com",
-    url="https://github.com/cropsinsilico/cis_interface",
+    url="https://github.com/cropsinsilico/yggdrasil",
     download_url=(
-        "https://github.com/cropsinsilico/cis_interface/archive/%s.tar.gz" % cis_ver),
+        "https://github.com/cropsinsilico/yggdrasil/archive/%s.tar.gz" % ygg_ver),
     keywords=["plants", "simulation", "models", "framework"],
     install_requires=requirements,
     tests_require=test_requirements,
@@ -135,18 +135,19 @@ setup(
         "Development Status :: 3 - Alpha",
     ],
     entry_points={
-        'console_scripts': ['cisrun=cis_interface.command_line:cisrun',
-                            'ciscc=cis_interface.command_line:ciscc',
-                            'cisccflags=cis_interface.command_line:cc_flags',
-                            'cisldflags=cis_interface.command_line:ld_flags',
-                            'cistest=cis_interface:run_nose',
-                            'cisschema=cis_interface.command_line:regen_schema',
-                            'cisbuildapi_c=cis_interface.command_line:rebuild_c_api',
-                            'cisconfig=cis_interface.command_line:update_config',
-                            'cistime_comm=cis_interface.command_line:cistime_comm',
-                            'cistime_lang=cis_interface.command_line:cistime_lang',
-                            'cistime_os=cis_interface.command_line:cistime_os',
-                            'cistime_py=cis_interface.command_line:cistime_py'],
+        'console_scripts': ['yggrun=yggdrasil.command_line:yggrun',
+                            'yggcc=yggdrasil.command_line:yggcc',
+                            'yggccflags=yggdrasil.command_line:cc_flags',
+                            'yggldflags=yggdrasil.command_line:ld_flags',
+                            'yggtest=yggdrasil:run_nose',
+                            'yggschema=yggdrasil.command_line:regen_schema',
+                            'yggbuildapi_c=yggdrasil.command_line:rebuild_c_api',
+                            'yggconfig=yggdrasil.command_line:update_config',
+                            'yggtime_comm=yggdrasil.command_line:yggtime_comm',
+                            'yggtime_lang=yggdrasil.command_line:yggtime_lang',
+                            'yggtime_os=yggdrasil.command_line:yggtime_os',
+                            'yggtime_py=yggdrasil.command_line:yggtime_py',
+                            'yggtime_paper=yggdrasil.command_line:yggtime_paper'],
     },
     license="BSD",
 )

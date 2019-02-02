@@ -3,19 +3,19 @@ C Serialize API
 
 
 .. autodoxygenfile:: AsciiTableSerialize.h
-   :project: cis_interface
+   :project: yggdrasil
 
 .. autodoxygenfile:: FormatSerialize.h
-   :project: cis_interface
+   :project: yggdrasil
 
 .. autodoxygenfile:: ObjSerialize.h
-   :project: cis_interface
+   :project: yggdrasil
 
 .. autodoxygenfile:: PlySerialize.h
-   :project: cis_interface
+   :project: yggdrasil
 
 .. autodoxygenfile:: SerializeBase.h
-   :project: cis_interface
+   :project: yggdrasil
 
 .. autodoxygenfile:: serialize.h
-   :project: cis_interface
+   :project: yggdrasil

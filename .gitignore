@@ -1,7 +1,7 @@
 
 # Copies of test input files
-cis_interface/tests/scripts/gcc_model.out
-cis_interface/tests/scripts/Makefile
+yggdrasil/tests/scripts/gcc_model.out
+yggdrasil/tests/scripts/Makefile
 
 # Library things
 *.a
@@ -14,11 +14,10 @@ cis_interface/tests/scripts/Makefile
 docs/build
 docs/source/cis_interface.inc
 docs/source/cis_interface*.rst
+docs/source/yggdrasil.inc
+docs/source/yggdrasil*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
-
-# Plots for timing purposes
-scaling_*.png
 
 # Coverage
 .coveragerc
@@ -51,7 +50,7 @@ tmp/
 
 
 # Packaging things
-cis_interface.egg-info
+yggdrasil.egg-info
 dist/
 build/
 

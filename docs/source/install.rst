@@ -7,14 +7,14 @@ Installation
 Conda Installation (recommended)
 --------------------------------
 
-There are conda distributions available for |cis_interface| from 
-`conda-forge <https://github.com/conda-forge/cis_interface-feedstock>`_. 
-You can install |cis_interface| from conda-forge by calling::
+There are conda distributions available for |yggdrasil| from 
+`conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_. 
+You can install |yggdrasil| from conda-forge by calling::
 
-  $ conda install -c conda-forge cis_interface
+  $ conda install -c conda-forge yggdrasil
 
 from your terminal prompt (or Anaconda prompt on Windows). This will 
-install |cis_interface| and all of its dependencies in your active
+install |yggdrasil| and all of its dependencies in your active
 conda environment from the ``conda-forge`` channel.
 
 
@@ -22,31 +22,31 @@ Manual Installation
 -------------------
 
 .. note::
-   Before installing |cis_interface| from ``pip`` or source, you 
+   Before installing |yggdrasil| from ``pip`` or source, you 
    should install the non-Python dependencies, particularly the
    ZeroMQ C and C++ libraries (see below).
 
-If you do not want to use conda, |cis_interface| can also be installed 
-from either `PyPI <https://pypi.org/project/cis_interface/>`_ 
+If you do not want to use conda, |yggdrasil| can also be installed 
+from either `PyPI <https://pypi.org/project/yggdrasil-framework/>`_ 
 using ``pip``::
 
-  $ pip install cis_interface
+  $ pip install yggdrasil-framework
 
 or by cloning the `Git <https://git-scm.com/>`_ repository on
-`Github <https://github.com/cropsinsilico/cis_interface>`_::
+`Github <https://github.com/cropsinsilico/yggdrasil>`_::
 
-  $ git clone https://github.com/cropsinsilico/cis_interface.git
+  $ git clone https://github.com/cropsinsilico/yggdrasil.git
 
 and then building the distribution.::
 
-  $ cd cis_interface
+  $ cd yggdrasil
   $ python setup.py install
 
 If you do not have admin privileges on the target machine, ``--user`` can be
 added to the end of either the ``pip`` or ``setup.py`` installation commands.
 When using the ``--user``, you may need to add the directory containing the 
 entry point scripts to your ``PATH`` environment variable in order to use 
-|cis_interface| command line tools (e.g. ``cisrun``) without specifying 
+|yggdrasil| command line tools (e.g. ``yggrun``) without specifying 
 their full path. Usually, this directory can be found using the following
 Python commands::
 
@@ -76,18 +76,18 @@ Additional Steps on Windows
 
 As local communication on Windows is handled by ZeroMQ, running models written
 in C or C++ will require installing the ZeroMQ libraries for C and C++. 
-If you install |cis_interface| using conda, these will be installed 
+If you install |yggdrasil| using conda, these will be installed 
 automatically as depencies. If you are not using conda, you will need to 
 install them yourself.
 
 Instructions for installing the ZeroMQ C and C++ libraries can be found
 `here <https://github.com/zeromq/czmq#building-and-installing>`_
-At install, |cis_interface| will attempt to search for those libraries.
+At install, |yggdrasil| will attempt to search for those libraries.
 To speed up the search you can (temporarily) add the directories 
 containing the libraries to your PATH environment variable prior to 
-running one of the above install commands. If |cis_interface| complains
+running one of the above install commands. If |yggdrasil| complains
 that it cannot find these libraries, you can manually set them in your
-``.cis_interface.cfg`` file (See :ref:`Configuration Options <config_rst>`).
+``.yggdrasil.cfg`` file (See :ref:`Configuration Options <config_rst>`).
 
 .. note::
    Although not required, the ZeroMQ libraries are also recommended for message 
@@ -102,7 +102,7 @@ Additional Steps for Matlab Models
 
 To run Matlab models, you will also need to install the Matlab engine for 
 Python. This requires that you have an existing Matlab installation and license.
-|cis_interface| will attempt to install the Matlab engine for Python at
+|yggdrasil| will attempt to install the Matlab engine for Python at
 install, but should it fail or if you want to use a non-default version of Matlab,
 you can also do it manually.
 
@@ -111,7 +111,7 @@ Instructions for installing the Matlab engine as a python package can be found o
 
 .. note::
    The version of Matlab that you are using will determine the versions of 
-   Python that you can use with |cis_interface|. The chart below shows the 
+   Python that you can use with |yggdrasil|. The chart below shows the 
    versions of Python that are compatible with several versions of Matlab. 
    If you are using an incompatible version, the instructions above for manually 
    installing the Matlab engine as a Python package will fail with an error 
@@ -130,13 +130,11 @@ Additional Steps for RabbitMQ Message Passing
 ---------------------------------------------
 
 RabbitMQ connections allow messages to be passed between models when the
-models are not running on the same machine. To use these connections
-(those with the prefix 'RMQ'), the framework must have access to a
+models are not running on the same machine. To use these connections, 
+the framework must have access to a
 RabbitMQ server. If you have access to an existing RabbitMQ server,
-the information for that server can either be provided to the
-RabbitMQ connection driver
-(See :class:`cis_interface.drivers.RMQDriver.RMQDriver`) or added
-to the cis_interface config file (See
+the information for that server can either be provided via the |yggdrasil|
+config file (See
 :ref:`Configuration Options <config_rst>` for information on setting
 config options).
 

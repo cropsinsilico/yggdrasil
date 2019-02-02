@@ -8,7 +8,7 @@ would required sending the input variable(s) to the model being called and
 then sending the output variables(s) back to the calling model. We refer to 
 this as a Remote Procedure Call (RPC). The model being called can be considered 
 a server providing its calculations as a service to the client (the calling model). 
-The |cis_interface| provides options for treating models as server and clients.
+The |yggdrasil| provides options for treating models as server and clients.
 
 
 One Server, One Client
@@ -22,11 +22,11 @@ disconnected.
 
 .. include:: examples/rpc_lesson1_src.rst
 
-The interface server-side API call (CisRpcServer for Python), 
+The interface server-side API call (YggRpcServer for Python), 
 requires 3 input variables: the name of the server channel (this will be 
 the name of the server model), a format string for input to the server model, 
 and a format string for output from the server model. The client-side API call 
-(CisRpcClient for Python), also requires 3 input variables: the name of the 
+(YggRpcClient for Python), also requires 3 input variables: the name of the 
 client channel (this is the name of the server model joined with the name of 
 the client model by an underscore, ``<server>_<client>``, a format string for 
 input to the server model, and a format string for output form the server 

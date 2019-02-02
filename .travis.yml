@@ -21,19 +21,19 @@ matrix:
     - python: 2.7
       env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - python: 2.7
-      env: INSTALLRMQ=1 INSTALLLPY=1 CIS_ENABLE_LONG_TESTS=1
+      env: INSTALLRMQ=1 INSTALLLPY=1 YGG_ENABLE_LONG_TESTS=1
     - python: 3.4
     - python: 3.5
       env: INSTALLAPY=1
     - python: 3.6
       env: INSTALLZMQ=0 INSTALLRMQ=0
     - python: 3.6
-      env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
+      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
     - python: 3.7
       dist: xenial
       sudo: true
     - os: osx
-      env: INSTALLRMQ=0 INSTALLZMQ=0 TRAVIS_PYTHON_VERSION=2.7 CIS_ENABLE_LONG_TESTS=1
+      env: INSTALLRMQ=0 INSTALLZMQ=0 TRAVIS_PYTHON_VERSION=2.7 YGG_ENABLE_LONG_TESTS=1
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -43,7 +43,7 @@ matrix:
           # `cache` does not support `env`-like `global` so copy-paste from top
           # - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
     - os: osx
-      env: INSTALLRMQ=0 DEPLOYPYPI=1 TRAVIS_PYTHON_VERSION=3.6 CIS_ENABLE_LONG_TESTS=1
+      env: INSTALLRMQ=0 DEPLOYPYPI=1 TRAVIS_PYTHON_VERSION=3.6 YGG_ENABLE_LONG_TESTS=1
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -160,16 +160,16 @@ install:
     pip install $NUMPY
     pip install $MATPLOTLIB
     pip install nose coverage coveralls codecov flake8
-    # Install cis_interface
+    # Install yggdrasil
     pip install -e .
 
 before_script:
   - |
-    flake8 cis_interface
+    flake8 yggdrasil
 
 script:
   - |
-    nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface
+    nosetests -svx --nologcapture --with-coverage --cover-package=yggdrasil
 
 after_success:
   - coveralls

@@ -41,10 +41,10 @@ environment:
       INSTALLZMQ: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
-      CIS_ENABLE_LONG_TESTS: 1
+      YGG_ENABLE_LONG_TESTS: 1
     - platform: x64
       PYTHON_VERSION: "3.6"
-      CIS_ENABLE_LONG_TESTS: 1
+      YGG_ENABLE_LONG_TESTS: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
@@ -102,12 +102,12 @@ install:
   # - "pip install zmq"
   - "conda install --yes -c conda-forge rapidjson"
 
-  # Install cis_interface allowing pip to resolve requirements
+  # Install yggdrasil allowing pip to resolve requirements
   - "pip install -e ."
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
-  - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
+  - 'C:\Users\appveyor\.yggdrasil.cfg -> setup.py'
   - libsodium    -> ci\install-czmq_windows.bat
   - libzmq       -> ci\install-czmq_windows.bat
   - build_libzmq -> ci\install-czmq_windows.bat
@@ -118,10 +118,10 @@ cache:
 build: false
 
 before_test:
-  - "flake8 cis_interface"
+  - "flake8 yggdrasil"
 
 test_script:
-  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx"
+  - "nosetests --nologcapture --with-coverage --cover-package=yggdrasil -svx"
 
 after_test:
   - "codecov"

@@ -28,10 +28,10 @@ Python API
 
 ::
 
-  from cis_interface.interface.CisInterface import CisInput, CisOutput
+  from yggdrasil.interface.YggInterface import YggInput, YggOutput
 
-  input = CisInput('input_name')
-  output = CisOutput('output_name', '%f\t%f\n')
+  input = YggInput('input_name')
+  output = YggOutput('output_name', '%f\t%f\n')
 
   flag, data = input.recv()
   flag = output.send(1.0, 2.0)
@@ -42,8 +42,8 @@ Matlab API
 
 ::
 
-  input = CisInterface('CisInput', 'input_name');
-  output = CisInterface('CisOutput', 'output_name', '%f\t%f\n');
+  input = YggInterface('YggInput', 'input_name');
+  output = YggInterface('YggOutput', 'output_name', '%f\t%f\n');
 
   [flag, data] = input.recv();
   flag = output.send(1.0, 2.0);
@@ -54,16 +54,16 @@ C API
 
 ::
 
-  #include "CisInterface.h"
+  #include "YggInterface.h"
 
-  cisInput_t input = cisInput("input_name");
-  cisOutput_t output = cisOutput("output_name", "%f\t%f\n");
+  yggInput_t input = yggInput("input_name");
+  yggOutput_t output = yggOutput("output_name", "%f\t%f\n");
 
   float a;
   float b = 1;
   float c = 2;
-  int flag = cisRecv(input, &a);
-  flag = cisSend(output, b, c);
+  int flag = yggRecv(input, &a);
+  flag = yggSend(output, b, c);
 
 
 C++ API
@@ -71,10 +71,10 @@ C++ API
 
 ::
 
-  #include "CisInterface.hpp"
+  #include "YggInterface.hpp"
 
-  CisInput input("input_name");
-  CisOutput output("output_name", "%f\t%f\n");
+  YggInput input("input_name");
+  YggOutput output("output_name", "%f\t%f\n");
 
   float a;
   float b = 1;

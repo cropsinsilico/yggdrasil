@@ -1,5 +1,5 @@
 C Interface
 ===========
 
-.. autodoxygenfile:: CisInterface.h
-   :project: cis_interface
+.. autodoxygenfile:: YggInterface.h
+   :project: yggdrasil

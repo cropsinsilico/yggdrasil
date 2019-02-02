@@ -1,0 +1,29 @@
+IDIR = .
+CC = gcc
+LINK = g++
+CFLAGS = -I$(IDIR) $(YGGCCFLAGS)
+
+ODIR = .
+LDIR = .
+
+LIBS = -lm $(YGGLDFLAGS)
+
+_DEPS = hellofunc.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+
+_OBJ = gcc_model.o hellofunc.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+.PHONY: all
+all: gcc_model
+
+$(ODIR)/%.o: %.c $(DEPS)
+	$(CC) -c $(CFLAGS) $< -o $@
+
+gcc_model: $(OBJ)
+	$(LINK) -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm -f $(ODIR)/*.o *~ gcc_model $(IDIR)/*~ 

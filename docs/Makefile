@@ -4,10 +4,10 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = cis_interface
+SPHINXPROJ    = yggdrasil
 SOURCEDIR     = source
 BUILDDIR      = build
-REPODIR       = ../../cis_interface_docs
+REPODIR       = ../../yggdrasil_docs
 DOXYDIR       = doxy
 
 # Put it first so that "make" without argument is like "make help".
@@ -25,8 +25,8 @@ ghpages: autodoc
 .PHONY: autodoc
 autodoc: doxy
 	python $(SOURCEDIR)/examples/make_example_rst.py
-	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../cis_interface # ../cis_interface/tests/* ../cis_interface/*/tests/*
-	mv $(SOURCEDIR)/cis_interface.rst $(SOURCEDIR)/cis_interface.inc
+	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../yggdrasil # ../yggdrasil/tests/* ../yggdrasil/*/tests/*
+	mv $(SOURCEDIR)/yggdrasil.rst $(SOURCEDIR)/yggdrasil.inc
 	make html
 
 .PHONY: doxy
