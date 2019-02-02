@@ -14,6 +14,7 @@ recursive-include cis_interface *.lpy
 recursive-include cis_interface *.ply
 recursive-include cis_interface *.obj
 recursive-include cis_interface *.txt
+recursive-include cis_interface *.json
 recursive-include cis_interface/examples *.py
 recursive-include cis_interface/tests/scripts *.py
 include cis_interface/drivers/matlab_screenrc
