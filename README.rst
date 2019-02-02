@@ -31,7 +31,7 @@ it.
    `here <https://github.com/cropsinsilico/yggdrasil>`__ 
    and the new documentation can be found 
    `here <https://cropsinsilico.github.io/yggdrasil/>`__. 
-   Future versions of the ``yggdrasil`` can be installed from 
+   Future versions of the ``yggdrasil`` package be installed from 
    PyPI via ``pip install yggdrasil-framework``. We apologize for 
    any inconvenince this change causes, but feel the new name 
    better reflects the spirit of the project.
