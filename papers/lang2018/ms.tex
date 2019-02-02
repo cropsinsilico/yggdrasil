@@ -129,17 +129,17 @@
 \newcommand{\addref}{{\color{red}(ref. needed)}}
 \newcommand{\Msol}{\,M$_{\odot}$}
 \newcommand{\TB}{\,Tbytes}
-\newcommand{\pippkg}{\todo{\tt yggdrasil-framework}}
-\newcommand{\condapkg}{\todo{\tt yggdrasil}}
+\newcommand{\pippkg}{{\tt yggdrasil-framework}}
+\newcommand{\condapkg}{{\tt yggdrasil}}
 \newcommand{\pkg}{{\tt yggdrasil}{}}
 \newcommand{\cis}{{\tt cis\_interface}{}}
-\newcommand{\pkglink}{\todo{cis\_interface}}
+\newcommand{\pkglink}{yggdrasil}
 %\newcommand{\pkg}{{\tt \todo{cis\_interface}}{}}
 \newcommand{\pkgrun}{{\tt yggrun}}
 \newcommand{\A}{Appendix{ }}
-\newcommand{\hrefgit}[1]{\href{https://github.com/cropsinsilico/yggdrasil}{\todo{#1}}}
-\newcommand{\hrefdoc}[1]{\href{https://cropsinsilico.github.io/yggdrasil/}{\todo{#1}}}
-\newcommand{\hrefhack}[1]{\href{https://cropsinsilico.github.io/yggdrasil/hackathon2018/index.html}{\todo{#1}}}
+\newcommand{\hrefgit}[1]{\href{https://github.com/cropsinsilico/yggdrasil}{{#1}}}
+\newcommand{\hrefdoc}[1]{\href{https://cropsinsilico.github.io/yggdrasil/}{{#1}}}
+\newcommand{\hrefhack}[1]{\href{https://cropsinsilico.github.io/yggdrasil/hackathon2018/index.html}{{#1}}}
 
 %---------------------------------------------------------------------------------
 % SOURCE CODE
@@ -583,7 +583,7 @@ Prior to any calls, both model wrappers must first locate the necessary {\pkg} a
 
 The first step in each model wrapper is to connect to the appropriate channels via the {\pkg} interface. This step occurs on lines 14-17 in the root model wrapper (Listing \ref{lst:wrap:root}) and lines 8-13 in the shoot model wrapper (Listing \ref{lst:wrap:shoot}). Regardless of the language, each has a similar call signature. Inputs require a single input that is a string specifying the name of the model input from the model YAML that the returned object should access. Outputs are similar in that their first argument is a string specifying the name of the model output from the mode YAML that the returned object should access. In addition, outputs can also be provided with a format string that tells {\pkg} interface what data type to expect how the output should be formatted if it is sent to a file. Additional information about how these strings are processed can be found in the ``C-Style Format Strings" section of the documentation\footnote{{\tt https://cropsinsilico.github.io/\pkglink/c\_format\_strings.html}}.
 
-The next step in each model wrapper is to receive the static input variables (those that are not being looped over). This step occurs on lines 19-33 in the root model wrapper (Listing \ref{lst:wrap:root}) and lines 15-34 in the shoot model wrapper (Listing \ref{lst:wrap:shoot}). Next, each model wrapper sends the initial mass to the output so that the output will contain the entire mass history. This occurs on lines 58-63 in the root model wrapper and lines 36-39 in the shoot model wrapper. The majority of these lines are devoted to error handling and print statements. The syntax for sending/receiving messages differs slightly from language to language, but each will return a flag indicating if the send/receive was successful or not. If an input channel is still open, a receive call will block until the channel is closed or a message is received. If the input channel is closed (either because of an error or because it was closed by the source), the flag will indicate this and the received message should not be used. If an output channel is open, a send call will return immediately while a worker thread handles asynchronous completion of the send request. If an output channel is closed, a send call will return immediately with a flag indicating failure. Additional information about the interface calls for sending and receiving can be found in the ``Model Interface" section of the documentation\footnote{{\tt \todo{link}}}.
+The next step in each model wrapper is to receive the static input variables (those that are not being looped over). This step occurs on lines 19-33 in the root model wrapper (Listing \ref{lst:wrap:root}) and lines 15-34 in the shoot model wrapper (Listing \ref{lst:wrap:shoot}). Next, each model wrapper sends the initial mass to the output so that the output will contain the entire mass history. This occurs on lines 58-63 in the root model wrapper and lines 36-39 in the shoot model wrapper. The majority of these lines are devoted to error handling and print statements. The syntax for sending/receiving messages differs slightly from language to language, but each will return a flag indicating if the send/receive was successful or not. If an input channel is still open, a receive call will block until the channel is closed or a message is received. If the input channel is closed (either because of an error or because it was closed by the source), the flag will indicate this and the received message should not be used. If an output channel is open, a send call will return immediately while a worker thread handles asynchronous completion of the send request. If an output channel is closed, a send call will return immediately with a flag indicating failure. Additional information about the interface calls for sending and receiving can be found in the ``Model Interface" section of the documentation\footnote{{\tt https://cropsinsilico.github.io/\pkglink/model\_interface.html}}.
 
 Once the static variables have been received and the initial masses have been sent to output, both model wrappers enter their while loop. The flag returned by the receive call for the new time step is then used to decide if the loop should be broken (lines 46-52 in the root model wrapper and lines 45-51 in the shoot model wrapper). In the case of the shoot model wrapper, a failure to also receive the root mass for the next time step results in an error as it is required that there be a new root mass for each new time step (lines 53-59). Finally, both model wrappers make calls to the appropriate model functions, send the result to the output, and advance the masses to the next time step.
 
