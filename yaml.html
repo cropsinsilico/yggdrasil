@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Files &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>YAML Files &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -108,6 +108,7 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
@@ -127,7 +128,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -184,7 +185,7 @@ or more YAML files. YAML files have a human readable structure that can be parse
 by many different programming languages to recreate data structures. While the
 YAML language can express very complex data structures (more information can be
 found <a class="reference external" href="http://yaml.org/">here</a>), only a few key concepts
-are needed to create a YAML file for use with the cis_interface framework.</p>
+are needed to create a YAML file for use with the yggdrasil framework.</p>
 <ul class="simple">
 <li>Indentation: Entries with the same indentation belong to the same collection.</li>
 <li>Sequences: Entries that begin with a dash and a space (- ) are members
@@ -195,7 +196,7 @@ or a mix of both.</li>
 </ul>
 <div class="section" id="model-options">
 <h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this headline">¶</a></h2>
-<p>At the root level of a cis_interface YAML, should be a mapping key <code class="docutils literal notranslate"><span class="pre">model:</span></code>
+<p>At the root level of a yggdrasil YAML, should be a mapping key <code class="docutils literal notranslate"><span class="pre">model:</span></code>
 or <code class="docutils literal notranslate"><span class="pre">models:</span></code>. This denotes information pertaining to the model(s) that should
 be run. The value for this key can be a single model entry:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
@@ -294,14 +295,14 @@ to another model, this may be ommitted.</td>
 <tr class="row-even"><td>is_server</td>
 <td>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, this model will be considered to function as a
 server for one or more models. The corresponding channel that
-should be passed to the cis_interface API will be the name of
+should be passed to the yggdrasil API will be the name of
 the model.</td>
 </tr>
 <tr class="row-odd"><td>client_of</td>
 <td>The names of one or more models that this model will call as a
 server. If there are more than one, this should be specified as
 a sequence collection. The corresponding channel(s) that should
-be passed to the cis_interface API will be the name of the
+be passed to the yggdrasil API will be the name of the
 server model joined with the name of the client model with an
 underscore <code class="docutils literal notranslate"><span class="pre">&lt;server_model&gt;_&lt;client_model&gt;</span></code>. There will be one
 channel created for each server the model is a client of.</td>
@@ -461,7 +462,7 @@ should be a mapping collection with, at minimum, the following keys:</p>
 <tbody valign="top">
 <tr class="row-even"><td>name</td>
 <td>The name of the channel that will be provided by the model to the
-cis_interface API. This can be any text, but should be unique.</td>
+yggdrasil API. This can be any text, but should be unique.</td>
 </tr>
 <tr class="row-odd"><td>driver</td>
 <td>The name of the input/output driver class that should be used.

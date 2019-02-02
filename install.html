@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>Installation &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
@@ -123,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -177,37 +178,37 @@
 <span id="install-rst"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="conda-installation-recommended">
 <h2>Conda Installation (recommended)<a class="headerlink" href="#conda-installation-recommended" title="Permalink to this headline">¶</a></h2>
-<p>There are conda distributions available for cis_interface from
-<a class="reference external" href="https://github.com/conda-forge/cis_interface-feedstock">conda-forge</a>.
-You can install cis_interface from conda-forge by calling:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge cis_interface
+<p>There are conda distributions available for yggdrasil from
+<a class="reference external" href="https://github.com/conda-forge/yggdrasil-feedstock">conda-forge</a>.
+You can install yggdrasil from conda-forge by calling:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -c conda-forge yggdrasil
 </pre></div>
 </div>
 <p>from your terminal prompt (or Anaconda prompt on Windows). This will
-install cis_interface and all of its dependencies in your active
+install yggdrasil and all of its dependencies in your active
 conda environment from the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> channel.</p>
 </div>
 <div class="section" id="manual-installation">
 <h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Before installing cis_interface from <code class="docutils literal notranslate"><span class="pre">pip</span></code> or source, you
+<p class="last">Before installing yggdrasil from <code class="docutils literal notranslate"><span class="pre">pip</span></code> or source, you
 should install the non-Python dependencies, particularly the
 ZeroMQ C and C++ libraries (see below).</p>
 </div>
-<p>If you do not want to use conda, cis_interface can also be installed
-from either <a class="reference external" href="https://pypi.org/project/cis_interface/">PyPI</a>
+<p>If you do not want to use conda, yggdrasil can also be installed
+from either <a class="reference external" href="https://pypi.org/project/yggdrasil/">PyPI</a>
 using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install cis_interface
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install yggdrasil
 </pre></div>
 </div>
 <p>or by cloning the <a class="reference external" href="https://git-scm.com/">Git</a> repository on
-<a class="reference external" href="https://github.com/cropsinsilico/cis_interface">Github</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/cropsinsilico/cis_interface.git
+<a class="reference external" href="https://github.com/cropsinsilico/yggdrasil">Github</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/cropsinsilico/yggdrasil.git
 </pre></div>
 </div>
 <p>and then building the distribution.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd cis_interface
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd yggdrasil
 $ python setup.py install
 </pre></div>
 </div>
@@ -215,7 +216,7 @@ $ python setup.py install
 added to the end of either the <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> installation commands.
 When using the <code class="docutils literal notranslate"><span class="pre">--user</span></code>, you may need to add the directory containing the
 entry point scripts to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable in order to use
-cis_interface command line tools (e.g. <code class="docutils literal notranslate"><span class="pre">cisrun</span></code>) without specifying
+yggdrasil command line tools (e.g. <code class="docutils literal notranslate"><span class="pre">yggrun</span></code>) without specifying
 their full path. Usually, this directory can be found using the following
 Python commands:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
@@ -243,17 +244,17 @@ Windows (&gt;=7), the following command will permanently modify your path:</p>
 <h2>Additional Steps on Windows<a class="headerlink" href="#additional-steps-on-windows" title="Permalink to this headline">¶</a></h2>
 <p>As local communication on Windows is handled by ZeroMQ, running models written
 in C or C++ will require installing the ZeroMQ libraries for C and C++.
-If you install cis_interface using conda, these will be installed
+If you install yggdrasil using conda, these will be installed
 automatically as depencies. If you are not using conda, you will need to
 install them yourself.</p>
 <p>Instructions for installing the ZeroMQ C and C++ libraries can be found
 <a class="reference external" href="https://github.com/zeromq/czmq#building-and-installing">here</a>
-At install, cis_interface will attempt to search for those libraries.
+At install, yggdrasil will attempt to search for those libraries.
 To speed up the search you can (temporarily) add the directories
 containing the libraries to your PATH environment variable prior to
-running one of the above install commands. If cis_interface complains
+running one of the above install commands. If yggdrasil complains
 that it cannot find these libraries, you can manually set them in your
-<code class="docutils literal notranslate"><span class="pre">.cis_interface.cfg</span></code> file (See <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
+<code class="docutils literal notranslate"><span class="pre">.yggdrasil.cfg</span></code> file (See <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Although not required, the ZeroMQ libraries are also recommended for message
@@ -267,7 +268,7 @@ overhead.</p>
 <h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
 <p>To run Matlab models, you will also need to install the Matlab engine for
 Python. This requires that you have an existing Matlab installation and license.
-cis_interface will attempt to install the Matlab engine for Python at
+yggdrasil will attempt to install the Matlab engine for Python at
 install, but should it fail or if you want to use a non-default version of Matlab,
 you can also do it manually.</p>
 <p>Instructions for installing the Matlab engine as a python package can be found on the
@@ -275,7 +276,7 @@ you can also do it manually.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The version of Matlab that you are using will determine the versions of
-Python that you can use with cis_interface. The chart below shows the
+Python that you can use with yggdrasil. The chart below shows the
 versions of Python that are compatible with several versions of Matlab.
 If you are using an incompatible version, the instructions above for manually
 installing the Matlab engine as a Python package will fail with an error
@@ -307,13 +308,11 @@ message indicating which versions of Python you can use.</p>
 <div class="section" id="additional-steps-for-rabbitmq-message-passing">
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
 <p>RabbitMQ connections allow messages to be passed between models when the
-models are not running on the same machine. To use these connections
-(those with the prefix ‘RMQ’), the framework must have access to a
+models are not running on the same machine. To use these connections,
+the framework must have access to a
 RabbitMQ server. If you have access to an existing RabbitMQ server,
-the information for that server can either be provided to the
-RabbitMQ connection driver
-(See <code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.drivers.RMQDriver.RMQDriver</span></code>) or added
-to the cis_interface config file (See
+the information for that server can either be provided via the yggdrasil
+config file (See
 <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a> for information on setting
 config options).</p>
 <p>Starting a local RabbitMQ Server is also relatively easy. Details on

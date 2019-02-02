@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Formatted I/O &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>Formatted I/O &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -108,6 +108,7 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
@@ -127,7 +128,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -179,7 +180,7 @@
             
   <div class="section" id="formatted-i-o">
 <span id="formatted-io-rst"></span><h1>Formatted I/O<a class="headerlink" href="#formatted-i-o" title="Permalink to this headline">¶</a></h1>
-<p>In addition to passing raw strings, the cis_interface framework also has
+<p>In addition to passing raw strings, the yggdrasil framework also has
 support for formatting/processing messages from/to language native objects.</p>
 <div class="section" id="scalars">
 <h2>Scalars<a class="headerlink" href="#scalars" title="Permalink to this headline">¶</a></h2>
@@ -216,11 +217,11 @@ for initializing channels and sending/receiving to/from them.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -267,11 +268,11 @@ for initializing channels and sending/receiving to/from them.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -351,8 +352,8 @@ rather than all at once:</p>
 <p>Tables can also be passed in a similar manner. For input from a table, the format
 string does not need to be provided and will be determined by the source of the
 table. There are different API classes/functions for I/O from/to table channels
-versus standard channels in each language. (e.g. <code class="docutils literal notranslate"><span class="pre">CisInput</span></code> vs.
-<code class="docutils literal notranslate"><span class="pre">CisAsciiTableInput</span></code> in Python)</p>
+versus standard channels in each language. (e.g. <code class="docutils literal notranslate"><span class="pre">YggInput</span></code> vs.
+<code class="docutils literal notranslate"><span class="pre">YggAsciiTableInput</span></code> in Python)</p>
 <p>Model Code:</p>
 <div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
@@ -381,12 +382,12 @@ versus standard channels in each language. (e.g. <code class="docutils literal n
 25
 26
 27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisAsciiTableInput</span><span class="p">,</span> <span class="n">CisAsciiTableOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggAsciiTableInput</span><span class="p">,</span> <span class="n">YggAsciiTableOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisAsciiTableInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisAsciiTableOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggAsciiTableInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggAsciiTableOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -436,12 +437,12 @@ versus standard channels in each language. (e.g. <code class="docutils literal n
 25
 26
 27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisAsciiTableInput</span><span class="p">,</span> <span class="n">CisAsciiTableOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggAsciiTableInput</span><span class="p">,</span> <span class="n">YggAsciiTableOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisAsciiTableInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisAsciiTableOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggAsciiTableInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggAsciiTableOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -466,7 +467,7 @@ versus standard channels in each language. (e.g. <code class="docutils literal n
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io2.html">Example in other languages</a>)</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">table</span></code> options in the YAML tell the
-cis_interface framework that the file should be read/written as a table
+yggdrasil framework that the file should be read/written as a table
 row-by-row including verification that each row conforms with the table.</p>
 <p>Model YAML:</p>
 <div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
@@ -550,12 +551,12 @@ arguments of the table API classes/functions.</p>
 26
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisAsciiArrayInput</span><span class="p">,</span> <span class="n">CisAsciiArrayOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggAsciiArrayInput</span><span class="p">,</span> <span class="n">YggAsciiArrayOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisAsciiArrayInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisAsciiArrayOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggAsciiArrayInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggAsciiArrayOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -607,12 +608,12 @@ arguments of the table API classes/functions.</p>
 26
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisAsciiArrayInput</span><span class="p">,</span> <span class="n">CisAsciiArrayOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggAsciiArrayInput</span><span class="p">,</span> <span class="n">YggAsciiArrayOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisAsciiArrayInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisAsciiArrayOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggAsciiArrayInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggAsciiArrayOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -733,12 +734,12 @@ data frames.</p>
 26
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPandasInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -790,12 +791,12 @@ data frames.</p>
 26
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPandasInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -920,12 +921,12 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisPlyInput</span><span class="p">,</span> <span class="n">CisPlyOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPlyInput</span><span class="p">,</span> <span class="n">YggPlyOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPlyInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPlyOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPlyInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPlyOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -977,12 +978,12 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisPlyInput</span><span class="p">,</span> <span class="n">CisPlyOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPlyInput</span><span class="p">,</span> <span class="n">YggPlyOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPlyInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPlyOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPlyInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPlyOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1057,8 +1058,8 @@ Ply/Obj file formats.</p>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io5.html">Example in other languages</a>)</p>
 <p>In Python the data is returned as a dictionary subclass
-(<code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.PlySerialize.PlyDict</span></code> or
-<code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.ObjSerialize.ObjDict</span></code>) while in
+(<code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.PlySerialize.PlyDict</span></code> or
+<code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.ObjSerialize.ObjDict</span></code>) while in
 C/C++ it is returned as a structure (<code class="xref c c-type docutils literal notranslate"><span class="pre">ply_t</span></code> or <code class="xref c c-type docutils literal notranslate"><span class="pre">obj_t</span></code>).</p>
 </div>
 <div class="section" id="id1">
@@ -1094,12 +1095,12 @@ data frames.</p>
 26
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPandasInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1151,12 +1152,12 @@ data frames.</p>
 26
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisPandasInput</span><span class="p">,</span> <span class="n">CisPandasOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggPandasInput</span><span class="p">,</span> <span class="n">YggPandasOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisPandasInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggPandasInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggPandasOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1277,11 +1278,11 @@ delimited format.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1328,11 +1329,11 @@ delimited format.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1454,11 +1455,11 @@ line in the file.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1505,11 +1506,11 @@ line in the file.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1630,11 +1631,11 @@ JSON files.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -1681,11 +1682,11 @@ JSON files.</p>
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>

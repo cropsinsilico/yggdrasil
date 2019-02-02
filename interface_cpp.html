@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>C++ Interface &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>C++ Interface &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -29,8 +29,8 @@
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="C++ DataIO API" href="dataio_cpp.html" />
-    <link rel="prev" title="C++ Code" href="code_cpp.html" /> 
+    <link rel="next" title="Matlab Interface" href="interface_m.html" />
+    <link rel="prev" title="C Interface" href="interface_c.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -97,20 +97,14 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="code_cpp.html">C++ Code</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="code_cpp.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">C++ Interface</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dataio_cpp.html">C++ DataIO API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="model_interface.html">Model Interface</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="interface_py.html">Python Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interface_c.html">C Interface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">C++ Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interface_m.html">Matlab Interface</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
@@ -129,7 +123,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -160,9 +154,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-          <li><a href="code.html">Code</a> &raquo;</li>
-        
-          <li><a href="code_cpp.html">C++ Code</a> &raquo;</li>
+          <li><a href="model_interface.html">Model Interface</a> &raquo;</li>
         
       <li>C++ Interface</li>
     
@@ -186,18 +178,18 @@
   <div class="section" id="c-interface">
 <h1>C++ Interface<a class="headerlink" href="#c-interface" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="_CPPv38CisInput">
-<span id="_CPPv28CisInput"></span><span id="CisInput"></span><span class="target" id="class_cis_input"></span><em class="property">class </em><code class="descname">CisInput</code><a class="headerlink" href="#_CPPv38CisInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>Flag for checking if CisInterface.hpp has already been included. </p>
-<p>C++ interface to cisInput_t functionality.</p>
-<p>The <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a> class is a basic wrapper around the C cisInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic input via an IPC queue. </p>
-<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a>, <a class="reference internal" href="#class_cis_obj_input"><span class="std std-ref">CisObjInput</span></a>, <a class="reference internal" href="#class_cis_ply_input"><span class="std std-ref">CisPlyInput</span></a></p>
+<dt id="_CPPv38YggInput">
+<span id="_CPPv28YggInput"></span><span id="YggInput"></span><span class="target" id="class_ygg_input"></span><em class="property">class </em><code class="descname">YggInput</code><a class="headerlink" href="#_CPPv38YggInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>Flag for checking if YggInterface.hpp has already been included. </p>
+<p>C++ interface to yggInput_t functionality.</p>
+<p>The <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> class is a basic wrapper around the C yggInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic input via an IPC queue. </p>
+<p>Subclassed by <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>, <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>, <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N8CisInput8CisInputEPKc">
-<span id="_CPPv2N8CisInput8CisInputEPKc"></span><span id="CisInput::CisInput__cCP"></span><span class="target" id="class_cis_input_1a5a81811ecb4ea9b3d786ea60522cdcb7"></span><code class="descname">CisInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput8CisInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a>. </p>
+<dt id="_CPPv3N8YggInput8YggInputEPKc">
+<span id="_CPPv2N8YggInput8YggInputEPKc"></span><span id="YggInput::YggInput__cCP"></span><span class="target" id="class_ygg_input_1aba0f47fe2b945efbf029e0a27c14f979"></span><code class="descname">YggInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput8YggInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -209,15 +201,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput8CisInputE10cisInput_t">
-<span id="_CPPv2N8CisInput8CisInputE10cisInput_t"></span><span id="CisInput::CisInput__cisInput_t"></span><span class="target" id="class_cis_input_1a9e6a005bec40db9eacc4bd7c8051c112"></span><code class="descname">CisInput</code><span class="sig-paren">(</span>cisInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput8CisInputE10cisInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N8YggInput8YggInputE10yggInput_t">
+<span id="_CPPv2N8YggInput8YggInputE10yggInput_t"></span><span id="YggInput::YggInput__yggInput_t"></span><span class="target" id="class_ygg_input_1a653d084427c00c558330f3feed0d9df4"></span><code class="descname">YggInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput8YggInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput8CisInputEPKcPKc">
-<span id="_CPPv2N8CisInput8CisInputEPKcPKc"></span><span id="CisInput::CisInput__cCP.cCP"></span><span class="target" id="class_cis_input_1ad39b94867de8741606bef7f1acdcbfd2"></span><code class="descname">CisInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput8CisInputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a> with format. </p>
+<dt id="_CPPv3N8YggInput8YggInputEPKcPKc">
+<span id="_CPPv2N8YggInput8YggInputEPKcPKc"></span><span id="YggInput::YggInput__cCP.cCP"></span><span class="target" id="class_ygg_input_1a574f0975187b352ccc7a39b3d97da65b"></span><code class="descname">YggInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput8YggInputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a> with format. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -230,32 +222,32 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput11_destroy_piEv">
-<span id="_CPPv2N8CisInput11_destroy_piEv"></span><span id="CisInput::_destroy_pi"></span><span class="target" id="class_cis_input_1af098d058831c5aeb24c785daf322d0d3"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N8YggInput11_destroy_piEv">
+<span id="_CPPv2N8YggInput11_destroy_piEv"></span><span id="YggInput::_destroy_pi"></span><span class="target" id="class_ygg_input_1aff8dc1c2931fddf42431e58064ec30d3"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Alias to allow freeing of underlying C struct at the class level. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInputD0Ev">
-<span id="_CPPv2N8CisInputD0Ev"></span><span id="CisInput::~CisInput"></span><span class="target" id="class_cis_input_1a66ff037c37e380abd82e107980f0af44"></span><code class="descname">~CisInput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Destructor for <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a>. See cis_free in CisInterface.h for details. </p>
+<dt id="_CPPv3N8YggInputD0Ev">
+<span id="_CPPv2N8YggInputD0Ev"></span><span id="YggInput::~YggInput"></span><span class="target" id="class_ygg_input_1a9d5ccb52ee46aebcab609eff9cdf0959"></span><code class="descname">~YggInput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_ygg_input"><span class="std std-ref">YggInput</span></a>. See ygg_free in YggInterface.h for details. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput2piEv">
-<span id="_CPPv2N8CisInput2piEv"></span><span id="CisInput::pi"></span><span class="target" id="class_cis_input_1a2b560759fbd797db1dc049e886ce72e5"></span>cisInput_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput2piEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Return the cisInput_t structure. </p>
+<dt id="_CPPv3N8YggInput2piEv">
+<span id="_CPPv2N8YggInput2piEv"></span><span id="YggInput::pi"></span><span class="target" id="class_ygg_input_1af94fea380a83a0f2f43c89fbd8cc2ba7"></span>yggInput_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput2piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the yggInput_t structure. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
-<dd>cisInput_t structure underlying the class. </dd>
+<dd>yggInput_t structure underlying the class. </dd>
 </dl>
 </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput4recvEPcK6size_t">
-<span id="_CPPv2N8CisInput4recvEPcK6size_t"></span><span id="CisInput::recv__cP.sC"></span><span class="target" id="class_cis_input_1aa05f26dd9d8db09e12da739831637a2a"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput4recvEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive a message shorter than CIS_MSG_MAX from the input queue. See cis_recv in CisInterface.h for additional details. </p>
+<dt id="_CPPv3N8YggInput4recvEPcK6size_t">
+<span id="_CPPv2N8YggInput4recvEPcK6size_t"></span><span id="YggInput::recv__cP.sC"></span><span class="target" id="class_ygg_input_1a730e7c5e58c5ef5cf2b7e0c9660db18e"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput4recvEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a message shorter than YGG_MSG_MAX from the input queue. See ygg_recv in YggInterface.h for additional details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
@@ -270,9 +262,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput4recvEKiz">
-<span id="_CPPv2N8CisInput4recvEKiz"></span><span id="CisInput::recv__iC.z"></span><span class="target" id="class_cis_input_1a387134ab4f750a06654946d4b92d412d"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive and parse a message shorter than CIS_MSG_MAX from the input queue. See cisRecv from CisInterface.h for details. </p>
+<dt id="_CPPv3N8YggInput4recvEKiz">
+<span id="_CPPv2N8YggInput4recvEKiz"></span><span id="YggInput::recv__iC.z"></span><span class="target" id="class_ygg_input_1a6b6493c28a41c6f66302d31bb634aa1e"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message shorter than YGG_MSG_MAX from the input queue. See yggRecv from YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
@@ -287,8 +279,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput11recvReallocEKiz">
-<span id="_CPPv2N8CisInput11recvReallocEKiz"></span><span id="CisInput::recvRealloc__iC.z"></span><span class="target" id="class_cis_input_1a40f45ea9c3f787e1287db1787708fcb5"></span>int <code class="descname">recvRealloc</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput11recvReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N8YggInput11recvReallocEKiz">
+<span id="_CPPv2N8YggInput11recvReallocEKiz"></span><span id="YggInput::recvRealloc__iC.z"></span><span class="target" id="class_ygg_input_1a38b8271f204d0c1ea5d258453ec657b6"></span>int <code class="descname">recvRealloc</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput11recvReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message from the input queue, allowing destination variables to be reallocated. The pointers passed must be on heap. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -304,9 +296,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput12recv_nolimitEPPcK6size_t">
-<span id="_CPPv2N8CisInput12recv_nolimitEPPcK6size_t"></span><span id="CisInput::recv_nolimit__cPP.sC"></span><span class="target" id="class_cis_input_1a962f5ebcac9d8b70fe3cd907da6dd3a9"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span>char **<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput12recv_nolimitEPPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive a message larger than CIS_MSG_MAX from the input queue. See cis_recv_nolimit in CisInterface.h for additional details. </p>
+<dt id="_CPPv3N8YggInput12recv_nolimitEPPcK6size_t">
+<span id="_CPPv2N8YggInput12recv_nolimitEPPcK6size_t"></span><span id="YggInput::recv_nolimit__cPP.sC"></span><span class="target" id="class_ygg_input_1ad513540a2cc8c69009fa05a2498628f7"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span>char **<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput12recv_nolimitEPPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a message larger than YGG_MSG_MAX from the input queue. See ygg_recv_nolimit in YggInterface.h for additional details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
@@ -321,9 +313,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N8CisInput12recv_nolimitEKiz">
-<span id="_CPPv2N8CisInput12recv_nolimitEKiz"></span><span id="CisInput::recv_nolimit__iC.z"></span><span class="target" id="class_cis_input_1aa78610915e128dc1ed0d234271d2d656"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8CisInput12recv_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive and parse a message larger than CIS_MSG_MAX from the input queue. See cisRecv from CisInterface.h for details. </p>
+<dt id="_CPPv3N8YggInput12recv_nolimitEKiz">
+<span id="_CPPv2N8YggInput12recv_nolimitEKiz"></span><span id="YggInput::recv_nolimit__iC.z"></span><span class="target" id="class_ygg_input_1ac5edea68d3188b1e22a08aa9ce42c28b"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N8YggInput12recv_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message larger than YGG_MSG_MAX from the input queue. See yggRecv from YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
@@ -341,25 +333,25 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Private Members</p>
 <dl class="member">
-<dt id="_CPPv3N8CisInput3_piE">
-<span id="_CPPv2N8CisInput3_piE"></span><span id="CisInput::_pi__cisInput_t"></span><span class="target" id="class_cis_input_1a2e19f15c0a05515264929f60fbe64121"></span>cisInput_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv3N8CisInput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N8YggInput3_piE">
+<span id="_CPPv2N8YggInput3_piE"></span><span id="YggInput::_pi__yggInput_t"></span><span class="target" id="class_ygg_input_1a98af900e623b307b31c6c980394632a7"></span>yggInput_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv3N8YggInput3_piE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv39CisOutput">
-<span id="_CPPv29CisOutput"></span><span id="CisOutput"></span><span class="target" id="class_cis_output"></span><em class="property">class </em><code class="descname">CisOutput</code><a class="headerlink" href="#_CPPv39CisOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisOutput_t functionality. </p>
-<p>The <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a> class is a basic wrapper around the C cisOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic output via an IPC queue. </p>
-<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a>, <a class="reference internal" href="#class_cis_obj_output"><span class="std std-ref">CisObjOutput</span></a>, <a class="reference internal" href="#class_cis_ply_output"><span class="std std-ref">CisPlyOutput</span></a></p>
+<dt id="_CPPv39YggOutput">
+<span id="_CPPv29YggOutput"></span><span id="YggOutput"></span><span class="target" id="class_ygg_output"></span><em class="property">class </em><code class="descname">YggOutput</code><a class="headerlink" href="#_CPPv39YggOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggOutput_t functionality. </p>
+<p>The <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> class is a basic wrapper around the C yggOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic output via an IPC queue. </p>
+<p>Subclassed by <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>, <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a>, <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N9CisOutput9CisOutputEPKc">
-<span id="_CPPv2N9CisOutput9CisOutputEPKc"></span><span id="CisOutput::CisOutput__cCP"></span><span class="target" id="class_cis_output_1acbe5281010e3dd4617006a03d9c6c06c"></span><code class="descname">CisOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput9CisOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a>. </p>
+<dt id="_CPPv3N9YggOutput9YggOutputEPKc">
+<span id="_CPPv2N9YggOutput9YggOutputEPKc"></span><span id="YggOutput::YggOutput__cCP"></span><span class="target" id="class_ygg_output_1aec62c628332beba733a65bc603be7cb7"></span><code class="descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput9YggOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -371,9 +363,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutput9CisOutputEPKcPKc">
-<span id="_CPPv2N9CisOutput9CisOutputEPKcPKc"></span><span id="CisOutput::CisOutput__cCP.cCP"></span><span class="target" id="class_cis_output_1a276eaee68d97cba54726752784d6c4df"></span><code class="descname">CisOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput9CisOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a> with format. </p>
+<dt id="_CPPv3N9YggOutput9YggOutputEPKcPKc">
+<span id="_CPPv2N9YggOutput9YggOutputEPKcPKc"></span><span id="YggOutput::YggOutput__cCP.cCP"></span><span class="target" id="class_ygg_output_1ac731249ebab6b5de86909960cdf2ac46"></span><code class="descname">YggOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput9YggOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a> with format. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -386,72 +378,38 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutput9CisOutputE11cisOutput_t">
-<span id="_CPPv2N9CisOutput9CisOutputE11cisOutput_t"></span><span id="CisOutput::CisOutput__cisOutput_t"></span><span class="target" id="class_cis_output_1abf373bf8e55beb4b32d558463b134a51"></span><code class="descname">CisOutput</code><span class="sig-paren">(</span>cisOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput9CisOutputE11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N9YggOutput9YggOutputE11yggOutput_t">
+<span id="_CPPv2N9YggOutput9YggOutputE11yggOutput_t"></span><span id="YggOutput::YggOutput__yggOutput_t"></span><span class="target" id="class_ygg_output_1a3a554669831e2cbd283de30f20e1a66a"></span><code class="descname">YggOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput9YggOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutput11_destroy_piEv">
-<span id="_CPPv2N9CisOutput11_destroy_piEv"></span><span id="CisOutput::_destroy_pi"></span><span class="target" id="class_cis_output_1af977def262b778702e06277f5d50f102"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N9YggOutput11_destroy_piEv">
+<span id="_CPPv2N9YggOutput11_destroy_piEv"></span><span id="YggOutput::_destroy_pi"></span><span class="target" id="class_ygg_output_1ad4b9bdf9450bd30f6eea4ca56722ac08"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Alias to allow freeing of underlying C struct at the class level. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutputD0Ev">
-<span id="_CPPv2N9CisOutputD0Ev"></span><span id="CisOutput::~CisOutput"></span><span class="target" id="class_cis_output_1a7dc7c92d8c50f61075d1ef0cf0dfce8f"></span><code class="descname">~CisOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Destructor for <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a>. See cis_free in CisInterface.h for details. </p>
+<dt id="_CPPv3N9YggOutputD0Ev">
+<span id="_CPPv2N9YggOutputD0Ev"></span><span id="YggOutput::~YggOutput"></span><span class="target" id="class_ygg_output_1a8a5e8aef1821bd896f193a67e2de3f51"></span><code class="descname">~YggOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_ygg_output"><span class="std std-ref">YggOutput</span></a>. See ygg_free in YggInterface.h for details. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutput2piEv">
-<span id="_CPPv2N9CisOutput2piEv"></span><span id="CisOutput::pi"></span><span class="target" id="class_cis_output_1a173ffd20bb1ce255ba95562caa220d6a"></span>cisOutput_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput2piEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Return the cisOutput_t structure. </p>
+<dt id="_CPPv3N9YggOutput2piEv">
+<span id="_CPPv2N9YggOutput2piEv"></span><span id="YggOutput::pi"></span><span class="target" id="class_ygg_output_1a66b1230c544de87b95ec351d18ca5abe"></span>yggOutput_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput2piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the yggOutput_t structure. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
-<dd>cisOutput_t structure underlying the class. </dd>
+<dd>yggOutput_t structure underlying the class. </dd>
 </dl>
 </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutput4sendEPKcK6size_t">
-<span id="_CPPv2N9CisOutput4sendEPKcK6size_t"></span><span id="CisOutput::send__cCP.sC"></span><span class="target" id="class_cis_output_1a38322e95e9743e4b5b5d4c529d13031e"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput4sendEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Send a message smaller than CIS_MSG_MAX to the output queue. If the message is larger than CIS_MSG_MAX an error code will be returned. See cis_send in CisInterface.h for details. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
-<li><code class="docutils literal notranslate"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv3N9CisOutput4sendEKiz">
-<span id="_CPPv2N9CisOutput4sendEKiz"></span><span id="CisOutput::send__iC.z"></span><span class="target" id="class_cis_output_1ad30d4a8e64e7a9b7033cddf4a3aef9de"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Format and send a message smaller than CIS_MSG_MAX to the output queue. See cisSend from CisInterface.h for details. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: arguments for formatting. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv3N9CisOutput12send_nolimitEPKcK6size_t">
-<span id="_CPPv2N9CisOutput12send_nolimitEPKcK6size_t"></span><span id="CisOutput::send_nolimit__cCP.sC"></span><span class="target" id="class_cis_output_1a794b0e4d24de72339faab690554db4d3"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput12send_nolimitEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Send a message larger than CIS_MSG_MAX to the output queue. See cis_send_nolimit in CisInterface.h for details. </p>
+<dt id="_CPPv3N9YggOutput4sendEPKcK6size_t">
+<span id="_CPPv2N9YggOutput4sendEPKcK6size_t"></span><span id="YggOutput::send__cCP.sC"></span><span class="target" id="class_ygg_output_1a9896b233529d284c9d2d9ea6b818c903"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput4sendEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a message smaller than YGG_MSG_MAX to the output queue. If the message is larger than YGG_MSG_MAX an error code will be returned. See ygg_send in YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
@@ -466,9 +424,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutput12send_nolimitEKiz">
-<span id="_CPPv2N9CisOutput12send_nolimitEKiz"></span><span id="CisOutput::send_nolimit__iC.z"></span><span class="target" id="class_cis_output_1a5b7e84b70352f3a5f99650184a076564"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput12send_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Format and send a message larger than CIS_MSG_MAX to the output queue. See cisSend from CisInterface.h for details. </p>
+<dt id="_CPPv3N9YggOutput4sendEKiz">
+<span id="_CPPv2N9YggOutput4sendEKiz"></span><span id="YggOutput::send__iC.z"></span><span class="target" id="class_ygg_output_1ae174c7badb998a6c6c7ca0e1c9caf12a"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message smaller than YGG_MSG_MAX to the output queue. See yggSend from YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
@@ -483,8 +441,42 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N9CisOutput8send_eofEv">
-<span id="_CPPv2N9CisOutput8send_eofEv"></span><span id="CisOutput::send_eof"></span><span class="target" id="class_cis_output_1a083fb17afbb3c03f103929850506e545"></span>int <code class="descname">send_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9CisOutput8send_eofEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N9YggOutput12send_nolimitEPKcK6size_t">
+<span id="_CPPv2N9YggOutput12send_nolimitEPKcK6size_t"></span><span id="YggOutput::send_nolimit__cCP.sC"></span><span class="target" id="class_ygg_output_1a82db25848c7a96e112e314c2efb64bd3"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput12send_nolimitEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a message larger than YGG_MSG_MAX to the output queue. See ygg_send_nolimit in YggInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
+<li><code class="docutils literal notranslate"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N9YggOutput12send_nolimitEKiz">
+<span id="_CPPv2N9YggOutput12send_nolimitEKiz"></span><span id="YggOutput::send_nolimit__iC.z"></span><span class="target" id="class_ygg_output_1a34346f05bb083d5bf8672ef59b86e82d"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput12send_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message larger than YGG_MSG_MAX to the output queue. See yggSend from YggInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal notranslate"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: arguments for formatting. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv3N9YggOutput8send_eofEv">
+<span id="_CPPv2N9YggOutput8send_eofEv"></span><span id="YggOutput::send_eof"></span><span class="target" id="class_ygg_output_1a24cbf867657171eed5a4ad166d466b3b"></span>int <code class="descname">send_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N9YggOutput8send_eofEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send EOF message to output file, closing it. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -497,54 +489,54 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Private Members</p>
 <dl class="member">
-<dt id="_CPPv3N9CisOutput3_piE">
-<span id="_CPPv2N9CisOutput3_piE"></span><span id="CisOutput::_pi__cisOutput_t"></span><span class="target" id="class_cis_output_1aeaa19426ff87e34bf3761ca6b351e8a0"></span>cisOutput_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv3N9CisOutput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N9YggOutput3_piE">
+<span id="_CPPv2N9YggOutput3_piE"></span><span id="YggOutput::_pi__yggOutput_t"></span><span class="target" id="class_ygg_output_1af473facbcbf1b1328cfc6d1518dd9cbe"></span>yggOutput_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv3N9YggOutput3_piE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv36CisRpc">
-<span id="_CPPv26CisRpc"></span><span id="CisRpc"></span><span class="target" id="class_cis_rpc"></span><em class="property">class </em><code class="descname">CisRpc</code><a class="headerlink" href="#_CPPv36CisRpc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisRpc_t functionality. </p>
-<p>The <a class="reference internal" href="#class_cis_rpc"><span class="std std-ref">CisRpc</span></a> class is a basic wrapper around the C cisRpc_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic RPC messaging via IPC queues. </p>
-<p>Subclassed by <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a>, <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a></p>
+<dt id="_CPPv36YggRpc">
+<span id="_CPPv26YggRpc"></span><span id="YggRpc"></span><span class="target" id="class_ygg_rpc"></span><em class="property">class </em><code class="descname">YggRpc</code><a class="headerlink" href="#_CPPv36YggRpc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggRpc_t functionality. </p>
+<p>The <a class="reference internal" href="#class_ygg_rpc"><span class="std std-ref">YggRpc</span></a> class is a basic wrapper around the C yggRpc_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic RPC messaging via IPC queues. </p>
+<p>Subclassed by <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a>, <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N6CisRpc6CisRpcE8cisRpc_t">
-<span id="_CPPv2N6CisRpc6CisRpcE8cisRpc_t"></span><span id="CisRpc::CisRpc__cisRpc_t"></span><span class="target" id="class_cis_rpc_1aca7fcde600dcb7b42ef93a5e9405358b"></span><code class="descname">CisRpc</code><span class="sig-paren">(</span>cisRpc_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6CisRpc6CisRpcE8cisRpc_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N6YggRpc6YggRpcE8yggRpc_t">
+<span id="_CPPv2N6YggRpc6YggRpcE8yggRpc_t"></span><span id="YggRpc::YggRpc__yggRpc_t"></span><span class="target" id="class_ygg_rpc_1aad7f4b95bde3cee4285824660bc1c217"></span><code class="descname">YggRpc</code><span class="sig-paren">(</span>yggRpc_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6YggRpc6YggRpcE8yggRpc_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N6CisRpc11_destroy_piEv">
-<span id="_CPPv2N6CisRpc11_destroy_piEv"></span><span id="CisRpc::_destroy_pi"></span><span class="target" id="class_cis_rpc_1a29148e3e2924edc61aeec247ed939161"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6CisRpc11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N6YggRpc11_destroy_piEv">
+<span id="_CPPv2N6YggRpc11_destroy_piEv"></span><span id="YggRpc::_destroy_pi"></span><span class="target" id="class_ygg_rpc_1a6bdf6e50d6141ffb825be1401add9e92"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6YggRpc11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Alias to allow freeing of underlying C struct at the class level. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N6CisRpcD0Ev">
-<span id="_CPPv2N6CisRpcD0Ev"></span><span id="CisRpc::~CisRpc"></span><span class="target" id="class_cis_rpc_1accbcccd1fd223660be6e8cf54cace2a8"></span><code class="descname">~CisRpc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6CisRpcD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Destructor for <a class="reference internal" href="#class_cis_rpc"><span class="std std-ref">CisRpc</span></a>. See cis_free in CisInterface.h for details. </p>
+<dt id="_CPPv3N6YggRpcD0Ev">
+<span id="_CPPv2N6YggRpcD0Ev"></span><span id="YggRpc::~YggRpc"></span><span class="target" id="class_ygg_rpc_1a30745faf60bf27bc2f50fe4bf14043ba"></span><code class="descname">~YggRpc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6YggRpcD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_ygg_rpc"><span class="std std-ref">YggRpc</span></a>. See ygg_free in YggInterface.h for details. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N6CisRpc2piEv">
-<span id="_CPPv2N6CisRpc2piEv"></span><span id="CisRpc::pi"></span><span class="target" id="class_cis_rpc_1ac58fc44e28ea378a1ef6b12684371aef"></span>cisRpc_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6CisRpc2piEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Return the cisRpc_t structure. </p>
+<dt id="_CPPv3N6YggRpc2piEv">
+<span id="_CPPv2N6YggRpc2piEv"></span><span id="YggRpc::pi"></span><span class="target" id="class_ygg_rpc_1ac7e39cad4e77a0b5e29b371da6e34338"></span>yggRpc_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6YggRpc2piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the yggRpc_t structure. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
-<dd>cisRpc_t structure underlying the class. </dd>
+<dd>yggRpc_t structure underlying the class. </dd>
 </dl>
 </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N6CisRpc4sendEKiz">
-<span id="_CPPv2N6CisRpc4sendEKiz"></span><span id="CisRpc::send__iC.z"></span><span class="target" id="class_cis_rpc_1afb4143aa59acfe94df91435262cde01e"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6CisRpc4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Format and send a message to an RPC output queue. See rpcSend from CisInterface.h for details. </p>
+<dt id="_CPPv3N6YggRpc4sendEKiz">
+<span id="_CPPv2N6YggRpc4sendEKiz"></span><span id="YggRpc::send__iC.z"></span><span class="target" id="class_ygg_rpc_1ab5b618d5e5d61d5d66c24d117b1ed66c"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6YggRpc4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message to an RPC output queue. See rpcSend from YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
@@ -559,9 +551,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N6CisRpc4recvEKiz">
-<span id="_CPPv2N6CisRpc4recvEKiz"></span><span id="CisRpc::recv__iC.z"></span><span class="target" id="class_cis_rpc_1a6b1acb06791551c0c3096f678690e315"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6CisRpc4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive and parse a message from an RPC input queue. See rpcRecv from CisInterface.h for details. </p>
+<dt id="_CPPv3N6YggRpc4recvEKiz">
+<span id="_CPPv2N6YggRpc4recvEKiz"></span><span id="YggRpc::recv__iC.z"></span><span class="target" id="class_ygg_rpc_1a95d9822a90d6299add4ff615a4187b0f"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6YggRpc4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message from an RPC input queue. See rpcRecv from YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
@@ -576,9 +568,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N6CisRpc11recvReallocEKiz">
-<span id="_CPPv2N6CisRpc11recvReallocEKiz"></span><span id="CisRpc::recvRealloc__iC.z"></span><span class="target" id="class_cis_rpc_1a60f7ff0983df9bd90adcf2a3d6c38226"></span>int <code class="descname">recvRealloc</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6CisRpc11recvReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive and parse a message from an RPC input queue, allowing destination memory to be reallocated as necessary. See rpcRecv from CisInterface.h for details. </p>
+<dt id="_CPPv3N6YggRpc11recvReallocEKiz">
+<span id="_CPPv2N6YggRpc11recvReallocEKiz"></span><span id="YggRpc::recvRealloc__iC.z"></span><span class="target" id="class_ygg_rpc_1aaa05e7b5d147b501b0b934f2fca72cad"></span>int <code class="descname">recvRealloc</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N6YggRpc11recvReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message from an RPC input queue, allowing destination memory to be reallocated as necessary. See rpcRecv from YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
@@ -596,23 +588,23 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Private Members</p>
 <dl class="member">
-<dt id="_CPPv3N6CisRpc3_piE">
-<span id="_CPPv2N6CisRpc3_piE"></span><span id="CisRpc::_pi__cisRpc_t"></span><span class="target" id="class_cis_rpc_1a04e90eb6d57173fa6c98544f445b7c5f"></span>cisRpc_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv3N6CisRpc3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N6YggRpc3_piE">
+<span id="_CPPv2N6YggRpc3_piE"></span><span id="YggRpc::_pi__yggRpc_t"></span><span class="target" id="class_ygg_rpc_1aad6598aa1c60d4a0b2cb002fdaa1752a"></span>yggRpc_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv3N6YggRpc3_piE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv312CisRpcServer">
-<span id="_CPPv212CisRpcServer"></span><span id="CisRpcServer"></span><span class="target" id="class_cis_rpc_server"></span><em class="property">class </em><code class="descname">CisRpcServer</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv36CisRpc" title="CisRpc">CisRpc</a><a class="headerlink" href="#_CPPv312CisRpcServer" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisRpc_t server-side functionality. The <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a> class is a basic wrapper around the C cisRpc_t structure and associated server-side functions from the CisInterface.h header. It provides the user with C++ style access to basic RPC server operations. </p>
+<dt id="_CPPv312YggRpcServer">
+<span id="_CPPv212YggRpcServer"></span><span id="YggRpcServer"></span><span class="target" id="class_ygg_rpc_server"></span><em class="property">class </em><code class="descname">YggRpcServer</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv36YggRpc" title="YggRpc">YggRpc</a><a class="headerlink" href="#_CPPv312YggRpcServer" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggRpc_t server-side functionality. The <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a> class is a basic wrapper around the C yggRpc_t structure and associated server-side functions from the YggInterface.h header. It provides the user with C++ style access to basic RPC server operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N12CisRpcServer12CisRpcServerEPKcPKcPKc">
-<span id="_CPPv2N12CisRpcServer12CisRpcServerEPKcPKcPKc"></span><span id="CisRpcServer::CisRpcServer__cCP.cCP.cCP"></span><span class="target" id="class_cis_rpc_server_1a4d531d6b97d3916f9b4fe9398b71f60f"></span><code class="descname">CisRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisRpcServer12CisRpcServerEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a>. </p>
+<dt id="_CPPv3N12YggRpcServer12YggRpcServerEPKcPKcPKc">
+<span id="_CPPv2N12YggRpcServer12YggRpcServerEPKcPKcPKc"></span><span id="YggRpcServer::YggRpcServer__cCP.cCP.cCP"></span><span class="target" id="class_ygg_rpc_server_1aefbc1c6bdff7dc8417cb2357e8d83326"></span><code class="descname">YggRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggRpcServer12YggRpcServerEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -626,24 +618,24 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N12CisRpcServerD0Ev">
-<span id="_CPPv2N12CisRpcServerD0Ev"></span><span id="CisRpcServer::~CisRpcServer"></span><span class="target" id="class_cis_rpc_server_1a5681ecdcbcd03ad613f4843c39a3403b"></span><code class="descname">~CisRpcServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisRpcServerD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Destructor for <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a>. See cis_free in CisInterface.h for details. </p>
+<dt id="_CPPv3N12YggRpcServerD0Ev">
+<span id="_CPPv2N12YggRpcServerD0Ev"></span><span id="YggRpcServer::~YggRpcServer"></span><span class="target" id="class_ygg_rpc_server_1aa02d158a203c98c845368c0f317632de"></span><code class="descname">~YggRpcServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggRpcServerD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_ygg_rpc_server"><span class="std std-ref">YggRpcServer</span></a>. See ygg_free in YggInterface.h for details. </p>
 </dd></dl>
 
 </div>
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv312CisRpcClient">
-<span id="_CPPv212CisRpcClient"></span><span id="CisRpcClient"></span><span class="target" id="class_cis_rpc_client"></span><em class="property">class </em><code class="descname">CisRpcClient</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv36CisRpc" title="CisRpc">CisRpc</a><a class="headerlink" href="#_CPPv312CisRpcClient" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisRpc_t client-side functionality. The <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a> class is a basic wrapper around the C cisRpc_t structure and associated client-side functions from the CisInterface.h header. It provides the user with C++ style access to basic RPC client operations. </p>
+<dt id="_CPPv312YggRpcClient">
+<span id="_CPPv212YggRpcClient"></span><span id="YggRpcClient"></span><span class="target" id="class_ygg_rpc_client"></span><em class="property">class </em><code class="descname">YggRpcClient</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv36YggRpc" title="YggRpc">YggRpc</a><a class="headerlink" href="#_CPPv312YggRpcClient" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggRpc_t client-side functionality. The <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a> class is a basic wrapper around the C yggRpc_t structure and associated client-side functions from the YggInterface.h header. It provides the user with C++ style access to basic RPC client operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N12CisRpcClient12CisRpcClientEPKcPKcPKc">
-<span id="_CPPv2N12CisRpcClient12CisRpcClientEPKcPKcPKc"></span><span id="CisRpcClient::CisRpcClient__cCP.cCP.cCP"></span><span class="target" id="class_cis_rpc_client_1a02fb4a473e586bb441524365f976cc02"></span><code class="descname">CisRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisRpcClient12CisRpcClientEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a>. </p>
+<dt id="_CPPv3N12YggRpcClient12YggRpcClientEPKcPKcPKc">
+<span id="_CPPv2N12YggRpcClient12YggRpcClientEPKcPKcPKc"></span><span id="YggRpcClient::YggRpcClient__cCP.cCP.cCP"></span><span class="target" id="class_ygg_rpc_client_1a89d4a24359bc25ac8a789e580be6dcca"></span><code class="descname">YggRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggRpcClient12YggRpcClientEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -657,15 +649,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N12CisRpcClientD0Ev">
-<span id="_CPPv2N12CisRpcClientD0Ev"></span><span id="CisRpcClient::~CisRpcClient"></span><span class="target" id="class_cis_rpc_client_1a58598885fe23f219ab5d1b9f74ee1d6f"></span><code class="descname">~CisRpcClient</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisRpcClientD0Ev" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Destructor for <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a>. See cis_free in CisInterface.h for details. </p>
+<dt id="_CPPv3N12YggRpcClientD0Ev">
+<span id="_CPPv2N12YggRpcClientD0Ev"></span><span id="YggRpcClient::~YggRpcClient"></span><span class="target" id="class_ygg_rpc_client_1a312d2ac88acfbfbdca6ac6fdecb948ae"></span><code class="descname">~YggRpcClient</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggRpcClientD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_ygg_rpc_client"><span class="std std-ref">YggRpcClient</span></a>. See ygg_free in YggInterface.h for details. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N12CisRpcClient4callEKiz">
-<span id="_CPPv2N12CisRpcClient4callEKiz"></span><span id="CisRpcClient::call__iC.z"></span><span class="target" id="class_cis_rpc_client_1a2378157bcfdde78aef3f8a0068daec39"></span>int <code class="descname">call</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisRpcClient4callEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Send request to an RPC server from the client and wait for a response, preserving the current sizes of memory at the provided output variable references. See rpcCall in CisInterface.h for details. </p>
+<dt id="_CPPv3N12YggRpcClient4callEKiz">
+<span id="_CPPv2N12YggRpcClient4callEKiz"></span><span id="YggRpcClient::call__iC.z"></span><span class="target" id="class_ygg_rpc_client_1a55f72ecc97b158b846f87db3909aa109"></span>int <code class="descname">call</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggRpcClient4callEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send request to an RPC server from the client and wait for a response, preserving the current sizes of memory at the provided output variable references. See rpcCall in YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
@@ -680,9 +672,9 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N12CisRpcClient11callReallocEKiz">
-<span id="_CPPv2N12CisRpcClient11callReallocEKiz"></span><span id="CisRpcClient::callRealloc__iC.z"></span><span class="target" id="class_cis_rpc_client_1a11bb3d1618889314924bc789352e9a1f"></span>int <code class="descname">callRealloc</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisRpcClient11callReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Send request to an RPC server from the client and wait for a response, allowing the memory pointed to by the pointers that the output variables reference to be reallocated. See rpcCall in CisInterface.h for details. </p>
+<dt id="_CPPv3N12YggRpcClient11callReallocEKiz">
+<span id="_CPPv2N12YggRpcClient11callReallocEKiz"></span><span id="YggRpcClient::callRealloc__iC.z"></span><span class="target" id="class_ygg_rpc_client_1a14f610175520f43683277e6d0e857521"></span>int <code class="descname">callRealloc</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggRpcClient11callReallocEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send request to an RPC server from the client and wait for a response, allowing the memory pointed to by the pointers that the output variables reference to be reallocated. See rpcCall in YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
@@ -700,16 +692,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv318CisAsciiFileOutput">
-<span id="_CPPv218CisAsciiFileOutput"></span><span id="CisAsciiFileOutput"></span><span class="target" id="class_cis_ascii_file_output"></span><em class="property">class </em><code class="descname">CisAsciiFileOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv39CisOutput" title="CisOutput">CisOutput</a><a class="headerlink" href="#_CPPv318CisAsciiFileOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileOutput_t functionality. The <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a> class is a basic wrapper around the C cisAsciiFileOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
-<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a>, <a class="reference internal" href="#class_cis_ascii_array_output__local"><span class="std std-ref">CisAsciiArrayOutput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_file_output__local"><span class="std std-ref">CisAsciiFileOutput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a>, <a class="reference internal" href="#class_cis_ascii_table_output__local"><span class="std std-ref">CisAsciiTableOutput_local</span></a></p>
+<dt id="_CPPv318YggAsciiFileOutput">
+<span id="_CPPv218YggAsciiFileOutput"></span><span id="YggAsciiFileOutput"></span><span class="target" id="class_ygg_ascii_file_output"></span><em class="property">class </em><code class="descname">YggAsciiFileOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv39YggOutput" title="YggOutput">YggOutput</a><a class="headerlink" href="#_CPPv318YggAsciiFileOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiFileOutput_t functionality. The <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a> class is a basic wrapper around the C yggAsciiFileOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<p>Subclassed by <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a>, <a class="reference internal" href="#class_ygg_ascii_array_output__local"><span class="std std-ref">YggAsciiArrayOutput_local</span></a>, <a class="reference internal" href="#class_ygg_ascii_file_output__local"><span class="std std-ref">YggAsciiFileOutput_local</span></a>, <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a>, <a class="reference internal" href="#class_ygg_ascii_table_output__local"><span class="std std-ref">YggAsciiTableOutput_local</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N18CisAsciiFileOutput18CisAsciiFileOutputEPKc">
-<span id="_CPPv2N18CisAsciiFileOutput18CisAsciiFileOutputEPKc"></span><span id="CisAsciiFileOutput::CisAsciiFileOutput__cCP"></span><span class="target" id="class_cis_ascii_file_output_1ab17524610ace98b485e02932ba3468af"></span><code class="descname">CisAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18CisAsciiFileOutput18CisAsciiFileOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a>. </p>
+<dt id="_CPPv3N18YggAsciiFileOutput18YggAsciiFileOutputEPKc">
+<span id="_CPPv2N18YggAsciiFileOutput18YggAsciiFileOutputEPKc"></span><span id="YggAsciiFileOutput::YggAsciiFileOutput__cCP"></span><span class="target" id="class_ygg_ascii_file_output_1a78d01d8df0ffbcfead79239f3f2c7127"></span><code class="descname">YggAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18YggAsciiFileOutput18YggAsciiFileOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -721,14 +713,14 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N18CisAsciiFileOutput18CisAsciiFileOutputE11cisOutput_t">
-<span id="_CPPv2N18CisAsciiFileOutput18CisAsciiFileOutputE11cisOutput_t"></span><span id="CisAsciiFileOutput::CisAsciiFileOutput__cisOutput_t"></span><span class="target" id="class_cis_ascii_file_output_1a123f97ab25f1930bc4930e468de1bf05"></span><code class="descname">CisAsciiFileOutput</code><span class="sig-paren">(</span>cisOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18CisAsciiFileOutput18CisAsciiFileOutputE11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N18YggAsciiFileOutput18YggAsciiFileOutputE11yggOutput_t">
+<span id="_CPPv2N18YggAsciiFileOutput18YggAsciiFileOutputE11yggOutput_t"></span><span id="YggAsciiFileOutput::YggAsciiFileOutput__yggOutput_t"></span><span class="target" id="class_ygg_ascii_file_output_1a762a9b04be25a10b21c86e551d329ecd"></span><code class="descname">YggAsciiFileOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18YggAsciiFileOutput18YggAsciiFileOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N18CisAsciiFileOutput9send_lineEPKc">
-<span id="_CPPv2N18CisAsciiFileOutput9send_lineEPKc"></span><span id="CisAsciiFileOutput::send_line__cCP"></span><span class="target" id="class_cis_ascii_file_output_1a8863d020f0cc7c4690fa0877358eae6d"></span>int <code class="descname">send_line</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18CisAsciiFileOutput9send_lineEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N18YggAsciiFileOutput9send_lineEPKc">
+<span id="_CPPv2N18YggAsciiFileOutput9send_lineEPKc"></span><span id="YggAsciiFileOutput::send_line__cCP"></span><span class="target" id="class_ygg_ascii_file_output_1ae2e007c16ee63830950a96426ef3ca27"></span>int <code class="descname">send_line</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18YggAsciiFileOutput9send_lineEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a single line to a file or queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -746,15 +738,15 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv324CisAsciiFileOutput_local">
-<span id="_CPPv224CisAsciiFileOutput_local"></span><span id="CisAsciiFileOutput_local"></span><span class="target" id="class_cis_ascii_file_output__local"></span><em class="property">class </em><code class="descname">CisAsciiFileOutput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318CisAsciiFileOutput" title="CisAsciiFileOutput">CisAsciiFileOutput</a><a class="headerlink" href="#_CPPv324CisAsciiFileOutput_local" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileOutput_t functionality for local files. The <a class="reference internal" href="#class_cis_ascii_file_output__local"><span class="std std-ref">CisAsciiFileOutput_local</span></a> class is a basic wrapper around the C cisAsciiFileOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<dt id="_CPPv324YggAsciiFileOutput_local">
+<span id="_CPPv224YggAsciiFileOutput_local"></span><span id="YggAsciiFileOutput_local"></span><span class="target" id="class_ygg_ascii_file_output__local"></span><em class="property">class </em><code class="descname">YggAsciiFileOutput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318YggAsciiFileOutput" title="YggAsciiFileOutput">YggAsciiFileOutput</a><a class="headerlink" href="#_CPPv324YggAsciiFileOutput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiFileOutput_t functionality for local files. The <a class="reference internal" href="#class_ygg_ascii_file_output__local"><span class="std std-ref">YggAsciiFileOutput_local</span></a> class is a basic wrapper around the C yggAsciiFileOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N24CisAsciiFileOutput_local24CisAsciiFileOutput_localEPKc">
-<span id="_CPPv2N24CisAsciiFileOutput_local24CisAsciiFileOutput_localEPKc"></span><span id="CisAsciiFileOutput_local::CisAsciiFileOutput_local__cCP"></span><span class="target" id="class_cis_ascii_file_output__local_1a879ac5cab1e7f7b8625cef59e239db91"></span><code class="descname">CisAsciiFileOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N24CisAsciiFileOutput_local24CisAsciiFileOutput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a>. </p>
+<dt id="_CPPv3N24YggAsciiFileOutput_local24YggAsciiFileOutput_localEPKc">
+<span id="_CPPv2N24YggAsciiFileOutput_local24YggAsciiFileOutput_localEPKc"></span><span id="YggAsciiFileOutput_local::YggAsciiFileOutput_local__cCP"></span><span class="target" id="class_ygg_ascii_file_output__local_1afc7908f7e0943cfe45a2916760293912"></span><code class="descname">YggAsciiFileOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N24YggAsciiFileOutput_local24YggAsciiFileOutput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_output"><span class="std std-ref">YggAsciiFileOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -769,16 +761,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv317CisAsciiFileInput">
-<span id="_CPPv217CisAsciiFileInput"></span><span id="CisAsciiFileInput"></span><span class="target" id="class_cis_ascii_file_input"></span><em class="property">class </em><code class="descname">CisAsciiFileInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv38CisInput" title="CisInput">CisInput</a><a class="headerlink" href="#_CPPv317CisAsciiFileInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileInput_t functionality. The <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a> class is a basic wrapper around the C cisAsciiFileInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
-<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a>, <a class="reference internal" href="#class_cis_ascii_array_input__local"><span class="std std-ref">CisAsciiArrayInput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_file_input__local"><span class="std std-ref">CisAsciiFileInput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a>, <a class="reference internal" href="#class_cis_ascii_table_input__local"><span class="std std-ref">CisAsciiTableInput_local</span></a></p>
+<dt id="_CPPv317YggAsciiFileInput">
+<span id="_CPPv217YggAsciiFileInput"></span><span id="YggAsciiFileInput"></span><span class="target" id="class_ygg_ascii_file_input"></span><em class="property">class </em><code class="descname">YggAsciiFileInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv38YggInput" title="YggInput">YggInput</a><a class="headerlink" href="#_CPPv317YggAsciiFileInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiFileInput_t functionality. The <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a> class is a basic wrapper around the C yggAsciiFileInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<p>Subclassed by <a class="reference internal" href="#class_ygg_ascii_array_input"><span class="std std-ref">YggAsciiArrayInput</span></a>, <a class="reference internal" href="#class_ygg_ascii_array_input__local"><span class="std std-ref">YggAsciiArrayInput_local</span></a>, <a class="reference internal" href="#class_ygg_ascii_file_input__local"><span class="std std-ref">YggAsciiFileInput_local</span></a>, <a class="reference internal" href="#class_ygg_ascii_table_input"><span class="std std-ref">YggAsciiTableInput</span></a>, <a class="reference internal" href="#class_ygg_ascii_table_input__local"><span class="std std-ref">YggAsciiTableInput_local</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N17CisAsciiFileInput17CisAsciiFileInputEPKc">
-<span id="_CPPv2N17CisAsciiFileInput17CisAsciiFileInputEPKc"></span><span id="CisAsciiFileInput::CisAsciiFileInput__cCP"></span><span class="target" id="class_cis_ascii_file_input_1aac31cfe291fe9b5f4dc16bb78a123e8c"></span><code class="descname">CisAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N17CisAsciiFileInput17CisAsciiFileInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a>. </p>
+<dt id="_CPPv3N17YggAsciiFileInput17YggAsciiFileInputEPKc">
+<span id="_CPPv2N17YggAsciiFileInput17YggAsciiFileInputEPKc"></span><span id="YggAsciiFileInput::YggAsciiFileInput__cCP"></span><span class="target" id="class_ygg_ascii_file_input_1a4a6dea325297ce6b1760802084710457"></span><code class="descname">YggAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N17YggAsciiFileInput17YggAsciiFileInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_input"><span class="std std-ref">YggAsciiFileInput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -790,15 +782,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N17CisAsciiFileInput17CisAsciiFileInputE10cisInput_t">
-<span id="_CPPv2N17CisAsciiFileInput17CisAsciiFileInputE10cisInput_t"></span><span id="CisAsciiFileInput::CisAsciiFileInput__cisInput_t"></span><span class="target" id="class_cis_ascii_file_input_1a7bee575f759ecb42dbe4d525638d5bc1"></span><code class="descname">CisAsciiFileInput</code><span class="sig-paren">(</span>cisInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N17CisAsciiFileInput17CisAsciiFileInputE10cisInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N17YggAsciiFileInput17YggAsciiFileInputE10yggInput_t">
+<span id="_CPPv2N17YggAsciiFileInput17YggAsciiFileInputE10yggInput_t"></span><span id="YggAsciiFileInput::YggAsciiFileInput__yggInput_t"></span><span class="target" id="class_ygg_ascii_file_input_1a8809ff5e5d1574f6e88712d124f3d838"></span><code class="descname">YggAsciiFileInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N17YggAsciiFileInput17YggAsciiFileInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N17CisAsciiFileInput9recv_lineEPcK6size_t">
-<span id="_CPPv2N17CisAsciiFileInput9recv_lineEPcK6size_t"></span><span id="CisAsciiFileInput::recv_line__cP.sC"></span><span class="target" id="class_cis_ascii_file_input_1a4509672e282e82990974104a811c1605"></span>int <code class="descname">recv_line</code><span class="sig-paren">(</span>char *<em>line</em>, <em class="property">const</em> size_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N17CisAsciiFileInput9recv_lineEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Receive a single line from an associated file or queue. See af_recv_line in CisInterface.h for details. </p>
+<dt id="_CPPv3N17YggAsciiFileInput9recv_lineEPcK6size_t">
+<span id="_CPPv2N17YggAsciiFileInput9recv_lineEPcK6size_t"></span><span id="YggAsciiFileInput::recv_line__cP.sC"></span><span class="target" id="class_ygg_ascii_file_input_1ac15bc27aab4ada3f7d859d867370ac52"></span>int <code class="descname">recv_line</code><span class="sig-paren">(</span>char *<em>line</em>, <em class="property">const</em> size_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N17YggAsciiFileInput9recv_lineEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a single line from an associated file or queue. See af_recv_line in YggInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int Number of bytes read/received. Negative values indicate that there was either an error or the EOF message was received. </dd>
@@ -816,15 +808,15 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv323CisAsciiFileInput_local">
-<span id="_CPPv223CisAsciiFileInput_local"></span><span id="CisAsciiFileInput_local"></span><span class="target" id="class_cis_ascii_file_input__local"></span><em class="property">class </em><code class="descname">CisAsciiFileInput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317CisAsciiFileInput" title="CisAsciiFileInput">CisAsciiFileInput</a><a class="headerlink" href="#_CPPv323CisAsciiFileInput_local" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileInput_t functionality for local files. The <a class="reference internal" href="#class_cis_ascii_file_input__local"><span class="std std-ref">CisAsciiFileInput_local</span></a> class is a basic wrapper around the C cisAsciiFileInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<dt id="_CPPv323YggAsciiFileInput_local">
+<span id="_CPPv223YggAsciiFileInput_local"></span><span id="YggAsciiFileInput_local"></span><span class="target" id="class_ygg_ascii_file_input__local"></span><em class="property">class </em><code class="descname">YggAsciiFileInput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317YggAsciiFileInput" title="YggAsciiFileInput">YggAsciiFileInput</a><a class="headerlink" href="#_CPPv323YggAsciiFileInput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiFileInput_t functionality for local files. The <a class="reference internal" href="#class_ygg_ascii_file_input__local"><span class="std std-ref">YggAsciiFileInput_local</span></a> class is a basic wrapper around the C yggAsciiFileInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N23CisAsciiFileInput_local23CisAsciiFileInput_localEPKc">
-<span id="_CPPv2N23CisAsciiFileInput_local23CisAsciiFileInput_localEPKc"></span><span id="CisAsciiFileInput_local::CisAsciiFileInput_local__cCP"></span><span class="target" id="class_cis_ascii_file_input__local_1a6a503a34514e6c0bd5ba6429393b2629"></span><code class="descname">CisAsciiFileInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N23CisAsciiFileInput_local23CisAsciiFileInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_input__local"><span class="std std-ref">CisAsciiFileInput_local</span></a>. </p>
+<dt id="_CPPv3N23YggAsciiFileInput_local23YggAsciiFileInput_localEPKc">
+<span id="_CPPv2N23YggAsciiFileInput_local23YggAsciiFileInput_localEPKc"></span><span id="YggAsciiFileInput_local::YggAsciiFileInput_local__cCP"></span><span class="target" id="class_ygg_ascii_file_input__local_1a20aef96883954f207b0140b7be13c3e7"></span><code class="descname">YggAsciiFileInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N23YggAsciiFileInput_local23YggAsciiFileInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_file_input__local"><span class="std std-ref">YggAsciiFileInput_local</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -839,16 +831,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv319CisAsciiTableOutput">
-<span id="_CPPv219CisAsciiTableOutput"></span><span id="CisAsciiTableOutput"></span><span class="target" id="class_cis_ascii_table_output"></span><em class="property">class </em><code class="descname">CisAsciiTableOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318CisAsciiFileOutput" title="CisAsciiFileOutput">CisAsciiFileOutput</a><a class="headerlink" href="#_CPPv319CisAsciiTableOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<dt id="_CPPv319YggAsciiTableOutput">
+<span id="_CPPv219YggAsciiTableOutput"></span><span id="YggAsciiTableOutput"></span><span class="target" id="class_ygg_ascii_table_output"></span><em class="property">class </em><code class="descname">YggAsciiTableOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318YggAsciiFileOutput" title="YggAsciiFileOutput">YggAsciiFileOutput</a><a class="headerlink" href="#_CPPv319YggAsciiTableOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableOutput_t functionality. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a> class is a basic wrapper around the C yggAsciiTableOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N19CisAsciiTableOutput19CisAsciiTableOutputEPKcPKc">
-<span id="_CPPv2N19CisAsciiTableOutput19CisAsciiTableOutputEPKcPKc"></span><span id="CisAsciiTableOutput::CisAsciiTableOutput__cCP.cCP"></span><span class="target" id="class_cis_ascii_table_output_1aa579418326a4192bf481e4e46fd3c170"></span><code class="descname">CisAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N19CisAsciiTableOutput19CisAsciiTableOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a>. </p>
+<dt id="_CPPv3N19YggAsciiTableOutput19YggAsciiTableOutputEPKcPKc">
+<span id="_CPPv2N19YggAsciiTableOutput19YggAsciiTableOutputEPKcPKc"></span><span id="YggAsciiTableOutput::YggAsciiTableOutput__cCP.cCP"></span><span class="target" id="class_ygg_ascii_table_output_1aa60a0f295fa67e3714434da40bffd24e"></span><code class="descname">YggAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N19YggAsciiTableOutput19YggAsciiTableOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -864,16 +856,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv325CisAsciiTableOutput_local">
-<span id="_CPPv225CisAsciiTableOutput_local"></span><span id="CisAsciiTableOutput_local"></span><span class="target" id="class_cis_ascii_table_output__local"></span><em class="property">class </em><code class="descname">CisAsciiTableOutput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318CisAsciiFileOutput" title="CisAsciiFileOutput">CisAsciiFileOutput</a><a class="headerlink" href="#_CPPv325CisAsciiTableOutput_local" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality for local files. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<dt id="_CPPv325YggAsciiTableOutput_local">
+<span id="_CPPv225YggAsciiTableOutput_local"></span><span id="YggAsciiTableOutput_local"></span><span class="target" id="class_ygg_ascii_table_output__local"></span><em class="property">class </em><code class="descname">YggAsciiTableOutput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318YggAsciiFileOutput" title="YggAsciiFileOutput">YggAsciiFileOutput</a><a class="headerlink" href="#_CPPv325YggAsciiTableOutput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableOutput_t functionality for local files. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a> class is a basic wrapper around the C yggAsciiTableOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N25CisAsciiTableOutput_local25CisAsciiTableOutput_localEPKcPKc">
-<span id="_CPPv2N25CisAsciiTableOutput_local25CisAsciiTableOutput_localEPKcPKc"></span><span id="CisAsciiTableOutput_local::CisAsciiTableOutput_local__cCP.cCP"></span><span class="target" id="class_cis_ascii_table_output__local_1af18720ffabf013387aa1bcb8f8826ce3"></span><code class="descname">CisAsciiTableOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N25CisAsciiTableOutput_local25CisAsciiTableOutput_localEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a> for local files. </p>
+<dt id="_CPPv3N25YggAsciiTableOutput_local25YggAsciiTableOutput_localEPKcPKc">
+<span id="_CPPv2N25YggAsciiTableOutput_local25YggAsciiTableOutput_localEPKcPKc"></span><span id="YggAsciiTableOutput_local::YggAsciiTableOutput_local__cCP.cCP"></span><span class="target" id="class_ygg_ascii_table_output__local_1afdfb7533c0fcddc046bd3bd915cb937f"></span><code class="descname">YggAsciiTableOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N25YggAsciiTableOutput_local25YggAsciiTableOutput_localEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_output"><span class="std std-ref">YggAsciiTableOutput</span></a> for local files. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -889,16 +881,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv319CisAsciiArrayOutput">
-<span id="_CPPv219CisAsciiArrayOutput"></span><span id="CisAsciiArrayOutput"></span><span class="target" id="class_cis_ascii_array_output"></span><em class="property">class </em><code class="descname">CisAsciiArrayOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318CisAsciiFileOutput" title="CisAsciiFileOutput">CisAsciiFileOutput</a><a class="headerlink" href="#_CPPv319CisAsciiArrayOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality with arrays. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<dt id="_CPPv319YggAsciiArrayOutput">
+<span id="_CPPv219YggAsciiArrayOutput"></span><span id="YggAsciiArrayOutput"></span><span class="target" id="class_ygg_ascii_array_output"></span><em class="property">class </em><code class="descname">YggAsciiArrayOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318YggAsciiFileOutput" title="YggAsciiFileOutput">YggAsciiFileOutput</a><a class="headerlink" href="#_CPPv319YggAsciiArrayOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableOutput_t functionality with arrays. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a> class is a basic wrapper around the C yggAsciiTableOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N19CisAsciiArrayOutput19CisAsciiArrayOutputEPKcPKc">
-<span id="_CPPv2N19CisAsciiArrayOutput19CisAsciiArrayOutputEPKcPKc"></span><span id="CisAsciiArrayOutput::CisAsciiArrayOutput__cCP.cCP"></span><span class="target" id="class_cis_ascii_array_output_1a3a4e19e80478aa1748f4074d72d3932a"></span><code class="descname">CisAsciiArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N19CisAsciiArrayOutput19CisAsciiArrayOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a>. </p>
+<dt id="_CPPv3N19YggAsciiArrayOutput19YggAsciiArrayOutputEPKcPKc">
+<span id="_CPPv2N19YggAsciiArrayOutput19YggAsciiArrayOutputEPKcPKc"></span><span id="YggAsciiArrayOutput::YggAsciiArrayOutput__cCP.cCP"></span><span class="target" id="class_ygg_ascii_array_output_1abfa5acaa3865ea11a4ca813d037ea46b"></span><code class="descname">YggAsciiArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N19YggAsciiArrayOutput19YggAsciiArrayOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -914,16 +906,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv325CisAsciiArrayOutput_local">
-<span id="_CPPv225CisAsciiArrayOutput_local"></span><span id="CisAsciiArrayOutput_local"></span><span class="target" id="class_cis_ascii_array_output__local"></span><em class="property">class </em><code class="descname">CisAsciiArrayOutput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318CisAsciiFileOutput" title="CisAsciiFileOutput">CisAsciiFileOutput</a><a class="headerlink" href="#_CPPv325CisAsciiArrayOutput_local" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality for local files. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<dt id="_CPPv325YggAsciiArrayOutput_local">
+<span id="_CPPv225YggAsciiArrayOutput_local"></span><span id="YggAsciiArrayOutput_local"></span><span class="target" id="class_ygg_ascii_array_output__local"></span><em class="property">class </em><code class="descname">YggAsciiArrayOutput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv318YggAsciiFileOutput" title="YggAsciiFileOutput">YggAsciiFileOutput</a><a class="headerlink" href="#_CPPv325YggAsciiArrayOutput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableOutput_t functionality for local files. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a> class is a basic wrapper around the C yggAsciiTableOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N25CisAsciiArrayOutput_local25CisAsciiArrayOutput_localEPKcPKc">
-<span id="_CPPv2N25CisAsciiArrayOutput_local25CisAsciiArrayOutput_localEPKcPKc"></span><span id="CisAsciiArrayOutput_local::CisAsciiArrayOutput_local__cCP.cCP"></span><span class="target" id="class_cis_ascii_array_output__local_1a65fa28278be3cf10be0e1a4882f2327f"></span><code class="descname">CisAsciiArrayOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N25CisAsciiArrayOutput_local25CisAsciiArrayOutput_localEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a> for local files. </p>
+<dt id="_CPPv3N25YggAsciiArrayOutput_local25YggAsciiArrayOutput_localEPKcPKc">
+<span id="_CPPv2N25YggAsciiArrayOutput_local25YggAsciiArrayOutput_localEPKcPKc"></span><span id="YggAsciiArrayOutput_local::YggAsciiArrayOutput_local__cCP.cCP"></span><span class="target" id="class_ygg_ascii_array_output__local_1a37da26de3c4dea80aa0cb9bf94ea65e9"></span><code class="descname">YggAsciiArrayOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N25YggAsciiArrayOutput_local25YggAsciiArrayOutput_localEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_output"><span class="std std-ref">YggAsciiArrayOutput</span></a> for local files. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -939,16 +931,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv318CisAsciiTableInput">
-<span id="_CPPv218CisAsciiTableInput"></span><span id="CisAsciiTableInput"></span><span class="target" id="class_cis_ascii_table_input"></span><em class="property">class </em><code class="descname">CisAsciiTableInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317CisAsciiFileInput" title="CisAsciiFileInput">CisAsciiFileInput</a><a class="headerlink" href="#_CPPv318CisAsciiTableInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<dt id="_CPPv318YggAsciiTableInput">
+<span id="_CPPv218YggAsciiTableInput"></span><span id="YggAsciiTableInput"></span><span class="target" id="class_ygg_ascii_table_input"></span><em class="property">class </em><code class="descname">YggAsciiTableInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317YggAsciiFileInput" title="YggAsciiFileInput">YggAsciiFileInput</a><a class="headerlink" href="#_CPPv318YggAsciiTableInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableInput_t functionality. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_table_input"><span class="std std-ref">YggAsciiTableInput</span></a> class is a basic wrapper around the C yggAsciiTableInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N18CisAsciiTableInput18CisAsciiTableInputEPKc">
-<span id="_CPPv2N18CisAsciiTableInput18CisAsciiTableInputEPKc"></span><span id="CisAsciiTableInput::CisAsciiTableInput__cCP"></span><span class="target" id="class_cis_ascii_table_input_1ae87bf636c04e42a7ab745eb164c52b41"></span><code class="descname">CisAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18CisAsciiTableInput18CisAsciiTableInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<dt id="_CPPv3N18YggAsciiTableInput18YggAsciiTableInputEPKc">
+<span id="_CPPv2N18YggAsciiTableInput18YggAsciiTableInputEPKc"></span><span id="YggAsciiTableInput::YggAsciiTableInput__cCP"></span><span class="target" id="class_ygg_ascii_table_input_1a4fa28562e167dc357d0fb7da430410e6"></span><code class="descname">YggAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18YggAsciiTableInput18YggAsciiTableInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_input"><span class="std std-ref">YggAsciiTableInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -963,16 +955,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv324CisAsciiTableInput_local">
-<span id="_CPPv224CisAsciiTableInput_local"></span><span id="CisAsciiTableInput_local"></span><span class="target" id="class_cis_ascii_table_input__local"></span><em class="property">class </em><code class="descname">CisAsciiTableInput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317CisAsciiFileInput" title="CisAsciiFileInput">CisAsciiFileInput</a><a class="headerlink" href="#_CPPv324CisAsciiTableInput_local" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality for local files. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<dt id="_CPPv324YggAsciiTableInput_local">
+<span id="_CPPv224YggAsciiTableInput_local"></span><span id="YggAsciiTableInput_local"></span><span class="target" id="class_ygg_ascii_table_input__local"></span><em class="property">class </em><code class="descname">YggAsciiTableInput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317YggAsciiFileInput" title="YggAsciiFileInput">YggAsciiFileInput</a><a class="headerlink" href="#_CPPv324YggAsciiTableInput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableInput_t functionality for local files. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_table_input"><span class="std std-ref">YggAsciiTableInput</span></a> class is a basic wrapper around the C yggAsciiTableInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N24CisAsciiTableInput_local24CisAsciiTableInput_localEPKc">
-<span id="_CPPv2N24CisAsciiTableInput_local24CisAsciiTableInput_localEPKc"></span><span id="CisAsciiTableInput_local::CisAsciiTableInput_local__cCP"></span><span class="target" id="class_cis_ascii_table_input__local_1a1f7f46702f688c571b4c86617ef5035d"></span><code class="descname">CisAsciiTableInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N24CisAsciiTableInput_local24CisAsciiTableInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_input__local"><span class="std std-ref">CisAsciiTableInput_local</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<dt id="_CPPv3N24YggAsciiTableInput_local24YggAsciiTableInput_localEPKc">
+<span id="_CPPv2N24YggAsciiTableInput_local24YggAsciiTableInput_localEPKc"></span><span id="YggAsciiTableInput_local::YggAsciiTableInput_local__cCP"></span><span class="target" id="class_ygg_ascii_table_input__local_1a282fd00d66d5ae921717cca017e9c362"></span><code class="descname">YggAsciiTableInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N24YggAsciiTableInput_local24YggAsciiTableInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_table_input__local"><span class="std std-ref">YggAsciiTableInput_local</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -987,16 +979,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv318CisAsciiArrayInput">
-<span id="_CPPv218CisAsciiArrayInput"></span><span id="CisAsciiArrayInput"></span><span class="target" id="class_cis_ascii_array_input"></span><em class="property">class </em><code class="descname">CisAsciiArrayInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317CisAsciiFileInput" title="CisAsciiFileInput">CisAsciiFileInput</a><a class="headerlink" href="#_CPPv318CisAsciiArrayInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality for arrays. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<dt id="_CPPv318YggAsciiArrayInput">
+<span id="_CPPv218YggAsciiArrayInput"></span><span id="YggAsciiArrayInput"></span><span class="target" id="class_ygg_ascii_array_input"></span><em class="property">class </em><code class="descname">YggAsciiArrayInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317YggAsciiFileInput" title="YggAsciiFileInput">YggAsciiFileInput</a><a class="headerlink" href="#_CPPv318YggAsciiArrayInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableInput_t functionality for arrays. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_array_input"><span class="std std-ref">YggAsciiArrayInput</span></a> class is a basic wrapper around the C yggAsciiTableInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N18CisAsciiArrayInput18CisAsciiArrayInputEPKc">
-<span id="_CPPv2N18CisAsciiArrayInput18CisAsciiArrayInputEPKc"></span><span id="CisAsciiArrayInput::CisAsciiArrayInput__cCP"></span><span class="target" id="class_cis_ascii_array_input_1a5b93411bc0df794c6f6a3189d2e02289"></span><code class="descname">CisAsciiArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18CisAsciiArrayInput18CisAsciiArrayInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<dt id="_CPPv3N18YggAsciiArrayInput18YggAsciiArrayInputEPKc">
+<span id="_CPPv2N18YggAsciiArrayInput18YggAsciiArrayInputEPKc"></span><span id="YggAsciiArrayInput::YggAsciiArrayInput__cCP"></span><span class="target" id="class_ygg_ascii_array_input_1a8ba211a2cc09444d739bd3c8b292c56e"></span><code class="descname">YggAsciiArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N18YggAsciiArrayInput18YggAsciiArrayInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_input"><span class="std std-ref">YggAsciiArrayInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -1011,16 +1003,16 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv324CisAsciiArrayInput_local">
-<span id="_CPPv224CisAsciiArrayInput_local"></span><span id="CisAsciiArrayInput_local"></span><span class="target" id="class_cis_ascii_array_input__local"></span><em class="property">class </em><code class="descname">CisAsciiArrayInput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317CisAsciiFileInput" title="CisAsciiFileInput">CisAsciiFileInput</a><a class="headerlink" href="#_CPPv324CisAsciiArrayInput_local" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality for local files as arrays. </p>
-<p>The <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<dt id="_CPPv324YggAsciiArrayInput_local">
+<span id="_CPPv224YggAsciiArrayInput_local"></span><span id="YggAsciiArrayInput_local"></span><span class="target" id="class_ygg_ascii_array_input__local"></span><em class="property">class </em><code class="descname">YggAsciiArrayInput_local</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv317YggAsciiFileInput" title="YggAsciiFileInput">YggAsciiFileInput</a><a class="headerlink" href="#_CPPv324YggAsciiArrayInput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggAsciiTableInput_t functionality for local files as arrays. </p>
+<p>The <a class="reference internal" href="#class_ygg_ascii_array_input"><span class="std std-ref">YggAsciiArrayInput</span></a> class is a basic wrapper around the C yggAsciiTableInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N24CisAsciiArrayInput_local24CisAsciiArrayInput_localEPKc">
-<span id="_CPPv2N24CisAsciiArrayInput_local24CisAsciiArrayInput_localEPKc"></span><span id="CisAsciiArrayInput_local::CisAsciiArrayInput_local__cCP"></span><span class="target" id="class_cis_ascii_array_input__local_1ab1a315749639f0edd562184bcdb34d42"></span><code class="descname">CisAsciiArrayInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N24CisAsciiArrayInput_local24CisAsciiArrayInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_input__local"><span class="std std-ref">CisAsciiArrayInput_local</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<dt id="_CPPv3N24YggAsciiArrayInput_local24YggAsciiArrayInput_localEPKc">
+<span id="_CPPv2N24YggAsciiArrayInput_local24YggAsciiArrayInput_localEPKc"></span><span id="YggAsciiArrayInput_local::YggAsciiArrayInput_local__cCP"></span><span class="target" id="class_ygg_ascii_array_input__local_1a2b526799669a3be21364817d89499930"></span><code class="descname">YggAsciiArrayInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N24YggAsciiArrayInput_local24YggAsciiArrayInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ascii_array_input__local"><span class="std std-ref">YggAsciiArrayInput_local</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -1035,15 +1027,15 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv312CisPlyOutput">
-<span id="_CPPv212CisPlyOutput"></span><span id="CisPlyOutput"></span><span class="target" id="class_cis_ply_output"></span><em class="property">class </em><code class="descname">CisPlyOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv39CisOutput" title="CisOutput">CisOutput</a><a class="headerlink" href="#_CPPv312CisPlyOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisPlyOutput_t functionality. The <a class="reference internal" href="#class_cis_ply_output"><span class="std std-ref">CisPlyOutput</span></a> class is a basic wrapper around the C cisPlyOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<dt id="_CPPv312YggPlyOutput">
+<span id="_CPPv212YggPlyOutput"></span><span id="YggPlyOutput"></span><span class="target" id="class_ygg_ply_output"></span><em class="property">class </em><code class="descname">YggPlyOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv39YggOutput" title="YggOutput">YggOutput</a><a class="headerlink" href="#_CPPv312YggPlyOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggPlyOutput_t functionality. The <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a> class is a basic wrapper around the C yggPlyOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N12CisPlyOutput12CisPlyOutputEPKc">
-<span id="_CPPv2N12CisPlyOutput12CisPlyOutputEPKc"></span><span id="CisPlyOutput::CisPlyOutput__cCP"></span><span class="target" id="class_cis_ply_output_1ae15d8b2786ee6353496795261861e840"></span><code class="descname">CisPlyOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisPlyOutput12CisPlyOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ply_output"><span class="std std-ref">CisPlyOutput</span></a>. </p>
+<dt id="_CPPv3N12YggPlyOutput12YggPlyOutputEPKc">
+<span id="_CPPv2N12YggPlyOutput12YggPlyOutputEPKc"></span><span id="YggPlyOutput::YggPlyOutput__cCP"></span><span class="target" id="class_ygg_ply_output_1a9e7364baeb21266dffad8e65717cf276"></span><code class="descname">YggPlyOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggPlyOutput12YggPlyOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_output"><span class="std std-ref">YggPlyOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -1055,8 +1047,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N12CisPlyOutput12CisPlyOutputE11cisOutput_t">
-<span id="_CPPv2N12CisPlyOutput12CisPlyOutputE11cisOutput_t"></span><span id="CisPlyOutput::CisPlyOutput__cisOutput_t"></span><span class="target" id="class_cis_ply_output_1abf07624890d145e13a036b2b3640c134"></span><code class="descname">CisPlyOutput</code><span class="sig-paren">(</span>cisOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisPlyOutput12CisPlyOutputE11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N12YggPlyOutput12YggPlyOutputE11yggOutput_t">
+<span id="_CPPv2N12YggPlyOutput12YggPlyOutputE11yggOutput_t"></span><span id="YggPlyOutput::YggPlyOutput__yggOutput_t"></span><span class="target" id="class_ygg_ply_output_1a82817a77f99af8d8f1e929bc517f91e7"></span><code class="descname">YggPlyOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggPlyOutput12YggPlyOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
@@ -1064,15 +1056,15 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv311CisPlyInput">
-<span id="_CPPv211CisPlyInput"></span><span id="CisPlyInput"></span><span class="target" id="class_cis_ply_input"></span><em class="property">class </em><code class="descname">CisPlyInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv38CisInput" title="CisInput">CisInput</a><a class="headerlink" href="#_CPPv311CisPlyInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisPlyInput_t functionality. The <a class="reference internal" href="#class_cis_ply_input"><span class="std std-ref">CisPlyInput</span></a> class is a basic wrapper around the C cisPlyInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<dt id="_CPPv311YggPlyInput">
+<span id="_CPPv211YggPlyInput"></span><span id="YggPlyInput"></span><span class="target" id="class_ygg_ply_input"></span><em class="property">class </em><code class="descname">YggPlyInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv38YggInput" title="YggInput">YggInput</a><a class="headerlink" href="#_CPPv311YggPlyInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggPlyInput_t functionality. The <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a> class is a basic wrapper around the C yggPlyInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N11CisPlyInput11CisPlyInputEPKc">
-<span id="_CPPv2N11CisPlyInput11CisPlyInputEPKc"></span><span id="CisPlyInput::CisPlyInput__cCP"></span><span class="target" id="class_cis_ply_input_1aedfc1d48a88199c0eb7b318f423b61c5"></span><code class="descname">CisPlyInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11CisPlyInput11CisPlyInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_ply_input"><span class="std std-ref">CisPlyInput</span></a>. </p>
+<dt id="_CPPv3N11YggPlyInput11YggPlyInputEPKc">
+<span id="_CPPv2N11YggPlyInput11YggPlyInputEPKc"></span><span id="YggPlyInput::YggPlyInput__cCP"></span><span class="target" id="class_ygg_ply_input_1a73faabdc73a209fa4b13da504f8c7621"></span><code class="descname">YggPlyInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11YggPlyInput11YggPlyInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_ply_input"><span class="std std-ref">YggPlyInput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -1084,8 +1076,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N11CisPlyInput11CisPlyInputE10cisInput_t">
-<span id="_CPPv2N11CisPlyInput11CisPlyInputE10cisInput_t"></span><span id="CisPlyInput::CisPlyInput__cisInput_t"></span><span class="target" id="class_cis_ply_input_1ae44397567fdba765a43aba31af169fd0"></span><code class="descname">CisPlyInput</code><span class="sig-paren">(</span>cisInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11CisPlyInput11CisPlyInputE10cisInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N11YggPlyInput11YggPlyInputE10yggInput_t">
+<span id="_CPPv2N11YggPlyInput11YggPlyInputE10yggInput_t"></span><span id="YggPlyInput::YggPlyInput__yggInput_t"></span><span class="target" id="class_ygg_ply_input_1abaada850efddd682de8a31a301f05373"></span><code class="descname">YggPlyInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11YggPlyInput11YggPlyInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
@@ -1093,15 +1085,15 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv312CisObjOutput">
-<span id="_CPPv212CisObjOutput"></span><span id="CisObjOutput"></span><span class="target" id="class_cis_obj_output"></span><em class="property">class </em><code class="descname">CisObjOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv39CisOutput" title="CisOutput">CisOutput</a><a class="headerlink" href="#_CPPv312CisObjOutput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisObjOutput_t functionality. The <a class="reference internal" href="#class_cis_obj_output"><span class="std std-ref">CisObjOutput</span></a> class is a basic wrapper around the C cisObjOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<dt id="_CPPv312YggObjOutput">
+<span id="_CPPv212YggObjOutput"></span><span id="YggObjOutput"></span><span class="target" id="class_ygg_obj_output"></span><em class="property">class </em><code class="descname">YggObjOutput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv39YggOutput" title="YggOutput">YggOutput</a><a class="headerlink" href="#_CPPv312YggObjOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggObjOutput_t functionality. The <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a> class is a basic wrapper around the C yggObjOutput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N12CisObjOutput12CisObjOutputEPKc">
-<span id="_CPPv2N12CisObjOutput12CisObjOutputEPKc"></span><span id="CisObjOutput::CisObjOutput__cCP"></span><span class="target" id="class_cis_obj_output_1afb7eecc9487342188c292e4a6889fee9"></span><code class="descname">CisObjOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisObjOutput12CisObjOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_obj_output"><span class="std std-ref">CisObjOutput</span></a>. </p>
+<dt id="_CPPv3N12YggObjOutput12YggObjOutputEPKc">
+<span id="_CPPv2N12YggObjOutput12YggObjOutputEPKc"></span><span id="YggObjOutput::YggObjOutput__cCP"></span><span class="target" id="class_ygg_obj_output_1a8308d4249eeabe76289aa0567bf705cd"></span><code class="descname">YggObjOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggObjOutput12YggObjOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_output"><span class="std std-ref">YggObjOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -1113,8 +1105,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N12CisObjOutput12CisObjOutputE11cisOutput_t">
-<span id="_CPPv2N12CisObjOutput12CisObjOutputE11cisOutput_t"></span><span id="CisObjOutput::CisObjOutput__cisOutput_t"></span><span class="target" id="class_cis_obj_output_1a0788a59b74f38c7bfd27b21fd39386e7"></span><code class="descname">CisObjOutput</code><span class="sig-paren">(</span>cisOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12CisObjOutput12CisObjOutputE11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N12YggObjOutput12YggObjOutputE11yggOutput_t">
+<span id="_CPPv2N12YggObjOutput12YggObjOutputE11yggOutput_t"></span><span id="YggObjOutput::YggObjOutput__yggOutput_t"></span><span class="target" id="class_ygg_obj_output_1a24c2c5cf1e268c4d7a9b3843255e9b7d"></span><code class="descname">YggObjOutput</code><span class="sig-paren">(</span>yggOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N12YggObjOutput12YggObjOutputE11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
@@ -1122,15 +1114,15 @@
 </dd></dl>
 
 <dl class="class">
-<dt id="_CPPv311CisObjInput">
-<span id="_CPPv211CisObjInput"></span><span id="CisObjInput"></span><span class="target" id="class_cis_obj_input"></span><em class="property">class </em><code class="descname">CisObjInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv38CisInput" title="CisInput">CisInput</a><a class="headerlink" href="#_CPPv311CisObjInput" title="Permalink to this definition">¶</a><br /></dt>
-<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisObjInput_t functionality. The <a class="reference internal" href="#class_cis_obj_input"><span class="std std-ref">CisObjInput</span></a> class is a basic wrapper around the C cisObjInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<dt id="_CPPv311YggObjInput">
+<span id="_CPPv211YggObjInput"></span><span id="YggObjInput"></span><span class="target" id="class_ygg_obj_input"></span><em class="property">class </em><code class="descname">YggObjInput</code> : <em class="property">public</em> <a class="reference internal" href="#_CPPv38YggInput" title="YggInput">YggInput</a><a class="headerlink" href="#_CPPv311YggObjInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;YggInterface.hpp&gt;</em><p>C++ interface to yggObjInput_t functionality. The <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a> class is a basic wrapper around the C yggObjInput_t structure and associated functions from the YggInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv3N11CisObjInput11CisObjInputEPKc">
-<span id="_CPPv2N11CisObjInput11CisObjInputEPKc"></span><span id="CisObjInput::CisObjInput__cCP"></span><span class="target" id="class_cis_obj_input_1a76dfa86d8de7415db586f5993271c5fe"></span><code class="descname">CisObjInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11CisObjInput11CisObjInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Constructor for <a class="reference internal" href="#class_cis_obj_input"><span class="std std-ref">CisObjInput</span></a>. </p>
+<dt id="_CPPv3N11YggObjInput11YggObjInputEPKc">
+<span id="_CPPv2N11YggObjInput11YggObjInputEPKc"></span><span id="YggObjInput::YggObjInput__cCP"></span><span class="target" id="class_ygg_obj_input_1a82b3d8d0a4edff3e11b195551622f3af"></span><code class="descname">YggObjInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11YggObjInput11YggObjInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_ygg_obj_input"><span class="std std-ref">YggObjInput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
@@ -1142,8 +1134,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv3N11CisObjInput11CisObjInputE10cisInput_t">
-<span id="_CPPv2N11CisObjInput11CisObjInputE10cisInput_t"></span><span id="CisObjInput::CisObjInput__cisInput_t"></span><span class="target" id="class_cis_obj_input_1a159e6c8945d6fa7fd8361a045255eddb"></span><code class="descname">CisObjInput</code><span class="sig-paren">(</span>cisInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11CisObjInput11CisObjInputE10cisInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv3N11YggObjInput11YggObjInputE10yggInput_t">
+<span id="_CPPv2N11YggObjInput11YggObjInputE10yggInput_t"></span><span id="YggObjInput::YggObjInput__yggInput_t"></span><span class="target" id="class_ygg_obj_input_1a303b39acf282878baa14eeaa7cc93ad7"></span><code class="descname">YggObjInput</code><span class="sig-paren">(</span>yggInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv3N11YggObjInput11YggObjInputE10yggInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Empty constructor for inheritance. </p>
 </dd></dl>
 
@@ -1160,10 +1152,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="dataio_cpp.html" class="btn btn-neutral float-right" title="C++ DataIO API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="interface_m.html" class="btn btn-neutral float-right" title="Matlab Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="code_cpp.html" class="btn btn-neutral" title="C++ Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="interface_c.html" class="btn btn-neutral" title="C Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

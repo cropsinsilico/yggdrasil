@@ -4,9 +4,10 @@ Release Steps
 
 #. [on branch] Regenerate schema:: 
 
-   $ cisschema
-   $ git add cis_interface/.cis_schema.yml
-   $ git commit -m "Updated .cis_schema.yml"
+   $ yggschema
+   $ git add yggdrasil/.ygg_schema.yml
+   $ git add yggdrasil/.ygg_metaschema.json
+   $ git commit -m "Updated .ygg_schema.yml and .ygg_metaschema.json"
    $ git push origin [BRANCH]
 
 #. [on branch] Open pull request to merge changes into master
@@ -36,9 +37,9 @@ Docs Checkout
 
 Before running ``make ghpages``, you must first checkout the 'ghpages' branch 
 in the appropriate location. This only has to be done once on each machine you 
-publish docs from. From the ``cis_interface`` source directory::
+publish docs from. From the ``yggdrasil`` source directory::
 
    $ cd ../
-   $ git clone https://github.com/cropsinsilico/cis_interface.git cis_interface_docs
-   $ cd cis_interface_docs
+   $ git clone https://github.com/cropsinsilico/yggdrasil.git yggdrasil_docs
+   $ cd yggdrasil_docs
    $ git checkout gh-pages

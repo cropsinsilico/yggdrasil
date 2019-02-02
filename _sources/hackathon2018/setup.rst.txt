@@ -11,7 +11,7 @@ Visual Studio. If you do not already have a copy, the free community
 edition will work and can be downloaded 
 `here <https://visualstudio.microsoft.com/vs/express/>`_. Visual Studio (VS)
 can be installed in parallel with conda, just be sure to finish installing 
-VS before moving on to installing |cis_interface|.
+VS before moving on to installing |yggdrasil|.
 
 
 Setting up your Conda environment
@@ -22,7 +22,7 @@ with Python 3.6 installed. Conda allows you to have multile development
 environments with different versions of Python and/or software packages 
 on the same machine. While this is not strictly necessary, it is recommended
 as it will help to ensure that you are using the same version of 
-|cis_interface| and its dependencies as everyone else.
+|yggdrasil| and its dependencies as everyone else.
 
 If you do not already have conda on your machine, download and 
 install Anaconda from `here <https://www.anaconda.com/download/>`_.
@@ -31,26 +31,26 @@ Once Anaconda (or Miniconda) is installed you can create a new Python 3.6
 environment for the hackathon by entering the following at your terminal 
 prompt (or Anaconda prompt for Windows)::
 
-  $ conda create -n cis python=3.6
+  $ conda create -n ygg python=3.6
 
 On Linux/MacOS, the created environment can be activated by calling::
 
-  $ source activate cis
+  $ source activate ygg
 
 On Windows, this can be done by calling the following from the Anaconda 
 prompt::
 
-  $ activate cis
+  $ activate ygg
 
 Verify that the correct version of Python is now being used.::
 
   $ python --version
 
 
-Installing |cis_interface|
+Installing |yggdrasil|
 ==========================
 
-Directions for installing the |cis_interface| package and its dependencies 
+Directions for installing the |yggdrasil| package and its dependencies 
 can be found :ref:`here <install_rst>`. We recommend installing via 
 conda and/or pip for the purpose of the hackathon.
 
@@ -60,11 +60,11 @@ Get Hackathon Materials
 
 To get started, we will walk through transforming an example model and 
 connecting it to other models. To make sure we are all on the same page, 
-create a ``cis_home`` directory somewhere that you will remember and can 
+create a ``ygg_home`` directory somewhere that you will remember and can 
 access from the command line and then move into that directory::
 
-  $ mkdir cis_home
-  $ cd cis_home
+  $ mkdir ygg_home
+  $ cd ygg_home
 
 The tutorial will use this directory as a reference for naming files and 
 running the examples.
@@ -85,7 +85,7 @@ you can fork the hackathon2018 repository (Fork button in the upper right)
 
 .. image:: setup_images/setup_fork.png
 
-and clone your fork on your machine into the ``cis_home`` directory.::
+and clone your fork on your machine into the ``ygg_home`` directory.::
 
   $ git clone https://github.com/[your username]/hackathon2018.git
 
@@ -103,7 +103,7 @@ repository as a .zip or .tar.gz archive from the GitHub page by clicking
 You can also download a tagged version of the materials from 
 `here <https://github.com/cropsinsilico/hackathon2018/releases/tag/1.0>`_.
 
-Once downloaded, extract the repository into the ``cis_home`` directory.
+Once downloaded, extract the repository into the ``ygg_home`` directory.
 
 
 Running Tests

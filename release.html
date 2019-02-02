@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Release Steps &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>Release Steps &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release Steps</a></li>
@@ -116,7 +117,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -170,9 +171,10 @@
 <h1>Release Steps<a class="headerlink" href="#release-steps" title="Permalink to this headline">¶</a></h1>
 <ol class="arabic">
 <li><p class="first">[on branch] Regenerate schema:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cisschema
-$ git add cis_interface/.cis_schema.yml
-$ git commit -m &quot;Updated .cis_schema.yml&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggschema
+$ git add yggdrasil/.ygg_schema.yml
+$ git add yggdrasil/.ygg_metaschema.json
+$ git commit -m &quot;Updated .ygg_schema.yml and .ygg_metaschema.json&quot;
 $ git push origin [BRANCH]
 </pre></div>
 </div>
@@ -211,10 +213,10 @@ $ make ghpages
 <h1>Docs Checkout<a class="headerlink" href="#docs-checkout" title="Permalink to this headline">¶</a></h1>
 <p>Before running <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">ghpages</span></code>, you must first checkout the ‘ghpages’ branch
 in the appropriate location. This only has to be done once on each machine you
-publish docs from. From the <code class="docutils literal notranslate"><span class="pre">cis_interface</span></code> source directory:</p>
+publish docs from. From the <code class="docutils literal notranslate"><span class="pre">yggdrasil</span></code> source directory:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ../
-$ git clone https://github.com/cropsinsilico/cis_interface.git cis_interface_docs
-$ cd cis_interface_docs
+$ git clone https://github.com/cropsinsilico/yggdrasil.git yggdrasil_docs
+$ cd yggdrasil_docs
 $ git checkout gh-pages
 </pre></div>
 </div>

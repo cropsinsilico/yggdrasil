@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>formatted_io9 Example &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>formatted_io9 Example &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> cis_interface
+            <a href="../index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../code.html">Code</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="examples_toc.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="gs_lesson1.html">gs_lesson1 Example</a></li>
@@ -138,7 +139,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">cis_interface</a>
+          <a href="../index.html">yggdrasil</a>
         
       </nav>
 
@@ -220,11 +221,11 @@
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -271,11 +272,11 @@
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -393,8 +394,8 @@
 28
 29
 30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">);</span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">);</span>
 
 <span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
@@ -454,8 +455,8 @@
 28
 29
 30</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">);</span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">);</span>
 
 <span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 

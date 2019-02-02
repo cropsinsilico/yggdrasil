@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>formatted_io6 Example &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>formatted_io6 Example &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> cis_interface
+            <a href="../index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../code.html">Code</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="examples_toc.html">Examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="gs_lesson1.html">gs_lesson1 Example</a></li>
@@ -140,7 +141,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">cis_interface</a>
+          <a href="../index.html">yggdrasil</a>
         
       </nav>
 
@@ -226,12 +227,12 @@
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisObjInput</span><span class="p">,</span> <span class="n">CisObjOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggObjInput</span><span class="p">,</span> <span class="n">YggObjOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisObjInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisObjOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggObjInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggObjOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -283,12 +284,12 @@
 27
 28</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pprint</span>
 <span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisObjInput</span><span class="p">,</span> <span class="n">CisObjOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggObjInput</span><span class="p">,</span> <span class="n">YggObjOutput</span><span class="p">)</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisObjInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisObjOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggObjInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggObjOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -392,8 +393,8 @@
 29
 30
 31</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisObjInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisObjOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">);</span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggObjInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggObjOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">);</span>
 
 <span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
@@ -455,8 +456,8 @@
 29
 30
 31</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
-<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisObjInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisObjOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">);</span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggObjInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">YggInterface</span><span class="p">(</span><span class="s">&#39;YggObjOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">);</span>
 
 <span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
@@ -593,12 +594,12 @@
 54
 55</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 <span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">cisObjInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisObjInput</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">cisObjOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisObjOutput</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
+  <span class="n">yggObjInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">yggObjInput</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+  <span class="n">yggObjOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">yggObjOutput</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -610,7 +611,7 @@
     <span class="c1">// Receive input from input channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cisRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
@@ -632,7 +633,7 @@
 
     <span class="c1">// Send output to output channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cisSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
@@ -704,12 +705,12 @@
 54
 55</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 <span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;YggInterface.h&quot;</span><span class="cp"></span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">cisObjInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisObjInput</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">cisObjOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisObjOutput</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
+  <span class="n">yggObjInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">yggObjInput</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+  <span class="n">yggObjOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">yggObjOutput</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -721,7 +722,7 @@
     <span class="c1">// Receive input from input channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="c1">// Otherwise, it is the size of the received message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cisRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
@@ -743,7 +744,7 @@
 
     <span class="c1">// Send output to output channel</span>
     <span class="c1">// If there is an error, the flag will be negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">cisSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">yggSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
@@ -864,12 +865,12 @@
 53
 54</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 <span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">CisObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
+  <span class="n">YggObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+  <span class="n">YggObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -975,14 +976,14 @@
 55
 56</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
 <span class="c1">// Include methods for input/output channels</span>
-<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;YggInterface.hpp&quot;</span><span class="cp"></span>
 
 <span class="cp">#define MYBUFSIZ 1000</span>
 
 <span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
   <span class="c1">// Initialize input/output channels</span>
-  <span class="n">CisObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">CisObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
+  <span class="n">YggObjInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+  <span class="n">YggObjOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">);</span>
 
   <span class="c1">// Declare resulting variables and create buffer for received message</span>
   <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>

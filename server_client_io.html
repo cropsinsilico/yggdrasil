@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Server/Client I/O &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>Server/Client I/O &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
@@ -119,7 +120,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -176,7 +177,7 @@ would required sending the input variable(s) to the model being called and
 then sending the output variables(s) back to the calling model. We refer to
 this as a Remote Procedure Call (RPC). The model being called can be considered
 a server providing its calculations as a service to the client (the calling model).
-The cis_interface provides options for treating models as server and clients.</p>
+The yggdrasil provides options for treating models as server and clients.</p>
 <div class="section" id="one-server-one-client">
 <h2>One Server, One Client<a class="headerlink" href="#one-server-one-client" title="Permalink to this headline">¶</a></h2>
 <p>In the example below, the “server” model computes the nth number in the
@@ -245,7 +246,7 @@ disconnected.</p>
 58
 59
 60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
@@ -277,7 +278,7 @@ disconnected.</p>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
@@ -351,8 +352,8 @@ disconnected.</p>
 43
 44</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisRpcClient</span><span class="p">,</span> <span class="n">CisOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggRpcClient</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
@@ -368,8 +369,8 @@ disconnected.</p>
 
     <span class="c1"># Set up connections matching yaml</span>
     <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">log</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s2">&quot;output_log&quot;</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s2">&quot;output_log&quot;</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="c1"># Iterate over Fibonacci sequence</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
@@ -396,11 +397,11 @@ disconnected.</p>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/rpc_lesson1.html">Example in other languages</a>)</p>
-<p>The interface server-side API call (CisRpcServer for Python),
+<p>The interface server-side API call (YggRpcServer for Python),
 requires 3 input variables: the name of the server channel (this will be
 the name of the server model), a format string for input to the server model,
 and a format string for output from the server model. The client-side API call
-(CisRpcClient for Python), also requires 3 input variables: the name of the
+(YggRpcClient for Python), also requires 3 input variables: the name of the
 client channel (this is the name of the server model joined with the name of
 the client model by an underscore, <code class="docutils literal notranslate"><span class="pre">&lt;server&gt;_&lt;client&gt;</span></code>, a format string for
 input to the server model, and a format string for output form the server
@@ -529,7 +530,7 @@ between two clients using the same source code.</p>
 58
 59
 60</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggRpcServer</span>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
@@ -561,7 +562,7 @@ between two clients using the same source code.</p>
     <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
 
     <span class="c1"># Create server-side rpc conneciton using model name</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Continue receiving requests until the connection is closed when all</span>
     <span class="c1"># clients have disconnected.</span>
@@ -638,8 +639,8 @@ between two clients using the same source code.</p>
 46
 47</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">CisRpcClient</span><span class="p">,</span> <span class="n">CisOutput</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">YggRpcClient</span><span class="p">,</span> <span class="n">YggOutput</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">client_index</span><span class="p">):</span>
@@ -657,8 +658,8 @@ between two clients using the same source code.</p>
 
     <span class="c1"># Set up connections matching yaml</span>
     <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
-    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">log</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s2">&quot;output_log</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">YggRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s2">&quot;output_log</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="c1"># Iterate over Fibonacci sequence</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>

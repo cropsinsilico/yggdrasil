@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>Configuration Files &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
@@ -122,7 +123,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -174,13 +175,13 @@
             
   <div class="section" id="configuration-files">
 <span id="config-rst"></span><h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
-<p>Many components of the cis_interface framework’s behavior can be controlled
-by options in the configuration file. When installed cis_interface creates
-a user config file called ‘.cis_interface.cfg’ in your home directory. By
+<p>Many components of the yggdrasil framework’s behavior can be controlled
+by options in the configuration file. When installed yggdrasil creates
+a user config file called ‘.yggdrasil.cfg’ in your home directory. By
 editting the options in the user config file, you can customize the behavior
 of your framework runs.</p>
 <p>Further customization for specific runs can be
-achieved by creating a local config file called ‘.cis_interface.cfg’ in the
+achieved by creating a local config file called ‘.yggdrasil.cfg’ in the
 directory where the interface will be run. Any options not found in the local
 will be filled in with values from the user config file. Any options not
 found in the user config file will be filled in with default package values.</p>
@@ -213,10 +214,10 @@ These include:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>cis</td>
+<tr class="row-even"><td>ygg</td>
 <td>INFO</td>
 <td>Controls the level of messages printed by the
-cis_interface framework itself.</td>
+yggdrasil framework itself.</td>
 </tr>
 <tr class="row-odd"><td>rmq</td>
 <td>WARNING</td>
@@ -226,7 +227,7 @@ RabbitMQ.</td>
 <tr class="row-even"><td>client</td>
 <td>INFO</td>
 <td>Controls the level of messages printed by
-cis_interface calls from the models.</td>
+yggdrasil calls from the models.</td>
 </tr>
 </tbody>
 </table>
@@ -306,7 +307,7 @@ These include:</p>
 <div class="section" id="parallel-options">
 <h2>Parallel Options<a class="headerlink" href="#parallel-options" title="Permalink to this headline">¶</a></h2>
 <p>Options in the ‘[parallel]’ section control the behavior of parallelization.
-Although, not supported in the current version of cis_interface, these
+Although, not supported in the current version of yggdrasil, these
 include:</p>
 <table border="1" class="docutils">
 <colgroup>

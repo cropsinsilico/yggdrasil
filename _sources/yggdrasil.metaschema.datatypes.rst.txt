@@ -1,0 +1,125 @@
+yggdrasil.metaschema.datatypes package
+======================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    yggdrasil.metaschema.datatypes.tests
+
+Submodules
+----------
+
+yggdrasil.metaschema.datatypes.ArrayMetaschemaType module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.ArrayMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.ContainerMetaschemaType module
+-------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.ContainerMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.FixedMetaschemaType module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.FixedMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.FunctionMetaschemaType module
+------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.FunctionMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType module
+-------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.JSONMetaschemaType module
+--------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.JSONMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType module
+--------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.MetaschemaType module
+----------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.MetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.ObjMetaschemaType module
+-------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.ObjMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.PlyMetaschemaType module
+-------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.PlyMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.ScalarMetaschemaType module
+----------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.ScalarMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.SchemaMetaschemaType module
+----------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.SchemaMetaschemaType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.datatypes.conversions module
+-------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.datatypes.conversions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.metaschema.datatypes
+    :members:
+    :undoc-members:
+    :show-inheritance:

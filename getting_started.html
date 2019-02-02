@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting started &mdash; cis_interface 0.6.1+424.ga1da56a3 documentation</title>
+  <title>Getting started &mdash; yggdrasil 0.7.0+121.g6a5e7485 documentation</title>
   
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cis_interface
+            <a href="index.html" class="icon icon-home"> yggdrasil
           
 
           
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.6.1
+                0.7.0
               </div>
             
           
@@ -104,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
@@ -123,7 +124,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cis_interface</a>
+          <a href="index.html">yggdrasil</a>
         
       </nav>
 
@@ -175,7 +176,7 @@
             
   <div class="section" id="getting-started">
 <span id="getting-started-rst"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>The cis_interface runs user defined models and orchestrates asynchronous
+<p>The yggdrasil runs user defined models and orchestrates asynchronous
 communication between models using drivers that coordinate the different
 components via threads. Model drivers run the models as seperate processes
 and monitor them to redirect output to stdout and determine if the model
@@ -212,18 +213,18 @@ the path to the model source code that should be run. There are specialized
 drivers for simple source written in Python, Matlab, C, and C++, but any
 executable can be run as a model using the ‘ModelDriver’ driver. Then the ‘args’
 model parameter should be the path to the execuatable. Additional information on
-the format cis_interface YAML files should take can be found in the
+the format yggdrasil YAML files should take can be found in the
 <a class="reference internal" href="yaml.html#yaml-rst"><span class="std std-ref">YAML Files</span></a> section.</p>
-<p>This model can then be run using the cis_interface framework by calling the
-commandline entry point <cite>cisrun</cite> followed by the path to the YAML.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cisrun model.yml
+<p>This model can then be run using the yggdrasil framework by calling the
+commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun model.yml
 </pre></div>
 </div>
 </div>
 <div class="section" id="running-multiple-models">
 <h2>Running multiple models<a class="headerlink" href="#running-multiple-models" title="Permalink to this headline">¶</a></h2>
-<p>Multiple models can be run by either passing multiple YAML files to <cite>cisrun</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cisrun model1.yml model2.yml
+<p>Multiple models can be run by either passing multiple YAML files to <cite>yggrun</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun model1.yml model2.yml
 </pre></div>
 </div>
 <p>or including multiple models in a single YAML file.</p>
@@ -250,7 +251,7 @@ commandline entry point <cite>cisrun</cite> followed by the path to the YAML.:</
 <div class="section" id="model-file-input-output">
 <h2>Model file input/output<a class="headerlink" href="#model-file-input-output" title="Permalink to this headline">¶</a></h2>
 <p>Models can get input from or send output to files via input and output channels.
-To do so cis_interface provides several useful functions for interfacing with
+To do so yggdrasil provides several useful functions for interfacing with
 these channels. In the example below, the model receives input from a channel
 named ‘input’ and sends output to a channel named ‘output’.</p>
 <p>Model Code:</p>
@@ -280,11 +281,11 @@ named ‘input’ and sends output to a channel named ‘output’.</p>
 24
 25
 26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -424,11 +425,11 @@ a channel named ‘outputA’, while model B receives input from a channel named
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputA&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputA&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
@@ -475,11 +476,11 @@ a channel named ‘outputA’, while model B receives input from a channel named
 23
 24
 25</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1"># Import classes for input/output channels</span>
-<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisInput</span><span class="p">,</span> <span class="n">CisOutput</span>
+<span class="kn">from</span> <span class="nn">yggdrasil.interface.YggInterface</span> <span class="kn">import</span> <span class="n">YggInput</span><span class="p">,</span> <span class="n">YggOutput</span>
 
 <span class="c1"># Initialize input/output channels</span>
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
+<span class="n">in_channel</span> <span class="o">=</span> <span class="n">YggInput</span><span class="p">(</span><span class="s1">&#39;inputB&#39;</span><span class="p">)</span>
+<span class="n">out_channel</span> <span class="o">=</span> <span class="n">YggOutput</span><span class="p">(</span><span class="s1">&#39;outputB&#39;</span><span class="p">)</span>
 
 <span class="c1"># Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
