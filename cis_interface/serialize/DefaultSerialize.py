@@ -423,7 +423,7 @@ class DefaultSerialize(tools.CisClass):
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-            self.info("Extra kwargs: %s" % str(self.extra_kwargs))
+            self.debug("Extra kwargs: %s" % str(self.extra_kwargs))
         # Update type
         if not skip_type:
             # Update typedef from oldstyle keywords in extra_kwargs
