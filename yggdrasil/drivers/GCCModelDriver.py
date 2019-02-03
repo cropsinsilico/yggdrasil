@@ -169,6 +169,10 @@ def get_cc(cpp=False, shared=False, static=False, linking=False):
         str: Command line compiler.
 
     """
+    if cpp:
+        cc_env = 'CXX'
+    else:
+        cc_env = 'CC'
     if platform._is_win:  # pragma: windows
         if shared:
             cc = 'LINK'
@@ -177,25 +181,21 @@ def get_cc(cpp=False, shared=False, static=False, linking=False):
         elif linking:
             cc = 'LINK'
         else:
-            cc = 'cl'
+            cc = os.environ.get(cc_env, 'cl')
     elif platform._is_mac:
         if static:
             cc = 'libtool'
         elif cpp:
-            cc = 'clang++'
+            cc = os.environ.get(cc_env, 'clang++')
         else:
-            cc = 'clang'
+            cc = os.environ.get(cc_env, 'clang')
     else:
         if static:
             cc = 'ar'
         elif cpp:
-            cc = 'g++'
+            cc = os.environ.get(cc_env, 'g++')
         else:
-            cc = 'gcc'
-    if cpp:
-        cc = os.environ.get('CXX', cc)
-    else:
-        cc = os.environ.get('CC', cc)
+            cc = os.environ.get(cc_env, 'gcc')
     return cc
 
 
