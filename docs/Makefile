@@ -17,8 +17,7 @@ help:
 .PHONY: help Makefile
 
 .PHONY: ghpages
-ghpages: autodoc
-
+ghpages: clean autodoc
 	cp -a $(BUILDDIR)/html/. $(REPODIR)/
 	cd $(REPODIR) ; git pull ; git add . ; git commit -m "rebuilt docs" ; git push origin master
 
