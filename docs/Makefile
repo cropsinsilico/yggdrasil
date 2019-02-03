@@ -16,7 +16,7 @@ help:
 
 .PHONY: help Makefile
 
-.PHONY: ghpages
+.PHONY: clean ghpages
 ghpages: autodoc
 
 	cp -a $(BUILDDIR)/html/. $(REPODIR)/
