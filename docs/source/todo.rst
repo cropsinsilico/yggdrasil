@@ -31,3 +31,4 @@ TODO
 * Preprocessor macro for dynamically determine message type?
 * Try to setup comm/connection at class level
 * Init new PyPI entry and update SHA in .travis.yml
+* Fix circular dependency when determining if C/C++ models are supported via czmq
