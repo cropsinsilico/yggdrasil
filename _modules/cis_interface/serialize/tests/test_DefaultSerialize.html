@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.serialize.tests.test_DefaultSerialize &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.serialize.tests.test_DefaultSerialize &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../index.html"/> 
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -174,51 +183,51 @@
 
 
 <div class="viewcode-block" id="test_demote_string"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.test_demote_string">[docs]</a><span class="k">def</span> <span class="nf">test_demote_string</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test format str creation of typedef.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test format str creation of typedef.&quot;&quot;&quot;</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
                              <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;bytes&#39;</span><span class="p">}]})</span></div>
 
 
 <div class="viewcode-block" id="TestDefaultSerialize"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize</span><span class="p">(</span><span class="n">CisTestClassInfo</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;DefaultSerialize&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">arg1</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="n">arg2</span><span class="o">=</span><span class="s1">&#39;two&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;datatype&#39;</span><span class="p">,</span> <span class="s1">&#39;typedef&#39;</span><span class="p">,</span> <span class="s1">&#39;numpy_dtype&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Module for class to be tested.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Module for class to be tested.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;cis_interface.serialize.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Keyword arguments for creating the test instance.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Keyword arguments for creating the test instance.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="TestDefaultSerialize.empty_head"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.empty_head">[docs]</a>    <span class="k">def</span> <span class="nf">empty_head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Empty header for message only contains the size.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Empty header for message only contains the size.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="n">incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">msg</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_EOF</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;eof&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="TestDefaultSerialize.map_sent2recv"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.map_sent2recv">[docs]</a>    <span class="k">def</span> <span class="nf">map_sent2recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="TestDefaultSerialize.assert_result_equal"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.assert_result_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_result_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that serialized/deserialized objects equal.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Assert that serialized/deserialized objects equal.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_sent2recv</span><span class="p">(</span><span class="n">y</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestDefaultSerialize.test_field_specs"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_field_specs">[docs]</a>    <span class="k">def</span> <span class="nf">test_field_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test field specifiers.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test field specifiers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">,</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_user_defined&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">,</span>
@@ -237,7 +246,7 @@
                               <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></div>
         
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serialize/deserialize.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">iobj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">)</span>
             <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -245,16 +254,16 @@
             <span class="c1"># self.assert_equal(ihead, self.empty_head(msg))</span>
 
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize_no_metadata"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_no_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_no_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serializing without metadata.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serializing without metadata.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
                                 <span class="n">no_metadata</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestDefaultSerialize.test_deserialize_error"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_deserialize_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when deserializing message that is not bytes.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test error when deserializing message that is not bytes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize_sinfo"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_sinfo">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_sinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize with serializer info.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serialize/deserialize with serializer info.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_user_defined&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
@@ -283,7 +292,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ihead</span><span class="p">,</span> <span class="n">hout</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize_header"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_header">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize with header.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serialize/deserialize with header.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">iobj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span><span class="p">)</span>
             <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -291,7 +300,7 @@
             <span class="c1"># self.assert_equal(ihead, self._header_info)</span>
         
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize_eof"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize EOF.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serialize/deserialize EOF.&quot;&quot;&quot;</span>
         <span class="n">iobj</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_EOF</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">)</span>
         <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -299,7 +308,7 @@
         <span class="c1"># self.assert_equal(ihead, self.empty_head(msg))</span>
         
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize_eof_header"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof_header">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_eof_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize EOF with header.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serialize/deserialize EOF with header.&quot;&quot;&quot;</span>
         <span class="n">iobj</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_EOF</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_header_info</span><span class="p">)</span>
         <span class="n">iout</span><span class="p">,</span> <span class="n">ihead</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -307,7 +316,7 @@
         <span class="c1"># self.assert_equal(ihead, self.empty_head(msg))</span>
         
 <div class="viewcode-block" id="TestDefaultSerialize.test_serialize_no_format"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_no_format">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_no_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize without format string.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serialize/deserialize without format string.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;DefaultSerialize&#39;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">iobj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">iobj</span><span class="p">,</span>
@@ -318,13 +327,13 @@
             <span class="c1"># self.assert_raises(Exception, self.instance.serialize, [&#39;msg&#39;, 0])</span>
         
 <div class="viewcode-block" id="TestDefaultSerialize.test_deserialize_empty"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_empty">[docs]</a>    <span class="k">def</span> <span class="nf">test_deserialize_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test call for empty string.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test call for empty string.&quot;&quot;&quot;</span>
         <span class="n">out</span><span class="p">,</span> <span class="n">head</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_head</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestDefaultSerialize.test_invalid_update"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_invalid_update">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error raised when serializer updated with type that isn&#39;t</span>
+        <span class="sd">r&quot;&quot;&quot;Test error raised when serializer updated with type that isn&#39;t</span>
 <span class="sd">        compatible.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;DefaultSerialize&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">initialize_from_message</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
@@ -333,22 +342,22 @@
         
 
 <div class="viewcode-block" id="TestDefaultSerialize_format"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_format</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with format.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class with format.&quot;&quot;&quot;</span>
 
     <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;as_format&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_array"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_array</span><span class="p">(</span><span class="n">TestDefaultSerialize_format</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with format as array.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class with format as array.&quot;&quot;&quot;</span>
 
     <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;as_format&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_uniform"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_uniform</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for items as dictionary.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for items as dictionary.&quot;&quot;&quot;</span>
     
 <div class="viewcode-block" id="TestDefaultSerialize_uniform.get_options"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;1darray&#39;</span><span class="p">,</span>
                                                      <span class="s1">&#39;subtype&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
                                                      <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">}},</span>
@@ -366,13 +375,13 @@
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_uniform_names"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform_names">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_uniform_names</span><span class="p">(</span><span class="n">TestDefaultSerialize_uniform</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for items as dictionary.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for items as dictionary.&quot;&quot;&quot;</span>
     
 <div class="viewcode-block" id="TestDefaultSerialize_uniform_names.get_options"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform_names.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_uniform_names</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_options</span><span class="p">()</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;g&#39;</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;field_units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;f8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;f8&#39;</span><span class="p">)])</span>
@@ -391,20 +400,20 @@
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_func"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_func</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with functions.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class with functions.&quot;&quot;&quot;</span>
 
     <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;as_format&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_func</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_func</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span>
 
 <div class="viewcode-block" id="TestDefaultSerialize_func.get_options"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;func_serialize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span><span class="p">,</span>
                           <span class="s1">&#39;func_deserialize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span><span class="p">},</span>
-               <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="n">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">],</span>
                            <span class="p">[</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">]],</span>
                <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
@@ -414,11 +423,11 @@
         <span class="k">return</span> <span class="n">out</span></div>
         
     <span class="k">def</span> <span class="nf">_func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that deserializes using eval.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Method that deserializes using eval.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;empty&#39;</span><span class="p">]</span>
         <span class="n">x</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
@@ -428,11 +437,11 @@
 <div class="viewcode-block" id="FakeSerializer"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.FakeSerializer">[docs]</a><span class="k">class</span> <span class="nc">FakeSerializer</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">):</span>
 
 <div class="viewcode-block" id="FakeSerializer.func_serialize"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.FakeSerializer.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">args</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="FakeSerializer.func_deserialize"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.FakeSerializer.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that deserializes using eval.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Method that deserializes using eval.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="n">x</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
@@ -440,12 +449,12 @@
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_class"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_class</span><span class="p">(</span><span class="n">TestDefaultSerialize_func</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with classes.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class with classes.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TestDefaultSerialize_class.get_options"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
         <span class="n">temp_seri</span> <span class="o">=</span> <span class="n">FakeSerializer</span><span class="p">()</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">temp_seri</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">))</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">temp_seri</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">))</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_class</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_options</span><span class="p">()</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;func_serialize&#39;</span><span class="p">:</span> <span class="n">temp_seri</span><span class="p">,</span>
                          <span class="s1">&#39;func_deserialize&#39;</span><span class="p">:</span> <span class="n">temp_seri</span><span class="p">,</span>
@@ -456,10 +465,10 @@
         
 
 <div class="viewcode-block" id="TestDefaultSerialize_alias"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_alias</span><span class="p">(</span><span class="n">TestDefaultSerialize_format</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with alias.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class with alias.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TestDefaultSerialize_alias.setup"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an instance of the class.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Create an instance of the class.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestDefaultSerialize_alias</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">DefaultSerialize</span><span class="p">()</span>
@@ -467,12 +476,12 @@
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_type"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_type">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_type</span><span class="p">(</span><span class="n">TestDefaultSerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with types.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class with types.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TestDefaultSerialize_type.get_options"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_type.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">},</span>
-               <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="n">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)],</span>
                <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span>
                <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">},</span>
@@ -481,39 +490,41 @@
 
 
 <div class="viewcode-block" id="TestDefaultSerialize_func_error"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error">[docs]</a><span class="k">class</span> <span class="nc">TestDefaultSerialize_func_error</span><span class="p">(</span><span class="n">TestDefaultSerialize_func</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for DefaultSerialize class with incorrect functions.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test class for DefaultSerialize class with incorrect functions.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Method that serializes using repr.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">args</span>
 
 <div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize with function that dosn&#39;t return correct type.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test serialize with function that dosn&#39;t return correct type.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,))</span></div>
 
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_no_metadata"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_no_metadata">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_serialize_no_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serializing without metadata.&quot;&quot;&quot;</span>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_no_metadata"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_no_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_no_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Test serializing without metadata.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
         
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_header"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_serialize_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test serialize/deserialize with header.&quot;&quot;&quot;</span>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_header"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Disabled: Test serialize/deserialize with header.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
 
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_sinfo"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_serialize_sinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test serialize/deserialize with serializer info.&quot;&quot;&quot;</span>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_serialize_sinfo"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_sinfo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Disabled: Test serialize/deserialize with serializer info.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
 
-<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_field_specs"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">test_field_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test field specifiers.&quot;&quot;&quot;</span>
+    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Error testing&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestDefaultSerialize_func_error.test_field_specs"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs">[docs]</a>    <span class="k">def</span> <span class="nf">test_field_specs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Disabled: Test field specifiers.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div></div>
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -522,11 +533,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -541,24 +552,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>C Interface &mdash; yggdrasil 0.8 documentation</title>
+  <title>C Interface &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,20 +24,30 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="C++ Interface" href="interface_cpp.html" />
-    <link rel="prev" title="Python Interface" href="interface_py.html" /> 
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="index.html"/>
+        <link rel="up" title="Model Interface" href="model_interface.html"/>
+        <link rel="next" title="C++ Interface" href="interface_cpp.html"/>
+        <link rel="prev" title="Python Interface" href="interface_py.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -59,7 +69,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -97,14 +107,22 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="model_interface.html">Model Interface</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="interface_py.html">Python Interface</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">C Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="interface_cpp.html">C++ Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="interface_m.html">Matlab Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_c.html">C Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_c.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">C Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serialize_c.html">C Serialize API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataio_c.html">C DataIO API</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
@@ -120,7 +138,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -128,10 +146,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -202,13 +219,13 @@
 <dd><p>Send arguments as a small formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. If the message is larger than YGG_MSG_MAX or cannot be encoded, it will not be sent. </p>
 <p>Formatted IO</p>
 <p>Output Usage:<ol class="arabic simple">
-<li>One-time: Create output channel with format specifier. yggOutput_t output_channel = yggOutputFmt(“out_name”, “a=%d, b=%d”);</li>
+<li>One-time: Create output channel with format specifier. yggOutput_t output_channel = yggOutputFmt(&#8220;out_name&#8221;, &#8220;a=%d, b=%d&#8221;);</li>
 <li>Send: ret = yggSend(output_channel, 1, 2);</li>
 <li>Free: ygg_free(&amp;output_channel);</li>
 </ol>
 </p>
 <p>Input Usage:<ol class="arabic simple">
-<li>One-time: Create output channel with format specifier. yggInput_t input_channel = yggInput(“in_name”, “a=%d, b=%d”);</li>
+<li>One-time: Create output channel with format specifier. yggInput_t input_channel = yggInput(&#8220;in_name&#8221;, &#8220;a=%d, b=%d&#8221;);</li>
 <li>Prepare: Allocate space for recovered variables. int a, b;</li>
 <li>Receive: int ret = yggRecv(input_channel, &amp;a, &amp;b);</li>
 </ol>
@@ -218,8 +235,8 @@
 <dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that queue should be sent to. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: arguments to be formatted into a message using sprintf. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that queue should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments to be formatted into a message using sprintf. </li>
 </ul>
 </dd>
 </dl>
@@ -235,8 +252,8 @@
 <dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: arguments that should be assigned by parsing the received message using sscanf. As these are being assigned, they should be pointers to memory that has already been allocated. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments that should be assigned by parsing the received message using sscanf. As these are being assigned, they should be pointers to memory that has already been allocated. </li>
 </ul>
 </dd>
 </dl>
@@ -286,7 +303,7 @@
 <p>Remote Procedure Call (RPC) IO</p>
 <p>Handle IO case of a server receiving input from clients, performing some calculation, and then sending a response back to the client.</p>
 <p>Server Usage:<ol class="arabic simple">
-<li>One-time: Create server channels with format specifiers for input and output. yggRpc_t srv = yggRpcServer(“srv_name”, “%d”, “%d %d”);</li>
+<li>One-time: Create server channels with format specifiers for input and output. yggRpc_t srv = yggRpcServer(&#8220;srv_name&#8221;, &#8220;%d&#8221;, &#8220;%d %d&#8221;);</li>
 <li>Prepare: Allocate space for recovered variables from request. int a;</li>
 <li>Receive request: int ret = rpcRecv(srv, &amp;a);</li>
 <li>Process: Do tasks the server should do with input to produce output. int b = 2*a; int c = 3*a;</li>
@@ -294,7 +311,7 @@
 </ol>
 </p>
 <p>Client Usage:<ol class="arabic simple">
-<li>One-time: Create client channels to desired server with format specifiers for output and input (should be the same arguments as for the server except for name). yggRpc_t cli = yggRpcClient(“cli_name”, “%d”, “%d %d”);</li>
+<li>One-time: Create client channels to desired server with format specifiers for output and input (should be the same arguments as for the server except for name). yggRpc_t cli = yggRpcClient(&#8220;cli_name&#8221;, &#8220;%d&#8221;, &#8220;%d %d&#8221;);</li>
 <li>Prepare: Allocate space for recovered variables from response. int b, c;</li>
 <li>Call server: int ret = rpcCall(cli, 1, &amp;b, &amp;c);</li>
 </ol>
@@ -311,8 +328,8 @@
 <dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list variable list of arguments for formatting. </li>
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list variable list of arguments for formatting. </li>
 </ul>
 </dd>
 </dl>
@@ -328,9 +345,9 @@
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
-<li><code class="docutils literal notranslate"><span class="pre">nargs</span></code>: int Number of arguments contained in ap. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list variable list of arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments contained in ap. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list variable list of arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
 </ul>
 </dd>
 </dl>
@@ -351,8 +368,8 @@
 <dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: arguments for formatting. </li>
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments for formatting. </li>
 </ul>
 </dd>
 </dl>
@@ -368,8 +385,8 @@
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
 </ul>
 </dd>
 </dl>
@@ -408,15 +425,15 @@
 <p>File IO</p>
 <p>Handle I/O from/to a local or remote file line by line.</p>
 <p>Input Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = yggAsciiFileInput(“file_channel”); // channel comm_t fin = yggAsciiFileInput_local(“/local/file.txt”); // local file</li>
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = yggAsciiFileInput(&#8220;file_channel&#8221;); // channel comm_t fin = yggAsciiFileInput_local(&#8220;/local/file.txt&#8221;); // local file</li>
 <li>Prepare: Get pointer for line. char *line;</li>
 <li>Receive each line, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;line); // line will be realloced to fit message Do something with the line }</li>
 <li>Cleanup. Call functions to deallocate structures. free(line);</li>
 </ol>
 </p>
 <p>Output Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fout = yggAsciiFileOutput(“file_channel”); // channel comm_t fout = yggAsciiFileOutput_local(“/local/file.txt”); // local file</li>
-<li>Send lines to the file. If return value is not 0, the send was not succesfull. int ret; ret = yggSend(fin, “Line 1\n”); ret = yggSend(fout, “Line 1\n”); ret = yggSend(fout, “Line 2\n”); </li>
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fout = yggAsciiFileOutput(&#8220;file_channel&#8221;); // channel comm_t fout = yggAsciiFileOutput_local(&#8220;/local/file.txt&#8221;); // local file</li>
+<li>Send lines to the file. If return value is not 0, the send was not succesfull. int ret; ret = yggSend(fin, &#8220;Line 1\n&#8221;); ret = yggSend(fout, &#8220;Line 1\n&#8221;); ret = yggSend(fout, &#8220;Line 2\n&#8221;); </li>
 </ol>
 </p>
 </dd></dl>
@@ -434,27 +451,27 @@
 <p>Handle I/O from/to a local or remote ASCII table either line-by-line or as an array.</p>
 <p><em>Row-by-Row </em></p>
 <p>Input by Row Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = yggAsciiTableInput(“file_channel”); // channel comm_t fin = yggAsciiTableInput_local(“/local/file.txt”); // local table</li>
-<li>Prepare: Allocate space for variables in row (the format in this example is “%5s %d %f\n” like the output example below). char a[5]; int b; double c;</li>
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = yggAsciiTableInput(&#8220;file_channel&#8221;); // channel comm_t fin = yggAsciiTableInput_local(&#8220;/local/file.txt&#8221;); // local table</li>
+<li>Prepare: Allocate space for variables in row (the format in this example is &#8220;%5s %d %f\n&#8221; like the output example below). char a[5]; int b; double c;</li>
 <li>Receive each row, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;a, &amp;b, &amp;c); Do something with the row }</li>
 </ol>
 </p>
 <p>Output by Row Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing either a channel name or a path to a local file and a format string for rows. comm_t fout = yggAsciiTableOutput(“file_channel”, // channel “%5s %d %f\n”); comm_t fout = yggAsciiTableOutput_local(“/local/file.txt”, // local table “%5s %d %f\n”);</li>
-<li>Send rows to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; ret = yggSend(fout, “one”, 1, 1.0); ret = yggSend(fout, “two”, 2, 2.0);</li>
+<li>One-time: Create file interface by providing either a channel name or a path to a local file and a format string for rows. comm_t fout = yggAsciiTableOutput(&#8220;file_channel&#8221;, // channel &#8220;%5s %d %f\n&#8221;); comm_t fout = yggAsciiTableOutput_local(&#8220;/local/file.txt&#8221;, // local table &#8220;%5s %d %f\n&#8221;);</li>
+<li>Send rows to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; ret = yggSend(fout, &#8220;one&#8221;, 1, 1.0); ret = yggSend(fout, &#8220;two&#8221;, 2, 2.0);</li>
 </ol>
 </p>
 <p><em>Array </em></p>
 <p>Input by Array Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = yggAsciiArrayInput(“file_channel”); // channel comm_t fin = yggAsciiArrayInput_local(“/local/file.txt”); // local table</li>
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = yggAsciiArrayInput(&#8220;file_channel&#8221;); // channel comm_t fin = yggAsciiArrayInput_local(&#8220;/local/file.txt&#8221;); // local table</li>
 <li>Prepare: Declare pointers for table columns (they will be allocated by the interface once the number of rows is known). char *aCol; int *bCol; double *cCol;</li>
 <li>Receive entire table as columns. Return value will be the number of elements in each column (the number of table rows). Negative values indicate errors. int ret = yggRecv(fin, &amp;a, &amp;b, &amp;c);</li>
 <li>Cleanup. Call functions to deallocate structures. free(a); free(b); free(c);</li>
 </ol>
 </p>
 <p>Output by Array Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing either a channel name or a path to a local file and a format string for rows. comm_t fout = yggAsciiArrayOutput(“file_channel”, // channel “%5s %d %f\n”); comm_t fout = yggAsciiArrayOutput_local(“/local/file.txt”, // local table “%5s %d %f\n”);</li>
-<li>Send columns to the file by providing pointers (or arrays). Formatting is handled by the interface. If return value is not 0, the send was not succesful. char aCol[] = {“one  “, “two  “, “three”}; \ Each str is of len 5 int bCol[3] = {1, 2, 3}; float cCol[3] = {1.0, 2.0, 3.0}; int ret = yggSend(fout, a, b, c); </li>
+<li>One-time: Create file interface by providing either a channel name or a path to a local file and a format string for rows. comm_t fout = yggAsciiArrayOutput(&#8220;file_channel&#8221;, // channel &#8220;%5s %d %f\n&#8221;); comm_t fout = yggAsciiArrayOutput_local(&#8220;/local/file.txt&#8221;, // local table &#8220;%5s %d %f\n&#8221;);</li>
+<li>Send columns to the file by providing pointers (or arrays). Formatting is handled by the interface. If return value is not 0, the send was not succesful. char aCol[] = {&#8220;one  &#8221;, &#8220;two  &#8221;, &#8220;three&#8221;}; \ Each str is of len 5 int bCol[3] = {1, 2, 3}; float cCol[3] = {1.0, 2.0, 3.0}; int ret = yggSend(fout, a, b, c); </li>
 </ol>
 </p>
 </dd></dl>
@@ -481,13 +498,13 @@
 <p>Ply IO</p>
 <p>Handle I/O from/to a Ply file.</p>
 <p>Input Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing a channel name. comm_t fin = yggPlyInput(“file_channel”); // channel</li>
+<li>One-time: Create file interface by providing a channel name. comm_t fin = yggPlyInput(&#8220;file_channel&#8221;); // channel</li>
 <li>Prepare: Allocate ply structure. <a class="reference internal" href="serialize_c.html#structply__t"><span class="std std-ref">ply_t</span></a> p;</li>
 <li>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the ply structure }</li>
 </ol>
 </p>
 <p>Output by Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing a channel name. comm_t fout = yggPlyOutput(“file_channel”); // channel</li>
+<li>One-time: Create file interface by providing a channel name. comm_t fout = yggPlyOutput(&#8220;file_channel&#8221;); // channel</li>
 <li>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; <a class="reference internal" href="serialize_c.html#structply__t"><span class="std std-ref">ply_t</span></a> p; Populate the structure ret = yggSend(fout, p); ret = yggSend(fout, p); </li>
 </ol>
 </p>
@@ -505,13 +522,13 @@
 <p>Obj IO</p>
 <p>Handle I/O from/to a Obj file.</p>
 <p>Input Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing a channel name. comm_t fin = yggObjInput(“file_channel”); // channel</li>
+<li>One-time: Create file interface by providing a channel name. comm_t fin = yggObjInput(&#8220;file_channel&#8221;); // channel</li>
 <li>Prepare: Allocate obj structure. <a class="reference internal" href="serialize_c.html#structobj__t"><span class="std std-ref">obj_t</span></a> p;</li>
 <li>Receive each structure, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = yggRecv(fin, &amp;p); Do something with the obj structure }</li>
 </ol>
 </p>
 <p>Output by Usage:<ol class="arabic simple">
-<li>One-time: Create file interface by providing a channel name. comm_t fout = yggObjOutput(“file_channel”); // channel</li>
+<li>One-time: Create file interface by providing a channel name. comm_t fout = yggObjOutput(&#8220;file_channel&#8221;); // channel</li>
 <li>Send structure to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; <a class="reference internal" href="serialize_c.html#structobj__t"><span class="std std-ref">obj_t</span></a> p; Populate the structure ret = yggSend(fout, p); ret = yggSend(fout, p); </li>
 </ol>
 </p>
@@ -526,18 +543,18 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
 <dl class="function">
-<dt id="_CPPv312yggOutputFmtPKcPKc">
-<span id="_CPPv212yggOutputFmtPKcPKc"></span><span id="yggOutputFmt__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a96c28a745d83625613d98d055966f9f0"></span><em class="property">static</em> yggOutput_t <code class="descname">yggOutputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312yggOutputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212yggOutputFmtPKcPKc">
+<span id="yggOutputFmt__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a96c28a745d83625613d98d055966f9f0"></span><em class="property">static</em> yggOutput_t <code class="descname">yggOutputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212yggOutputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for yggOutput_t structure with format. Create a yggOutput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name and a format string that can be used to format arguments into outgoing messages for the queue. </p>
 <p>Basic IO</p>
 <p>Output Usage:<ol class="arabic simple">
-<li>One-time: Create output channel (store in named variables) yggOutput_t output_channel = yggOutput(“out_name”);</li>
-<li>Prepare: Format data to a character array buffer. char buffer[YGG_MSG_BUF]; sprintf(buffer, “a=%d, b=%d”, 1, 2);</li>
+<li>One-time: Create output channel (store in named variables) yggOutput_t output_channel = yggOutput(&#8220;out_name&#8221;);</li>
+<li>Prepare: Format data to a character array buffer. char buffer[YGG_MSG_BUF]; sprintf(buffer, &#8220;a=%d, b=%d&#8221;, 1, 2);</li>
 <li>Send: ret = ygg_send(output_channel, buffer, strlen(buffer));</li>
 </ol>
 </p>
 <p>Input Usage:<ol class="arabic simple">
-<li>One-time: Create output channel (store in named variables) yggInput_t input_channel = yggInput(“in_name”);</li>
+<li>One-time: Create output channel (store in named variables) yggInput_t input_channel = yggInput(&#8220;in_name&#8221;);</li>
 <li>Prepare: Allocate a character array buffer. char buffer[YGG_MSG_BUF];</li>
 <li>Receive: int ret = ygg_recv(input_channel, buffer, YGG_MSG_BUF);</li>
 </ol>
@@ -547,8 +564,8 @@
 <dd>yggOutput_t output queue structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
-<li><code class="docutils literal notranslate"><span class="pre">fmtString</span></code>: character pointer to format string. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+<li><code class="docutils literal"><span class="pre">fmtString</span></code>: character pointer to format string. </li>
 </ul>
 </dd>
 </dl>
@@ -556,16 +573,16 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv311yggInputFmtPKcPKc">
-<span id="_CPPv211yggInputFmtPKcPKc"></span><span id="yggInputFmt__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a82929b85080665bd452665bcd56bd27f"></span><em class="property">static</em> yggInput_t <code class="descname">yggInputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv311yggInputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211yggInputFmtPKcPKc">
+<span id="yggInputFmt__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a82929b85080665bd452665bcd56bd27f"></span><em class="property">static</em> yggInput_t <code class="descname">yggInputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211yggInputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for yggInput_t structure with format. Create a yggInput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name and a format stirng that can be used to extract arguments from received messages. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>yggInput_t input queue structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
-<li><code class="docutils literal notranslate"><span class="pre">fmtString</span></code>: character pointer to format string. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+<li><code class="docutils literal"><span class="pre">fmtString</span></code>: character pointer to format string. </li>
 </ul>
 </dd>
 </dl>
@@ -573,15 +590,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv39yggOutputPKc">
-<span id="_CPPv29yggOutputPKc"></span><span id="yggOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1afaa901b91a8353fcd4a34eca1f6ee7cd"></span><em class="property">static</em> yggOutput_t <code class="descname">yggOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv39yggOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv29yggOutputPKc">
+<span id="yggOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1afaa901b91a8353fcd4a34eca1f6ee7cd"></span><em class="property">static</em> yggOutput_t <code class="descname">yggOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29yggOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for yggOutput_t output structure. Create a yggOutput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>yggOutput_t output queue structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
 </ul>
 </dd>
 </dl>
@@ -589,15 +606,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv38yggInputPKc">
-<span id="_CPPv28yggInputPKc"></span><span id="yggInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a0ade4dc07ba579bb7a5f766c97fc09fe"></span><em class="property">static</em> yggInput_t <code class="descname">yggInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv38yggInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28yggInputPKc">
+<span id="yggInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a0ade4dc07ba579bb7a5f766c97fc09fe"></span><em class="property">static</em> yggInput_t <code class="descname">yggInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28yggInputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for yggInput_t structure. Create a yggInput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>yggInput_t input queue structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
 </ul>
 </dd>
 </dl>
@@ -605,17 +622,17 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv38ygg_sendK11yggOutput_tPKcK6size_t">
-<span id="_CPPv28ygg_sendK11yggOutput_tPKcK6size_t"></span><span id="ygg_send__yggOutput_tC.cCP.sC"></span><span class="target" id="_ygg_interface_8h_1a98da80acacba97584045dd92d47944f1"></span><em class="property">static</em> int <code class="descname">ygg_send</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv38ygg_sendK11yggOutput_tPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28ygg_sendK11yggOutput_tPKcK6size_t">
+<span id="ygg_send__yggOutput_tC.cCP.sC"></span><span class="target" id="_ygg_interface_8h_1a98da80acacba97584045dd92d47944f1"></span><em class="property">static</em> int <code class="descname">ygg_send</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28ygg_sendK11yggOutput_tPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a message to an output queue. Send a message smaller than YGG_MSG_MAX bytes to an output queue. If the message is larger, it will not be sent. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that queue should be sent to. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
-<li><code class="docutils literal notranslate"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that queue should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
 </ul>
 </dd>
 </dl>
@@ -623,15 +640,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv312ygg_send_eofK11yggOutput_t">
-<span id="_CPPv212ygg_send_eofK11yggOutput_t"></span><span id="ygg_send_eof__yggOutput_tC"></span><span class="target" id="_ygg_interface_8h_1a05945a6d511e6551a52488659fbcbd13"></span><em class="property">static</em> int <code class="descname">ygg_send_eof</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312ygg_send_eofK11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212ygg_send_eofK11yggOutput_t">
+<span id="ygg_send_eof__yggOutput_tC"></span><span class="target" id="_ygg_interface_8h_1a05945a6d511e6551a52488659fbcbd13"></span><em class="property">static</em> int <code class="descname">ygg_send_eof</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212ygg_send_eofK11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send EOF message to the output queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int 0 if send successfull, -1 if unsuccessful. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
 </ul>
 </dd>
 </dl>
@@ -639,17 +656,17 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv38ygg_recvK10yggInput_tPcK6size_t">
-<span id="_CPPv28ygg_recvK10yggInput_tPcK6size_t"></span><span id="ygg_recv__yggInput_tC.cP.sC"></span><span class="target" id="_ygg_interface_8h_1a1a215fb2d8289e219e62ed654816b1e7"></span><em class="property">static</em> int <code class="descname">ygg_recv</code><span class="sig-paren">(</span><em class="property">const</em> yggInput_t <em>yggQ</em>, char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv38ygg_recvK10yggInput_tPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28ygg_recvK10yggInput_tPcK6size_t">
+<span id="ygg_recv__yggInput_tC.cP.sC"></span><span class="target" id="_ygg_interface_8h_1a1a215fb2d8289e219e62ed654816b1e7"></span><em class="property">static</em> int <code class="descname">ygg_recv</code><span class="sig-paren">(</span><em class="property">const</em> yggInput_t <em>yggQ</em>, char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28ygg_recvK10yggInput_tPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message from an input queue. Receive a message smaller than YGG_MSG_MAX bytes from an input queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: character pointer to allocated buffer where the message should be saved. </li>
-<li><code class="docutils literal notranslate"><span class="pre">len</span></code>: const size_t length of the allocated message buffer in bytes. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to allocated buffer where the message should be saved. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: const size_t length of the allocated message buffer in bytes. </li>
 </ul>
 </dd>
 </dl>
@@ -657,17 +674,17 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv316ygg_send_nolimitK11yggOutput_tPKcK6size_t">
-<span id="_CPPv216ygg_send_nolimitK11yggOutput_tPKcK6size_t"></span><span id="ygg_send_nolimit__yggOutput_tC.cCP.sC"></span><span class="target" id="_ygg_interface_8h_1a9e52c095b08ed33fb7251e5d199d07c9"></span><em class="property">static</em> int <code class="descname">ygg_send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv316ygg_send_nolimitK11yggOutput_tPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv216ygg_send_nolimitK11yggOutput_tPKcK6size_t">
+<span id="ygg_send_nolimit__yggOutput_tC.cCP.sC"></span><span class="target" id="_ygg_interface_8h_1a9e52c095b08ed33fb7251e5d199d07c9"></span><em class="property">static</em> int <code class="descname">ygg_send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216ygg_send_nolimitK11yggOutput_tPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a large message to an output queue. Send a message larger than YGG_MSG_MAX bytes to an output queue by breaking it up between several smaller messages and sending initial message with the size of the message that should be expected. Must be partnered with ygg_recv_nolimit for communication to make sense. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
-<li><code class="docutils literal notranslate"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
 </ul>
 </dd>
 </dl>
@@ -675,15 +692,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv320ygg_send_nolimit_eofK11yggOutput_t">
-<span id="_CPPv220ygg_send_nolimit_eofK11yggOutput_t"></span><span id="ygg_send_nolimit_eof__yggOutput_tC"></span><span class="target" id="_ygg_interface_8h_1ae369bebe2617cb0d997c7ac7e35e7236"></span><em class="property">static</em> int <code class="descname">ygg_send_nolimit_eof</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv320ygg_send_nolimit_eofK11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv220ygg_send_nolimit_eofK11yggOutput_t">
+<span id="ygg_send_nolimit_eof__yggOutput_tC"></span><span class="target" id="_ygg_interface_8h_1ae369bebe2617cb0d997c7ac7e35e7236"></span><em class="property">static</em> int <code class="descname">ygg_send_nolimit_eof</code><span class="sig-paren">(</span><em class="property">const</em> yggOutput_t <em>yggQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv220ygg_send_nolimit_eofK11yggOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send EOF message to the output queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int 0 if send successfull, -1 if unsuccessful. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
 </ul>
 </dd>
 </dl>
@@ -691,17 +708,17 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv316ygg_recv_nolimitK10yggInput_tPPcK6size_t">
-<span id="_CPPv216ygg_recv_nolimitK10yggInput_tPPcK6size_t"></span><span id="ygg_recv_nolimit__yggInput_tC.cPP.sC"></span><span class="target" id="_ygg_interface_8h_1a637b65efd6e05c2aa6e15dc6abf8d1b1"></span><em class="property">static</em> int <code class="descname">ygg_recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> yggInput_t <em>yggQ</em>, char **<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv316ygg_recv_nolimitK10yggInput_tPPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv216ygg_recv_nolimitK10yggInput_tPPcK6size_t">
+<span id="ygg_recv_nolimit__yggInput_tC.cPP.sC"></span><span class="target" id="_ygg_interface_8h_1a637b65efd6e05c2aa6e15dc6abf8d1b1"></span><em class="property">static</em> int <code class="descname">ygg_recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> yggInput_t <em>yggQ</em>, char **<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216ygg_recv_nolimitK10yggInput_tPPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a large message from an input queue. Receive a message larger than YGG_MSG_MAX bytes from an input queue by receiving it in parts. This expects the first message to be the size of the total message. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
-<li><code class="docutils literal notranslate"><span class="pre">data</span></code>: character pointer to pointer for allocated buffer where the message should be stored. A pointer to a pointer is used so that the buffer may be reallocated as necessary for the incoming message. </li>
-<li><code class="docutils literal notranslate"><span class="pre">len</span></code>: size_t length of the initial allocated message buffer in bytes. </li>
+<li><code class="docutils literal"><span class="pre">yggQ</span></code>: yggOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to pointer for allocated buffer where the message should be stored. A pointer to a pointer is used so that the buffer may be reallocated as necessary for the incoming message. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of the initial allocated message buffer in bytes. </li>
 </ul>
 </dd>
 </dl>
@@ -709,17 +726,17 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv312yggRpcClientPKcPKcPKc">
-<span id="_CPPv212yggRpcClientPKcPKcPKc"></span><span id="yggRpcClient__cCP.cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a9a8a15fd46d28a7abb7f23c9a2bf695a"></span><em class="property">static</em> comm_t <code class="descname">yggRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312yggRpcClientPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212yggRpcClientPKcPKcPKc">
+<span id="yggRpcClient__cCP.cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a9a8a15fd46d28a7abb7f23c9a2bf695a"></span><em class="property">static</em> comm_t <code class="descname">yggRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212yggRpcClientPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for client side RPC structure. Creates an instance of yggRpc_t with provided information. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>yggRpc_t structure with provided info. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name for queues. </li>
-<li><code class="docutils literal notranslate"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
-<li><code class="docutils literal notranslate"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name for queues. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
 </ul>
 </dd>
 </dl>
@@ -727,17 +744,17 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv312yggRpcServerPKcPKcPKc">
-<span id="_CPPv212yggRpcServerPKcPKcPKc"></span><span id="yggRpcServer__cCP.cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1ad2b4bbdfe1701ea0675a070713099bae"></span><em class="property">static</em> comm_t <code class="descname">yggRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312yggRpcServerPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212yggRpcServerPKcPKcPKc">
+<span id="yggRpcServer__cCP.cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1ad2b4bbdfe1701ea0675a070713099bae"></span><em class="property">static</em> comm_t <code class="descname">yggRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212yggRpcServerPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for server side RPC structure. Creates an instance of yggRpc_t with provided information. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>yggRpc_t structure with provided info. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name for queues. </li>
-<li><code class="docutils literal notranslate"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
-<li><code class="docutils literal notranslate"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name for queues. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
 </ul>
 </dd>
 </dl>
@@ -745,18 +762,18 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv312vrpcCallBaseK8yggRpc_tKi6size_t9va_list_t">
-<span id="_CPPv212vrpcCallBaseK8yggRpc_tKi6size_t9va_list_t"></span><span id="vrpcCallBase__yggRpc_tC.iC.s.va_list_t"></span><span class="target" id="_ygg_interface_8h_1ab4686596bbafd53898c27c603b542626"></span><em class="property">static</em> int <code class="descname">vrpcCallBase</code><span class="sig-paren">(</span><em class="property">const</em> yggRpc_t <em>rpc</em>, <em class="property">const</em> int <em>allow_realloc</em>, size_t <em>nargs</em>, va_list_t <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312vrpcCallBaseK8yggRpc_tKi6size_t9va_list_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212vrpcCallBaseK8yggRpc_tKi6size_t9va_list_t">
+<span id="vrpcCallBase__yggRpc_tC.iC.s.va_list_t"></span><span class="target" id="_ygg_interface_8h_1ab4686596bbafd53898c27c603b542626"></span><em class="property">static</em> int <code class="descname">vrpcCallBase</code><span class="sig-paren">(</span><em class="property">const</em> yggRpc_t <em>rpc</em>, <em class="property">const</em> int <em>allow_realloc</em>, size_t <em>nargs</em>, va_list_t <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212vrpcCallBaseK8yggRpc_tKi6size_t9va_list_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response. Format arguments using the output queue format string, send the message to the output queue, receive a response from the input queue, and assign arguments from the message using the input queue format string to parse it. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
-<li><code class="docutils literal notranslate"><span class="pre">allow_realloc</span></code>: int If 1, output arguments are assumed to be pointers to pointers such that they can be reallocated as necessary to receive incoming data. If 0, output arguments are assumed to be preallocated. </li>
-<li><code class="docutils literal notranslate"><span class="pre">nargs</span></code>: size_t Number of arguments contained in ap including both input and output arguments. </li>
-<li><code class="docutils literal notranslate"><span class="pre">ap</span></code>: va_list mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </li>
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">allow_realloc</span></code>: int If 1, output arguments are assumed to be pointers to pointers such that they can be reallocated as necessary to receive incoming data. If 0, output arguments are assumed to be preallocated. </li>
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: size_t Number of arguments contained in ap including both input and output arguments. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </li>
 </ul>
 </dd>
 </dl>
@@ -764,18 +781,18 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv312nrpcCallBaseK8yggRpc_tKi6size_tz">
-<span id="_CPPv212nrpcCallBaseK8yggRpc_tKi6size_tz"></span><span id="nrpcCallBase__yggRpc_tC.iC.s.z"></span><span class="target" id="_ygg_interface_8h_1acedf6b6f31421ffde78f94d0a5ea8c76"></span><em class="property">static</em> int <code class="descname">nrpcCallBase</code><span class="sig-paren">(</span><em class="property">const</em> yggRpc_t <em>rpc</em>, <em class="property">const</em> int <em>allow_realloc</em>, size_t <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312nrpcCallBaseK8yggRpc_tKi6size_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212nrpcCallBaseK8yggRpc_tKi6size_tz">
+<span id="nrpcCallBase__yggRpc_tC.iC.s.z"></span><span class="target" id="_ygg_interface_8h_1acedf6b6f31421ffde78f94d0a5ea8c76"></span><em class="property">static</em> int <code class="descname">nrpcCallBase</code><span class="sig-paren">(</span><em class="property">const</em> yggRpc_t <em>rpc</em>, <em class="property">const</em> int <em>allow_realloc</em>, size_t <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212nrpcCallBaseK8yggRpc_tKi6size_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response. Format arguments using the output queue format string, send the message to the output queue, receive a response from the input queue, and assign arguments from the message using the input queue format string to parse it. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
-<li><code class="docutils literal notranslate"><span class="pre">allow_realloc</span></code>: int If 1, output arguments are assumed to be pointers to pointers such that they can be reallocated as necessary to receive incoming data. If 0, output arguments are assumed to be preallocated. </li>
-<li><code class="docutils literal notranslate"><span class="pre">nargs</span></code>: size_t Number of arguments contained in ap including both input and output arguments. </li>
-<li><code class="docutils literal notranslate"><span class="pre">...</span></code>: mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </li>
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: yggRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">allow_realloc</span></code>: int If 1, output arguments are assumed to be pointers to pointers such that they can be reallocated as necessary to receive incoming data. If 0, output arguments are assumed to be preallocated. </li>
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: size_t Number of arguments contained in ap including both input and output arguments. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </li>
 </ul>
 </dd>
 </dl>
@@ -783,15 +800,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv318yggAsciiFileOutputPKc">
-<span id="_CPPv218yggAsciiFileOutputPKc"></span><span id="yggAsciiFileOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1a019ef23fdc43204bed37e5f959ca5b59"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv318yggAsciiFileOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv218yggAsciiFileOutputPKc">
+<span id="yggAsciiFileOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1a019ef23fdc43204bed37e5f959ca5b59"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218yggAsciiFileOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiFile output comm to channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t for line-by-line output to a file or channel. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name of an output channel. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of an output channel. </li>
 </ul>
 </dd>
 </dl>
@@ -799,15 +816,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv324yggAsciiFileOutput_localPKc">
-<span id="_CPPv224yggAsciiFileOutput_localPKc"></span><span id="yggAsciiFileOutput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a241d85d2147b78115fef50db696405d1"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv324yggAsciiFileOutput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv224yggAsciiFileOutput_localPKc">
+<span id="yggAsciiFileOutput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a241d85d2147b78115fef50db696405d1"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv224yggAsciiFileOutput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiFile output comm to local file. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t for line-by-line output to a file or channel. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
 </ul>
 </dd>
 </dl>
@@ -815,15 +832,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv317yggAsciiFileInputPKc">
-<span id="_CPPv217yggAsciiFileInputPKc"></span><span id="yggAsciiFileInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a6240c40b983fb8f00fef8e2dca72713b"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv317yggAsciiFileInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv217yggAsciiFileInputPKc">
+<span id="yggAsciiFileInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a6240c40b983fb8f00fef8e2dca72713b"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217yggAsciiFileInputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiFile input comm from channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t for line-by-line input from a file or channel. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to name of an input channel. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of an input channel. </li>
 </ul>
 </dd>
 </dl>
@@ -831,15 +848,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv323yggAsciiFileInput_localPKc">
-<span id="_CPPv223yggAsciiFileInput_localPKc"></span><span id="yggAsciiFileInput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a0ba8136295db7a6619949c4368123e56"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv323yggAsciiFileInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv223yggAsciiFileInput_localPKc">
+<span id="yggAsciiFileInput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a0ba8136295db7a6619949c4368123e56"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiFileInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv223yggAsciiFileInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiFile input comm from local file. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t for line-by-line input from a file or channel. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
 </ul>
 </dd>
 </dl>
@@ -847,16 +864,16 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv319yggAsciiTableOutputPKcPKc">
-<span id="_CPPv219yggAsciiTableOutputPKcPKc"></span><span id="yggAsciiTableOutput__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a935030615117f90f3e4abb7651a3b23d"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv319yggAsciiTableOutputPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv219yggAsciiTableOutputPKcPKc">
+<span id="yggAsciiTableOutput__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a935030615117f90f3e4abb7651a3b23d"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv219yggAsciiTableOutputPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for table output comm to an output channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t output structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to output channel name. </li>
-<li><code class="docutils literal notranslate"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to output channel name. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
 </ul>
 </dd>
 </dl>
@@ -864,15 +881,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv318yggAsciiTableInputPKc">
-<span id="_CPPv218yggAsciiTableInputPKc"></span><span id="yggAsciiTableInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a89df62121cd78ce0a84559b8b9edfe7e"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv318yggAsciiTableInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv218yggAsciiTableInputPKc">
+<span id="yggAsciiTableInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a89df62121cd78ce0a84559b8b9edfe7e"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218yggAsciiTableInputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiTable input comm from an input channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t input structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to input channel name. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to input channel name. </li>
 </ul>
 </dd>
 </dl>
@@ -880,16 +897,16 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv325yggAsciiTableOutput_localPKcPKc">
-<span id="_CPPv225yggAsciiTableOutput_localPKcPKc"></span><span id="yggAsciiTableOutput_local__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a6bb074993a3822b7f2857760874273f9"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv325yggAsciiTableOutput_localPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv225yggAsciiTableOutput_localPKcPKc">
+<span id="yggAsciiTableOutput_local__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a6bb074993a3822b7f2857760874273f9"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv225yggAsciiTableOutput_localPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for table output comm to local file. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t output structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
-<li><code class="docutils literal notranslate"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
 </ul>
 </dd>
 </dl>
@@ -897,15 +914,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv324yggAsciiTableInput_localPKc">
-<span id="_CPPv224yggAsciiTableInput_localPKc"></span><span id="yggAsciiTableInput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a6e49828c289aa2e600ceb70caaa4d6e1"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv324yggAsciiTableInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv224yggAsciiTableInput_localPKc">
+<span id="yggAsciiTableInput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a6e49828c289aa2e600ceb70caaa4d6e1"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiTableInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv224yggAsciiTableInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiTable input comm from local file. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t input structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
 </ul>
 </dd>
 </dl>
@@ -913,16 +930,16 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv319yggAsciiArrayOutputPKcPKc">
-<span id="_CPPv219yggAsciiArrayOutputPKcPKc"></span><span id="yggAsciiArrayOutput__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a5c653ef9eaa35c9920a9d26f42e63cb5"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv319yggAsciiArrayOutputPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv219yggAsciiArrayOutputPKcPKc">
+<span id="yggAsciiArrayOutput__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a5c653ef9eaa35c9920a9d26f42e63cb5"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv219yggAsciiArrayOutputPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for table output comm with array output. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t output structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to an output channel name. </li>
-<li><code class="docutils literal notranslate"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to an output channel name. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
 </ul>
 </dd>
 </dl>
@@ -930,15 +947,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv318yggAsciiArrayInputPKc">
-<span id="_CPPv218yggAsciiArrayInputPKc"></span><span id="yggAsciiArrayInput__cCP"></span><span class="target" id="_ygg_interface_8h_1acb64a59268001896dfbcba1efd929437"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv318yggAsciiArrayInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv218yggAsciiArrayInputPKc">
+<span id="yggAsciiArrayInput__cCP"></span><span class="target" id="_ygg_interface_8h_1acb64a59268001896dfbcba1efd929437"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218yggAsciiArrayInputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiTable input comm with array input. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t input structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to an input channel name. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to an input channel name. </li>
 </ul>
 </dd>
 </dl>
@@ -946,16 +963,16 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv325yggAsciiArrayOutput_localPKcPKc">
-<span id="_CPPv225yggAsciiArrayOutput_localPKcPKc"></span><span id="yggAsciiArrayOutput_local__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a940d55946e8952a146a4abda925b8b9c"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv325yggAsciiArrayOutput_localPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv225yggAsciiArrayOutput_localPKcPKc">
+<span id="yggAsciiArrayOutput_local__cCP.cCP"></span><span class="target" id="_ygg_interface_8h_1a940d55946e8952a146a4abda925b8b9c"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv225yggAsciiArrayOutput_localPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for table output comm to local file from arrays. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t output structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
-<li><code class="docutils literal notranslate"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
 </ul>
 </dd>
 </dl>
@@ -963,15 +980,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv324yggAsciiArrayInput_localPKc">
-<span id="_CPPv224yggAsciiArrayInput_localPKc"></span><span id="yggAsciiArrayInput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a494f221f533478883f913f2737a490c3"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv324yggAsciiArrayInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv224yggAsciiArrayInput_localPKc">
+<span id="yggAsciiArrayInput_local__cCP"></span><span class="target" id="_ygg_interface_8h_1a494f221f533478883f913f2737a490c3"></span><em class="property">static</em> comm_t <code class="descname">yggAsciiArrayInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv224yggAsciiArrayInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for AsciiTable input comm from local file as arrays. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t input structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
 </ul>
 </dd>
 </dl>
@@ -979,15 +996,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv312yggPlyOutputPKc">
-<span id="_CPPv212yggPlyOutputPKc"></span><span id="yggPlyOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1a03f4a6654ab0fdd063d4883def0471f0"></span><em class="property">static</em> comm_t <code class="descname">yggPlyOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312yggPlyOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212yggPlyOutputPKc">
+<span id="yggPlyOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1a03f4a6654ab0fdd063d4883def0471f0"></span><em class="property">static</em> comm_t <code class="descname">yggPlyOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212yggPlyOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for ply output comm to an output channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t output structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to output channel name. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to output channel name. </li>
 </ul>
 </dd>
 </dl>
@@ -995,15 +1012,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv311yggPlyInputPKc">
-<span id="_CPPv211yggPlyInputPKc"></span><span id="yggPlyInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a03bf2d5b82e20a2294637f9be67decae"></span><em class="property">static</em> comm_t <code class="descname">yggPlyInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv311yggPlyInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211yggPlyInputPKc">
+<span id="yggPlyInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a03bf2d5b82e20a2294637f9be67decae"></span><em class="property">static</em> comm_t <code class="descname">yggPlyInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211yggPlyInputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for ply input comm from an input channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t input structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to input channel name. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to input channel name. </li>
 </ul>
 </dd>
 </dl>
@@ -1011,15 +1028,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv312yggObjOutputPKc">
-<span id="_CPPv212yggObjOutputPKc"></span><span id="yggObjOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1afd8b4331638ce903973e0558537181e2"></span><em class="property">static</em> comm_t <code class="descname">yggObjOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv312yggObjOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212yggObjOutputPKc">
+<span id="yggObjOutput__cCP"></span><span class="target" id="_ygg_interface_8h_1afd8b4331638ce903973e0558537181e2"></span><em class="property">static</em> comm_t <code class="descname">yggObjOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212yggObjOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for obj output comm to an output channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t output structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to output channel name. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to output channel name. </li>
 </ul>
 </dd>
 </dl>
@@ -1027,15 +1044,15 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv311yggObjInputPKc">
-<span id="_CPPv211yggObjInputPKc"></span><span id="yggObjInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a75528f26156a1cbc6297fcbb0890cb1d"></span><em class="property">static</em> comm_t <code class="descname">yggObjInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv311yggObjInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211yggObjInputPKc">
+<span id="yggObjInput__cCP"></span><span class="target" id="_ygg_interface_8h_1a75528f26156a1cbc6297fcbb0890cb1d"></span><em class="property">static</em> comm_t <code class="descname">yggObjInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211yggObjInputPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for obj input comm from an input channel. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
 <dd>comm_t input structure. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal notranslate"><span class="pre">name</span></code>: constant character pointer to input channel name. </li>
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to input channel name. </li>
 </ul>
 </dd>
 </dl>
@@ -1047,7 +1064,9 @@
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -1065,11 +1084,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1084,24 +1103,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

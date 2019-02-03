@@ -1,0 +1,47 @@
+formatted_io7 Example
+=====================
+
+Python Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io7/src/formatted_io7_modelA.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io7/src/formatted_io7_modelB.py
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io7/formatted_io7_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io7/src/formatted_io7_modelA.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io7/src/formatted_io7_modelB.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io7/formatted_io7_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.ClientResponseDriver &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.drivers.ClientResponseDriver &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="cis_interface.drivers" href="../drivers.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -171,7 +180,7 @@
 
 
 <div class="viewcode-block" id="ClientResponseDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ClientResponseDriver.ClientResponseDriver">[docs]</a><span class="k">class</span> <span class="nc">ClientResponseDriver</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling client side RPC type communication.</span>
+    <span class="sd">r&quot;&quot;&quot;Class for handling client side RPC type communication.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        model_response_address (str): The address of the channel used by the</span>
@@ -213,18 +222,20 @@
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ocomm_kws</span>
         <span class="c1"># Overall keywords</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;single_use&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ClientResponseDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">response_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ClientResponseDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">response_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">comm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">msg_id</span> <span class="o">=</span> <span class="n">msg_id</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">response_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address of response comm.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Address of response comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">address</span></div>
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -233,11 +244,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -252,24 +263,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

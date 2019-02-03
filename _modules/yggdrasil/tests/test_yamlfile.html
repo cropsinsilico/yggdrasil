@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil 0.8 documentation</title>
+  <title>yggdrasil.tests.test_yamlfile &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="yggdrasil.tests" href="../tests.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -175,17 +184,17 @@
 
 
 <div class="viewcode-block" id="direct_translate"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.direct_translate">[docs]</a><span class="k">def</span> <span class="nf">direct_translate</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test translator that just returns passed message.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test translator that just returns passed message.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">msg</span></div>
 
 
 <div class="viewcode-block" id="test_load_yaml_error"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.test_load_yaml_error">[docs]</a><span class="k">def</span> <span class="nf">test_load_yaml_error</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on loading invalid file.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error on loading invalid file.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">load_yaml</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="test_parse_component_error"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.test_parse_component_error">[docs]</a><span class="k">def</span> <span class="nf">test_parse_component_error</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in parse_component.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test errors in parse_component.&quot;&quot;&quot;</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_component</span><span class="p">,</span>
                   <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_component</span><span class="p">,</span>
@@ -193,32 +202,32 @@
 
 
 <div class="viewcode-block" id="YamlTestBase"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase">[docs]</a><span class="k">class</span> <span class="nc">YamlTestBase</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test base for yamlfile.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test base for yamlfile.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fname</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of files.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of files.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">contents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Contents of files.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;tuple: Contents of files.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contents</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">yaml_env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Environment variable where file path is stored.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Environment variable where file path is stored.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_yaml_env</span>
 
 <div class="viewcode-block" id="YamlTestBase.setup"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write contents to temp file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Write contents to temp file.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml_env</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -227,24 +236,24 @@
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">content</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="YamlTestBase.teardown"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the temporary file if it exists.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Remove the temporary file if it exists.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YamlTestBase.get_fname"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.get_fname">[docs]</a>    <span class="k">def</span> <span class="nf">get_fname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Path to temporary file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Path to temporary file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span>
                             <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%d</span><span class="s1">.yml&#39;</span> <span class="o">%</span> <span class="p">(</span>
                                 <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempprefix</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="YamlTestBase.create_instance"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Create a new instance of the class.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Disabled: Create a new instance of the class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="YamlTestBase.test_parse_yaml"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBase.test_parse_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">test_parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test successfully reading &amp; parsing yaml.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test successfully reading &amp; parsing yaml.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -254,18 +263,18 @@
 
 
 <div class="viewcode-block" id="YamlTestBaseError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBaseError">[docs]</a><span class="k">class</span> <span class="nc">YamlTestBaseError</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error for yamlfile.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error for yamlfile.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="YamlTestBaseError.test_parse_yaml"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml">[docs]</a>    <span class="k">def</span> <span class="nf">test_parse_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error reading &amp; parsing yaml.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test error reading &amp; parsing yaml.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nfiles</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">return</span>
         <span class="n">assert_raises</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_error</span><span class="p">,</span> <span class="n">yamlfile</span><span class="o">.</span><span class="n">parse_yaml</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TestYamlModelOnly"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlModelOnly">[docs]</a><span class="k">class</span> <span class="nc">TestYamlModelOnly</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parsing of different numbers/styles of models.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test parsing of different numbers/styles of models.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -285,7 +294,7 @@
 
 
 <div class="viewcode-block" id="TestYamlServerClient"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlServerClient">[docs]</a><span class="k">class</span> <span class="nc">TestYamlServerClient</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test specification of server/client models.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test specification of server/client models.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -299,7 +308,7 @@
 
 
 <div class="viewcode-block" id="TestYamlIODrivers"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlIODrivers">[docs]</a><span class="k">class</span> <span class="nc">TestYamlIODrivers</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test full specification of IO drivers.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test full specification of IO drivers.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -307,18 +316,18 @@
                   <span class="s1">&#39;    inputs:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;      - name: inputA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;        driver: FileInputDriver&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;        translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="vm">__name__</span><span class="p">,</span>
+                  <span class="s1">&#39;        translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="n">__name__</span><span class="p">,</span>
                   <span class="s1">&#39;        onexit: printStatus&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;        args: {{ </span><span class="si">%s</span><span class="s1"> }}&#39;</span> <span class="o">%</span> <span class="n">_yaml_env</span><span class="p">,</span>
                   <span class="s1">&#39;    outputs:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;      - name: outputA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;        driver: FileOutputDriver&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;        translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="vm">__name__</span><span class="p">,</span>
+                  <span class="s1">&#39;        translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="n">__name__</span><span class="p">,</span>
                   <span class="s1">&#39;        onexit: printStatus&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;        args: fileA.txt&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;      - name: outputA2&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;        driver: OutputDriver&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;        translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="vm">__name__</span><span class="p">,</span>
+                  <span class="s1">&#39;        translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="n">__name__</span><span class="p">,</span>
                   <span class="s1">&#39;        onexit: printStatus&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;        args: A_to_B&#39;</span><span class="p">],</span>
                  <span class="p">[</span><span class="s1">&#39;model:&#39;</span><span class="p">,</span>
@@ -351,7 +360,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnection"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnection">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnection</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection between I/O channels.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection between I/O channels.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -371,7 +380,7 @@
 
 
 <div class="viewcode-block" id="TestYamlIODatatype"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlIODatatype">[docs]</a><span class="k">class</span> <span class="nc">TestYamlIODatatype</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test specification of datatype via schema.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test specification of datatype via schema.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -396,7 +405,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionFork"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionFork">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionFork</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection between I/O channels.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection between I/O channels.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -434,7 +443,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionTranslator"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionTranslator">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionTranslator</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection between I/O channels.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection between I/O channels.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -445,7 +454,7 @@
                   <span class="s1">&#39;connections:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - input: outputB&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    output: inputA&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;    translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="vm">__name__</span><span class="p">],</span>
+                  <span class="s1">&#39;    translator: </span><span class="si">%s</span><span class="s1">:direct_translate&#39;</span> <span class="o">%</span> <span class="n">__name__</span><span class="p">],</span>
                  <span class="p">[</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelB&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -455,7 +464,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputFile"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFile">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputFile</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with File.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with File.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -477,7 +486,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputAsciiFile"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiFile">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputAsciiFile</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with AsciiFile.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with AsciiFile.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -497,7 +506,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputAsciiTable"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiTable">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputAsciiTable</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with AsciiTable.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with AsciiTable.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -517,7 +526,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputAsciiTableArray"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiTableArray">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputAsciiTableArray</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with AsciiTable as array.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with AsciiTable as array.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -541,7 +550,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputPickle"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPickle">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputPickle</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with Pickle.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with Pickle.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -561,7 +570,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputPandas"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPandas">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputPandas</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with Pandas csv.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with Pandas csv.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -585,7 +594,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputAsciiMap"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputAsciiMap">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputAsciiMap</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with AsciiMap.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with AsciiMap.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -605,7 +614,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputPly"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputPly">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputPly</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with Ply file.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with Ply file.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -625,7 +634,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputObj"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputObj">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputObj</span><span class="p">(</span><span class="n">YamlTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test connection with Obj file.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test connection with Obj file.&quot;&quot;&quot;</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;    driver: GCCModelDriver&#39;</span><span class="p">,</span>
@@ -645,13 +654,13 @@
 
 
 <div class="viewcode-block" id="TestYamlComponentError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlComponentError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlComponentError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error for non-dictionary component.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error for non-dictionary component.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models: error&#39;</span><span class="p">],)</span></div>
 
 
 <div class="viewcode-block" id="TestYamlDuplicateError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlDuplicateError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlDuplicateError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there are two components with the same name.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there are two components with the same name.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="ne">ValueError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -663,7 +672,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is not connection for a model I/O channel.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is not connection for a model I/O channel.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="ne">RuntimeError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -674,7 +683,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionError_forkin"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionError_forkin">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionError_forkin</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is not connection for a fork input channel.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is not connection for a fork input channel.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="ne">RuntimeError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -707,7 +716,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionError_readmeth"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionError_readmeth">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionError_readmeth</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when read_meth is specified for non-file.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when read_meth is specified for non-file.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -729,7 +738,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionError_writemeth"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionError_writemeth">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionError_writemeth</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when write_meth is specified for non-file.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when write_meth is specified for non-file.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -751,7 +760,7 @@
 
 
 <div class="viewcode-block" id="TestYamlMissingModelArgsError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlMissingModelArgsError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlMissingModelArgsError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is a missing arguments to a model.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is a missing arguments to a model.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -763,7 +772,7 @@
 
 
 <div class="viewcode-block" id="TestYamlMissingIOArgsError_input"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlMissingIOArgsError_input">[docs]</a><span class="k">class</span> <span class="nc">TestYamlMissingIOArgsError_input</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is a missing arguments to an input driver.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is a missing arguments to an input driver.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -775,7 +784,7 @@
 
 
 <div class="viewcode-block" id="TestYamlMissingIOArgsError_output"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlMissingIOArgsError_output">[docs]</a><span class="k">class</span> <span class="nc">TestYamlMissingIOArgsError_output</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is a missing arguments to an output driver.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is a missing arguments to an output driver.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -787,7 +796,7 @@
 
 
 <div class="viewcode-block" id="TestYamlMissingConnArgsError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlMissingConnArgsError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlMissingConnArgsError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is a missing arguments to a connection.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is a missing arguments to a connection.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -807,7 +816,7 @@
 
 
 <div class="viewcode-block" id="TestYamlMissingConnInputError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlMissingConnInputError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlMissingConnInputError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is no model output matching connection input.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is no model output matching connection input.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="ne">RuntimeError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -826,7 +835,7 @@
 
 
 <div class="viewcode-block" id="TestYamlMissingConnInputFileError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlMissingConnInputFileError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlMissingConnInputFileError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is no file for missing connection input.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is no file for missing connection input.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -843,7 +852,7 @@
 
 
 <div class="viewcode-block" id="TestYamlMissingConnIOError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlMissingConnIOError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlMissingConnIOError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error when there is no model input/output matching connection.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error when there is no model input/output matching connection.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -856,7 +865,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputFileReadMethError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFileReadMethError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputFileReadMethError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error for invalid read_meth.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error for invalid read_meth.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -876,7 +885,7 @@
 
 
 <div class="viewcode-block" id="TestYamlConnectionInputFileWriteMethError"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_yamlfile.TestYamlConnectionInputFileWriteMethError">[docs]</a><span class="k">class</span> <span class="nc">TestYamlConnectionInputFileWriteMethError</span><span class="p">(</span><span class="n">YamlTestBaseError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error for invalid write_meth.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test error for invalid write_meth.&quot;&quot;&quot;</span>
     <span class="n">_error</span> <span class="o">=</span> <span class="n">ValidationError</span>
     <span class="n">_contents</span> <span class="o">=</span> <span class="p">([</span><span class="s1">&#39;models:&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;  - name: modelA&#39;</span><span class="p">,</span>
@@ -896,7 +905,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -905,11 +916,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -924,24 +935,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

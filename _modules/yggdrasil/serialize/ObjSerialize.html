@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.ObjSerialize &mdash; yggdrasil 0.8 documentation</title>
+  <title>yggdrasil.serialize.ObjSerialize &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -170,16 +179,16 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.metaschema.datatypes.ObjMetaschemaType</span> <span class="k">import</span> <span class="n">ObjDict</span>
 
 
-<div class="viewcode-block" id="ObjSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize">[docs]</a><span class="nd">@register_serializer</span>
-<span class="k">class</span> <span class="nc">ObjSerialize</span><span class="p">(</span><span class="n">PlySerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing .obj file formats. Reader</span>
+<span class="nd">@register_serializer</span>
+<div class="viewcode-block" id="ObjSerialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize">[docs]</a><span class="k">class</span> <span class="nc">ObjSerialize</span><span class="p">(</span><span class="n">PlySerialize</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class for serializing/deserializing .obj file formats. Reader</span>
 <span class="sd">    adapted from https://www.pygame.org/wiki/OBJFileLoader.&quot;&quot;&quot;</span>
 
     <span class="n">_seritype</span> <span class="o">=</span> <span class="s1">&#39;obj&#39;</span>
     <span class="n">_default_type</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;obj&#39;</span><span class="p">}</span>
 
 <div class="viewcode-block" id="ObjSerialize.func_serialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args: List of arguments to be formatted or numpy array to be</span>
@@ -192,7 +201,7 @@
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="ObjSerialize.func_deserialize"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg: Message to be deserialized.</span>
@@ -204,15 +213,15 @@
         <span class="k">return</span> <span class="n">ObjDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">decode_data</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span>
                                                  <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="ObjSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjSerialize.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.serialize.html#yggdrasil.serialize.ObjSerialize.ObjSerialize.get_testing_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjSerialize</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">()</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">ObjDict</span><span class="p">({</span><span class="s1">&#39;vertices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">)},</span>
                                     <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
                                     <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;z&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1</span><span class="p">)}],</span>
@@ -220,22 +229,24 @@
                                   <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">)},</span>
                                   <span class="p">{</span><span class="s1">&#39;vertex_index&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">)}]]})</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj</span><span class="p">]</span>
-        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;# Author ygg_auto</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# Generated by yggdrasil</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 0.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 1.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 0.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 0.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;v 0.0000 1.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 1// 2// 3//</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;f 4// 5// 6//</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="s1">&#39;# Author ygg_auto</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;# Generated by yggdrasil</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;v 0.0000 0.0000 0.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;v 0.0000 0.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;v 0.0000 1.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;v 0.0000 0.0000 0.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;v 0.0000 0.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;v 0.0000 1.0000 1.0000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;f 1// 2// 3//</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;f 4// 5// 6//</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="c1"># out[&#39;contents&#39;] = out[&#39;contents&#39;].replace(b&#39;\n&#39;, platform._newline)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -244,11 +255,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -263,24 +274,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

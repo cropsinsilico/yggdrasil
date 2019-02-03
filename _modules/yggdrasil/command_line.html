@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.command_line &mdash; yggdrasil 0.8 documentation</title>
+  <title>yggdrasil.command_line &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -174,7 +183,7 @@
 
 
 <div class="viewcode-block" id="yggrun"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.yggrun">[docs]</a><span class="k">def</span> <span class="nf">yggrun</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a run.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Start a run.&quot;&quot;&quot;</span>
     <span class="n">prog</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="c1"># Print help</span>
     <span class="k">if</span> <span class="s1">&#39;-h&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">:</span>
@@ -192,7 +201,7 @@
 
 
 <div class="viewcode-block" id="yggcc"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.yggcc">[docs]</a><span class="k">def</span> <span class="nf">yggcc</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile C/C++ program.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Compile C/C++ program.&quot;&quot;&quot;</span>
     <span class="c1"># prog = sys.argv[0].split(os.path.sep)[-1]</span>
     <span class="n">src</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">do_compile</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
@@ -200,7 +209,7 @@
 
 
 <div class="viewcode-block" id="cc_flags"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.cc_flags">[docs]</a><span class="k">def</span> <span class="nf">cc_flags</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the compiler flags necessary for including the interface</span>
+    <span class="sd">r&quot;&quot;&quot;Get the compiler flags necessary for including the interface</span>
 <span class="sd">    library in a C or C++ program.</span>
 
 <span class="sd">    Returns:</span>
@@ -211,7 +220,7 @@
 
 
 <div class="viewcode-block" id="ld_flags"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.ld_flags">[docs]</a><span class="k">def</span> <span class="nf">ld_flags</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the linker flags necessary for calling functions/classes from</span>
+    <span class="sd">r&quot;&quot;&quot;Get the linker flags necessary for calling functions/classes from</span>
 <span class="sd">    the interface library in a C or C++ program.</span>
 
 <span class="sd">    Returns:</span>
@@ -222,7 +231,7 @@
 
 
 <div class="viewcode-block" id="rebuild_c_api"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.rebuild_c_api">[docs]</a><span class="k">def</span> <span class="nf">rebuild_c_api</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Rebuild the C/C++ API.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Rebuild the C/C++ API.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">_c_installed</span><span class="p">:</span>
         <span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">build_api</span><span class="p">(</span><span class="n">cpp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">GCCModelDriver</span><span class="o">.</span><span class="n">build_api</span><span class="p">(</span><span class="n">cpp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -232,7 +241,7 @@
 
 
 <div class="viewcode-block" id="regen_schema"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.regen_schema">[docs]</a><span class="k">def</span> <span class="nf">regen_schema</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Regenerate the yggdrasil schema.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Regenerate the yggdrasil schema.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_schema_fname</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">_schema_fname</span><span class="p">)</span>
     <span class="n">schema</span><span class="o">.</span><span class="n">clear_schema</span><span class="p">()</span>
@@ -240,32 +249,32 @@
 
 
 <div class="viewcode-block" id="update_config"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.update_config">[docs]</a><span class="k">def</span> <span class="nf">update_config</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the user config file for yggdrasil.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Update the user config file for yggdrasil.&quot;&quot;&quot;</span>
     <span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">usr_config_file</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">def_config_file</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="yggtime_comm"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.yggtime_comm">[docs]</a><span class="k">def</span> <span class="nf">yggtime_comm</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot timing statistics comparing the different communication mechanisms.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Plot timing statistics comparing the different communication mechanisms.&quot;&quot;&quot;</span>
     <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="s1">&#39;commtype&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="yggtime_lang"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.yggtime_lang">[docs]</a><span class="k">def</span> <span class="nf">yggtime_lang</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot timing statistics comparing the different languages.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Plot timing statistics comparing the different languages.&quot;&quot;&quot;</span>
     <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="s1">&#39;language&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="yggtime_os"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.yggtime_os">[docs]</a><span class="k">def</span> <span class="nf">yggtime_os</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot timing statistics comparing the different operating systems.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Plot timing statistics comparing the different operating systems.&quot;&quot;&quot;</span>
     <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="s1">&#39;platform&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="yggtime_py"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.yggtime_py">[docs]</a><span class="k">def</span> <span class="nf">yggtime_py</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Plot timing statistics comparing the different versions of Python.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Plot timing statistics comparing the different versions of Python.&quot;&quot;&quot;</span>
     <span class="n">timing</span><span class="o">.</span><span class="n">plot_scalings</span><span class="p">(</span><span class="n">compare</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="yggtime_paper"><a class="viewcode-back" href="../../code_python.html#yggdrasil.command_line.yggtime_paper">[docs]</a><span class="k">def</span> <span class="nf">yggtime_paper</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create plots for timing.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Create plots for timing.&quot;&quot;&quot;</span>
     <span class="n">_lang_list</span> <span class="o">=</span> <span class="n">timing</span><span class="o">.</span><span class="n">_lang_list</span>
     <span class="n">_lang_list_nomatlab</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">_lang_list</span><span class="p">)</span>
     <span class="n">_lang_list_nomatlab</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;matlab&#39;</span><span class="p">)</span>
@@ -280,13 +289,15 @@
                          <span class="n">compare_values</span><span class="o">=</span><span class="n">_lang_list</span><span class="p">)</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">yggrun</span><span class="p">()</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -295,11 +306,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -314,24 +325,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

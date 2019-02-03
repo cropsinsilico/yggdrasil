@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests.test_units &mdash; yggdrasil 0.8 documentation</title>
+  <title>yggdrasil.tests.test_units &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="yggdrasil.tests" href="../tests.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -172,11 +181,11 @@
 
 
 <div class="viewcode-block" id="TestPint"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint">[docs]</a><span class="k">class</span> <span class="nc">TestPint</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tests for using pint for units.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Tests for using pint for units.&quot;&quot;&quot;</span>
     <span class="n">_unit_package</span> <span class="o">=</span> <span class="s1">&#39;pint&#39;</span>
 
 <div class="viewcode-block" id="TestPint.setup"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set use_unyt for tests.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Set use_unyt for tests.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_use_unyt</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">_use_unyt</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit_package</span> <span class="o">==</span> <span class="s1">&#39;unyt&#39;</span><span class="p">:</span>
             <span class="n">units</span><span class="o">.</span><span class="n">_use_unyt</span> <span class="o">=</span> <span class="kc">True</span>
@@ -187,33 +196,33 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TestPint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestPint.teardown"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset use_unyt to default.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Reset use_unyt to default.&quot;&quot;&quot;</span>
         <span class="n">units</span><span class="o">.</span><span class="n">_use_unyt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_use_unyt</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestPint</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestPint.test_has_units"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_has_units">[docs]</a>    <span class="k">def</span> <span class="nf">test_has_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test has_units.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test has_units.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_nounits</span><span class="p">:</span>  <span class="c1"># + [&#39;string&#39;]:</span>
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_units</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">v</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestPint.test_get_data"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_get_data">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_data.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test get_data.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_nounits</span><span class="p">:</span>
             <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">vno</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vars_nounits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_units</span><span class="p">):</span>
             <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vno</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestPint.test_get_units"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_get_units">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_units.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test get_units.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_nounits</span><span class="p">:</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_units</span><span class="p">:</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">as_unit</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">units</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestPint.test_add_units"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_add_units">[docs]</a>    <span class="k">def</span> <span class="nf">test_add_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test add_units.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test add_units.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_nounits</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
@@ -221,18 +230,18 @@
         <span class="n">assert_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;n/a&#39;</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestPint.test_is_null_unit"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_is_null_unit">[docs]</a>    <span class="k">def</span> <span class="nf">test_is_null_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test is_null_unit.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test is_null_unit.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">is_null_unit</span><span class="p">(</span><span class="s1">&#39;n/a&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">is_null_unit</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">is_null_unit</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestPint.test_as_unit"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_as_unit">[docs]</a>    <span class="k">def</span> <span class="nf">test_as_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test as_unit.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test as_unit.&quot;&quot;&quot;</span>
         <span class="n">units</span><span class="o">.</span><span class="n">as_unit</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">)</span>
         <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">as_unit</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestPint.test_is_unit"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_is_unit">[docs]</a>    <span class="k">def</span> <span class="nf">test_is_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test is_unit.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test is_unit.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">is_unit</span><span class="p">(</span><span class="s1">&#39;n/a&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">is_unit</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">is_unit</span><span class="p">(</span><span class="s1">&#39;cm/s**2&#39;</span><span class="p">))</span>
@@ -243,14 +252,14 @@
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">is_unit</span><span class="p">(</span><span class="s1">&#39;invalid&#39;</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestPint.test_convert_to"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_convert_to">[docs]</a>    <span class="k">def</span> <span class="nf">test_convert_to</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test convert_to.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test convert_to.&quot;&quot;&quot;</span>
         <span class="n">units</span><span class="o">.</span><span class="n">convert_to</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vars_units</span><span class="p">:</span>
             <span class="n">units</span><span class="o">.</span><span class="n">convert_to</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">)</span>
             <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_to</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestPint.test_are_compatible"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestPint.test_are_compatible">[docs]</a>    <span class="k">def</span> <span class="nf">test_are_compatible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test are_compatible.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Test are_compatible.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">are_compatible</span><span class="p">(</span><span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">))</span>
@@ -258,12 +267,14 @@
 
 
 <div class="viewcode-block" id="TestUnyt"><a class="viewcode-back" href="../../../yggdrasil.tests.html#yggdrasil.tests.test_units.TestUnyt">[docs]</a><span class="k">class</span> <span class="nc">TestUnyt</span><span class="p">(</span><span class="n">TestPint</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test for using unyt for units.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test for using unyt for units.&quot;&quot;&quot;</span>
     <span class="n">_unit_package</span> <span class="o">=</span> <span class="s1">&#39;unyt&#39;</span></div>
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -272,11 +283,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -291,24 +302,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

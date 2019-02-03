@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.interface.CisInterface &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.interface.CisInterface &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -174,22 +183,22 @@
 
 
 <div class="viewcode-block" id="maxMsgSize"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.maxMsgSize">[docs]</a><span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The maximum message size.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;int: The maximum message size.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">CIS_MSG_MAX</span></div>
 
 
 <div class="viewcode-block" id="bufMsgSize"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.bufMsgSize">[docs]</a><span class="k">def</span> <span class="nf">bufMsgSize</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Buffer size for average message.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;int: Buffer size for average message.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">CIS_MSG_BUF</span></div>
 
 
 <div class="viewcode-block" id="eof_msg"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.eof_msg">[docs]</a><span class="k">def</span> <span class="nf">eof_msg</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Message signalling end of file.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;str: Message signalling end of file.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">CIS_MSG_EOF</span></div>
 
 
 <div class="viewcode-block" id="CisMatlab"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisMatlab">[docs]</a><span class="k">def</span> <span class="nf">CisMatlab</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Short interface to identify functions called by Matlab.</span>
+    <span class="sd">r&quot;&quot;&quot;Short interface to identify functions called by Matlab.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        _type (str): Name of class that should be returned.</span>
@@ -206,17 +215,17 @@
         <span class="n">_type</span> <span class="o">=</span> <span class="n">_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Psi&#39;</span><span class="p">,</span> <span class="s1">&#39;Cis&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PSI&#39;</span><span class="p">):</span>
         <span class="n">_type</span> <span class="o">=</span> <span class="n">_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PSI&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="bp">cls</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode_type</span><span class="p">)):</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span>
+    <span class="n">cls</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode_type</span><span class="p">)):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;matlab&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">obj</span></div>
 
 
 <div class="viewcode-block" id="CisInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisInput">[docs]</a><span class="k">def</span> <span class="nf">CisInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling input from a message queue.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling input from a message queue.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue. Combined with the</span>
@@ -240,7 +249,7 @@
     
 
 <div class="viewcode-block" id="CisOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisOutput">[docs]</a><span class="k">def</span> <span class="nf">CisOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling output to a message queue.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling output to a message queue.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue. Combined with the</span>
@@ -264,7 +273,7 @@
 
     
 <div class="viewcode-block" id="CisRpcServer"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisRpcServer">[docs]</a><span class="k">def</span> <span class="nf">CisRpcServer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling requests and response for an RPC Server.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling requests and response for an RPC Server.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the server queues.</span>
@@ -290,7 +299,7 @@
     
 
 <div class="viewcode-block" id="CisRpcClient"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisRpcClient">[docs]</a><span class="k">def</span> <span class="nf">CisRpcClient</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling requests and response to an RPC Server from a</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling requests and response to an RPC Server from a</span>
 <span class="sd">    client.</span>
 
 <span class="sd">    Args:</span>
@@ -318,7 +327,7 @@
 
 <span class="c1"># Specialized classes for ascii IO</span>
 <div class="viewcode-block" id="CisAsciiFileInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiFileInput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiFileInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for generic ASCII input.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for generic ASCII input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -333,7 +342,7 @@
 
 
 <div class="viewcode-block" id="CisAsciiFileOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiFileOutput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiFileOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for generic ASCII output.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for generic ASCII output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -348,7 +357,7 @@
 
 <span class="c1"># Specialized classes for ascii table IO</span>
 <div class="viewcode-block" id="CisAsciiTableInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiTableInput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiTableInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted input.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -367,7 +376,7 @@
 
 
 <div class="viewcode-block" id="CisAsciiTableOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiTableOutput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiTableOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted output.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -391,7 +400,7 @@
 
 <span class="c1"># Specialized classes for ascii table IO arrays</span>
 <div class="viewcode-block" id="CisAsciiArrayInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiArrayInput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiArrayInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted input as arrays.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted input as arrays.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -407,7 +416,7 @@
 
 
 <div class="viewcode-block" id="CisAsciiArrayOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiArrayOutput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiArrayOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted output as arrays.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted output as arrays.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -427,7 +436,7 @@
 
 <span class="c1"># Pickle io (for backwards compatibility)</span>
 <div class="viewcode-block" id="CisPickleInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPickleInput">[docs]</a><span class="k">def</span> <span class="nf">CisPickleInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pickled input.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling pickled input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -442,7 +451,7 @@
 
 
 <div class="viewcode-block" id="CisPickleOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPickleOutput">[docs]</a><span class="k">def</span> <span class="nf">CisPickleOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pickled output.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling pickled output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -457,7 +466,7 @@
 
 <span class="c1"># Pandas io</span>
 <div class="viewcode-block" id="CisPandasInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPandasInput">[docs]</a><span class="k">def</span> <span class="nf">CisPandasInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Pandas input.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling Pandas input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -476,7 +485,7 @@
 
 
 <div class="viewcode-block" id="CisPandasOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPandasOutput">[docs]</a><span class="k">def</span> <span class="nf">CisPandasOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pandasd output.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling pandasd output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -495,7 +504,7 @@
 
 <span class="c1"># Ply io</span>
 <div class="viewcode-block" id="CisPlyInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPlyInput">[docs]</a><span class="k">def</span> <span class="nf">CisPlyInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Ply input.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling Ply input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -511,7 +520,7 @@
 
 
 <div class="viewcode-block" id="CisPlyOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPlyOutput">[docs]</a><span class="k">def</span> <span class="nf">CisPlyOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Ply output.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling Ply output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -527,7 +536,7 @@
 
 <span class="c1"># Obj io</span>
 <div class="viewcode-block" id="CisObjInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisObjInput">[docs]</a><span class="k">def</span> <span class="nf">CisObjInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Obj input.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling Obj input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -543,7 +552,7 @@
 
 
 <div class="viewcode-block" id="CisObjOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisObjOutput">[docs]</a><span class="k">def</span> <span class="nf">CisObjOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Obj output.</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling Obj output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -558,7 +567,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -567,11 +578,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -586,24 +597,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

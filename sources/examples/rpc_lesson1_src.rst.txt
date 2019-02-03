@@ -1,0 +1,12 @@
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson1/src/server.py
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson1/src/client.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <examples/rpc_lesson1.html>`__)

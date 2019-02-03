@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.tests.test_GCCModelDriver &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.drivers.tests.test_GCCModelDriver &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../../index.html"/>
+        <link rel="up" title="cis_interface.drivers" href="../../drivers.html"/> 
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -181,7 +190,7 @@
 
 
 <div class="viewcode-block" id="test_get_zmq_flags"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_get_zmq_flags">[docs]</a><span class="k">def</span> <span class="nf">test_get_zmq_flags</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_zmq_flags.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test get_zmq_flags.&quot;&quot;&quot;</span>
     <span class="n">cc</span><span class="p">,</span> <span class="n">ld</span> <span class="o">=</span> <span class="n">get_zmq_flags</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">):</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cc</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
@@ -189,7 +198,7 @@
 
 
 <div class="viewcode-block" id="test_get_ipc_flags"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_get_ipc_flags">[docs]</a><span class="k">def</span> <span class="nf">test_get_ipc_flags</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_ipc_flags.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test get_ipc_flags.&quot;&quot;&quot;</span>
     <span class="n">cc</span><span class="p">,</span> <span class="n">ld</span> <span class="o">=</span> <span class="n">get_ipc_flags</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">is_comm_installed</span><span class="p">(</span><span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="s1">&#39;c&#39;</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cc</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
@@ -197,16 +206,16 @@
 
 
 <div class="viewcode-block" id="test_get_flags"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_get_flags">[docs]</a><span class="k">def</span> <span class="nf">test_get_flags</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_flags.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test get_flags.&quot;&quot;&quot;</span>
     <span class="n">cc</span><span class="p">,</span> <span class="n">ld</span> <span class="o">=</span> <span class="n">get_flags</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cc</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ld</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_build_shared"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_build_shared">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">test_build_shared</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test building libraries as shared.&quot;&quot;&quot;</span>
+<span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_build_shared"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_build_shared">[docs]</a><span class="k">def</span> <span class="nf">test_build_shared</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Test building libraries as shared.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
         <span class="n">build_regex_win32</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">build_datatypes</span><span class="p">(</span><span class="n">as_shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -216,26 +225,26 @@
     <span class="n">build_api</span><span class="p">(</span><span class="n">cpp</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">as_shared</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_GCCModelDriver_no_C_library"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_GCCModelDriver_no_C_library">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library installed&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">test_GCCModelDriver_no_C_library</span><span class="p">():</span>  <span class="c1"># pragma: windows</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test GCCModelDriver error when C library not installed.&quot;&quot;&quot;</span>
+<span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_GCCModelDriver_no_C_library"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_GCCModelDriver_no_C_library">[docs]</a><span class="k">def</span> <span class="nf">test_GCCModelDriver_no_C_library</span><span class="p">():</span>  <span class="c1"># pragma: windows</span>
+    <span class="sd">r&quot;&quot;&quot;Test GCCModelDriver error when C library not installed.&quot;&quot;&quot;</span>
     <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">GCCModelDriver</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">])</span></div>
 
 
-<div class="viewcode-block" id="test_GCCModelDriver_errors"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_GCCModelDriver_errors">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">test_GCCModelDriver_errors</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test GCCModelDriver errors.&quot;&quot;&quot;</span>
+<span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="test_GCCModelDriver_errors"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.test_GCCModelDriver_errors">[docs]</a><span class="k">def</span> <span class="nf">test_GCCModelDriver_errors</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Test GCCModelDriver errors.&quot;&quot;&quot;</span>
     <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">GCCModelDriver</span><span class="p">,</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;test.py&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="TestGCCModelParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelParam">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TestGCCModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestModelParam</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for GCCModelDriver.&quot;&quot;&quot;</span>
+<span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestGCCModelParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelParam">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestModelParam</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Test parameters for GCCModelDriver.&quot;&quot;&quot;</span>
 
     <span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;GCCModelDriver&#39;</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[]</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span>
         <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -245,14 +254,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">src</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;-I&#39;</span> <span class="o">+</span> <span class="n">script_dir</span><span class="p">,</span> <span class="s1">&#39;-L&#39;</span> <span class="o">+</span> <span class="n">script_dir</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="TestGCCModelDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriverNoStart">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TestGCCModelDriverNoStart</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span>
+<span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestGCCModelDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelDriverNoStart</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span>
                                 <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriverNoStart</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for GCCModelDriver without start.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Test runner for GCCModelDriver without start.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Version to run C++ example</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelDriverNoStart</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelDriverNoStart</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">scripts</span><span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">]</span>
         <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">src</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
@@ -264,29 +273,31 @@
     
     <span class="c1"># Done in driver, but driver not started</span>
 <div class="viewcode-block" id="TestGCCModelDriverNoStart.teardown"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriverNoStart.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelDriverNoStart</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="TestGCCModelDriverNoStart_std"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriverNoStart_std">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TestGCCModelDriverNoStart_std</span><span class="p">(</span><span class="n">TestGCCModelDriverNoStart</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for GCCModelDriver with std lib specified.&quot;&quot;&quot;</span>
+<span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestGCCModelDriverNoStart_std"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriverNoStart_std">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelDriverNoStart_std</span><span class="p">(</span><span class="n">TestGCCModelDriverNoStart</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Test runner for GCCModelDriver with std lib specified.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelDriverNoStart_std</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelDriverNoStart_std</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="TestGCCModelDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriver">[docs]</a><span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">TestGCCModelDriver</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for GCCModelDriver.&quot;&quot;&quot;</span>
+<span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">_driver_installed</span><span class="p">,</span> <span class="s2">&quot;C Library not installed&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="TestGCCModelDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriver">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelDriver</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriver</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Test runner for GCCModelDriver.&quot;&quot;&quot;</span>
 
     <span class="k">pass</span></div>
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -295,11 +306,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -314,24 +325,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

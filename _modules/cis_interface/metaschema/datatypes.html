@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.metaschema.datatypes &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.metaschema.datatypes &mdash; cis_interface 0.7.5 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+  
 
   
-  <script src="../../../_static/js/modernizr.min.js"></script>
+    <link rel="stylesheet" href="../../../static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="cis_interface 0.7.5 documentation" href="../../../index.html"/>
+        <link rel="up" title="cis_interface.metaschema" href="../metaschema.html"/> 
+
+  
+  <script src="../../../static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -47,7 +57,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> yggdrasil
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
           
 
           
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.7.5
               </div>
             
           
@@ -95,7 +105,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
@@ -112,18 +121,17 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">yggdrasil</a>
+          <a href="../../../index.html">cis_interface</a>
         
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -178,18 +186,18 @@
 
 
 <span class="n">_type_registry</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-<span class="n">_schema_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;schemas&#39;</span><span class="p">)</span>
+<span class="n">_schema_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;schemas&#39;</span><span class="p">)</span>
 <span class="n">_base_validator</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">validator_for</span><span class="p">({</span><span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">})</span>
-<span class="n">CIS_MSG_HEAD</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;CIS_MSG_HEAD&#39;</span>
+<span class="n">CIS_MSG_HEAD</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;CIS_MSG_HEAD&#39;</span>
 
 
 <div class="viewcode-block" id="MetaschemaTypeError"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.MetaschemaTypeError">[docs]</a><span class="k">class</span> <span class="nc">MetaschemaTypeError</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Error that should be raised when a class encounters a type it cannot handle.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Error that should be raised when a class encounters a type it cannot handle.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="register_type"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.register_type">[docs]</a><span class="k">def</span> <span class="nf">register_type</span><span class="p">(</span><span class="n">type_class</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a type class, recording methods for encoding/decoding.</span>
+    <span class="sd">r&quot;&quot;&quot;Register a type class, recording methods for encoding/decoding.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type_class (class): Class to be registered.</span>
@@ -240,7 +248,7 @@
 
 
 <div class="viewcode-block" id="add_type_from_schema"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.add_type_from_schema">[docs]</a><span class="k">def</span> <span class="nf">add_type_from_schema</span><span class="p">(</span><span class="n">path_to_schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a type from a schema in a file.</span>
+    <span class="sd">r&quot;&quot;&quot;Add a type from a schema in a file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path_to_schema (string): Full path to the location of a schema file that</span>
@@ -274,7 +282,7 @@
 
 
 <div class="viewcode-block" id="register_type_from_file"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.register_type_from_file">[docs]</a><span class="k">def</span> <span class="nf">register_type_from_file</span><span class="p">(</span><span class="n">path_to_schema</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorator for registering a type by loading the schema describing it</span>
+    <span class="sd">r&quot;&quot;&quot;Decorator for registering a type by loading the schema describing it</span>
 <span class="sd">    from a file. The original base class is discarded and replaced by one</span>
 <span class="sd">    determined from the &#39;type&#39; key in the schema. All attributes/methods</span>
 <span class="sd">    for the class are preserved.</span>
@@ -290,14 +298,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">_wrapped_decorator</span><span class="p">(</span><span class="n">type_class</span><span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">add_type_from_schema</span><span class="p">(</span><span class="n">path_to_schema</span><span class="p">,</span> <span class="n">target_globals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                   <span class="o">**</span><span class="n">type_class</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+                                   <span class="o">**</span><span class="n">type_class</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
                                    
         <span class="k">return</span> <span class="n">out</span>
     <span class="k">return</span> <span class="n">_wrapped_decorator</span></div>
 
 
 <div class="viewcode-block" id="get_registered_types"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.get_registered_types">[docs]</a><span class="k">def</span> <span class="nf">get_registered_types</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a dictionary of registered types.</span>
+    <span class="sd">r&quot;&quot;&quot;Return a dictionary of registered types.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Registered type/class pairs.</span>
@@ -307,8 +315,8 @@
 
 
 <div class="viewcode-block" id="import_all_types"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.import_all_types">[docs]</a><span class="k">def</span> <span class="nf">import_all_types</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
+    <span class="sd">r&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
         <span class="n">type_mod</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">type_mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
             <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;cis_interface.metaschema.datatypes.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">type_mod</span><span class="p">)</span>
@@ -334,7 +342,7 @@
     
 
 <div class="viewcode-block" id="complete_typedef"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.complete_typedef">[docs]</a><span class="k">def</span> <span class="nf">complete_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Complete the type definition by converting it into the standard format.</span>
+    <span class="sd">r&quot;&quot;&quot;Complete the type definition by converting it into the standard format.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (str, dict, list): A type name, type definition dictionary,</span>
@@ -356,7 +364,7 @@
 
 
 <div class="viewcode-block" id="get_type_class"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.get_type_class">[docs]</a><span class="k">def</span> <span class="nf">get_type_class</span><span class="p">(</span><span class="n">type_name</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a type class given it&#39;s name.</span>
+    <span class="sd">r&quot;&quot;&quot;Return a type class given it&#39;s name.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        type_name (str): Name of type class.</span>
@@ -371,7 +379,7 @@
 
 
 <div class="viewcode-block" id="get_type_from_def"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.get_type_from_def">[docs]</a><span class="k">def</span> <span class="nf">get_type_from_def</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">dont_complete</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the type instance based on the provided type definition.</span>
+    <span class="sd">r&quot;&quot;&quot;Return the type instance based on the provided type definition.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        typedef (obj): This can be the name of a type, a dictionary containing a</span>
@@ -392,7 +400,7 @@
 
 
 <div class="viewcode-block" id="guess_type_from_msg"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.guess_type_from_msg">[docs]</a><span class="k">def</span> <span class="nf">guess_type_from_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guess the type class from a message.</span>
+    <span class="sd">r&quot;&quot;&quot;Guess the type class from a message.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (str, bytes): Message containing metadata.</span>
@@ -408,16 +416,16 @@
         <span class="k">if</span> <span class="n">CIS_MSG_HEAD</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">CIS_MSG_HEAD</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_unicode</span><span class="p">(</span><span class="n">metadata</span><span class="p">))</span>
-            <span class="bp">cls</span> <span class="o">=</span> <span class="n">_type_registry</span><span class="p">[</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
+            <span class="n">cls</span> <span class="o">=</span> <span class="n">_type_registry</span><span class="p">[</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span>
-        <span class="k">return</span> <span class="bp">cls</span>
+        <span class="k">return</span> <span class="n">cls</span>
     <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not guess type.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="guess_type_from_obj"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.guess_type_from_obj">[docs]</a><span class="k">def</span> <span class="nf">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Guess the type class for a given Python object.</span>
+    <span class="sd">r&quot;&quot;&quot;Guess the type class for a given Python object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object.</span>
@@ -430,12 +438,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">type_encoder</span> <span class="o">=</span> <span class="n">get_metaschema_property</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span>
-    <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">type_encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
-    <span class="k">return</span> <span class="bp">cls</span></div>
+    <span class="n">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">type_encoder</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">cls</span></div>
 
 
 <div class="viewcode-block" id="encode_type"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.encode_type">[docs]</a><span class="k">def</span> <span class="nf">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON schema that can be used to both</span>
+    <span class="sd">r&quot;&quot;&quot;Encode an object into a JSON schema that can be used to both</span>
 <span class="sd">    describe the object and validate others.</span>
 
 <span class="sd">    Args:</span>
@@ -448,12 +456,12 @@
 <span class="sd">        dict: Encoded JSON schema describing the object.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-    <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span></div>
+    <span class="n">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="encode_data"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.encode_data">[docs]</a><span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON serializable object.</span>
+    <span class="sd">r&quot;&quot;&quot;Encode an object into a JSON serializable object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object to be encoded.</span>
@@ -465,17 +473,17 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">typedef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-            <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-    <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span></div>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="n">typedef</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">encode_data</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="encode_data_readable"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.encode_data_readable">[docs]</a><span class="k">def</span> <span class="nf">encode_data_readable</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a JSON serializable object that is human readable</span>
+    <span class="sd">r&quot;&quot;&quot;Encode an object into a JSON serializable object that is human readable</span>
 <span class="sd">    but dosn&#39;t guarantee identical deserialization.</span>
 
 <span class="sd">    Args:</span>
@@ -488,17 +496,17 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">typedef</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-            <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-    <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_data_readable</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span></div>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="n">typedef</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">encode_data_readable</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="encode"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.encode">[docs]</a><span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object into a message.</span>
+    <span class="sd">r&quot;&quot;&quot;Encode an object into a message.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (object): Python object to be encoded.</span>
@@ -507,16 +515,16 @@
 <span class="sd">        bytes: Encoded message.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-    <span class="n">metadata</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
-    <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-    <span class="n">cls_inst</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">typedef</span><span class="p">)</span>
+    <span class="n">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">typedef</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">cls_inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">**</span><span class="n">typedef</span><span class="p">)</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="n">cls_inst</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">msg</span></div>
 
 
 <div class="viewcode-block" id="decode"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.decode">[docs]</a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object from a message.</span>
+    <span class="sd">r&quot;&quot;&quot;Decode an object from a message.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (bytes): Bytes encoded message.</span>
@@ -525,10 +533,10 @@
 <span class="sd">        object: Decoded Python object.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">cls</span> <span class="o">=</span> <span class="n">guess_type_from_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_unicode</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">CIS_MSG_HEAD</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-    <span class="n">cls_inst</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">typedef</span><span class="p">)</span>
+    <span class="n">typedef</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">cls_inst</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">**</span><span class="n">typedef</span><span class="p">)</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">cls_inst</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">obj</span></div>
 
@@ -565,7 +573,7 @@
 
 
 <div class="viewcode-block" id="compare_schema"><a class="viewcode-back" href="../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.compare_schema">[docs]</a><span class="k">def</span> <span class="nf">compare_schema</span><span class="p">(</span><span class="n">schema1</span><span class="p">,</span> <span class="n">schema2</span><span class="p">,</span> <span class="n">root1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">root2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compare two schemas for compatibility.</span>
+    <span class="sd">r&quot;&quot;&quot;Compare two schemas for compatibility.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema1 (dict): First schema.</span>
@@ -642,7 +650,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -651,11 +661,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -670,24 +680,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.7.5',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../static/jquery.js"></script>
+      <script type="text/javascript" src="../../../static/underscore.js"></script>
+      <script type="text/javascript" src="../../../static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

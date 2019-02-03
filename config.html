@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Configuration Files &mdash; yggdrasil 0.8 documentation</title>
+  <title>Configuration Files &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,20 +24,29 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Units" href="units.html" />
-    <link rel="prev" title="YAML Files" href="yaml.html" /> 
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="index.html"/>
+        <link rel="next" title="Units" href="units.html"/>
+        <link rel="prev" title="YAML Files" href="yaml.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -59,7 +68,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -120,7 +129,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -128,10 +137,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -175,20 +183,20 @@
             
   <div class="section" id="configuration-files">
 <span id="config-rst"></span><h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
-<p>Many components of the yggdrasil framework’s behavior can be controlled
+<p>Many components of the yggdrasil framework&#8217;s behavior can be controlled
 by options in the configuration file. When installed yggdrasil creates
-a user config file called ‘.yggdrasil.cfg’ in your home directory. By
+a user config file called &#8216;.yggdrasil.cfg&#8217; in your home directory. By
 editting the options in the user config file, you can customize the behavior
 of your framework runs.</p>
 <p>Further customization for specific runs can be
-achieved by creating a local config file called ‘.yggdrasil.cfg’ in the
+achieved by creating a local config file called &#8216;.yggdrasil.cfg&#8217; in the
 directory where the interface will be run. Any options not found in the local
 will be filled in with values from the user config file. Any options not
 found in the user config file will be filled in with default package values.</p>
 <div class="section" id="debug-options">
 <h2>Debug Options<a class="headerlink" href="#debug-options" title="Permalink to this headline">¶</a></h2>
 <p>Options for controlling the level of information printed during a run can be
-controlled by options in the ‘[debug]’ section of the config files. Each one
+controlled by options in the &#8216;[debug]&#8217; section of the config files. Each one
 can have any of the valid
 <a class="reference external" href="https://docs.python.org/2/library/logging.html#levels">logging levels</a>.
 These include:</p>
@@ -235,7 +243,7 @@ yggdrasil calls from the models.</td>
 <div class="section" id="windows-options">
 <h2>Windows Options<a class="headerlink" href="#windows-options" title="Permalink to this headline">¶</a></h2>
 <p>On Windows, it may be necessary for you to manually specify the location of
-the <code class="docutils literal notranslate"><span class="pre">libzmq</span></code> and <code class="docutils literal notranslate"><span class="pre">czmq</span></code> headers and libraries. These can be set using
+the <code class="docutils literal"><span class="pre">libzmq</span></code> and <code class="docutils literal"><span class="pre">czmq</span></code> headers and libraries. These can be set using
 the following config options. This should not be necessary on Linux/MacOS.</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -265,7 +273,7 @@ the following config options. This should not be necessary on Linux/MacOS.</p>
 </div>
 <div class="section" id="rabbitmq-options">
 <h2>RabbitMQ Options<a class="headerlink" href="#rabbitmq-options" title="Permalink to this headline">¶</a></h2>
-<p>Options in the ‘[RMQ]’ section control the behavior of RabbitMQ connections.
+<p>Options in the &#8216;[RMQ]&#8217; section control the behavior of RabbitMQ connections.
 If the option is left blank, the default RabbitMQ option is used.
 These include:</p>
 <table border="1" class="docutils">
@@ -282,7 +290,7 @@ These include:</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>namespace</td>
-<td>&#160;</td>
+<td>&nbsp;</td>
 <td>RabbitMQ exchange.</td>
 </tr>
 <tr class="row-odd"><td>host</td>
@@ -290,7 +298,7 @@ These include:</p>
 <td>RabbitMQ server host.</td>
 </tr>
 <tr class="row-even"><td>vhost</td>
-<td>&#160;</td>
+<td>&nbsp;</td>
 <td>RabbitMQ server virtual host.</td>
 </tr>
 <tr class="row-odd"><td>user</td>
@@ -306,7 +314,7 @@ These include:</p>
 </div>
 <div class="section" id="parallel-options">
 <h2>Parallel Options<a class="headerlink" href="#parallel-options" title="Permalink to this headline">¶</a></h2>
-<p>Options in the ‘[parallel]’ section control the behavior of parallelization.
+<p>Options in the &#8216;[parallel]&#8217; section control the behavior of parallelization.
 Although, not supported in the current version of yggdrasil, these
 include:</p>
 <table border="1" class="docutils">
@@ -323,7 +331,7 @@ include:</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>cluster</td>
-<td>&#160;</td>
+<td>&nbsp;</td>
 <td>List of IP address of cluster nodes.</td>
 </tr>
 </tbody>
@@ -333,7 +341,9 @@ include:</p>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -351,11 +361,11 @@ include:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -370,24 +380,37 @@ include:</p>
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

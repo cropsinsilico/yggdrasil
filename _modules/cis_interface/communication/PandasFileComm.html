@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.PandasFileComm &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.communication.PandasFileComm &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../index.html"/>
+        <link rel="up" title="cis_interface.communication" href="../communication.html"/> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -175,7 +184,7 @@
 
 
 <div class="viewcode-block" id="pandas_send_converter"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.pandas_send_converter">[docs]</a><span class="k">def</span> <span class="nf">pandas_send_converter</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs conversion from a limited set of objects to a Pandas data frame</span>
+    <span class="sd">r&quot;&quot;&quot;Performs conversion from a limited set of objects to a Pandas data frame</span>
 <span class="sd">    for sending to a file via PandasFileComm. Currently supports converting from</span>
 <span class="sd">    structured numpy arrays, lists/tuples of numpy arrays, and dictionaries.</span>
 
@@ -197,7 +206,7 @@
 
 
 <div class="viewcode-block" id="pandas_recv_converter"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.pandas_recv_converter">[docs]</a><span class="k">def</span> <span class="nf">pandas_recv_converter</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs conversion to a limited set of objects from a Pandas data frame</span>
+    <span class="sd">r&quot;&quot;&quot;Performs conversion to a limited set of objects from a Pandas data frame</span>
 <span class="sd">    for receiving from a file via PandasFileComm. Currently supports converting to</span>
 <span class="sd">    lists/tuples of numpy arrays.</span>
 
@@ -212,9 +221,9 @@
     <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2list</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="PandasFileComm"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">PandasFileComm</span><span class="p">(</span><span class="n">AsciiTableComm</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a pandas csv file on disk.</span>
+<span class="nd">@register_component</span>
+<div class="viewcode-block" id="PandasFileComm"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm">[docs]</a><span class="k">class</span> <span class="nc">PandasFileComm</span><span class="p">(</span><span class="n">AsciiTableComm</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class for handling I/O from/to a pandas csv file on disk.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The environment variable where communication address is</span>
@@ -229,15 +238,15 @@
     <span class="n">_default_serializer</span> <span class="o">=</span> <span class="n">PandasSerialize</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up dataio and attributes.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Set up dataio and attributes.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;send_converter&#39;</span><span class="p">,</span> <span class="n">pandas_send_converter</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;recv_converter&#39;</span><span class="p">,</span> <span class="n">pandas_recv_converter</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PandasFileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span> <span class="o">=</span> <span class="s1">&#39;read&#39;</span>
 
-<div class="viewcode-block" id="PandasFileComm.get_testing_options"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">as_frames</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_names</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="PandasFileComm.get_testing_options"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm.get_testing_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">as_frames</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_names</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            as_frames (bool, optional): If True, the test objects will be Pandas</span>
@@ -274,12 +283,12 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">header_was_written</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if head has been written to the current file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if head has been written to the current file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_header_was_written&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
     <span class="nd">@header_was_written</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">header_was_written</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header_was_written</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set for header_was_written property.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Set for header_was_written property.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">header_was_written</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">write_header</span> <span class="o">=</span> <span class="kc">True</span>
@@ -290,11 +299,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_header_was_written</span> <span class="o">=</span> <span class="n">header_was_written</span>
 
 <div class="viewcode-block" id="PandasFileComm.read_header"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm.read_header">[docs]</a>    <span class="k">def</span> <span class="nf">read_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read header lines from the file and update serializer info.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Read header lines from the file and update serializer info.&quot;&quot;&quot;</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="PandasFileComm.write_header"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm.write_header">[docs]</a>    <span class="k">def</span> <span class="nf">write_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write header lines to the file based on the serializer info.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Write header lines to the file based on the serializer info.&quot;&quot;&quot;</span>
         <span class="c1"># This will result in header only being sent for first message</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">True</span>
@@ -302,7 +311,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -311,11 +322,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -330,24 +341,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

@@ -1,0 +1,34 @@
+.. cis_interface documentation master file, created by
+   sphinx-quickstart on Wed Sep  6 12:03:29 2017.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to cis_interface's documentation!
+=========================================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   includeme
+   install
+   getting_started
+   formatted_io
+   server_client_io
+   yaml
+   config
+   units
+   c_format_strings
+   io_drivers
+   model_drivers
+   code
+   examples/examples_toc
+   release
+   hackathon2018/index
+   
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

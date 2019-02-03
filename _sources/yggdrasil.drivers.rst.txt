@@ -195,8 +195,8 @@ yggdrasil.drivers.ServerResponseDriver module
     :undoc-members:
     :show-inheritance:
 
-yggdrasil.drivers.lpy\_model module
------------------------------------
+yggdrasil.drivers.lpy_model module
+----------------------------------
 
 .. automodule:: yggdrasil.drivers.lpy_model
     :members:

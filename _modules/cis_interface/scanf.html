@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.scanf &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.scanf &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -234,7 +243,7 @@
 
 
 <span class="k">def</span> <span class="nf">no_cast</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy function to cast a string to a string.</span>
+    <span class="sd">r&quot;&quot;&quot;Dummy function to cast a string to a string.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -247,7 +256,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_str</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a string, stripping whitespace.</span>
+    <span class="sd">r&quot;&quot;&quot;Cast a string value to a string, stripping whitespace.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -260,7 +269,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_hex</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to a hex integer.</span>
+    <span class="sd">r&quot;&quot;&quot;Cast a string value to a hex integer.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -273,7 +282,7 @@
 
 
 <span class="k">def</span> <span class="nf">cast_oct</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cast a string value to an octal.</span>
+    <span class="sd">r&quot;&quot;&quot;Cast a string value to an octal.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String to cast.</span>
@@ -286,7 +295,7 @@
 
 
 <span class="k">def</span> <span class="nf">cformat2regex</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">specifier</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get regex substring that will match the given cformat components.</span>
+    <span class="sd">r&quot;&quot;&quot;Get regex substring that will match the given cformat components.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        flags (str): Format flags.</span>
@@ -512,7 +521,7 @@
     <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: </span><span class="si">%r</span><span class="s2"> -&gt; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">collapseWhitespace</span><span class="p">:</span>
-        <span class="n">format_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">s+&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">s+&#39;</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">)</span>
+        <span class="n">format_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">s+&#39;</span><span class="p">,</span> <span class="s1">r&#39;</span><span class="se">\\</span><span class="s1">s+&#39;</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">)</span>
 
     <span class="n">format_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">format_pat</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scanf_cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SCANF_CACHE_SIZE</span><span class="p">:</span>
@@ -594,13 +603,15 @@
     <span class="k">return</span> <span class="n">y</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">doctest</span>
     <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -609,11 +620,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -628,24 +639,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>

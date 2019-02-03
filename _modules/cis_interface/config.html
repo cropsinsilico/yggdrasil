@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.config &mdash; yggdrasil 0.8 documentation</title>
+  <title>cis_interface.config &mdash; yggdrasil 0.8.3 documentation</title>
   
 
   
@@ -24,18 +24,28 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -57,7 +67,7 @@
             
             
               <div class="version">
-                0.8
+                0.8.3
               </div>
             
           
@@ -112,7 +122,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
@@ -120,10 +130,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -181,16 +190,16 @@
 <span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">configparser</span>
 <span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">platform</span><span class="p">,</span> <span class="n">backwards</span>
 <span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;.cis_interface.cfg&#39;</span>
-<span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
+<span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
 <span class="n">usr_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="n">config_file</span><span class="p">))</span>
 <span class="n">loc_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">config_file</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="CisConfigParser"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.CisConfigParser">[docs]</a><span class="k">class</span> <span class="nc">CisConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Config parser that returns None if option not provided on get.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Config parser that returns None if option not provided on get.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="CisConfigParser.get"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.CisConfigParser.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return None if the section/option does not exist.</span>
+        <span class="sd">r&quot;&quot;&quot;Return None if the section/option does not exist.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            section (str): Name of section.</span>
@@ -220,7 +229,7 @@
 
 
 <div class="viewcode-block" id="find_all"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.find_all">[docs]</a><span class="k">def</span> <span class="nf">find_all</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find all instances of a file with a given name within the directory</span>
+    <span class="sd">r&quot;&quot;&quot;Find all instances of a file with a given name within the directory</span>
 <span class="sd">    tree starting at a given path.</span>
 
 <span class="sd">    Args:</span>
@@ -252,7 +261,7 @@
             <span class="p">(</span><span class="n">stdoutdata</span><span class="p">,</span> <span class="n">stderrdata</span><span class="p">)</span> <span class="o">=</span> <span class="n">pfind</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">stdoutdata</span>
             <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">stderrdata</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-                <span class="k">if</span> <span class="sa">b</span><span class="s1">&#39;Permission denied&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">b</span><span class="s1">&#39;Permission denied&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">(</span><span class="n">pfind</span><span class="o">.</span><span class="n">returncode</span><span class="p">,</span>
                                                         <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">),</span>
                                                         <span class="n">output</span><span class="o">=</span><span class="n">stderrdata</span><span class="p">)</span>
@@ -265,7 +274,7 @@
 
 
 <div class="viewcode-block" id="locate_file"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.locate_file">[docs]</a><span class="k">def</span> <span class="nf">locate_file</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Locate a file on PATH.</span>
+    <span class="sd">r&quot;&quot;&quot;Locate a file on PATH.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str): Name of the file that should be located.</span>
@@ -293,7 +302,7 @@
 
 
 <div class="viewcode-block" id="update_config_matlab"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.update_config_matlab">[docs]</a><span class="k">def</span> <span class="nf">update_config_matlab</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options specific to matlab.</span>
+    <span class="sd">r&quot;&quot;&quot;Update config options specific to matlab.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config (CisConfigParser): Config class that options should be set for.</span>
@@ -341,7 +350,7 @@
 
 
 <div class="viewcode-block" id="update_config_windows"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.update_config_windows">[docs]</a><span class="k">def</span> <span class="nf">update_config_windows</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options specific to windows.</span>
+    <span class="sd">r&quot;&quot;&quot;Update config options specific to windows.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config (CisConfigParser): Config class that options should be set for.</span>
@@ -375,7 +384,7 @@
 
 
 <div class="viewcode-block" id="update_config_c"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.update_config_c">[docs]</a><span class="k">def</span> <span class="nf">update_config_c</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options specific to C/C++.</span>
+    <span class="sd">r&quot;&quot;&quot;Update config options specific to C/C++.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config (CisConfigParser): Config class that options should be set for.</span>
@@ -393,7 +402,7 @@
               <span class="s1">&#39;The full path to the directory containing rapidjson headers.&#39;</span><span class="p">)]</span>
     <span class="k">for</span> <span class="n">opt</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="n">clibs</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
-            <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="s1">&#39;rapidjson&#39;</span><span class="p">,</span>
+            <span class="n">fpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">__file__</span><span class="p">)),</span> <span class="s1">&#39;rapidjson&#39;</span><span class="p">,</span>
                                  <span class="s1">&#39;include&#39;</span><span class="p">,</span> <span class="s1">&#39;rapidjson&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fpath</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                 <span class="n">fpath</span> <span class="o">=</span> <span class="n">locate_file</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -408,7 +417,7 @@
 
 
 <div class="viewcode-block" id="update_config"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.update_config">[docs]</a><span class="k">def</span> <span class="nf">update_config</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">config_base</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update config options for the current platform.</span>
+    <span class="sd">r&quot;&quot;&quot;Update config options for the current platform.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config_file (str): Full path to the config file that should be created</span>
@@ -471,7 +480,7 @@
 
 
 <div class="viewcode-block" id="cfg_logging"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.cfg_logging">[docs]</a><span class="k">def</span> <span class="nf">cfg_logging</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set logging levels from config options.</span>
+    <span class="sd">r&quot;&quot;&quot;Set logging levels from config options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cfg (:class:`cis_interface.config.CisConfigParser`, optional):</span>
@@ -500,7 +509,7 @@
 
 
 <div class="viewcode-block" id="cfg_environment"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.cfg_environment">[docs]</a><span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables based on config options.</span>
+    <span class="sd">r&quot;&quot;&quot;Set environment variables based on config options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        env (dict, optional): Dictionary of environment variables that should</span>
@@ -526,7 +535,9 @@
 </pre></div>
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -535,11 +546,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -554,24 +565,37 @@
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.8.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>
