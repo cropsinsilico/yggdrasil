@@ -192,6 +192,10 @@ def get_cc(cpp=False, shared=False, static=False, linking=False):
             cc = 'g++'
         else:
             cc = 'gcc'
+    if cpp:
+        cc = os.environ.get('CXX', cc)
+    else:
+        cc = os.environ.get('CC', cc)
     return cc
 
 

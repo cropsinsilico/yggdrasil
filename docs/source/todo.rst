@@ -33,3 +33,4 @@ TODO
 * Add docstrings to metaschema classes
 * Preprocessor macro for dynamically determine message type?
 * Try to setup comm/connection at class level
+* Fix circular dependency when determining if C/C++ models are supported via czmq

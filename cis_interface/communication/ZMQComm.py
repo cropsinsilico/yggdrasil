@@ -46,10 +46,18 @@ def check_czmq():
                 return False
         return True
     else:
-        process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        outs, errs = process.communicate()
+        if platform._is_mac:
+            cc = 'clang'
+        else:
+            cc = 'gcc'
+        cc = os.environ.get('CC', cc)
+        try:
+            process = subprocess.Popen([cc, '-lzmq', '-lczmq'],
+                                       stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+            outs, errs = process.communicate()
+        except OSError:  # pragma: debug
+            return False
         # Python 3
         # try:
         #     outs, errs = process.communicate(timeout=15)
