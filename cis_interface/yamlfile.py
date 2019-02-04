@@ -231,7 +231,7 @@ def parse_connection(yml, existing):
             if not os.path.isabs(fname):
                 fname = os.path.join(x['working_dir'], fname)
             fname = os.path.normpath(fname)
-            if not os.path.isfile(fname):
+            if (not os.path.isfile(fname)) and (not x.get('wait_for_creation', False)):
                 raise RuntimeError(("Input '%s' not found in any of the registered "
                                     + "model outputs and is not a file.") % x['name'])
             x['address'] = fname

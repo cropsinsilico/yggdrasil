@@ -309,6 +309,28 @@ class TestYamlConnectionInputFile(YamlTestBase):
                   '    write_meth: all'],)
 
 
+class TestYamlConnectionInputFile_wait(YamlTestBase):
+    r"""Test connection with File where wait_for_creation specified."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '    outputs:',
+                  '      - outputA',
+                  '',
+                  'connections:',
+                  '  - input:',
+                  '      - {{ %s }}' % _yaml_env,
+                  '    read_meth: all',
+                  '    output: inputA',
+                  '  - input: outputA',
+                  '    output:',
+                  '      - output.txt',
+                  '    write_meth: all'],)
+
+
 class TestYamlConnectionInputAsciiFile(YamlTestBase):
     r"""Test connection with AsciiFile."""
     _contents = (['models:',
@@ -321,8 +343,9 @@ class TestYamlConnectionInputAsciiFile(YamlTestBase):
                   '      - outputA',
                   '',
                   'connections:',
-                  '  - input: {{ %s }}' % _yaml_env,
+                  '  - input: invalid.txt',
                   '    output: inputA',
+                  '    wait_for_creation: 4',
                   '    read_meth: line',
                   '  - input: outputA',
                   '    output: output.txt',
