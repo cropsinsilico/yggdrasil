@@ -95,8 +95,8 @@ def create(*args, **kwargs):
                     self._normalized = copy.deepcopy(instance)
                 instance = self._normalized
 
-            if self._normalizing and (u"$ref" not in _schema):
-
+            if ((self._normalizing
+                 and isinstance(_schema, dict) and (u"$ref" not in _schema))):
                 # Path based normalization
                 try:
                     # print(self.current_schema_path, instance, type(instance), _schema)

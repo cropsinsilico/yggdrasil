@@ -89,8 +89,10 @@ def test_get_metaschema():
         shutil.move(metaschema._metaschema_fname, temp)
         metaschema._metaschema = None
         new_metaschema = metaschema.get_metaschema()
-        new_id = new_metaschema.get('$id', new_metaschema['id'])
-        old_id = old_metaschema.get('$id', old_metaschema['id'])
+        new_id = new_metaschema.get('$id', new_metaschema.get('id', None))
+        old_id = old_metaschema.get('$id', old_metaschema.get('id', None))
+        assert(new_id is not None)
+        assert(old_id is not None)
         if new_id != old_id:  # pragma: debug
             warnings.warn(("The locally generated metaschema would have a different "
                            "id than the default (%s vs. %s). Check that your "
