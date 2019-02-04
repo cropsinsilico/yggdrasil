@@ -16,6 +16,7 @@ Release Steps
    $ cd docs
    $ make autodoc
 
+#. Test conda-forge recipe locally using steps below.
 #. Merge branch into master after tests pass and code review complete
 #. Create tag with new version on master::
 
@@ -25,11 +26,49 @@ Release Steps
 
    $ git push; git push --tags
    
-#. Update conda-forge build
+#. Once the source distribution has been uploaded to PyPI, update the conda-forge recipe
+on the cropsinsilico feedstock fork
+`here <https://github.com/cropsinsilico/yggdrasil-feedstock>`_ with the new version
+and SHA256 (this can be found
+`here <https://pypi.org/project/yggdrasil-framework/#files>`_) and create a pull request
+to merge the changes into the
+`conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_ feedstock.
 #. Checkout ``gh-pages`` branch if it dosn't already exist (See below), regenerate docs and push to gh-pages branch::
 
    $ cd docs
    $ make ghpages
+
+
+Updating and Testing the Conda Recipe
+=====================================
+
+#. Install ``conda-build`` if you don't already have it.::
+     
+   $ conda install conda-build
+
+#. Clone the feedstock fork.::
+
+   $ git clone https://github.com/cropsinsilico/yggdrasil-feedstock.git
+
+#. Update the recipe to reflect any changes to the dependencies.
+#. Update the source section of ``meta.yaml`` to use your local installation by 
+specifying a path and commenting out the ``url`` and ``sha256`` entries.::
+
+   source:
+     path: <path to local yggdrasil>
+
+#. Create a new conda environment for testing.::
+
+   $ conda create -n test_yggdrasil python=3.6
+   $ source activate test_yggdrasil
+
+#. Install the local build of |yggdrasil|.::
+
+   $ conda install --use-local yggdrasil
+
+#. Run the tests.::
+
+   $ yggtest -svx --nologcapture
 
 
 Docs Checkout
