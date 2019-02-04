@@ -1,8 +1,9 @@
 #!/usr/bin/python
 import os
 import sys
+import logging
 import traceback
-from cis_interface import runner, schema, config, timing
+from cis_interface import runner, schema, config, timing, yamlfile
 from cis_interface.drivers import GCCModelDriver
 
 
@@ -70,6 +71,13 @@ def regen_schema():
         os.remove(schema._schema_fname)
     schema.clear_schema()
     schema.init_schema()
+
+
+def validate_yaml():
+    r"""Validate a set of or or more YAMLs defining an integration."""
+    files = sys.argv[1:]
+    yamlfile.parse_yaml(files)
+    logging.info("Validation succesful.")
 
 
 def update_config():

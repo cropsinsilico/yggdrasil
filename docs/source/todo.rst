@@ -13,7 +13,6 @@ TODO
 * Change "args" in drivers to more transparent wording (source_code, etc.)
 * Alias input/output keyword arguments for connections to from/to for clarity
 * Update docs to reflect changes to YAML spec
-* Add schema to documentation
 * Write docs on units
 * Docs on datatypes w/ example of user defined data type
 * Update/replace io_drivers section of docs
@@ -28,5 +27,5 @@ TODO
 * Docs on how nested data objects are represented in C/C++.
 * Add docstrings to metaschema classes
 * Preprocessor macro for dynamically determine message type?
-* Try to setup comm/connection at class level
+* Try to setup comm/connection testing at class level so that comms only created once
 * Fix circular dependency when determining if C/C++ models are supported via czmq
