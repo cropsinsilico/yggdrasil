@@ -187,14 +187,14 @@ def get_cc(cpp=False, shared=False, static=False, linking=False):
             cc = os.environ.get(cc_env, 'cl')
     elif platform._is_mac:
         if static:
-            cc = 'libtool'
+            cc = os.environ.get('LIBTOOL', 'libtool')
         elif cpp:
             cc = os.environ.get(cc_env, 'clang++')
         else:
             cc = os.environ.get(cc_env, 'clang')
     else:
         if static:
-            cc = 'ar'
+            cc = os.environ.get('AR', 'ar')
         elif cpp:
             cc = os.environ.get(cc_env, 'g++')
         else:
