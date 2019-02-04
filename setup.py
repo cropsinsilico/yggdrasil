@@ -33,7 +33,7 @@ else:
 rj_include_dir0 = os.path.join(ROOT_PATH, 'cis_interface', 'rapidjson', 'include')
 for idx, arg in enumerate(sys.argv[:]):
     if ((arg.startswith('--rj-include-dir=')
-         or arg.startswith('--rapidjson-include-dir'))):
+         or arg.startswith('--rapidjson-include-dir='))):
         sys.argv.pop(idx)
         rj_include_dir = os.path.abspath(arg.split('=', 1)[1])
         break
