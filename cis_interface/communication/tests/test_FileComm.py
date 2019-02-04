@@ -1,9 +1,41 @@
 import os
 import unittest
-import nose.tools as nt
 import copy
+from cis_interface.tests import assert_equal
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
+
+
+def test_wait_for_creation():
+    r"""Test FileComm waiting for creation."""
+    msg_send = b'Test message\n'
+    name = 'temp_file_create.txt'
+    kwargs = {'in_temp': True, 'comm': 'FileComm', 'dont_open': True}
+    send_instance = new_comm(name, direction='send', **kwargs)
+    recv_instance = new_comm(name, direction='recv',
+                             wait_for_creation=5, **kwargs)
+    if os.path.isfile(send_instance.address):
+        os.remove(send_instance.address)
+    
+    def open_and_send(inst, msg):
+        inst.open()
+        flag = inst.send(msg)
+        return flag
+    
+    send_instance.sched_task(0.5, open_and_send, args=[send_instance, msg_send],
+                             store_output=True)
+    recv_instance.open()
+    T = recv_instance.start_timeout(recv_instance.wait_for_creation)
+    while (not T.is_out) and (send_instance.sched_out is None):
+        recv_instance.sleep()
+    recv_instance.stop_timeout()
+    assert(send_instance.sched_out)
+    flag, msg_recv = recv_instance.recv()
+    assert(flag)
+    assert_equal(msg_recv, msg_send)
+    send_instance.close()
+    recv_instance.close()
+    recv_instance.remove_file()
 
 
 class TestFileComm(parent.TestCommBase):
@@ -41,7 +73,7 @@ class TestFileComm(parent.TestCommBase):
         r"""Test raise of error on invalid read_meth."""
         kwargs = self.send_inst_kwargs
         kwargs['read_meth'] = 'invalid'
-        nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
+        self.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
     def test_append(self):
         r"""Test open of file comm with append."""
@@ -66,15 +98,15 @@ class TestFileComm(parent.TestCommBase):
             if flag:
                 msg_list.append(msg_recv)
             else:
-                nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
-        nt.assert_equal(len(msg_list), len(recv_objects))
+                self.assert_equal(msg_recv, self.recv_instance.eof_msg)
+        self.assert_equal(len(msg_list), len(recv_objects))
         for x, y in zip(msg_list, recv_objects):
             self.assert_msg_equal(x, y)
         # Check file contents
         if self.testing_options.get('exact_contents', True):
             with open(self.send_instance.address, 'rb') as fd:
                 contents = fd.read()
-            nt.assert_equal(contents, self.testing_options['contents'])
+            self.assert_equal(contents, self.testing_options['contents'])
 
     def test_series(self):
         r"""Test sending/receiving to/from a series of files."""
@@ -95,16 +127,16 @@ class TestFileComm(parent.TestCommBase):
         
     def test_remaining_bytes(self):
         r"""Test remaining_bytes."""
-        nt.assert_equal(self.send_instance.remaining_bytes, 0)
+        self.assert_equal(self.send_instance.remaining_bytes, 0)
         self.recv_instance.close()
         assert(self.recv_instance.is_closed)
-        nt.assert_equal(self.recv_instance.remaining_bytes, 0)
+        self.assert_equal(self.recv_instance.remaining_bytes, 0)
 
     def test_recv_nomsg(self):
         r"""Test recieve when there is no waiting message."""
         flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
         assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
+        self.assert_equal(msg_recv, self.recv_instance.eof_msg)
 
 
 class TestFileComm_readline(TestFileComm):

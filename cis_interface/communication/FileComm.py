@@ -38,6 +38,9 @@ class FileComm(CommBase.CommBase):
             the end is reached. If writing, each output will be to a new
             file in the series. The addressed is assumed to contain a format
             for the index of the file. Defaults to False.
+        wait_for_creation (float, optional): Time (in seconds) that should be
+            waited before opening for the file to be created if it dosn't exist.
+            Defaults to 0 s and file will attempt to be opened immediately.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -69,7 +72,8 @@ class FileComm(CommBase.CommBase):
          'filetype': {'type': 'string', 'default': _filetype},
          'append': {'type': 'boolean', 'default': False},
          'in_temp': {'type': 'boolean', 'default': False},
-         'is_series': {'type': 'boolean', 'default': False}},
+         'is_series': {'type': 'boolean', 'default': False},
+         'wait_for_creation': {'type': 'float', 'default': 0.0}},
         remove_keys=['commtype', 'datatype'], **DirectSerialize._schema_properties)
     _default_serializer = DirectSerialize
     _attr_conv = ['newline', 'platform_newline']
@@ -289,6 +293,11 @@ class FileComm(CommBase.CommBase):
     def _open(self):
         address = self.current_address
         if self.fd is None:
+            if (not os.path.isfile(address)) and (self.wait_for_creation > 0):
+                T = self.start_timeout(self.wait_for_creation)
+                while (not T.is_out) and (not os.path.isfile(address)):
+                    self.sleep()
+                self.stop_timeout()
             self._fd = open(address, self.open_mode)
         T = self.start_timeout()
         while (not T.is_out) and (not self.is_open):  # pragma: debug
