@@ -2,8 +2,9 @@
 import os
 import sys
 import copy
+import logging
 import traceback
-from yggdrasil import runner, schema, config, timing
+from yggdrasil import runner, schema, config, timing, yamlfile
 from yggdrasil.drivers import GCCModelDriver
 
 
@@ -71,6 +72,13 @@ def regen_schema():
         os.remove(schema._schema_fname)
     schema.clear_schema()
     schema.init_schema()
+
+
+def validate_yaml():
+    r"""Validate a set of or or more YAMLs defining an integration."""
+    files = sys.argv[1:]
+    yamlfile.parse_yaml(files)
+    logging.info("Validation succesful.")
 
 
 def update_config():

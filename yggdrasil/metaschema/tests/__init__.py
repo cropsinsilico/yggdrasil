@@ -2,6 +2,7 @@ import os
 import numpy as np
 import shutil
 import tempfile
+import warnings
 from yggdrasil import metaschema
 from yggdrasil.tests import assert_raises, assert_equal
 
@@ -89,7 +90,15 @@ def test_get_metaschema():
         shutil.move(metaschema._metaschema_fname, temp)
         metaschema._metaschema = None
         new_metaschema = metaschema.get_metaschema()
-        assert_equal(new_metaschema, old_metaschema)
+        new_id = new_metaschema.get('$id', new_metaschema['id'])
+        old_id = old_metaschema.get('$id', old_metaschema['id'])
+        if new_id != old_id:  # pragma: debug
+            warnings.warn(("The locally generated metaschema would have a different "
+                           "id than the default (%s vs. %s). Check that your "
+                           "installation of jsonschema is up to date.") % (
+                               new_id, old_id))
+        else:
+            assert_equal(new_metaschema, old_metaschema)
     except BaseException:  # pragma: debug
         shutil.move(temp, metaschema._metaschema_fname)
         raise

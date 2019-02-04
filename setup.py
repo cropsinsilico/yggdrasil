@@ -147,7 +147,8 @@ setup(
                             'yggtime_lang=yggdrasil.command_line:yggtime_lang',
                             'yggtime_os=yggdrasil.command_line:yggtime_os',
                             'yggtime_py=yggdrasil.command_line:yggtime_py',
-                            'yggtime_paper=yggdrasil.command_line:yggtime_paper'],
+                            'yggtime_paper=yggdrasil.command_line:yggtime_paper',
+                            'yggvalidate=yggdrasil.command_line:validate_yaml'],
     },
     license="BSD",
 )

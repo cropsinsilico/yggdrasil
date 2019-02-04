@@ -51,8 +51,7 @@ Updating and Testing the Conda Recipe
    $ git clone https://github.com/cropsinsilico/yggdrasil-feedstock.git
 
 #. Update the recipe to reflect any changes to the dependencies.
-#. Update the source section of ``meta.yaml`` to use your local installation by 
-specifying a path and commenting out the ``url`` and ``sha256`` entries.::
+#. Update the source section of ``meta.yaml`` to use your local installation by specifying a path and commenting out the ``url`` and ``sha256`` entries.::
 
    source:
      path: <path to local yggdrasil>
@@ -62,6 +61,10 @@ specifying a path and commenting out the ``url`` and ``sha256`` entries.::
    $ conda create -n test_yggdrasil python=3.6
    $ source activate test_yggdrasil
 
+#. Build the updated recipe.::
+
+   $ conda build <path>/<to>/<recipe>/meta.yaml
+
 #. Install the local build of |yggdrasil|.::
 
    $ conda install --use-local yggdrasil
@@ -70,6 +73,22 @@ specifying a path and commenting out the ``url`` and ``sha256`` entries.::
 
    $ yggtest -svx --nologcapture
 
+
+After the initial creation of the environment etc., the procedure for debugging the recipe will be:
+
+#. Make changes to the source code/recipe.
+#. Re-build the recipe from the local source without tests.::
+   
+   $ conda build --no-test <path>/<to>/<recipe>/meta.yaml
+
+#. Force re-install of the local build.::
+
+   $ conda install --use-local --force-reinstall yggdrasil
+
+#. Run the tests.::
+
+   $ yggtest -svx --nologcapture
+     
 
 Docs Checkout
 =============

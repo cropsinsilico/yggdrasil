@@ -241,3 +241,13 @@ args      For connections made to other models, this should be text that matches
 Any additional keys in the input/output entry will be passed to the input/output 
 driver. A full description of the available input/output drivers and potential 
 arguments can be found :ref:`here <io_drivers_rst>`.
+
+
+Validation
+----------
+
+|yggdrasil| uses a :ref:`JSON schema <schema_rst>` to validate the provided
+YAML specification files. If you would like to validate a set of YAML specification
+files without running the integration, this can be done via the ``yggvalidate`` CLI.::
+
+  $ yggvalidate name1.yml name2.yml ...
