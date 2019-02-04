@@ -479,26 +479,6 @@ public:
 
 
 /*!
-  @brief C++ interface to yggAsciiFileOutput_t functionality for local files.
-  The YggAsciiFileOutput_local class is a basic wrapper around the C
-  yggAsciiFileOutput_t structure and associated functions from the
-  YggInterface.h header. It provides the user with C++ style access to basic
-  ASCII file output operations.
- */
-class YggAsciiFileOutput_local : public YggAsciiFileOutput {
-public:
-
-  /*!
-    @brief Constructor for YggAsciiFileOutput.
-    @param[in] name constant character pointer to path of local file.
-   */
-  YggAsciiFileOutput_local(const char *name) :
-    YggAsciiFileOutput(yggAsciiFileOutput_local(name)) {}
-  
-};
-
-
-/*!
   @brief C++ interface to yggAsciiFileInput_t functionality.
   The YggAsciiFileInput class is a basic wrapper around the C
   yggAsciiFileInput_t structure and associated functions from the
@@ -534,26 +514,6 @@ public:
 
 
 /*!
-  @brief C++ interface to yggAsciiFileInput_t functionality for local files.
-  The YggAsciiFileInput_local class is a basic wrapper around the C
-  yggAsciiFileInput_t structure and associated functions from the
-  YggInterface.h header. It provides the user with C++ style access to basic
-  ASCII file input operations.
- */
-class YggAsciiFileInput_local : public YggAsciiFileInput {
-public:
-
-  /*!
-    @brief Constructor for YggAsciiFileInput_local.
-    @param[in] name constant character pointer to path of local file.
-   */
-  YggAsciiFileInput_local(const char *name) :
-    YggAsciiFileInput(yggAsciiFileInput_local(name)) {}
-
-};
-
-
-/*!
   @brief C++ interface to yggAsciiTableOutput_t functionality.
 
   The YggAsciiTableOutput class is a basic wrapper around the C
@@ -572,29 +532,6 @@ public:
    */
   YggAsciiTableOutput(const char *name, const char *format_str) :
     YggAsciiFileOutput(yggAsciiTableOutput(name, format_str)) {}
-
-};
-
-
-/*!
-  @brief C++ interface to yggAsciiTableOutput_t functionality for local files.
-
-  The YggAsciiTableOutput class is a basic wrapper around the C
-  yggAsciiTableOutput_t structure and associated functions from the
-  YggInterface.h header. It provides the user with C++ style access to basic
-  ASCII table output operations.
- */
-class YggAsciiTableOutput_local : public YggAsciiFileOutput {
-public:
-
-  /*!
-    @brief Constructor for YggAsciiTableOutput for local files.
-    @param[in] name constant character pointer to path of local table.
-    @param[in] format_str character pointer to format string that should be used
-    to format rows into table lines.
-   */
-  YggAsciiTableOutput_local(const char *name, const char *format_str) :
-    YggAsciiFileOutput(yggAsciiTableOutput_local(name, format_str)) {}
 
 };
 
@@ -623,29 +560,6 @@ public:
 
 
 /*!
-  @brief C++ interface to yggAsciiTableOutput_t functionality for local files.
-
-  The YggAsciiArrayOutput class is a basic wrapper around the C
-  yggAsciiTableOutput_t structure and associated functions from the
-  YggInterface.h header. It provides the user with C++ style access to basic
-  ASCII table output operations.
- */
-class YggAsciiArrayOutput_local : public YggAsciiFileOutput {
-public:
-
-  /*!
-    @brief Constructor for YggAsciiArrayOutput for local files.
-    @param[in] name constant character pointer to path of local table.
-    @param[in] format_str character pointer to format string that should be used
-    to format arrays into table columns.
-   */
-  YggAsciiArrayOutput_local(const char *name, const char *format_str) :
-    YggAsciiFileOutput(yggAsciiArrayOutput_local(name, format_str)) {}
-
-};
-
-
-/*!
   @brief C++ interface to yggAsciiTableInput_t functionality.
 
   The YggAsciiTableInput class is a basic wrapper around the C
@@ -669,29 +583,6 @@ public:
 };
 
 /*!
-  @brief C++ interface to yggAsciiTableInput_t functionality for local files.
-
-  The YggAsciiTableInput class is a basic wrapper around the C
-  yggAsciiTableInput_t structure and associated functions from the
-  YggInterface.h header. It provides the user with C++ style access to basic
-  ASCII table input operations.
- */
-class YggAsciiTableInput_local : public YggAsciiFileInput {
-public:
-
-  /*!
-    @brief Constructor for YggAsciiTableInput_local.
-    Due to issues with the C++ version of vsscanf, flags and precision
-    indicators for floating point format specifiers (e.g. %e, %f), must be
-    removed so that table input can be properly parsed.
-    @param[in] name constant character pointer to path of local table.
-   */
-  YggAsciiTableInput_local(const char *name) :
-    YggAsciiFileInput(yggAsciiTableInput_local(name)) {}
-
-};
-
-/*!
   @brief C++ interface to yggAsciiTableInput_t functionality for arrays.
 
   The YggAsciiArrayInput class is a basic wrapper around the C
@@ -711,30 +602,6 @@ public:
    */
   YggAsciiArrayInput(const char *name) :
     YggAsciiFileInput(yggAsciiArrayInput(name)) {}
-
-};
-
-/*!
-  @brief C++ interface to yggAsciiTableInput_t functionality for local files
-  as arrays.
-
-  The YggAsciiArrayInput class is a basic wrapper around the C
-  yggAsciiTableInput_t structure and associated functions from the
-  YggInterface.h header. It provides the user with C++ style access to basic
-  ASCII table input operations.
- */
-class YggAsciiArrayInput_local : public YggAsciiFileInput {
-public:
-
-  /*!
-    @brief Constructor for YggAsciiArrayInput_local.
-    Due to issues with the C++ version of vsscanf, flags and precision
-    indicators for floating point format specifiers (e.g. %e, %f), must be
-    removed so that table input can be properly parsed.
-    @param[in] name constant character pointer to path of local table.
-   */
-  YggAsciiArrayInput_local(const char *name) :
-    YggAsciiFileInput(yggAsciiArrayInput_local(name)) {}
 
 };
 
