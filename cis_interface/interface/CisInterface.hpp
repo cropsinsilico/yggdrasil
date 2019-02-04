@@ -479,26 +479,6 @@ public:
 
 
 /*!
-  @brief C++ interface to cisAsciiFileOutput_t functionality for local files.
-  The CisAsciiFileOutput_local class is a basic wrapper around the C
-  cisAsciiFileOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
-  ASCII file output operations.
- */
-class CisAsciiFileOutput_local : public CisAsciiFileOutput {
-public:
-
-  /*!
-    @brief Constructor for CisAsciiFileOutput.
-    @param[in] name constant character pointer to path of local file.
-   */
-  CisAsciiFileOutput_local(const char *name) :
-    CisAsciiFileOutput(cisAsciiFileOutput_local(name)) {}
-  
-};
-
-
-/*!
   @brief C++ interface to cisAsciiFileInput_t functionality.
   The CisAsciiFileInput class is a basic wrapper around the C
   cisAsciiFileInput_t structure and associated functions from the
@@ -534,26 +514,6 @@ public:
 
 
 /*!
-  @brief C++ interface to cisAsciiFileInput_t functionality for local files.
-  The CisAsciiFileInput_local class is a basic wrapper around the C
-  cisAsciiFileInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
-  ASCII file input operations.
- */
-class CisAsciiFileInput_local : public CisAsciiFileInput {
-public:
-
-  /*!
-    @brief Constructor for CisAsciiFileInput_local.
-    @param[in] name constant character pointer to path of local file.
-   */
-  CisAsciiFileInput_local(const char *name) :
-    CisAsciiFileInput(cisAsciiFileInput_local(name)) {}
-
-};
-
-
-/*!
   @brief C++ interface to cisAsciiTableOutput_t functionality.
 
   The CisAsciiTableOutput class is a basic wrapper around the C
@@ -572,29 +532,6 @@ public:
    */
   CisAsciiTableOutput(const char *name, const char *format_str) :
     CisAsciiFileOutput(cisAsciiTableOutput(name, format_str)) {}
-
-};
-
-
-/*!
-  @brief C++ interface to cisAsciiTableOutput_t functionality for local files.
-
-  The CisAsciiTableOutput class is a basic wrapper around the C
-  cisAsciiTableOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
-  ASCII table output operations.
- */
-class CisAsciiTableOutput_local : public CisAsciiFileOutput {
-public:
-
-  /*!
-    @brief Constructor for CisAsciiTableOutput for local files.
-    @param[in] name constant character pointer to path of local table.
-    @param[in] format_str character pointer to format string that should be used
-    to format rows into table lines.
-   */
-  CisAsciiTableOutput_local(const char *name, const char *format_str) :
-    CisAsciiFileOutput(cisAsciiTableOutput_local(name, format_str)) {}
 
 };
 
@@ -623,29 +560,6 @@ public:
 
 
 /*!
-  @brief C++ interface to cisAsciiTableOutput_t functionality for local files.
-
-  The CisAsciiArrayOutput class is a basic wrapper around the C
-  cisAsciiTableOutput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
-  ASCII table output operations.
- */
-class CisAsciiArrayOutput_local : public CisAsciiFileOutput {
-public:
-
-  /*!
-    @brief Constructor for CisAsciiArrayOutput for local files.
-    @param[in] name constant character pointer to path of local table.
-    @param[in] format_str character pointer to format string that should be used
-    to format arrays into table columns.
-   */
-  CisAsciiArrayOutput_local(const char *name, const char *format_str) :
-    CisAsciiFileOutput(cisAsciiArrayOutput_local(name, format_str)) {}
-
-};
-
-
-/*!
   @brief C++ interface to cisAsciiTableInput_t functionality.
 
   The CisAsciiTableInput class is a basic wrapper around the C
@@ -669,29 +583,6 @@ public:
 };
 
 /*!
-  @brief C++ interface to cisAsciiTableInput_t functionality for local files.
-
-  The CisAsciiTableInput class is a basic wrapper around the C
-  cisAsciiTableInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
-  ASCII table input operations.
- */
-class CisAsciiTableInput_local : public CisAsciiFileInput {
-public:
-
-  /*!
-    @brief Constructor for CisAsciiTableInput_local.
-    Due to issues with the C++ version of vsscanf, flags and precision
-    indicators for floating point format specifiers (e.g. %e, %f), must be
-    removed so that table input can be properly parsed.
-    @param[in] name constant character pointer to path of local table.
-   */
-  CisAsciiTableInput_local(const char *name) :
-    CisAsciiFileInput(cisAsciiTableInput_local(name)) {}
-
-};
-
-/*!
   @brief C++ interface to cisAsciiTableInput_t functionality for arrays.
 
   The CisAsciiArrayInput class is a basic wrapper around the C
@@ -711,30 +602,6 @@ public:
    */
   CisAsciiArrayInput(const char *name) :
     CisAsciiFileInput(cisAsciiArrayInput(name)) {}
-
-};
-
-/*!
-  @brief C++ interface to cisAsciiTableInput_t functionality for local files
-  as arrays.
-
-  The CisAsciiArrayInput class is a basic wrapper around the C
-  cisAsciiTableInput_t structure and associated functions from the
-  CisInterface.h header. It provides the user with C++ style access to basic
-  ASCII table input operations.
- */
-class CisAsciiArrayInput_local : public CisAsciiFileInput {
-public:
-
-  /*!
-    @brief Constructor for CisAsciiArrayInput_local.
-    Due to issues with the C++ version of vsscanf, flags and precision
-    indicators for floating point format specifiers (e.g. %e, %f), must be
-    removed so that table input can be properly parsed.
-    @param[in] name constant character pointer to path of local table.
-   */
-  CisAsciiArrayInput_local(const char *name) :
-    CisAsciiFileInput(cisAsciiArrayInput_local(name)) {}
 
 };
 
