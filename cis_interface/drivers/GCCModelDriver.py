@@ -109,10 +109,10 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
 
     """
     if cpp:
-        _compile_flags = os.environ.get('CXXFLAGS', [])
+        _compile_flags = os.environ.get('CXXFLAGS', '').split()
     else:
-        _compile_flags = os.environ.get('CFLAGS', [])
-    _linker_flags = os.environ.get('LDFLAGS', [])
+        _compile_flags = os.environ.get('CFLAGS', '').split()
+    _linker_flags = os.environ.get('LDFLAGS', '').split()
     if not _c_installed:  # pragma: windows
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
