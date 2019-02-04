@@ -140,6 +140,7 @@ definitions:
         send_converter: {type: function}
         sort_keys: &id005 {default: true, type: boolean}
         use_astropy: &id003 {default: false, type: boolean}
+        wait_for_creation: {default: 0.0, type: float}
         working_dir: {type: string}
       required: [name, filetype, working_dir]
       type: object
@@ -214,13 +215,13 @@ definitions:
         args:
           items: {type: string}
           type: array
-        builddir: &id008 {type: string}
-        cc: &id011 {type: string}
+        builddir: {type: string}
+        cc: &id008 {type: string}
         client_of:
           default: []
           items: {type: string}
           type: array
-        cmakeargs: &id009
+        cmakeargs:
           default: []
           items: {type: string}
           type: array
@@ -233,16 +234,16 @@ definitions:
         language:
           enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
           type: string
-        make_command: {default: make, type: string}
-        makedir: {type: string}
-        makefile: {default: Makefile, type: string}
+        make_command: &id010 {default: make, type: string}
+        makedir: &id011 {type: string}
+        makefile: &id012 {default: Makefile, type: string}
         name: {type: string}
         outputs:
           default: []
           items: {$ref: '#/definitions/comm'}
           type: array
-        overwrite: &id012 {default: true, type: boolean}
-        sourcedir: &id010 {type: string}
+        overwrite: &id009 {default: true, type: boolean}
+        sourcedir: {type: string}
         strace_flags:
           default: []
           items: {type: string}
@@ -258,17 +259,14 @@ definitions:
       type: object
     - anyOf:
       - properties:
-          builddir: *id008
-          cmakeargs: *id009
           language:
             enum: [cmake]
-          sourcedir: *id010
         title: CMakeModelDriver
       - properties:
-          cc: *id011
+          cc: *id008
           language:
             enum: [c, c++, cpp]
-          overwrite: *id012
+          overwrite: *id009
         title: GCCModelDriver
       - properties:
           language:
@@ -277,6 +275,9 @@ definitions:
       - properties:
           language:
             enum: [make]
+          make_command: *id010
+          makedir: *id011
+          makefile: *id012
         title: MakeModelDriver
       - properties:
           language:
