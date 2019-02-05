@@ -77,13 +77,19 @@ Updating and Testing the Conda Recipe
 After the initial creation of the environment etc., the procedure for debugging the recipe will be:
 
 #. Make changes to the source code/recipe.
+
+#. Get clean environment (``--force-reinstall`` dosn't seem to work with ``--use-local``).::
+
+   $ conda uninstall yggdrasil
+   $ conda build purge
+
 #. Re-build the recipe from the local source without tests.::
-   
+
    $ conda build --no-test <path>/<to>/<recipe>/meta.yaml
 
 #. Force re-install of the local build.::
 
-   $ conda install --use-local --force-reinstall yggdrasil
+   $ conda install --use-local yggdrasil
 
 #. Run the tests.::
 
