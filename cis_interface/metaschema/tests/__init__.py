@@ -2,6 +2,7 @@ import os
 import numpy as np
 import shutil
 import tempfile
+import warnings
 from cis_interface.tests import assert_equal, assert_raises
 from cis_interface import metaschema
 
