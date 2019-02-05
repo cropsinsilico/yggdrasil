@@ -76,7 +76,9 @@ before_install:
     bash miniconda.sh -b -p $HOME/miniconda
     export PATH="$HOME/miniconda/bin:$PATH"
     hash -r
-    sudo conda init
+    if [[ "$TRAVIS_PYTHON_VERSION" != "2.7" ]]; then
+      sudo conda init
+    fi
     conda config --set always_yes yes --set changeps1 no
     conda update -q conda
     # Useful for debugging any issues with conda
