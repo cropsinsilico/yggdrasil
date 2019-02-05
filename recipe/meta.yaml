@@ -9,7 +9,7 @@ source:
   path: ../
 
 build:
-  number: 0
+  number: 1000
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv "
   skip: true  # [win and vc<14]
 
