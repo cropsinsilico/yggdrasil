@@ -177,7 +177,7 @@ script:
       conda install --use-local -y cis_interface
       cisconfig
       cistest -svx --nologcapture
-      conda deactivate
+      # conda deactivate
     fi
 
 after_success:
