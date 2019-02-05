@@ -238,7 +238,11 @@ class FileComm(CommBase.CommBase):
 
         """
         if self.is_open:
-            self.fd.seek(file_pos)
+            try:
+                self.fd.seek(file_pos)
+            except AttributeError:  # pragma: debug
+                if self.fd is not None:
+                    raise
 
     def advance_in_series(self, series_index=None):
         r"""Advance to a certain file in a series.
@@ -304,7 +308,11 @@ class FileComm(CommBase.CommBase):
             self.sleep()
         self.stop_timeout()
         if self.append == 'ow':
-            self.fd.seek(0, os.SEEK_END)
+            try:
+                self.fd.seek(0, os.SEEK_END)
+            except AttributeError:  # pragma: debug
+                if self.fd is not None:
+                    raise
 
     def _file_close(self):
         if self.is_open:
@@ -313,7 +321,11 @@ class FileComm(CommBase.CommBase):
                 os.fsync(self.fd.fileno())
             except OSError:  # pragma: debug
                 pass
-            self.fd.close()
+            try:
+                self.fd.close()
+            except AttributeError:  # pragma: debug
+                if self.fd is not None:
+                    raise
         self._fd = None
 
     def open(self):
@@ -346,7 +358,12 @@ class FileComm(CommBase.CommBase):
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
-        return (self.fd is not None) and (not self.fd.closed)
+        try:
+            return (self.fd is not None) and (not self.fd.closed)
+        except AttributeError:  # pragma: debug
+            if self.fd is not None:
+                raise
+            return False
 
     @property
     def fd(self):
@@ -408,7 +425,11 @@ class FileComm(CommBase.CommBase):
 
         """
         flag, msg_s = super(FileComm, self).on_send_eof()
-        self.fd.flush()
+        try:
+            self.fd.flush()
+        except AttributeError:  # pragma: debug
+            if self.fd is not None:
+                raise
         # self.close()
         return flag, msg_s
 
@@ -422,13 +443,18 @@ class FileComm(CommBase.CommBase):
             bool: Success or failure of writing to the file.
 
         """
-        if msg != self.eof_msg:
-            if not self.open_as_binary:
-                msg = backwards.as_unicode(msg)
-            self.fd.write(msg)
-            if self.append == 'ow':
-                self.fd.truncate()
-        self.fd.flush()
+        try:
+            if msg != self.eof_msg:
+                if not self.open_as_binary:
+                    msg = backwards.as_unicode(msg)
+                self.fd.write(msg)
+                if self.append == 'ow':
+                    self.fd.truncate()
+            self.fd.flush()
+        except AttributeError:  # pragma: debug
+            if self.fd is not None:
+                raise
+            return False
         if msg != self.eof_msg and self.is_series:
             self.advance_in_series()
             self.debug("Advanced to %d", self._series_index)
@@ -471,4 +497,8 @@ class FileComm(CommBase.CommBase):
     def purge(self):
         r"""Purge all messages from the comm."""
         if self.is_open and self.direction == 'recv':
-            self.fd.seek(0, os.SEEK_END)
+            try:
+                self.fd.seek(0, os.SEEK_END)
+            except AttributeError:  # pragma: debug
+                if self.fd is not None:
+                    raise

@@ -2,36 +2,43 @@
 Release Steps
 =============
 
-#. [on branch] Regenerate schema:: 
+#. [on branch/fork] Make code changes adding desired feature(s).
+#. [on branch/fork] Run tests locally.::
+
+   $ cistest -svx --nologcapture
+
+#. [on branch/fork] Regenerate schema if you added any new components (there will be an erorr in the tests if you need to regenerate the schema).:: 
 
    $ cisschema
    $ git add cis_interface/.cis_schema.yml
    $ git commit -m "Updated .cis_schema.yml"
    $ git push origin [BRANCH]
 
-#. [on branch] Open pull request to merge changes into master
-#. [on branch] Update docs to reflect new features and make sure they build locally::
+#. [on branch/fork] Make sure all CI tests pass (`travis <>`_, `appveyor <>`_).::
+#. [on branch/fork] Update docs to reflect new features and make sure they build locally::
 
    $ cd docs
    $ make autodoc
 
-#. Test conda-forge recipe locally using steps below.
+#. [on branch/fork] Test conda-forge recipe locally using steps below.
+#. [on branch/fork] Open pull request to merge changes into master
 #. Merge branch into master after tests pass and code review complete
 #. Create tag with new version on master::
 
    $ git tag x.x.x
    
-#. Push to github (this triggers deployment of source distribution and wheels to PyPI)::
+#. Push to github. Pushing a tag will trigger travis testing of the conda build recipe in the |cis_interface| repository (under recipe) and, on success, the deployment of source distribution and wheels to PyPI.::
 
    $ git push; git push --tags
+
+#. If there are any errors, make updates to the repo/recipe as necessary, delete the tag (provided it has not deployed to PyPI) and push it again.::
+
+   $ git tag -d x.x.x
+   $ git push origin :refs/tags/x.x.x
+   $ git tag x.x.x
+   $ git push; git push --tags
    
-#. Once the source distribution has been uploaded to PyPI, update the conda-forge recipe
-on the cropsinsilico feedstock fork
-`here <https://github.com/cropsinsilico/yggdrasil-feedstock>`_ with the new version
-and SHA256 (this can be found
-`here <https://pypi.org/project/yggdrasil-framework/#files>`_) and create a pull request
-to merge the changes into the
-`conda-forge <https://github.com/conda-forge/yggdrasil-feedstock>`_ feedstock.
+#. Once the source distribution has been uploaded to PyPI, update the conda-forge recipe on the cropsinsilico feedstock fork `here <https://github.com/cropsinsilico/cis_interface-feedstock>`_ with the changes from the |cis_interface| source repository, the new version, and the SHA256 for the release (this can be found `here <https://pypi.org/project/cis-interface/#files>`_) and create a pull request to merge the changes into the `conda-forge <https://github.com/conda-forge/cis_interface-feedstock>`_ feedstock.
 #. Checkout ``gh-pages`` branch if it dosn't already exist (See below), regenerate docs and push to gh-pages branch::
 
    $ cd docs
@@ -45,41 +52,37 @@ Updating and Testing the Conda Recipe
      
    $ conda install conda-build
 
-#. Clone the feedstock fork.::
-
-   $ git clone https://github.com/cropsinsilico/yggdrasil-feedstock.git
-
-#. Update the recipe to reflect any changes to the dependencies.
-#. Update the source section of ``meta.yaml`` to use your local installation by specifying a path and commenting out the ``url`` and ``sha256`` entries.::
-
-   source:
-     path: <path to local yggdrasil>
-
+#. Update the recipe (``recipe/meta.yaml``) to reflect any changes to the dependencies.
 #. Create a new conda environment for testing.::
 
-   $ conda create -n test_yggdrasil python=3.6
-   $ source activate test_yggdrasil
+   $ conda create -n test_cis_interface python=3.6
+   $ source activate test_cis_interface
 
 #. Build the updated recipe.::
 
    $ conda build <path>/<to>/<recipe>/meta.yaml
 
-#. Install the local build of |yggdrasil|.::
+#. Install the local build of |cis_interface|.::
 
-   $ conda install --use-local yggdrasil
+   $ conda install --use-local -y cis_interface
 
-#. Run the tests.::
+#. Reconfigure |cis_interface| to use test installation and run the tests.::
 
-   $ yggtest -svx --nologcapture
+   $ cisconfig
+   $ cistest -svx --nologcapture
+
+#. Deactivate the test environment and reconfigure |cis_interface| to use the original installation.::
+
+   $ conda deactivate
+   $ cisconfig
 
 
 After the initial creation of the environment etc., the procedure for debugging the recipe will be:
 
 #. Make changes to the source code/recipe.
-
 #. Get clean environment (``--force-reinstall`` dosn't seem to work with ``--use-local``).::
 
-   $ conda uninstall yggdrasil
+   $ conda uninstall -y cis_interface
    $ conda build purge
 
 #. Re-build the recipe from the local source without tests.::
@@ -88,11 +91,11 @@ After the initial creation of the environment etc., the procedure for debugging 
 
 #. Force re-install of the local build.::
 
-   $ conda install --use-local yggdrasil
+   $ conda install --use-local -y cis_interface
 
 #. Run the tests.::
 
-   $ yggtest -svx --nologcapture
+   $ cistest -svx --nologcapture
      
 
 Docs Checkout

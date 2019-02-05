@@ -1,8 +1,8 @@
 import os
 import copy
-import nose.tools as nt
+import unittest
 from cis_interface import tools, timing, backwards, platform
-from cis_interface.tests import CisTestClass
+from cis_interface.tests import CisTestClass, assert_raises
 
 
 _test_size = 1
@@ -46,7 +46,7 @@ def test_platform_error():
     else:
         test_platform = 'MacOS'
     x = timing.TimedRun(_test_lang, _test_lang, platform=test_platform)
-    nt.assert_raises(RuntimeError, x.can_run, raise_error=True)
+    assert_raises(RuntimeError, x.can_run, raise_error=True)
 
 
 class TimedRunTestBase(CisTestClass):
@@ -99,6 +99,12 @@ class TimedRunTestBase(CisTestClass):
         r"""str: Name of the file where data is stored."""
         return self.instance.filename
 
+    def check_filename(self):
+        r"""Raise a unittest.SkipTest error if the filename dosn't exist."""
+        if not os.path.isfile(self.filename):  # pragma: debug
+            raise unittest.SkipTest("Performance stats file dosn't exist: %s"
+                                    % self.filename)
+
     def get_raw_data(self):
         r"""Get the raw contents of the data file."""
         out = ''
@@ -132,42 +138,47 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_json(self):
         r"""Test loading/saving perf data as json."""
+        self.check_filename()
         old_text = self.get_raw_data()
         x = self.instance.load(as_json=True)
         self.instance.save(x, overwrite=True)
         new_text = self.get_raw_data()
-        nt.assert_equal(new_text, old_text)
+        self.assert_equal(new_text, old_text)
 
     def test_save(self):
         r"""Test save with/without overwrite."""
+        self.check_filename()
         old_text = self.get_raw_data()
-        nt.assert_raises(RuntimeError, self.instance.save, self.instance.data)
+        self.assert_raises(RuntimeError, self.instance.save, self.instance.data)
         self.instance.save(self.instance.data, overwrite=True)
         new_text = self.get_raw_data()
-        nt.assert_equal(new_text, old_text)
+        self.assert_equal(new_text, old_text)
 
     def test_scaling_count(self):
         r"""Test running scaling with number of messages."""
+        self.check_filename()
         kwargs = dict(min_count=self.count, max_count=self.count,
                       nsamples=1, nrep=self.nrep)
         self.instance.scaling_count(self.size, scaling='log', **kwargs)
         self.instance.scaling_count(self.size, scaling='linear',
                                     per_message=True, **kwargs)
-        nt.assert_raises(ValueError, self.instance.scaling_count, self.size,
-                         scaling='invalid')
+        self.assert_raises(ValueError, self.instance.scaling_count, self.size,
+                           scaling='invalid')
 
     def test_scaling_size(self):
         r"""Test running scaling with size of messages."""
+        self.check_filename()
         kwargs = dict(min_size=self.size, max_size=self.size,
                       nsamples=1, nrep=self.nrep)
         self.instance.scaling_size(self.count, scaling='log', **kwargs)
         self.instance.scaling_size(self.count, scaling='linear',
                                    per_message=True, **kwargs)
-        nt.assert_raises(ValueError, self.instance.scaling_size, self.count,
-                         scaling='invalid')
+        self.assert_raises(ValueError, self.instance.scaling_size, self.count,
+                           scaling='invalid')
 
     def test_plot_scaling_joint(self):
         r"""Test plot_scaling_joint."""
+        self.check_filename()
         kwargs = dict(msg_size0=self.size, msg_count0=self.count,
                       msg_size=[self.size], msg_count=[self.count],
                       per_message=True, time_method='bestof')
@@ -175,6 +186,7 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_plot_scaling(self):
         r"""Test plot_scaling corner cases not covered by test_plot_scaling_joint."""
+        self.check_filename()
         self.instance.plot_scaling(self.size, [self.count], per_message=True,
                                    time_method='average', yscale='linear')
         self.instance.plot_scaling([self.size], self.count, per_message=False,
@@ -196,26 +208,29 @@ class TestTimedRun(TimedRunTestBase):
             kwargs['time_method'] = 'bestof'
             kwargs['axs'] = self.instance.plot_scaling(*args, **kwargs)
         # Errors
-        nt.assert_raises(RuntimeError, self.instance.plot_scaling,
-                         [self.size], [self.count])
-        nt.assert_raises(RuntimeError, self.instance.plot_scaling,
-                         self.size, self.count)
-        nt.assert_raises(ValueError, self.instance.plot_scaling,
-                         [self.size], self.count, nrep=self.nrep,
-                         time_method='invalid')
+        self.assert_raises(RuntimeError, self.instance.plot_scaling,
+                           [self.size], [self.count])
+        self.assert_raises(RuntimeError, self.instance.plot_scaling,
+                           self.size, self.count)
+        self.assert_raises(ValueError, self.instance.plot_scaling,
+                           [self.size], self.count, nrep=self.nrep,
+                           time_method='invalid')
 
     def test_perfjson_to_pandas(self):
         r"""Test perfjson_to_pandas."""
+        self.check_filename()
         timing.perfjson_to_pandas(self.filename)
 
     def test_fits(self):
         r"""Test fits to scaling on one platform."""
+        self.check_filename()
         self.instance.time_per_byte
         self.instance.time_per_message
         self.instance.startup_time
 
     def test_plot_scalings(self):
         r"""Test plot_scalings corner cases on test platform."""
+        self.check_filename()
         kwargs = copy.deepcopy(self.inst_kwargs)
         kwargs.update(msg_size=[self.size], msg_size0=self.size,
                       msg_count=[self.count], msg_count0=self.count,
@@ -230,12 +245,13 @@ class TestTimedRun(TimedRunTestBase):
                 ikws['compare_values'] = [self.language]
             timing.plot_scalings(**ikws)
         # Errors
-        nt.assert_raises(ValueError, timing.plot_scalings, compare='invalid')
-        nt.assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
-                         comm_type='ZMQComm')
+        self.assert_raises(ValueError, timing.plot_scalings, compare='invalid')
+        self.assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
+                           comm_type='ZMQComm')
 
     def test_production_runs(self):
         r"""Test production tests (those used in paper)."""
+        self.check_filename()
         # Limit language list for tests
         for c in ['comm_type', 'language', 'platform', 'python_ver']:
             kwargs = copy.deepcopy(self.inst_kwargs)

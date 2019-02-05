@@ -15,18 +15,20 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     DEPLOYPYPI=0
+    TESTCONDARECIPE=0
+    DEPLOYPYPITEMP=0
 
 matrix:
   include:
     - python: 2.7
-      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 TESTCONDARECIPE=1
     - python: 2.7
       env: INSTALLRMQ=1 INSTALLLPY=1 CIS_ENABLE_LONG_TESTS=1
     - python: 3.4
     - python: 3.5
       env: INSTALLAPY=1
     - python: 3.6
-      env: INSTALLZMQ=0 INSTALLRMQ=0
+      env: INSTALLZMQ=0 INSTALLRMQ=0 TESTCONDARECIPE=1
     - python: 3.6
       env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
     - python: 3.7
@@ -43,7 +45,7 @@ matrix:
           # `cache` does not support `env`-like `global` so copy-paste from top
           # - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
     - os: osx
-      env: INSTALLRMQ=0 DEPLOYPYPI=1 TRAVIS_PYTHON_VERSION=3.6 CIS_ENABLE_LONG_TESTS=1
+      env: INSTALLRMQ=0 DEPLOYPYPI=1 TESTCONDARECIPE=1 TRAVIS_PYTHON_VERSION=3.6 CIS_ENABLE_LONG_TESTS=1
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -79,15 +81,6 @@ before_install:
     # Useful for debugging any issues with conda
     conda info -a
     
-    # Install rapid-json
-    echo Installing rapidjson...;
-    # conda install rapidjson -c conda-forge
-    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-       sh ci/install-rapidjson-osx.sh
-    else
-       sh ci/install-rapidjson-linux.sh
-    fi
-
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
        brew update
        # brew install ccache
@@ -162,6 +155,11 @@ install:
     pip install nose coverage coveralls codecov flake8
     # Install cis_interface
     pip install -e .
+    # Install conda build
+    # TODO: Install recipe from feedstock?
+    if [ $TESTCONDARECIPE == 1]; then
+      conda install conda-build
+    fi
 
 before_script:
   - |
@@ -174,6 +172,16 @@ script:
 after_success:
   - coveralls
   - codecov
+  - |
+    if [ $TESTCONDARECIPE == 1 || $DEPLOYPYPI == 1]; then
+      conda build ./recipe/meta.yaml
+      conda create -n test_conda_recipe python=3.6
+      conda activate test_conda_recipe
+      conda install --use-local -y yggdrasil
+      yggconfig
+      yggtest -svx --nologcapture
+      conda deactivate
+    fi
 
 deploy:
   provider: pypi
