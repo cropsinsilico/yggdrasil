@@ -100,7 +100,6 @@ install:
   # - "conda install --yes -c conda-forge numpy nose coverage coveralls codecov flake8"
   # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy pika"
   # - "pip install zmq"
-  - "conda install --yes -c conda-forge rapidjson"
 
   # Install yggdrasil allowing pip to resolve requirements
   - "pip install -e ."
