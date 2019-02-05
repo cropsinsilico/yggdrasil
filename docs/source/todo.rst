@@ -29,3 +29,5 @@ TODO
 * Preprocessor macro for dynamically determine message type?
 * Try to setup comm/connection testing at class level so that comms only created once
 * Fix circular dependency when determining if C/C++ models are supported via czmq
+* Regenerate metaschema with $schema entry
+* Refence metaschema on website in $id or $schema?

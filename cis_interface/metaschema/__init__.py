@@ -11,22 +11,27 @@ from cis_interface.metaschema.datatypes import (
     get_registered_types, import_all_types)
 
 
-_base_validator = jsonschema.validators.validator_for({"$schema": ""})
-
-
 # TODO: this should be included in release as YAML/JSON and then loaded
 _metaschema_fbase = '.cis_metaschema.json'
 _metaschema_fname = os.path.abspath(os.path.join(
     os.path.dirname(cis_interface.__file__), _metaschema_fbase))
 _metaschema = None
 _validator = None
+_base_schema = {"$schema": ""}
 
 
 if os.path.isfile(_metaschema_fname):
     with open(_metaschema_fname, 'r') as fd:
         _metaschema = json.load(fd)  # , object_pairs_hook=OrderedDict)
+    schema_id = _metaschema.get('id', _metaschema.get('$id', None))
+    assert(schema_id is not None)
+    _metaschema.setdefault('$schema', schema_id)
+    _base_schema['$schema'] = _metaschema.get('$schema', schema_id)
 
+        
+_base_validator = jsonschema.validators.validator_for(_base_schema)
 
+        
 def create_metaschema(overwrite=False):
     r"""Create the meta schema for validating cis schema.
 
@@ -49,7 +54,7 @@ def create_metaschema(overwrite=False):
     out = copy.deepcopy(_base_validator.META_SCHEMA)
     out['title'] = "Cis meta-schema for data type schemas"
     # TODO: Replace schema with a link to the metaschema in the documentation
-    del out['$schema']
+    # del out['$schema']
     # Add properties
     for k, v in get_registered_properties().items():
         if v.schema is not None:
