@@ -177,7 +177,7 @@ script:
       conda install --use-local -y yggdrasil
       yggconfig
       yggtest -svx --nologcapture
-      conda deactivate
+      # conda deactivate
     fi
 
 after_success:
