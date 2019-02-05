@@ -2,7 +2,7 @@ import os
 import copy
 import unittest
 from cis_interface import tools, timing, backwards, platform
-from cis_interface.tests import CisTestClass, assert_raises
+from cis_interface.tests import CisTestClass, assert_raises, long_running
 
 
 _test_size = 1
@@ -118,6 +118,7 @@ class TimedRunTestBase(CisTestClass):
         self.instance.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@long_running
 class TestTimedRun(TimedRunTestBase):
     r"""Test class for the TimedRun class using existing data."""
 
@@ -265,6 +266,7 @@ class TestTimedRun(TimedRunTestBase):
                 timing.plot_scalings(**kwargs)
 
 
+@long_running
 class TestTimedRunTemp(TimedRunTestBase):
     r"""Test class for the TimedRun class using temporary data."""
 
@@ -333,6 +335,7 @@ class TestTimedRunTemp(TimedRunTestBase):
             x.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@long_running
 class TestTimedRunTempNoPerf(TestTimedRunTemp):
     r"""Test class for the TimedRun class using temporary data without perf."""
 
