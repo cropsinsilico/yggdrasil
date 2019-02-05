@@ -69,6 +69,17 @@ shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 enable_long_tests = os.environ.get("YGG_ENABLE_LONG_TESTS", False)
 
 
+def long_running(func):
+    r"""Decorator for marking long tests that should be skipped if
+    CIS_ENABLE_LONG_TESTS is set.
+
+    Args:
+        func (callable): Test function or method.
+
+    """
+    return unittest.skipIf(not enable_long_tests, "Long tests not enabled.")(func)
+
+
 def assert_raises(exception, callable, *args, **kwargs):
     r"""Assert that a call raises an exception.
 

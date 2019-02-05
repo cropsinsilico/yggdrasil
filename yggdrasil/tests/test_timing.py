@@ -2,7 +2,7 @@ import os
 import copy
 import unittest
 from yggdrasil import tools, timing, backwards, platform
-from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
+from yggdrasil.tests import YggTestClass, assert_raises, long_running
 
 
 _test_size = 1
@@ -118,6 +118,7 @@ class TimedRunTestBase(YggTestClass):
         self.instance.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@long_running
 class TestTimedRun(TimedRunTestBase):
     r"""Test class for the TimedRun class using existing data."""
 
@@ -143,7 +144,7 @@ class TestTimedRun(TimedRunTestBase):
         x = self.instance.load(as_json=True)
         self.instance.save(x, overwrite=True)
         new_text = self.get_raw_data()
-        assert_equal(new_text, old_text)
+        self.assert_equal(new_text, old_text)
 
     def test_save(self):
         r"""Test save with/without overwrite."""
@@ -152,7 +153,7 @@ class TestTimedRun(TimedRunTestBase):
         assert_raises(RuntimeError, self.instance.save, self.instance.data)
         self.instance.save(self.instance.data, overwrite=True)
         new_text = self.get_raw_data()
-        assert_equal(new_text, old_text)
+        self.assert_equal(new_text, old_text)
 
     def test_scaling_count(self):
         r"""Test running scaling with number of messages."""
@@ -265,6 +266,7 @@ class TestTimedRun(TimedRunTestBase):
                 timing.plot_scalings(**kwargs)
 
 
+@long_running
 class TestTimedRunTemp(TimedRunTestBase):
     r"""Test class for the TimedRun class using temporary data."""
 
@@ -333,6 +335,7 @@ class TestTimedRunTemp(TimedRunTestBase):
             x.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@long_running
 class TestTimedRunTempNoPerf(TestTimedRunTemp):
     r"""Test class for the TimedRun class using temporary data without perf."""
 
