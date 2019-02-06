@@ -450,7 +450,7 @@ class RMQComm(AsyncComm.AsyncComm):
             self.channel.basic_ack(method_frame.delivery_tag)
         else:  # pragma: debug
             self.debug("No message")
-            msg = self.empty_msg
+            msg = self.empty_bytes_msg
         return (True, msg)
 
     def purge(self):

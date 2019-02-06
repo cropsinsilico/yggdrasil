@@ -1,10 +1,10 @@
 import os
 import copy
 import pprint
-import json
 import jsonschema
 import yggdrasil
 from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.properties import (
     get_registered_properties, import_all_properties)
 from yggdrasil.metaschema.datatypes import (
@@ -22,7 +22,7 @@ _base_schema = {"$schema": ""}
 
 if os.path.isfile(_metaschema_fname):
     with open(_metaschema_fname, 'r') as fd:
-        _metaschema = json.load(fd)  # , object_pairs_hook=OrderedDict)
+        _metaschema = decode_json(fd)
     schema_id = _metaschema.get('id', _metaschema.get('$id', None))
     assert(schema_id is not None)
     _metaschema.setdefault('$schema', schema_id)
@@ -75,10 +75,7 @@ def create_metaschema(overwrite=False):
     pprint.pprint(out)
     # Save it to a file
     with open(_metaschema_fname, 'w') as fd:
-        if backwards.PY2:  # pragma: Python 2
-            json.dump(out, fd, sort_keys=True, indent=4)
-        else:  # pragma: Python 3
-            json.dump(out, fd, sort_keys=True, indent='\t')
+        encode_json(out, fd)
     return out
 
 

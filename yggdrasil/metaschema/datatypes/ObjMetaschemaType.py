@@ -1,9 +1,9 @@
 import os
-import json
 import copy
 import numpy as np
 import warnings
 from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.datatypes import register_type_from_file, _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
@@ -204,10 +204,7 @@ def create_schema(overwrite=False):
             'curve2Ds': ['params'],
             'surfaces': ['vertices']}}
     with open(_schema_file, 'w') as fd:
-        if backwards.PY2:  # pragma: Python 2
-            json.dump(schema, fd, sort_keys=True, indent=4)
-        else:  # pragma: Python 3
-            json.dump(schema, fd, sort_keys=True, indent="\t")
+        encode_json(schema, fd, indent='\t')
 
 
 def get_schema():
@@ -220,7 +217,7 @@ def get_schema():
     if not os.path.isfile(_schema_file):
         create_schema()
     with open(_schema_file, 'r') as fd:
-        out = json.load(fd)
+        out = decode_json(fd)
     return out
 
 

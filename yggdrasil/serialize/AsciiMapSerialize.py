@@ -26,11 +26,6 @@ class AsciiMapSerialize(DefaultSerialize):
                     'default': backwards.as_str(_default_newline)}}
     _default_type = {'type': 'object'}
 
-    @property
-    def empty_msg(self):
-        r"""obj: Object indicating empty message."""
-        return dict()
-
     def func_serialize(self, args):
         r"""Serialize a message.
 

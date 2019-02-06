@@ -226,7 +226,7 @@ class ClientComm(CommBase.CommBase):
         """
         flag = self.send(*args, **kwargs)
         if not flag:  # pragma: debug
-            return (False, self.empty_msg)
+            return (False, self.empty_obj_recv)
         return self.recv(timeout=False)
 
     def call_nolimit(self, *args, **kwargs):

@@ -509,12 +509,12 @@ class CommBase(tools.YggClass):
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
         return self._maxMsgSize
-        
-    @property
-    def empty_msg(self):
-        r"""str: Empty message."""
-        return b''
 
+    @property
+    def empty_bytes_msg(self):
+        r"""str: Empty serialized message."""
+        return b''
+        
     @property
     def comm_class(self):
         r"""str: Name of communication class."""
@@ -850,11 +850,29 @@ class CommBase(tools.YggClass):
                                    self.recv_converter)
         else:
             return self.recv_converter(msg_in)
+
+    def apply_send_converter(self, msg_in):
+        r"""Apply send converter.
+
+        Args:
+            msg_in (object): Message to convert.
+        
+        Returns:
+            object: Converted message.
+ 
+        """
+        if (self.send_converter is None):
+            return msg_in
+        elif isinstance(self.send_converter, str):  # pragma: debug
+            raise RuntimeError("String send_converter not supported: '%s'." %
+                               self.send_converter)
+        else:
+            return self.send_converter(msg_in)
         
     @property
     def empty_obj_recv(self):
         r"""obj: Empty message object."""
-        emsg, _ = self.deserialize(self.empty_msg)
+        emsg, _ = self.deserialize(self.empty_bytes_msg)
         emsg = self.apply_recv_converter(emsg)
         return emsg
 
@@ -870,8 +888,31 @@ class CommBase(tools.YggClass):
         """
         if self.is_eof(msg):
             return False
-        return (msg == self.empty_obj_recv)
+        emsg = self.empty_obj_recv
+        try:
+            out = (isinstance(msg, type(emsg)) and (msg == emsg))
+        except BaseException:  # pragma: debug
+            out = False
+        return out
     
+    def is_empty_send(self, msg):
+        r"""Check if a message object being sent is empty.
+
+        Args:
+            msg (obj): Message object.
+
+        Returns:
+            bool: True if the object is empty, False otherwise.
+
+        """
+        smsg = self.apply_send_converter(msg)
+        emsg, _ = self.deserialize(self.empty_bytes_msg)
+        try:
+            out = (isinstance(smsg, type(emsg)) and (smsg == emsg))
+        except BaseException:  # pragma: debug
+            out = False
+        return out
+        
     def chunk_message(self, msg):
         r"""Yield chunks of message of size maxMsgSize
 
@@ -1205,7 +1246,7 @@ class CommBase(tools.YggClass):
         work_comm = None
         if self.is_closed:
             self.debug('Comm closed')
-            return False, self.empty_msg, work_comm
+            return False, self.empty_bytes_msg, work_comm
         if len(msg) == 1:
             msg = msg[0]
         if isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg):
@@ -1213,10 +1254,7 @@ class CommBase(tools.YggClass):
         else:
             flag = True
             # Covert object
-            if self.send_converter is not None:
-                msg_ = self.send_converter(msg)
-            else:
-                msg_ = msg
+            msg_ = self.apply_send_converter(msg)
             # Serialize
             add_sinfo = (self._send_serializer and (not self.is_file))
             if add_sinfo:
@@ -1338,7 +1376,7 @@ class CommBase(tools.YggClass):
         r"""Safe receive that does things for all comm classes."""
         with self._closing_thread.lock:
             if self.is_closed:
-                return (False, self.empty_msg)
+                return (False, self.empty_bytes_msg)
             out = self._recv(*args, **kwargs)
         if out[0] and out[1]:
             self._n_recv += 1
@@ -1632,7 +1670,7 @@ class CommBase(tools.YggClass):
 
     #     """
     #     flag = True
-    #     field_msg = self.empty_msg
+    #     field_msg = self.empty_obj_recv
     #     if not self._field_backlog.get(field, []):
     #         flag, msg = self.recv_dict(*args, **kwargs)
     #         if self.is_eof(msg):

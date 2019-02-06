@@ -390,7 +390,7 @@ class AsyncComm(CommBase.CommBase):
                 and the message received.
 
         """
-        return (False, self.empty_msg)
+        return (False, self.empty_bytes_msg)
 
     def _send(self, payload, no_backlog=False, no_confirm=False, **kwargs):
         r"""Send a message to the backlog.
@@ -475,10 +475,10 @@ class AsyncComm(CommBase.CommBase):
             self.stop_timeout(key_suffix='_recv:direct')
             if not self.is_open_direct:  # pragma: debug
                 self.debug("Comm closed")
-                return (False, self.empty_msg)
+                return (False, self.empty_bytes_msg)
             if self.n_msg_direct_recv == 0:  # pragma: debug
                 self.verbose_debug("No messages waiting.")
-                return (True, self.empty_msg)
+                return (True, self.empty_bytes_msg)
             if not self._used_direct:
                 self.suppress_special_debug = True
             out = self._recv_direct()
@@ -499,11 +499,11 @@ class AsyncComm(CommBase.CommBase):
         # Return False if the queue is closed
         if (not self.is_open_backlog):  # pragma: debug
             self.debug("Backlog closed")
-            return (False, self.empty_msg)
+            return (False, self.empty_bytes_msg)
         # Return True, '' if there are no messages
         if not self.backlog_recv_ready.is_set():
             self.verbose_debug("No messages waiting.")
-            return (True, self.empty_msg)
+            return (True, self.empty_bytes_msg)
         # Return backlogged message
         self.debug('Returning backlogged received message')
         return (True, self.pop_backlog_recv())

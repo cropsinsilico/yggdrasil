@@ -352,11 +352,11 @@ class IPCComm(AsyncComm.AsyncComm):
         except sysv_ipc.ExistentialError:  # pragma: debug
             self.debug("sysv_ipc.ExistentialError: closing")
             self._close_direct()
-            return (False, self.empty_msg)
+            return (False, self.empty_bytes_msg)
         except AttributeError:  # pragma: debug
             if self.is_closed:
                 self.debug("Queue closed")
-                return (False, self.empty_msg)
+                return (False, self.empty_bytes_msg)
             raise
         return (True, data)
 

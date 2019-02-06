@@ -125,7 +125,7 @@ class ServerRequestDriver(ConnectionDriver):
             if self.nclients == 0:
                 self.debug("All clients have signed off.")
                 return super(ServerRequestDriver, self).on_eof()
-        return self.icomm.serializer.empty_msg
+        return self.icomm.empty_obj_recv
 
     def on_message(self, msg):
         r"""Process a message checking to see if it is a client signing on.
@@ -141,7 +141,7 @@ class ServerRequestDriver(ConnectionDriver):
             if msg == YGG_CLIENT_INI:
                 self.debug("New client signed on.")
                 self.nclients += 1
-                msg = self.icomm.serializer.empty_msg
+                msg = self.icomm.empty_obj_recv
                 return msg
         return super(ServerRequestDriver, self).on_message(msg)
     
