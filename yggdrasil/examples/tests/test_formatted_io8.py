@@ -1,5 +1,6 @@
 import os
 from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import _use_rapidjson
 from yggdrasil.examples.tests import TestExample
 
 
@@ -15,7 +16,9 @@ class TestExampleFIO8(TestExample):
         r"""Input file."""
         if backwards.PY2:  # pragma: Python 2
             out = [os.path.join(self.yamldir, 'Input', 'input_py2.txt')]
-        else:   # pragma: Python 3
+        elif _use_rapidjson:   # pragma: Python 3
+            out = [os.path.join(self.yamldir, 'Input', 'input_rj.txt')]
+        else:   # pragma: no cover
             out = [os.path.join(self.yamldir, 'Input', 'input.txt')]
         return out
 
