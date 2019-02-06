@@ -91,7 +91,7 @@ before_install:
     fi
 
     # Install ZeroMQ
-    if [[ $INSTALLZMQ == '1' ]]; then
+    if [[ $INSTALLZMQ == '1' && -n "$PYTHON" ]]; then
        echo Installing ZeroMQ...;
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           sh ci/install-czmq-osx.sh
