@@ -158,7 +158,7 @@ class TestCommBase(CisTestClassInfo):
         recv_inst = new_comm(err_name, **recv_kwargs)
         return send_inst, recv_inst
 
-    def test_empty_msg(self):
+    def test_empty_obj_recv(self):
         r"""Test identification of empty message."""
         msg = self.instance.empty_obj_recv
         assert(self.instance.is_empty_recv(msg))

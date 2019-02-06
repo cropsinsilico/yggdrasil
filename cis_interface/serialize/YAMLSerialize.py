@@ -1,8 +1,8 @@
 import yaml
 from cis_interface import backwards
+from cis_interface.metaschema.encoder import indent_char2int
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.serialize.JSONSerialize import indent_char2int
 
 
 @register_serializer

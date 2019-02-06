@@ -1,11 +1,10 @@
 import os
 import glob
-import json
 import jsonschema
 import copy
 import importlib
 from collections import OrderedDict
-from cis_interface import backwards
+from cis_interface.metaschema.encoder import decode_json
 from cis_interface.metaschema.properties import get_metaschema_property
 
 
@@ -92,7 +91,7 @@ def add_type_from_schema(path_to_schema, **kwargs):
         raise ValueError("The 'path_to_schema' attribute is not a valid path: "
                          + "'%s'" % path_to_schema)
     with open(path_to_schema, 'r') as fd:
-        out = json.load(fd)
+        out = decode_json(fd)
     jsonschema.validate(out, {'type': 'object',
                               'required': ['title', 'description', 'type']})
     name = out['title']
@@ -239,7 +238,7 @@ def guess_type_from_msg(msg):
     try:
         if CIS_MSG_HEAD in msg:
             _, metadata, data = msg.split(CIS_MSG_HEAD, 2)
-            metadata = json.loads(backwards.as_unicode(metadata))
+            metadata = decode_json(metadata)
             cls = _type_registry[metadata['type']]
         else:
             raise Exception
@@ -358,7 +357,7 @@ def decode(msg):
 
     """
     cls = guess_type_from_msg(msg)
-    metadata = json.loads(backwards.as_unicode(msg.split(CIS_MSG_HEAD, 2)[1]))
+    metadata = decode_json(msg.split(CIS_MSG_HEAD, 2)[1])
     typedef = cls.extract_typedef(metadata)
     cls_inst = cls(**typedef)
     obj = cls_inst.deserialize(msg)[0]

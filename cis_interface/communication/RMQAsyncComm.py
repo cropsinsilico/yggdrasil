@@ -263,7 +263,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         #     return (False, None)
         # if self.n_msg_recv == 0:
         #     # self.debug(".recv(): No buffered messages.")
-        #     out = (True, self.empty_msg)
+        #     out = (True, self.empty_bytes_msg)
         # else:
         #     with self.rmq_lock:
         #         out = (True, self._buffered_messages.pop(0))

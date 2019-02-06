@@ -1,8 +1,6 @@
 import os
 import uuid
-import warnings
 import unittest
-import nose.tools as nt
 import tempfile
 from cis_interface import runner, tools
 from cis_interface.examples import yamls
@@ -102,7 +100,7 @@ class TestExample(CisTestBase, tools.CisClass):
         out_list = self.output_files
         assert(res_list is not None)
         assert(out_list is not None)
-        nt.assert_equal(len(res_list), len(out_list))
+        self.assert_equal(len(res_list), len(out_list))
         for res, fout in zip(res_list, out_list):
             self.check_file_exists(fout)
             if isinstance(res, tuple):
@@ -115,8 +113,8 @@ class TestExample(CisTestBase, tools.CisClass):
         r"""This runs an example in the correct language."""
         if self.yaml is None:
             if self.name is not None:
-                warnings.warn("Could not locate example %s in language %s." %
-                              (self.name, self.language))
+                raise unittest.SkipTest("Could not locate example %s in language %s." %
+                                        (self.name, self.language))
         else:
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
@@ -162,9 +160,9 @@ class TestExample(CisTestBase, tools.CisClass):
         self.run_example()
         self.language = None
 
-    def test_matlab(self):
+    @unittest.skipIf(not _matlab_installed, "Matlab not installed")
+    def test_matlab(self):  # pragma: matlab
         r"""Test the Matlab version of the example."""
-        if _matlab_installed:  # pragma: matlab
-            self.language = 'matlab'
-            self.run_example()
-            self.language = None
+        self.language = 'matlab'
+        self.run_example()
+        self.language = None

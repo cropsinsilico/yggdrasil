@@ -691,8 +691,7 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('receiving')
             return
-        if ((isinstance(msg, type(self.icomm.serializer.empty_msg))
-             and (msg == self.icomm.serializer.empty_msg))):
+        if self.icomm.is_empty_recv(msg):
             self.state = 'waiting'
             self.verbose_debug(':run: Waiting for next message.')
             self.sleep()
@@ -716,8 +715,7 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('processing')
             return
-        elif ((isinstance(msg, type(self.ocomm.serializer.empty_msg))
-               and (msg == self.ocomm.serializer.empty_msg))):
+        elif self.ocomm.is_empty_send(msg):
             self.debug('Message skipped.')
             self.nskip += 1
             return

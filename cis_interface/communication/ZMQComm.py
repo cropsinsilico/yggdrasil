@@ -1070,7 +1070,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         #     ret = self.socket.poll(timeout=max(1, 1000.0 * timeout))
         #     if ret == 0:
         #         self.verbose_debug("No messages waiting.")
-        #         return (True, self.empty_msg)
+        #         return (True, self.empty_bytes_msg)
         #     flags = zmq.NOBLOCK
         # else:
         #     flags = 0
@@ -1080,7 +1080,7 @@ class ZMQComm(AsyncComm.AsyncComm):
             try:
                 if self.socket.closed:  # pragma: debug
                     self.error("Socket closed")
-                    return (False, self.empty_msg)
+                    return (False, self.empty_bytes_msg)
                 if self.socket_type_name == 'ROUTER':
                     identity = self.socket.recv(flags)
                     self._recv_identities.add(identity)
@@ -1088,7 +1088,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 total_msg = self.socket.recv(**kwargs)
             except zmq.ZMQError:  # pragma: debug
                 self.exception("Error receiving")
-                return (False, self.empty_msg)
+                return (False, self.empty_bytes_msg)
         self.debug("Recv %d bytes from %s", len(total_msg), self.address)
         # Interpret headers
         total_msg, k = self.check_reply_socket_recv(total_msg)
