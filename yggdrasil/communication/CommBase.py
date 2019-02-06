@@ -1256,7 +1256,11 @@ class CommBase(tools.YggClass):
                 if self.serializer._initialized:
                     self._send_serializer = False
         except BaseException:
-            self.exception('Failed to send.')
+            # Handle error caused by calling repr on unyt array that isn't float64
+            try:
+                self.exception('Failed to send: %.100s.', str(args))
+            except ValueError:  # pragma: debug
+                self.exception('Failed to send (unyt array in message)')
             return False
         if self.single_use and self._used:
             self.debug('Closing single use send comm [DISABLED]')
