@@ -1,3 +1,4 @@
+from yggdrasil import backwards
 import json as stdjson
 json = stdjson
 _use_rapidjson = True
@@ -6,7 +7,6 @@ if _use_rapidjson:
         import rapidjson as json
     except ImportError:  # pragma: Python 2
         _use_rapidjson = False
-from yggdrasil import backwards
 
 
 _json_encoder = None

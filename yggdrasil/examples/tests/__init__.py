@@ -4,7 +4,7 @@ import unittest
 import tempfile
 from yggdrasil import runner, tools
 from yggdrasil.examples import yamls
-from yggdrasil.tests import YggTestBase, assert_equal
+from yggdrasil.tests import YggTestBase
 from yggdrasil.drivers.MatlabModelDriver import _matlab_installed
 
 
