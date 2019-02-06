@@ -1,8 +1,7 @@
 r"""Tests for drivers sub-package."""
-import nose.tools as nt
 from cis_interface import drivers
 from cis_interface.drivers import Driver, ModelDriver, ConnectionDriver
-from cis_interface.tests import scripts
+from cis_interface.tests import scripts, assert_equal
 
 
 def test_import_driver():
@@ -12,7 +11,7 @@ def test_import_driver():
             ('ConnectionDriver', ConnectionDriver.ConnectionDriver)]
     for n, dans in drvs:
         dres = drivers.import_driver(n)
-        nt.assert_equal(dres, dans)
+        assert_equal(dres, dans)
 
 
 def test_create_driver():
