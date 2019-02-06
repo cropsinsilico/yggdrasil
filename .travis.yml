@@ -77,7 +77,11 @@ before_install:
     # Install AstroPy
     if [[ $INSTALLAPY == '1' ]]; then
        echo Installing AstroPy...;
-       pip install astropy
+       if [[ -n "$PYTHON" ]]; then
+         pip install astropy
+       elif [[ -n "$CONDA" ]]; then
+         conda install astropy
+       fi
     fi
 
     # Install LPy
@@ -99,7 +103,11 @@ before_install:
     # Install RabbitMQ & Start a server
     if [[ $INSTALLRMQ == '1' ]]; then
        echo Installing RabbitMQ...;
-       pip install pika
+       if [[ -n "$PYTHON" ]]; then
+         pip install pika
+       elif [[ -n "$CONDA" ]]; then
+         conda install pika
+       fi
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           sh ci/install-rmqserver-osx.sh
        else
@@ -124,15 +132,19 @@ install:
     pip install --upgrade pip
     pip install --upgrade wheel
     pip install --upgrade setuptools
-    # Install dependencies
-    pip install $NUMPY
-    pip install $MATPLOTLIB
-    pip install nose coverage coveralls codecov flake8
     # Install cis_interface
     if [[ -n "$PYTHON" ]]; then
+      pip install $NUMPY
+      pip install $MATPLOTLIB
+      pip install nose coverage coveralls codecov flake8
       python setup.py sdist
       pip install --verbose dist/*.tar.gz
     elif [[ -n "$CONDA" ]]; then
+      pip uninstall matplotlib
+      pip uninstall numpy
+      conda install $NUMPY
+      conda install $MATPLOTLIB
+      conda install nose coverage coveralls codecov flake8
       conda build recipe/meta.yaml
       conda install --use-local cis_interface
     fi
@@ -145,24 +157,26 @@ script:
 
 jobs:
   include:
+
+    # Tests
     - stage: test
-      include:
+      script: skip
     - os: linux
       env: PYTHON=2.7 NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=1
     - os: linux
       env: PYTHON=3.4
+      script: |
+              cistest -svx --nologcapture --with-coverage --cover-package=cis_interface tests/test_backwards.py
     - os: linux
-      env: PYTHON=3.5 INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0
-    - os: linux
-      env: PYTHON=3.6 CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1
+      env: PYTHON=3.6 INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1
     # Python 3.7 requires special dist
     - os: linux
-      env: PYTHON=3.7 INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
+      env: PYTHON=3.7 CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
-      env: PYTHON=3.7 INSTALLRMQ=1 DEPLOYPYPI=1 CIS_ENABLE_LONG_TESTS=1
+      env: PYTHON=2.7 INSTALLRMQ=1 DEPLOYPYPI=1 CIS_ENABLE_LONG_TESTS=1
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -170,12 +184,13 @@ jobs:
          directories:
           - $HOME/Library/Caches/pip
     - os: osx
-      env: CONDA=3.7 INSTALLRMQ=1 DEPLOYPYPI=1 CIS_ENABLE_LONG_TESTS=1
+      env: CONDA=3.7 INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-      
+
+    # Deploy
     - stage: deploy
       name: "Deploy to PyPI"
       script: skip
