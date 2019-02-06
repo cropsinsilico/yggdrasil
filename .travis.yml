@@ -53,7 +53,7 @@ before_install:
     fi
 
     # Install from conda in conda env
-    if [-n "$CONDA" ]; then
+    if [[ -n "$CONDA" ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
       wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
@@ -129,10 +129,10 @@ install:
     pip install $MATPLOTLIB
     pip install nose coverage coveralls codecov flake8
     # Install cis_interface
-    if [ -n "$PYTHON" ]; then
+    if [[ -n "$PYTHON" ]]; then
       python setup.py sdist
       pip install --verbose dist/*.tar.gz
-    elif [ -n "$CONDA" ]; then
+    elif [[ -n "$CONDA" ]]; then
       conda build recipe/meta.yaml
       conda install --use-local cis_interface
     fi
