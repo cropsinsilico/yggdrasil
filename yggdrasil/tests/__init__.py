@@ -10,7 +10,6 @@ import pandas as pd
 import threading
 import psutil
 import copy
-import nose.tools as nt
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil.tools import get_default_comm, YggClass
 from yggdrasil import backwards, platform, units
@@ -67,6 +66,7 @@ shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 # Flag for enabling tests that take a long time
 enable_long_tests = os.environ.get("YGG_ENABLE_LONG_TESTS", False)
+ut = unittest.TestCase()
 
 
 def long_running(func):
@@ -93,7 +93,7 @@ def assert_raises(exception, callable, *args, **kwargs):
         AssertionError: If the correct exception is not raised.
 
     """
-    return nt.assert_raises(exception, callable, *args, **kwargs)
+    return ut.assertRaises(exception, callable, *args, **kwargs)
 
 
 def assert_equal(x, y):
@@ -109,13 +109,13 @@ def assert_equal(x, y):
     """
     if isinstance(y, (list, tuple)):
         assert(isinstance(x, (list, tuple)))
-        nt.assert_equal(len(x), len(y))
+        ut.assertEqual(len(x), len(y))
         for ix, iy in zip(x, y):
             assert_equal(ix, iy)
     elif isinstance(y, dict):
         assert(issubclass(y.__class__, dict))
-        # nt.assert_equal(type(x), type(y))
-        nt.assert_equal(len(x), len(y))
+        # ut.assertEqual(type(x), type(y))
+        ut.assertEqual(len(x), len(y))
         for k, iy in y.items():
             ix = x[k]
             assert_equal(ix, iy)
@@ -130,7 +130,7 @@ def assert_equal(x, y):
             y = units.get_data(y)
         elif (not units.has_units(y)) and units.has_units(x):
             x = units.get_data(x)
-        nt.assert_equal(x, y)
+        ut.assertEqual(x, y)
 
 
 def assert_not_equal(x, y):
@@ -144,11 +144,11 @@ def assert_not_equal(x, y):
         AssertionError: If the two objects are equivalent.
 
     """
-    nt.assert_not_equal(x, y)
+    ut.assertNotEqual(x, y)
         
 
 class YggTestBase(unittest.TestCase):
-    r"""Wrapper for unittest.TestCase that allows use of nose setup and
+    r"""Wrapper for unittest.TestCase that allows use of setup and
     teardown methods along with description prefix.
 
     Args:
@@ -192,15 +192,15 @@ class YggTestBase(unittest.TestCase):
 
     def assert_less_equal(self, x, y):
         r"""Assert that one value is less than or equal to another."""
-        nt.assert_less_equal(x, y)
+        return self.assertLessEqual(x, y)
 
     def assert_greater(self, x, y):
         r"""Assert that one value is greater than another."""
-        nt.assert_greater(x, y)
+        return self.assertGreater(x, y)
 
     def assert_raises(self, *args, **kwargs):
         r"""Assert that a function raises an error."""
-        assert_raises(*args, **kwargs)
+        return self.assertRaises(*args, **kwargs)
 
     @property
     def comm_count(self):

@@ -28,7 +28,6 @@ requirements:
     - czmq
     - jsonschema
     - matplotlib
-    - nose
     - numpy
     - pandas
     - pint

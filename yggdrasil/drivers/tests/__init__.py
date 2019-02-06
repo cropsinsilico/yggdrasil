@@ -1,8 +1,7 @@
 r"""Tests for drivers sub-package."""
-import nose.tools as nt
 from yggdrasil import drivers
 from yggdrasil.drivers import Driver, ModelDriver, ConnectionDriver
-from yggdrasil.tests import scripts
+from yggdrasil.tests import scripts, assert_equal
 
 
 def test_import_driver():
@@ -12,7 +11,7 @@ def test_import_driver():
             ('ConnectionDriver', ConnectionDriver.ConnectionDriver)]
     for n, dans in drvs:
         dres = drivers.import_driver(n)
-        nt.assert_equal(dres, dans)
+        assert_equal(dres, dans)
 
 
 def test_create_driver():

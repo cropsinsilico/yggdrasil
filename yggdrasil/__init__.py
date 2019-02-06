@@ -3,9 +3,24 @@ such that they can be run simultaneously, passing input back and forth."""
 from yggdrasil import platform
 import os
 import sys
-import nose
 from ._version import get_versions
-
+_test_package_name = None
+_test_package = None
+_func_sep = None
+try:
+    import pytest
+    _test_package_name = 'pytest'
+    _test_package = pytest
+    _func_sep = '::'
+except ImportError:  # pragma: debug
+    try:
+        import nose
+        _test_package_name = 'nose'
+        _test_package = nose
+        _func_sep = ':'
+    except ImportError:
+        pass
+    
 
 if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
@@ -13,44 +28,56 @@ if platform._is_win:  # pragma: windows
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
 
 
-def run_nose(verbose=False, nocapture=False, stop=False,
-             nologcapture=False, withcoverage=False):  # pragma: debug
-    r"""Run nose tests for the package. Relative paths are interpreted to be
+def run_tsts(verbose=True, nocapture=True, stop=True,
+             nologcapture=True, withcoverage=True):  # pragma: no cover
+    r"""Run tests for the package. Relative paths are interpreted to be
     relative to the package root directory.
 
     Args:
-        verbose (bool, optional): If True, set nose option '-v' which
-            increases the verbosity. Defaults to False.
-        nocapture (bool, optional): If True, set nose option '--nocapture'
-            which allows messages to be printed to stdout. Defaults to False.
-        stop (bool, optional): If True, set nose option '--stop' which
-            stops tests at the first failure. Defaults to False.
-        nologcapture (bool, optional): If True, set nose option '--nologcapture'
-            which allows logged messages to be printed. Defaults to False.
-        withcoverage (bool, optional): If True, set nose option '--with-coverage'
-            which invokes coverage. Defaults to False.
+        verbose (bool, optional): If True, set option '-v' which
+            increases the verbosity. Defaults to True.
+        nocapture (bool, optional): If True, set option '--nocapture'
+            ('--capture=no' with pytest) which allows messages to be printed to
+            stdout. Defaults to True.
+        stop (bool, optional): If True, set option '--stop' ('--exitfirst' for
+            pytest) which stops tests at the first failure. Defaults to True.
+        nologcapture (bool, optional): If True, set option '--nologcapture'
+            which allows logged messages to be printed. Defaults to True.
+        withcoverage (bool, optional): If True, set option '--with-coverage'
+            which invokes coverage. Defaults to True.
 
     """
+    if _test_package is None:
+        raise RuntimeError("Could not locate test runner pytest or nose.")
     error_code = 0
-    nose_argv = []
+    argv = []
     test_paths = []
     for x in sys.argv:
-        if x.endswith('yggtest') or x.startswith('-'):
-            nose_argv.append(x)
+        if x.endswith('yggtest'):
+            if _test_package_name == 'nose':
+                argv.append(x)
+        elif x == '--nocover':
+            withcoverage = False
+        elif x.startswith('-'):
+            argv.append(x)
         else:
             test_paths.append(x)
-    nose_argv += ['--detailed-errors', '--exe']
+    if _test_package_name == 'nose':
+        argv += ['--detailed-errors', '--exe']
     if verbose:
-        nose_argv.append('-v')
+        argv.append('-v')
     if nocapture:
-        nose_argv.append('--nocapture')
+        argv.append('-s')
     if stop:
-        nose_argv.append('--stop')
-    if nologcapture:
-        nose_argv.append('--nologcapture')
+        argv.append('-x')
+    if nologcapture and (_test_package_name == 'nose'):
+        argv.append('--nologcapture')
     if withcoverage:
-        nose_argv.append('--with-coverage')
-        nose_argv.append('--cover-package=yggdrasil')
+        if _test_package_name == 'nose':
+            argv.append('--with-coverage')
+            argv.append('--cover-package=yggdrasil')
+        elif _test_package_name == 'pytest':
+            argv.append('--cov=yggdrasil')
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     if not test_paths:
@@ -58,16 +85,25 @@ def run_nose(verbose=False, nocapture=False, stop=False,
     else:
         for i in range(len(test_paths)):
             if not os.path.isabs(test_paths[i]):
-                if (':' in test_paths[i]):
-                    path, mod = test_paths[i].rsplit(':', 1)
-                    if (((not os.path.isabs(path))
-                         and os.path.isfile(os.path.join(package_dir, path)))):
-                        test_paths[i] = '%s:%s' % (os.path.join(package_dir, path), mod)
-                elif os.path.isfile(os.path.join(package_dir, test_paths[i])):
-                    test_paths[i] = os.path.join(package_dir, test_paths[i])
+                for func_sep in ['::', ':']:
+                    if (func_sep in test_paths[i]):
+                        path, mod = test_paths[i].rsplit(func_sep, 1)
+                        if (((not os.path.isabs(path))
+                             and os.path.isfile(os.path.join(package_dir, path)))):
+                            test_paths[i] = '%s%s%s' % (
+                                os.path.join(package_dir, path), _func_sep, mod)
+                            break
+                else:
+                    if os.path.isfile(os.path.join(package_dir, test_paths[i])):
+                        test_paths[i] = os.path.join(package_dir, test_paths[i])
     os.chdir(package_dir)
     try:
-        result = nose.run(argv=nose_argv + test_paths)
+        if _test_package_name == 'nose':
+            result = _test_package.run(argv=argv + test_paths)
+        elif _test_package_name == 'pytest':
+            result = _test_package.main(argv + test_paths)
+        else:
+            raise RuntimeError("No test runner.")
         if not result:
             error_code = -1
     except BaseException:

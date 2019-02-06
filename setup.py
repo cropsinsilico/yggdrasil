@@ -83,7 +83,7 @@ else:
 
 # Create requirements list based on platform
 requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
-                "pystache", "nose", "pyzmq", "psutil",
+                "pystache", "pyzmq", "psutil",
                 "matplotlib<3.0; python_version < '3.5'",
                 "matplotlib; python_version >= '3.5'",
                 "jsonschema",
@@ -92,7 +92,7 @@ requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 'pandas; python_version != "3.4"',
                 "perf", "pint", "unyt",
                 'sysv_ipc; platform_system != "Windows"']
-test_requirements = ['pytest', 'nose']
+test_requirements = ['pytest']
 # optional_requirements = ["pika", "astropy"]
 
 
@@ -140,7 +140,7 @@ setup(
                             'yggcc=yggdrasil.command_line:yggcc',
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',
-                            'yggtest=yggdrasil:run_nose',
+                            'yggtest=yggdrasil:run_tsts',
                             'yggschema=yggdrasil.command_line:regen_schema',
                             'yggbuildapi_c=yggdrasil.command_line:rebuild_c_api',
                             'yggconfig=yggdrasil.command_line:update_config',
