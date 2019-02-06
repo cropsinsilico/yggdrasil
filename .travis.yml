@@ -5,6 +5,9 @@ cache:
   directories:
     - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
 
+os:
+  - linux
+
 env:
   global:
     NUMPY=numpy
@@ -17,84 +20,58 @@ env:
     DEPLOYPYPI=0
     TESTCONDARECIPE=0
     DEPLOYPYPITEMP=0
-
-matrix:
-  include:
-    - python: 2.7
-      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 TESTCONDARECIPE=1
-    - python: 2.7
-      env: INSTALLRMQ=1 INSTALLLPY=1 YGG_ENABLE_LONG_TESTS=1
-    - python: 3.4
-    - python: 3.5
-      env: INSTALLAPY=1
-    - python: 3.6
-      env: INSTALLZMQ=0 INSTALLRMQ=0 TESTCONDARECIPE=1
-    - python: 3.6
-      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
-    - python: 3.7
-      dist: xenial
-      sudo: true
-    - os: osx
-      env: INSTALLRMQ=0 INSTALLZMQ=0 TRAVIS_PYTHON_VERSION=2.7 YGG_ENABLE_LONG_TESTS=1
-      osx_image: xcode7.3
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-      cache:
-         pip: false
-         directories:
-          - $HOME/Library/Caches/pip
-          # `cache` does not support `env`-like `global` so copy-paste from top
-          # - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
-    - os: osx
-      env: INSTALLRMQ=0 DEPLOYPYPI=1 TESTCONDARECIPE=1 TRAVIS_PYTHON_VERSION=3.6 YGG_ENABLE_LONG_TESTS=1
-      osx_image: xcode7.3
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-      cache:
-         pip: false
-         directories:
-          - $HOME/Library/Caches/pip
-          # `cache` does not support `env`-like `global` so copy-paste from top
-          # - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
+  matrix:
+    - PYTHON=2.7 YGG_ENABLE_LONG_TESTS=1
+    - PYTHON=3.6 YGG_ENABLE_LONG_TESTS=1
+    - CONDA=2.7
+    - CONDA=3.6
 
 before_install:
   - |
+    echo Installing os level packages...;
     sudo apt-get update
-    # We do this conditionally because it saves us some downloading if the
-    # version is the same.
-    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
-      else
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
-      fi
-    else
-      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-      else
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      fi
-    fi
-    bash miniconda.sh -b -p $HOME/miniconda
-    export PATH="$HOME/miniconda/bin:$PATH"
-    hash -r
-    sudo conda init
-    conda config --set always_yes yes --set changeps1 no
-    conda update -q conda
-    # Useful for debugging any issues with conda
-    conda info -a
-    
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
        brew update
        # brew install ccache
        # export PATH=/usr/local/opt/ccache/libexec:$PATH
        brew install valgrind
     else
-       pip install --upgrade virtualenv
-       python -m virtualenv venv
-       source venv/bin/activate
+       # pip install --upgrade virtualenv
+       # python -m virtualenv venv
+       # source venv/bin/activate
        export PATH=/usr/lib/ccache:$PATH
        sudo apt-get install strace valgrind
     fi
 
+    # Install from source in virtual env
+    if [[ -n "$PYTHON" ]]; then
+      echo Installing Python using virtualenv...;
+      if [[ "$TRAVIS_OS_NAME" == "osx" && "${PYTHON:0:1}" == "3" ]]; then
+        brew update; brew install python3;
+      fi
+      pip install --upgrade pip virtualenv
+      virtualenv -p python${PYTHON:0:1} venv
+      source venv/bin/activate
+    fi
+
+    # Install from conda in conda env
+    if [[ -n "$CONDA" || $INSTALLLPY == '1' ]]; then
+      echo Installing Python using conda...;
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
+      wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      # wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      bash miniconda.sh -b -p $HOME/miniconda
+      export PATH="$HOME/miniconda/bin:$PATH"
+      hash -r
+      conda config --set always_yes yes --set changeps1 no
+      conda config --add channels conda-forge
+      conda update -q conda
+      conda install -q conda-build
+      conda create -q -n test-environment python=$CONDA
+      source activate test-environment
+      conda info -a
+    fi
+    
     # Install AstroPy
     if [[ $INSTALLAPY == '1' ]]; then
        echo Installing AstroPy...;
@@ -109,15 +86,10 @@ before_install:
     if [[ $INSTALLLPY == '1' ]]; then
        echo Installing LPy...;
        sh ci/install-lpy-linux.sh
-       # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-       #    sh ci/install-lpy-osx.sh
-       # else
-       #    sh ci/install-lpy-linux.sh
-       # fi
     fi
 
     # Install ZeroMQ
-    if [[ $INSTALLZMQ == '1' ]]; then
+    if [[ $INSTALLZMQ == '1' && -n "$PYTHON" ]]; then
        echo Installing ZeroMQ...;
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           sh ci/install-czmq-osx.sh
@@ -150,12 +122,6 @@ before_install:
 
     fi
 
-    # Install conda build
-    # TODO: Install recipe from feedstock?
-    if [[ $TESTCONDARECIPE == '1' ]]; then
-       conda install conda-build
-    fi
-
 install:
   - |
     # setup environment
@@ -164,43 +130,90 @@ install:
     pip install --upgrade pip
     pip install --upgrade wheel
     pip install --upgrade setuptools
-    # Install dependencies
-    pip install $NUMPY
-    pip install $MATPLOTLIB
-    pip install nose coverage coveralls codecov flake8
     # Install yggdrasil
-    pip install -e .
-
-before_script:
-  - |
-    flake8 yggdrasil
+    if [[ -n "$PYTHON" ]]; then
+      # May need to uninstall conda version of numpy and matplotlib on LPy test
+      pip install $NUMPY
+      pip install $MATPLOTLIB
+      pip install nose coverage coveralls codecov flake8
+      python setup.py sdist
+      pip install --verbose dist/*.tar.gz
+    elif [[ -n "$CONDA" ]]; then
+      pip uninstall -y numpy
+      pip uninstall -y matplotlib
+      conda install $NUMPY
+      conda install $MATPLOTLIB
+      conda install nose coverage coveralls codecov flake8
+      conda build recipe/meta.yaml --python $CONDA
+      conda install --use-local yggdrasil
+    fi
 
 script:
   - |
-    nosetests -svx --nologcapture --with-coverage --cover-package=yggdrasil
+    flake8 yggdrasil
   - |
-    if [[ $TESTCONDARECIPE == '1' || $DEPLOYPYPI == '1' ]]; then
-      conda build ./recipe/meta.yaml
-      conda create -n test_conda_recipe python=3.6
-      conda activate test_conda_recipe
-      conda install --use-local -y yggdrasil
-      yggconfig
+    if [[ -n "$PYTHON" ]]; then
+      yggtest -svx --nologcapture --with-coverage --cover-package=yggdrasil
+    elif [[ -n "$CONDA" ]]; then
       yggtest -svx --nologcapture
-      # conda deactivate
     fi
+
+jobs:
+  include:
+
+    # Tests
+    - stage: test
+      os: linux
+      env: PYTHON=2.7 NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 INSTALLLPY=1
+    - os: linux
+      env: PYTHON=3.4
+      script: |
+              yggtest -svx --nologcapture --with-coverage --cover-package=yggdrasil tests/test_backwards.py
+    - os: linux
+      env: PYTHON=3.6 INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0
+    # Python 3.7 requires special dist
+    - os: linux
+      env: PYTHON=3.7 YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
+      dist: xenial
+      sudo: true
+    # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
+    - os: osx
+      env: PYTHON=2.7 INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
+      # osx_image: xcode7.3
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+         pip: false
+         directories:
+          - $HOME/Library/Caches/pip
+    - os: osx
+      env: CONDA=3.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
+      dist: xenial
+      sudo: true
+      # osx_image: xcode7.3
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+         pip: false
+         directories:
+          - $HOME/Library/Caches/pip
+
+    # Deploy
+    - stage: deploy
+      name: "Deploy to PyPI"
+      script: skip
+      deploy:
+        provider: pypi
+        edge: true
+        skip_existing: true
+        distributions: sdist bdist_wheel --universal
+        user: langmm
+        password:
+          secure: cYP65ktykU8vzNpjDxVJ7hb5VIA8pcG0+LfaboyJ/7jJ85OFFMb7k12cuzmcFgyCMzxaMaR74ZwSL1Zs3jwfpsfKt22rdXV3YtAlrbLfHDd1ReoPeg6ZHSHYlZq/pkGowB7OHZMPaF7Pwjl2igWE1ZrJ8q/K2vVCt/cv9JhZXZS3nnC3iTY9jbvq/sWp6QChy61s5ekxf9m3PJBcS3s/n34ZyuQt8eF73YSMlztWNLTBWKIfK2LOpDXXKDWhFRDhlmt3mA88I2HI1ZxFyANIrrMwGEBIJOVWlAfnPOdoI36JW9wqv3DXj9RGVDNcVwfW5/juxMF+DSHORwQDuTn3E6Z0Q/ic6rLndI+vzHjYdjPeLXutggOEGTjq32LP6FkJ+3LyrFoQXwZIZ+FqLRni/HyppoyIQ+S5NneLB7Wj5Hyja7ycmwLZnlnixUz3qHOvIv6Hpv/koDltqyB5gzf0xvbNUMkRCHuuovtbqtmRtxA1BL8VKoGVzZ7zHrWG+iTGZXSFhgrcO1k8OYzxaWR2O/NeeURuy3ViD+xzPSvMASRX0sCULOf3o2rgDdJyTBjW5KZcLqVcOiGZoHgwOjZY0NQ50R7mE7T+CQmoYtil1Ovmm8b6NUhoE0z6jEgDVfEhKo9/WACHamzIQ4afrYsEWlQhDSg+dvrzS7OciILOK+Q=
+        on:
+          tags: true
+          condition: $DEPLOYPYPI = 1
+    
 
 after_success:
   - coveralls
   - codecov
-
-deploy:
-  provider: pypi
-  edge: true
-  skip_existing: true
-  distributions: sdist bdist_wheel --universal
-  user: langmm
-  password:
-    secure: cYP65ktykU8vzNpjDxVJ7hb5VIA8pcG0+LfaboyJ/7jJ85OFFMb7k12cuzmcFgyCMzxaMaR74ZwSL1Zs3jwfpsfKt22rdXV3YtAlrbLfHDd1ReoPeg6ZHSHYlZq/pkGowB7OHZMPaF7Pwjl2igWE1ZrJ8q/K2vVCt/cv9JhZXZS3nnC3iTY9jbvq/sWp6QChy61s5ekxf9m3PJBcS3s/n34ZyuQt8eF73YSMlztWNLTBWKIfK2LOpDXXKDWhFRDhlmt3mA88I2HI1ZxFyANIrrMwGEBIJOVWlAfnPOdoI36JW9wqv3DXj9RGVDNcVwfW5/juxMF+DSHORwQDuTn3E6Z0Q/ic6rLndI+vzHjYdjPeLXutggOEGTjq32LP6FkJ+3LyrFoQXwZIZ+FqLRni/HyppoyIQ+S5NneLB7Wj5Hyja7ycmwLZnlnixUz3qHOvIv6Hpv/koDltqyB5gzf0xvbNUMkRCHuuovtbqtmRtxA1BL8VKoGVzZ7zHrWG+iTGZXSFhgrcO1k8OYzxaWR2O/NeeURuy3ViD+xzPSvMASRX0sCULOf3o2rgDdJyTBjW5KZcLqVcOiGZoHgwOjZY0NQ50R7mE7T+CQmoYtil1Ovmm8b6NUhoE0z6jEgDVfEhKo9/WACHamzIQ4afrYsEWlQhDSg+dvrzS7OciILOK+Q=
-  on:
-    tags: true
-    condition: $DEPLOYPYPI = 1
+  
