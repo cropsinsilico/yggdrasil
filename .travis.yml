@@ -98,7 +98,11 @@ before_install:
     # Install AstroPy
     if [[ $INSTALLAPY == '1' ]]; then
        echo Installing AstroPy...;
-       pip install astropy
+       if [[ -n "$PYTHON" ]]; then
+         pip install astropy
+       elif [[ -n "$CONDA" ]]; then
+         conda install astropy
+       fi
     fi
 
     # Install LPy
@@ -125,7 +129,11 @@ before_install:
     # Install RabbitMQ & Start a server
     if [[ $INSTALLRMQ == '1' ]]; then
        echo Installing RabbitMQ...;
-       pip install pika
+       if [[ -n "$PYTHON" ]]; then
+         pip install pika
+       elif [[ -n "$CONDA" ]]; then
+         conda install pika
+       fi
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           sh ci/install-rmqserver-osx.sh
        else
