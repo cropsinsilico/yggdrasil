@@ -67,7 +67,7 @@ before_install:
       conda install -q conda-build
       conda create -q -n test-environment python=$CONDA
       source activate test-environment
-      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      if [[ "$CONDA" == "2.7" ]]; then
         export INSTALLLPY=1
         # conda init
       fi
@@ -145,7 +145,7 @@ install:
       conda install $NUMPY
       conda install $MATPLOTLIB
       conda install nose coverage coveralls codecov flake8
-      conda build recipe/meta.yaml
+      conda build recipe/meta.yaml --python $CONDA
       conda install --use-local cis_interface
     fi
 
