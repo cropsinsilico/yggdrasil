@@ -1,6 +1,6 @@
 from cis_interface import backwards
 from cis_interface.metaschema.encoder import (
-    indent_char2int, encode_json, decode_json)
+    indent_char2int, encode_json, decode_json, _use_rapidjson)
 from cis_interface.serialize import register_serializer
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
@@ -58,8 +58,9 @@ class JSONSerialize(DefaultSerialize):
                'typedef': {'type': 'object'}}
         out['contents'] = (b'{\n\t"a": [\n\t\t"b",\n\t\t1,\n\t\t1.0\n\t],'
                            b'\n\t"c": {\n\t\t"z": "hello"\n\t}\n}')
-        if backwards.PY2:  # pragma: Python 2
+        if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
             tab_rep = indent_char2int('\t') * b' '
             out['contents'] = out['contents'].replace(b'\t', tab_rep)
+        if backwards.PY2:  # pragma: Python 2
             out['contents'] = out['contents'].replace(b',', b', ')
         return out
