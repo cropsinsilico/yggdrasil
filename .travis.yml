@@ -53,7 +53,7 @@ before_install:
     fi
 
     # Install from conda in conda env
-    if [[ -n "$CONDA" && $INSTALLLPY == '1' ]]; then
+    if [[ -n "$CONDA" || $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
       wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
