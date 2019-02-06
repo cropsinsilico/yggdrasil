@@ -1,4 +1,11 @@
-import json
+import json as stdjson
+json = stdjson
+_use_rapidjson = True
+if _use_rapidjson:
+    try:  # pragma: Python 3
+        import rapidjson as json
+    except ImportError:  # pragma: Python 2
+        _use_rapidjson = False
 from cis_interface import backwards
 
 
@@ -38,7 +45,7 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
         str, bytes: Encoded object.
 
     """
-    if backwards.PY2:  # pragma: Python 2
+    if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
         # Character indents not allowed in Python 2 json
         indent = indent_char2int(indent)
     kwargs['indent'] = indent
@@ -72,7 +79,7 @@ def decode_json(msg, **kwargs):
         return json.load(msg, **kwargs)
     
 
-class JSONReadableEncoder(json.JSONEncoder):
+class JSONReadableEncoder(stdjson.JSONEncoder):
     r"""Encoder class for CiS messages."""
 
     def default(self, o):  # pragma: no cover
@@ -82,10 +89,10 @@ class JSONReadableEncoder(json.JSONEncoder):
             if (not cls._replaces_existing) and cls.validate(o):
                 new_o = cls.encode_data_readable(o, None)
                 return new_o
-        return json.JSONEncoder.default(self, o)
+        return stdjson.JSONEncoder.default(self, o)
 
 
-# class JSONEncoder(json.JSONEncoder):
+# class JSONEncoder(stdjson.JSONEncoder):
 #     r"""Encoder class for CiS messages."""
 
 #     def default(self, o):
@@ -94,10 +101,10 @@ class JSONReadableEncoder(json.JSONEncoder):
 #             if cls.validate(o):
 #                 new_o = cls.encode_data(o, None)
 #                 return new_o
-#         return json.JSONEncoder.default(self, o)
+#         return stdjson.JSONEncoder.default(self, o)
 
     
-# class JSONDecoder(json.JSONDecoder):
+# class JSONDecoder(stdjson.JSONDecoder):
 #     r"""Decoder class for CiS messages."""
 #
 #     def raw_decode(self, s, idx=0):

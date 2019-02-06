@@ -35,6 +35,7 @@ requirements:
     - psutil
     - pystache
     - python
+    - python-rapidjson  # [not py2k]
     - pyyaml
     - pyzmq
     - scipy
