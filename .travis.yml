@@ -140,8 +140,8 @@ install:
       python setup.py sdist
       pip install --verbose dist/*.tar.gz
     elif [[ -n "$CONDA" ]]; then
-      pip uninstall matplotlib
-      pip uninstall numpy
+      pip uninstall -y matplotlib
+      pip uninstall -y numpy
       conda install $NUMPY
       conda install $MATPLOTLIB
       conda install nose coverage coveralls codecov flake8
