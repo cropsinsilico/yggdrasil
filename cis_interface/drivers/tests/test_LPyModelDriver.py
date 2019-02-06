@@ -1,6 +1,5 @@
-import nose.tools as nt
 import unittest
-from cis_interface.tests import scripts
+from cis_interface.tests import scripts, assert_raises
 from cis_interface.drivers import LPyModelDriver
 import cis_interface.drivers.tests.test_ModelDriver as parent
 
@@ -8,8 +7,8 @@ import cis_interface.drivers.tests.test_ModelDriver as parent
 @unittest.skipIf(LPyModelDriver._lpy_installed, "LPy is installed")
 def test_LPyModelDriver_nolpy():  # pragma: no lpy
     r"""Test LPyModelDriver error when LPy not installed."""
-    nt.assert_raises(RuntimeError, LPyModelDriver.LPyModelDriver,
-                     'test', scripts['lpy'])
+    assert_raises(RuntimeError, LPyModelDriver.LPyModelDriver,
+                  'test', scripts['lpy'])
 
 
 class TestLPyModelParam(parent.TestModelParam):

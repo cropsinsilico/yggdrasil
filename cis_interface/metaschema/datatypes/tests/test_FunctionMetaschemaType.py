@@ -1,4 +1,3 @@
-import nose.tools as nt
 from cis_interface.metaschema.datatypes.tests import test_MetaschemaType as parent
 
 
@@ -25,6 +24,6 @@ class TestFunctionMetaschemaType(parent.TestMetaschemaType):
 
     def test_decode_data_errors(self):
         r"""Test errors in decode_data."""
-        nt.assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
-        nt.assert_raises(AttributeError, self.import_cls.decode_data,
-                         'cis_interface:invalid', None)
+        self.assert_raises(ValueError, self.import_cls.decode_data, 'hello', None)
+        self.assert_raises(AttributeError, self.import_cls.decode_data,
+                           'cis_interface:invalid', None)

@@ -1,4 +1,3 @@
-import nose.tools as nt
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 from cis_interface import runner, tools
 
@@ -79,7 +78,7 @@ class TestClientDriverNoStart(TestClientParam,
         r"""Test error raised when trying to access attributes set on recv."""
         err_attr = ['request_id', 'model_response_address']
         for k in err_attr:
-            nt.assert_raises(AttributeError, getattr, self.instance, k)
+            self.assert_raises(AttributeError, getattr, self.instance, k)
             
 
 class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
@@ -114,7 +113,7 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         # Receive on server side
         flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
         assert(flag)
-        nt.assert_equal(srv_msg, msg_send)
+        self.assert_equal(srv_msg, msg_send)
         self.instance.printStatus()
         self.srv_drv.printStatus()
         # Send reply back to client
@@ -123,7 +122,7 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         # Receive response on client side
         flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
         assert(flag)
-        nt.assert_equal(cli_msg, msg_send)
+        self.assert_equal(cli_msg, msg_send)
 
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""

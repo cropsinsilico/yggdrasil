@@ -1,5 +1,4 @@
-import nose.tools as nt
-from cis_interface.tests import CisTestClass
+from cis_interface.tests import CisTestClass, assert_raises
 
 
 class TestCisTest(CisTestClass):
@@ -16,11 +15,11 @@ class TestCisTest(CisTestClass):
 
     def test_import_cls(self):
         r"""Test import class with mod/cls unset."""
-        nt.assert_raises(Exception, getattr, self, 'import_cls')
+        assert_raises(Exception, getattr, self, 'import_cls')
         self._mod = 'drivers'
-        nt.assert_raises(Exception, getattr, self, 'import_cls')
+        assert_raises(Exception, getattr, self, 'import_cls')
 
     def test_post_teardown_ref(self):
         r"""Test errors on instance ref post teardown."""
         self.teardown()
-        nt.assert_raises(RuntimeError, getattr, self, 'instance')
+        assert_raises(RuntimeError, getattr, self, 'instance')

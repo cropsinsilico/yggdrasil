@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-import nose.tools as nt
+from cis_interface.tests import assert_raises
 from cis_interface.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
@@ -42,8 +42,8 @@ _count = len(_vallist)
 
 def test_container_errors():
     r"""Test implementation errors on bare container class."""
-    nt.assert_raises(NotImplementedError, ContainerMetaschemaType._iterate, None)
-    nt.assert_raises(NotImplementedError, ContainerMetaschemaType._assign,
-                     None, None, None)
-    nt.assert_raises(NotImplementedError, ContainerMetaschemaType._has_element,
-                     None, None)
+    assert_raises(NotImplementedError, ContainerMetaschemaType._iterate, None)
+    assert_raises(NotImplementedError, ContainerMetaschemaType._assign,
+                  None, None, None)
+    assert_raises(NotImplementedError, ContainerMetaschemaType._has_element,
+                  None, None)

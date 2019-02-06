@@ -2,8 +2,8 @@ import os
 import copy
 import shutil
 import tempfile
-import nose.tools as nt
 import unittest
+from cis_interface.tests import assert_raises, assert_equal
 from cis_interface.metaschema.datatypes.tests import (
     test_PlyMetaschemaType as parent)
 from cis_interface.metaschema.datatypes import ObjMetaschemaType
@@ -65,13 +65,13 @@ for t in _test_value_simple['texcoords']:
 
 def test_create_schema():
     r"""Test create_schema."""
-    nt.assert_raises(RuntimeError, ObjMetaschemaType.create_schema, overwrite=False)
+    assert_raises(RuntimeError, ObjMetaschemaType.create_schema, overwrite=False)
     temp = os.path.join(tempfile.gettempdir(), 'temp_schema')
     old_schema = ObjMetaschemaType.get_schema()
     try:
         shutil.move(ObjMetaschemaType._schema_file, temp)
         new_schema = ObjMetaschemaType.get_schema()
-        nt.assert_equal(old_schema, new_schema)
+        assert_equal(old_schema, new_schema)
     except BaseException:  # pragma: debug
         shutil.move(temp, ObjMetaschemaType._schema_file)
         raise

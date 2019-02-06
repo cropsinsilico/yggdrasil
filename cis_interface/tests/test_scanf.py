@@ -1,5 +1,5 @@
-import nose.tools as nt
 from cis_interface import scanf
+from cis_interface.tests import assert_equal
 
 
 def test_scanf():
@@ -28,4 +28,4 @@ def test_scanf():
                 new_tup.append(v)
         val_str = fmt % tuple(new_tup)
         res = scanf.scanf(fmt, val_str)
-        nt.assert_equal(res, val_tup)
+        assert_equal(res, val_tup)

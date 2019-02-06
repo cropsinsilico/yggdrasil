@@ -1,7 +1,6 @@
 import os
 import unittest
-import nose.tools as nt
-from cis_interface.tests import scripts
+from cis_interface.tests import scripts, assert_raises
 import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface import runner
 from cis_interface.drivers import MatlabModelDriver
@@ -21,11 +20,11 @@ def test_is_matlab_running():
 @unittest.skipIf(MatlabModelDriver._matlab_installed, "Matlab installed.")
 def test_matlab_not_installed():  # pragma: no matlab
     r"""Assert that errors are raised when Matlab is not installed."""
-    nt.assert_raises(RuntimeError, MatlabModelDriver.start_matlab)
-    nt.assert_raises(RuntimeError, MatlabModelDriver.stop_matlab,
-                     None, None, None, None)
-    nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabProcess, None, None)
-    nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, None, None)
+    assert_raises(RuntimeError, MatlabModelDriver.start_matlab)
+    assert_raises(RuntimeError, MatlabModelDriver.stop_matlab,
+                  None, None, None, None)
+    assert_raises(RuntimeError, MatlabModelDriver.MatlabProcess, None, None)
+    assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, None, None)
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
@@ -40,8 +39,8 @@ def test_matlab_exit():  # pragma: matlab
     r"""Test error when model contains 'exit' call."""
     MatlabModelDriver.MatlabModelDriver('error', [scripts['matlab_error']])
     # Re-enable if it becomes necessary to raise an error instead of just a warning
-    # nt.assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, 'error',
-    #                  [scripts['matlab_error']])
+    # assert_raises(RuntimeError, MatlabModelDriver.MatlabModelDriver, 'error',
+    #               [scripts['matlab_error']])
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
