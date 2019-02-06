@@ -53,7 +53,7 @@ before_install:
     fi
 
     # Install from conda in conda env
-    if [[ -n "$CONDA" ]]; then
+    if [[ -n "$CONDA" && $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
       wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
@@ -67,10 +67,6 @@ before_install:
       conda install -q conda-build
       conda create -q -n test-environment python=$CONDA
       source activate test-environment
-      if [[ "$CONDA" == "2.7" ]]; then
-        export INSTALLLPY=1
-        # conda init
-      fi
       conda info -a
     fi
     
@@ -134,14 +130,15 @@ install:
     pip install --upgrade setuptools
     # Install cis_interface
     if [[ -n "$PYTHON" ]]; then
+      # May need to uninstall conda version of numpy and matplotlib on LPy test
       pip install $NUMPY
       pip install $MATPLOTLIB
       pip install nose coverage coveralls codecov flake8
       python setup.py sdist
       pip install --verbose dist/*.tar.gz
     elif [[ -n "$CONDA" ]]; then
-      pip uninstall -y matplotlib
       pip uninstall -y numpy
+      pip uninstall -y matplotlib
       conda install $NUMPY
       conda install $MATPLOTLIB
       conda install nose coverage coveralls codecov flake8
@@ -153,7 +150,11 @@ script:
   - |
     flake8 cis_interface
   - |
-    nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface
+    if [[ -n "$PYTHON" ]]; then
+      cistest -svx --nologcapture --with-coverage --cover-package=cis_interface
+    elif [[ -n "$CONDA" ]]; then
+      cistest -svx --nologcapture
+    fi
 
 jobs:
   include:
@@ -161,7 +162,7 @@ jobs:
     # Tests
     - stage: test
       os: linux
-      env: PYTHON=2.7 NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
+      env: PYTHON=2.7 NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 INSTALLLPY=1
     - os: linux
       env: PYTHON=3.4
       script: |
