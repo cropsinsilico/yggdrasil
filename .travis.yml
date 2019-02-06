@@ -5,6 +5,9 @@ cache:
   directories:
     - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
 
+os:
+  - linux
+
 env:
   global:
     NUMPY=numpy
@@ -15,64 +18,12 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     DEPLOYPYPI=0
+  matrix:
+    - PYTHON=2.7 CIS_ENABLE_LONG_TESTS=1
+    - PYTHON=3.6 CIS_ENABLE_LONG_TESTS=1
+    - CONDA=2.7
+    - CONDA=3.6
 
-matrix:
-  include:
-    - os: linux
-      env: PYTHON=2.7 NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 DEPLOYPYPI=1
-    - os: linux
-      env: PYTHON=2.7 INSTALLRMQ=1 INSTALLLPY=1 CIS_ENABLE_LONG_TESTS=1
-    - os: linux
-      env: PYTHON=3.4
-    - os: linux
-      env: PYTHON=3.5 INSTALLAPY=1
-    - os: linux
-      env: PYTHON=3.5 INSTALLZMQ=0 INSTALLRMQ=0
-    - os: linux
-      env: PYTHON=3.6 CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
-    - os: linux
-      env: PYTHON=3.7
-      dist: xenial
-      sudo: true
-    # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
-    - os: osx
-      env: PYTHON=2.7 INSTALLRMQ=0 INSTALLZMQ=0 CIS_ENABLE_LONG_TESTS=1
-      osx_image: xcode7.3
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-      cache:
-         pip: false
-         directories:
-          - $HOME/Library/Caches/pip
-    - os: osx
-      env: PYTHON=3.6 INSTALLRMQ=0 DEPLOYPYPI=1 CIS_ENABLE_LONG_TESTS=1
-      osx_image: xcode7.3
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-      cache:
-         pip: false
-         directories:
-          - $HOME/Library/Caches/pip
-    - os: linux
-      env: CONDA=2.7
-    - os: linux
-      env: CONDA=3.6
-    - os: linux
-      env: CONDA=3.7
-    - os: osx
-      env: CONDA=2.7
-      osx_image: xcode7.3
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-    - os: osx
-      env: CONDA=3.6
-      osx_image: xcode7.3
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-    - os: osx
-      env: CONDA=3.7
-      dist: xenial
-      sudo: true
-      osx_image: xcode7.3
-      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-
-      
 before_install:
   - |
     echo Installing os level packages...;
@@ -116,9 +67,10 @@ before_install:
       conda install -q conda-build
       conda create -q -n test-environment python=$CONDA
       source activate test-environment
-      # if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      #   conda init
-      # fi
+      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        export INSTALLLPY=1
+        # conda init
+      fi
       conda info -a
     fi
     
@@ -185,19 +137,45 @@ install:
       conda install --use-local cis_interface
     fi
 
-before_script:
+script:
   - |
     flake8 cis_interface
+  - |
+    nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface
 
 jobs:
   include:
-    - stage: Tests
-      name: "Flake8"
-      script: |
-              flake8 cis_interface
-    - name: "Full tests"
-      script: |
-              nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface
+    - stage: test
+      include:
+    - os: linux
+      env: PYTHON=2.7 NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=1
+    - os: linux
+      env: PYTHON=3.4
+    - os: linux
+      env: PYTHON=3.5 INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0
+    - os: linux
+      env: PYTHON=3.6 CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1
+    # Python 3.7 requires special dist
+    - os: linux
+      env: PYTHON=3.7 INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
+      dist: xenial
+      sudo: true
+    # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
+    - os: osx
+      env: PYTHON=3.7 INSTALLRMQ=1 DEPLOYPYPI=1 CIS_ENABLE_LONG_TESTS=1
+      osx_image: xcode7.3
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+         pip: false
+         directories:
+          - $HOME/Library/Caches/pip
+    - os: osx
+      env: CONDA=3.7 INSTALLRMQ=1 DEPLOYPYPI=1 CIS_ENABLE_LONG_TESTS=1
+      dist: xenial
+      sudo: true
+      osx_image: xcode7.3
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      
     - stage: deploy
       name: "Deploy to PyPI"
       script: skip
@@ -217,4 +195,4 @@ jobs:
 after_success:
   - coveralls
   - codecov
-
+  
