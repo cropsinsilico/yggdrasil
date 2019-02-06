@@ -1256,7 +1256,7 @@ class CommBase(tools.CisClass):
                 if self.serializer._initialized:
                     self._send_serializer = False
         except BaseException:
-            self.exception('Failed to send.')
+            self.exception('Failed to send: %.100s.', str(args))
             return False
         if self.single_use and self._used:
             self.debug('Closing single use send comm [DISABLED]')

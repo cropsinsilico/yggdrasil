@@ -3,7 +3,7 @@ import os
 import nose.tools as nt
 from jsonschema.exceptions import ValidationError
 from cis_interface import yamlfile
-from cis_interface.tests import CisTestClass
+from cis_interface.tests import CisTestClass, long_running
 _yaml_env = 'TEST_YAML_FILE'
 
 
@@ -25,6 +25,7 @@ def test_parse_component_error():
                      {}, 'invalid', 'invalid')
 
 
+@long_running
 class YamlTestBase(CisTestClass):
     r"""Test base for yamlfile."""
     _contents = tuple()

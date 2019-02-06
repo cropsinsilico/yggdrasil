@@ -1,8 +1,10 @@
 import os
+from cis_interface.tests import long_running
 from cis_interface.examples.tests import TestExample
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
+@long_running
 class TestExampleSaM(TestExample):
     r"""Test the SaM example."""
 
