@@ -177,7 +177,7 @@ jobs:
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       env: PYTHON=2.7 INSTALLRMQ=1 DEPLOYPYPI=1 CIS_ENABLE_LONG_TESTS=1
-      osx_image: xcode7.3
+      # osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
          pip: false
@@ -187,8 +187,12 @@ jobs:
       env: CONDA=3.7 INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
-      osx_image: xcode7.3
+      # osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+         pip: false
+         directories:
+          - $HOME/Library/Caches/pip
 
     # Deploy
     - stage: deploy
