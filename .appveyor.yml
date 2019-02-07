@@ -120,7 +120,7 @@ before_test:
   - "flake8 yggdrasil"
 
 test_script:
-  - "pytest -svx --cov=yggdrasil --ignore=yggdrasil\rapidjson yggdrasil"
+  - "pytest -svx --cov=yggdrasil --ignore=yggdrasil/rapidjson yggdrasil"
 
 after_test:
   - "codecov"
