@@ -216,6 +216,7 @@ jobs:
     - stage: deploy
       name: "Deploy to PyPI"
       script: skip
+      if: (tag IS present) AND (env(DEPLOYPYPI) = 1)
       deploy:
         provider: pypi
         edge: true
