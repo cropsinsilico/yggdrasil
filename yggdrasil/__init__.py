@@ -66,7 +66,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
     if _test_package_name == 'nose':
         argv += ['--detailed-errors', '--exe']
     elif _test_package_name == 'pytest':
-        argv.append('--ignore=cis_interface/rapidjson/')
+        argv.append('--ignore=yggdrasil/rapidjson/')
     if verbose:
         argv.append('-v')
     if nocapture:
