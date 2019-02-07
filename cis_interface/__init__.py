@@ -3,6 +3,7 @@ such that they can be run simultaneously, passing input back and forth."""
 from cis_interface import platform
 import os
 import sys
+import logging
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
@@ -107,6 +108,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         else:
             raise RuntimeError("No test runner.")
     except BaseException:
+        logging.exception('Error in running test.')
         error_code = -1
     finally:
         os.chdir(initial_dir)
