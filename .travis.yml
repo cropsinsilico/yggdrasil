@@ -141,7 +141,7 @@ install:
       # May need to uninstall conda version of numpy and matplotlib on LPy test
       pip install $NUMPY
       pip install $MATPLOTLIB
-      pip install pytest pytest-cov coverage coveralls codecov flake8
+      pip install pytest "pytest-cov<2.6" coverage coveralls codecov flake8
       python setup.py develop
       # python setup.py sdist
       # pip install --verbose dist/*.tar.gz
@@ -150,7 +150,7 @@ install:
       pip uninstall -y matplotlib
       conda install $NUMPY
       conda install $MATPLOTLIB
-      conda install pytest pytest-cov coverage coveralls codecov flake8
+      conda install pytest "pytest-cov<2.6" coverage coveralls codecov flake8
       conda build recipe/meta.yaml --python $CONDA
       conda install --use-local cis_interface
     fi
