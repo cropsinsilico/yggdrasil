@@ -100,12 +100,12 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
     try:
         if _test_package_name == 'nose':
             result = _test_package.run(argv=argv + test_paths)
+            if not result:
+                error_code = -1
         elif _test_package_name == 'pytest':
-            result = _test_package.main(argv + test_paths)
+            error_code = _test_package.main(argv + test_paths)
         else:
             raise RuntimeError("No test runner.")
-        if not result:
-            error_code = -1
     except BaseException:
         error_code = -1
     finally:
