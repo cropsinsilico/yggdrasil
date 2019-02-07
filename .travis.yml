@@ -48,8 +48,8 @@ before_install:
         brew update; brew install python3;
       fi
       pip install --upgrade pip virtualenv
-      virtualenv -p python${PYTHON:0:1} venv
-      source venv/bin/activate
+      virtualenv -p python${PYTHON} test-venv
+      source test-venv/bin/activate
     fi
 
     # Install from conda in conda env

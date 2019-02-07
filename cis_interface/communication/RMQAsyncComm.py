@@ -282,11 +282,11 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Establish the connection."""
         self.times_connected += 1
         parameters = pika.URLParameters(self.url)
-        self.connection = pika.SelectConnection(
-            parameters,
-            on_open_callback=self.on_connection_open,
-            on_open_error_callback=self.on_connection_open_error,
-            stop_ioloop_on_close=False)
+        kwargs = dict(on_open_callback=self.on_connection_open,
+                      on_open_error_callback=self.on_connection_open_error)
+        if float(pika.__version__.split('.')[0]) < 1:
+            kwargs['stop_ioloop_on_close'] = False
+        self.connection = pika.SelectConnection(parameters, **kwargs)
 
     def on_connection_open(self, connection):
         r"""Actions that must be taken when the connection is opened.
