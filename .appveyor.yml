@@ -120,7 +120,7 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "pytest -svx --cov=cis_interface --ignore=cis_interface\\rapidjson cis_interface"
+  - "pytest -svx --cov=cis_interface --ignore=cis_interface\rapidjson cis_interface"
 
 after_test:
   - "codecov"
