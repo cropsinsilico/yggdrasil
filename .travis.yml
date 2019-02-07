@@ -144,9 +144,9 @@ install:
       pip install $NUMPY
       pip install $MATPLOTLIB
       pip install pytest "pytest-cov<2.6" coverage coveralls codecov flake8
-      python setup.py develop
       # python setup.py sdist
       # pip install --verbose dist/*.tar.gz
+      pip install --verbose -e .
     elif [[ -n "$CONDA" ]]; then
       pip uninstall -y numpy
       pip uninstall -y matplotlib
