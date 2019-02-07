@@ -162,7 +162,7 @@ script:
     flake8 yggdrasil
   - |
     if [[ -n "$PYTHON" ]]; then
-      yggtest
+      yggtest --ignore=yggdrasil/rapidjson/
     elif [[ -n "$CONDA" ]]; then
       yggtest --nocover
     fi

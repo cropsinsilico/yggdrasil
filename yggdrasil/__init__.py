@@ -106,6 +106,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             if not result:
                 error_code = -1
         elif _test_package_name == 'pytest':
+            print("running", argv + test_paths)
             error_code = _test_package.main(argv + test_paths)
         else:
             raise RuntimeError("No test runner.")
