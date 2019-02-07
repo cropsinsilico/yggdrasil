@@ -120,7 +120,7 @@ before_test:
   - "flake8 yggdrasil"
 
 test_script:
-  - "yggtest"
+  - "pytest -svx --cov=ygg_interface ygg_interface"
 
 after_test:
   - "codecov"
