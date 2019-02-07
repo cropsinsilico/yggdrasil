@@ -66,7 +66,34 @@ shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 # Flag for enabling tests that take a long time
 enable_long_tests = os.environ.get("CIS_ENABLE_LONG_TESTS", False)
-ut = unittest.TestCase()
+
+
+if backwards.PY2:  # pragma: Python 2
+    # Dummy TestCase instance, so we can initialize an instance
+    # and access the assert instance methods
+    class DummyTestCase(unittest.TestCase):  # pragma: no cover
+        def __init__(self):
+            super(DummyTestCase, self).__init__('_dummy')
+
+        def _dummy(self):
+            pass
+
+    # A metaclass that makes __getattr__ static
+    class AssertsAccessorType(type):  # pragma: no cover
+        dummy = DummyTestCase()
+
+        def __getattr__(cls, key):
+            return getattr(AssertsAccessor.dummy, key)
+
+    # The actual accessor, a static class, that redirect the asserts
+    class AssertsAccessor(object):  # pragma: no cover
+        __metaclass__ = AssertsAccessorType
+        
+    ut = AssertsAccessor
+        
+else:  # pragma: Python 3
+
+    ut = unittest.TestCase()
 
 
 def long_running(func):
