@@ -26,14 +26,16 @@ env:
     DEPLOYPYPITEMP=0
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
-    - CONDA=1
+    - CONDA=yes
 
 before_install:
   - |
     if [[ -n "$CONDA" ]]; then
       export CONDA=$TRAVIS_PYTHON_VERSION
+      echo "CONDA = $CONDA"
     else
       export PYTHON=$TRAVIS_PYTHON_VERSION
+      echo "PYTHON = $PYTHON"
     fi
 
     echo Installing os level packages...;
