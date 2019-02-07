@@ -8,6 +8,10 @@ cache:
 os:
   - linux
 
+python:
+  - 2.7
+  - 3.6
+
 env:
   global:
     NUMPY=numpy
@@ -21,13 +25,17 @@ env:
     TESTCONDARECIPE=0
     DEPLOYPYPITEMP=0
   matrix:
-    - PYTHON=2.7 YGG_ENABLE_LONG_TESTS=1
-    - PYTHON=3.6 YGG_ENABLE_LONG_TESTS=1
-    - CONDA=2.7
-    - CONDA=3.6
+    - YGG_ENABLE_LONG_TESTS=1
+    - CONDA=1
 
 before_install:
   - |
+    if [[ -n "$CONDA" ]]; then
+      export CONDA=$TRAVIS_PYTHON_VERSION
+    else
+      export PYTHON=$TRAVIS_PYTHON_VERSION
+    fi
+
     echo Installing os level packages...;
     sudo apt-get update
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
@@ -44,15 +52,15 @@ before_install:
     fi
 
     # Install from source in virtual env
-    if [[ -n "$PYTHON" ]]; then
-      echo Installing Python using virtualenv...;
-      if [[ "$TRAVIS_OS_NAME" == "osx" && "${PYTHON:0:1}" == "3" ]]; then
-        brew update; brew install python3;
-      fi
-      pip install --upgrade pip virtualenv
-      virtualenv -p python$PYTHON venv
-      source venv/bin/activate
-    fi
+    # if [[ -n "$PYTHON" ]]; then
+    #   echo Installing Python using virtualenv...;
+    #   if [[ "$TRAVIS_OS_NAME" == "osx" && "${PYTHON:0:1}" == "3" ]]; then
+    #     brew update; brew install python3;
+    #   fi
+    #   pip install --upgrade pip virtualenv
+    #   virtualenv -p python$PYTHON venv
+    #   source venv/bin/activate
+    # fi
 
     # Install from conda in conda env
     if [[ -n "$CONDA" || $INSTALLLPY == '1' ]]; then
@@ -164,21 +172,25 @@ jobs:
     # Tests
     - stage: test
       os: linux
-      env: PYTHON=2.7 NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 INSTALLLPY=1
+      python: 2.7
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 INSTALLLPY=1
     - os: linux
-      env: PYTHON=3.4
+      python: 3.4
       script: |
               yggtest tests/test_backwards.py
     - os: linux
-      env: PYTHON=3.6 INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0
+      python: 3.6
+      env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0
     # Python 3.7 requires special dist
     - os: linux
-      env: PYTHON=3.7 YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
+      python: 3.7
+      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
-      env: PYTHON=2.7 INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
+      python: 2.7
+      env: INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
       # osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
@@ -186,7 +198,8 @@ jobs:
          directories:
           - $HOME/Library/Caches/pip
     - os: osx
-      env: CONDA=3.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
+      python: 3.7
+      env: CONDA=1 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
       dist: xenial
       sudo: true
       # osx_image: xcode7.3
