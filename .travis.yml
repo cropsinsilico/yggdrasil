@@ -168,7 +168,7 @@ jobs:
     - os: linux
       env: PYTHON=3.4
       script: |
-              yggtest -svx --nologcapture --with-coverage --cover-package=yggdrasil tests/test_backwards.py
+              yggtest tests/test_backwards.py
     - os: linux
       env: PYTHON=3.6 INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0
     # Python 3.7 requires special dist
