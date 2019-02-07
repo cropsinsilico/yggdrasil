@@ -160,7 +160,7 @@ script:
     flake8 cis_interface
   - |
     if [[ -n "$PYTHON" ]]; then
-      cistest
+      cistest --ignore=cis_interface/rapidjson/
     elif [[ -n "$CONDA" ]]; then
       cistest --nocover
     fi
