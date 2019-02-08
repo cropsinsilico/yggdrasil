@@ -8,7 +8,7 @@ from cis_interface.metaschema.encoder import encode_json, decode_json
 from cis_interface.metaschema.properties import (
     get_registered_properties, import_all_properties)
 from cis_interface.metaschema.datatypes import (
-    get_registered_types, import_all_types)
+    get_registered_types, import_all_types, _jsonschema_ver_maj)
 
 
 # TODO: this should be included in release as YAML/JSON and then loaded
@@ -122,21 +122,32 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
                 assert(k not in all_validators)
             all_validators[k] = v.wrapped_validate
         # Get set of datatypes
-        # TODO: This will need to be changed with deprecation in jsonschema
-        all_datatypes = copy.deepcopy(_base_validator.DEFAULT_TYPES)
-        for k, v in get_registered_types().items():
-            if (not v._replaces_existing):
-                # Error raised on registration
-                assert(k not in all_datatypes)
-            all_datatypes[k] = v.python_types
+        # TODO: This will need to be changed if back-ported in jsonschema
+        if _jsonschema_ver_maj < 3:
+            all_datatypes = copy.deepcopy(_base_validator.DEFAULT_TYPES)
+            for k, v in get_registered_types().items():
+                if (not v._replaces_existing):
+                    # Error raised on registration
+                    assert(k not in all_datatypes)
+                all_datatypes[k] = v.python_types
+            kwargs['default_types'] = all_datatypes
+        else:
+            type_checker = copy.deepcopy(_base_validator.TYPE_CHECKER)
+            new_type_checkers = {}
+            for k, v in get_registered_types().items():
+                if (not v._replaces_existing):
+                    # Error raised on registration
+                    assert(k not in type_checker._type_checkers)
+                new_type_checkers[k] = v.jsonschema_type_checker
+            kwargs['type_checker'] = type_checker.redefine_many(
+                new_type_checkers)
         # Get set of normalizers
         if normalizers is None:
             normalizers = {}
         # Use default base and update validators
         _validator = normalizer.create(meta_schema=metaschema,
                                        validators=all_validators,
-                                       normalizers=normalizers,
-                                       default_types=all_datatypes, **kwargs)
+                                       normalizers=normalizers, **kwargs)
         _validator._base_validator = _base_validator
     return _validator
 

@@ -152,6 +152,20 @@ class MetaschemaType(object):
         return (cls.name == t)
 
     @classmethod
+    def jsonschema_type_checker(cls, checker, instance):
+        r"""Type checker for use with jsonschema >= 3.0.0.
+
+        Args:
+            checker (jsonschema.TypeChecker): Type checker class.
+            instance (object): Object being checked.
+
+        Returns:
+            bool: True if instance could be of this type, False otherwise.
+
+        """
+        return cls.validate(instance)
+
+    @classmethod
     def validate(cls, obj, raise_errors=False):
         r"""Validate an object to check if it could be of this type.
 

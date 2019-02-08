@@ -2,7 +2,7 @@
 import copy
 import contextlib
 import jsonschema
-from cis_interface.metaschema.datatypes import get_type_class
+from cis_interface.metaschema.datatypes import get_type_class, _jsonschema_ver_maj
 
 
 class UndefinedProperty(object):
@@ -333,7 +333,7 @@ def create(*args, **kwargs):
 
             """
             out = super(Normalizer, self).is_type(instance, type)
-            if out:
+            if (_jsonschema_ver_maj < 3) and out:
                 out = get_type_class(type).validate(instance)
             return out
 
