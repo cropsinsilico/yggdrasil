@@ -240,8 +240,8 @@ class FileComm(CommBase.CommBase):
         if self.is_open:
             try:
                 self.fd.seek(file_pos)
-            except AttributeError:  # pragma: debug
-                if self.fd is not None:
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
                     raise
 
     def advance_in_series(self, series_index=None):
@@ -310,8 +310,8 @@ class FileComm(CommBase.CommBase):
         if self.append == 'ow':
             try:
                 self.fd.seek(0, os.SEEK_END)
-            except AttributeError:  # pragma: debug
-                if self.fd is not None:
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
                     raise
 
     def _file_close(self):
@@ -323,8 +323,8 @@ class FileComm(CommBase.CommBase):
                 pass
             try:
                 self.fd.close()
-            except AttributeError:  # pragma: debug
-                if self.fd is not None:
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
                     raise
         self._fd = None
 
@@ -382,6 +382,8 @@ class FileComm(CommBase.CommBase):
             endpos = self.fd.tell()
             out = endpos - curpos
         except (ValueError, AttributeError):  # pragma: debug
+            if self.is_open:
+                raise
             out = 0
         if self.is_series:
             i = self._series_index + 1
@@ -427,8 +429,8 @@ class FileComm(CommBase.CommBase):
         flag, msg_s = super(FileComm, self).on_send_eof()
         try:
             self.fd.flush()
-        except AttributeError:  # pragma: debug
-            if self.fd is not None:
+        except (AttributeError, ValueError):  # pragma: debug
+            if self.is_open:
                 raise
         # self.close()
         return flag, msg_s
@@ -451,8 +453,8 @@ class FileComm(CommBase.CommBase):
                 if self.append == 'ow':
                     self.fd.truncate()
             self.fd.flush()
-        except AttributeError:  # pragma: debug
-            if self.fd is not None:
+        except (AttributeError, ValueError):  # pragma: debug
+            if self.is_open:
                 raise
             return False
         if msg != self.eof_msg and self.is_series:
@@ -499,6 +501,6 @@ class FileComm(CommBase.CommBase):
         if self.is_open and self.direction == 'recv':
             try:
                 self.fd.seek(0, os.SEEK_END)
-            except AttributeError:  # pragma: debug
-                if self.fd is not None:
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
                     raise
