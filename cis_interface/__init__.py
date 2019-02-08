@@ -80,7 +80,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             argv.append('--with-coverage')
             argv.append('--cover-package=cis_interface')
         elif _test_package_name == 'pytest':
-            argv.append('--cov=cis_interface')
+            argv.append('--cov=./')
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     if not test_paths:
