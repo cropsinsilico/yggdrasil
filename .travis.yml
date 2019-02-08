@@ -196,7 +196,7 @@ jobs:
          directories:
           - $HOME/Library/Caches/pip
     - os: osx
-      env: PYTHON=3.7 CONDA=1 INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
+      env: CONDA=3.7 INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
       dist: xenial
       sudo: true
       # osx_image: xcode7.3
