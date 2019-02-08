@@ -4,8 +4,10 @@ from yggdrasil.communication import RMQComm
 from yggdrasil.schema import register_component
 if RMQComm._rmq_installed:
     import pika
+    _pika_version_maj = int(float(pika.__version__.split('.')[0]))
 else:
     pika = False
+    _pika_version_maj = 0
 
 
 @register_component
@@ -284,7 +286,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         parameters = pika.URLParameters(self.url)
         kwargs = dict(on_open_callback=self.on_connection_open,
                       on_open_error_callback=self.on_connection_open_error)
-        if float(pika.__version__.split('.')[0]) < 1:
+        if _pika_version_maj < 1:
             kwargs['stop_ioloop_on_close'] = False
         self.connection = pika.SelectConnection(parameters, **kwargs)
 
@@ -301,13 +303,19 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.close()
         raise Exception('Could not connect.')
 
-    def on_connection_closed(self, connection, reply_code, reply_text):
+    def on_connection_closed(self, connection, *args):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
+        if _pika_version_maj < 1:
+            reply_code = args[0]
+            reply_text = args[1]
+        else:
+            reply_code = 0
+            reply_text = args[0]
         with self.rmq_lock:
-            self.debug('::on_connection_closed code %d %s', reply_code,
-                       reply_text)
+            self.debug('::on_connection_closed code %s (code = %d)', reply_text,
+                       reply_code)
             if self._closing or reply_code == 200:
                 connection.ioloop.stop()
                 self.connection = None
@@ -366,12 +374,19 @@ class RMQAsyncComm(RMQComm.RMQComm):
         channel.add_on_close_callback(self.on_channel_closed)
         self.setup_exchange(self.exchange)
 
-    def on_channel_closed(self, channel, reply_code, reply_text):
+    def on_channel_closed(self, channel, *args):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
         with self.rmq_lock:
-            self.debug('::channel %i was closed: (%s) %s',
-                       channel, reply_code, reply_text)
+            if _pika_version_maj < 1:
+                reply_code = args[0]
+                reply_text = args[1]
+                self.debug('::channel %i was closed: (%s) %s',
+                           channel, reply_code, reply_text)
+            else:
+                reason = args[0]
+                self.debug('::channel %i was closed: %s',
+                           channel, reason)
             channel.connection.close()
             self.channel = None
             # if self.connection is not None:
