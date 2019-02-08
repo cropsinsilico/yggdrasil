@@ -42,13 +42,15 @@ before_install:
        sudo apt-get install strace valgrind
     fi
 
-    if [[ -n "$CONDA" ]]; then
-      export CONDA=$TRAVIS_PYTHON_VERSION
-      echo "CONDA = $CONDA"
-    else
-      export PYTHON=$TRAVIS_PYTHON_VERSION
-      echo "PYTHON = $PYTHON"
+    if [[ -n "$TRAVIS_PYTHON_VERSION" ]]; then
+      if [[ -n "$CONDA" ]]; then
+        export CONDA=$TRAVIS_PYTHON_VERSION
+      else
+        export PYTHON=$TRAVIS_PYTHON_VERSION
+      fi
     fi
+    echo "CONDA = $CONDA"
+    echo "PYTHON = $PYTHON"
 
     # Install from source in virtual env
     if [[ -n "$PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
