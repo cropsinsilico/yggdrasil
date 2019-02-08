@@ -8,9 +8,8 @@ This module imports the configuration for yggdrasil.
 import os
 import sys
 import shutil
-import warnings
 import logging
-# import pprint
+import warnings
 import subprocess
 from yggdrasil.backwards import configparser
 from yggdrasil import platform, backwards
@@ -120,9 +119,9 @@ def locate_file(fname):
         return False
     first = out[0]
     if len(out) > 1:
-        # pprint.pprint(out)
-        warnings.warn("More than one (%d) match to %s. Using first match (%s)" % (
-            len(out), fname, first))
+        warnings.warn(("More than one (%d) match to %s. "
+                       + "Using first match (%s)") %
+                      (len(out), fname, first), RuntimeWarning)
     return first
 
 
@@ -140,8 +139,8 @@ def update_config_matlab(config):
     out = []
     # This should be uncommented if the matlab section is removed from the
     # default config file
-    # if not config.has_section('matlab'):
-    #     config.add_section('matlab')
+    if not config.has_section('matlab'):  # pragma: debug
+        config.add_section('matlab')
     opts = {
         'startup_waittime_s': [('The time allowed for a Matlab engine to start'
                                + 'before timing out and reporting an error.'),
@@ -149,22 +148,22 @@ def update_config_matlab(config):
         'release': ['The version (release number) of matlab that is installed.',
                     ''],
         'matlabroot': ['The path to the default installation of matlab.', '']}
-    mtl_id = '=MATLABROOT='
-    cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
-           + ",matlabroot,version('-release')); exit();")
-    mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
-               '-r', '%s' % cmd]
-    try:  # pragma: matlab
-        mtl_proc = subprocess.check_output(mtl_cmd)
-        mtl_id = backwards.match_stype(mtl_proc, mtl_id)
-        if mtl_id not in mtl_proc:  # pragma: debug
-            print(mtl_proc)
-            raise RuntimeError("Could not locate matlab root id (%s) in output."
-                               % mtl_id)
-        opts['matlabroot'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-3])
-        opts['release'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-2])
-    except (subprocess.CalledProcessError, OSError):  # pragma: no matlab
-        pass
+    if config.get('matlab', 'disable', 'False').lower() != 'true':
+        mtl_id = '=MATLABROOT='
+        cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
+               + ",matlabroot,version('-release')); exit();")
+        mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
+                   '-r', '%s' % cmd]
+        try:  # pragma: matlab
+            mtl_proc = subprocess.check_output(mtl_cmd)
+            mtl_id = backwards.match_stype(mtl_proc, mtl_id)
+            if mtl_id not in mtl_proc:  # pragma: debug
+                raise RuntimeError(("Could not locate matlab root id (%s) in "
+                                    "output (%s).") % (mtl_id, mtl_proc))
+            opts['matlabroot'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-3])
+            opts['release'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-2])
+        except (subprocess.CalledProcessError, OSError):  # pragma: no matlab
+            pass
     for k in opts.keys():
         if not config.has_option('matlab', k):
             if opts[k][1]:  # pragma: matlab
@@ -201,7 +200,7 @@ def update_config_windows(config):  # pragma: windows
         if not config.has_option('windows', opt):
             fpath = locate_file(fname)
             if fpath:
-                print('located %s: %s' % (fname, fpath))
+                logging.info('Located %s: %s' % (fname, fpath))
                 config.set('windows', opt, fpath)
             else:
                 out.append(('windows', opt, desc))
@@ -234,7 +233,7 @@ def update_config_c(config):
             if fpath:
                 if opt == 'rapidjson_include':
                     fpath = os.path.dirname(os.path.dirname(fpath))
-                print('located %s: %s' % (fname, fpath))
+                logging.info('Located %s: %s' % (fname, fpath))
                 config.set('c', opt, fpath)
             else:  # pragma: debug
                 out.append(('c', opt, desc))
@@ -269,9 +268,9 @@ def update_config(config_file, config_base=None):
     for sect, opt, desc in miss:  # pragma: windows
         warnings.warn(("Could not set option %s in section %s. "
                        + "Please set this in %s to: %s")
-                      % (opt, sect, config_file, desc))
-
+                      % (opt, sect, config_file, desc), RuntimeWarning)
         
+
 # In order read: defaults, user, local files
 if not os.path.isfile(usr_config_file):
     logging.info('Creating user config file: "%s".' % usr_config_file)

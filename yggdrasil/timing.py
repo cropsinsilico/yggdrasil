@@ -143,8 +143,8 @@ def perf_func(loops, timer, nmsg, msg_size, max_errors):
                 if nerrors >= max_errors:
                     raise
                 else:
-                    warnings.warn("Error %d/%d. Trying again. (error = '%s')" % (
-                        nerrors, max_errors, e))
+                    warnings.warn("Error %d/%d. Trying again. (error = '%s')"
+                                  % (nerrors, max_errors, e), RuntimeWarning)
     return ttot
 
 
