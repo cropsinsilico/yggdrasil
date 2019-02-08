@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 from cis_interface.tests import assert_raises
 from cis_interface import backwards
@@ -24,10 +25,9 @@ def test_deserialize_nofmt():
 class TestAsciiTableSerialize(parent.TestDefaultSerialize):
     r"""Test class for AsciiTableSerialize class."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestAsciiTableSerialize, self).__init__(*args, **kwargs)
-        self._cls = 'AsciiTableSerialize'
-        self.attr_list += ['format_str', 'field_names', 'field_units', 'as_array']
+    _cls = 'AsciiTableSerialize'
+    attr_list = (copy.deepcopy(parent.TestDefaultSerialize.attr_list),
+                 ['format_str', 'field_names', 'field_units', 'as_array'])
 
     def test_field_specs(self):
         r"""Test field specifiers."""
@@ -48,12 +48,13 @@ class TestAsciiTableSerialize(parent.TestDefaultSerialize):
 class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
     r"""Test class for AsciiTableSerialize class."""
 
+    _cls = 'AsciiTableSerialize'
+    _empty_obj = []
+    _objects = [(1, )]
+
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableSerializeSingle, self).__init__(*args, **kwargs)
         self._inst_kwargs['format_str'] = b'%d\n'
-        self._cls = 'AsciiTableSerialize'
-        self._empty_obj = []
-        self._objects = [(1, )]
 
     def get_options(self):
         r"""Get testing options."""

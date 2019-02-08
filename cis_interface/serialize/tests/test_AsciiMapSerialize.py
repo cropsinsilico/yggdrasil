@@ -5,9 +5,7 @@ from cis_interface.serialize.tests import test_DefaultSerialize as parent
 class TestAsciiMapSerialize(parent.TestDefaultSerialize):
     r"""Test class for TestAsciiMapSerialize class."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestAsciiMapSerialize, self).__init__(*args, **kwargs)
-        self._cls = 'AsciiMapSerialize'
+    _cls = 'AsciiMapSerialize'
 
     def test_error_delim(self):
         r"""Test error for message with too many delimiters on a line."""
