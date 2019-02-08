@@ -588,7 +588,10 @@ class PlyDict(dict):
                 for v in self['faces'][i]['vertex_index']:
                     vertex_scalar[v].append(scalar_arr[i])
         for i in range(len(vertex_scalar)):
-            vertex_scalar[i] = np.mean(vertex_scalar[i])
+            if len(vertex_scalar[i]) == 0:
+                vertex_scalar[i] = 0
+            else:
+                vertex_scalar[i] = np.mean(vertex_scalar[i])
         vertex_scalar = np.array(vertex_scalar)
         if scaling == 'log':
             vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)
