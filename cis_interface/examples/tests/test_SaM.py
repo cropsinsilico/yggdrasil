@@ -8,9 +8,7 @@ from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 class TestExampleSaM(TestExample):
     r"""Test the SaM example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleSaM, self).__init__(*args, **kwargs)
-        self._name = 'SaM'
+    example_name = 'SaM'
 
     @property
     def results(self):

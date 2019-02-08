@@ -7,9 +7,7 @@ from cis_interface.examples.tests import TestExample
 class TestExampleHello(TestExample):
     r"""Test the Hello example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleHello, self).__init__(*args, **kwargs)
-        self._name = 'hello'
+    example_name = 'hello'
 
     @property
     def input_files(self):

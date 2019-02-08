@@ -5,9 +5,7 @@ from cis_interface.examples.tests import TestExample
 class TestExampleGS4b(TestExample):
     r"""Test the Getting Started Lesson 4b example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleGS4b, self).__init__(*args, **kwargs)
-        self._name = 'gs_lesson4b'
+    example_name = 'gs_lesson4b'
 
     @property
     def input_files(self):

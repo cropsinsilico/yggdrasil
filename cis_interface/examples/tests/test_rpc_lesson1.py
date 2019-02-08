@@ -5,10 +5,8 @@ from cis_interface.examples.tests import TestExample
 class TestExampleRPC1(TestExample):
     r"""Test the rpc_lesson1 example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleRPC1, self).__init__(*args, **kwargs)
-        self._name = 'rpc_lesson1'
-        self.niter = 3
+    example_name = 'rpc_lesson1'
+    niter = 3
 
     @property
     def results(self):

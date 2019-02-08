@@ -7,9 +7,7 @@ from cis_interface.examples.tests import TestExample
 class TestExampleAsciiIO(TestExample):
     r"""Test the AsciiIO example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleAsciiIO, self).__init__(*args, **kwargs)
-        self._name = 'ascii_io'
+    example_name = 'ascii_io'
 
     @property
     def input_file(self):

@@ -5,9 +5,7 @@ from cis_interface.examples.tests import TestExample
 class TestExampleFakeplant(TestExample):
     r"""Test the Fakeplant example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleFakeplant, self).__init__(*args, **kwargs)
-        self._name = 'fakeplant'
+    example_name = 'fakeplant'
 
     @property
     def output_dir(self):
