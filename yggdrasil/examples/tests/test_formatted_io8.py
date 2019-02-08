@@ -7,9 +7,7 @@ from yggdrasil.examples.tests import TestExample
 class TestExampleFIO8(TestExample):
     r"""Test the Formatted I/O lesson 8 example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleFIO8, self).__init__(*args, **kwargs)
-        self._name = 'formatted_io8'
+    example_name = 'formatted_io8'
 
     @property
     def input_files(self):

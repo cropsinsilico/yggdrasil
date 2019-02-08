@@ -10,13 +10,14 @@ _default_comm = tools.get_default_comm()
 class ExampleTimedPipeTestBase(TestExample):
     r"""Base class for testing TimedPipe example with various comm types."""
 
+    example_name = 'timed_pipe'
+    env = {'PIPE_MSG_COUNT': '10',
+           'PIPE_MSG_SIZE': '1024'}
+
     def __init__(self, *args, **kwargs):
         super(ExampleTimedPipeTestBase, self).__init__(*args, **kwargs)
-        self._name = 'timed_pipe'
         self._new_default_comm = getattr(self.__class__, '__new_default_comm',
                                          _default_comm)
-        self.env = {'PIPE_MSG_COUNT': '10',
-                    'PIPE_MSG_SIZE': '1024'}
         # if self._new_default_comm == 'IPCComm':
         #     self.debug_flag = True
         

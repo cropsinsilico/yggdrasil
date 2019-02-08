@@ -5,13 +5,10 @@ from yggdrasil.examples.tests import TestExample
 class TestExampleRpcFib(TestExample):
     r"""Test the rpcFib example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleRpcFib, self).__init__(*args, **kwargs)
-        self._name = 'rpcFib'
-        self.env = {'FIB_ITERATIONS': '3',
-                    'FIB_SERVER_SLEEP_SECONDS': '0.01'}
-        # self.debug_flag = True
-
+    example_name = 'rpcFib'
+    env = {'FIB_ITERATIONS': '3',
+           'FIB_SERVER_SLEEP_SECONDS': '0.01'}
+    
     @property
     def results(self):
         r"""Result that should be found in output files."""

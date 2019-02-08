@@ -6,10 +6,8 @@ from yggdrasil.examples.tests import TestExample
 class TestExampleModelError(TestExample):
     r"""Test the model_error example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleModelError, self).__init__(*args, **kwargs)
-        self._name = 'model_error'
-        self.expects_error = True
+    example_name = 'model_error'
+    expects_error = True
 
     @property
     def core_dump(self):

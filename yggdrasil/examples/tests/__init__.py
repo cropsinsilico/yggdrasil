@@ -14,13 +14,15 @@ _c_comm_installed = tools.get_installed_comm(language='c')
 class TestExample(YggTestBase, tools.YggClass):
     r"""Base class for running examples."""
 
+    example_name = None
+    expects_error = False
+    env = {}
+
     def __init__(self, *args, **kwargs):
-        tools.YggClass.__init__(self, None)
+        tools.YggClass.__init__(self, self.example_name)
         self.language = None
         self.uuid = str(uuid.uuid4())
-        self.env = {}
         self.runner = None
-        self.expects_error = False
         # self.debug_flag = True
         super(TestExample, self).__init__(*args, **kwargs)
 
