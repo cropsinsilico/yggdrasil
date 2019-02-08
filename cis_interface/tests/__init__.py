@@ -4,6 +4,8 @@ import shutil
 import uuid
 import difflib
 import importlib
+import contextlib
+import warnings
 import unittest
 import numpy as np
 import pandas as pd
@@ -107,12 +109,13 @@ def long_running(func):
     return unittest.skipIf(not enable_long_tests, "Long tests not enabled.")(func)
 
 
-def assert_raises(exception, callable, *args, **kwargs):
+def assert_raises(exception, *args, **kwargs):
     r"""Assert that a call raises an exception.
 
     Args:
         exception (Exception): Exception class that should be raised.
-        callable (function, class): Callable that should raise the exception.
+        callable (function, class, optional): Callable that should raise the
+            exception. If not provided, a context manager is returned.
         *args: Additional arguments are passed to the callable.
         **kwargs: Additional keyword arguments are passed to the callable.
 
@@ -120,7 +123,44 @@ def assert_raises(exception, callable, *args, **kwargs):
         AssertionError: If the correct exception is not raised.
 
     """
-    return ut.assertRaises(exception, callable, *args, **kwargs)
+    return ut.assertRaises(exception, *args, **kwargs)
+
+
+@contextlib.contextmanager
+def assert_warns(warning, *args, **kwargs):
+    r"""Assert that a call (or context) raises an exception.
+
+    Args:
+        warning (Warning): Warning class that should be raised.
+        callable (function, class, optional): Function that should raise
+            the warning. If not provided, a context manager is returned.
+        *args: Additional arguments are passed to the callable.
+        **kwargs: Additional keyword arguments are passed to the callable.
+
+    Raises:
+        AssertionError: If the correct warning is not caught.
+
+    """
+    if backwards.PY2:  # pragma: Python 2
+        if args and args[0] is None:  # pragma: debug
+            warnings.warn("callable is None",
+                          DeprecationWarning, 3)
+            args = ()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            try:
+                if not args:
+                    yield w
+                else:
+                    callable_obj = args[0]
+                    args = args[1:]
+                    callable_obj(*args, **kwargs)
+            finally:
+                assert(len(w) >= 1)
+                for iw in w:
+                    assert(issubclass(iw.category, warning))
+    else:  # pragma: Python 3
+        yield ut.assertWarns(warning, *args, **kwargs)
 
 
 def assert_equal(x, y):
