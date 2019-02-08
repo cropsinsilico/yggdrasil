@@ -49,7 +49,7 @@ before_install:
     fi
 
     # Install from source in virtual env
-    if [[ -n "$PYTHON" && $TRAVIS_OS_NAME == 'osx']]; then
+    if [[ -n "$PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
       echo Installing Python using virtualenv...;
       if [[ "$TRAVIS_OS_NAME" == "osx" && "${PYTHON:0:1}" == "3" ]]; then
          brew update; brew install python3;
