@@ -4,6 +4,7 @@ from yggdrasil import platform
 import os
 import sys
 import logging
+import subprocess
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
@@ -12,12 +13,14 @@ try:
     import pytest
     _test_package_name = 'pytest'
     _test_package = pytest
+    _test_cmd = 'pytest'
     _func_sep = '::'
 except ImportError:  # pragma: debug
     try:
         import nose
         _test_package_name = 'nose'
         _test_package = nose
+        _test_cmd = 'nosetests'
         _func_sep = ':'
     except ImportError:
         pass
@@ -51,12 +54,13 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
     if _test_package is None:
         raise RuntimeError("Could not locate test runner pytest or nose.")
     error_code = 0
-    argv = []
+    argv = [_test_cmd]
     test_paths = []
     for x in sys.argv:
         if x.endswith('yggtest'):
-            if _test_package_name == 'nose':
-                argv.append(x)
+            # if _test_package_name == 'nose':
+            #     argv.append(x)
+            print(x)  # pass
         elif x == '--nocover':
             withcoverage = False
         elif x.startswith('-'):
@@ -80,7 +84,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             argv.append('--with-coverage')
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
-            argv.append('--cov=./')
+            argv.append('--cov=yggdrasil')
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     if not test_paths:
@@ -99,17 +103,20 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
                 else:
                     if os.path.isfile(os.path.join(package_dir, test_paths[i])):
                         test_paths[i] = os.path.join(package_dir, test_paths[i])
-    os.chdir(package_dir)
+    # os.chdir(package_dir)
+    argv += test_paths
+    print("running", argv)
+    print(os.getcwd())
     try:
-        if _test_package_name == 'nose':
-            result = _test_package.run(argv=argv + test_paths)
-            if not result:
-                error_code = -1
-        elif _test_package_name == 'pytest':
-            print("running", argv + test_paths)
-            error_code = _test_package.main(argv + test_paths)
-        else:
-            raise RuntimeError("No test runner.")
+        error_code = subprocess.call(argv)
+        # if _test_package_name == 'nose':
+        #     result = _test_package.run(argv=argv)
+        #     if not result:
+        #         error_code = -1
+        # elif _test_package_name == 'pytest':
+        #     error_code = _test_package.main(argv)
+        # else:
+        #     raise RuntimeError("No test runner.")
     except BaseException:
         logging.exception('Error in running test.')
         error_code = -1

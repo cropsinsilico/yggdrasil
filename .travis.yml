@@ -143,7 +143,9 @@ install:
       # May need to uninstall conda version of numpy and matplotlib on LPy test
       pip install $NUMPY
       pip install $MATPLOTLIB
-      pip install pytest "pytest-cov<2.6" coverage coveralls codecov flake8
+      pip install nose
+      pip install pytest "pytest-cov<2.6"
+      pip install coverage coveralls codecov flake8
       python setup.py sdist
       pip install --verbose dist/*.tar.gz
       # pip install --verbose -e .
@@ -152,7 +154,9 @@ install:
       pip uninstall -y matplotlib
       conda install $NUMPY
       conda install $MATPLOTLIB
-      conda install pytest "pytest-cov<2.6" coverage coveralls codecov flake8
+      conda install nose
+      conda install pytest "pytest-cov<2.6"
+      conda install coverage coveralls codecov flake8
       conda build recipe/meta.yaml --python $CONDA
       conda install --use-local yggdrasil
     fi
@@ -162,7 +166,7 @@ script:
     flake8 yggdrasil
   - |
     if [[ -n "$PYTHON" ]]; then
-      yggtest --ignore=yggdrasil/rapidjson/
+      yggtest
     elif [[ -n "$CONDA" ]]; then
       yggtest --nocover
     fi
