@@ -396,8 +396,12 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def setup_exchange(self, exchange_name):
         r"""Setup the exchange."""
         self.debug('::Declaring exchange %s', exchange_name)
-        self.channel.exchange_declare(self.on_exchange_declareok,
-                                      exchange=exchange_name, auto_delete=True)
+        if _pika_version_maj < 1:
+            self.channel.exchange_declare(self.on_exchange_declareok,
+                                          exchange=exchange_name, auto_delete=True)
+        else:
+            self.channel.exchange_declare(exchange_name, auto_delete=True,
+                                          callback=self.on_exchange_declareok)
 
     def on_exchange_declareok(self, unused_frame):
         r"""Actions to perform once an exchange is succesfully declared.
