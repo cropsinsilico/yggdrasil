@@ -19,7 +19,7 @@ class TestDefaultSerialize(CisTestClassInfo):
 
     _cls = 'DefaultSerialize'
     _empty_msg = b''
-    attr_list = (copy.deepcopy(YggTestClassInfo.attr_list)
+    attr_list = (copy.deepcopy(CisTestClassInfo.attr_list)
                  + ['datatype', 'typedef', 'numpy_dtype'])
 
     def __init__(self, *args, **kwargs):
