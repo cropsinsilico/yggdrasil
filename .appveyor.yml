@@ -95,12 +95,12 @@ install:
 
   # Install testing dependencies
   - "pip install nose"
-  - "pip install pytest 'pytest-cov<2.6'"
+  - "pip install pytest pytest-cov"
   - "pip install coverage coveralls codecov flake8
 
   # Install dependencies using conda/pip
   # - "conda install --yes -c conda-forge nose"
-  # - "conda install --yes -c conda-forge pytest 'pytest-cov<2.6'"
+  # - "conda install --yes -c conda-forge pytest pytest-cov"
   # - "conda install --yes -c conda-forge numpy coverage coveralls codecov flake8"
   # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy pika"
   # - "pip install zmq"
