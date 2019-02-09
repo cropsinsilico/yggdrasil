@@ -187,7 +187,7 @@ jobs:
     # Python 3.7 requires special dist
     - os: linux
       python: 3.7
-      env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1
+      env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
@@ -200,7 +200,7 @@ jobs:
          directories:
           - $HOME/Library/Caches/pip
     - os: osx
-      env: CONDA=3.7 INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
+      env: CONDA=3.7 INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
       dist: xenial
       sudo: true
       # osx_image: xcode7.3
