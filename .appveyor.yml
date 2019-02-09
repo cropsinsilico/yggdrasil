@@ -96,7 +96,7 @@ install:
   # Install testing dependencies
   - "pip install nose"
   - "pip install pytest pytest-cov"
-  - "pip install coverage coveralls codecov flake8
+  - "pip install coverage coveralls codecov flake8"
 
   # Install dependencies using conda/pip
   # - "conda install --yes -c conda-forge nose"
