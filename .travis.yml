@@ -8,13 +8,13 @@ cache:
 addons:
   apt:
     packages: &native_deps_apt
-    - strace
-    - valgrind
-    # - ccache
+      - strace
+      - valgrind
+      # - ccache
     update: true
   homebrew: &native_deps_brew
     packages:
-    - valgrind
+      - valgrind
     update: true
 
 os:
@@ -201,8 +201,8 @@ jobs:
       addons:
         apt:
           packages:
-          - *native_deps_apt
-	  - rabbitmq-server
+            - *native_deps_apt
+            - rabbitmq-server
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       env: PYTHON=2.7 INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1
