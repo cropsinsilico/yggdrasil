@@ -1,4 +1,4 @@
-from cis_interface import scanf
+from cis_interface import scanf, backwards
 from cis_interface.tests import assert_equal
 
 
@@ -29,3 +29,11 @@ def test_scanf():
         val_str = fmt % tuple(new_tup)
         res = scanf.scanf(fmt, val_str)
         assert_equal(res, val_tup)
+        # Test bytes version
+        res = backwards.scanf_bytes(fmt, backwards.as_bytes(val_str))
+        assert_equal(res, backwards.as_bytes(val_tup, recurse=True,
+                                             allow_pass=True))
+        # Test unicode version
+        res = backwards.scanf_bytes(fmt, backwards.as_unicode(val_str))
+        assert_equal(res, backwards.as_unicode(val_tup, recurse=True,
+                                               allow_pass=True))

@@ -766,7 +766,7 @@ class CisClass(logging.LoggerAdapter):
         sleep(t)
 
     @property
-    def timeout_key(self):
+    def timeout_key(self):  # pragma: no cover
         r"""str: Key identifying calling object and method."""
         return self.get_timeout_key()
 
