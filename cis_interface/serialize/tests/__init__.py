@@ -588,3 +588,6 @@ def test_pandas2dict():
         d = serialize.pandas2dict(frame)
         res = serialize.dict2pandas(d, order=ans.dtype.names)
         np.testing.assert_array_equal(res, frame)
+
+
+__all__ = []
