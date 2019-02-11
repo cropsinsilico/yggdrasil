@@ -5,6 +5,18 @@ cache:
   directories:
     - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
 
+addons:
+  apt:
+    packages: &native_deps_apt
+    - strace
+    - valgrind
+    # - ccache
+    update: true
+  homebrew: &native_deps_brew
+    packages:
+    - valgrind
+    update: true
+
 os:
   - linux
 
@@ -30,14 +42,9 @@ before_install:
   - |
     echo Installing os level packages...;
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-       brew update
-       # brew install ccache
        # export PATH=/usr/local/opt/ccache/libexec:$PATH
-       brew install valgrind
     else
        export PATH=/usr/lib/ccache:$PATH
-       sudo apt-get update
-       sudo apt-get install strace valgrind
     fi
 
     if [[ -n "$TRAVIS_PYTHON_VERSION" ]]; then
@@ -54,7 +61,7 @@ before_install:
     if [[ -n "$PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then
       echo Installing Python using virtualenv...;
       if [[ "$TRAVIS_OS_NAME" == "osx" && "${PYTHON:0:1}" == "3" ]]; then
-         brew update; brew install python3;
+         brew install python3;
       fi
       pip install --upgrade pip virtualenv
       virtualenv -p python$PYTHON venv
@@ -112,19 +119,20 @@ before_install:
        elif [[ -n "$CONDA" ]]; then
          conda install pika
        fi
-       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-          sh ci/install-rmqserver-osx.sh
-       else
-          sh ci/install-rmqserver-linux.sh
-       fi
+       # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+       #    sh ci/install-rmqserver-osx.sh
+       # else
+       #    sh ci/install-rmqserver-linux.sh
+       # fi
 
        echo Starting RabbitMQ...;
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           export PATH="${PATH}:/usr/local/sbin";
-          sh ci/start-rmqserver-osx.sh
-       else
-          sh ci/start-rmqserver-linux.sh
+          # sh ci/start-rmqserver-osx.sh
+          # else
+          # sh ci/start-rmqserver-linux.sh
        fi
+       sudo rabbitmq-server -detached
 
     fi
 
@@ -166,7 +174,7 @@ script:
     if [[ -n "$PYTHON" ]]; then
       cistest -c setup.cfg --cov-config=.coveragerc
     elif [[ -n "$CONDA" ]]; then
-      cistest --nocover
+      cistest -c setup.cfg --cov-config=.coveragerc
     fi
 
 jobs:
@@ -190,6 +198,11 @@ jobs:
       env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=1 CIS_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
+      addons:
+        apt:
+          packages:
+          - *native_deps_apt
+	  - rabbitmq-server
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       env: PYTHON=2.7 INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1
@@ -201,8 +214,6 @@ jobs:
           - $HOME/Library/Caches/pip
     - os: osx
       env: CONDA=3.7 INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
-      dist: xenial
-      sudo: true
       # osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
