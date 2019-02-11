@@ -49,20 +49,9 @@ def scanf_bytes(fmt, bytes_line):
     if PY2:  # pragma: Python 2
         out_byt = scanf(fmt, bytes_line)
     else:  # pragma: Python 3
-        out_uni = scanf(as_str(fmt), as_str(bytes_line))
-        if isinstance(bytes_line, unicode_type):
-            out_byt = out_uni
-        else:
-            if out_uni is None:
-                out_byt = None
-            else:
-                out_byt = []
-                for a in out_uni:
-                    if isinstance(a, unicode_type):
-                        out_byt.append(as_bytes(a))
-                    else:
-                        out_byt.append(a)
-                out_byt = tuple(out_byt)
+        out_str = scanf(as_str(fmt), as_str(bytes_line))
+        out_byt = match_stype(bytes_line, out_str, recurse=True,
+                              allow_pass=True)
     return out_byt
 
 
@@ -281,7 +270,7 @@ def as_str(s_in, recurse=False, convert_types=None, allow_pass=False):
     return s_out
     
 
-def match_stype(s1, s2):
+def match_stype(s1, s2, **kwargs):
     r"""Encodes one string to match the type of the second.
 
     Args:
@@ -289,6 +278,7 @@ def match_stype(s1, s2):
             from.
         s2 (str, bytes, bytearray, unicode): Object that should be returned
             in the type from s1.
+        **kwargs: Additional keyword arguments are passed to the conversion function.
 
     Returns:
         str, bytes, bytearray, unicode: Type matched version of s2.
@@ -298,13 +288,15 @@ def match_stype(s1, s2):
 
     """
     if isinstance(s1, string_type):
-        out = as_str(s2)
+        out = as_str(s2, **kwargs)
     elif isinstance(s1, bytes_type):
-        out = as_bytes(s2)
+        out = as_bytes(s2, **kwargs)
     elif isinstance(s1, unicode_type):
-        out = as_unicode(s2)
+        out = as_unicode(s2, **kwargs)
     elif isinstance(s1, bytearray):
         out = bytearray(as_unicode(s2), 'utf-8')
+        if kwargs:  # pragma: debug
+            raise RuntimeError("No conversion function for bytearray.")
     else:
         raise TypeError("Cannot match s1 type of '%s'" % type(s1))
     return out
