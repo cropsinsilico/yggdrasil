@@ -53,11 +53,17 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
     """
     if _test_package is None:
         raise RuntimeError("Could not locate test runner pytest or nose.")
+    initial_dir = os.getcwd()
+    package_dir = os.path.dirname(os.path.abspath(__file__))
     error_code = 0
     argv = [_test_cmd]
     test_paths = []
+    opt_val = 0
     for x in sys.argv:
-        if x.endswith('yggtest'):
+        if opt_val > 0:
+            argv.append(x)
+            opt_val -= 1
+        elif x.endswith('yggtest'):
             # if _test_package_name == 'nose':
             #     argv.append(x)
             print(x)  # pass
@@ -65,12 +71,14 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             withcoverage = False
         elif x.startswith('-'):
             argv.append(x)
+            if (_test_package_name == 'pytest') and (x in ['-c']):
+                opt_val = 1
         else:
             test_paths.append(x)
     if _test_package_name == 'nose':
         argv += ['--detailed-errors', '--exe']
-    elif _test_package_name == 'pytest':
-        argv.append('--ignore=yggdrasil/rapidjson/')
+    # elif _test_package_name == 'pytest':
+    #     argv.append('--ignore=yggdrasil/rapidjson/')
     if verbose:
         argv.append('-v')
     if nocapture:
@@ -84,9 +92,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             argv.append('--with-coverage')
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
-            argv.append('--cov=yggdrasil')
-    initial_dir = os.getcwd()
-    package_dir = os.path.dirname(os.path.abspath(__file__))
+            argv.append('--cov=%s' % package_dir)
     if not test_paths:
         test_paths.append(package_dir)
     else:
@@ -96,12 +102,12 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
                     if (func_sep in test_paths[i]):
                         path, mod = test_paths[i].rsplit(func_sep, 1)
                         if (((not os.path.isabs(path))
-                             and os.path.isfile(os.path.join(package_dir, path)))):
+                             and os.path.exists(os.path.join(package_dir, path)))):
                             test_paths[i] = '%s%s%s' % (
                                 os.path.join(package_dir, path), _func_sep, mod)
                             break
                 else:
-                    if os.path.isfile(os.path.join(package_dir, test_paths[i])):
+                    if os.path.exists(os.path.join(package_dir, test_paths[i])):
                         test_paths[i] = os.path.join(package_dir, test_paths[i])
     # os.chdir(package_dir)
     argv += test_paths

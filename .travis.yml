@@ -166,7 +166,7 @@ script:
     flake8 yggdrasil
   - |
     if [[ -n "$PYTHON" ]]; then
-      yggtest
+      yggtest -c setup.cfg --cov-config=.coveragerc
     elif [[ -n "$CONDA" ]]; then
       yggtest --nocover
     fi
@@ -178,7 +178,7 @@ jobs:
     - stage: test
       os: linux
       python: 2.7
-      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0 INSTALLLPY=1
     - os: linux
       python: 3.4
       script: |
@@ -231,6 +231,8 @@ jobs:
     
 
 after_success:
-  - coveralls
-  - codecov
-  
+  - |
+    if [[ -n "$PYTHON" ]]; then
+      coveralls
+      codecov
+    fi
