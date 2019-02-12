@@ -114,30 +114,23 @@ before_install:
 
     # Install RabbitMQ & Start a server
     if [[ $INSTALLRMQ == '1' ]]; then
-       echo Installing RabbitMQ...;
+       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          echo Installing RabbitMQ...;
+          brew install rabbitmq
+          echo Starting RabbitMQ...;
+          export PATH="${PATH}:/usr/local/sbin";
+          sudo /bin/sh -c "RABBITMQ_PID_FILE=$TRAVIS_BUILD_DIR/rabbitmq.pid rabbitmq-server &"
+          sudo rabbitmqctl wait "$TRAVIS_BUILD_DIR/rabbitmq.pid"
+       fi
+       echo Checking rabbitmq status...;
+       sudo rabbitmqctl status
+       
+       echo Installing Pika...;
        if [[ -n "$PYTHON" ]]; then
          pip install pika
        elif [[ -n "$CONDA" ]]; then
          conda install pika
        fi
-       # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-       #    sh ci/install-rmqserver-osx.sh
-       # else
-       #    sh ci/install-rmqserver-linux.sh
-       # fi
-
-       echo Starting RabbitMQ...;
-       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-          export PATH="${PATH}:/usr/local/sbin";
-          # sh ci/start-rmqserver-osx.sh
-          # else
-          # sh ci/start-rmqserver-linux.sh
-          sudo /bin/sh -c "RABBITMQ_PID_FILE=$TRAVIS_BUILD_DIR/rabbitmq.pid rabbitmq-server &"
-          # export RABBITMQ_PID_FILE="$TRAVIS_BUILD_DIR/rabbitmq.pid"
-          # sudo rabbitmq-server &  # -detached
-          sudo rabbitmqctl wait "$TRAVIS_BUILD_DIR/rabbitmq.pid"
-       fi
-       sudo rabbitmqctl status
     fi
 
 install:
@@ -207,6 +200,7 @@ jobs:
       env: CIS_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 CIS_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
+      
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       python: 2.7
@@ -226,11 +220,6 @@ jobs:
          directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
-      addons:
-        homebrew:
-          packages:
-            - *native_deps_brew
-            - rabbitmq-server
 
     # Deploy
     - stage: deploy
