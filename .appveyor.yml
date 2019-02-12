@@ -95,7 +95,6 @@ install:
 
   # Install testing dependencies
   - "conda install --yes numpy"  # Installing via pip causes import error
-  # - "pip install numpy"
   - "pip install nose"
   - "pip install pytest pytest-cov"
   - "pip install coverage coveralls codecov flake8"
@@ -111,8 +110,8 @@ install:
   - "pip install -e ."
 
 cache:
-  # - '%LOCALAPPDATA%\pip\Cache -> setup.py'
-  # - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
+  - '%LOCALAPPDATA%\pip\Cache -> setup.py'
+  - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
   - libsodium    -> ci\install-czmq_windows.bat
   - libzmq       -> ci\install-czmq_windows.bat
   - build_libzmq -> ci\install-czmq_windows.bat
@@ -126,9 +125,7 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "python -c \"import numpy\""
-  - "python -c \"import cis_interface\""
-  # - "cistest"
+  - "cistest"
   # - "pytest -svx --cov=cis_interface --ignore=cis_interface/rapidjson cis_interface"
 
 after_test:
