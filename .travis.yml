@@ -135,10 +135,10 @@ before_install:
           # else
           # sh ci/start-rmqserver-linux.sh
        fi
-       export RABBITMQ_PID_FILE=$TRAVIS_BUILD_DIR/rabbitmq.pid
-       sudo rabbitmq-server -detached
-       sudo rabbitmqctl wait "$TRAVIS_BUILD_DIR/rabbitmq.pid"
-       sudo rabbitmqctl status
+       # export RABBITMQ_PID_FILE=$TRAVIS_BUILD_DIR/rabbitmq.pid
+       # sudo rabbitmq-server -detached
+       # sudo rabbitmqctl wait "$TRAVIS_BUILD_DIR/rabbitmq.pid"
+       # sudo rabbitmqctl status
     fi
 
 install:
@@ -197,17 +197,19 @@ jobs:
     - os: linux
       python: 3.6
       env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=1
-      addons:
-        apt:
-          packages:
-            - *native_deps_apt
-            - rabbitmq-server
+      services:
+        - rabbitmq
     # Python 3.7 requires special dist
     - os: linux
       python: 3.7
       env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
       dist: xenial
       sudo: true
+      # addons:
+      #   apt:
+      #     packages:
+      #       - *native_deps_apt
+      #       - rabbitmq-server
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
       env: PYTHON=2.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
@@ -217,11 +219,8 @@ jobs:
          pip: false
          directories:
           - $HOME/Library/Caches/pip
-      addons:
-        homebrew:
-          packages:
-            - *native_deps_brew
-            - rabbitmq-server
+      services:
+        - rabbitmq
     - os: osx
       env: CONDA=3.7 INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
       # osx_image: xcode7.3
