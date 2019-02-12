@@ -176,8 +176,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 if self._qres_event.is_set():
                     self._qres_event.clear()
                     try:
-                        self.channel.queue_declare(self._set_qres,
-                                                   queue=self.queue,
+                        self.channel.queue_declare(queue=self.queue,
+                                                   callback=self._set_qres,
                                                    # , auto_delete=True,
                                                    passive=True)
                     except (pika.exceptions.ChannelClosed,
@@ -325,7 +325,10 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 self.warning('Connection closed, reopening in %f seconds: (%s) %s',
                              self.sleeptime, reply_code, reply_text)
                 self._reconnecting = True
-                connection.add_timeout(self.sleeptime, self.reconnect)
+                if _pika_version_maj < 1:
+                    connection.add_timeout(self.sleeptime, self.reconnect)
+                else:
+                    connection.call_later(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
@@ -387,7 +390,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 reason = args[0]
                 self.debug('::channel %i was closed: %s',
                            channel, reason)
-            channel.connection.close()
+            if not (channel.connection.is_closing or channel.connection.is_closed):
+                channel.connection.close()
             self.channel = None
             # if self.connection is not None:
             #     self.connection.close()
@@ -396,12 +400,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def setup_exchange(self, exchange_name):
         r"""Setup the exchange."""
         self.debug('::Declaring exchange %s', exchange_name)
-        if _pika_version_maj < 1:
-            self.channel.exchange_declare(self.on_exchange_declareok,
-                                          exchange=exchange_name, auto_delete=True)
-        else:
-            self.channel.exchange_declare(exchange_name, auto_delete=True,
-                                          callback=self.on_exchange_declareok)
+        self.channel.exchange_declare(callback=self.on_exchange_declareok,
+                                      exchange=exchange_name,
+                                      auto_delete=True)
 
     def on_exchange_declareok(self, unused_frame):
         r"""Actions to perform once an exchange is succesfully declared.
@@ -421,8 +422,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
             passive = True
         else:
             passive = False
-        self.channel.queue_declare(self.on_queue_declareok,
-                                   queue=self.queue,
+        self.channel.queue_declare(queue=self.queue,
+                                   callback=self.on_queue_declareok,
                                    exclusive=exclusive,
                                    # , auto_delete=True,
                                    passive=passive)
@@ -434,7 +435,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         with self.rmq_lock:
             if not self.queue:
                 self.address += method_frame.method.queue
-        self.channel.queue_bind(self.on_bindok,
+        self.channel.queue_bind(callback=self.on_bindok,
                                 exchange=self.exchange,
                                 # routing_key=self.routing_key,
                                 queue=self.queue)
@@ -446,7 +447,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.channel.basic_qos(prefetch_count=1)
         self.channel.add_on_cancel_callback(self.on_cancelok)
         if self.direction == 'recv':
-            self.consumer_tag = self.channel.basic_consume(self.on_message,
+            self.consumer_tag = self.channel.basic_consume(callback=self.on_message,
                                                            queue=self.queue)
         with self.rmq_lock:
             self._opening = False
