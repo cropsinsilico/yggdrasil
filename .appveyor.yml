@@ -94,8 +94,8 @@ install:
   - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
   # Install testing dependencies
-  # - "conda install --yes numpy"
-  - "pip install numpy"
+  - "conda install --yes numpy"
+  # - "pip install numpy"
   - "pip install nose"
   - "pip install pytest pytest-cov"
   - "pip install coverage coveralls codecov flake8"
