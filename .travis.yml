@@ -212,6 +212,7 @@ jobs:
       #       - rabbitmq-server
     # Only ever test one python 2 and one python 3 because brew dosn't allow specification of python version
     - os: osx
+      python: 2.7
       env: PYTHON=2.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
       # osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
@@ -222,6 +223,7 @@ jobs:
       services:
         - rabbitmq
     - os: osx
+      python: 3.7
       env: CONDA=3.7 INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
       # osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
@@ -250,7 +252,5 @@ jobs:
 
 after_success:
   - |
-    if [[ -n "$PYTHON" ]]; then
-      coveralls
-      codecov
-    fi
+    coveralls
+    codecov
