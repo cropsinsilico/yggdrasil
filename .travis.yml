@@ -177,6 +177,7 @@ script:
     if [[ -n "$PYTHON" ]]; then
       cistest -c setup.cfg --cov-config=.coveragerc
     elif [[ -n "$CONDA" ]]; then
+      python create_coveragerc.py
       cistest -c setup.cfg --cov-config=.coveragerc
     fi
 
