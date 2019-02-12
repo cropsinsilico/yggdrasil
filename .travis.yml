@@ -135,8 +135,10 @@ before_install:
           # else
           # sh ci/start-rmqserver-linux.sh
        fi
+       export RABBITMQ_PID_FILE=$TRAVIS_BUILD_DIR/rabbitmq.pid
        sudo rabbitmq-server -detached
-
+       rabbitmqctl wait "$TRAVIS_BUILD_DIR/rabbitmq.pid"
+       rabbitmqctl status
     fi
 
 install:

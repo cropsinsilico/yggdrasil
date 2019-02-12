@@ -5,25 +5,22 @@ import os
 import sys
 import logging
 import subprocess
+import importlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
-_func_sep = None
+order = ['pytest', 'nose']
+# order = ['nose', 'pytest']
 try:
-    import pytest
-    _test_package_name = 'pytest'
-    _test_package = pytest
-    _test_cmd = 'pytest'
-    _func_sep = '::'
+    _test_package_name = order[0]
+    _test_package = importlib.import_module(_test_package_name)
 except ImportError:  # pragma: debug
     try:
-        import nose
-        _test_package_name = 'nose'
-        _test_package = nose
-        _test_cmd = 'nosetests'
-        _func_sep = ':'
+        _test_package_name = order[1]
+        _test_package = importlib.import_module(_test_package_name)
     except ImportError:
-        pass
+        _test_package_name = None
+        _test_package = None
     
 
 if platform._is_win:  # pragma: windows
@@ -53,10 +50,18 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
     """
     if _test_package is None:
         raise RuntimeError("Could not locate test runner pytest or nose.")
+    elif _test_package_name == 'pytest':
+        test_cmd = 'pytest'
+        func_sep = '::'
+    elif _test_package_name == 'nose':
+        test_cmd = 'nosetests'
+        func_sep = ':'
+    else:
+        raise RuntimeError("Unsupported test package: '%s'" % _test_package_name)
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     error_code = 0
-    argv = [_test_cmd]
+    argv = [test_cmd]
     test_paths = []
     opt_val = 0
     for x in sys.argv:
@@ -104,7 +109,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
                         if (((not os.path.isabs(path))
                              and os.path.exists(os.path.join(package_dir, path)))):
                             test_paths[i] = '%s%s%s' % (
-                                os.path.join(package_dir, path), _func_sep, mod)
+                                os.path.join(package_dir, path), func_sep, mod)
                             break
                 else:
                     if os.path.exists(os.path.join(package_dir, test_paths[i])):
