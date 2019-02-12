@@ -151,7 +151,7 @@ def assert_warns(warning, *args, **kwargs):
             try:
                 if not args:
                     yield w
-                else:
+                else:  # pragma: debug
                     callable_obj = args[0]
                     args = args[1:]
                     callable_obj(*args, **kwargs)
