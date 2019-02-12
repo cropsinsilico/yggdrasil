@@ -94,6 +94,8 @@ install:
   - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
   # Install testing dependencies
+  # - "conda install --yes numpy"
+  - "pip install numpy"
   - "pip install nose"
   - "pip install pytest pytest-cov"
   - "pip install coverage coveralls codecov flake8"
@@ -106,11 +108,11 @@ install:
   # - "pip install zmq"
 
   # Install cis_interface allowing pip to resolve requirements
-  - "pip install -e ."
+  # - "pip install -e ."
 
 cache:
   # - '%LOCALAPPDATA%\pip\Cache -> setup.py'
-  - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
+  # - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
   - libsodium    -> ci\install-czmq_windows.bat
   - libzmq       -> ci\install-czmq_windows.bat
   - build_libzmq -> ci\install-czmq_windows.bat
@@ -124,7 +126,8 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "cistest"
+  - "python -c \"import numpy\""
+  # - "cistest"
   # - "pytest -svx --cov=cis_interface --ignore=cis_interface/rapidjson cis_interface"
 
 after_test:
