@@ -82,10 +82,8 @@ def test_update_config():
     test_cfg = os.path.join(tempfile.gettempdir(), 'test.cfg')
     assert(not os.path.isfile(test_cfg))
     if not tools.is_lang_installed('matlab'):  # pragma: no matlab
-        with assert_warns(RuntimeWarning):
-            config.update_config(test_cfg)
-    else:  # pragma: matlab
-        config.update_config(test_cfg)
+        assert_warns(RuntimeWarning, config.update_config, test_cfg)
+    config.update_config(test_cfg)
     assert(os.path.isfile(test_cfg))
     os.remove(test_cfg)
 
