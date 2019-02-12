@@ -26,7 +26,7 @@ def test_wait_for_creation():
                              store_output=True)
     recv_instance.open()
     T = recv_instance.start_timeout(recv_instance.wait_for_creation)
-    while (not T.is_out) and (send_instance.sched_out is None):
+    while (not T.is_out) and (send_instance.sched_out is None):  # pragma: debug
         recv_instance.sleep()
     recv_instance.stop_timeout()
     assert(send_instance.sched_out)
