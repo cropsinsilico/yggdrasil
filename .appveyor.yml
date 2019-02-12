@@ -94,7 +94,7 @@ install:
   - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
   # Install testing dependencies
-  - "conda install --yes numpy"  # Installing via pip causes import error
+  - "conda install --yes numpy scipy"  # Installing via pip causes import error
   - "pip install nose"
   - "pip install pytest pytest-cov"
   - "pip install coverage coveralls codecov flake8"
