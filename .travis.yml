@@ -131,7 +131,7 @@ before_install:
        if [[ -n "$PYTHON" ]]; then
          pip install "pika<1.0"
        elif [[ -n "$CONDA" ]]; then
-         conda install "pika<1.0"
+         conda install "pika<1.0.0b1"
        fi
     fi
 
