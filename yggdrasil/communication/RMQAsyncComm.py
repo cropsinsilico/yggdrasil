@@ -5,6 +5,8 @@ from yggdrasil.schema import register_component
 if RMQComm._rmq_installed:
     import pika
     _pika_version_maj = int(float(pika.__version__.split('.')[0]))
+    if _pika_version_maj >= 1:  # pragma: debug
+        raise ImportError("pika version 1.0 not yet supported.")
 else:
     pika = False
     _pika_version_maj = 0
@@ -310,9 +312,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
         if _pika_version_maj < 1:
             reply_code = args[0]
             reply_text = args[1]
-        else:
-            reply_code = 0
-            reply_text = args[0]
+        # else:
+        #     reply_code = 0
+        #     reply_text = args[0]
         with self.rmq_lock:
             self.debug('::on_connection_closed code %s (code = %d)', reply_text,
                        reply_code)
@@ -327,8 +329,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 self._reconnecting = True
                 if _pika_version_maj < 1:
                     connection.add_timeout(self.sleeptime, self.reconnect)
-                else:
-                    connection.ioloop.call_later(self.sleeptime, self.reconnect)
+                # else:
+                #     connection.ioloop.call_later(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
@@ -386,10 +388,10 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 reply_text = args[1]
                 self.debug('::channel %i was closed: (%s) %s',
                            channel, reply_code, reply_text)
-            else:
-                reason = args[0]
-                self.debug('::channel %i was closed: %s',
-                           channel, reason)
+            # else:
+            #     reason = args[0]
+            #     self.debug('::channel %i was closed: %s',
+            #                channel, reason)
             if not (channel.connection.is_closing or channel.connection.is_closed):
                 channel.connection.close()
             self.channel = None
