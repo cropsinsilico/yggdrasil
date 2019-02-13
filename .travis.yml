@@ -33,6 +33,8 @@ env:
     INSTALLRMQ=0
     INSTALLAPY=0
     INSTALLLPY=0
+    BUILDDOCS=0
+    DEPLOYDOCS=0
     DEPLOYPYPI=0
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
@@ -149,6 +151,9 @@ install:
       pip install nose
       pip install pytest "pytest-cov<2.6"
       pip install coverage coveralls codecov flake8
+      if [[ $BUILDDOCS == '1' || $DEPLOYDOCS == '1' ]]; then
+        pip install sphinx breathe sphinx_rtd_theme
+      fi
       # Install from source dist
       python setup.py sdist
       pip install --verbose dist/*.tar.gz
@@ -162,6 +167,9 @@ install:
       conda install nose
       conda install pytest "pytest-cov<2.6"
       conda install coverage coveralls codecov flake8
+      if [[ $BUILDDOCS == '1' || $DEPLOYDOCS == '1' ]]; then
+        conda install sphinx breathe sphinx_rtd_theme
+      fi
       conda build recipe/meta.yaml --python $CONDA
       conda install --use-local yggdrasil
     fi
@@ -213,18 +221,58 @@ jobs:
           - $HOME/Library/Caches/Homebrew
     - os: osx
       python: 3.7
-      env: CONDA=3.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1 DEPLOYPYPI=1
+      env: CONDA=3.7 INSTALLRMQ=1 YGG_ENABLE_LONG_TESTS=1
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
       cache:
          pip: false
          directories:
           - $HOME/Library/Caches/pip
           - $HOME/Library/Caches/Homebrew
+    - name: "Build docs"
+      python: 3.6
+      env: BUILDDOCS=1
+      script: |
+              cd docs
+              make autodoc
+              cd "$TRAVIS_BUILD_DIR"
+      addons:
+        apt:
+          packages:
+            - *native_deps_apt
+            - doxygen
+          update: true
+
+    # Docs
+    - stage: deploy
+      name: "Deploy docs"
+      python: 3.6
+      env: DEPLOYDOCS=1
+      script: |
+              cd docs
+              make autodoc
+              cd "$TRAVIS_BUILD_DIR"
+      if: (tag IS present) AND (env(DEPLOYDOCS) = 1)
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        local_dir: docs/build/html/
+        keep-history: true
+        github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+        on:
+          tags: true
+          condition: $DEPLOYDOCS = 1
+      addons:
+        apt:
+          packages:
+            - *native_deps_apt
+            - doxygen
+          update: true
 
     # Deploy
     - stage: deploy
       name: "Deploy to PyPI"
       script: skip
+      env: DEPLOYPYPI=1
       if: (tag IS present) AND (env(DEPLOYPYPI) = 1)
       deploy:
         provider: pypi
