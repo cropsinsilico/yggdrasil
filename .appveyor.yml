@@ -3,11 +3,6 @@
 
 # branches to build
 branches:
-  # whitelist
-  # only:
-  #   - topic/zmq
-
-  # blacklist
   except:
     - gh-pages
 
@@ -78,9 +73,7 @@ install:
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
 
   # Install & start RabbitMQ
-  # - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
-  # - "if %INSTALLRMQ% == 1 ci\\start-rmqserver-windows.bat"  
-  - "if %INSTALLRMQ% == 1 pip install pika"
+  - "if %INSTALLRMQ% == 1 pip install \"pika<1.0\""
   - ps: If ($INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
   - if "%INSTALLRMQ%" == "1" ECHO Downloading Erlang...
   - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
@@ -103,7 +96,7 @@ install:
   # - "conda install --yes -c conda-forge nose"
   # - "conda install --yes -c conda-forge pytest pytest-cov"
   # - "conda install --yes -c conda-forge numpy coverage coveralls codecov flake8"
-  # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy pika"
+  # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy \"pika<1.0\""
   # - "pip install zmq"
 
   # Install cis_interface allowing pip to resolve requirements
@@ -126,7 +119,6 @@ before_test:
 
 test_script:
   - "cistest"
-  # - "pytest -svx --cov=cis_interface --ignore=cis_interface/rapidjson cis_interface"
 
 after_test:
   - "codecov"

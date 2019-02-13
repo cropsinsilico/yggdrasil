@@ -31,3 +31,5 @@ TODO
 * Fix circular dependency when determining if C/C++ models are supported via czmq
 * Regenerate metaschema with $schema entry
 * Refence metaschema on website in $id or $schema?
+* Clean up dependencies (i.e. remove pint etc.)
+* Test outside of conda on windows?

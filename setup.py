@@ -93,7 +93,7 @@ requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 "perf", "pint", "unyt",
                 'sysv_ipc; platform_system != "Windows"']
 test_requirements = ['pytest']
-# optional_requirements = ["pika", "astropy"]
+# optional_requirements = ["pika<1.0", "astropy"]
 
 
 # Warn that local install may not have entry points on path
