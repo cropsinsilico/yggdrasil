@@ -1284,7 +1284,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         v = fits[k]
         print(fmt_row % (k, v[0], v[1]))
     # Save plot
-    plt.savefig(plotfile)
+    plt.savefig(plotfile, dpi=600)
     logging.info('plotfile: %s', plotfile)
     if cleanup_plot:
         os.remove(plotfile)
