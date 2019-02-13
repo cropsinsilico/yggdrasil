@@ -328,7 +328,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 if _pika_version_maj < 1:
                     connection.add_timeout(self.sleeptime, self.reconnect)
                 else:
-                    connection.call_later(self.sleeptime, self.reconnect)
+                    connection.ioloop.call_later(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
