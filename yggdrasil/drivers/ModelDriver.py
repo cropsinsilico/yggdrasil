@@ -2,6 +2,8 @@ import os
 import sys
 import copy
 import warnings
+import logging
+import subprocess
 from pprint import pformat
 from yggdrasil import platform, tools
 from yggdrasil.drivers.Driver import Driver
@@ -80,6 +82,7 @@ class ModelDriver(Driver):
         'with_valgrind': {'type': 'boolean', 'default': False},
         'valgrind_flags': {'type': 'array', 'default': ['--leak-check=full'],  # '-v'
                            'items': {'type': 'string'}}}
+    _version_flags = ['--version']
 
     def __init__(self, name, args, model_index=0, **kwargs):
         for k, v in self._schema_properties.items():
@@ -113,6 +116,56 @@ class ModelDriver(Driver):
         for k in self.env_copy:
             if k in os.environ:
                 self.env[k] = os.environ[k]
+        if not self.is_installed():
+            raise RuntimeError("%s is not installed" % self._language)
+
+    @classmethod
+    def language_executable(cls):
+        r"""Command/arguments required to compile/run a model written in this
+        language from the command line.
+
+        Returns:
+            list: Name of (or path to) compiler/interpreter executable and any
+                flags required to run the compiler/interpreter from the command
+                line.
+
+        """
+        if cls._language == 'executable':
+            return []
+        raise NotImplementedError("Language executable not set.")
+
+    @classmethod
+    def is_language_installed(self):
+        r"""Determine if the interpreter/compiler for the associated programming
+        language is installed.
+
+        Returns:
+            bool: True if the language interpreter/compiler is installed.
+
+        """
+        if cls._language == 'executable':
+            return True  # executables are executable
+        version_cmd = cls.language_executable() + cls._version_flags
+        process = subprocess.Popen(version_cmd,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        outs, errs = process.communicate()
+        if errs:
+            logging.info('Errors captured from running %s: %s',
+                         str(version_cmd), errs)
+            return False
+        return True
+
+    @classmethod
+    def is_comm_installed(self):
+        r"""Determine if a comm is installed for the associated programming
+        language.
+
+        Returns:
+            bool: True if a comm is installed for this language.
+
+        """
+        return True  # executables presumable include comms
 
     @classmethod
     def is_installed(self):
@@ -124,7 +177,7 @@ class ModelDriver(Driver):
                 machine.
 
         """
-        return False
+        return (self.is_language_installed() and self.is_comm_installed())
 
     def set_env(self):
         env = copy.deepcopy(self.env)

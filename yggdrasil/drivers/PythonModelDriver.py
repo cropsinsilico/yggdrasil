@@ -3,7 +3,7 @@
 #
 import os
 import sys
-from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.schema import register_component
 
 
@@ -13,30 +13,26 @@ _incl_io = os.path.join(_top_dir, 'io')
 
 
 @register_component
-class PythonModelDriver(ModelDriver):
-    r"""Class for running Python models.
-
-    Args:
-        name (str): Driver name.
-        args (str or list): Argument(s) for running the model on the command
-            after the call to python.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
-
-    """
+class PythonModelDriver(InterpretedModelDriver):
+    r"""Class for running Python models."""
 
     _language = 'python'
-
-    def __init__(self, name, args, **kwargs):
-        super(PythonModelDriver, self).__init__(name, args, **kwargs)
-        self.debug(args)
-        
-        if 'python' not in self.args[0] or self.args[0].endswith('.py'):
-            python_exec = sys.executable
-            self.args = [python_exec] + self.args
+    _language_ext = '.py'
 
     @classmethod
-    def is_installed(self):
+    def language_interpreter(cls):
+        r"""Command/arguments required to run a model written in this language
+        from the command line.
+
+        Returns:
+            list: Name of (or path to) interpreter executable and any flags
+                required to run the interpreter from the command line.
+
+        """
+        return [sys.executable]
+        
+    @classmethod
+    def is_language_installed(self):
         r"""Determine if this model driver is installed on the current
         machine.
 

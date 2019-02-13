@@ -8,11 +8,12 @@ import weakref
 from yggdrasil import backwards, tools, platform, config
 try:  # pragma: matlab
     import matlab.engine
-    _matlab_installed = (config.ygg_cfg.get('matlab', 'disable', 'False') == 'False')
+    _matlab_engine_installed = (config.ygg_cfg.get('matlab', 'disable', 'False')
+                                == 'False')
 except ImportError:  # pragma: no matlab
     debug("Could not import matlab.engine. "
-          + "Matlab support will be disabled.")
-    _matlab_installed = False
+          + "Matlab support for using a sharedEngine will be disabled.")
+    _matlab_engine_installed = False
 from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.tools import TimeOut, sleep
 from yggdrasil.schema import register_component
@@ -59,7 +60,7 @@ def is_matlab_running():
         bool: True if there is a Matlab engine running, False otherwise.
 
     """
-    if not _matlab_installed:  # pragma: no matlab
+    if not _matlab_engine_installed:  # pragma: no matlab
         out = False
     else:  # pragma: matlab
         out = (len(matlab.engine.find_matlab()) != 0)
@@ -96,8 +97,8 @@ def locate_matlabroot():  # pragma: matlab
         str: Full path to matlabroot directory.
 
     """
-    # if not _matlab_installed:  # pragma: no matlab
-    #     raise RuntimeError("Matlab is not installed.")
+    # if not _matlab_engine_installed:  # pragma: no matlab
+    #     raise RuntimeError("Matlab engine is not installed.")
     mtl_id = '=MATLABROOT='
     cmd = "fprintf('" + mtl_id + "%s" + mtl_id + "', matlabroot); exit();"
     mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
@@ -116,7 +117,7 @@ def locate_matlabroot():  # pragma: matlab
 
 def install_matlab_engine():  # pragma: matlab
     r"""Install the MATLAB engine API for Python."""
-    if not _matlab_installed:
+    if not _matlab_engine_installed:
         mtl_root = locate_matlabroot()
         mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
         cmd = 'python setup.py install'
@@ -144,8 +145,8 @@ def start_matlab(skip_connect=False, timeout=None):  # pragma: matlab
         RuntimeError: If Matlab is not installed.
 
     """
-    if not _matlab_installed:  # pragma: no matlab
-        raise RuntimeError("Matlab is not installed.")
+    if not _matlab_engine_installed:  # pragma: no matlab
+        raise RuntimeError("Matlab engine is not installed.")
     if timeout is None:
         timeout = float(config.ygg_cfg.get('matlab', 'startup_waittime_s', 10))
     old_process = set(locate_matlab_engine_processes())
@@ -229,8 +230,8 @@ def stop_matlab(screen_session, matlab_engine, matlab_session, matlab_process,
         RuntimeError: If Matlab is not installed.
 
     """
-    if not _matlab_installed:  # pragma: no matlab
-        raise RuntimeError("Matlab is not installed.")
+    if not _matlab_engine_installed:  # pragma: no matlab
+        raise RuntimeError("Matlab engine is not installed.")
     if keep_engine and (matlab_engine is not None):
         if '_matlab' in matlab_engine.__dict__:
             matlab_engine.quit()
@@ -299,8 +300,8 @@ class MatlabProcess(tools.YggClass):  # pragma: matlab
     """
 
     def __init__(self, target, args, kwargs=None, name=None, matlab_engine=None):
-        if not _matlab_installed:  # pragma: no matlab
-            raise RuntimeError("Matlab is not installed.")
+        if not _matlab_engine_installed:  # pragma: no matlab
+            raise RuntimeError("Matlab engine is not installed.")
         if kwargs is None:
             kwargs = {}
         self.stdout = backwards.sio.StringIO()
@@ -454,31 +455,34 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
     """
 
     _language = 'matlab'
+    _language_ext = '.m'
+    _version_flags = ["fprintf('R%s', version('-release')); exit();"]
 
     def __init__(self, name, args, **kwargs):
-        if not _matlab_installed:  # pragma: no matlab
-            raise RuntimeError("Matlab is not installed.")
+        if _matlab_engine_installed:  # pragma: matlab
+            kwargs['skip_interpreter'] = True
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
         self.started_matlab = False
         self.screen_session = None
         self.mlengine = None
         self.mlsession = None
         self.mlprocess = None
-        self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
-        self.check_exits()
+        if _matlab_engine_installed:  # pragma: matlab
+            self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
+            self.check_exits()
 
     @classmethod
-    def is_installed(self):
-        r"""Determine if this model driver is installed on the current
-        machine.
+    def language_interpreter(cls):
+        r"""Command/arguments required to run a model written in this language
+        from the command line.
 
         Returns:
-            bool: Truth of if this model driver can be run on the current
-                machine.
+            list: Name of (or path to) interpreter executable and any flags
+                required to run the interpreter from the command line.
 
         """
-        return _matlab_installed
-
+        return ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm', '-r']
+        
     def start_matlab(self):
         r"""Start matlab session and connect to it."""
         ml_attr = ['screen_session', 'mlengine', 'mlsession', 'mlprocess']
@@ -544,38 +548,39 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
     def before_start(self):
         r"""Actions to perform before the run loop."""
-        self.target_name = os.path.splitext(os.path.basename(self.args[0]))[0]
-        self.start_matlab()
+        if _matlab_engine_installed:
+            self.target_name = os.path.splitext(os.path.basename(self.args[0]))[0]
+            self.start_matlab()
 
-        # Add environment variables
-        self.debug('Setting environment variables for Matlab engine.')
-        env = self.set_env()
-        old_env = {}
-        new_env_str = ''
-        for k, v in env.items():
+            # Add environment variables
+            self.debug('Setting environment variables for Matlab engine.')
+            env = self.set_env()
+            old_env = {}
+            new_env_str = ''
+            for k, v in env.items():
+                with self.lock:
+                    if self.mlengine is None:  # pragma: debug
+                        return
+                    old_env[k] = self.mlengine.getenv(k)
+                    self.mlengine.setenv(k, v, nargout=0)
+                    new_env_str += "'%s', %s, " % (k, repr(v))
+            with self.lock:
+                self.mlengine.eval('new_env = py.dict(pyargs(%s));' % new_env_str[:-2],
+                                   nargout=0)
+                self.mlengine.eval('os.environ.update(new_env);', nargout=0)
+
+            # Run
             with self.lock:
                 if self.mlengine is None:  # pragma: debug
+                    self.debug('Matlab engine not set. Stopping')
                     return
-                old_env[k] = self.mlengine.getenv(k)
-                self.mlengine.setenv(k, v, nargout=0)
-                new_env_str += "'%s', %s, " % (k, repr(v))
-        with self.lock:
-            self.mlengine.eval('new_env = py.dict(pyargs(%s));' % new_env_str[:-2],
-                               nargout=0)
-            self.mlengine.eval('os.environ.update(new_env);', nargout=0)
-
-        # Run
-        with self.lock:
-            if self.mlengine is None:  # pragma: debug
-                self.debug('Matlab engine not set. Stopping')
-                return
-            self.model_process = MatlabProcess(
-                target=getattr(self.mlengine, self.target_name),
-                name=self.name + '.MatlabProcess',
-                args=self.args[1:], matlab_engine=self.mlengine)
-            self.debug('Starting MatlabProcess')
-            self.model_process.start()
-            self.debug('MatlabProcess running model.')
+                self.model_process = MatlabProcess(
+                    target=getattr(self.mlengine, self.target_name),
+                    name=self.name + '.MatlabProcess',
+                    args=self.args[1:], matlab_engine=self.mlengine)
+                self.debug('Starting MatlabProcess')
+                self.model_process.start()
+                self.debug('MatlabProcess running model.')
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
