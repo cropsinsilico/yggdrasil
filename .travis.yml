@@ -178,12 +178,17 @@ script:
   - |
     flake8 cis_interface
   - |
-    if [[ -n "$PYTHON" ]]; then
-      cistest -c setup.cfg --cov-config=.coveragerc
-    elif [[ -n "$CONDA" ]]; then
+    if [[ -n "$CONDA" ]]; then
       python create_coveragerc.py
-      cistest -c setup.cfg --cov-config=.coveragerc
     fi
+    cistest -c setup.cfg --cov-config=.coveragerc
+    
+
+after_success:
+  - |
+    coveralls
+    codecov
+
 
 jobs:
   include:
@@ -235,6 +240,7 @@ jobs:
               cd docs
               make autodoc
               cd "$TRAVIS_BUILD_DIR"
+      after_success: skip
       addons:
         apt:
           packages:
@@ -251,6 +257,7 @@ jobs:
               cd docs
               make autodoc
               cd "$TRAVIS_BUILD_DIR"
+      after_success: skip
       if: (tag IS present) AND (env(DEPLOYDOCS) = 1)
       deploy:
         provider: pages
@@ -285,9 +292,3 @@ jobs:
         on:
           tags: true
           condition: $DEPLOYPYPI = 1
-    
-
-after_success:
-  - |
-    coveralls
-    codecov
