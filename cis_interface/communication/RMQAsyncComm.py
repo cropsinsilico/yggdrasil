@@ -447,10 +447,10 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.channel.basic_qos(prefetch_count=1)
         self.channel.add_on_cancel_callback(self.on_cancelok)
         if self.direction == 'recv':
-            kwargs = dict(callback=self.on_message,
+            kwargs = dict(on_message_callback=self.on_message,
                           queue=self.queue)
             if _pika_version_maj < 1:
-                kwargs['consumer_callback'] = kwargs.pop('callback')
+                kwargs['consumer_callback'] = kwargs.pop('on_message_callback')
             self.consumer_tag = self.channel.basic_consume(**kwargs)
         with self.rmq_lock:
             self._opening = False
