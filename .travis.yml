@@ -252,10 +252,10 @@ jobs:
     - stage: deploy
       name: "Deploy docs"
       python: 3.6
-      env: DEPLOYDOCS=1
+      env: DEPLOYDOCS=0
       script: |
               cd docs
-              make autodoc
+              make ghpages
               cd "$TRAVIS_BUILD_DIR"
       after_success: skip
       if: (tag IS present) AND (env(DEPLOYDOCS) = 1)
