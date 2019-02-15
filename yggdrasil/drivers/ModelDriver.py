@@ -61,6 +61,7 @@ class ModelDriver(Driver):
     """
 
     _language = 'executable'
+    _language_ext = None
     _schema_type = 'model'
     _schema_required = ['name', 'language', 'args', 'working_dir']
     _schema_properties = {

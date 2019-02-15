@@ -459,7 +459,8 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
     _version_flags = ["fprintf('R%s', version('-release')); exit();"]
 
     def __init__(self, name, args, **kwargs):
-        if _matlab_engine_installed:  # pragma: matlab
+        self.using_matlab_engine = _matlab_engine_installed
+        if self.using_matlab_engine:
             kwargs['skip_interpreter'] = True
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
         self.started_matlab = False
@@ -467,7 +468,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.mlengine = None
         self.mlsession = None
         self.mlprocess = None
-        if _matlab_engine_installed:  # pragma: matlab
+        if self.using_matlab_engine:
             self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
             self.check_exits()
 

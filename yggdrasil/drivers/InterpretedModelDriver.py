@@ -6,12 +6,11 @@ class InterpretedModelDriver(ModelDriver):
 
     def __init__(self, name, args, skip_interpreter=False, **kwargs):
         super(InterpretedModelDriver, self).__init__(name, args, **kwargs)
-        self.debug(args)
-
         if not skip_interpreter:
             if (((self._language not in self.args[0])
                  or (self.args[0].endswith(self._language_ext)))):
                 self.args = self.language_interpreter() + self.args
+        self.debug(self.args)
 
     @classmethod
     def language_interpreter(cls):
