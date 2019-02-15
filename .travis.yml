@@ -129,9 +129,9 @@ before_install:
        
        echo Installing Pika...;
        if [[ -n "$PYTHON" ]]; then
-         pip install "pika<1.0"
+         pip install "pika<1.0.0b1"
        elif [[ -n "$CONDA" ]]; then
-         conda install "pika=0.12"
+         conda install "pika<1.0.0b1"
        fi
     fi
 
