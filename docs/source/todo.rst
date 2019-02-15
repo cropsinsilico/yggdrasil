@@ -12,7 +12,7 @@ TODO
 * Change "args" in drivers to more transparent wording (source_code, etc.)
 * Alias input/output keyword arguments for connections to from/to for clarity
 * Update docs to reflect changes to YAML spec
-* Write docs on units
+* Write docs on units (with reference to us of pint on Python 2.7)
 * Docs on datatypes w/ example of user defined data type
 * Update/replace io_drivers section of docs
 * Remove IOInfo test class as no longer used
@@ -28,5 +28,6 @@ TODO
 * Fix circular dependency when determining if C/C++ models are supported via czmq
 * Regenerate metaschema with $schema entry
 * Refence metaschema on website in $id or $schema?
-* Clean up dependencies (i.e. remove pint etc.)
+* Clean up dependencies if possible
 * Test outside of conda on windows?
+* Silence warnings from pint/pika on model processes

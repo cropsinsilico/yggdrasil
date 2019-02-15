@@ -30,7 +30,7 @@ requirements:
     - matplotlib
     - numpy
     - pandas
-    - pint
+    - pint  # [py2k]
     - psutil
     - pystache
     - python
@@ -39,7 +39,7 @@ requirements:
     - pyzmq
     - scipy
     - sysv_ipc  # [unix]
-    - unyt
+    - unyt  # [not py2k]
     - zeromq
     - perf
 

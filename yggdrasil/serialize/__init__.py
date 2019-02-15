@@ -372,7 +372,8 @@ def format_message(args, fmt_str):
     if len(args) < nfmt:
         raise RuntimeError("Number of arguments (%d) does not match " % len(args)
                            + "number of format fields (%d)." % nfmt)
-    for a in args:
+    for a0 in args:
+        a = units.get_data(a0)
         if np.iscomplexobj(a):
             args_ += [a.real, a.imag]
         else:
