@@ -34,8 +34,6 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     BUILDDOCS=0
-    DEPLOYDOCS=0
-    DEPLOYPYPI=0
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
     - CONDA=yes
@@ -151,7 +149,7 @@ install:
       pip install nose
       pip install pytest "pytest-cov<2.6"
       pip install coverage coveralls codecov flake8
-      if [[ $BUILDDOCS == '1' || $DEPLOYDOCS == '1' ]]; then
+      if [[ $BUILDDOCS == '1' ]]; then
         pip install sphinx breathe sphinx_rtd_theme
       fi
       # Install from source dist
@@ -167,7 +165,7 @@ install:
       conda install nose
       conda install pytest "pytest-cov<2.6"
       conda install coverage coveralls codecov flake8
-      if [[ $BUILDDOCS == '1' || $DEPLOYDOCS == '1' ]]; then
+      if [[ $BUILDDOCS == '1' ]]; then
         conda install sphinx breathe sphinx_rtd_theme
       fi
       conda build recipe/meta.yaml --python $CONDA
@@ -252,13 +250,13 @@ jobs:
     - stage: deploy
       name: "Deploy docs"
       python: 3.6
-      env: DEPLOYDOCS=1
+      env: BUILDDOCS=1
       script: |
               cd docs
               make autodoc
               cd "$TRAVIS_BUILD_DIR"
       after_success: skip
-      if: (tag IS present) AND (env(DEPLOYDOCS) = 1)
+      if: (tag IS present)
       deploy:
         provider: pages
         skip_cleanup: true
@@ -267,7 +265,6 @@ jobs:
         github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
         on:
           tags: true
-          condition: $DEPLOYDOCS = 1
       addons:
         apt:
           packages:
@@ -279,8 +276,7 @@ jobs:
     - stage: deploy
       name: "Deploy to PyPI"
       script: skip
-      env: DEPLOYPYPI=1
-      if: (tag IS present) AND (env(DEPLOYPYPI) = 1)
+      if: (tag IS present)
       deploy:
         provider: pypi
         edge: true
@@ -291,4 +287,3 @@ jobs:
           secure: cYP65ktykU8vzNpjDxVJ7hb5VIA8pcG0+LfaboyJ/7jJ85OFFMb7k12cuzmcFgyCMzxaMaR74ZwSL1Zs3jwfpsfKt22rdXV3YtAlrbLfHDd1ReoPeg6ZHSHYlZq/pkGowB7OHZMPaF7Pwjl2igWE1ZrJ8q/K2vVCt/cv9JhZXZS3nnC3iTY9jbvq/sWp6QChy61s5ekxf9m3PJBcS3s/n34ZyuQt8eF73YSMlztWNLTBWKIfK2LOpDXXKDWhFRDhlmt3mA88I2HI1ZxFyANIrrMwGEBIJOVWlAfnPOdoI36JW9wqv3DXj9RGVDNcVwfW5/juxMF+DSHORwQDuTn3E6Z0Q/ic6rLndI+vzHjYdjPeLXutggOEGTjq32LP6FkJ+3LyrFoQXwZIZ+FqLRni/HyppoyIQ+S5NneLB7Wj5Hyja7ycmwLZnlnixUz3qHOvIv6Hpv/koDltqyB5gzf0xvbNUMkRCHuuovtbqtmRtxA1BL8VKoGVzZ7zHrWG+iTGZXSFhgrcO1k8OYzxaWR2O/NeeURuy3ViD+xzPSvMASRX0sCULOf3o2rgDdJyTBjW5KZcLqVcOiGZoHgwOjZY0NQ50R7mE7T+CQmoYtil1Ovmm8b6NUhoE0z6jEgDVfEhKo9/WACHamzIQ4afrYsEWlQhDSg+dvrzS7OciILOK+Q=
         on:
           tags: true
-          condition: $DEPLOYPYPI = 1
