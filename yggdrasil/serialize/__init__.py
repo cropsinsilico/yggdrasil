@@ -772,7 +772,6 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         np.ndarray: Table contents as an array.
     
     """
-    print("use_astropy", _use_astropy, use_astropy)
     if not _use_astropy:
         use_astropy = False
     if fmt_str is None:

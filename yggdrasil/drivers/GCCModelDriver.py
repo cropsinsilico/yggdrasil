@@ -713,7 +713,18 @@ class GCCModelDriver(ModelDriver):
                 products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
         for p in products:
             if os.path.isfile(p):
-                os.remove(p)
+                T = self.start_timeout()
+                while ((not T.is_out) and os.path.isfile(p)):
+                    try:
+                        os.remove(p)
+                    except BaseException:  # pragma: debug
+                        if os.path.isfile(p):
+                            self.sleep()
+                        if T.is_out:
+                            raise
+                self.stop_timeout()
+                if os.path.isfile(p):  # pragma: debug
+                    raise RuntimeError("Failed to remove product: %s" % p)
 
     def cleanup(self):
         r"""Remove compile executable."""
