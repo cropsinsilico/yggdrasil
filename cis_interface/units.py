@@ -1,15 +1,23 @@
 import numpy as np
 from cis_interface import backwards
-import unyt
-import pint
-_ureg_unyt = unyt.UnitRegistry()
-_ureg_pint = pint.UnitRegistry()
-_ureg_pint.define('micro_mole = 1e-6 * mole = uMol = umol')
-_use_unyt = True
+if backwards.PY2:  # pragma: Python 2
+    import pint
+    unyt = None
+    _use_unyt = False
+    _ureg_unyt = None
+    _ureg_pint = pint.UnitRegistry()
+    # _ureg_pint.define('micro_mole = 1e-6 * mole = uMol = umol')
+    _ureg_pint.define('day = 24 * hour = d')
+else:  # pragma: Python 3
+    import unyt
+    pint = None
+    _use_unyt = True
+    _ureg_unyt = unyt.UnitRegistry()
+    _ureg_pint = None
 if _use_unyt:
     _unit_quantity = unyt.array.unyt_quantity
     _unit_array = unyt.array.unyt_array
-else:  # pragma: no cover
+else:
     _unit_quantity = _ureg_pint.Quantity
     _unit_array = _ureg_pint.Quantity
 

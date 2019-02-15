@@ -3,25 +3,14 @@ from cis_interface.tests import CisTestBase
 from cis_interface import units
 
 
-class TestPint(CisTestBase):
+class TestUnits(CisTestBase):
     r"""Tests for using pint for units."""
-    _unit_package = 'pint'
 
     def setup(self, *args, **kwargs):
-        r"""Set use_unyt for tests."""
-        self._old_use_unyt = units._use_unyt
-        if self._unit_package == 'unyt':
-            units._use_unyt = True
-        else:
-            units._use_unyt = False
+        r"""Setup, create variables for testing."""
         self._vars_nounits = [1.0, np.zeros(5), int(1)]
         self._vars_units = [units.add_units(v, 'cm') for v in self._vars_nounits]
-        super(TestPint, self).setup(*args, **kwargs)
-
-    def teardown(self, *args, **kwargs):
-        r"""Reset use_unyt to default."""
-        units._use_unyt = self._old_use_unyt
-        super(TestPint, self).teardown(*args, **kwargs)
+        super(TestUnits, self).setup(*args, **kwargs)
 
     def test_has_units(self):
         r"""Test has_units."""
@@ -33,9 +22,9 @@ class TestPint(CisTestBase):
     def test_get_data(self):
         r"""Test get_data."""
         for v in self._vars_nounits:
-            np.testing.assert_array_equal(units.get_data(v), v)
+            self.assert_equal(units.get_data(v), v)
         for vno, v in zip(self._vars_nounits, self._vars_units):
-            np.testing.assert_array_equal(units.get_data(v), np.array(vno))
+            self.assert_equal(units.get_data(v), np.array(vno))
 
     def test_get_units(self):
         r"""Test get_units."""
@@ -87,8 +76,5 @@ class TestPint(CisTestBase):
         assert(units.are_compatible('cm', ''))
         assert(not units.are_compatible('cm', 's'))
         assert(not units.are_compatible('cm', 'invalid'))
-
-
-class TestUnyt(TestPint):
-    r"""Test for using unyt for units."""
-    _unit_package = 'unyt'
+        assert(units.are_compatible('d', 'hr'))
+        assert(units.are_compatible('hr', 'd'))
