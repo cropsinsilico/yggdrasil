@@ -193,11 +193,15 @@ def assert_equal(x, y):
             x = units.get_data(x)
         np.testing.assert_array_equal(x, y)
     else:
-        if units.has_units(y) and (not units.has_units(x)):  # pragma: debug
-            y = units.get_data(y)
-        elif (not units.has_units(y)) and units.has_units(x):
-            x = units.get_data(x)
-        ut.assertEqual(x, y)
+        if units.has_units(y) and units.has_units(x):
+            x = units.convert_to(x, units.get_units(y))
+            assert_equal(units.get_data(x), units.get_data(y))
+        else:
+            if units.has_units(y) and (not units.has_units(x)):  # pragma: debug
+                y = units.get_data(y)
+            elif (not units.has_units(y)) and units.has_units(x):
+                x = units.get_data(x)
+            ut.assertEqual(x, y)
 
 
 def assert_not_equal(x, y):
