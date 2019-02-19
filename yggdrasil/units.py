@@ -66,7 +66,7 @@ def get_data(obj):
         if _use_unyt:
             out = obj.to_ndarray()
         else:
-            out = np.array(obj)
+            out = obj.magnitude
     else:
         out = obj
     return out

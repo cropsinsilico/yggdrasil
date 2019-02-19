@@ -36,7 +36,7 @@ class ScalarMetaschemaType(MetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if super(ScalarMetaschemaType, cls).validate(obj,
+        if super(ScalarMetaschemaType, cls).validate(units.get_data(obj),
                                                      raise_errors=raise_errors):
             dtype = ScalarMetaschemaProperties.data2dtype(obj)
             if cls.is_fixed and ('subtype' in cls.fixed_properties):
