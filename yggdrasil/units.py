@@ -65,6 +65,8 @@ def get_data(obj):
     if has_units(obj):
         if _use_unyt:
             out = obj.to_ndarray()
+            if out.ndim == 0:
+                out = out.reshape((1, ))[0]
         else:
             out = obj.magnitude
     else:
