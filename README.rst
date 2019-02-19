@@ -4,12 +4,12 @@
 The CiS framework provides support for combining scientific models
 written in different programming languages. To combine two models,
 modelers add simple communications interfaces to the model code and
-provide simple declarative specification files that identfy the models
+provide simple declarative specification files that identify the models
 that should be run and the inputs and outputs those models expect.
 
-The system uses the specification file to configure the communications
+The system uses the specification files to configure the communications
 channels and expose them to the models. The complexity of the particular
-communications system is managed by the framework which performns
+communications system is managed by the framework, which performs
 communication setup, binds the communications to simple interfaces
 within the models, and manages execution of the models. The complexities
 of model registration and discovery, as well as the complexities of

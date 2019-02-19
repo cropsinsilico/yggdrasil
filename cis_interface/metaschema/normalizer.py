@@ -320,21 +320,22 @@ def create(*args, **kwargs):
             else:
                 return self._normalized
 
-        def is_type(self, instance, type):
+        def is_type(self, instance, types):
             r"""Determine if an object is an example of the given type.
 
             Args:
                 instance (object): Object to test against to the type.
-                type (str): Name of type that object should be tested against.
+                type (str, list): Name of single type or a list of types that
+                    instance should be tested against.
 
             Returns:
-                bool: True if the instance is of the specified type. False
+                bool: True if the instance is of the specified type(s). False
                     otherwise.
 
             """
-            out = super(Normalizer, self).is_type(instance, type)
+            out = super(Normalizer, self).is_type(instance, types)
             if (_jsonschema_ver_maj < 3) and out:
-                out = get_type_class(type).validate(instance)
+                out = get_type_class(types).validate(instance)
             return out
 
     return Normalizer
