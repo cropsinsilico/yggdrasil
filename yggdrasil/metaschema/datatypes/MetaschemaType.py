@@ -1,10 +1,9 @@
 import copy
-import json
 import uuid
 import pprint
 import jsonschema
 from yggdrasil import backwards, tools
-from yggdrasil.metaschema import get_metaschema, get_validator
+from yggdrasil.metaschema import get_metaschema, get_validator, encoder
 from yggdrasil.metaschema.datatypes import (
     MetaschemaTypeError, compare_schema, YGG_MSG_HEAD, get_type_class,
     conversions)
@@ -151,6 +150,20 @@ class MetaschemaType(object):
 
         """
         return (cls.name == t)
+
+    @classmethod
+    def jsonschema_type_checker(cls, checker, instance):
+        r"""Type checker for use with jsonschema >= 3.0.0.
+
+        Args:
+            checker (jsonschema.TypeChecker): Type checker class.
+            instance (object): Object being checked.
+
+        Returns:
+            bool: True if instance could be of this type, False otherwise.
+
+        """
+        return cls.validate(instance)
 
     @classmethod
     def validate(cls, obj, raise_errors=False):
@@ -593,12 +606,12 @@ class MetaschemaType(object):
             if k in metadata:
                 raise RuntimeError("'%s' is a reserved keyword in the metadata." % k)
         if not is_raw:
-            data = backwards.as_bytes(json.dumps(data, sort_keys=True))
+            data = encoder.encode_json(data)
         if no_metadata:
             return data
         metadata['size'] = len(data)
         metadata.setdefault('id', str(uuid.uuid4()))
-        metadata = backwards.as_bytes(json.dumps(metadata, sort_keys=True))
+        metadata = encoder.encode_json(metadata)
         msg = YGG_MSG_HEAD + metadata + YGG_MSG_HEAD + data
         return msg
     
@@ -634,7 +647,7 @@ class MetaschemaType(object):
             if len(metadata) == 0:
                 metadata = dict(size=len(data))
             else:
-                metadata = json.loads(backwards.as_unicode(metadata))
+                metadata = encoder.decode_json(metadata)
         else:
             data = msg
             if metadata is None:
@@ -656,7 +669,7 @@ class MetaschemaType(object):
               or (metadata.get('type', None) == 'direct') or dont_decode):
             return data, metadata
         else:
-            data = json.loads(backwards.as_unicode(data))
+            data = encoder.decode_json(data)
             obj = self.decode(metadata, data, self._typedef,
                               typedef_validated=True)
         return obj, metadata

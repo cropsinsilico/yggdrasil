@@ -1,7 +1,8 @@
-import numpy as np
+from yggdrasil import units
 from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
+from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
 
 
 @register_type
@@ -12,7 +13,7 @@ class OneDArrayMetaschemaType(ScalarMetaschemaType):
     description = 'A 1D array with or without units.'
     properties = ScalarMetaschemaType.properties + ['length']
     metadata_properties = ScalarMetaschemaType.metadata_properties + ['length']
-    python_types = (np.ndarray, )
+    python_types = ScalarMetaschemaProperties._all_python_arrays
 
     @classmethod
     def validate(cls, obj, raise_errors=False):
@@ -30,7 +31,7 @@ class OneDArrayMetaschemaType(ScalarMetaschemaType):
         if not super(OneDArrayMetaschemaType, cls).validate(obj,
                                                             raise_errors=raise_errors):
             return False
-        if obj.ndim != 1:
+        if units.get_data(obj).ndim != 1:
             if raise_errors:
                 raise ValueError("The array has more than one dimension.")
             return False
@@ -45,7 +46,7 @@ class NDArrayMetaschemaType(ScalarMetaschemaType):
     description = 'An ND array with or without units.'
     properties = ScalarMetaschemaType.properties + ['shape']
     metadata_properties = ScalarMetaschemaType.metadata_properties + ['shape']
-    python_types = (np.ndarray, )
+    python_types = ScalarMetaschemaProperties._all_python_arrays
 
     @classmethod
     def validate(cls, obj, raise_errors=False):
@@ -63,7 +64,7 @@ class NDArrayMetaschemaType(ScalarMetaschemaType):
         if not super(NDArrayMetaschemaType, cls).validate(obj,
                                                           raise_errors=raise_errors):
             return False
-        if obj.ndim <= 1:
+        if units.get_data(obj).ndim <= 1:
             if raise_errors:
                 raise ValueError("The array does not have more than one dimension.")
             return False

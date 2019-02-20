@@ -1,9 +1,9 @@
 import os
-import json
 import copy
 import warnings
 import numpy as np
 from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.datatypes import register_type_from_file, _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
@@ -129,10 +129,7 @@ def create_schema(overwrite=False):
             'edges': ['vertices'],
             'faces': ['vertices']}}
     with open(_schema_file, 'w') as fd:
-        if backwards.PY2:  # pragma: Python 2
-            json.dump(schema, fd, sort_keys=True, indent=4)
-        else:  # pragma: Python 3
-            json.dump(schema, fd, sort_keys=True, indent="\t")
+        encode_json(schema, fd, indent='\t')
 
 
 def get_schema():
@@ -145,7 +142,7 @@ def get_schema():
     if not os.path.isfile(_schema_file):
         create_schema()
     with open(_schema_file, 'r') as fd:
-        out = json.load(fd)
+        out = decode_json(fd)
     return out
 
 
@@ -591,7 +588,10 @@ class PlyDict(dict):
                 for v in self['faces'][i]['vertex_index']:
                     vertex_scalar[v].append(scalar_arr[i])
         for i in range(len(vertex_scalar)):
-            vertex_scalar[i] = np.mean(vertex_scalar[i])
+            if len(vertex_scalar[i]) == 0:
+                vertex_scalar[i] = 0
+            else:
+                vertex_scalar[i] = np.mean(vertex_scalar[i])
         vertex_scalar = np.array(vertex_scalar)
         if scaling == 'log':
             vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)

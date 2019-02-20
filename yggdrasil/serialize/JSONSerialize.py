@@ -1,23 +1,8 @@
-import json
 from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import (
+    indent_char2int, encode_json, decode_json, _use_rapidjson)
 from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-
-
-def indent_char2int(indent):
-    r"""Convert a character indent into a number of spaces that should be used.
-    Tabs are set to be equivalent to 4 spaces.
-
-    Args:
-        indent (str): String indent.
-
-    Returns:
-        int: Number of whitespaces that is equivalent to the provided string.
-
-    """
-    if isinstance(indent, str):
-        indent = len(indent.replace('\t', '    '))
-    return indent
 
 
 @register_serializer
@@ -43,12 +28,7 @@ class JSONSerialize(DefaultSerialize):
         """
         # Convert bytes to str because JSON cannot serialize bytes by default
         args = backwards.as_str(args, recurse=True, allow_pass=True)
-        indent = self.indent
-        if backwards.PY2:  # pragma: Python 2
-            # Character indents not allowed in Python 2 json
-            indent = indent_char2int(indent)
-        out = json.dumps(args, sort_keys=True, indent=indent)
-        return backwards.as_bytes(out)
+        return encode_json(args, indent=self.indent)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -60,8 +40,7 @@ class JSONSerialize(DefaultSerialize):
             obj: Deserialized Python object.
 
         """
-        out = json.loads(backwards.as_str(msg))
-        return out
+        return decode_json(msg)
 
     @classmethod
     def get_testing_options(cls, **kwargs):
@@ -79,7 +58,9 @@ class JSONSerialize(DefaultSerialize):
                'typedef': {'type': 'object'}}
         out['contents'] = (b'{\n\t"a": [\n\t\t"b",\n\t\t1,\n\t\t1.0\n\t],'
                            b'\n\t"c": {\n\t\t"z": "hello"\n\t}\n}')
+        if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
+            tab_rep = indent_char2int('\t') * b' '
+            out['contents'] = out['contents'].replace(b'\t', tab_rep)
         if backwards.PY2:  # pragma: Python 2
-            out['contents'] = out['contents'].replace(b'\t', 4 * b' ')
             out['contents'] = out['contents'].replace(b',', b', ')
         return out

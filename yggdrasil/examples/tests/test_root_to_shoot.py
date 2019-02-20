@@ -5,9 +5,7 @@ from yggdrasil.examples.tests import TestExample
 class TestExampleRootToShoot(TestExample):
     r"""Test the Root to Shoot example."""
 
-    def __init__(self, *args, **kwargs):
-        super(TestExampleRootToShoot, self).__init__(*args, **kwargs)
-        self._name = 'root_to_shoot'
+    example_name = 'root_to_shoot'
 
     @property
     def output_dir(self):

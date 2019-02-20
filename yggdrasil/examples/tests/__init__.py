@@ -1,11 +1,10 @@
 import os
 import uuid
-import warnings
 import unittest
 import tempfile
 from yggdrasil import runner, tools
 from yggdrasil.examples import yamls
-from yggdrasil.tests import YggTestBase, assert_equal
+from yggdrasil.tests import YggTestBase
 from yggdrasil.drivers.MatlabModelDriver import _matlab_installed
 
 
@@ -15,13 +14,15 @@ _c_comm_installed = tools.get_installed_comm(language='c')
 class TestExample(YggTestBase, tools.YggClass):
     r"""Base class for running examples."""
 
+    example_name = None
+    expects_error = False
+    env = {}
+
     def __init__(self, *args, **kwargs):
-        tools.YggClass.__init__(self, None)
+        tools.YggClass.__init__(self, self.example_name)
         self.language = None
         self.uuid = str(uuid.uuid4())
-        self.env = {}
         self.runner = None
-        self.expects_error = False
         # self.debug_flag = True
         super(TestExample, self).__init__(*args, **kwargs)
 
@@ -101,7 +102,7 @@ class TestExample(YggTestBase, tools.YggClass):
         out_list = self.output_files
         assert(res_list is not None)
         assert(out_list is not None)
-        assert_equal(len(res_list), len(out_list))
+        self.assert_equal(len(res_list), len(out_list))
         for res, fout in zip(res_list, out_list):
             self.check_file_exists(fout)
             if isinstance(res, tuple):
@@ -114,8 +115,8 @@ class TestExample(YggTestBase, tools.YggClass):
         r"""This runs an example in the correct language."""
         if self.yaml is None:
             if self.name is not None:
-                warnings.warn("Could not locate example %s in language %s." %
-                              (self.name, self.language))
+                raise unittest.SkipTest("Could not locate example %s in language %s." %
+                                        (self.name, self.language))
         else:
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
@@ -161,9 +162,9 @@ class TestExample(YggTestBase, tools.YggClass):
         self.run_example()
         self.language = None
 
-    def test_matlab(self):
+    @unittest.skipIf(not _matlab_installed, "Matlab not installed")
+    def test_matlab(self):  # pragma: matlab
         r"""Test the Matlab version of the example."""
-        if _matlab_installed:  # pragma: matlab
-            self.language = 'matlab'
-            self.run_example()
-            self.language = None
+        self.language = 'matlab'
+        self.run_example()
+        self.language = None

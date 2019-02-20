@@ -274,6 +274,10 @@ class IPCComm(AsyncComm.AsyncComm):
             return False
         try:
             self.q.current_messages
+        except AttributeError:  # pragma: debug
+            if self.q is not None:
+                raise
+            return False
         except sysv_ipc.ExistentialError:  # pragma: debug
             self._close_direct()
             return False
@@ -295,6 +299,10 @@ class IPCComm(AsyncComm.AsyncComm):
         if self.is_open_direct:
             try:
                 return self.q.current_messages
+            except AttributeError:  # pragma: debug
+                if self.is_open_direct:
+                    raise
+                return 0
             except sysv_ipc.ExistentialError:  # pragma: debug
                 self._close_direct()
                 return 0
@@ -352,16 +360,20 @@ class IPCComm(AsyncComm.AsyncComm):
         except sysv_ipc.ExistentialError:  # pragma: debug
             self.debug("sysv_ipc.ExistentialError: closing")
             self._close_direct()
-            return (False, self.empty_msg)
+            return (False, self.empty_bytes_msg)
         except AttributeError:  # pragma: debug
             if self.is_closed:
                 self.debug("Queue closed")
-                return (False, self.empty_msg)
+                return (False, self.empty_bytes_msg)
             raise
         return (True, data)
 
     def purge(self):
         r"""Purge all messages from the comm."""
         super(IPCComm, self).purge()
-        while self.n_msg_direct > 0:  # pragma: debug
-            self.q.receive()
+        try:
+            while self.n_msg_direct > 0:  # pragma: debug
+                self.q.receive()
+        except AttributeError:  # pragma: debug
+            if self.is_open_direct:
+                raise

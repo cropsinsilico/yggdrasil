@@ -4,13 +4,14 @@ import shutil
 import uuid
 import difflib
 import importlib
+import contextlib
+import warnings
 import unittest
 import numpy as np
 import pandas as pd
 import threading
 import psutil
 import copy
-import nose.tools as nt
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil.tools import get_default_comm, YggClass
 from yggdrasil import backwards, platform, units
@@ -69,12 +70,52 @@ shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 enable_long_tests = os.environ.get("YGG_ENABLE_LONG_TESTS", False)
 
 
-def assert_raises(exception, callable, *args, **kwargs):
+if backwards.PY2:  # pragma: Python 2
+    # Dummy TestCase instance, so we can initialize an instance
+    # and access the assert instance methods
+    class DummyTestCase(unittest.TestCase):  # pragma: no cover
+        def __init__(self):
+            super(DummyTestCase, self).__init__('_dummy')
+
+        def _dummy(self):
+            pass
+
+    # A metaclass that makes __getattr__ static
+    class AssertsAccessorType(type):  # pragma: no cover
+        dummy = DummyTestCase()
+
+        def __getattr__(cls, key):
+            return getattr(AssertsAccessor.dummy, key)
+
+    # The actual accessor, a static class, that redirect the asserts
+    class AssertsAccessor(object):  # pragma: no cover
+        __metaclass__ = AssertsAccessorType
+        
+    ut = AssertsAccessor
+        
+else:  # pragma: Python 3
+
+    ut = unittest.TestCase()
+
+
+def long_running(func):
+    r"""Decorator for marking long tests that should be skipped if
+    CIS_ENABLE_LONG_TESTS is set.
+
+    Args:
+        func (callable): Test function or method.
+
+    """
+    return unittest.skipIf(not enable_long_tests, "Long tests not enabled.")(func)
+
+
+def assert_raises(exception, *args, **kwargs):
     r"""Assert that a call raises an exception.
 
     Args:
         exception (Exception): Exception class that should be raised.
-        callable (function, class): Callable that should raise the exception.
+        callable (function, class, optional): Callable that should raise the
+            exception. If not provided, a context manager is returned.
         *args: Additional arguments are passed to the callable.
         **kwargs: Additional keyword arguments are passed to the callable.
 
@@ -82,7 +123,44 @@ def assert_raises(exception, callable, *args, **kwargs):
         AssertionError: If the correct exception is not raised.
 
     """
-    return nt.assert_raises(exception, callable, *args, **kwargs)
+    return ut.assertRaises(exception, *args, **kwargs)
+
+
+@contextlib.contextmanager
+def assert_warns(warning, *args, **kwargs):
+    r"""Assert that a call (or context) raises an exception.
+
+    Args:
+        warning (Warning): Warning class that should be raised.
+        callable (function, class, optional): Function that should raise
+            the warning. If not provided, a context manager is returned.
+        *args: Additional arguments are passed to the callable.
+        **kwargs: Additional keyword arguments are passed to the callable.
+
+    Raises:
+        AssertionError: If the correct warning is not caught.
+
+    """
+    if backwards.PY2:  # pragma: Python 2
+        if args and args[0] is None:  # pragma: debug
+            warnings.warn("callable is None",
+                          DeprecationWarning, 3)
+            args = ()
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            try:
+                if not args:
+                    yield w
+                else:  # pragma: debug
+                    callable_obj = args[0]
+                    args = args[1:]
+                    callable_obj(*args, **kwargs)
+            finally:
+                assert(len(w) >= 1)
+                for iw in w:
+                    assert(issubclass(iw.category, warning))
+    else:  # pragma: Python 3
+        yield ut.assertWarns(warning, *args, **kwargs)
 
 
 def assert_equal(x, y):
@@ -98,13 +176,13 @@ def assert_equal(x, y):
     """
     if isinstance(y, (list, tuple)):
         assert(isinstance(x, (list, tuple)))
-        nt.assert_equal(len(x), len(y))
+        ut.assertEqual(len(x), len(y))
         for ix, iy in zip(x, y):
             assert_equal(ix, iy)
     elif isinstance(y, dict):
         assert(issubclass(y.__class__, dict))
-        # nt.assert_equal(type(x), type(y))
-        nt.assert_equal(len(x), len(y))
+        # ut.assertEqual(type(x), type(y))
+        ut.assertEqual(len(x), len(y))
         for k, iy in y.items():
             ix = x[k]
             assert_equal(ix, iy)
@@ -115,11 +193,15 @@ def assert_equal(x, y):
             x = units.get_data(x)
         np.testing.assert_array_equal(x, y)
     else:
-        if units.has_units(y) and (not units.has_units(x)):  # pragma: debug
-            y = units.get_data(y)
-        elif (not units.has_units(y)) and units.has_units(x):
-            x = units.get_data(x)
-        nt.assert_equal(x, y)
+        if units.has_units(y) and units.has_units(x):
+            x = units.convert_to(x, units.get_units(y))
+            assert_equal(units.get_data(x), units.get_data(y))
+        else:
+            if units.has_units(y) and (not units.has_units(x)):  # pragma: debug
+                y = units.get_data(y)
+            elif (not units.has_units(y)) and units.has_units(x):
+                x = units.get_data(x)
+            ut.assertEqual(x, y)
 
 
 def assert_not_equal(x, y):
@@ -133,11 +215,11 @@ def assert_not_equal(x, y):
         AssertionError: If the two objects are equivalent.
 
     """
-    nt.assert_not_equal(x, y)
+    ut.assertNotEqual(x, y)
         
 
 class YggTestBase(unittest.TestCase):
-    r"""Wrapper for unittest.TestCase that allows use of nose setup and
+    r"""Wrapper for unittest.TestCase that allows use of setup and
     teardown methods along with description prefix.
 
     Args:
@@ -181,15 +263,15 @@ class YggTestBase(unittest.TestCase):
 
     def assert_less_equal(self, x, y):
         r"""Assert that one value is less than or equal to another."""
-        nt.assert_less_equal(x, y)
+        return self.assertLessEqual(x, y)
 
     def assert_greater(self, x, y):
         r"""Assert that one value is greater than another."""
-        nt.assert_greater(x, y)
+        return self.assertGreater(x, y)
 
     def assert_raises(self, *args, **kwargs):
         r"""Assert that a function raises an error."""
-        assert_raises(*args, **kwargs)
+        return self.assertRaises(*args, **kwargs)
 
     @property
     def comm_count(self):

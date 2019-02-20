@@ -1,17 +1,14 @@
 import os
 import copy
 import pprint
-import json
 import jsonschema
 import yggdrasil
 from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import encode_json, decode_json
 from yggdrasil.metaschema.properties import (
     get_registered_properties, import_all_properties)
 from yggdrasil.metaschema.datatypes import (
-    get_registered_types, import_all_types)
-
-
-_base_validator = jsonschema.validators.validator_for({"$schema": ""})
+    get_registered_types, import_all_types, _jsonschema_ver_maj)
 
 
 # TODO: this should be included in release as YAML/JSON and then loaded
@@ -20,13 +17,21 @@ _metaschema_fname = os.path.abspath(os.path.join(
     os.path.dirname(yggdrasil.__file__), _metaschema_fbase))
 _metaschema = None
 _validator = None
+_base_schema = {"$schema": ""}
 
 
 if os.path.isfile(_metaschema_fname):
     with open(_metaschema_fname, 'r') as fd:
-        _metaschema = json.load(fd)  # , object_pairs_hook=OrderedDict)
+        _metaschema = decode_json(fd)
+    schema_id = _metaschema.get('id', _metaschema.get('$id', None))
+    assert(schema_id is not None)
+    _metaschema.setdefault('$schema', schema_id)
+    _base_schema['$schema'] = _metaschema.get('$schema', schema_id)
 
+        
+_base_validator = jsonschema.validators.validator_for(_base_schema)
 
+        
 def create_metaschema(overwrite=False):
     r"""Create the meta schema for validating ygg schema.
 
@@ -49,7 +54,7 @@ def create_metaschema(overwrite=False):
     out = copy.deepcopy(_base_validator.META_SCHEMA)
     out['title'] = "Ygg meta-schema for data type schemas"
     # TODO: Replace schema with a link to the metaschema in the documentation
-    del out['$schema']
+    # del out['$schema']
     # Add properties
     for k, v in get_registered_properties().items():
         if v.schema is not None:
@@ -70,10 +75,7 @@ def create_metaschema(overwrite=False):
     pprint.pprint(out)
     # Save it to a file
     with open(_metaschema_fname, 'w') as fd:
-        if backwards.PY2:  # pragma: Python 2
-            json.dump(out, fd, sort_keys=True, indent=4)
-        else:  # pragma: Python 3
-            json.dump(out, fd, sort_keys=True, indent='\t')
+        encode_json(out, fd)
     return out
 
 
@@ -120,21 +122,32 @@ def get_validator(overwrite=False, normalizers=None, **kwargs):
                 assert(k not in all_validators)
             all_validators[k] = v.wrapped_validate
         # Get set of datatypes
-        # TODO: This will need to be changed with deprecation in jsonschema
-        all_datatypes = copy.deepcopy(_base_validator.DEFAULT_TYPES)
-        for k, v in get_registered_types().items():
-            if (not v._replaces_existing):
-                # Error raised on registration
-                assert(k not in all_datatypes)
-            all_datatypes[k] = v.python_types
+        # TODO: This will need to be changed if back-ported in jsonschema
+        if _jsonschema_ver_maj < 3:
+            all_datatypes = copy.deepcopy(_base_validator.DEFAULT_TYPES)
+            for k, v in get_registered_types().items():
+                if (not v._replaces_existing):
+                    # Error raised on registration
+                    assert(k not in all_datatypes)
+                all_datatypes[k] = v.python_types
+            kwargs['default_types'] = all_datatypes
+        else:
+            type_checker = copy.deepcopy(_base_validator.TYPE_CHECKER)
+            new_type_checkers = {}
+            for k, v in get_registered_types().items():
+                if (not v._replaces_existing):
+                    # Error raised on registration
+                    assert(k not in type_checker._type_checkers)
+                new_type_checkers[k] = v.jsonschema_type_checker
+            kwargs['type_checker'] = type_checker.redefine_many(
+                new_type_checkers)
         # Get set of normalizers
         if normalizers is None:
             normalizers = {}
         # Use default base and update validators
         _validator = normalizer.create(meta_schema=metaschema,
                                        validators=all_validators,
-                                       normalizers=normalizers,
-                                       default_types=all_datatypes, **kwargs)
+                                       normalizers=normalizers, **kwargs)
         _validator._base_validator = _base_validator
     return _validator
 

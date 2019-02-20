@@ -22,7 +22,7 @@ Manual Installation
 -------------------
 
 .. note::
-   Before installing |yggdrasil| from ``pip`` or source, you 
+   Before installing |yggdrasil| from ``pip`` or the cloned repository, you 
    should install the non-Python dependencies, particularly the
    ZeroMQ C and C++ libraries (see below).
 
@@ -35,12 +35,20 @@ using ``pip``::
 or by cloning the `Git <https://git-scm.com/>`_ repository on
 `Github <https://github.com/cropsinsilico/yggdrasil>`_::
 
-  $ git clone https://github.com/cropsinsilico/yggdrasil.git
+  $ git clone --recurse-submodules https://github.com/cropsinsilico/yggdrasil.git
 
 and then building the distribution.::
 
   $ cd yggdrasil
   $ python setup.py install
+
+If the ``--recurse-submodules`` option was not included when cloning the repo, 
+you will need to run the following from within the repository before calling
+``python setup.py install`` to ensure that
+`rapidjson <http://rapidjson.org/>`_ is cloned as a submodule::
+
+  $ git submodule init
+  $ git submodule update
 
 If you do not have admin privileges on the target machine, ``--user`` can be
 added to the end of either the ``pip`` or ``setup.py`` installation commands.
@@ -69,7 +77,18 @@ Windows (>=7), the following command will permanently modify your path::
   $ setx PATH "%PATH%:<scripts_dir>
 
 The changes will take affect the next time you open the terminal.
-  
+
+
+User Defined rapidjson
+----------------------
+
+If you would like to use an existing installation of the
+`rapidjson <http://rapidjson.org/>`_ 
+header-only library, you can pass the flag
+``--rapidjson-include-dir=<user_defined_dir>`` to either the ``pip``
+or ``setup.py`` installation commands from above with the location of the
+existing rapidjson include directory.
+
 
 Additional Steps on Windows
 ---------------------------
@@ -88,6 +107,9 @@ containing the libraries to your PATH environment variable prior to
 running one of the above install commands. If |yggdrasil| complains
 that it cannot find these libraries, you can manually set them in your
 ``.yggdrasil.cfg`` file (See :ref:`Configuration Options <config_rst>`).
+If you install these libraries after installing |yggdrasil| you can re-configure
+|yggdrasil| and have it search for the libraries again by calling ``yggconfig``
+from the command line.
 
 .. note::
    Although not required, the ZeroMQ libraries are also recommended for message 
@@ -107,7 +129,9 @@ install, but should it fail or if you want to use a non-default version of Matla
 you can also do it manually.
 
 Instructions for installing the Matlab engine as a python package can be found on the 
-`Mathworks website <https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html>`_.
+`Mathworks website <https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html>`_. Once you have installed the Matlab engine as a python
+package, you can re-configure |yggdrasil| by calling ``yggconfig``. from the comamnd
+line.
 
 .. note::
    The version of Matlab that you are using will determine the versions of 

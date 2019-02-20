@@ -38,6 +38,9 @@ class FileComm(CommBase.CommBase):
             the end is reached. If writing, each output will be to a new
             file in the series. The addressed is assumed to contain a format
             for the index of the file. Defaults to False.
+        wait_for_creation (float, optional): Time (in seconds) that should be
+            waited before opening for the file to be created if it dosn't exist.
+            Defaults to 0 s and file will attempt to be opened immediately.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -69,7 +72,8 @@ class FileComm(CommBase.CommBase):
          'filetype': {'type': 'string', 'default': _filetype},
          'append': {'type': 'boolean', 'default': False},
          'in_temp': {'type': 'boolean', 'default': False},
-         'is_series': {'type': 'boolean', 'default': False}},
+         'is_series': {'type': 'boolean', 'default': False},
+         'wait_for_creation': {'type': 'float', 'default': 0.0}},
         remove_keys=['commtype', 'datatype'], **DirectSerialize._schema_properties)
     _default_serializer = DirectSerialize
     _attr_conv = ['newline', 'platform_newline']
@@ -234,7 +238,11 @@ class FileComm(CommBase.CommBase):
 
         """
         if self.is_open:
-            self.fd.seek(file_pos)
+            try:
+                self.fd.seek(file_pos)
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
+                    raise
 
     def advance_in_series(self, series_index=None):
         r"""Advance to a certain file in a series.
@@ -289,13 +297,22 @@ class FileComm(CommBase.CommBase):
     def _open(self):
         address = self.current_address
         if self.fd is None:
+            if (not os.path.isfile(address)) and (self.wait_for_creation > 0):
+                T = self.start_timeout(self.wait_for_creation)
+                while (not T.is_out) and (not os.path.isfile(address)):
+                    self.sleep()
+                self.stop_timeout()
             self._fd = open(address, self.open_mode)
         T = self.start_timeout()
         while (not T.is_out) and (not self.is_open):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         if self.append == 'ow':
-            self.fd.seek(0, os.SEEK_END)
+            try:
+                self.fd.seek(0, os.SEEK_END)
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
+                    raise
 
     def _file_close(self):
         if self.is_open:
@@ -304,7 +321,11 @@ class FileComm(CommBase.CommBase):
                 os.fsync(self.fd.fileno())
             except OSError:  # pragma: debug
                 pass
-            self.fd.close()
+            try:
+                self.fd.close()
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
+                    raise
         self._fd = None
 
     def open(self):
@@ -337,7 +358,12 @@ class FileComm(CommBase.CommBase):
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
-        return (self.fd is not None) and (not self.fd.closed)
+        try:
+            return (self.fd is not None) and (not self.fd.closed)
+        except AttributeError:  # pragma: debug
+            if self.fd is not None:
+                raise
+            return False
 
     @property
     def fd(self):
@@ -356,6 +382,8 @@ class FileComm(CommBase.CommBase):
             endpos = self.fd.tell()
             out = endpos - curpos
         except (ValueError, AttributeError):  # pragma: debug
+            if self.is_open:
+                raise
             out = 0
         if self.is_series:
             i = self._series_index + 1
@@ -399,7 +427,11 @@ class FileComm(CommBase.CommBase):
 
         """
         flag, msg_s = super(FileComm, self).on_send_eof()
-        self.fd.flush()
+        try:
+            self.fd.flush()
+        except (AttributeError, ValueError):  # pragma: debug
+            if self.is_open:
+                raise
         # self.close()
         return flag, msg_s
 
@@ -413,13 +445,18 @@ class FileComm(CommBase.CommBase):
             bool: Success or failure of writing to the file.
 
         """
-        if msg != self.eof_msg:
-            if not self.open_as_binary:
-                msg = backwards.as_unicode(msg)
-            self.fd.write(msg)
-            if self.append == 'ow':
-                self.fd.truncate()
-        self.fd.flush()
+        try:
+            if msg != self.eof_msg:
+                if not self.open_as_binary:
+                    msg = backwards.as_unicode(msg)
+                self.fd.write(msg)
+                if self.append == 'ow':
+                    self.fd.truncate()
+            self.fd.flush()
+        except (AttributeError, ValueError):  # pragma: debug
+            if self.is_open:
+                raise
+            return False
         if msg != self.eof_msg and self.is_series:
             self.advance_in_series()
             self.debug("Advanced to %d", self._series_index)
@@ -462,4 +499,8 @@ class FileComm(CommBase.CommBase):
     def purge(self):
         r"""Purge all messages from the comm."""
         if self.is_open and self.direction == 'recv':
-            self.fd.seek(0, os.SEEK_END)
+            try:
+                self.fd.seek(0, os.SEEK_END)
+            except (AttributeError, ValueError):  # pragma: debug
+                if self.is_open:
+                    raise

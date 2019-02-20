@@ -36,7 +36,7 @@ class ScalarMetaschemaType(MetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if super(ScalarMetaschemaType, cls).validate(obj,
+        if super(ScalarMetaschemaType, cls).validate(units.get_data(obj),
                                                      raise_errors=raise_errors):
             dtype = ScalarMetaschemaProperties.data2dtype(obj)
             if cls.is_fixed and ('subtype' in cls.fixed_properties):
@@ -151,8 +151,8 @@ class ScalarMetaschemaType(MetaschemaType):
         """
         bytes = backwards.base64_decode(obj.encode('ascii'))
         dtype = ScalarMetaschemaProperties.definition2dtype(typedef)
-        # arr = np.frombuffer(bytes, dtype=dtype)
-        arr = np.fromstring(bytes, dtype=dtype)
+        arr = np.frombuffer(bytes, dtype=dtype)
+        # arr = np.fromstring(bytes, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
         out = cls.from_array(arr, unit_str=typedef.get('units', None), dtype=dtype)

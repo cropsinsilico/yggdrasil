@@ -497,13 +497,11 @@ int nrpcCallBase(const yggRpc_t rpc, const int allow_realloc, size_t nargs, ...)
 /*!
   File IO
 
-  Handle I/O from/to a local or remote file line by line.
+  Handle I/O from/to a file line by line.
 
   Input Usage:
-      1. One-time: Create file interface by providing either a channel name or
-         a path to a local file.
-	    comm_t fin = yggAsciiFileInput("file_channel"); // channel
-	    comm_t fin = yggAsciiFileInput_local("/local/file.txt"); // local file
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fin = yggAsciiFileInput("file_channel");
       2. Prepare: Get pointer for line.
             char *line;
       3. Receive each line, terminating when receive returns -1 (EOF or channel
@@ -517,10 +515,8 @@ int nrpcCallBase(const yggRpc_t rpc, const int allow_realloc, size_t nargs, ...)
             free(line);
 
   Output Usage:
-      1. One-time: Create file interface by providing either a channel name or
-         a path to a local file.
-	    comm_t fout = yggAsciiFileOutput("file_channel"); // channel
-	    comm_t fout = yggAsciiFileOutput_local("/local/file.txt"); // local file
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fout = yggAsciiFileOutput("file_channel");
       2. Send lines to the file. If return value is not 0, the send was not
           succesfull.
             int ret;
@@ -547,17 +543,6 @@ comm_t yggAsciiFileOutput(const char *name) {
 };
 
 /*!
-  @brief Constructor for AsciiFile output comm to local file.
-  @param[in] name constant character pointer to path of local file.
-  @returns comm_t for line-by-line output to a file or channel.
- */
-static inline
-comm_t yggAsciiFileOutput_local(const char *name) {
-  comm_t out = init_comm(name, "send", ASCII_FILE_COMM, NULL);
-  return out;
-};
-
-/*!
   @brief Constructor for AsciiFile input comm from channel.
   @param[in] name constant character pointer to name of an input channel.
   @returns comm_t for line-by-line input from a file or channel.
@@ -569,34 +554,18 @@ comm_t yggAsciiFileInput(const char *name) {
 };
 
 
-/*!
-  @brief Constructor for AsciiFile input comm from local file.
-  @param[in] name constant character pointer to path of local file.
-  @returns comm_t for line-by-line input from a file or channel.
- */
-static inline
-comm_t yggAsciiFileInput_local(const char *name) {
-  comm_t out = init_comm(name, "recv", ASCII_FILE_COMM, NULL);
-  return out;
-};
-
-
-
 //==============================================================================
 /*!
   Table IO
 
-  Handle I/O from/to a local or remote ASCII table either line-by-line or as
-  an array.
+  Handle I/O from/to an ASCII table either line-by-line or as an array.
 
   Row-by-Row
   ==========
 
   Input by Row Usage:
-      1. One-time: Create file interface by providing either a channel name or
-         a path to a local file.
-	    comm_t fin = yggAsciiTableInput("file_channel");    // channel
-	    comm_t fin = yggAsciiTableInput_local("/local/file.txt"); // local table
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fin = yggAsciiTableInput("file_channel");
       2. Prepare: Allocate space for variables in row (the format in this
          example is "%5s %d %f\n" like the output example below).
 	    char a[5];
@@ -611,12 +580,9 @@ comm_t yggAsciiFileInput_local(const char *name) {
 	    }
 
   Output by Row Usage:
-      1. One-time: Create file interface by providing either a channel name or
-         a path to a local file and a format string for rows.
-	    comm_t fout = yggAsciiTableOutput("file_channel",    // channel
-                                              "%5s %d %f\n");
-	    comm_t fout = yggAsciiTableOutput_local("/local/file.txt", // local table
-                                                    "%5s %d %f\n");
+      1. One-time: Create file interface by providing a channel name and a
+         format string for rows.
+	    comm_t fout = yggAsciiTableOutput("file_channel", "%5s %d %f\n");
       2. Send rows to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
@@ -627,10 +593,8 @@ comm_t yggAsciiFileInput_local(const char *name) {
   =====
 
   Input by Array Usage:
-      1. One-time: Create file interface by providing either a channel name or
-         a path to a local file.
-	    comm_t fin = yggAsciiArrayInput("file_channel");    // channel
-	    comm_t fin = yggAsciiArrayInput_local("/local/file.txt"); // local table
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fin = yggAsciiArrayInput("file_channel");
       2. Prepare: Declare pointers for table columns (they will be allocated by
          the interface once the number of rows is known).
 	    char *aCol;
@@ -646,12 +610,9 @@ comm_t yggAsciiFileInput_local(const char *name) {
             free(c);
 
   Output by Array Usage:
-      1. One-time: Create file interface by providing either a channel name or
-         a path to a local file and a format string for rows.
-	    comm_t fout = yggAsciiArrayOutput("file_channel",    // channel
-                                              "%5s %d %f\n");
-	    comm_t fout = yggAsciiArrayOutput_local("/local/file.txt", // local table
-	                                            "%5s %d %f\n");
+      1. One-time: Create file interface by providing a channel name and a
+         format string for rows.
+	    comm_t fout = yggAsciiArrayOutput("file_channel", "%5s %d %f\n");
       2. Send columns to the file by providing pointers (or arrays). Formatting
          is handled by the interface. If return value is not 0, the send was not
 	 succesful.
@@ -692,30 +653,6 @@ comm_t yggAsciiTableInput(const char *name) {
 };
 
 /*!
-  @brief Constructor for table output comm to local file.
-  @param[in] name constant character pointer to local file path.
-  @param[in] format_str character pointer to format string that should be used
-  to format rows into table lines.
-  @returns comm_t output structure.
- */
-static inline
-comm_t yggAsciiTableOutput_local(const char *name, const char *format_str) {
-  void* seri_info = get_ascii_table_type(format_str, 0);
-  return init_comm(name, "send", ASCII_TABLE_COMM, seri_info);
-};
-
-/*!
-  @brief Constructor for AsciiTable input comm from local file.
-  @param[in] name constant character pointer to local file path.
-  @returns comm_t input structure.
- */
-static inline
-comm_t yggAsciiTableInput_local(const char *name) {
-  void* seri_info = get_ascii_table_type(NULL, 0);
-  return init_comm(name, "recv", ASCII_TABLE_COMM, seri_info);
-};
-
-/*!
   @brief Constructor for table output comm with array output.
   @param[in] name constant character pointer to an output channel name.
   @param[in] format_str character pointer to format string that should be used
@@ -737,29 +674,6 @@ comm_t yggAsciiArrayInput(const char *name) {
   return yggAsciiTableInput(name);
 };
 
-/*!
-  @brief Constructor for table output comm to local file from arrays.
-  @param[in] name constant character pointer to local file path.
-  @param[in] format_str character pointer to format string that should be used
-  to format rows into table lines.
-  @returns comm_t output structure.
- */
-static inline
-comm_t yggAsciiArrayOutput_local(const char *name, const char *format_str) {
-  void* seri_info = get_ascii_table_type(format_str, 1);
-  return init_comm(name, "send", ASCII_TABLE_COMM, seri_info);
-};
-
-/*!
-  @brief Constructor for AsciiTable input comm from local file as arrays.
-  @param[in] name constant character pointer to local file path.
-  @returns comm_t input structure.
- */
-static inline
-comm_t yggAsciiArrayInput_local(const char *name) {
-  void* seri_info = get_ascii_table_type(NULL, 1);
-  return init_comm(name, "recv", ASCII_TABLE_COMM, seri_info);
-};
 
 //==============================================================================
 /*!

@@ -22,6 +22,8 @@ Welcome to yggdrasil's documentation!
    io_drivers
    model_drivers
    model_interface
+   metaschema
+   schema
    code
    examples/examples_toc
    release

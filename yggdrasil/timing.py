@@ -143,8 +143,8 @@ def perf_func(loops, timer, nmsg, msg_size, max_errors):
                 if nerrors >= max_errors:
                     raise
                 else:
-                    warnings.warn("Error %d/%d. Trying again. (error = '%s')" % (
-                        nerrors, max_errors, e))
+                    warnings.warn("Error %d/%d. Trying again. (error = '%s')"
+                                  % (nerrors, max_errors, e), RuntimeWarning)
     return ttot
 
 
@@ -1284,7 +1284,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         v = fits[k]
         print(fmt_row % (k, v[0], v[1]))
     # Save plot
-    plt.savefig(plotfile)
+    plt.savefig(plotfile, dpi=600)
     logging.info('plotfile: %s', plotfile)
     if cleanup_plot:
         os.remove(plotfile)

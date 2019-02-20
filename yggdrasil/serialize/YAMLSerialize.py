@@ -1,8 +1,8 @@
 import yaml
 from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import indent_char2int
 from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-from yggdrasil.serialize.JSONSerialize import indent_char2int
 
 
 @register_serializer

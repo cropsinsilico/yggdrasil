@@ -4,12 +4,12 @@
 The CiS framework, yggdrasil, provides support for combining scientific models
 written in different programming languages. To combine two models,
 modelers add simple communications interfaces to the model code and
-provide simple declarative specification files that identfy the models
+provide simple declarative specification files that identify the models
 that should be run and the inputs and outputs those models expect.
 
-The system uses the specification file to configure the communications
+The system uses the specification files to configure the communications
 channels and expose them to the models. The complexity of the particular
-communications system is managed by the framework which performns
+communications system is managed by the framework, which performs
 communication setup, binds the communications to simple interfaces
 within the models, and manages execution of the models. The complexities
 of model registration and discovery, as well as the complexities of
@@ -23,6 +23,10 @@ Please refer to the package
 `documentation <https://cropsinsilico.github.io/yggdrasil/>`__ for
 additional information about the package and directions for installing
 it.
+
+.. note:: yggdrasil was previously known as cis_interface. While cis_interface
+   can be installed from PyPI `here <https://pypi.org/project/cis-interface/>`__,
+   cis_interface will no longer be updated.
 
 .. |PyPI version| image:: https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat
    :target: https://pypi.org/project/yggdrasil-framework

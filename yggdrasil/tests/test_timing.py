@@ -1,7 +1,8 @@
 import os
 import copy
+import unittest
 from yggdrasil import tools, timing, backwards, platform
-from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
+from yggdrasil.tests import YggTestClass, assert_raises, long_running
 
 
 _test_size = 1
@@ -98,6 +99,12 @@ class TimedRunTestBase(YggTestClass):
         r"""str: Name of the file where data is stored."""
         return self.instance.filename
 
+    def check_filename(self):
+        r"""Raise a unittest.SkipTest error if the filename dosn't exist."""
+        if not os.path.isfile(self.filename):  # pragma: debug
+            raise unittest.SkipTest("Performance stats file dosn't exist: %s"
+                                    % self.filename)
+
     def get_raw_data(self):
         r"""Get the raw contents of the data file."""
         out = ''
@@ -111,6 +118,7 @@ class TimedRunTestBase(YggTestClass):
         self.instance.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@long_running
 class TestTimedRun(TimedRunTestBase):
     r"""Test class for the TimedRun class using existing data."""
 
@@ -131,22 +139,25 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_json(self):
         r"""Test loading/saving perf data as json."""
+        self.check_filename()
         old_text = self.get_raw_data()
         x = self.instance.load(as_json=True)
         self.instance.save(x, overwrite=True)
         new_text = self.get_raw_data()
-        assert_equal(new_text, old_text)
+        self.assert_equal(new_text, old_text)
 
     def test_save(self):
         r"""Test save with/without overwrite."""
+        self.check_filename()
         old_text = self.get_raw_data()
         assert_raises(RuntimeError, self.instance.save, self.instance.data)
         self.instance.save(self.instance.data, overwrite=True)
         new_text = self.get_raw_data()
-        assert_equal(new_text, old_text)
+        self.assert_equal(new_text, old_text)
 
     def test_scaling_count(self):
         r"""Test running scaling with number of messages."""
+        self.check_filename()
         kwargs = dict(min_count=self.count, max_count=self.count,
                       nsamples=1, nrep=self.nrep)
         self.instance.scaling_count(self.size, scaling='log', **kwargs)
@@ -157,6 +168,7 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_scaling_size(self):
         r"""Test running scaling with size of messages."""
+        self.check_filename()
         kwargs = dict(min_size=self.size, max_size=self.size,
                       nsamples=1, nrep=self.nrep)
         self.instance.scaling_size(self.count, scaling='log', **kwargs)
@@ -167,6 +179,7 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_plot_scaling_joint(self):
         r"""Test plot_scaling_joint."""
+        self.check_filename()
         kwargs = dict(msg_size0=self.size, msg_count0=self.count,
                       msg_size=[self.size], msg_count=[self.count],
                       per_message=True, time_method='bestof')
@@ -174,6 +187,7 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_plot_scaling(self):
         r"""Test plot_scaling corner cases not covered by test_plot_scaling_joint."""
+        self.check_filename()
         self.instance.plot_scaling(self.size, [self.count], per_message=True,
                                    time_method='average', yscale='linear')
         self.instance.plot_scaling([self.size], self.count, per_message=False,
@@ -205,16 +219,19 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_perfjson_to_pandas(self):
         r"""Test perfjson_to_pandas."""
+        self.check_filename()
         timing.perfjson_to_pandas(self.filename)
 
     def test_fits(self):
         r"""Test fits to scaling on one platform."""
+        self.check_filename()
         self.instance.time_per_byte
         self.instance.time_per_message
         self.instance.startup_time
 
     def test_plot_scalings(self):
         r"""Test plot_scalings corner cases on test platform."""
+        self.check_filename()
         kwargs = copy.deepcopy(self.inst_kwargs)
         kwargs.update(msg_size=[self.size], msg_size0=self.size,
                       msg_count=[self.count], msg_count0=self.count,
@@ -235,6 +252,7 @@ class TestTimedRun(TimedRunTestBase):
 
     def test_production_runs(self):
         r"""Test production tests (those used in paper)."""
+        self.check_filename()
         # Limit language list for tests
         for c in ['comm_type', 'language', 'platform', 'python_ver']:
             kwargs = copy.deepcopy(self.inst_kwargs)
@@ -248,6 +266,7 @@ class TestTimedRun(TimedRunTestBase):
                 timing.plot_scalings(**kwargs)
 
 
+@long_running
 class TestTimedRunTemp(TimedRunTestBase):
     r"""Test class for the TimedRun class using temporary data."""
 
@@ -316,6 +335,7 @@ class TestTimedRunTemp(TimedRunTestBase):
             x.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@long_running
 class TestTimedRunTempNoPerf(TestTimedRunTemp):
     r"""Test class for the TimedRun class using temporary data without perf."""
 

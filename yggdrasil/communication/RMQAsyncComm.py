@@ -4,8 +4,12 @@ from yggdrasil.communication import RMQComm
 from yggdrasil.schema import register_component
 if RMQComm._rmq_installed:
     import pika
+    _pika_version_maj = int(float(pika.__version__.split('.')[0]))
+    if _pika_version_maj >= 1:  # pragma: debug
+        raise ImportError("pika version 1.0 not yet supported.")
 else:
     pika = False
+    _pika_version_maj = 0
 
 
 @register_component
@@ -174,8 +178,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 if self._qres_event.is_set():
                     self._qres_event.clear()
                     try:
-                        self.channel.queue_declare(self._set_qres,
-                                                   queue=self.queue,
+                        self.channel.queue_declare(queue=self.queue,
+                                                   callback=self._set_qres,
                                                    # , auto_delete=True,
                                                    passive=True)
                     except (pika.exceptions.ChannelClosed,
@@ -263,7 +267,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         #     return (False, None)
         # if self.n_msg_recv == 0:
         #     # self.debug(".recv(): No buffered messages.")
-        #     out = (True, self.empty_msg)
+        #     out = (True, self.empty_bytes_msg)
         # else:
         #     with self.rmq_lock:
         #         out = (True, self._buffered_messages.pop(0))
@@ -282,11 +286,11 @@ class RMQAsyncComm(RMQComm.RMQComm):
         r"""Establish the connection."""
         self.times_connected += 1
         parameters = pika.URLParameters(self.url)
-        self.connection = pika.SelectConnection(
-            parameters,
-            on_open_callback=self.on_connection_open,
-            on_open_error_callback=self.on_connection_open_error,
-            stop_ioloop_on_close=False)
+        kwargs = dict(on_open_callback=self.on_connection_open,
+                      on_open_error_callback=self.on_connection_open_error)
+        if _pika_version_maj < 1:
+            kwargs['stop_ioloop_on_close'] = False
+        self.connection = pika.SelectConnection(parameters, **kwargs)
 
     def on_connection_open(self, connection):
         r"""Actions that must be taken when the connection is opened.
@@ -301,13 +305,19 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.close()
         raise Exception('Could not connect.')
 
-    def on_connection_closed(self, connection, reply_code, reply_text):
+    def on_connection_closed(self, connection, *args):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
+        if _pika_version_maj < 1:
+            reply_code = args[0]
+            reply_text = args[1]
+        # else:
+        #     reply_code = 0
+        #     reply_text = args[0]
         with self.rmq_lock:
-            self.debug('::on_connection_closed code %d %s', reply_code,
-                       reply_text)
+            self.debug('::on_connection_closed code %s (code = %d)', reply_text,
+                       reply_code)
             if self._closing or reply_code == 200:
                 connection.ioloop.stop()
                 self.connection = None
@@ -317,7 +327,10 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 self.warning('Connection closed, reopening in %f seconds: (%s) %s',
                              self.sleeptime, reply_code, reply_text)
                 self._reconnecting = True
-                connection.add_timeout(self.sleeptime, self.reconnect)
+                if _pika_version_maj < 1:
+                    connection.add_timeout(self.sleeptime, self.reconnect)
+                # else:
+                #     connection.ioloop.call_later(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
@@ -366,13 +379,21 @@ class RMQAsyncComm(RMQComm.RMQComm):
         channel.add_on_close_callback(self.on_channel_closed)
         self.setup_exchange(self.exchange)
 
-    def on_channel_closed(self, channel, reply_code, reply_text):
+    def on_channel_closed(self, channel, *args):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
         with self.rmq_lock:
-            self.debug('::channel %i was closed: (%s) %s',
-                       channel, reply_code, reply_text)
-            channel.connection.close()
+            if _pika_version_maj < 1:
+                reply_code = args[0]
+                reply_text = args[1]
+                self.debug('::channel %i was closed: (%s) %s',
+                           channel, reply_code, reply_text)
+            # else:
+            #     reason = args[0]
+            #     self.debug('::channel %i was closed: %s',
+            #                channel, reason)
+            if not (channel.connection.is_closing or channel.connection.is_closed):
+                channel.connection.close()
             self.channel = None
             # if self.connection is not None:
             #     self.connection.close()
@@ -381,8 +402,9 @@ class RMQAsyncComm(RMQComm.RMQComm):
     def setup_exchange(self, exchange_name):
         r"""Setup the exchange."""
         self.debug('::Declaring exchange %s', exchange_name)
-        self.channel.exchange_declare(self.on_exchange_declareok,
-                                      exchange=exchange_name, auto_delete=True)
+        self.channel.exchange_declare(callback=self.on_exchange_declareok,
+                                      exchange=exchange_name,
+                                      auto_delete=True)
 
     def on_exchange_declareok(self, unused_frame):
         r"""Actions to perform once an exchange is succesfully declared.
@@ -402,8 +424,8 @@ class RMQAsyncComm(RMQComm.RMQComm):
             passive = True
         else:
             passive = False
-        self.channel.queue_declare(self.on_queue_declareok,
-                                   queue=self.queue,
+        self.channel.queue_declare(queue=self.queue,
+                                   callback=self.on_queue_declareok,
                                    exclusive=exclusive,
                                    # , auto_delete=True,
                                    passive=passive)
@@ -415,7 +437,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         with self.rmq_lock:
             if not self.queue:
                 self.address += method_frame.method.queue
-        self.channel.queue_bind(self.on_bindok,
+        self.channel.queue_bind(callback=self.on_bindok,
                                 exchange=self.exchange,
                                 # routing_key=self.routing_key,
                                 queue=self.queue)
@@ -427,8 +449,11 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self.channel.basic_qos(prefetch_count=1)
         self.channel.add_on_cancel_callback(self.on_cancelok)
         if self.direction == 'recv':
-            self.consumer_tag = self.channel.basic_consume(self.on_message,
-                                                           queue=self.queue)
+            kwargs = dict(on_message_callback=self.on_message,
+                          queue=self.queue)
+            if _pika_version_maj < 1:
+                kwargs['consumer_callback'] = kwargs.pop('on_message_callback')
+            self.consumer_tag = self.channel.basic_consume(**kwargs)
         with self.rmq_lock:
             self._opening = False
 

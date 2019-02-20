@@ -238,6 +238,19 @@ class DefaultSerialize(tools.YggClass):
             out = self.datatype._empty_msg
         return out
 
+    # def is_empty(self, obj):
+    #     r"""Determine if an object represents an empty message for this serializer.
+
+    #     Args:
+    #         obj (object): Object to test.
+
+    #     Returns:
+    #         bool: True if the object is empty, False otherwise.
+
+    #     """
+    #     emsg = self.empty_msg
+    #     return (isinstance(obj, type(emsg)) and (obj == emsg))
+
     def get_field_names(self, as_bytes=False):
         r"""Get the field names for an array of fields.
 
@@ -423,7 +436,7 @@ class DefaultSerialize(tools.YggClass):
         # Update extra keywords
         if (len(kwargs) > 0):
             self.extra_kwargs.update(kwargs)
-            self.info("Extra kwargs: %s" % str(self.extra_kwargs))
+            self.debug("Extra kwargs: %s" % str(self.extra_kwargs))
         # Update type
         if not skip_type:
             # Update typedef from oldstyle keywords in extra_kwargs

@@ -1,7 +1,7 @@
 import os
 import tempfile
-from yggdrasil.tests import assert_equal
-from yggdrasil import config, backwards
+from yggdrasil.tests import assert_equal, assert_warns
+from yggdrasil import config, backwards, tools
 
 
 def make_temp(fname_base, count=1):
@@ -55,9 +55,10 @@ def test_locate_file():
     assert_equal(sout, sans[0])
     # Multiple files
     mdir, mpat, mans = make_temp_multiple()
-    mout = config.locate_file(mpat)
-    assert(isinstance(mout, backwards.string_types))
-    assert_equal(mout, mans[0])
+    with assert_warns(RuntimeWarning):
+        mout = config.locate_file(mpat)
+        assert(isinstance(mout, backwards.string_types))
+        assert_equal(mout, mans[0])
     
 
 def test_find_all():
@@ -80,6 +81,8 @@ def test_update_config():
     r"""Test update_config."""
     test_cfg = os.path.join(tempfile.gettempdir(), 'test.cfg')
     assert(not os.path.isfile(test_cfg))
+    if not tools.is_lang_installed('matlab'):  # pragma: no matlab
+        assert_warns(RuntimeWarning, config.update_config, test_cfg)
     config.update_config(test_cfg)
     assert(os.path.isfile(test_cfg))
     os.remove(test_cfg)

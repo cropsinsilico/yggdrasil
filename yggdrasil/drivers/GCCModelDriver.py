@@ -108,8 +108,11 @@ def get_flags(for_cmake=False, for_api=False, cpp=False):
         tuple(list, list): compile and linker flags.
 
     """
-    _compile_flags = []
-    _linker_flags = []
+    if cpp:
+        _compile_flags = os.environ.get('CXXFLAGS', '').split()
+    else:
+        _compile_flags = os.environ.get('CFLAGS', '').split()
+    _linker_flags = os.environ.get('LDFLAGS', '').split()
     if not _c_installed:  # pragma: windows
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
@@ -169,6 +172,10 @@ def get_cc(cpp=False, shared=False, static=False, linking=False):
         str: Command line compiler.
 
     """
+    if cpp:
+        cc_env = 'CXX'
+    else:
+        cc_env = 'CC'
     if platform._is_win:  # pragma: windows
         if shared:
             cc = 'LINK'
@@ -177,21 +184,21 @@ def get_cc(cpp=False, shared=False, static=False, linking=False):
         elif linking:
             cc = 'LINK'
         else:
-            cc = 'cl'
+            cc = os.environ.get(cc_env, 'cl')
     elif platform._is_mac:
         if static:
-            cc = 'libtool'
+            cc = os.environ.get('LIBTOOL', 'libtool')
         elif cpp:
-            cc = 'clang++'
+            cc = os.environ.get(cc_env, 'clang++')
         else:
-            cc = 'clang'
+            cc = os.environ.get(cc_env, 'clang')
     else:
         if static:
-            cc = 'ar'
+            cc = os.environ.get('AR', 'ar')
         elif cpp:
-            cc = 'g++'
+            cc = os.environ.get(cc_env, 'g++')
         else:
-            cc = 'gcc'
+            cc = os.environ.get(cc_env, 'gcc')
     return cc
 
 
@@ -706,7 +713,18 @@ class GCCModelDriver(ModelDriver):
                 products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
         for p in products:
             if os.path.isfile(p):
-                os.remove(p)
+                T = self.start_timeout()
+                while ((not T.is_out) and os.path.isfile(p)):
+                    try:
+                        os.remove(p)
+                    except BaseException:  # pragma: debug
+                        if os.path.isfile(p):
+                            self.sleep()
+                        if T.is_out:
+                            raise
+                self.stop_timeout()
+                if os.path.isfile(p):  # pragma: debug
+                    raise RuntimeError("Failed to remove product: %s" % p)
 
     def cleanup(self):
         r"""Remove compile executable."""

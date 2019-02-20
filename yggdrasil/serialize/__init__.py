@@ -372,7 +372,8 @@ def format_message(args, fmt_str):
     if len(args) < nfmt:
         raise RuntimeError("Number of arguments (%d) does not match " % len(args)
                            + "number of format fields (%d)." % nfmt)
-    for a in args:
+    for a0 in args:
+        a = units.get_data(a0)
         if np.iscomplexobj(a):
             args_ += [a.real, a.imag]
         else:
@@ -836,9 +837,11 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
     else:
         np_ver = tuple([float(x) for x in (np.__version__).split('.')])
         if (np_ver >= (1.0, 14.0, 0.0)):
-            np_kws['encoding'] = 'bytes'
-        arr = np.genfromtxt(fd, autostrip=True, dtype=None,
-                            names=names, **np_kws)
+            arr = np.genfromtxt(fd, encoding='bytes', autostrip=True, dtype=None,
+                                names=names, **np_kws)
+        else:
+            arr = np.genfromtxt(fd, autostrip=True, dtype=None,
+                                names=names, **np_kws)
         if dtype is not None:
             arr = arr.astype(dtype)
     fd.close()
@@ -915,17 +918,21 @@ def bytes_to_array(data, dtype, order='C', shape=None):
             if np.issubdtype(dtype[i], np.dtype('complex')):
                 idata_real = idata[:(nele * dtype[i].itemsize // 2)]
                 idata_imag = idata[(nele * dtype[i].itemsize // 2):]
-                arr_real = np.fromstring(idata_real, dtype='float64')
-                arr_imag = np.fromstring(idata_imag, dtype='float64')
+                arr_real = np.frombuffer(idata_real, dtype='float64')
+                arr_imag = np.frombuffer(idata_imag, dtype='float64')
+                # arr_real = np.fromstring(idata_real, dtype='float64')
+                # arr_imag = np.fromstring(idata_imag, dtype='float64')
                 arr[dtype.names[i]] = np.zeros(nele, dtype=dtype[i])
                 arr[dtype.names[i]] += arr_real
                 arr[dtype.names[i]] += arr_imag * 1j
             else:
-                arr[dtype.names[i]] = np.fromstring(idata, dtype=dtype[i])
+                arr[dtype.names[i]] = np.frombuffer(idata, dtype=dtype[i])
+                # arr[dtype.names[i]] = np.fromstring(idata, dtype=dtype[i])
             prev += len(idata)
             j += 1
     else:
-        arr = np.fromstring(data, dtype=dtype)
+        arr = np.frombuffer(data, dtype=dtype)
+        # arr = np.fromstring(data, dtype=dtype)
     # Reshape array
     if shape is not None:
         arr = arr.reshape(shape, order=order)

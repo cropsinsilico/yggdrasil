@@ -17,12 +17,14 @@ def test_demote_string():
 class TestDefaultSerialize(YggTestClassInfo):
     r"""Test class for DefaultSerialize class."""
 
+    _cls = 'DefaultSerialize'
+    _empty_msg = b''
+    attr_list = (copy.deepcopy(YggTestClassInfo.attr_list)
+                 + ['datatype', 'typedef', 'numpy_dtype'])
+
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize, self).__init__(*args, **kwargs)
-        self._cls = 'DefaultSerialize'
-        self._empty_msg = b''
         self._header_info = dict(arg1='1', arg2='two')
-        self.attr_list += ['datatype', 'typedef', 'numpy_dtype']
 
     @property
     def mod(self):

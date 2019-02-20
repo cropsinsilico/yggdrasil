@@ -1,8 +1,42 @@
 import os
 import copy
 import unittest
+from yggdrasil.tests import assert_equal
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.tests import test_CommBase as parent
+
+
+def test_wait_for_creation():
+    r"""Test FileComm waiting for creation."""
+    msg_send = b'Test message\n'
+    name = 'temp_file_create.txt'
+    kwargs = {'in_temp': True, 'comm': 'FileComm', 'dont_open': True}
+    # kwargs = {'wait_for_creation': 5, 'in_temp': True, comm='FileComm'}
+    send_instance = new_comm(name, direction='send', **kwargs)
+    recv_instance = new_comm(name, direction='recv',
+                             wait_for_creation=5, **kwargs)
+    if os.path.isfile(send_instance.address):
+        os.remove(send_instance.address)
+    
+    def open_and_send(inst, msg):
+        inst.open()
+        flag = inst.send(msg)
+        return flag
+    
+    send_instance.sched_task(0.5, open_and_send, args=[send_instance, msg_send],
+                             store_output=True)
+    recv_instance.open()
+    T = recv_instance.start_timeout(recv_instance.wait_for_creation)
+    while (not T.is_out) and (send_instance.sched_out is None):  # pragma: debug
+        recv_instance.sleep()
+    recv_instance.stop_timeout()
+    assert(send_instance.sched_out)
+    flag, msg_recv = recv_instance.recv()
+    assert(flag)
+    assert_equal(msg_recv, msg_send)
+    send_instance.close()
+    recv_instance.close()
+    recv_instance.remove_file()
 
 
 class TestFileComm(parent.TestCommBase):
