@@ -3,8 +3,8 @@ import copy
 import logging
 from yggdrasil import platform, tools
 from yggdrasil.config import ygg_cfg
-from yggdrasil.drivers.ModelDriver import ModelDriver
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
+from yggdrasil.schema import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -564,86 +564,45 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
 
 
 @register_component
-class GCCModelDriver(ModelDriver):
-    r"""Class for running gcc compiled drivers.
+class CModelDriver(CompiledModelDriver):
+    r"""Class for running C models."""
 
-    Args:
-        name (str): Driver name.
-        args (str or list): Argument(s) for running the model on the command
-            line. If the first element ends with '.c', the driver attempts to
-            compile the code with the necessary interface include directories.
-            Additional arguments that start with '-I' are included in the
-            compile command. Others are assumed to be runtime arguments.
-        cc (str, optional): C/C++ Compiler that should be used. Defaults to
-            gcc/clang for '.c' files, and g++/clang++ for '.cpp' or '.cc' files
-            on Linux/MacOS. Defaults to cl on Windows.
-        overwrite (bool, optional): If True, any existing object or executable
-            files for the model are overwritten, otherwise they will only be
-            compiled if they do not exist. Defaults to True. Setting this to
-            False can be done to improve performance after debugging is complete,
-            but this dosn't check if the source files should be changed, so
-            users should make sure they recompile after any changes. The value
-            of this keyword also determines whether or not any compilation
-            products are cleaned up after a run.
-        **kwargs: Additional keyword arguments are passed to parent class.
-
-    Attributes (in additon to parent class's):
-        overwrite (bool): If True, any existing compilation products will be
-            overwritten by compilation and cleaned up following the run.
-            Otherwise, existing products will be used and will remain after
-            the run.
-        products (list): File created by the compilation.
-        compiled (bool): True if the compilation was succesful. False otherwise.
-        cfile (str): Source file.
-        cc (str): C/C++ Compiler that should be used.
-        flags (list): List of compiler flags.
-        efile (str): Compiled executable file.
-
-    Raises:
-        RuntimeError: If neither the IPC or ZMQ C libraries are available.
-        RuntimeError: If the compilation fails.
-
-    """
-
-    _language = ['c', 'c++', 'cpp']
-    _schema_properties = inherit_schema(
-        ModelDriver._schema_properties,
-        {'cc': {'type': 'string'},  # default will depend on whats being compiled
-         'overwrite': {'type': 'boolean', 'default': True}})
-
-    def __init__(self, name, args, **kwargs):
-        super(GCCModelDriver, self).__init__(name, args, **kwargs)
-        if not self.is_installed():  # pragma: windows
-            raise RuntimeError("No library available for models written in C/C++.")
-        self.debug('')
-        # Prepare arguments to compile the file
-        self.parse_arguments(self.args)
-        self.debug("Compiling")
-        self.products = do_compile(self.src, out=self.efile, cc=self.cc,
-                                   ccflags=self.ccflags, ldflags=self.ldflags,
-                                   overwrite=self.overwrite,
-                                   working_dir=self.working_dir)
-        self.efile = self.products[0]
-        assert(os.path.isfile(self.efile))
-        self.debug("Compiled %s", self.efile)
-        if platform._is_win:  # pragma: windows
-            self.args = [os.path.splitext(self.efile)[0]]
-        else:
-            self.args = [os.path.join(".", self.efile)]
-        self.args += self.run_args
-        self.debug('Compiled executable with %s', self.cc)
+    _language = 'c'
+    _language_ext = ['.c', '.cpp', '.cc', '.h', '.hpp', '.hh']
+    _compiler = get_cc(cpp=False)
+    _linker_switch = ['/link']
+    _object_keys = ['/out:']
+    _object_switch = ['-o']
 
     @classmethod
-    def is_installed(self):
-        r"""Determine if this model driver is installed on the current
-        machine.
+    def configure(cls, cfg):
+        r"""Add configuration options for this language.
 
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
         Returns:
-            bool: Truth of if this model driver can be run on the current
-                machine.
+            list: Section, option, description tuples for options that could not
+                be set.
 
         """
-        return _c_installed
+        out = super(CModelDriver, cls).configure(cfg)
+        # TODO: configure libraries
+        return out
+        
+    @classmethod
+    def is_configured(cls):
+        r"""Determine if the appropriate configuration has been performed (e.g.
+        installation of supporting libraries etc.)
+
+        Returns:
+            bool: True if the language has been configured.
+
+        """
+        out = super(CModelDriver, cls).is_configured()
+        if out:
+            out = (ygg_cfg.get('c', 'rapidjson_include', None) is not None)
+        return out
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax. Arguments ending with '.c' or
@@ -661,73 +620,47 @@ class GCCModelDriver(ModelDriver):
                 list.
 
         """
-        self.src = []
-        self.ldflags = []
-        self.ccflags = []
-        self.ccflags.append('-DYGG_DEBUG=%d' % self.logger.getEffectiveLevel())
-        self.run_args = []
-        self.efile = None
-        is_object = False
-        is_link = False
-        for a in args:
-            if a.endswith('.c') or a.endswith('.cpp') or a.endswith('.cc'):
-                self.src.append(a)
-            elif a.lower().startswith('-l') or is_link:
-                if a.lower().startswith('/out:'):  # pragma: windows
-                    self.efile = a[5:]
-                elif a.lower().startswith('-l') and platform._is_win:  # pragma: windows
-                    a1 = '/LIBPATH:"%s"' % a[2:]
-                    if a1 not in self.ldflags:
-                        self.ldflags.append(a1)
-                elif a not in self.ldflags:
-                    self.ldflags.append(a)
-            elif a == '-o':
-                # Next argument should be the name of the executable
-                is_object = True
-            elif a.lower() == '/link':  # pragma: windows
-                # Following arguments should be linker options
-                is_link = True
-            elif a.startswith('-') or (platform._is_win and a.startswith('/')):
-                if a not in self.ccflags:
-                    self.ccflags.append(a)
-            else:
-                if is_object:
-                    # Previous argument was -o flag
-                    self.efile = a
-                    is_object = False
-                else:
-                    self.run_args.append(a)
-        # Check source file
-        if len(self.src) == 0:
-            raise RuntimeError("Could not locate a source file in the "
-                               + "provided arguments.")
-        
-    def remove_products(self):
-        r"""Delete products produced during the compilation process."""
-        if getattr(self, 'products', None) is None:  # pragma: debug
-            return
-        products = self.products
+        # self.compiler_flags.append('-DYGG_DEBUG=%d' % self.logger.getEffectiveLevel())
+        super(CModelDriver, self).parse_arguments(args)
         if platform._is_win:  # pragma: windows
-            for x in copy.deepcopy(products):
-                base = os.path.splitext(x)[0]
-                products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
-        for p in products:
-            if os.path.isfile(p):
-                T = self.start_timeout()
-                while ((not T.is_out) and os.path.isfile(p)):
-                    try:
-                        os.remove(p)
-                    except BaseException:  # pragma: debug
-                        if os.path.isfile(p):
-                            self.sleep()
-                        if T.is_out:
-                            raise
-                self.stop_timeout()
-                if os.path.isfile(p):  # pragma: debug
-                    raise RuntimeError("Failed to remove product: %s" % p)
+            dellist = []
+            for i in range(len(self.linker_flags)):
+                a = self.linker_flags[i]
+                if a.startswith('-l'):
+                    a1 = '/LIBPATH:"%s"' % a[2:]
+                    if a1 in self.linker_flags:
+                        dellist.append(i)
+                    else:
+                        self.linker_flags[i] = a1
+            for i in dellist:
+                self.linker_flags.pop(i)
+        
+    def compile(self):
+        r"""Compile model executable(s).
 
-    def cleanup(self):
-        r"""Remove compile executable."""
-        if self.overwrite:
-            self.remove_products()
-        super(GCCModelDriver, self).cleanup()
+        Returns:
+            list: Full paths to products produced during compilation that should
+                be removed after the run is complete.
+
+        """
+        self.debug("Compiling")
+        self.products = do_compile(self.source_files,
+                                   out=self.model_executable,
+                                   cc=self.compiler(),
+                                   ccflags=self.compiler_flags,
+                                   ldflags=self.linker_flags,
+                                   overwrite=self.overwrite,
+                                   working_dir=self.working_dir)
+        if platform._is_win:  # pragma: windows
+            for x in copy.deepcopy(self.products):
+                base = os.path.splitext(x)[0]
+                self.products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
+
+
+@register_component
+class CPPModelDriver(CModelDriver):
+    r"""Class for running C++ models."""
+                
+    _language = 'c++'
+    _language_aliases = ['cpp']
+    _compiler = get_cc(cpp=True)

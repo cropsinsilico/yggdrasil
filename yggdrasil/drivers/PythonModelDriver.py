@@ -18,19 +18,8 @@ class PythonModelDriver(InterpretedModelDriver):
 
     _language = 'python'
     _language_ext = '.py'
+    _interpreter = sys.executable
 
-    @classmethod
-    def language_interpreter(cls):
-        r"""Command/arguments required to run a model written in this language
-        from the command line.
-
-        Returns:
-            list: Name of (or path to) interpreter executable and any flags
-                required to run the interpreter from the command line.
-
-        """
-        return [sys.executable]
-        
     @classmethod
     def is_language_installed(self):
         r"""Determine if this model driver is installed on the current

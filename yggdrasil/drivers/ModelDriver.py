@@ -2,20 +2,17 @@ import os
 import sys
 import copy
 import warnings
-import logging
-import subprocess
 from pprint import pformat
 from yggdrasil import platform, tools
+from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.Driver import Driver
 from threading import Event
 try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
-from yggdrasil.schema import register_component
 
 
-@register_component
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -60,8 +57,10 @@ class ModelDriver(Driver):
 
     """
 
-    _language = 'executable'
+    _language = None
     _language_ext = None
+    _language_flags = []
+    _language_aliases = []
     _schema_type = 'model'
     _schema_required = ['name', 'language', 'args', 'working_dir']
     _schema_properties = {
@@ -122,21 +121,37 @@ class ModelDriver(Driver):
 
     @classmethod
     def language_executable(cls):
-        r"""Command/arguments required to compile/run a model written in this
-        language from the command line.
+        r"""Command required to compile/run a model written in this language
+        from the command line.
 
         Returns:
-            list: Name of (or path to) compiler/interpreter executable and any
-                flags required to run the compiler/interpreter from the command
-                line.
+            str: Name of (or path to) compiler/interpreter executable required
+                to run the compiler/interpreter from the command line.
 
         """
-        if cls._language == 'executable':
-            return []
-        raise NotImplementedError("Language executable not set.")
+        raise NotImplementedError("Language executable not implemented for '%s'"
+                                  % cls._language)
 
     @classmethod
-    def is_language_installed(self):
+    def configure(cls, cfg):
+        r"""Add configuration options for this language.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        if not cfg.has_section(cls._language):
+            cfg.add_section(cls._language)
+        # Installed comms
+        cfg.set(cls._language, 'comms', tools.get_installed_comm(cls._language))
+        return []
+
+    @classmethod
+    def is_language_installed(cls):
         r"""Determine if the interpreter/compiler for the associated programming
         language is installed.
 
@@ -144,21 +159,25 @@ class ModelDriver(Driver):
             bool: True if the language interpreter/compiler is installed.
 
         """
-        if cls._language == 'executable':
-            return True  # executables are executable
-        version_cmd = cls.language_executable() + cls._version_flags
-        process = subprocess.Popen(version_cmd,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        outs, errs = process.communicate()
-        if errs:
-            logging.info('Errors captured from running %s: %s',
-                         str(version_cmd), errs)
+        disable_flag = ygg_cfg.get(cls._language, 'disable', 'false').lower()
+        if (disable_flag == 'true'):  # pragma: no cover
             return False
-        return True
+        out = tools.which(cls.language_executable())
+        return (out is not None)
 
     @classmethod
-    def is_comm_installed(self):
+    def is_configured(cls):
+        r"""Determine if the appropriate configuration has been performed (e.g.
+        installation of supporting libraries etc.)
+
+        Returns:
+            bool: True if the language has been configured.
+
+        """
+        return ygg_cfg.has_section(cls._language)
+
+    @classmethod
+    def is_comm_installed(cls):
         r"""Determine if a comm is installed for the associated programming
         language.
 
@@ -166,10 +185,10 @@ class ModelDriver(Driver):
             bool: True if a comm is installed for this language.
 
         """
-        return True  # executables presumable include comms
+        return (len(ygg_cfg.get(cls._language, 'comms', [])) > 0)
 
     @classmethod
-    def is_installed(self):
+    def is_installed(cls):
         r"""Determine if this model driver is installed on the current
         machine.
 
@@ -178,7 +197,8 @@ class ModelDriver(Driver):
                 machine.
 
         """
-        return (self.is_language_installed() and self.is_comm_installed())
+        return (cls.is_language_installed() and cls.is_comm_installed()
+                and cls.is_configured())
 
     def set_env(self):
         env = copy.deepcopy(self.env)

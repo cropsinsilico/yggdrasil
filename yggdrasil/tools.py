@@ -5,6 +5,7 @@ import logging
 import pprint
 import os
 import sys
+import shutil
 import inspect
 import time
 import signal
@@ -86,6 +87,34 @@ def ygg_atexit():  # pragma: debug
 
 
 atexit.register(ygg_atexit)
+
+
+def which(program):
+    r"""Determine the path to an executable if it exists.
+
+    Args:
+        program (str): Name of program to locate or full path to program.
+
+    Returns:
+        str: Path to executable if it can be located. Otherwise, None.
+
+    """
+    if backwards.PY2:  # pragma: Python 2
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+        fpath, fname = os.path.split(program)
+        if fpath:
+            if is_exe(program):
+                return program
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                exe_file = os.path.join(path, program)
+                if is_exe(exe_file):
+                    return exe_file
+        return None
+    else:  # pragma: Python 3
+        return shutil.which(program)
 
 
 def locate_path(fname, basedir=os.path.abspath(os.sep)):

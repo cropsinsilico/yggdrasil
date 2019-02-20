@@ -1,4 +1,5 @@
 import os
+import sys
 from yggdrasil import tools, platform
 from yggdrasil.tests import YggTestClass, assert_equal
 
@@ -11,6 +12,13 @@ def test_get_installed_lang():
 def test_get_installed_comm():
     r"""Test get_installed_comm."""
     tools.get_installed_comm()
+
+
+def test_which():
+    r"""Test location of executable."""
+    assert(tools.which('python') is not None)
+    assert(tools.which(sys.executable) is not None)
+    assert(tools.which('invalid') is None)
 
 
 def test_locate_path():

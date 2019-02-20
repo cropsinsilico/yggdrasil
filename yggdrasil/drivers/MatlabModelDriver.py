@@ -8,15 +8,16 @@ import weakref
 from yggdrasil import backwards, tools, platform, config
 try:  # pragma: matlab
     import matlab.engine
-    _matlab_engine_installed = (config.ygg_cfg.get('matlab', 'disable', 'False')
-                                == 'False')
+    _matlab_engine_installed = True
 except ImportError:  # pragma: no matlab
     debug("Could not import matlab.engine. "
           + "Matlab support for using a sharedEngine will be disabled.")
     _matlab_engine_installed = False
-from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.tools import TimeOut, sleep
 from yggdrasil.schema import register_component
+if platform._is_win:  # pragma: windows
+    _matlab_engine_installed = False
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -430,7 +431,7 @@ class MatlabProcess(tools.YggClass):  # pragma: matlab
 
 
 @register_component
-class MatlabModelDriver(ModelDriver):  # pragma: matlab
+class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     r"""Base class for running Matlab models.
 
     Args:
@@ -456,6 +457,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
     _language = 'matlab'
     _language_ext = '.m'
+    _interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop', '-nojvm', '-r']
     _version_flags = ["fprintf('R%s', version('-release')); exit();"]
 
     def __init__(self, name, args, **kwargs):
@@ -472,19 +474,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
             self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
             self.check_exits()
 
-    @classmethod
-    def language_interpreter(cls):
-        r"""Command/arguments required to run a model written in this language
-        from the command line.
-
-        Returns:
-            list: Name of (or path to) interpreter executable and any flags
-                required to run the interpreter from the command line.
-
-        """
-        return ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm', '-r']
-        
-    def start_matlab(self):
+    def start_matlab_engine(self):
         r"""Start matlab session and connect to it."""
         ml_attr = ['screen_session', 'mlengine', 'mlsession', 'mlprocess']
         attempt_connect = (len(matlab.engine.find_matlab()) != 0)
@@ -516,18 +506,19 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
     def cleanup(self):
         r"""Close the Matlab session and engine."""
-        try:
-            stop_matlab(self.screen_session, self.mlengine, self.mlsession,
-                        self.mlprocess, keep_engine=(not self.started_matlab))
-        except (SystemError, Exception) as e:  # pragma: debug
-            self.error('Failed to exit matlab engine')
-            self.raise_error(e)
-        self.debug('Stopped Matlab')
-        self.screen_session = None
-        self.mlsession = None
-        self.started_matlab = False
-        self.mlengine = None
-        self.mlprocess = None
+        if self.using_matlab_engine:
+            try:
+                stop_matlab(self.screen_session, self.mlengine, self.mlsession,
+                            self.mlprocess, keep_engine=(not self.started_matlab))
+            except (SystemError, Exception) as e:  # pragma: debug
+                self.error('Failed to exit matlab engine')
+                self.raise_error(e)
+            self.debug('Stopped Matlab')
+            self.screen_session = None
+            self.mlsession = None
+            self.started_matlab = False
+            self.mlengine = None
+            self.mlprocess = None
         super(MatlabModelDriver, self).cleanup()
 
     def check_exits(self):
@@ -549,9 +540,9 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
     def before_start(self):
         r"""Actions to perform before the run loop."""
-        if _matlab_engine_installed:
+        if self.using_matlab_engine:
             self.target_name = os.path.splitext(os.path.basename(self.args[0]))[0]
-            self.start_matlab()
+            self.start_matlab_engine()
 
             # Add environment variables
             self.debug('Setting environment variables for Matlab engine.')
@@ -582,32 +573,39 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                 self.debug('Starting MatlabProcess')
                 self.model_process.start()
                 self.debug('MatlabProcess running model.')
+        else:
+            super(MatlabModelDriver, self).before_start()
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
-        self.model_process.print_output()
-        self.periodic_debug('matlab loop', period=100)('Looping')
-        if self.model_process.is_done():
+        if self.using_matlab_engine:
             self.model_process.print_output()
-            self.set_break_flag()
-            try:
-                self.model_process.future.result()
+            self.periodic_debug('matlab loop', period=100)('Looping')
+            if self.model_process.is_done():
                 self.model_process.print_output()
-            except matlab.engine.EngineError:
-                self.model_process.print_output()
-            except BaseException:
-                self.model_process.print_output()
-                self.exception("Error running model.")
+                self.set_break_flag()
+                try:
+                    self.model_process.future.result()
+                    self.model_process.print_output()
+                except matlab.engine.EngineError:
+                    self.model_process.print_output()
+                except BaseException:
+                    self.model_process.print_output()
+                    self.exception("Error running model.")
+            else:
+                self.sleep()
         else:
-            self.sleep()
+            super(MatlabModelDriver, self).run_loop()
 
     def after_loop(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
-        if (self.model_process is not None) and self.model_process.is_alive():
+        if (((self.model_process is not None) and self.model_process.is_alive()
+             and self.using_matlab_engine)):
             self.info("Model process thread still alive")
             self.kill_process()
             return
         super(MatlabModelDriver, self).after_loop()
-        with self.lock:
-            self.cleanup()
+        if self.using_matlab_engine:
+            with self.lock:
+                self.cleanup()

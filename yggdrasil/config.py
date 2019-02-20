@@ -12,7 +12,7 @@ import logging
 import warnings
 import subprocess
 from yggdrasil.backwards import configparser
-from yggdrasil import platform, backwards
+from yggdrasil import platform, backwards, schema, drivers, tools
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
 usr_config_file = os.path.expanduser(os.path.join('~', config_file))
@@ -261,8 +261,12 @@ def update_config(config_file, config_base=None):
     miss = []
     if platform._is_win:  # pragma: windows
         miss += update_config_windows(cp)
-    miss += update_config_c(cp)
-    miss += update_config_matlab(cp)
+    s = schema.get_schema()
+    for l in tools.get_supported_lang():
+        drv = drivers.import_driver(s['model'].subtype2class[l])
+        miss += drv.configure(cp)
+    # miss += update_config_c(cp)
+    # miss += update_config_matlab(cp)
     with open(config_file, 'w') as fd:
         cp.write(fd)
     for sect, opt, desc in miss:  # pragma: windows
