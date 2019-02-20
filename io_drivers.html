@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Input/Output Drivers &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>Input/Output Drivers &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,29 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="index.html"/>
-        <link rel="next" title="Model Drivers" href="model_drivers.html"/>
-        <link rel="prev" title="C-Style Format Strings" href="c_format_strings.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Model Drivers" href="model_drivers.html" />
+    <link rel="prev" title="C-Style Format Strings" href="c_format_strings.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -68,7 +59,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -114,9 +105,12 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -130,7 +124,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -138,9 +132,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -195,9 +190,9 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -217,9 +212,9 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be written to.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of the output queue to receive messages from.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path to the file that messages should be written to.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -233,17 +228,17 @@
 <dl class="class">
 <dt id="yggdrasil.drivers.InputDriver.InputDriver">
 <em class="property">class </em><code class="descclassname">yggdrasil.drivers.InputDriver.</code><code class="descname">InputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.InputDriver.InputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Driver for receiving input from another model&#8217;s comm via a local comm.</p>
+<dd><p>Driver for receiving input from another model’s comm via a local comm.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the local message comm that the driver should
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the local message comm that the driver should
 connect to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the other message comm that the driver should
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the other message comm that the driver should
 connect to.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -257,17 +252,17 @@ connect to.</li>
 <dl class="class">
 <dt id="yggdrasil.drivers.OutputDriver.OutputDriver">
 <em class="property">class </em><code class="descclassname">yggdrasil.drivers.OutputDriver.</code><code class="descname">OutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/drivers/OutputDriver.html#OutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.drivers.OutputDriver.OutputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Driver for sending output to another model&#8217;s comm via a local comm.</p>
+<dd><p>Driver for sending output to another model’s comm via a local comm.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the local message comm that the driver should
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the local message comm that the driver should
 connect to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the other message comme that the driver should
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the other message comme that the driver should
 connect to.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -299,8 +294,8 @@ connect to.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>*args</strong> &#8211; Arguments are passed to parent class.</li>
-<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to parent class.</li>
+<li><strong>*args</strong> – Arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -317,8 +312,8 @@ connect to.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>*args</strong> &#8211; Arguments are passed to parent class.</li>
-<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to parent class.</li>
+<li><strong>*args</strong> – Arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> – Keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -331,9 +326,7 @@ connect to.</li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -351,11 +344,11 @@ connect to.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -370,37 +363,24 @@ connect to.</li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

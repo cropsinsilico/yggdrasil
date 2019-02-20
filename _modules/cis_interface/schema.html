@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.schema &mdash; yggdrasil 0.8.3 documentation</title>
+  <title>cis_interface.schema &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.3
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -185,7 +179,7 @@
 
 
 <span class="n">_schema_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;.cis_schema.yml&#39;</span><span class="p">))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;.cis_schema.yml&#39;</span><span class="p">))</span>
 <span class="n">_schema</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">_registry_complete</span> <span class="o">=</span> <span class="kc">False</span>
@@ -219,7 +213,7 @@
 
 
 <div class="viewcode-block" id="register_component"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.register_component">[docs]</a><span class="k">def</span> <span class="nf">register_component</span><span class="p">(</span><span class="n">component_class</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Decorator for registering a class as a yaml component.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorator for registering a class as a yaml component.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_registry</span>
     <span class="n">yaml_typ</span> <span class="o">=</span> <span class="n">component_class</span><span class="o">.</span><span class="n">_schema_type</span>
     <span class="k">if</span> <span class="n">yaml_typ</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_registry</span><span class="p">:</span>
@@ -231,7 +225,7 @@
 
 
 <div class="viewcode-block" id="inherit_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.inherit_schema">[docs]</a><span class="k">def</span> <span class="nf">inherit_schema</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">new_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Create an inherited schema, adding new value to accepted ones for</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inherited schema, adding new value to accepted ones for</span>
 <span class="sd">    dependencies.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -260,7 +254,7 @@
 
 
 <div class="viewcode-block" id="init_registry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.init_registry">[docs]</a><span class="k">def</span> <span class="nf">init_registry</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Initialize the registries and schema.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize the registries and schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_registry_complete</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_registry_complete</span><span class="p">:</span>
         <span class="n">import_all_drivers</span><span class="p">()</span>
@@ -269,20 +263,20 @@
 
 
 <div class="viewcode-block" id="clear_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.clear_schema">[docs]</a><span class="k">def</span> <span class="nf">clear_schema</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Clear global schema.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear global schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_schema</span>
     <span class="n">_schema</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="init_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.init_schema">[docs]</a><span class="k">def</span> <span class="nf">init_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Initialize global schema.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize global schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_schema</span>
     <span class="k">if</span> <span class="n">_schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_schema</span> <span class="o">=</span> <span class="n">load_schema</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Create a new schema from the registry.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new schema from the registry.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_registry</span><span class="p">,</span> <span class="n">_registry_complete</span>
     <span class="n">init_registry</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">SchemaRegistry</span><span class="p">(</span><span class="n">_registry</span><span class="p">)</span>
@@ -290,7 +284,7 @@
 
 
 <div class="viewcode-block" id="load_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.load_schema">[docs]</a><span class="k">def</span> <span class="nf">load_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, optional): Full path to the file that the schema should be</span>
@@ -310,7 +304,7 @@
 
 
 <div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, optional): Full path to the file that the schema should be</span>
@@ -331,7 +325,7 @@
 
 
 <div class="viewcode-block" id="ComponentSchema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema">[docs]</a><span class="k">class</span> <span class="nc">ComponentSchema</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Schema information for one component.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schema information for one component.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema_type (str): The name of the component.</span>
@@ -355,11 +349,11 @@
         <span class="k">if</span> <span class="n">schema_subtypes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">schema_subtypes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span> <span class="o">=</span> <span class="n">schema_subtypes</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ComponentSchema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComponentSchema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Schema for this component.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for this component.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Schema for </span><span class="si">%s</span><span class="s1"> components.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span>
                <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span> <span class="s1">&#39;$id&#39;</span><span class="p">:</span> <span class="s1">&#39;#</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">}</span>
         <span class="n">combo</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;allOf&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">),</span>
@@ -388,7 +382,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
 <span class="sd">        the properties for each component.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span>
         <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;additionalProperties&#39;</span><span class="p">]</span>
@@ -404,9 +398,9 @@
             <span class="n">x</span><span class="p">[</span><span class="s1">&#39;additionalProperties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">out</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ComponentSchema.from_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.from_schema">[docs]</a>    <span class="k">def</span> <span class="nf">from_schema</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Construct a ComponentSchema from a schema.</span>
+<div class="viewcode-block" id="ComponentSchema.from_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.from_schema">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a ComponentSchema from a schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            schema (dict): Schema.</span>
@@ -416,7 +410,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">schema_type</span> <span class="o">=</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="n">schema_registry</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="n">schema_registry</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">_base_schema</span> <span class="o">=</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">subt_schema</span> <span class="o">=</span> <span class="n">schema</span><span class="p">[</span><span class="s1">&#39;allOf&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;anyOf&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">subt_schema</span><span class="p">:</span>
@@ -429,9 +423,9 @@
             <span class="n">out</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">subtypes</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ComponentSchema.from_registry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.from_registry">[docs]</a>    <span class="k">def</span> <span class="nf">from_registry</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">schema_classes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Construct a ComponentSchema from a registry entry.</span>
+<div class="viewcode-block" id="ComponentSchema.from_registry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.from_registry">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_registry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">schema_classes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Construct a ComponentSchema from a registry entry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            schema_type (str): Name of component type to build.</span>
@@ -443,14 +437,14 @@
 <span class="sd">            ComponentSchema: Schema with information from classes.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">schema_classes</span><span class="p">:</span>
             <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: Valid properties for this component.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Valid properties for this component.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_schema</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -459,7 +453,7 @@
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">out</span><span class="p">)))</span>
 
 <div class="viewcode-block" id="ComponentSchema.get_subtype_properties"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.get_subtype_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_subtype_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subtype</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get the valid properties for a specific subtype.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the valid properties for a specific subtype.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            subtype (str): Name of the subtype to get keys for.</span>
@@ -476,12 +470,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">class2subtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Mapping from class to list of subtypes.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from class to list of subtypes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">subtype2class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Mapping from subtype to class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from subtype to class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
@@ -490,7 +484,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">subtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: All subtypes for this schema type.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All subtypes for this schema type.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="n">v</span>
@@ -498,11 +492,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: All available classes for this schema.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All available classes for this schema.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_subtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
 
 <div class="viewcode-block" id="ComponentSchema.append"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_cls</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Append component class to the schema.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append component class to the schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_cls (class): Component class that should be added.</span>
@@ -512,7 +506,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema_type</span><span class="p">)</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;DefaultComm&#39;</span>
         <span class="c1"># Append subtype</span>
@@ -575,7 +569,7 @@
 
 
 <div class="viewcode-block" id="SchemaRegistry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry">[docs]</a><span class="k">class</span> <span class="nc">SchemaRegistry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Registry of schema&#39;s for different integration components.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Registry of schema&#39;s for different integration components.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        registry (dict, optional): Dictionary of registered components.</span>
@@ -592,7 +586,7 @@
     <span class="n">_normalizers</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SchemaRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SchemaRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">required</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -606,17 +600,17 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">icomp</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SchemaRegistry.add"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Add a new component schema to the registry.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a new component schema to the registry.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_schema</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.get"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Return a component schema from the registry.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a component schema from the registry.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">k</span><span class="p">]</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Schema for evaluating YAML input file.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file.&quot;&quot;&quot;</span>
         <span class="n">required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;connection&#39;</span><span class="p">]</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;YAML Schema&#39;</span><span class="p">,</span>
                <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Schema for cis_interface YAML input files.&#39;</span><span class="p">,</span>
@@ -638,7 +632,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">full_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Schema for evaluating YAML input file that fully specifies</span>
 <span class="sd">        the properties for each component.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -656,20 +650,20 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SchemaRegistry.from_file"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.from_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Create a SchemaRegistry from a file.</span>
+<div class="viewcode-block" id="SchemaRegistry.from_file"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.from_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a SchemaRegistry from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be loaded from.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
         <span class="n">out</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.load"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Load schema from a file.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load schema from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be loaded from.</span>
@@ -686,7 +680,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">icomp</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.save"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Save the schema to a file.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save the schema to a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be saved to.</span>
@@ -699,7 +693,7 @@
             <span class="n">ordered_dump</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeDumper</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.validate"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Validate an object against this schema.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against this schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to valdiate.</span>
@@ -713,7 +707,7 @@
         <span class="k">return</span> <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.validate_component"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.validate_component">[docs]</a>    <span class="k">def</span> <span class="nf">validate_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Validate an object against a specific component.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object against a specific component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to validate against.</span>
@@ -724,7 +718,7 @@
         <span class="k">return</span> <span class="n">metaschema</span><span class="o">.</span><span class="n">validate_instance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">comp_schema</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.normalize"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">backwards_compat</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Normalize an object against this schema.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object against this schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>
@@ -757,7 +751,7 @@
     <span class="c1">#     return True</span>
 
 <div class="viewcode-block" id="SchemaRegistry.is_valid_component"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.is_valid_component">[docs]</a>    <span class="k">def</span> <span class="nf">is_valid_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Determine if an object is a valid represenation of a component.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if an object is a valid represenation of a component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to validate against.</span>
@@ -774,7 +768,7 @@
         <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.get_component_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.get_component_schema">[docs]</a>    <span class="k">def</span> <span class="nf">get_component_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get the schema for a certain component.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the schema for a certain component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to get the schema for.</span>
@@ -788,7 +782,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.get_component_keys"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.get_component_keys">[docs]</a>    <span class="k">def</span> <span class="nf">get_component_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_name</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get the properties associated with a certain component.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the properties associated with a certain component.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_name (str): Name of the component to return keys for.</span>
@@ -799,9 +793,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_storage</span><span class="p">[</span><span class="n">comp_name</span><span class="p">]</span><span class="o">.</span><span class="n">properties</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SchemaRegistry.register_normalizer"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.register_normalizer">[docs]</a>    <span class="k">def</span> <span class="nf">register_normalizer</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Register a normalizer that will be applied to elements in the</span>
+<div class="viewcode-block" id="SchemaRegistry.register_normalizer"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.register_normalizer">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">register_normalizer</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a normalizer that will be applied to elements in the</span>
 <span class="sd">        instance at the specified path.</span>
 
 <span class="sd">        Args:</span>
@@ -818,9 +812,9 @@
 
         <span class="k">def</span> <span class="nf">_register_normalizer</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">path_list</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">_normalizers</span><span class="p">:</span>
-                    <span class="n">cls</span><span class="o">.</span><span class="n">_normalizers</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">cls</span><span class="o">.</span><span class="n">_normalizers</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_normalizers</span><span class="p">:</span>
+                    <span class="bp">cls</span><span class="o">.</span><span class="n">_normalizers</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">_normalizers</span><span class="p">[</span><span class="n">p</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">func</span>
 
         <span class="k">return</span> <span class="n">_register_normalizer</span></div></div>
@@ -829,7 +823,7 @@
 <span class="c1"># The following are function add to allow backwards compatability of older</span>
 <span class="c1"># yaml schemas</span>
 <div class="viewcode-block" id="rwmeth2filetype"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.rwmeth2filetype">[docs]</a><span class="k">def</span> <span class="nf">rwmeth2filetype</span><span class="p">(</span><span class="n">rw_meth</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get the alternate properties that corresponding to the old</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the alternate properties that corresponding to the old</span>
 <span class="sd">    read_meth/write_meth keywords.</span>
 
 <span class="sd">    Args:</span>
@@ -853,7 +847,7 @@
 
 
 <div class="viewcode-block" id="cdriver2commtype"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.cdriver2commtype">[docs]</a><span class="k">def</span> <span class="nf">cdriver2commtype</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Convert a connection driver to a file type.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a connection driver to a file type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        driver (str): The name of the connection driver.</span>
@@ -878,7 +872,7 @@
 
     
 <div class="viewcode-block" id="cdriver2filetype"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.cdriver2filetype">[docs]</a><span class="k">def</span> <span class="nf">cdriver2filetype</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Convert a connection driver to a file type.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a connection driver to a file type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        driver (str): The name of the connection driver.</span>
@@ -911,7 +905,7 @@
 
 
 <div class="viewcode-block" id="migrate_keys"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.migrate_keys">[docs]</a><span class="k">def</span> <span class="nf">migrate_keys</span><span class="p">(</span><span class="n">from_dict</span><span class="p">,</span> <span class="n">to_dict</span><span class="p">,</span> <span class="n">key_list</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Migrate keys from one component to another that are not in a list</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Migrate keys from one component to another that are not in a list</span>
 <span class="sd">    of predefined keys.</span>
 
 <span class="sd">    Args:</span>
@@ -933,7 +927,7 @@
 
 
 <div class="viewcode-block" id="standardize"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.standardize">[docs]</a><span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">is_singular</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">suffixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">altkeys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Standardize a component such that each key contains a list of dictionaries.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Standardize a component such that each key contains a list of dictionaries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        instance (dict): Component to standardize.</span>
@@ -986,7 +980,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">(</span><span class="nb">tuple</span><span class="p">())</span>
 <span class="k">def</span> <span class="nf">_normalize_root</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Decorate normalizer.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorate normalizer.&quot;&quot;&quot;</span>
     <span class="c1"># if getattr(normalizer, &#39;schema_registry&#39;, None) is None:</span>
     <span class="c1">#     normalizer.schema_registry = get_schema()</span>
     <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;iodict&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -999,7 +993,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_modelio_first</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalizes set of model inputs/outputs before each input/output is normalized.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes set of model inputs/outputs before each input/output is normalized.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">standardize</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">io</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>
@@ -1011,7 +1005,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_modelio_elements</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize case of models singular.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize case of models singular.&quot;&quot;&quot;</span>
     <span class="n">io</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="c1"># Register io if dict set</span>
     <span class="n">iodict</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;iodict&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -1055,7 +1049,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;connections&#39;</span><span class="p">,))</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_base</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalizes list of connections, adding those represented by</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes list of connections, adding those represented by</span>
 <span class="sd">    multiple drivers.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_path</span> <span class="o">!=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">instance</span>
@@ -1105,7 +1099,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_first</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalizes set of connection before each connection is normalized.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes set of connection before each connection is normalized.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">standardize</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">],</span> <span class="n">suffixes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;_file&#39;</span><span class="p">,</span> <span class="s1">&#39;_files&#39;</span><span class="p">],</span>
                     <span class="n">altkeys</span><span class="o">=</span><span class="p">[[</span><span class="s1">&#39;from&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">]])</span>
@@ -1156,7 +1150,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_elements_comm</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize connection inputs/outputs as comms.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize connection inputs/outputs as comms.&quot;&quot;&quot;</span>
     <span class="n">io</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Check to see if is file</span>
@@ -1177,7 +1171,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_elements_file</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize connection inputs/outputs as files.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize connection inputs/outputs as files.&quot;&quot;&quot;</span>
     <span class="n">io</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">current_schema_path</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Check to see if is file</span>
@@ -1192,7 +1186,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_connio_last</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize set of connections after they have been normalized.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize set of connections after they have been normalized.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Check that files properly specified</span>
         <span class="n">s</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;schema_registry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -1217,7 +1211,7 @@
 
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">((</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">_normalize_model_driver</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalizes older style of specifying driver rather than language.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalizes older style of specifying driver rather than language.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="s1">&#39;schema_registry&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1230,7 +1224,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_rwmeth</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize older style of specifying &#39;read_meth&#39; or &#39;write_meth&#39; instead</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize older style of specifying &#39;read_meth&#39; or &#39;write_meth&#39; instead</span>
 <span class="sd">    of filetype.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Replace old read/write methd with filetype</span>
@@ -1245,7 +1239,7 @@
 <span class="nd">@SchemaRegistry</span><span class="o">.</span><span class="n">register_normalizer</span><span class="p">([(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_ascii_table</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize the older style arguments for ascii table connections.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the older style arguments for ascii table connections.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">alias_keys</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;column_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">),</span>
                       <span class="p">(</span><span class="s1">&#39;column_units&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">),</span>
@@ -1261,7 +1255,7 @@
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                                      <span class="p">(</span><span class="s1">&#39;connections&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span>
 <span class="k">def</span> <span class="nf">_normalize_datatype</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize the datatype if the type information is in the comm.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize the datatype if the type information is in the comm.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;datatype&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">instance</span><span class="p">):</span>
         <span class="n">type_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metaschema</span><span class="o">.</span><span class="n">get_metaschema</span><span class="p">()[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">datatype</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1274,9 +1268,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1285,11 +1277,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1304,37 +1296,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.8.3',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

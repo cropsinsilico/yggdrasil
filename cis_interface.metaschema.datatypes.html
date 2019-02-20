@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.metaschema.datatypes package &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>cis_interface.metaschema.datatypes package &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,27 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -66,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -105,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -238,454 +233,17 @@
 <div class="section" id="cis-interface-metaschema-datatypes-schemametaschematype-module">
 <h2>cis_interface.metaschema.datatypes.SchemaMetaschemaType module<a class="headerlink" href="#cis-interface-metaschema-datatypes-schemametaschematype-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-cis_interface.metaschema.datatypes.conversions">
-<span id="cis-interface-metaschema-datatypes-conversions-module"></span><h2>cis_interface.metaschema.datatypes.conversions module<a class="headerlink" href="#module-cis_interface.metaschema.datatypes.conversions" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.conversions.get_conversion">
-<code class="descclassname">cis_interface.metaschema.datatypes.conversions.</code><code class="descname">get_conversion</code><span class="sig-paren">(</span><em>from_type</em>, <em>to_type</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.conversions.get_conversion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a conversion function for moving from one type to the other.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>from_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of type being converted from.</li>
-<li><strong>to_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of type being converted to.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
-<dt>Method for performing the conversion. If there is no known</dt>
-<dd><p class="first last">conversion between the specified types, None will be returned.</p>
-</dd>
-</dl>
-</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">function</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.conversions.obj2ply">
-<code class="descclassname">cis_interface.metaschema.datatypes.conversions.</code><code class="descname">obj2ply</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.conversions.obj2ply" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert an Obj object to a Ply object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Obj type object.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Ply data container.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.conversions.ply2obj">
-<code class="descclassname">cis_interface.metaschema.datatypes.conversions.</code><code class="descname">ply2obj</code><span class="sig-paren">(</span><em>ply</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.conversions.ply2obj" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert a Ply object to an Obj object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ply</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Ply type object.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Obj data container.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.conversions.register_conversion">
-<code class="descclassname">cis_interface.metaschema.datatypes.conversions.</code><code class="descname">register_conversion</code><span class="sig-paren">(</span><em>from_type</em>, <em>to_type</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.conversions.register_conversion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a conversion function for going between types.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>from_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of type being converted from.</li>
-<li><strong>to_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of type being converted to.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Decorator that will register the conversion.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">function</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="section" id="cis-interface-metaschema-datatypes-conversions-module">
+<h2>cis_interface.metaschema.datatypes.conversions module<a class="headerlink" href="#cis-interface-metaschema-datatypes-conversions-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-cis_interface.metaschema.datatypes">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.metaschema.datatypes" title="Permalink to this headline">¶</a></h2>
-<dl class="exception">
-<dt id="cis_interface.metaschema.datatypes.MetaschemaTypeError">
-<em class="property">exception </em><code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">MetaschemaTypeError</code><a class="headerlink" href="#cis_interface.metaschema.datatypes.MetaschemaTypeError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">exceptions.TypeError</span></code></p>
-<p>Error that should be raised when a class encounters a type it cannot handle.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.add_type_from_schema">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">add_type_from_schema</code><span class="sig-paren">(</span><em>path_to_schema</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.add_type_from_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a type from a schema in a file.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>path_to_schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) &#8211; Full path to the location of a schema file that
-can be loaded.</li>
-<li><strong>target_globals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Globals dictionary for module where the
-fixed class should be added. If None, the new class is returned.
-Defaults to local globals.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are assumed to be attributes for
-the new class.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.compare_schema">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">compare_schema</code><span class="sig-paren">(</span><em>schema1</em>, <em>schema2</em>, <em>root1=None</em>, <em>root2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.compare_schema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compare two schemas for compatibility.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>schema1</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; First schema.</li>
-<li><strong>schema2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Second schema.</li>
-<li><strong>root1</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Root for first schema. Defaults to None and is
-set to schema1.</li>
-<li><strong>root2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Root for second schema. Defaults to None and is
-set to schema2.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Yields:</th><td class="field-body"><p class="first last"><em>str</em> &#8211; Comparision failure messages.</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.complete_typedef">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">complete_typedef</code><span class="sig-paren">(</span><em>typedef</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.complete_typedef" title="Permalink to this definition">¶</a></dt>
-<dd><p>Complete the type definition by converting it into the standard format.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; A type name, type definition dictionary,
-dictionary of subtype definitions, or a list of subtype definitions.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Type definition dictionary.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If typedef is not a valid type.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.decode">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">decode</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.decode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decode an object from a message.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Bytes encoded message.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Decoded Python object.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.encode">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">encode</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.encode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encode an object into a message.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object to be encoded.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Encoded message.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.encode_data">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">encode_data</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.encode_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encode an object into a JSON serializable object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object to be encoded.</li>
-<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; JSON schema describing the object. Defaults
-to None and class is determined from the object.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">JSON serializable version of the object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.encode_data_readable">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">encode_data_readable</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.encode_data_readable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encode an object into a JSON serializable object that is human readable
-but dosn&#8217;t guarantee identical deserialization.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object to be encoded.</li>
-<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; JSON schema describing the object. Defaults
-to None and class is determined from the object.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">JSON serializable version of the object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.encode_type">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">encode_type</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.encode_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Encode an object into a JSON schema that can be used to both
-describe the object and validate others.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object to be encoded.</li>
-<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Type properties that should be used to
-initialize the encoded type definition in certain cases.
-Defaults to None and is ignored.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Encoded JSON schema describing the object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.get_registered_types">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">get_registered_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.get_registered_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary of registered types.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Registered type/class pairs.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.get_type_class">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">get_type_class</code><span class="sig-paren">(</span><em>type_name</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.get_type_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a type class given it&#8217;s name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of type class.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Type class.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">class</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.get_type_from_def">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">get_type_from_def</code><span class="sig-paren">(</span><em>typedef</em>, <em>dont_complete=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.get_type_from_def" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the type instance based on the provided type definition.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>typedef</strong> (<em>obj</em>) &#8211; This can be the name of a type, a dictionary containing a
-type definition (the &#8216;typename&#8217; keyword must be specified), or a
-complex type (a list or dictionary containing types).</li>
-<li><strong>dont_complete</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the type definition will be
-used as-is. Otherwise it will be completed using normalization which
-can be time consuming. Defaults to False.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Instance of the appropriate type class.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType" title="yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType">MetaschemaType</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.guess_type_from_msg">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">guess_type_from_msg</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.guess_type_from_msg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Guess the type class from a message.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Message containing metadata.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If a type class cannot be determined.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Instance of the appropriate type class.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType" title="yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType">MetaschemaType</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.guess_type_from_obj">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">guess_type_from_obj</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.guess_type_from_obj" title="Permalink to this definition">¶</a></dt>
-<dd><p>Guess the type class for a given Python object.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Instance of the appropriate type class.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html#yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType" title="yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType">MetaschemaType</a></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If a type class cannot be determined.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.import_all_types">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">import_all_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.import_all_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Import all types to ensure they are registered.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.register_type">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">register_type</code><span class="sig-paren">(</span><em>type_class</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.register_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Register a type class, recording methods for encoding/decoding.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>type_class</strong> (<em>class</em>) &#8211; Class to be registered.</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the type is already registered.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the type is a default JSON type.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If any of the type&#8217;s properties are not registered.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.metaschema.datatypes.register_type_from_file">
-<code class="descclassname">cis_interface.metaschema.datatypes.</code><code class="descname">register_type_from_file</code><span class="sig-paren">(</span><em>path_to_schema</em><span class="sig-paren">)</span><a class="headerlink" href="#cis_interface.metaschema.datatypes.register_type_from_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decorator for registering a type by loading the schema describing it
-from a file. The original base class is discarded and replaced by one
-determined from the &#8216;type&#8217; key in the schema. All attributes/methods
-for the class are preserved.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path_to_schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the location of a schema file that
-can be loaded.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
-<dt>Decorator that will modify a class according to the information</dt>
-<dd>provided in the schema.</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">function</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -694,11 +252,11 @@ can be loaded.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -713,37 +271,24 @@ can be loaded.</td>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

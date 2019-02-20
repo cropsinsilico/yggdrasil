@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.metaschema.datatypes.tests.test_MetaschemaType &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../../../index.html"/>
-        <link rel="up" title="yggdrasil.metaschema.datatypes.tests" href="../tests.html"/> 
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
 
   
   <script src="../../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -188,15 +182,15 @@
 
 
 <div class="viewcode-block" id="TestMetaschemaType"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">TestMetaschemaType</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test class for MetaschemaType class.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for MetaschemaType class.&quot;&quot;&quot;</span>
 
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;MetaschemaType&#39;</span>
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;MetaschemaType&#39;</span>
     <span class="n">_explicit</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestMetaschemaType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestMetaschemaType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span> <span class="o">=</span> <span class="p">[]</span>
@@ -210,23 +204,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Absolute name of module containing class to be tested.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Absolute name of module containing class to be tested.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;yggdrasil.metaschema.datatypes.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mod</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Type definition.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Type definition.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span><span class="p">)</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">name</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span>
 
 <div class="viewcode-block" id="TestMetaschemaType.assert_result_equal"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.assert_result_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_result_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assert that serialized/deserialized objects equal.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that serialized/deserialized objects equal.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Second variable is not a dictionary.&quot;</span><span class="p">)</span>
@@ -270,7 +264,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_validate"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_validate">[docs]</a>    <span class="k">def</span> <span class="nf">test_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test validation.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test validation.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">validate</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
@@ -283,13 +277,13 @@
                                    <span class="n">x</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_normalize"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_normalize">[docs]</a>    <span class="k">def</span> <span class="nf">test_normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test normalization.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test normalization.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_normalize</span><span class="p">:</span>
             <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_fixed2base"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_fixed2base">[docs]</a>    <span class="k">def</span> <span class="nf">test_fixed2base</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test conversion of type definition from fixed type to the base.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of type definition from fixed type to the base.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_explicit</span><span class="p">:</span>
             <span class="n">t1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span>
             <span class="n">x1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">typedef_fixed2base</span><span class="p">(</span><span class="n">t1</span><span class="p">)</span>
@@ -301,12 +295,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_extract_typedef"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_extract_typedef">[docs]</a>    <span class="k">def</span> <span class="nf">test_extract_typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test extract_typedef.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test extract_typedef.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_update_typedef"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_update_typedef">[docs]</a>    <span class="k">def</span> <span class="nf">test_update_typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test update_typedef raises error on non-matching typename.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test update_typedef raises error on non-matching typename.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">update_typedef</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">update_typedef</span><span class="p">,</span>
                            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
@@ -315,19 +309,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">update_typedef</span><span class="p">(</span><span class="o">**</span><span class="n">typedef_base</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_definition_schema"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_definition_schema">[docs]</a>    <span class="k">def</span> <span class="nf">test_definition_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test definition schema.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test definition schema.&quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">definition_schema</span><span class="p">()</span>
         <span class="c1"># jsonschema.Draft3Validator.check_schema(s)</span>
         <span class="n">jsonschema</span><span class="o">.</span><span class="n">Draft4Validator</span><span class="o">.</span><span class="n">check_schema</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_metadata_schema"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_metadata_schema">[docs]</a>    <span class="k">def</span> <span class="nf">test_metadata_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test metadata schema.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test metadata schema.&quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">metadata_schema</span><span class="p">()</span>
         <span class="c1"># jsonschema.Draft3Validator.check_schema(s)</span>
         <span class="n">jsonschema</span><span class="o">.</span><span class="n">Draft4Validator</span><span class="o">.</span><span class="n">check_schema</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_encode_data"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_encode_data">[docs]</a>    <span class="k">def</span> <span class="nf">test_encode_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test encode/decode data &amp; type.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test encode/decode data &amp; type.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
@@ -345,7 +339,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">MetaschemaTypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_check_encoded"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_check_encoded">[docs]</a>    <span class="k">def</span> <span class="nf">test_check_encoded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test check_encoded.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test check_encoded.&quot;&quot;&quot;</span>
         <span class="c1"># Test invalid for incorrect typedef</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">check_encoded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -362,7 +356,7 @@
                                <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_check_decoded"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_check_decoded">[docs]</a>    <span class="k">def</span> <span class="nf">test_check_decoded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test check_decoded.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test check_decoded.&quot;&quot;&quot;</span>
         <span class="c1"># Not implemented for base class</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">:</span>
@@ -388,7 +382,7 @@
                                    <span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_encode_errors"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_encode_errors">[docs]</a>    <span class="k">def</span> <span class="nf">test_encode_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test error on encode.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on encode.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">encode</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_validate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span>
@@ -400,19 +394,19 @@
                                <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_decode_errors"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_decode_errors">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test error on decode.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on decode.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">((</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">),</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">decode</span><span class="p">,</span>
                            <span class="bp">self</span><span class="o">.</span><span class="n">_invalid_encoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_transform_type"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_transform_type">[docs]</a>    <span class="k">def</span> <span class="nf">test_transform_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test transform_type.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test transform_type.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">typedef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compatible_objects</span><span class="p">:</span>
             <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">transform_type</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">typedef</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_serialize"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test serialize/deserialize.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialize/deserialize.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">==</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
@@ -423,23 +417,23 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_serialize_error"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_serialize_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_serialize_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test serialization errors.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test serialization errors.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">!=</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="o">=</span><span class="s1">&#39;something&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_deserialize_error"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_deserialize_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test deserialization errors.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test deserialization errors.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">,</span>
-                           <span class="n">b</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
+                           <span class="sa">b</span><span class="s1">&#39;invalid&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">!=</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
                                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span></div>
         
 <div class="viewcode-block" id="TestMetaschemaType.test_deserialize_empty"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_empty">[docs]</a>    <span class="k">def</span> <span class="nf">test_deserialize_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test call for empty string.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test call for empty string.&quot;&quot;&quot;</span>
         <span class="c1"># Completely empty</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_empty_msg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_result_equal</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">_empty_msg</span><span class="p">)</span>
@@ -450,7 +444,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestMetaschemaType.test_deserialize_incomplete"><a class="viewcode-back" href="../../../../../yggdrasil.metaschema.datatypes.tests.html#yggdrasil.metaschema.datatypes.tests.test_MetaschemaType.TestMetaschemaType.test_deserialize_incomplete">[docs]</a>    <span class="k">def</span> <span class="nf">test_deserialize_incomplete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test call for incomplete message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test call for incomplete message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cls</span> <span class="o">!=</span> <span class="s1">&#39;MetaschemaType&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">serialize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_decoded</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">obj</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">deserialize</span><span class="p">(</span><span class="n">out</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -458,9 +452,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -469,11 +461,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -488,37 +480,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

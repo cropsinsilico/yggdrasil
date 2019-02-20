@@ -1,0 +1,17 @@
+yggdrasil.examples package
+==========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    yggdrasil.examples.tests
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.examples
+    :members:
+    :undoc-members:
+    :show-inheritance:

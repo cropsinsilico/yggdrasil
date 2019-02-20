@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_FileInputDriver &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.drivers.tests.test_FileInputDriver &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../../index.html"/>
-        <link rel="up" title="yggdrasil.drivers" href="../../drivers.html"/> 
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -183,7 +177,7 @@
 
 
 <div class="viewcode-block" id="TestFileInputParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputParam">[docs]</a><span class="k">class</span> <span class="nc">TestFileInputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionParam</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test parameters for FileInputDriver.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for FileInputDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
 <span class="sd">        filepath (str): Full path to test file.</span>
@@ -194,7 +188,7 @@
     <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;FileInputDriver&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span>
                                      <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_input</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
@@ -204,24 +198,24 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for send comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send comm.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_comm_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;append&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">contents_to_write</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Contents that should be written to the file.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Contents that should be written to the file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="TestFileInputParam.setup"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputParam.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Create a driver instance and start the driver.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance and start the driver.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
             <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contents_to_write</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestFileInputParam.teardown"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputParam.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">address</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
@@ -230,15 +224,15 @@
 
 <div class="viewcode-block" id="TestFileInputDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestFileInputDriverNoStart</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span>
                                  <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriverNoStart</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test runner for FileInputDriver without start.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for FileInputDriver without start.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="TestFileInputDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestFileInputDriver</span><span class="p">(</span><span class="n">TestFileInputParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test runner for FileInputDriver.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for FileInputDriver.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TestFileInputDriver.assert_before_stop"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">(</span><span class="n">check_open</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="c1"># File contents</span>
@@ -256,24 +250,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">assert_msg_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestFileInputDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assertions to make after stopping the driver instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make after stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_after_terminate</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_comm_closed</span><span class="p">)</span></div>
         
     <span class="c1"># These are disabled to prevent writting extraneous data</span>
 <div class="viewcode-block" id="TestFileInputDriver.run_before_terminate"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Commands to run while the instance is running, before terminate.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Commands to run while the instance is running, before terminate.&quot;&quot;&quot;</span>
         <span class="c1"># Don&#39;t send any messages to the file</span>
         <span class="k">pass</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="TestFileInputDriver.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Disabled: Test sending/receiving small message.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestFileInputDriver.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.test_send_recv">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test sending/receiving small message.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
 
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="TestFileInputDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Disabled: Test sending/receiving large message.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestFileInputDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_FileInputDriver.TestFileInputDriver.test_send_recv_nolimit">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;File driver&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test sending/receiving large message.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div></div>
 
 
@@ -283,19 +277,17 @@
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">file_types</span><span class="p">:</span>
     <span class="n">cls_exp</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">InputDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
                    <span class="p">(</span><span class="n">TestFileInputDriver</span><span class="p">,</span> <span class="p">),</span> <span class="p">{</span><span class="s1">&#39;icomm_name&#39;</span><span class="p">:</span> <span class="n">k</span><span class="p">})</span>
-    <span class="nb">globals</span><span class="p">()[</span><span class="n">cls_exp</span><span class="o">.</span><span class="n">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls_exp</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="n">cls_exp</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls_exp</span>
     <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;AsciiTableComm&#39;</span><span class="p">:</span>
         <span class="n">cls_exp2</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">ArrayInputDriver&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
                         <span class="p">(</span><span class="n">cls_exp</span><span class="p">,</span> <span class="p">),</span> <span class="p">{</span><span class="s1">&#39;testing_option_kws&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;as_array&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
-        <span class="nb">globals</span><span class="p">()[</span><span class="n">cls_exp2</span><span class="o">.</span><span class="n">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls_exp2</span>
+        <span class="nb">globals</span><span class="p">()[</span><span class="n">cls_exp2</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls_exp2</span>
         <span class="k">del</span> <span class="n">cls_exp2</span>
     <span class="k">del</span> <span class="n">cls_exp</span>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -304,11 +296,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -323,37 +315,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

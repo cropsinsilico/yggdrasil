@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Interface &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>Python Interface &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,30 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="index.html"/>
-        <link rel="up" title="Model Interface" href="model_interface.html"/>
-        <link rel="next" title="C Interface" href="interface_c.html"/>
-        <link rel="prev" title="Model Interface" href="model_interface.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="C Interface" href="interface_c.html" />
+    <link rel="prev" title="Model Interface" href="model_interface.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -69,7 +59,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -114,9 +104,12 @@
 <li class="toctree-l2"><a class="reference internal" href="interface_m.html">Matlab Interface</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -130,7 +123,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -138,9 +131,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -195,16 +189,16 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue that input should be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
 received from.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggAsciiTableInput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggAsciiTableInput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -220,17 +214,17 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue where output should be sent.</li>
-<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; A C style format string specifying how each &#8216;row&#8217; of output
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
+<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
 should be formated. This should include the newline character.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggAsciiTableOutput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggAsciiTableOutput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -246,16 +240,16 @@ should be formated. This should include the newline character.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue that input should be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
 received from.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggInput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -271,15 +265,15 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggOutput.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -295,19 +289,19 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue that input should be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
 received from.</li>
-<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, recv returns the entire table
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, recv returns the entire table
 array and can only be called once. If False, recv returns row
 entries. Default to False.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggInput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -323,20 +317,20 @@ entries. Default to False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue where output should be sent.</li>
-<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; A C style format string specifying how each &#8216;row&#8217; of output
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
+<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
 should be formated. This should include the newline character.</li>
-<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, send expects and entire array.
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, send expects and entire array.
 If False, send expects the entries for one table row. Defaults to
 False.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggOutput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -352,20 +346,20 @@ False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
-suffix &#8216;_IN&#8217;, it should match an environment variable containing
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue. Combined with the
+suffix ‘_IN’, it should match an environment variable containing
 a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
 to deserialize messages that are receieved into a list of python
 objects. Defaults to None and raw string messages are returned.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the underlying comm.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the underlying comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -381,8 +375,8 @@ objects. Defaults to None and raw string messages are returned.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of class that should be returned.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Additional arguments that should be passed to class
+<li><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of class that should be returned.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – Additional arguments that should be passed to class
 initializer.</li>
 </ul>
 </td>
@@ -406,16 +400,16 @@ initializer.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue that input should be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
 received from.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggInput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -431,15 +425,15 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggOutput.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -455,20 +449,20 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
-suffix &#8216;_OUT&#8217;, it should match an environment variable containing
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue. Combined with the
+suffix ‘_OUT’, it should match an environment variable containing
 a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
 to create a message from a list of python ojbects. Defaults to None
 and raw string messages are sent.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the underlying comm.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the underlying comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -484,16 +478,16 @@ and raw string messages are sent.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue that input should be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
 received from.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggInput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -509,15 +503,15 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggOutput.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -533,16 +527,16 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue that input should be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
 received from.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggInput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -558,15 +552,15 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggOutput.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -582,16 +576,16 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue that input should be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the input message queue that input should be
 received from.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggInput.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggInput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -607,15 +601,15 @@ received from.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue where output should be sent.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to YggOutput.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the message queue where output should be sent.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to YggOutput.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="yggdrasil.communication.html#yggdrasil.communication.DefaultComm" title="yggdrasil.communication.DefaultComm">DefaultComm</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
 </td>
 </tr>
 </tbody>
@@ -632,11 +626,11 @@ client.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the server queues.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to format variables in a
-message sent to the request queue. Defautls to &#8216;%s&#8217;.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to recover variables from
-messages received from the response queue. Defautls to &#8216;%s&#8217;.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the server queues.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
+message sent to the request queue. Defautls to ‘%s’.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
+messages received from the response queue. Defautls to ‘%s’.</li>
 </ul>
 </td>
 </tr>
@@ -656,11 +650,11 @@ messages received from the response queue. Defautls to &#8216;%s&#8217;.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the server queues.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to recover variables from
-messages received from the request queue. Defaults to &#8216;%s&#8217;.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to format variables in a
-message sent to the response queue. Defautls to &#8216;%s&#8217;.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the server queues.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
+messages received from the request queue. Defaults to ‘%s’.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
+message sent to the response queue. Defautls to ‘%s’.</li>
 </ul>
 </td>
 </tr>
@@ -693,9 +687,7 @@ message sent to the response queue. Defautls to &#8216;%s&#8217;.</li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -713,11 +705,11 @@ message sent to the response queue. Defautls to &#8216;%s&#8217;.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -732,37 +724,24 @@ message sent to the response queue. Defautls to &#8216;%s&#8217;.</li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

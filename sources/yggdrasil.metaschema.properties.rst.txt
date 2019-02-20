@@ -1,0 +1,85 @@
+yggdrasil.metaschema.properties package
+=======================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    yggdrasil.metaschema.properties.tests
+
+Submodules
+----------
+
+yggdrasil.metaschema.properties.ArrayMetaschemaProperties module
+----------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.ArrayMetaschemaProperties
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.DefaultProperty module
+------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.DefaultProperty
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties module
+--------------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.JSONArrayMetaschemaProperties
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties module
+---------------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.MetaschemaProperty module
+---------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.MetaschemaProperty
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.ScalarMetaschemaProperties module
+-----------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.ScalarMetaschemaProperties
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.TitleMetaschemaProperty module
+--------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.TitleMetaschemaProperty
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yggdrasil.metaschema.properties.TypeMetaschemaProperty module
+-------------------------------------------------------------
+
+.. automodule:: yggdrasil.metaschema.properties.TypeMetaschemaProperty
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.metaschema.properties
+    :members:
+    :undoc-members:
+    :show-inheritance:

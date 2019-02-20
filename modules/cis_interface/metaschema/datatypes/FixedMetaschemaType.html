@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.metaschema.datatypes.FixedMetaschemaType &mdash; cis_interface 0.7.4+3.g56c4bbe6 documentation</title>
+  <title>cis_interface.metaschema.datatypes.FixedMetaschemaType &mdash; cis_interface 0.7.10 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="cis_interface 0.7.4+3.g56c4bbe6 documentation" href="../../../../index.html"/>
-        <link rel="up" title="cis_interface.metaschema.datatypes" href="../datatypes.html"/> 
+  <link rel="stylesheet" href="../../../../static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
   <script src="../../../../static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.7.4
+                0.7.10
               </div>
             
           
@@ -105,9 +95,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">cis_interface</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -184,7 +179,7 @@
 
 <div class="viewcode-block" id="create_fixed_type_class"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.create_fixed_type_class">[docs]</a><span class="k">def</span> <span class="nf">create_fixed_type_class</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">fixed_properties</span><span class="p">,</span>
                             <span class="n">target_globals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Create a fixed class.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a fixed class.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str); Name of the fixed type.</span>
@@ -218,7 +213,7 @@
     <span class="n">new_cls</span> <span class="o">=</span> <span class="n">register_type</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">MetaschemaType&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="o">.</span><span class="n">title</span><span class="p">()),</span>
                                  <span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="p">),</span> <span class="n">iattr</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">target_globals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">target_globals</span><span class="p">[</span><span class="n">new_cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cls</span>
+        <span class="n">target_globals</span><span class="p">[</span><span class="n">new_cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cls</span>
         <span class="k">del</span> <span class="n">new_cls</span>
         <span class="k">return</span> <span class="n">name</span>
     <span class="k">else</span><span class="p">:</span>
@@ -226,7 +221,7 @@
 
 
 <div class="viewcode-block" id="FixedMetaschemaType"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">FixedMetaschemaType</span><span class="p">(</span><span class="n">MetaschemaType</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class that should be used to alias another type, but with certain</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that should be used to alias another type, but with certain</span>
 <span class="sd">    properties fixed.</span>
 
 <span class="sd">    Arguments:</span>
@@ -243,14 +238,14 @@
     <span class="n">is_fixed</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">fixed_properties</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.base"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.base">[docs]</a>    <span class="k">def</span> <span class="nf">base</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get the type that this type is a fixed version of.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">__bases__</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+<div class="viewcode-block" id="FixedMetaschemaType.base"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.base">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">base</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the type that this type is a fixed version of.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.typedef_base2fixed"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.typedef_base2fixed">[docs]</a>    <span class="k">def</span> <span class="nf">typedef_base2fixed</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Transform a type definition from the unfixed base type to the fixed</span>
+<div class="viewcode-block" id="FixedMetaschemaType.typedef_base2fixed"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.typedef_base2fixed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">typedef_base2fixed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform a type definition from the unfixed base type to the fixed</span>
 <span class="sd">        type alias by removing fixed properties.</span>
 
 <span class="sd">        Args:</span>
@@ -263,24 +258,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
             <span class="n">typedef_base</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
-            <span class="n">typedef_base</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="p">)</span>
+            <span class="n">typedef_base</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="p">)</span>
             <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">compare_schema</span><span class="p">(</span><span class="n">typedef</span><span class="p">,</span> <span class="n">typedef_base</span><span class="p">)]</span>
             <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;Error(s) in comparison with fixed properties.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
                     <span class="n">error_msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">e</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
                     <span class="k">del</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.typedef_fixed2base"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.typedef_fixed2base">[docs]</a>    <span class="k">def</span> <span class="nf">typedef_fixed2base</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Transform a type definition from the fixed alias to the unfixed base by</span>
+<div class="viewcode-block" id="FixedMetaschemaType.typedef_fixed2base"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.typedef_fixed2base">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">typedef_fixed2base</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Transform a type definition from the fixed alias to the unfixed base by</span>
 <span class="sd">        setting the fixed properties if they are not already present.</span>
 
 <span class="sd">        Args:</span>
@@ -291,22 +286,22 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">cls</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">properties</span><span class="p">):</span>
                     <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
                     <span class="k">assert</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
         <span class="c1"># if cls.base().is_fixed:</span>
         <span class="c1">#     out = cls.base().typedef_fixed2base(out)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.issubtype"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.issubtype">[docs]</a>    <span class="k">def</span> <span class="nf">issubtype</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Determine if this type is a subclass of the provided type.</span>
+<div class="viewcode-block" id="FixedMetaschemaType.issubtype"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.issubtype">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">issubtype</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this type is a subclass of the provided type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (str): Type name to check against.</span>
@@ -315,15 +310,15 @@
 <span class="sd">            bool: True if this type is a subtype of the specified type t.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">issubtype</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">issubtype</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">issubtype</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">issubtype</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.updated_fixed_properties"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.updated_fixed_properties">[docs]</a>    <span class="k">def</span> <span class="nf">updated_fixed_properties</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
+<div class="viewcode-block" id="FixedMetaschemaType.updated_fixed_properties"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.updated_fixed_properties">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">updated_fixed_properties</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a version of the fixed properties schema that includes information</span>
 <span class="sd">        from the object.</span>
 
 <span class="sd">        Args:</span>
@@ -334,11 +329,11 @@
 <span class="sd">            dict: Fixed properties schema with object dependent constraints.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">fixed_properties</span><span class="p">)</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.validate"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
+<div class="viewcode-block" id="FixedMetaschemaType.validate"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.validate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to validate.</span>
@@ -349,12 +344,12 @@
 <span class="sd">            bool: True if the object could be of this type, False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span>
                                                         <span class="n">raise_errors</span><span class="o">=</span><span class="n">raise_errors</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">updated_fixed_properties</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span>
-                                <span class="n">cls</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">validator</span><span class="p">())</span>
+            <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">updated_fixed_properties</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span>
+                                <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">validator</span><span class="p">())</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">raise_errors</span><span class="p">:</span>
                 <span class="k">raise</span>
@@ -399,9 +394,9 @@
     <span class="c1">#     out = cls.typedef_base2fixed(out)</span>
     <span class="c1">#     return out</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.check_encoded"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.check_encoded">[docs]</a>    <span class="k">def</span> <span class="nf">check_encoded</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Checks if the metadata for an encoded object matches the type</span>
+<div class="viewcode-block" id="FixedMetaschemaType.check_encoded"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.check_encoded">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_encoded</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Checks if the metadata for an encoded object matches the type</span>
 <span class="sd">        definition.</span>
 
 <span class="sd">        Args:</span>
@@ -421,17 +416,17 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">typedef_base2fixed</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">typedef_base2fixed</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">raise_errors</span><span class="p">:</span>
                 <span class="k">raise</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">check_encoded</span><span class="p">(</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">check_encoded</span><span class="p">(</span>
             <span class="n">out</span><span class="p">,</span> <span class="n">typedef</span><span class="o">=</span><span class="n">typedef</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="n">raise_errors</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="FixedMetaschemaType.extract_typedef"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.extract_typedef">[docs]</a>    <span class="k">def</span> <span class="nf">extract_typedef</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Extract the minimum typedef required for this type from the provided</span>
+<div class="viewcode-block" id="FixedMetaschemaType.extract_typedef"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.extract_typedef">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">extract_typedef</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract the minimum typedef required for this type from the provided</span>
 <span class="sd">        metadata.</span>
 
 <span class="sd">        Args:</span>
@@ -441,12 +436,12 @@
 <span class="sd">            dict: Encoded type definition with unncessary properties removed.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">typedef_base2fixed</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">typedef_base2fixed</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="FixedMetaschemaType.update_typedef"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.FixedMetaschemaType.FixedMetaschemaType.update_typedef">[docs]</a>    <span class="k">def</span> <span class="nf">update_typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Update the current typedef with new values.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the current typedef with new values.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: All keyword arguments are considered to be new type</span>
@@ -459,16 +454,14 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">typename</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">typename</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-            <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">typedef_base2fixed</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typename</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">base</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">typedef_base2fixed</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">FixedMetaschemaType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update_typedef</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -477,11 +470,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -496,37 +489,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.7.4+3.g56c4bbe6',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

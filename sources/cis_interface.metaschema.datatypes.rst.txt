@@ -1,5 +1,5 @@
-cis_interface.metaschema.datatypes package
-==========================================
+cis\_interface.metaschema.datatypes package
+===========================================
 
 Subpackages
 -----------
@@ -11,104 +11,104 @@ Subpackages
 Submodules
 ----------
 
-cis_interface.metaschema.datatypes.ArrayMetaschemaType module
--------------------------------------------------------------
+cis\_interface.metaschema.datatypes.ArrayMetaschemaType module
+--------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.ArrayMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.ContainerMetaschemaType module
------------------------------------------------------------------
+cis\_interface.metaschema.datatypes.ContainerMetaschemaType module
+------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.ContainerMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.FixedMetaschemaType module
--------------------------------------------------------------
+cis\_interface.metaschema.datatypes.FixedMetaschemaType module
+--------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.FixedMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.FunctionMetaschemaType module
-----------------------------------------------------------------
+cis\_interface.metaschema.datatypes.FunctionMetaschemaType module
+-----------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.FunctionMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.JSONArrayMetaschemaType module
------------------------------------------------------------------
+cis\_interface.metaschema.datatypes.JSONArrayMetaschemaType module
+------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.JSONArrayMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.JSONMetaschemaType module
-------------------------------------------------------------
+cis\_interface.metaschema.datatypes.JSONMetaschemaType module
+-------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.JSONMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.JSONObjectMetaschemaType module
-------------------------------------------------------------------
+cis\_interface.metaschema.datatypes.JSONObjectMetaschemaType module
+-------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.JSONObjectMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.MetaschemaType module
---------------------------------------------------------
+cis\_interface.metaschema.datatypes.MetaschemaType module
+---------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.MetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.ObjMetaschemaType module
------------------------------------------------------------
+cis\_interface.metaschema.datatypes.ObjMetaschemaType module
+------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.ObjMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.PlyMetaschemaType module
------------------------------------------------------------
+cis\_interface.metaschema.datatypes.PlyMetaschemaType module
+------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.PlyMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.ScalarMetaschemaType module
---------------------------------------------------------------
+cis\_interface.metaschema.datatypes.ScalarMetaschemaType module
+---------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.ScalarMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.SchemaMetaschemaType module
---------------------------------------------------------------
+cis\_interface.metaschema.datatypes.SchemaMetaschemaType module
+---------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.SchemaMetaschemaType
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.datatypes.conversions module
------------------------------------------------------
+cis\_interface.metaschema.datatypes.conversions module
+------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.datatypes.conversions
     :members:

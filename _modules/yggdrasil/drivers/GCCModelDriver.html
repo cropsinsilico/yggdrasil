@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.GCCModelDriver &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.drivers.GCCModelDriver &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../index.html"/>
-        <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -184,7 +178,7 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.schema</span> <span class="k">import</span> <span class="n">register_component</span><span class="p">,</span> <span class="n">inherit_schema</span>
 
 
-<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
+<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
 <span class="n">_incl_interface</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;interface&#39;</span><span class="p">)</span>
 <span class="n">_incl_io</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">)</span>
 <span class="n">_incl_seri</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;serialize&#39;</span><span class="p">)</span>
@@ -214,7 +208,7 @@
 
 
 <div class="viewcode-block" id="get_zmq_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.get_zmq_flags">[docs]</a><span class="k">def</span> <span class="nf">get_zmq_flags</span><span class="p">(</span><span class="n">for_cmake</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_api</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with zmq libraries.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with zmq libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        for_cmake (bool, optional): If True, the returned flags will match the</span>
@@ -250,7 +244,7 @@
 
 
 <div class="viewcode-block" id="get_ipc_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.get_ipc_flags">[docs]</a><span class="k">def</span> <span class="nf">get_ipc_flags</span><span class="p">(</span><span class="n">for_cmake</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_api</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with ipc libraries.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with ipc libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        for_cmake (bool, optional): If True, the returned flags will match the</span>
@@ -270,7 +264,7 @@
 
 
 <div class="viewcode-block" id="get_flags"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.get_flags">[docs]</a><span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="n">for_cmake</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">for_api</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">cpp</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with Ygg libraries.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with Ygg libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        for_cmake (bool, optional): If True, the returned flags will match the</span>
@@ -333,7 +327,7 @@
 
 
 <div class="viewcode-block" id="get_cc"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.get_cc">[docs]</a><span class="k">def</span> <span class="nf">get_cc</span><span class="p">(</span><span class="n">cpp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linking</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get command line compiler utility.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get command line compiler utility.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        cpp (bool, optional): If True, value is returned assuming the source</span>
@@ -364,14 +358,14 @@
             <span class="n">cc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cc_env</span><span class="p">,</span> <span class="s1">&#39;cl&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_mac</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">static</span><span class="p">:</span>
-            <span class="n">cc</span> <span class="o">=</span> <span class="s1">&#39;libtool&#39;</span>
+            <span class="n">cc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LIBTOOL&#39;</span><span class="p">,</span> <span class="s1">&#39;libtool&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">cpp</span><span class="p">:</span>
             <span class="n">cc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cc_env</span><span class="p">,</span> <span class="s1">&#39;clang++&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cc_env</span><span class="p">,</span> <span class="s1">&#39;clang&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">static</span><span class="p">:</span>
-            <span class="n">cc</span> <span class="o">=</span> <span class="s1">&#39;ar&#39;</span>
+            <span class="n">cc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AR&#39;</span><span class="p">,</span> <span class="s1">&#39;ar&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">cpp</span><span class="p">:</span>
             <span class="n">cc</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cc_env</span><span class="p">,</span> <span class="s1">&#39;g++&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -381,7 +375,7 @@
 
 <div class="viewcode-block" id="call_compile"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.call_compile">[docs]</a><span class="k">def</span> <span class="nf">call_compile</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">[],</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">cpp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Compile a source file, checking for errors.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile a source file, checking for errors.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        src (str): Full path to source file.</span>
@@ -481,7 +475,7 @@
 
 <div class="viewcode-block" id="call_link"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.call_link">[docs]</a><span class="k">def</span> <span class="nf">call_link</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">[],</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
               <span class="n">cpp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shared</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Compile a source file, checking for errors.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile a source file, checking for errors.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        obj (list): Object files that should be linked.</span>
@@ -590,7 +584,7 @@
 
 
 <div class="viewcode-block" id="build_api"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.build_api">[docs]</a><span class="k">def</span> <span class="nf">build_api</span><span class="p">(</span><span class="n">cpp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">as_shared</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Build api library.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build api library.&quot;&quot;&quot;</span>
     <span class="c1"># Get paths</span>
     <span class="n">api_src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_incl_interface</span><span class="p">,</span> <span class="s1">&#39;YggInterface&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cpp</span><span class="p">:</span>
@@ -628,7 +622,7 @@
 
 
 <div class="viewcode-block" id="build_datatypes"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.build_datatypes">[docs]</a><span class="k">def</span> <span class="nf">build_datatypes</span><span class="p">(</span><span class="n">just_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">as_shared</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Build the datatypes library.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build the datatypes library.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">as_shared</span><span class="p">:</span>
         <span class="n">dtype_lib</span> <span class="o">=</span> <span class="n">_datatypes_shared_lib</span>
     <span class="k">else</span><span class="p">:</span>
@@ -662,7 +656,7 @@
     
 
 <div class="viewcode-block" id="build_regex_win32"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.build_regex_win32">[docs]</a><span class="k">def</span> <span class="nf">build_regex_win32</span><span class="p">(</span><span class="n">just_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
-    <span class="sd">r&quot;&quot;&quot;Build the regex_win32 library.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build the regex_win32 library.&quot;&quot;&quot;</span>
     <span class="n">_regex_win32_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_regex_win32_lib</span><span class="p">)</span>
     <span class="n">_regex_win32_cpp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_regex_win32_dir</span><span class="p">,</span> <span class="s1">&#39;regex_win32.cpp&#39;</span><span class="p">)</span>
     <span class="c1"># Compile object</span>
@@ -685,7 +679,7 @@
 
 <div class="viewcode-block" id="do_compile"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.do_compile">[docs]</a><span class="k">def</span> <span class="nf">do_compile</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ccflags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ldflags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Compile a C/C++ program with necessary interface libraries.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile a C/C++ program with necessary interface libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        src (list): List of source files.</span>
@@ -740,9 +734,9 @@
     <span class="k">return</span> <span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">+</span> <span class="n">fname_src_obj</span></div>
 
 
-<span class="nd">@register_component</span>
-<div class="viewcode-block" id="GCCModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.GCCModelDriver">[docs]</a><span class="k">class</span> <span class="nc">GCCModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class for running gcc compiled drivers.</span>
+<div class="viewcode-block" id="GCCModelDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.GCCModelDriver">[docs]</a><span class="nd">@register_component</span>
+<span class="k">class</span> <span class="nc">GCCModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running gcc compiled drivers.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Driver name.</span>
@@ -789,7 +783,7 @@
          <span class="s1">&#39;overwrite&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GCCModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GCCModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_installed</span><span class="p">():</span>  <span class="c1"># pragma: windows</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No library available for models written in C/C++.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -810,9 +804,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Compiled executable with </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cc</span><span class="p">)</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="GCCModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.GCCModelDriver.is_installed">[docs]</a>    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
+<div class="viewcode-block" id="GCCModelDriver.is_installed"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.GCCModelDriver.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if this model driver is installed on the current</span>
 <span class="sd">        machine.</span>
 
 <span class="sd">        Returns:</span>
@@ -823,7 +817,7 @@
         <span class="k">return</span> <span class="n">_c_installed</span></div>
 
 <div class="viewcode-block" id="GCCModelDriver.parse_arguments"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.GCCModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Sort arguments based on their syntax. Arguments ending with &#39;.c&#39; or</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort arguments based on their syntax. Arguments ending with &#39;.c&#39; or</span>
 <span class="sd">        &#39;.cpp&#39; are considered source and the first one will be compiled to an</span>
 <span class="sd">        executable. Arguments starting with &#39;-L&#39; or &#39;-l&#39; are treated as linker</span>
 <span class="sd">        flags. Arguments starting with &#39;-&#39; are treated as compiler flags. Any</span>
@@ -880,7 +874,7 @@
                                <span class="o">+</span> <span class="s2">&quot;provided arguments.&quot;</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="GCCModelDriver.remove_products"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.GCCModelDriver.remove_products">[docs]</a>    <span class="k">def</span> <span class="nf">remove_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Delete products produced during the compilation process.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete products produced during the compilation process.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span>
         <span class="n">products</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">products</span>
@@ -890,19 +884,28 @@
                 <span class="n">products</span> <span class="o">+=</span> <span class="p">[</span><span class="n">base</span> <span class="o">+</span> <span class="n">ext</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.ilk&#39;</span><span class="p">,</span> <span class="s1">&#39;.pdb&#39;</span><span class="p">,</span> <span class="s1">&#39;.obj&#39;</span><span class="p">]]</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">products</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
+                <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
+                <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">)):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
+                            <span class="k">raise</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to remove product: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">p</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="GCCModelDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.GCCModelDriver.GCCModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">remove_products</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GCCModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -911,11 +914,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -930,37 +933,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

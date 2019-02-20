@@ -4,8 +4,8 @@ yggdrasil.interface.tests package
 Submodules
 ----------
 
-yggdrasil.interface.tests.test_YggInterface module
---------------------------------------------------
+yggdrasil.interface.tests.test\_YggInterface module
+---------------------------------------------------
 
 .. automodule:: yggdrasil.interface.tests.test_YggInterface
     :members:

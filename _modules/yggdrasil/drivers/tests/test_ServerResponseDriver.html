@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.tests.test_ServerResponseDriver &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.drivers.tests.test_ServerResponseDriver &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../../index.html"/>
-        <link rel="up" title="yggdrasil.drivers" href="../../drivers.html"/> 
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -180,10 +174,10 @@
 
 
 <div class="viewcode-block" id="TestServerResponseParam"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerResponseDriver.TestServerResponseParam">[docs]</a><span class="k">class</span> <span class="nc">TestServerResponseParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionParam</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test parameters for ServerResponseDriver class.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for ServerResponseDriver class.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestServerResponseParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestServerResponseParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;ServerResponseDriver&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;msg_id&#39;</span><span class="p">,</span> <span class="s1">&#39;model_response_name&#39;</span><span class="p">,</span>
@@ -195,14 +189,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;tuple: Driver arguments.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Driver arguments.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestServerResponseParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_args</span>
         <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Force driver to create an address</span>
         <span class="k">return</span> <span class="n">out</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestServerResponseParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">inst_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_comm</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -210,35 +204,33 @@
 
 <div class="viewcode-block" id="TestServerResponseDriverNoStart"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerResponseDriver.TestServerResponseDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestServerResponseDriverNoStart</span><span class="p">(</span><span class="n">TestServerResponseParam</span><span class="p">,</span>
                                       <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriverNoStart</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test class for ServerResponseDriver class without start.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for ServerResponseDriver class without start.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TestServerResponseDriverNoStart.get_fresh_name"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerResponseDriver.TestServerResponseDriverNoStart.get_fresh_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get a fresh name for a new instance that won&#39;t overlap with the base.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a fresh name for a new instance that won&#39;t overlap with the base.&quot;&quot;&quot;</span>
         <span class="c1"># This ensures that a new address will be generated</span>
         <span class="k">return</span> <span class="kc">None</span></div></div>
 
 
 <div class="viewcode-block" id="TestServerResponseDriver"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerResponseDriver.TestServerResponseDriver">[docs]</a><span class="k">class</span> <span class="nc">TestServerResponseDriver</span><span class="p">(</span><span class="n">TestServerResponseParam</span><span class="p">,</span>
                                <span class="n">parent</span><span class="o">.</span><span class="n">TestConnectionDriver</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test class for ServerResponseDriver class.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for ServerResponseDriver class.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TestServerResponseDriver.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerResponseDriver.TestServerResponseDriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestServerResponseDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_send_recv</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">_used</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_valid</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestServerResponseDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.drivers.tests.html#yggdrasil.drivers.tests.test_ServerResponseDriver.TestServerResponseDriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestServerResponseDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">test_send_recv_nolimit</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">_used</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_valid</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -247,11 +239,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -266,37 +258,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

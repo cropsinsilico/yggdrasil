@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.examples.tests package &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.examples.tests package &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,30 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="index.html"/>
-        <link rel="up" title="yggdrasil.examples package" href="yggdrasil.examples.html"/>
-        <link rel="next" title="C Code" href="code_c.html"/>
-        <link rel="prev" title="yggdrasil.examples package" href="yggdrasil.examples.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="C Code" href="code_c.html" />
+    <link rel="prev" title="yggdrasil.examples package" href="yggdrasil.examples.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -69,7 +59,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -108,11 +98,14 @@
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="code_python.html">Python Code</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.interface.html">yggdrasil.interface package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.serialize.html">yggdrasil.serialize package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html">yggdrasil.metaschema.datatypes package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.drivers.html">yggdrasil.drivers package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="yggdrasil.examples.html">yggdrasil.examples package</a></li>
 </ul>
@@ -139,6 +132,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -152,7 +146,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -160,9 +154,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -220,18 +215,39 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_SaM.TestExampleSaM">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_SaM.</code><code class="descname">TestExampleSaM</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_SaM.html#TestExampleSaM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_SaM.TestExampleSaM" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the SaM example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_SaM.TestExampleSaM.example_name">
+<code class="descname">example_name</code><em class="property"> = 'SaM'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_SaM.TestExampleSaM.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_SaM.TestExampleSaM.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_SaM.TestExampleSaM.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_SaM.TestExampleSaM.results">
 <code class="descname">results</code><a class="headerlink" href="#yggdrasil.examples.tests.test_SaM.TestExampleSaM.results" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Results that should be found in the output files.</p>
+<dd><p>Results that should be found in the output files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -242,7 +258,7 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_ascii_io.</code><code class="descname">TestExampleAsciiIO</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_ascii_io.html#TestExampleAsciiIO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the AsciiIO example.</p>
 <dl class="method">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.check_table">
@@ -251,51 +267,120 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.example_name">
+<code class="descname">example_name</code><em class="property"> = 'ascii_io'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.input_array">
 <code class="descname">input_array</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.input_array" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Input array file.</p>
+<dd><p>Input array file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.input_file">
 <code class="descname">input_file</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.input_file" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Input file.</p>
+<dd><p>Input file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.input_table">
 <code class="descname">input_table</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.input_table" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Input table file.</p>
+<dd><p>Input table file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_array">
 <code class="descname">output_array</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_array" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output array for the run.</p>
+<dd><p>Output array for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_file">
 <code class="descname">output_file</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_file" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output file for the run.</p>
+<dd><p>Output file for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_table">
 <code class="descname">output_table</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.output_table" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output table for the run.</p>
+<dd><p>Output table for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.results">
 <code class="descname">results</code><a class="headerlink" href="#yggdrasil.examples.tests.test_ascii_io.TestExampleAsciiIO.results" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Results that should be found in the output files.</p>
+<dd><p>Results that should be found in the output files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -306,7 +391,7 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_fakeplant.</code><code class="descname">TestExampleFakeplant</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_fakeplant.html#TestExampleFakeplant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Fakeplant example.</p>
 <dl class="method">
 <dt id="yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant.check_results">
@@ -315,15 +400,36 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant.example_name">
+<code class="descname">example_name</code><em class="property"> = 'fakeplant'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant.output_dir">
 <code class="descname">output_dir</code><a class="headerlink" href="#yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant.output_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output directory.</p>
+<dd><p>Output directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_fakeplant.TestExampleFakeplant.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -340,8 +446,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io1.TestExampleFIO1">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io1.</code><code class="descname">TestExampleFIO1</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io1.html#TestExampleFIO1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io1.TestExampleFIO1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 1 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io1.TestExampleFIO1.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io1'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io1.TestExampleFIO1.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io1.TestExampleFIO1.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io1.TestExampleFIO1.input_files" title="Permalink to this definition">¶</a></dt>
@@ -362,8 +473,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io2.TestExampleFIO2">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io2.</code><code class="descname">TestExampleFIO2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io2.html#TestExampleFIO2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io2.TestExampleFIO2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 2 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io2.TestExampleFIO2.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io2'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io2.TestExampleFIO2.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io2.TestExampleFIO2.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io2.TestExampleFIO2.input_files" title="Permalink to this definition">¶</a></dt>
@@ -384,8 +500,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io3.TestExampleFIO3">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io3.</code><code class="descname">TestExampleFIO3</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io3.html#TestExampleFIO3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io3.TestExampleFIO3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 3 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io3.TestExampleFIO3.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io3'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io3.TestExampleFIO3.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io3.TestExampleFIO3.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io3.TestExampleFIO3.input_files" title="Permalink to this definition">¶</a></dt>
@@ -406,8 +527,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io4.TestExampleFIO4">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io4.</code><code class="descname">TestExampleFIO4</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io4.html#TestExampleFIO4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io4.TestExampleFIO4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 4 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io4.TestExampleFIO4.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io4'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io4.TestExampleFIO4.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io4.TestExampleFIO4.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io4.TestExampleFIO4.input_files" title="Permalink to this definition">¶</a></dt>
@@ -428,8 +554,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io5.TestExampleFIO5">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io5.</code><code class="descname">TestExampleFIO5</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io5.html#TestExampleFIO5"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io5.TestExampleFIO5" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 5 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io5.TestExampleFIO5.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io5'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io5.TestExampleFIO5.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io5.TestExampleFIO5.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io5.TestExampleFIO5.input_files" title="Permalink to this definition">¶</a></dt>
@@ -450,8 +581,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io6.TestExampleFIO6">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io6.</code><code class="descname">TestExampleFIO6</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io6.html#TestExampleFIO6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io6.TestExampleFIO6" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 6 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io6.TestExampleFIO6.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io6'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io6.TestExampleFIO6.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io6.TestExampleFIO6.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io6.TestExampleFIO6.input_files" title="Permalink to this definition">¶</a></dt>
@@ -472,8 +608,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io7.TestExampleFIO7">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io7.</code><code class="descname">TestExampleFIO7</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io7.html#TestExampleFIO7"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io7.TestExampleFIO7" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 7 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io7.TestExampleFIO7.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io7'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io7.TestExampleFIO7.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io7.TestExampleFIO7.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io7.TestExampleFIO7.input_files" title="Permalink to this definition">¶</a></dt>
@@ -494,8 +635,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io8.TestExampleFIO8">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io8.</code><code class="descname">TestExampleFIO8</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io8.html#TestExampleFIO8"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io8.TestExampleFIO8" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 8 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io8.TestExampleFIO8.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io8'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io8.TestExampleFIO8.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io8.TestExampleFIO8.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io8.TestExampleFIO8.input_files" title="Permalink to this definition">¶</a></dt>
@@ -516,8 +662,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_formatted_io9.TestExampleFIO9">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_formatted_io9.</code><code class="descname">TestExampleFIO9</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_formatted_io9.html#TestExampleFIO9"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io9.TestExampleFIO9" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Formatted I/O lesson 9 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_formatted_io9.TestExampleFIO9.example_name">
+<code class="descname">example_name</code><em class="property"> = 'formatted_io9'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io9.TestExampleFIO9.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_formatted_io9.TestExampleFIO9.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_formatted_io9.TestExampleFIO9.input_files" title="Permalink to this definition">¶</a></dt>
@@ -538,8 +689,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_gs_lesson1.TestExampleGS1">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_gs_lesson1.</code><code class="descname">TestExampleGS1</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_gs_lesson1.html#TestExampleGS1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson1.TestExampleGS1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 1 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_gs_lesson1.TestExampleGS1.example_name">
+<code class="descname">example_name</code><em class="property"> = 'gs_lesson1'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson1.TestExampleGS1.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -548,8 +704,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_gs_lesson2.TestExampleGS2">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_gs_lesson2.</code><code class="descname">TestExampleGS2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_gs_lesson2.html#TestExampleGS2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson2.TestExampleGS2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 2 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_gs_lesson2.TestExampleGS2.example_name">
+<code class="descname">example_name</code><em class="property"> = 'gs_lesson2'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson2.TestExampleGS2.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -558,8 +719,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_gs_lesson3.TestExampleGS3">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_gs_lesson3.</code><code class="descname">TestExampleGS3</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_gs_lesson3.html#TestExampleGS3"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson3.TestExampleGS3" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 3 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_gs_lesson3.TestExampleGS3.example_name">
+<code class="descname">example_name</code><em class="property"> = 'gs_lesson3'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson3.TestExampleGS3.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_gs_lesson3.TestExampleGS3.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson3.TestExampleGS3.input_files" title="Permalink to this definition">¶</a></dt>
@@ -580,8 +746,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_gs_lesson4.TestExampleGS4">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_gs_lesson4.</code><code class="descname">TestExampleGS4</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_gs_lesson4.html#TestExampleGS4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson4.TestExampleGS4" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 4 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_gs_lesson4.TestExampleGS4.example_name">
+<code class="descname">example_name</code><em class="property"> = 'gs_lesson4'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson4.TestExampleGS4.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_gs_lesson4.TestExampleGS4.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson4.TestExampleGS4.input_files" title="Permalink to this definition">¶</a></dt>
@@ -602,8 +773,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_gs_lesson4b.TestExampleGS4b">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_gs_lesson4b.</code><code class="descname">TestExampleGS4b</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_gs_lesson4b.html#TestExampleGS4b"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson4b.TestExampleGS4b" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Getting Started Lesson 4b example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_gs_lesson4b.TestExampleGS4b.example_name">
+<code class="descname">example_name</code><em class="property"> = 'gs_lesson4b'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson4b.TestExampleGS4b.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_gs_lesson4b.TestExampleGS4b.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_gs_lesson4b.TestExampleGS4b.input_files" title="Permalink to this definition">¶</a></dt>
@@ -624,8 +800,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_hello.TestExampleHello">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_hello.</code><code class="descname">TestExampleHello</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_hello.html#TestExampleHello"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_hello.TestExampleHello" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Hello example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_hello.TestExampleHello.example_name">
+<code class="descname">example_name</code><em class="property"> = 'hello'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_hello.TestExampleHello.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_hello.TestExampleHello.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_hello.TestExampleHello.input_files" title="Permalink to this definition">¶</a></dt>
@@ -646,8 +827,13 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_maxMsg.TestExampleMaxMsg">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_maxMsg.</code><code class="descname">TestExampleMaxMsg</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_maxMsg.html#TestExampleMaxMsg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_maxMsg.TestExampleMaxMsg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the MaxMsg example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_maxMsg.TestExampleMaxMsg.example_name">
+<code class="descname">example_name</code><em class="property"> = 'maxMsg'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_maxMsg.TestExampleMaxMsg.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -656,7 +842,7 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_model_error.TestExampleModelError">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_model_error.</code><code class="descname">TestExampleModelError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_model_error.html#TestExampleModelError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error.TestExampleModelError" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the model_error example.</p>
 <dl class="method">
 <dt id="yggdrasil.examples.tests.test_model_error.TestExampleModelError.cleanup">
@@ -667,8 +853,26 @@
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_model_error.TestExampleModelError.core_dump">
 <code class="descname">core_dump</code><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error.TestExampleModelError.core_dump" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Pattern for core dump that may be produced.</p>
+<dd><p>Pattern for core dump that may be produced.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_model_error.TestExampleModelError.example_name">
+<code class="descname">example_name</code><em class="property"> = 'model_error'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error.TestExampleModelError.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_model_error.TestExampleModelError.expects_error">
+<code class="descname">expects_error</code><em class="property"> = True</em><a class="headerlink" href="#yggdrasil.examples.tests.test_model_error.TestExampleModelError.expects_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -678,7 +882,7 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_root_to_shoot.</code><code class="descname">TestExampleRootToShoot</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_root_to_shoot.html#TestExampleRootToShoot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the Root to Shoot example.</p>
 <dl class="method">
 <dt id="yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot.check_results">
@@ -687,15 +891,36 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot.example_name">
+<code class="descname">example_name</code><em class="property"> = 'root_to_shoot'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_dir">
 <code class="descname">output_dir</code><a class="headerlink" href="#yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Output directory.</p>
+<dd><p>Output directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_root_to_shoot.TestExampleRootToShoot.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -712,8 +937,18 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_rpcFib.</code><code class="descname">TestExampleRpcFib</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_rpcFib.html#TestExampleRpcFib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the rpcFib example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib.env">
+<code class="descname">env</code><em class="property"> = {'FIB_ITERATIONS': '3', 'FIB_SERVER_SLEEP_SECONDS': '0.01'}</em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib.env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib.example_name">
+<code class="descname">example_name</code><em class="property"> = 'rpcFib'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_rpcFib.TestExampleRpcFib.output_files" title="Permalink to this definition">¶</a></dt>
@@ -734,8 +969,18 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_rpc_lesson1.</code><code class="descname">TestExampleRPC1</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_rpc_lesson1.html#TestExampleRPC1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the rpc_lesson1 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1.example_name">
+<code class="descname">example_name</code><em class="property"> = 'rpc_lesson1'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1.niter">
+<code class="descname">niter</code><em class="property"> = 3</em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1.niter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson1.TestExampleRPC1.output_files" title="Permalink to this definition">¶</a></dt>
@@ -756,8 +1001,23 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_rpc_lesson2.</code><code class="descname">TestExampleRPC2</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_rpc_lesson2.html#TestExampleRPC2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Test the rpc_lesson2 example.</p>
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.example_name">
+<code class="descname">example_name</code><em class="property"> = 'rpc_lesson2'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.niter1">
+<code class="descname">niter1</code><em class="property"> = 3</em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.niter1" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.niter2">
+<code class="descname">niter2</code><em class="property"> = 5</em><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.niter2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.test_rpc_lesson2.TestExampleRPC2.output_files" title="Permalink to this definition">¶</a></dt>
@@ -778,13 +1038,23 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_timed_pipe.</code><code class="descname">ExampleTimedPipeTestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests/test_timed_pipe.html#ExampleTimedPipeTestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.TestExample" title="yggdrasil.examples.tests.TestExample"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.TestExample</span></code></a></p>
 <p>Base class for testing TimedPipe example with various comm types.</p>
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.description_prefix">
 <code class="descname">description_prefix</code><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.description_prefix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prefix message with test name.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.env">
+<code class="descname">env</code><em class="property"> = {'PIPE_MSG_COUNT': '10', 'PIPE_MSG_SIZE': '1024'}</em><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.example_name">
+<code class="descname">example_name</code><em class="property"> = 'timed_pipe'</em><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase.output_files">
@@ -809,7 +1079,7 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.test_timed_pipe.TestExampleTimedPipeIPCComm">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.test_timed_pipe.</code><code class="descname">TestExampleTimedPipeIPCComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#yggdrasil.examples.tests.test_timed_pipe.TestExampleTimedPipeIPCComm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase" title="yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase" title="yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.examples.tests.test_timed_pipe.ExampleTimedPipeTestBase</span></code></a></p>
 </dd></dl>
 
 </div>
@@ -818,7 +1088,7 @@
 <dl class="class">
 <dt id="yggdrasil.examples.tests.TestExample">
 <em class="property">class </em><code class="descclassname">yggdrasil.examples.tests.</code><code class="descname">TestExample</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/examples/tests.html#TestExample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.examples.tests.TestExample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="yggdrasil.tests.html#yggdrasil.tests.YggTestBase" title="yggdrasil.tests.YggTestBase"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.tests.YggTestBase</span></code></a>, <a class="reference internal" href="code_python.html#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="yggdrasil.tests.html#yggdrasil.tests.YggTestBase" title="yggdrasil.tests.YggTestBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.YggTestBase</span></code></a>, <a class="reference internal" href="code_python.html#yggdrasil.tools.YggClass" title="yggdrasil.tools.YggClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tools.YggClass</span></code></a></p>
 <p>Base class for running examples.</p>
 <dl class="method">
 <dt id="yggdrasil.examples.tests.TestExample.check_results">
@@ -839,6 +1109,21 @@
 </dd></dl>
 
 <dl class="attribute">
+<dt id="yggdrasil.examples.tests.TestExample.env">
+<code class="descname">env</code><em class="property"> = {}</em><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.TestExample.example_name">
+<code class="descname">example_name</code><em class="property"> = None</em><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.example_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.examples.tests.TestExample.expects_error">
+<code class="descname">expects_error</code><em class="property"> = False</em><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.expects_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="yggdrasil.examples.tests.TestExample.input_files">
 <code class="descname">input_files</code><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.input_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>list Input files for the run.</p>
@@ -847,19 +1132,43 @@
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.TestExample.namespace">
 <code class="descname">namespace</code><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.namespace" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Namespace for the example.</p>
+<dd><p>Namespace for the example.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.TestExample.output_files">
 <code class="descname">output_files</code><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.output_files" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output files for the run.</p>
+<dd><p>Output files for the run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.TestExample.results">
 <code class="descname">results</code><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.results" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Results that should be found in the output files.</p>
+<dd><p>Results that should be found in the output files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -871,7 +1180,15 @@
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.TestExample.tempdir">
 <code class="descname">tempdir</code><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.tempdir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Temporary directory.</p>
+<dd><p>Temporary directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -907,13 +1224,29 @@
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.TestExample.yaml">
 <code class="descname">yaml</code><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; The full path to the yaml file for this example.</p>
+<dd><p>The full path to the yaml file for this example.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="yggdrasil.examples.tests.TestExample.yamldir">
 <code class="descname">yamldir</code><a class="headerlink" href="#yggdrasil.examples.tests.TestExample.yamldir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; Full path to the directory containing the yaml file.</p>
+<dd><p>Full path to the directory containing the yaml file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -923,9 +1256,7 @@
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -943,11 +1274,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -962,37 +1293,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

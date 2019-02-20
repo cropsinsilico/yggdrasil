@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.communication.tests.test_CommBase &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../../index.html"/>
-        <link rel="up" title="yggdrasil.communication" href="../../communication.html"/> 
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -183,7 +177,7 @@
 
 
 <div class="viewcode-block" id="test_registry"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.test_registry">[docs]</a><span class="k">def</span> <span class="nf">test_registry</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Test registry of comm.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test registry of comm.&quot;&quot;&quot;</span>
     <span class="n">comm_class</span> <span class="o">=</span> <span class="s1">&#39;CommBase&#39;</span>
     <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;key1&#39;</span>
     <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
@@ -200,7 +194,7 @@
 
 
 <div class="viewcode-block" id="TestCommBase"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase">[docs]</a><span class="k">class</span> <span class="nc">TestCommBase</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Tests for CommBase communication class.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tests for CommBase communication class.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        send_inst_kwargs (dict): Keyword arguments for send half of the comm</span>
@@ -216,76 +210,76 @@
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cleanup_comm_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: Comm classes that should be cleaned up following the test.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Comm classes that should be cleaned up following the test.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Name of the test connection.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of the test connection.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;Test</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Communication class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Communication class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Absolute module import.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Absolute module import.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;yggdrasil.communication.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: Is the communication class installed.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Is the communication class installed.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="s1">&#39;reverse_names&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;direction&#39;</span><span class="p">:</span> <span class="s1">&#39;send&#39;</span><span class="p">}</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: Arguments for tested class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Arguments for tested class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for tested class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">opp_comm_kwargs</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">recv_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Alias for instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Alias for instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;int: Maximum message size.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Maximum message size.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">maxMsgSize</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">test_msg_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;msg_array&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Test message that should be used for any send/recv tests.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;msg&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msg_long</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Small test message for sending.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Small test message for sending.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">*</span> <span class="n">b</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">*</span> <span class="sa">b</span><span class="s1">&#39;0&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span>
             
 <div class="viewcode-block" id="TestCommBase.setup"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Initialize comm object pair.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize comm object pair.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_installed</span><span class="p">)</span>
         <span class="n">sleep_after_connect</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sleep_after_connect&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">send_inst_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
@@ -304,24 +298,24 @@
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.teardown"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Destroy comm object pair.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Destroy comm object pair.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCommBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.create_instance"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Create a new instance of the class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance of the class.&quot;&quot;&quot;</span>
         <span class="n">inst</span> <span class="o">=</span> <span class="n">get_comm</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
 <div class="viewcode-block" id="TestCommBase.remove_instance"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Remove an instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove an instance.&quot;&quot;&quot;</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCommBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.get_fresh_error_instance"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.get_fresh_error_instance">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_error_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recv</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get comm instance with ErrorClass parent class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get comm instance with ErrorClass parent class.&quot;&quot;&quot;</span>
         <span class="n">send_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
         <span class="n">err_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">base_comm</span><span class="o">=</span><span class="n">send_kwargs</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">],</span> <span class="n">new_comm_class</span><span class="o">=</span><span class="s1">&#39;ErrorComm&#39;</span><span class="p">)</span>
         <span class="n">err_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span>
@@ -335,8 +329,8 @@
         <span class="n">recv_inst</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="n">err_name</span><span class="p">,</span> <span class="o">**</span><span class="n">recv_kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">send_inst</span><span class="p">,</span> <span class="n">recv_inst</span></div>
 
-<div class="viewcode-block" id="TestCommBase.test_empty_msg"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_empty_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_empty_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test identification of empty message.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestCommBase.test_empty_obj_recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_empty_obj_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_empty_obj_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test identification of empty message.&quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">empty_obj_recv</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">))</span>
@@ -347,11 +341,11 @@
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">))</span></div>
             
 <div class="viewcode-block" id="TestCommBase.test_error_name"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_error_name">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test error on missing address.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on missing address.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">,</span> <span class="s1">&#39;test</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_error_send"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_error_send">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test error on send.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on send.&quot;&quot;&quot;</span>
         <span class="n">send_inst</span><span class="p">,</span> <span class="n">recv_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_error_instance</span><span class="p">()</span>
         <span class="n">send_inst</span><span class="o">.</span><span class="n">_first_send_done</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">send_inst</span><span class="o">.</span><span class="n">error_replace</span><span class="p">(</span><span class="s1">&#39;send_multipart&#39;</span><span class="p">)</span>
@@ -362,7 +356,7 @@
         <span class="n">recv_inst</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_error_recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_error_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test error on recv.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test error on recv.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd_count</span>
         <span class="n">send_inst</span><span class="p">,</span> <span class="n">recv_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fresh_error_instance</span><span class="p">(</span><span class="n">recv</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd_count</span>
@@ -376,7 +370,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fd_count</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_after_close"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_after_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test that opening twice dosn&#39;t cause errors and that send/recv after</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that opening twice dosn&#39;t cause errors and that send/recv after</span>
 <span class="sd">        close returns false.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
@@ -393,7 +387,7 @@
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_attributes"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">test_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assert that the instance has all of the required attributes.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the instance has all of the required attributes.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Send comm does not have attribute </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="p">)</span>
@@ -411,14 +405,14 @@
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="s1">&#39;invalid&#39;</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_invalid_direction"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_invalid_direction">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Check that error raised for invalid direction.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that error raised for invalid direction.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;invalid&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">new_comm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
                            <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_work_comm"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">test_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test creating/removing a work comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test creating/removing a work comm.&quot;&quot;&quot;</span>
         <span class="n">wc_send</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">create_work_comm</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">add_work_comm</span><span class="p">,</span> <span class="n">wc_send</span><span class="p">)</span>
         <span class="c1"># Create recv instance in way that tests new_comm</span>
@@ -450,11 +444,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">create_work_comm</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestCommBase.map_sent2recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.map_sent2recv">[docs]</a>    <span class="k">def</span> <span class="nf">map_sent2recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a sent object into a received one.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
 <div class="viewcode-block" id="TestCommBase.assert_msg_equal"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.assert_msg_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_msg_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assert that two messages are equivalent.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two messages are equivalent.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">))</span>
                 <span class="ow">and</span> <span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">)):</span>
             <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_sent2recv</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
@@ -466,7 +460,7 @@
                      <span class="n">reverse_comms</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">send_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">recv_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">n_send</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_recv</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                      <span class="n">close_on_send_eof</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">close_on_recv_eof</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Generic send/recv of a message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generic send/recv of a message.&quot;&quot;&quot;</span>
         <span class="n">tkey</span> <span class="o">=</span> <span class="s1">&#39;do_send_recv&#39;</span>
         <span class="n">is_eof</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;eof&#39;</span> <span class="ow">in</span> <span class="n">send_meth</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">msg_send</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -565,7 +559,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">recv_instance</span><span class="p">,</span> <span class="n">n_msg_recv_meth</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_drain_messages"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_drain_messages">[docs]</a>    <span class="k">def</span> <span class="nf">test_drain_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test waiting for messages to drain.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test waiting for messages to drain.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">drain_messages</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">n_msg_send_drain</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">is_file</span><span class="p">:</span>
@@ -577,7 +571,7 @@
                            <span class="n">variable</span><span class="o">=</span><span class="s1">&#39;n_msg_invalid&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_recv_nomsg"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_recv_nomsg">[docs]</a>    <span class="k">def</span> <span class="nf">test_recv_nomsg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test recieve when there is no waiting message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test recieve when there is no waiting message.&quot;&quot;&quot;</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;AsyncComm&#39;</span><span class="p">]:</span>
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">flag</span><span class="p">)</span>
@@ -586,29 +580,29 @@
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">msg_recv</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test send/recv of a small message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of a small message.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test send/recv of a large message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of a large message.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="s1">&#39;send_nolimit&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_nolimit&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_array"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test send/recv of a array message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of a array message.&quot;&quot;&quot;</span>
         <span class="n">msg_send</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;test_msg_array&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="s1">&#39;send_array&#39;</span><span class="p">,</span> <span class="s1">&#39;recv_array&#39;</span><span class="p">,</span> <span class="n">msg_send</span><span class="o">=</span><span class="n">msg_send</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_eof"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_eof">[docs]</a>    <span class="k">def</span> <span class="nf">test_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test send/recv of EOF message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF message.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_eof&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_eof_no_close"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_eof_no_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_eof_no_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test send/recv of EOF message with no close.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF message with no close.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_eof&#39;</span><span class="p">,</span> <span class="n">close_on_recv_eof</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_purge"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nrecv</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test purging messages from the comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test purging messages from the comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">n_msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="c1"># Purge recv while open</span>
@@ -630,7 +624,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="TestCommBase.test_send_recv_dict"><a class="viewcode-back" href="../../../../yggdrasil.communication.tests.html#yggdrasil.communication.tests.test_CommBase.TestCommBase.test_send_recv_dict">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test send/recv message as dict.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv message as dict.&quot;&quot;&quot;</span>
         <span class="n">msg_send</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">testing_options</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_dict&#39;</span><span class="p">,</span> <span class="n">recv_meth</span><span class="o">=</span><span class="s1">&#39;recv_dict&#39;</span><span class="p">,</span>
                           <span class="n">msg_send</span><span class="o">=</span><span class="n">msg_send</span><span class="p">)</span>
@@ -643,9 +637,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -654,11 +646,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -673,37 +665,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

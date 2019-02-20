@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.drivers.ConnectionDriver &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../index.html"/>
-        <link rel="up" title="yggdrasil.drivers" href="../drivers.html"/> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -192,7 +186,7 @@
 
 
 <div class="viewcode-block" id="ConnectionDriver"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver">[docs]</a><span class="k">class</span> <span class="nc">ConnectionDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class that continuously passes messages from one comm to another.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that continuously passes messages from one comm to another.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Name that should be used to set names of input/output comms.</span>
@@ -253,16 +247,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_is_input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: True if the connection is providing input to a model.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is providing input to a model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_direction</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_is_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: True if the connection is retreiving output from a model.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is retreiving output from a model.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_direction</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">translator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">single_use</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onexit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="c1"># Translator</span>
         <span class="k">if</span> <span class="n">translator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">translator</span> <span class="o">=</span> <span class="p">[]</span>
@@ -298,12 +292,12 @@
                     <span class="o">+</span> <span class="s1">&#39;class = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
                     <span class="o">+</span> <span class="s1">&#39;    input: name = </span><span class="si">%s</span><span class="s1">, address = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
                     <span class="o">+</span> <span class="s1">&#39;    output: name = </span><span class="si">%s</span><span class="s1">, address = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
-                    <span class="o">+</span> <span class="p">(</span><span class="mi">80</span> <span class="o">*</span> <span class="s1">&#39;=&#39;</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="mi">80</span> <span class="o">*</span> <span class="s1">&#39;=&#39;</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_init_single_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">comm_kws</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Parse keyword arguments for input/output comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse keyword arguments for input/output comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating </span><span class="si">%s</span><span class="s2"> comm&quot;</span><span class="p">,</span> <span class="n">io</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="n">get_schema</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">comm_kws</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -363,7 +357,7 @@
         <span class="k">return</span> <span class="n">kwargs</span>
 
     <span class="k">def</span> <span class="nf">_init_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">icomm_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ocomm_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Parse keyword arguments for input/output comms.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse keyword arguments for input/output comms.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_single_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="n">icomm_kws</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_single_comm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="n">ocomm_kws</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -375,7 +369,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Final env:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         
 <div class="viewcode-block" id="ConnectionDriver.wait_for_route"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.wait_for_route">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_route</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Wait until messages have been routed.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until messages have been routed.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="p">((</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)</span>
                <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nrecv</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsent</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nskip</span><span class="p">))):</span>  <span class="c1"># pragma: debug</span>
@@ -385,7 +379,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: Returns True if the connection is open and the parent class</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if the connection is open and the parent class</span>
 <span class="sd">        is valid.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_valid</span>
@@ -393,25 +387,25 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_comm_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: Returns True if both communicators are open.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if both communicators are open.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span>
                     <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comm_closed</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_comm_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: Returns True if both communicators are closed.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if both communicators are closed.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_closed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_closed</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;int: Number of messages waiting in input communicator.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages waiting in input communicator.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">n_msg_recv</span>
 
 <div class="viewcode-block" id="ConnectionDriver.open_comm"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.open_comm">[docs]</a>    <span class="k">def</span> <span class="nf">open_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Open the communicators.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the communicators.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_comm_closed</span><span class="p">:</span>
@@ -427,7 +421,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.close_comm"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.close_comm">[docs]</a>    <span class="k">def</span> <span class="nf">close_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Close the communicators.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the communicators.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_comm_closed</span> <span class="o">=</span> <span class="kc">True</span>
@@ -452,7 +446,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.start"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Open connection before running.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open connection before running.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
         <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
         <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">Tout</span><span class="o">.</span><span class="n">is_out</span><span class="p">):</span>
@@ -463,7 +457,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.graceful_stop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Stop the driver, first waiting for the input comm to be empty.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the driver, first waiting for the input comm to be empty.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
@@ -483,7 +477,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.on_model_exit"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Drain input and then close it.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain input and then close it.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">onexit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;on_model_exit&#39;</span><span class="p">,</span> <span class="s1">&#39;pass&#39;</span><span class="p">]):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calling onexit = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">onexit</span><span class="p">)</span>
@@ -505,20 +499,20 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.do_terminate"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.do_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">do_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Stop the driver by closing the communicators.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the driver by closing the communicators.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_close_state</span><span class="p">(</span><span class="s1">&#39;terminate&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">do_terminate</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.cleanup"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Ensure that the communicators are closed.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ensure that the communicators are closed.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.printStatus"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Print information on the status of the ConnectionDriver.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print information on the status of the ConnectionDriver.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            beg_msg (str, optional): Additional message to print at beginning.</span>
@@ -526,7 +520,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">beg_msg</span>
-        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-50s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;): &#39;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-50s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;): &#39;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-30s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;last action: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-25s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;is_open(</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">), &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_open</span><span class="p">,</span>
                                                  <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_open</span><span class="p">))</span>
@@ -543,7 +537,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.confirm_input"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.confirm_input">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Confirm receipt of messages from input comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm receipt of messages from input comm.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -555,7 +549,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.confirm_output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.confirm_output">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Confirm receipt of messages from output comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm receipt of messages from output comm.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -567,7 +561,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.drain_input"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.drain_input">[docs]</a>    <span class="k">def</span> <span class="nf">drain_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Drain messages from input comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain messages from input comm.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -580,7 +574,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.drain_output"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.drain_output">[docs]</a>    <span class="k">def</span> <span class="nf">drain_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Drain messages from output comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Drain messages from output comm.&quot;&quot;&quot;</span>
         <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -593,7 +587,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.before_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Actions to perform prior to sending messages.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform prior to sending messages.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;before loop&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
@@ -608,7 +602,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.after_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Actions to perform after sending messages.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after sending messages.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;after loop&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="c1"># Close input comm in case loop did not</span>
@@ -627,7 +621,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finished&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.recv_message"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.recv_message">[docs]</a>    <span class="k">def</span> <span class="nf">recv_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get a new message to send.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a new message to send.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to the appropriate</span>
@@ -650,7 +644,7 @@
             <span class="k">return</span> <span class="n">flag</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.on_eof"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.on_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Actions to take when EOF received.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to take when EOF received.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str, bool: Value that should be returned by recv_message on EOF.</span>
@@ -665,7 +659,7 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.on_message"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.on_message">[docs]</a>    <span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Process a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (bytes, str): Message to be processed.</span>
@@ -681,7 +675,7 @@
         <span class="k">return</span> <span class="n">msg</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.update_serializer"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Update the serializer for the output comm based on input.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the serializer for the output comm based on input.&quot;&quot;&quot;</span>
         <span class="n">sinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">)</span>
         <span class="n">sinfo</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;seritype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -732,7 +726,7 @@
                    <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">typedef</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">_send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Send a single message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a single message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: Arguments are passed to the output comm send method.</span>
@@ -749,7 +743,7 @@
             <span class="k">return</span> <span class="n">flag</span>
         
     <span class="k">def</span> <span class="nf">_send_1st_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Send the first message, trying multiple times.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send the first message, trying multiple times.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: Arguments are passed to the output comm send method.</span>
@@ -781,7 +775,7 @@
         <span class="k">return</span> <span class="n">flag</span>
 
 <div class="viewcode-block" id="ConnectionDriver.send_eof"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Send EOF message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send EOF message.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: Success or failure of send.</span>
@@ -796,7 +790,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">,</span> <span class="n">is_eof</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.send_message"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Send a single message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a single message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: Arguments are passed to the output comm send method.</span>
@@ -822,7 +816,7 @@
         <span class="k">return</span> <span class="n">flag</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.set_close_state"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.set_close_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_close_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Set the close state if its not already set.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the close state if its not already set.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_state</span><span class="p">:</span>
@@ -832,7 +826,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.wait_close_state"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.wait_close_state">[docs]</a>    <span class="k">def</span> <span class="nf">wait_close_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Set the close state after waiting for specified time for the</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the close state after waiting for specified time for the</span>
 <span class="sd">        close state to be set by another method.</span>
 
 <span class="sd">        Args:</span>
@@ -851,7 +845,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">set_close_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConnectionDriver.run_loop"><a class="viewcode-back" href="../../../yggdrasil.drivers.html#yggdrasil.drivers.ConnectionDriver.ConnectionDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Run the driver. Continue looping over messages until there are not</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. Continue looping over messages until there are not</span>
 <span class="sd">        any left or the communication channel is closed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;in loop&#39;</span>
@@ -868,8 +862,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_close_state</span><span class="p">(</span><span class="s1">&#39;receiving&#39;</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">if</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">))</span>
-             <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">))):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">is_empty_recv</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;waiting&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s1">&#39;:run: Waiting for next message.&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
@@ -893,8 +886,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_close_state</span><span class="p">(</span><span class="s1">&#39;processing&#39;</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">elif</span> <span class="p">((</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">))</span>
-               <span class="ow">and</span> <span class="p">(</span><span class="n">msg</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">))):</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_empty_send</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Message skipped.&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nskip</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">return</span>
@@ -915,9 +907,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -926,11 +916,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -945,37 +935,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

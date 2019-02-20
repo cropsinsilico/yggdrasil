@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.serialize.DefaultSerialize &mdash; yggdrasil 0.8.3 documentation</title>
+  <title>cis_interface.serialize.DefaultSerialize &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.3
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -189,9 +183,9 @@
     <span class="n">OneDArrayMetaschemaType</span><span class="p">)</span>
 
 
-<span class="nd">@register_serializer</span>
-<div class="viewcode-block" id="DefaultSerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize">[docs]</a><span class="k">class</span> <span class="nc">DefaultSerialize</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">CisClass</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Default class for serializing/deserializing a python object into/from</span>
+<div class="viewcode-block" id="DefaultSerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize">[docs]</a><span class="nd">@register_serializer</span>
+<span class="k">class</span> <span class="nc">DefaultSerialize</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">CisClass</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default class for serializing/deserializing a python object into/from</span>
 <span class="sd">    a bytes message.</span>
 
 <span class="sd">    Args:</span>
@@ -244,21 +238,21 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func_serialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">func_deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">encode_func_serialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decode_func_deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">func_typedef</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_alias</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># Set user defined serialization/deserialization functions</span>
         <span class="k">if</span> <span class="n">func_serialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;func_serialize&#39;</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">func_serialize</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">func_serialize</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span> <span class="o">=</span> <span class="n">func_serialize</span><span class="o">.</span><span class="n">func_serialize</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span> <span class="o">=</span> <span class="n">func_serialize</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">func_deserialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;func_deserialize&#39;</span><span class="p">))</span>
-            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">func_deserialize</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">func_deserialize</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span> <span class="o">=</span> <span class="n">func_deserialize</span><span class="o">.</span><span class="n">func_deserialize</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span> <span class="o">=</span> <span class="n">func_deserialize</span>
@@ -281,9 +275,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_type</span><span class="p">)</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="DefaultSerialize.get_testing_options"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.get_testing_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">as_format</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<div class="viewcode-block" id="DefaultSerialize.get_testing_options"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">as_format</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
@@ -304,9 +298,9 @@
         <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
             <span class="n">as_format</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">as_format</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="n">b</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">b</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;size&#39;</span><span class="p">],</span>
-                              <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">b</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;cm&#39;</span><span class="p">]},</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;field_names&#39;</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;size&#39;</span><span class="p">],</span>
+                              <span class="s1">&#39;field_units&#39;</span><span class="p">:</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;cm&#39;</span><span class="p">]},</span>
                    <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                    <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;format_str&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">},</span>
                    <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
@@ -316,22 +310,22 @@
                                           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span><span class="p">},</span>
                                          <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span> <span class="s1">&#39;precision&#39;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
                                           <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;size&#39;</span><span class="p">}]},</span>
-                   <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">b</span><span class="s1">&#39;# name</span><span class="se">\t</span><span class="s1">count</span><span class="se">\t</span><span class="s1">size</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;# n/a</span><span class="se">\t</span><span class="s1">umol</span><span class="se">\t</span><span class="s1">cm</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;# </span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;  one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;  two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;  one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;  two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.000000</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)}</span>
+                   <span class="s1">&#39;contents&#39;</span><span class="p">:</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;# name</span><span class="se">\t</span><span class="s1">count</span><span class="se">\t</span><span class="s1">size</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# n/a</span><span class="se">\t</span><span class="s1">umol</span><span class="se">\t</span><span class="s1">cm</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;# </span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;  one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;  two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;  one</span><span class="se">\t</span><span class="s1">1</span><span class="se">\t</span><span class="s1">1.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;  two</span><span class="se">\t</span><span class="s1">2</span><span class="se">\t</span><span class="s1">2.000000</span><span class="se">\n</span><span class="s1">&#39;</span>
+                                <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;three</span><span class="se">\t</span><span class="s1">3</span><span class="se">\t</span><span class="s1">3.000000</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)}</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span>
                                   <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_names&#39;</span><span class="p">]]</span>
             <span class="n">out</span><span class="p">[</span><span class="s1">&#39;field_units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span>
                                   <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_units&#39;</span><span class="p">]]</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="p">[(</span><span class="n">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">),</span>
-                    <span class="p">(</span><span class="n">b</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span><span class="p">),</span>
-                    <span class="p">(</span><span class="n">b</span><span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mf">3.0</span><span class="p">)]</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span><span class="p">),</span>
+                    <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mf">3.0</span><span class="p">)]</span>
             <span class="k">if</span> <span class="n">as_array</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;as_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">as_array</span>
                 <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span>
@@ -350,38 +344,38 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">rows</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="n">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="n">cls</span><span class="o">.</span><span class="n">_default_type</span><span class="p">,</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;kwargs&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;empty&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="s1">&#39;typedef&#39;</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_default_type</span><span class="p">,</span>
                    <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">:</span> <span class="p">{}}</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="s1">&#39;Test message</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;Test message 2</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]</span>
-            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">])</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="sa">b</span><span class="s1">&#39;Test message</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;Test message 2</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;contents&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;objects&#39;</span><span class="p">])</span>
         <span class="c1"># out[&#39;contents&#39;] = out[&#39;contents&#39;].replace(b&#39;\n&#39;, platform._newline)</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="DefaultSerialize.seri_kws"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.seri_kws">[docs]</a>    <span class="k">def</span> <span class="nf">seri_kws</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get a list of valid keyword arguments.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="n">cls</span><span class="o">.</span><span class="n">_oldstyle_kws</span><span class="p">))</span></div>
+<div class="viewcode-block" id="DefaultSerialize.seri_kws"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.seri_kws">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">seri_kws</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of valid keyword arguments.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_schema_properties</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_oldstyle_kws</span><span class="p">))</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">typedef</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Type definition.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Type definition.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">func_datatype</span><span class="o">.</span><span class="n">_typedef</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">_typedef</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DefaultSerialize.__getattribute__"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.__getattribute__">[docs]</a>    <span class="k">def</span> <span class="nf">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Return alias result if there is one.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return alias result if there is one.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;_alias&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_alias&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serializer_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Serializer info.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Serializer info.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot define serializer information for user &quot;</span>
                                <span class="o">+</span> <span class="s2">&quot;supplied functions.&quot;</span><span class="p">)</span>
@@ -406,15 +400,28 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">empty_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="o">.</span><span class="n">_empty_msg</span>
         <span class="k">return</span> <span class="n">out</span>
 
+    <span class="c1"># def is_empty(self, obj):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Determine if an object represents an empty message for this serializer.</span>
+
+    <span class="c1">#     Args:</span>
+    <span class="c1">#         obj (object): Object to test.</span>
+
+    <span class="c1">#     Returns:</span>
+    <span class="c1">#         bool: True if the object is empty, False otherwise.</span>
+
+    <span class="c1">#     &quot;&quot;&quot;</span>
+    <span class="c1">#     emsg = self.empty_msg</span>
+    <span class="c1">#     return (isinstance(obj, type(emsg)) and (obj == emsg))</span>
+
 <div class="viewcode-block" id="DefaultSerialize.get_field_names"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.get_field_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_field_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_bytes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get the field names for an array of fields.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the field names for an array of fields.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            as_bytes (bool, optional): If True, the field names will be returned</span>
@@ -449,7 +456,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.get_field_units"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.get_field_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_field_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_bytes</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get the field units for an array of fields.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the field units for an array of fields.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            as_bytes (bool, optional): If True, the field units will be returned</span>
@@ -485,7 +492,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numpy_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;np.dtype: Corresponding structured data type. Will be None unless the</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;np.dtype: Corresponding structured data type. Will be None unless the</span>
 <span class="sd">        type is an array of 1darrays.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;items&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">):</span>
@@ -508,7 +515,7 @@
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="DefaultSerialize.initialize_from_message"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.initialize_from_message">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_from_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">metadata</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Initialize the serializer based on recieved message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize the serializer based on recieved message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (object): Message that serializer should be initialized from.</span>
@@ -519,14 +526,14 @@
         <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="ow">or</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
              <span class="ow">or</span> <span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;incomplete&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))):</span>
             <span class="k">return</span>
-        <span class="n">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="n">typedef</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="n">typedef</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="n">guess_type_from_obj</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encode_type</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
         <span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_serializer</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.initialize_serializer"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.initialize_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">extract</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Initialize a serializer based on received metadata. This method will</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize a serializer based on received metadata. This method will</span>
 <span class="sd">        exit early if the serializer has already been intialized.</span>
 
 <span class="sd">        Args:</span>
@@ -545,7 +552,7 @@
         <span class="c1"># self._initialized = True</span>
 
 <div class="viewcode-block" id="DefaultSerialize.update_serializer"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extract</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_type</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Update serializer with provided information.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update serializer with provided information.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            extract (bool, optional): If True, the updated typedef will be</span>
@@ -598,15 +605,15 @@
         <span class="c1"># Update extra keywords</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extra kwargs: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Extra kwargs: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">))</span>
         <span class="c1"># Update type</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_type</span><span class="p">:</span>
             <span class="c1"># Update typedef from oldstyle keywords in extra_kwargs</span>
             <span class="n">typedef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_typedef_from_oldstyle</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">typedef</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">extract</span><span class="p">:</span>
-                    <span class="n">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
-                    <span class="n">typedef</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
+                    <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">])</span>
+                    <span class="n">typedef</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">extract_typedef</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="n">get_type_from_def</span><span class="p">(</span><span class="n">typedef</span><span class="p">)</span>
             <span class="c1"># Check to see if new datatype is compatible with new one</span>
             <span class="k">if</span> <span class="n">old_datatype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -619,7 +626,7 @@
                              <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">old_datatype</span><span class="o">.</span><span class="n">_typedef</span><span class="p">)))</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.update_typedef_from_oldstyle"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_typedef_from_oldstyle">[docs]</a>    <span class="k">def</span> <span class="nf">update_typedef_from_oldstyle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Update a given typedef using an old, table-style serialization spec.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update a given typedef using an old, table-style serialization spec.</span>
 <span class="sd">        Existing typedef values are not overwritten and warnings are raised if the</span>
 <span class="sd">        provided serialization spec is not compatible with the type definition.</span>
 
@@ -710,7 +717,7 @@
 
 <div class="viewcode-block" id="DefaultSerialize.serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_serializer_info</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">no_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Serialize a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args (obj): List of arguments to be formatted or a ready made message.</span>
@@ -761,7 +768,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Deserialize a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to be deserialized.</span>
@@ -804,7 +811,7 @@
         <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">metadata</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.consolidate_array"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.consolidate_array">[docs]</a>    <span class="k">def</span> <span class="nf">consolidate_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Consolidate message into a structure numpy array if possible.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Consolidate message into a structure numpy array if possible.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            out (list, tuple, np.ndarray): Object to consolidate into a</span>
@@ -837,7 +844,7 @@
     <span class="c1">#     &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DefaultSerialize.parse_header"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.parse_header">[docs]</a>    <span class="k">def</span> <span class="nf">parse_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Extract header info from a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract header info from a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str): Message to extract header from.</span>
@@ -850,9 +857,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -861,11 +866,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -880,37 +885,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.8.3',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

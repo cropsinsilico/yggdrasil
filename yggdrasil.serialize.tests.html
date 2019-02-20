@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.serialize.tests package &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.serialize.tests package &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,30 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="index.html"/>
-        <link rel="up" title="yggdrasil.serialize package" href="yggdrasil.serialize.html"/>
-        <link rel="next" title="yggdrasil.drivers package" href="yggdrasil.drivers.html"/>
-        <link rel="prev" title="yggdrasil.serialize package" href="yggdrasil.serialize.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="yggdrasil.metaschema.datatypes package" href="yggdrasil.metaschema.datatypes.html" />
+    <link rel="prev" title="yggdrasil.serialize package" href="yggdrasil.serialize.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -69,7 +59,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -108,11 +98,14 @@
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="code_python.html">Python Code</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.interface.html">yggdrasil.interface package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="yggdrasil.serialize.html">yggdrasil.serialize package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="yggdrasil.metaschema.datatypes.html">yggdrasil.metaschema.datatypes package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.drivers.html">yggdrasil.drivers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="yggdrasil.examples.html">yggdrasil.examples package</a></li>
 </ul>
@@ -139,6 +132,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -152,7 +146,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -160,9 +154,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -220,7 +215,7 @@
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_AsciiMapSerialize.</code><code class="descname">TestAsciiMapSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiMapSerialize.html#TestAsciiMapSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for TestAsciiMapSerialize class.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize.test_error_delim">
@@ -248,8 +243,13 @@
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">TestAsciiTableSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for AsciiTableSerialize class.</p>
+<dl class="attribute">
+<dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize.attr_list">
+<code class="descname">attr_list</code><em class="property"> = (['datatype', 'typedef', 'numpy_dtype'], ['format_str', 'field_names', 'field_units', 'as_array'])</em><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize.attr_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize.test_field_specs">
 <code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize.test_field_specs" title="Permalink to this definition">¶</a></dt>
@@ -261,7 +261,7 @@
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerializeSingle">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">TestAsciiTableSerializeSingle</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerializeSingle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerializeSingle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for AsciiTableSerialize class.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerializeSingle.get_options">
@@ -274,7 +274,7 @@
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">TestAsciiTableSerialize_asarray</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize_asarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize</span></code></a></p>
 <p>Test class for AsciiTableSerialize class with as_array.</p>
 <dl class="attribute">
 <dt id="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray.testing_option_kws">
@@ -301,7 +301,7 @@
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.FakeSerializer">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">FakeSerializer</code><span class="sig-paren">(</span><em>func_serialize=None</em>, <em>func_deserialize=None</em>, <em>encode_func_serialize=None</em>, <em>decode_func_deserialize=None</em>, <em>func_typedef=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#FakeSerializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.FakeSerializer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="yggdrasil.serialize.html#yggdrasil.serialize.DefaultSerialize.DefaultSerialize" title="yggdrasil.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="yggdrasil.serialize.html#yggdrasil.serialize.DefaultSerialize.DefaultSerialize" title="yggdrasil.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.FakeSerializer.func_deserialize">
 <code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#FakeSerializer.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.FakeSerializer.func_deserialize" title="Permalink to this definition">¶</a></dt>
@@ -319,13 +319,18 @@
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="yggdrasil.tests.html#yggdrasil.tests.YggTestClassInfo" title="yggdrasil.tests.YggTestClassInfo"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.tests.YggTestClassInfo</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="yggdrasil.tests.html#yggdrasil.tests.YggTestClassInfo" title="yggdrasil.tests.YggTestClassInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.tests.YggTestClassInfo</span></code></a></p>
 <p>Test class for DefaultSerialize class.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.assert_result_equal">
 <code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.assert_result_equal" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assert that serialized/deserialized objects equal.</p>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.attr_list">
+<code class="descname">attr_list</code><em class="property"> = ['datatype', 'typedef', 'numpy_dtype']</em><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.attr_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.empty_head">
@@ -372,7 +377,7 @@
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_invalid_update">
 <code class="descname">test_invalid_update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_invalid_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_invalid_update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test error raised when serializer updated with type that isn&#8217;t
+<dd><p>Test error raised when serializer updated with type that isn’t
 compatible.</p>
 </dd></dl>
 
@@ -423,7 +428,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_alias</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_alias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format</span></code></a></p>
 <p>Test class for DefaultSerialize class with alias.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias.setup">
@@ -436,7 +441,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_array</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format</span></code></a></p>
 <p>Test class for DefaultSerialize class with format as array.</p>
 <dl class="attribute">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array.testing_option_kws">
@@ -448,7 +453,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_class</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func</span></code></a></p>
 <p>Test class for DefaultSerialize class with classes.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class.get_options">
@@ -461,7 +466,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_format</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for DefaultSerialize class with format.</p>
 <dl class="attribute">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format.testing_option_kws">
@@ -473,7 +478,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_func</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for DefaultSerialize class with functions.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func.get_options">
@@ -491,35 +496,35 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_func_error</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func</span></code></a></p>
 <p>Test class for DefaultSerialize class with incorrect functions.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs">
-<code class="descname">test_field_specs</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs" title="Permalink to this definition">¶</a></dt>
+<code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disabled: Test field specifiers.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize">
 <code class="descname">test_serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test serialize with function that dosn&#8217;t return correct type.</p>
+<dd><p>Test serialize with function that dosn’t return correct type.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header">
-<code class="descname">test_serialize_header</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header" title="Permalink to this definition">¶</a></dt>
+<code class="descname">test_serialize_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disabled: Test serialize/deserialize with header.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_no_metadata">
-<code class="descname">test_serialize_no_metadata</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_no_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_no_metadata" title="Permalink to this definition">¶</a></dt>
+<code class="descname">test_serialize_no_metadata</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_no_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_no_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test serializing without metadata.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo">
-<code class="descname">test_serialize_sinfo</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_sinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo" title="Permalink to this definition">¶</a></dt>
+<code class="descname">test_serialize_sinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_sinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Disabled: Test serialize/deserialize with serializer info.</p>
 </dd></dl>
 
@@ -528,7 +533,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_type">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_type</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for DefaultSerialize class with types.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_type.get_options">
@@ -541,7 +546,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_uniform</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_uniform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for items as dictionary.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform.get_options">
@@ -554,7 +559,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform_names">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_uniform_names</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_uniform_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform</span></code></a></p>
 <p>Test class for items as dictionary.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_uniform_names.get_options">
@@ -576,7 +581,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_JSONSerialize.TestJSONSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_JSONSerialize.</code><code class="descname">TestJSONSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_JSONSerialize.html#TestJSONSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_JSONSerialize.TestJSONSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for TestJSONSerialize class.</p>
 </dd></dl>
 
@@ -586,7 +591,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_MatSerialize.TestMatSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_MatSerialize.</code><code class="descname">TestMatSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_MatSerialize.html#TestMatSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_MatSerialize.TestMatSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for TestMatSerialize class.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_MatSerialize.TestMatSerialize.test_serialize_errors">
@@ -602,7 +607,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_ObjSerialize.TestObjSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_ObjSerialize.</code><code class="descname">TestObjSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_ObjSerialize.html#TestObjSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_ObjSerialize.TestObjSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize" title="yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize" title="yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize</span></code></a></p>
 <p>Test class for TestObjSerialize class.</p>
 </dd></dl>
 
@@ -612,7 +617,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_PandasSerialize.</code><code class="descname">TestPandasSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_PandasSerialize.html#TestPandasSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize</span></code></a></p>
 <p>Test class for TestPandasSerialize class.</p>
 <dl class="method">
 <dt id="yggdrasil.serialize.tests.test_PandasSerialize.TestPandasSerialize.test_apply_field_names_errors">
@@ -634,7 +639,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_PickleSerialize.TestPickleSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_PickleSerialize.</code><code class="descname">TestPickleSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_PickleSerialize.html#TestPickleSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_PickleSerialize.TestPickleSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for TestPickleSerialize class.</p>
 </dd></dl>
 
@@ -644,7 +649,7 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_PlySerialize.</code><code class="descname">TestPlySerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_PlySerialize.html#TestPlySerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_PlySerialize.TestPlySerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for TestPlySerialize class.</p>
 </dd></dl>
 
@@ -654,8 +659,150 @@ compatible.</p>
 <dl class="class">
 <dt id="yggdrasil.serialize.tests.test_YAMLSerialize.TestYAMLSerialize">
 <em class="property">class </em><code class="descclassname">yggdrasil.serialize.tests.test_YAMLSerialize.</code><code class="descname">TestYAMLSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_YAMLSerialize.html#TestYAMLSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_YAMLSerialize.TestYAMLSerialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">yggdrasil.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
 <p>Test class for TestYAMLSerialize class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-yggdrasil.serialize.tests.test_serialize">
+<span id="yggdrasil-serialize-tests-test-serialize-module"></span><h2>yggdrasil.serialize.tests.test_serialize module<a class="headerlink" href="#module-yggdrasil.serialize.tests.test_serialize" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_array_to_bytes">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_array_to_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_array_to_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_array_to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of arrays to bytes and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_array_to_table">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_array_to_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_array_to_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_array_to_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of arrays to ASCII table and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_cformat2nptype">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_cformat2nptype</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_cformat2nptype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_cformat2nptype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion from C format string to numpy dtype.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_cformat2nptype_structured">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_cformat2nptype_structured</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_cformat2nptype_structured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_cformat2nptype_structured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion from C format string to numpy dtype for structured
+data types.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_cformat2pyscanf">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_cformat2pyscanf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_cformat2pyscanf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_cformat2pyscanf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of C format string to version for python scanf.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_combine_eles">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_combine_eles</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_combine_eles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_combine_eles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test combine_eles.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_combine_flds">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_combine_flds</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_combine_flds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_combine_flds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test combine_flds.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_consolidate_array">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_consolidate_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_consolidate_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_consolidate_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test consolidation of array information in different forms.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_dict2list">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_dict2list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_dict2list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_dict2list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of a dictionary to a list and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_extract_formats">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_extract_formats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_extract_formats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_extract_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test extract_formats.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_format2table">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_format2table</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_format2table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_format2table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test getting table information from a format string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_format_header">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_format_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_format_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_format_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test formatting header.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_format_message">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_format_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_format_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_format_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test formatting message from a list or arguments and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_get_registered_serializers">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_get_registered_serializers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_get_registered_serializers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_get_registered_serializers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_registered_serializers.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_get_serializer_class_errors">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_get_serializer_class_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_get_serializer_class_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_get_serializer_class_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in get_serializer_class for invalid serializer.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_nptype2cformat">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_nptype2cformat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_nptype2cformat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_nptype2cformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion from numpy dtype to C format string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_nptype2cformat_structured">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_nptype2cformat_structured</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_nptype2cformat_structured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_nptype2cformat_structured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion from structured numpy dtype to C format string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_numpy2dict">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_numpy2dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_numpy2dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_numpy2dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of a numpy array to a dictionary and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_numpy2list">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_numpy2list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_numpy2list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_numpy2list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of a numpy array to a list and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_numpy2pandas">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_numpy2pandas</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_numpy2pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_numpy2pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of a numpy array to a pandas data frame and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_pandas2dict">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_pandas2dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_pandas2dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_pandas2dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion of a Pandas data frame to a dictionary and back.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_parse_header">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_parse_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_parse_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_parse_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test parsing header.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.serialize.tests.test_serialize.test_register_serializer_errors">
+<code class="descclassname">yggdrasil.serialize.tests.test_serialize.</code><code class="descname">test_register_serializer_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/serialize/tests/test_serialize.html#test_register_serializer_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.serialize.tests.test_serialize.test_register_serializer_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in register_serializer for duplicate.</p>
 </dd></dl>
 
 </div>
@@ -666,15 +813,13 @@ compatible.</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="yggdrasil.drivers.html" class="btn btn-neutral float-right" title="yggdrasil.drivers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="yggdrasil.metaschema.datatypes.html" class="btn btn-neutral float-right" title="yggdrasil.metaschema.datatypes package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="yggdrasil.serialize.html" class="btn btn-neutral" title="yggdrasil.serialize package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -686,11 +831,11 @@ compatible.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -705,37 +850,24 @@ compatible.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

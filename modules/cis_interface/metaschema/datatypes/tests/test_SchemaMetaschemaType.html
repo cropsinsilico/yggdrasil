@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType &mdash; cis_interface 0.7.4+3.g56c4bbe6 documentation</title>
+  <title>cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType &mdash; cis_interface 0.7.10 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../../static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../../static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../../search.html"/>
-    <link rel="top" title="cis_interface 0.7.4+3.g56c4bbe6 documentation" href="../../../../../index.html"/>
-        <link rel="up" title="cis_interface.metaschema.datatypes.tests" href="../tests.html"/> 
+  <link rel="stylesheet" href="../../../../../static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
 
   
   <script src="../../../../../static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.7.4
+                0.7.10
               </div>
             
           
@@ -105,9 +95,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../../index.html">cis_interface</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -183,13 +178,13 @@
 
 
 <div class="viewcode-block" id="TestSchemaMetaschemaType"><a class="viewcode-back" href="../../../../../cis_interface.metaschema.datatypes.tests.html#cis_interface.metaschema.datatypes.tests.test_SchemaMetaschemaType.TestSchemaMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">TestSchemaMetaschemaType</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestJSONObjectMetaschemaType</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test class for SchemaMetaschemaType class.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for SchemaMetaschemaType class.&quot;&quot;&quot;</span>
 
     <span class="n">_mod</span> <span class="o">=</span> <span class="s1">&#39;SchemaMetaschemaType&#39;</span>
     <span class="n">_cls</span> <span class="o">=</span> <span class="s1">&#39;SchemaMetaschemaType&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestSchemaMetaschemaType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestSchemaMetaschemaType</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fulldef</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fulldef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_typedef</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;schema&#39;</span><span class="p">}</span>
@@ -213,9 +208,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -224,11 +217,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -243,37 +236,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../../',
-            VERSION:'0.7.4+3.g56c4bbe6',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../../static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../../static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../../static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../../static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../../static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../../static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../../static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../../static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../../static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

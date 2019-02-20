@@ -1,0 +1,811 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.serialize.tests.test_serialize &mdash; cis_interface 0.7.10 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.serialize.tests.test_serialize</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.serialize.tests.test_serialize</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">serialize</span><span class="p">,</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">cis_interface.tests</span> <span class="k">import</span> <span class="n">assert_raises</span><span class="p">,</span> <span class="n">assert_equal</span>
+<span class="kn">from</span> <span class="nn">cis_interface.serialize.DefaultSerialize</span> <span class="k">import</span> <span class="n">DefaultSerialize</span>
+
+
+<span class="n">unsupported_nptype</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;bool_&#39;</span><span class="p">]</span>
+<span class="n">map_nptype2cformat</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">([</span><span class="s1">&#39;float_&#39;</span><span class="p">,</span> <span class="s1">&#39;float16&#39;</span><span class="p">,</span> <span class="s1">&#39;float32&#39;</span><span class="p">,</span> <span class="s1">&#39;float64&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">),</span>
+    <span class="p">([</span><span class="s1">&#39;complex_&#39;</span><span class="p">,</span> <span class="s1">&#39;complex64&#39;</span><span class="p">,</span> <span class="s1">&#39;complex128&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="si">%g%+g</span><span class="s1">j&#39;</span><span class="p">),</span>
+    <span class="c1"># ([&#39;int8&#39;, &#39;short&#39;, &#39;intc&#39;, &#39;int_&#39;, &#39;longlong&#39;], &#39;%d&#39;),</span>
+    <span class="c1"># ([&#39;uint8&#39;, &#39;ushort&#39;, &#39;uintc&#39;, &#39;uint64&#39;, &#39;ulonglong&#39;], &#39;%u&#39;),</span>
+    <span class="p">(</span><span class="s1">&#39;int8&#39;</span><span class="p">,</span> <span class="s1">&#39;%hhd&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;short&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%hd</span><span class="s1">&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;intc&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="s1">&#39;%hhu&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;ushort&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%hu</span><span class="s1">&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;uintc&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%u</span><span class="s1">&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%5s</span><span class="s1">&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;U5&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%20s</span><span class="s1">&#39;</span><span class="p">)]</span>
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+    <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span> <span class="s1">&#39;%l64d&#39;</span><span class="p">))</span>
+    <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;uint64&#39;</span><span class="p">,</span> <span class="s1">&#39;%l64u&#39;</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;int64&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%ld</span><span class="s1">&#39;</span><span class="p">))</span>
+    <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;uint64&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%lu</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="c1"># Conditional on if default int 32bit or 64bit</span>
+<span class="c1"># This is for when default int is 32bit</span>
+<span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;int_&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;intc&#39;</span><span class="p">):</span>
+    <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;int_&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%ld</span><span class="s1">&#39;</span><span class="p">))</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;int_&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">))</span>  <span class="c1"># pragma: windows</span>
+<span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;int_&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;longlong&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+        <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;longlong&#39;</span><span class="p">,</span> <span class="s1">&#39;%l64d&#39;</span><span class="p">))</span>
+        <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;ulonglong&#39;</span><span class="p">,</span> <span class="s1">&#39;%l64u&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;longlong&#39;</span><span class="p">,</span> <span class="s1">&#39;%lld&#39;</span><span class="p">))</span>
+        <span class="n">map_nptype2cformat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;ulonglong&#39;</span><span class="p">,</span> <span class="s1">&#39;%llu&#39;</span><span class="p">))</span>
+<span class="n">map_cformat2pyscanf</span> <span class="o">=</span> <span class="p">[([</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">],</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                       <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">),</span>
+                       <span class="c1"># ([&#39;%hhd&#39;, &#39;%hd&#39;, &#39;%d&#39;, &#39;%ld&#39;, &#39;%lld&#39;, &#39;%l64d&#39;], &#39;%d&#39;),</span>
+                       <span class="c1"># ([&#39;%hhu&#39;, &#39;%hu&#39;, &#39;%u&#39;, &#39;%lu&#39;, &#39;%llu&#39;, &#39;%l64u&#39;], &#39;%u&#39;),</span>
+                       <span class="p">(</span><span class="s1">&#39;</span><span class="si">%g%+g</span><span class="s1">j&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%g%+g</span><span class="s1">j&#39;</span><span class="p">)]</span>
+
+<span class="n">unsupported_cfmt</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;n&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+<span class="n">map_cformat2nptype</span> <span class="o">=</span> <span class="p">[([</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">],</span> <span class="s1">&#39;float64&#39;</span><span class="p">),</span>
+                      <span class="c1"># ([&#39;f&#39;, &#39;F&#39;, &#39;e&#39;, &#39;E&#39;, &#39;g&#39;, &#39;G&#39;], &#39;float32&#39;),</span>
+                      <span class="c1"># ([&#39;lf&#39;, &#39;lF&#39;, &#39;le&#39;, &#39;lE&#39;, &#39;lg&#39;, &#39;lG&#39;], &#39;float64&#39;),</span>
+                      <span class="p">([</span><span class="s1">&#39;hhd&#39;</span><span class="p">,</span> <span class="s1">&#39;hhi&#39;</span><span class="p">],</span> <span class="s1">&#39;int8&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;hd&#39;</span><span class="p">,</span> <span class="s1">&#39;hi&#39;</span><span class="p">],</span> <span class="s1">&#39;short&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">],</span> <span class="s1">&#39;intc&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;ld&#39;</span><span class="p">,</span> <span class="s1">&#39;li&#39;</span><span class="p">],</span> <span class="s1">&#39;int_&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;lld&#39;</span><span class="p">,</span> <span class="s1">&#39;lli&#39;</span><span class="p">,</span> <span class="s1">&#39;l64d&#39;</span><span class="p">],</span> <span class="s1">&#39;longlong&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;hhu&#39;</span><span class="p">,</span> <span class="s1">&#39;hho&#39;</span><span class="p">,</span> <span class="s1">&#39;hhx&#39;</span><span class="p">,</span> <span class="s1">&#39;hhX&#39;</span><span class="p">],</span> <span class="s1">&#39;uint8&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;hu&#39;</span><span class="p">,</span> <span class="s1">&#39;ho&#39;</span><span class="p">,</span> <span class="s1">&#39;hx&#39;</span><span class="p">,</span> <span class="s1">&#39;hX&#39;</span><span class="p">],</span> <span class="s1">&#39;ushort&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="s1">&#39;uintc&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;lu&#39;</span><span class="p">,</span> <span class="s1">&#39;lo&#39;</span><span class="p">,</span> <span class="s1">&#39;lx&#39;</span><span class="p">,</span> <span class="s1">&#39;lX&#39;</span><span class="p">],</span> <span class="s1">&#39;uint64&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;llu&#39;</span><span class="p">,</span> <span class="s1">&#39;llo&#39;</span><span class="p">,</span> <span class="s1">&#39;llx&#39;</span><span class="p">,</span> <span class="s1">&#39;llX&#39;</span><span class="p">,</span> <span class="s1">&#39;l64u&#39;</span><span class="p">],</span> <span class="s1">&#39;ulonglong&#39;</span><span class="p">),</span>
+                      <span class="p">([</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">],</span> <span class="n">backwards</span><span class="o">.</span><span class="n">np_dtype_str</span><span class="p">),</span>
+                      <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">np_dtype_str</span><span class="p">)]</span>
+<span class="c1"># if np.dtype(&#39;int_&#39;) != np.dtype(&#39;intc&#39;):</span>
+<span class="c1">#     map_cformat2nptype.append(([&#39;ld&#39;, &#39;li&#39;], &#39;int_&#39;))</span>
+<span class="n">map_cformat2nptype</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+    <span class="p">([</span><span class="s1">&#39;%</span><span class="si">{}</span><span class="s1">%+</span><span class="si">{}</span><span class="s1">j&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">]],</span>
+     <span class="s1">&#39;complex128&#39;</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="test_get_registered_serializers"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_get_registered_serializers">[docs]</a><span class="k">def</span> <span class="nf">test_get_registered_serializers</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test get_registered_serializers.&quot;&quot;&quot;</span>
+    <span class="n">registry</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">get_registered_serializers</span><span class="p">()</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">registry</span><span class="p">[</span><span class="n">DefaultSerialize</span><span class="o">.</span><span class="n">_seritype</span><span class="p">],</span> <span class="n">DefaultSerialize</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_register_serializer_errors"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_register_serializer_errors">[docs]</a><span class="k">def</span> <span class="nf">test_register_serializer_errors</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in register_serializer for duplicate.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">register_serializer</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_get_serializer_class_errors"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_get_serializer_class_errors">[docs]</a><span class="k">def</span> <span class="nf">test_get_serializer_class_errors</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test errors in get_serializer_class for invalid serializer.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">get_serializer_class</span><span class="p">,</span> <span class="s1">&#39;invalid&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_extract_formats"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_extract_formats">[docs]</a><span class="k">def</span> <span class="nf">test_extract_formats</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test extract_formats.&quot;&quot;&quot;</span>
+    <span class="n">test_str</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;</span><span class="si">%10s</span><span class="se">\t</span><span class="si">%5.2f</span><span class="se">\t</span><span class="si">%4d</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s1">j&#39;</span><span class="p">]</span>
+    <span class="n">test_fmt</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;</span><span class="si">%10s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%5.2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%4d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%g%+g</span><span class="s1">j&#39;</span><span class="p">]]</span>
+    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_str</span><span class="p">,</span> <span class="n">test_fmt</span><span class="p">):</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">extract_formats</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">extract_formats</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">s</span><span class="p">)),</span>
+                     <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">f</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="test_nptype2cformat"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_nptype2cformat">[docs]</a><span class="k">def</span> <span class="nf">test_nptype2cformat</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion from numpy dtype to C format string.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">map_nptype2cformat</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ia</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">nptype2cformat</span><span class="p">(</span><span class="n">ia</span><span class="p">),</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">nptype2cformat</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">unsupported_nptype</span><span class="p">:</span>
+        <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">nptype2cformat</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_nptype2cformat_structured"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_nptype2cformat_structured">[docs]</a><span class="k">def</span> <span class="nf">test_nptype2cformat_structured</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion from structured numpy dtype to C format string.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+        <span class="n">fmts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%5s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;%l64d&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%g%+g</span><span class="s2">j&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fmts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%5s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%g%+g</span><span class="s2">j&quot;</span><span class="p">]</span>
+    <span class="n">names0</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f2&#39;</span><span class="p">,</span> <span class="s1">&#39;f3&#39;</span><span class="p">]</span>
+    <span class="n">names1</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]</span>
+    <span class="n">dtype0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names0</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">dtype1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names1</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">alist</span> <span class="o">=</span> <span class="p">[</span><span class="n">dtype0</span><span class="p">,</span> <span class="n">dtype1</span><span class="p">]</span>
+    <span class="n">blist</span> <span class="o">=</span> <span class="p">[</span><span class="n">fmts</span><span class="p">,</span> <span class="n">fmts</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">blist</span><span class="p">):</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">nptype2cformat</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">nptype2cformat</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">asbytes</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                     <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">ib</span><span class="p">)</span> <span class="k">for</span> <span class="n">ib</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="test_cformat2nptype"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_cformat2nptype">[docs]</a><span class="k">def</span> <span class="nf">test_cformat2nptype</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion from C format string to numpy dtype.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">map_cformat2nptype</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">_ia</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_ia</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">_fmt_char</span><span class="p">)):</span>
+                <span class="n">ia</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">_ia</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ia</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">_fmt_char</span> <span class="o">+</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">_ia</span><span class="p">)</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">ia</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>  <span class="c1"># .str)</span>
+            <span class="c1"># assert_equal(serialize.cformat2nptype(ia), np.dtype(b).str)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;%&#39;</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">,</span>
+                  <span class="s1">&#39;</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;one&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">unsupported_nptype</span><span class="p">:</span>
+        <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">,</span>
+                      <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="n">a</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="test_cformat2nptype_structured"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_cformat2nptype_structured">[docs]</a><span class="k">def</span> <span class="nf">test_cformat2nptype_structured</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion from C format string to numpy dtype for structured</span>
+<span class="sd">    data types.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="n">fmts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%5s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;%l64d&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%lf</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%g%+g</span><span class="s2">j&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fmts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%5s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%lf</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%g%+g</span><span class="s2">j&quot;</span><span class="p">]</span>
+    <span class="n">names0</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f2&#39;</span><span class="p">,</span> <span class="s1">&#39;f3&#39;</span><span class="p">]</span>
+    <span class="n">names1</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]</span>
+    <span class="n">dtype0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names0</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">dtype1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names1</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">alist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fmts</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fmts</span><span class="p">),</span> <span class="n">fmts</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">alist</span><span class="p">:</span>
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">b0</span><span class="p">,</span> <span class="n">dtype0</span><span class="p">)</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names1</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">dtype1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_cformat2pyscanf"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_cformat2pyscanf">[docs]</a><span class="k">def</span> <span class="nf">test_cformat2pyscanf</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of C format string to version for python scanf.&quot;&quot;&quot;</span>
+    <span class="n">all_a</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_b</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">map_cformat2pyscanf</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">_ia</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="n">ia</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">_ia</span><span class="p">)</span>
+            <span class="n">ib</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="n">all_a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ia</span><span class="p">)</span>
+            <span class="n">all_b</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ib</span><span class="p">)</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">(</span><span class="n">ia</span><span class="p">),</span> <span class="n">ib</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;s&#39;</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;%&#39;</span><span class="p">)</span>
+    <span class="n">fmt_a</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_a</span><span class="p">)</span>
+    <span class="n">fmt_b</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">all_b</span><span class="p">)</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">(</span><span class="n">all_a</span><span class="p">),</span> <span class="n">all_b</span><span class="p">)</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">(</span><span class="n">fmt_a</span><span class="p">),</span> <span class="n">fmt_b</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_format_message"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_format_message">[docs]</a><span class="k">def</span> <span class="nf">test_format_message</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test formatting message from a list or arguments and back.&quot;&quot;&quot;</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%lf</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s1">j</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="n">x_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">x_tup</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_arr</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">x_arr</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">]</span>
+    <span class="c1"># x_tup[0] = backwards.as_str(x_tup[0])</span>
+    <span class="n">flist</span> <span class="o">=</span> <span class="p">[</span><span class="n">fmt</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="n">alist</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">x_tup</span><span class="p">),</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">alist</span><span class="p">,</span> <span class="n">flist</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format_message</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">process_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="c1"># Errors</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format_message</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">),</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">process_message</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">process_message</span><span class="p">,</span> <span class="sa">b</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_combine_flds"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_combine_flds">[docs]</a><span class="k">def</span> <span class="nf">test_combine_flds</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test combine_flds.&quot;&quot;&quot;</span>
+    <span class="n">names0</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f2&#39;</span><span class="p">,</span> <span class="s1">&#39;f3&#39;</span><span class="p">]</span>
+    <span class="n">names1</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]</span>
+    <span class="n">dtype0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names0</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">dtype1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names1</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">nfld</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names0</span><span class="p">)</span>
+    <span class="n">nele</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">arrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype0</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nfld</span><span class="p">)]</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_flds</span><span class="p">(</span><span class="n">arrs</span><span class="p">),</span>
+                                  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype0</span><span class="p">))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_flds</span><span class="p">(</span><span class="n">arrs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype1</span><span class="p">),</span>
+                                  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype1</span><span class="p">))</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">combine_flds</span><span class="p">,</span> <span class="n">arrs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype0</span><span class="p">)</span>
+    <span class="n">arrs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">combine_flds</span><span class="p">,</span> <span class="n">arrs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_combine_eles"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_combine_eles">[docs]</a><span class="k">def</span> <span class="nf">test_combine_eles</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test combine_eles.&quot;&quot;&quot;</span>
+    <span class="n">names0</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f2&#39;</span><span class="p">,</span> <span class="s1">&#39;f3&#39;</span><span class="p">]</span>
+    <span class="n">names1</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]</span>
+    <span class="n">dtype0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names0</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">dtype1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names1</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">dtype_short</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names1</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtypes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])])</span>
+    <span class="c1"># nfld = len(names0)</span>
+    <span class="n">nele</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">res0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype0</span><span class="p">)</span>
+    <span class="n">res1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype1</span><span class="p">)</span>
+    <span class="n">res0</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+    <span class="n">res1</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+    <span class="n">arrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nele</span><span class="p">)]</span>
+    <span class="n">arrs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;f0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;hello&#39;</span>
+    <span class="n">arrs_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arrs</span><span class="p">]</span>
+    <span class="n">arrs_void</span> <span class="o">=</span> <span class="p">[</span><span class="n">res1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nele</span><span class="p">)]</span>
+    <span class="n">arrs_mixd</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">res1</span><span class="p">]</span>
+    <span class="n">arrs_mixd</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">arrs_void</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+        <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+            <span class="n">res0_list</span> <span class="o">=</span> <span class="n">res0</span>
+            <span class="n">res1_list</span> <span class="o">=</span> <span class="n">res1</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+            <span class="n">dtype0_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">({</span><span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">names0</span><span class="p">,</span> <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]})</span>
+            <span class="n">dtype1_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">({</span><span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">names1</span><span class="p">,</span> <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]})</span>
+            <span class="n">res0_list</span> <span class="o">=</span> <span class="n">res0</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype0_w</span><span class="p">)</span>
+            <span class="n">res1_list</span> <span class="o">=</span> <span class="n">res1</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype1_w</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">res0_list</span> <span class="o">=</span> <span class="n">res0</span>
+        <span class="n">res1_list</span> <span class="o">=</span> <span class="n">res1</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">([</span><span class="n">res1</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names1</span><span class="p">]),</span>
+                                  <span class="n">res0</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">(</span><span class="n">arrs</span><span class="p">),</span> <span class="n">res0</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">(</span><span class="n">arrs_list</span><span class="p">),</span> <span class="n">res0_list</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">(</span><span class="n">arrs_void</span><span class="p">),</span> <span class="n">res1</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">(</span><span class="n">arrs_mixd</span><span class="p">),</span> <span class="n">res1_list</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">(</span><span class="n">arrs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype1</span><span class="p">),</span>
+                                  <span class="n">res1</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">(</span><span class="n">arrs_list</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype1</span><span class="p">),</span>
+                                  <span class="n">res1</span><span class="p">)</span>
+    <span class="n">arrs_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">arrs_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">,</span> <span class="n">arrs_list</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype1</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">,</span> <span class="n">arrs_list</span><span class="p">)</span>
+    <span class="n">arrs_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">,</span> <span class="n">arrs_list</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">combine_eles</span><span class="p">,</span> <span class="n">arrs_void</span><span class="p">,</span>
+                  <span class="n">dtype</span><span class="o">=</span><span class="n">dtype_short</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_consolidate_array"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_consolidate_array">[docs]</a><span class="k">def</span> <span class="nf">test_consolidate_array</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test consolidation of array information in different forms.&quot;&quot;&quot;</span>
+    <span class="n">names0</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f2&#39;</span><span class="p">,</span> <span class="s1">&#39;f3&#39;</span><span class="p">]</span>
+    <span class="c1"># names1 = [&quot;name&quot;, &quot;number&quot;, &quot;value&quot;, &quot;complex&quot;]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]</span>
+    <span class="n">dtype0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names0</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+        <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+            <span class="n">dtype0_list</span> <span class="o">=</span> <span class="n">dtype0</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+            <span class="n">dtype0_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">({</span><span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="n">names0</span><span class="p">,</span>
+                                    <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]})</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtype0_list</span> <span class="o">=</span> <span class="n">dtype0</span>
+    <span class="c1"># dtype1 = np.dtype([(n, f) for n, f in zip(names1, dtypes)])</span>
+    <span class="n">dtype2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">)])</span>
+    <span class="n">dtype3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;i4&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f4&#39;</span><span class="p">)])</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="c1"># Create list of input variables</span>
+    <span class="n">dlist</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x0list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x1list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">),</span> <span class="n">dtype0</span><span class="p">]:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">dtype0</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+        <span class="n">x_flat</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">dlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">x0list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x1list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dlist</span> <span class="o">+=</span> <span class="p">[</span><span class="n">dtype</span><span class="p">,</span> <span class="n">dtype</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">dtype0</span><span class="p">:</span>
+                <span class="n">dtype_list</span> <span class="o">=</span> <span class="n">dtype0_list</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">dtype_list</span> <span class="o">=</span> <span class="n">dtype</span>
+            <span class="n">dlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dtype_list</span><span class="p">)</span>
+            <span class="n">x0list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">x_flat</span><span class="p">,</span> <span class="n">x_flat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype_list</span><span class="p">)]</span>
+            <span class="c1"># Tests with lists of arrays rows or columns</span>
+            <span class="n">x1list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">])</span>
+            <span class="n">x1list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_flat</span><span class="p">))])</span>
+            <span class="n">x1list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">x_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x_flat</span><span class="p">))])</span>
+    <span class="c1"># Tests with single array mapped onto structured array</span>
+    <span class="n">nrow</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nrow</span><span class="p">,</span> <span class="n">dtype2</span><span class="p">)</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nrow</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtype2</span><span class="p">)))</span>
+    <span class="n">dlist</span> <span class="o">+=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+    <span class="n">x0list</span> <span class="o">+=</span> <span class="p">[</span><span class="n">x0</span><span class="p">]</span>
+    <span class="n">x1list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype2</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nrow</span><span class="p">,</span> <span class="n">dtype3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype2</span><span class="p">))</span>
+    <span class="c1"># Test with list of arrays</span>
+    <span class="n">arr_void</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype0</span><span class="p">)</span>
+    <span class="n">x0list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arr_void</span><span class="p">)</span>
+    <span class="n">x1list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arr_void</span><span class="p">])</span>
+    <span class="n">dlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dtype0</span><span class="p">)</span>
+    <span class="c1"># Loop over different test inputs</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x0list</span><span class="p">,</span> <span class="n">x1list</span><span class="p">,</span> <span class="n">dlist</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># Dtype provided</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+        <span class="c1"># Dtype not provided</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="c1"># Error on incorrect data format</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">,</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype2</span><span class="p">)</span>
+    <span class="c1"># Error on incorrect type</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="c1"># Error on dtypes with differing numbers of fields</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span><span class="p">,</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">dtype0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype3</span><span class="p">)</span></div>
+                     
+
+<div class="viewcode-block" id="test_format2table"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_format2table">[docs]</a><span class="k">def</span> <span class="nf">test_format2table</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test getting table information from a format string.&quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;delimiter&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;newline&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="sa">b</span><span class="s1">&#39;# &#39;</span><span class="p">,</span>
+           <span class="s1">&#39;fmts&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%5s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%lf</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%g%+g</span><span class="s2">j&quot;</span><span class="p">]}</span>
+    <span class="n">out</span><span class="p">[</span><span class="s1">&#39;fmts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;fmts&#39;</span><span class="p">]]</span>
+    <span class="n">sfmt</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;fmts&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sout</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">sout</span><span class="p">[</span><span class="s1">&#39;fmts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sfmt</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">sout</span><span class="p">[</span><span class="s1">&#39;newline&#39;</span><span class="p">],</span> <span class="n">sout</span><span class="p">[</span><span class="s1">&#39;comment&#39;</span><span class="p">]</span>
+    <span class="n">fmt</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;# </span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%lf</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s1">j</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">fmt2</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;# </span><span class="si">%5s</span><span class="se">\t\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%lf</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s1">j</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">fmts</span><span class="o">=</span><span class="p">[]),</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format2table</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">))</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">sout</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format2table</span><span class="p">(</span><span class="n">sfmt</span><span class="p">))</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">table2format</span><span class="p">(</span><span class="o">**</span><span class="n">out</span><span class="p">))</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format2table</span><span class="p">(</span><span class="n">fmt</span><span class="p">))</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">table2format</span><span class="p">(</span><span class="n">fmts</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;fmts&#39;</span><span class="p">]))</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format2table</span><span class="p">(</span><span class="n">fmt2</span><span class="p">))</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format2table</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="s2">,</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%g</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_array_to_table"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_array_to_table">[docs]</a><span class="k">def</span> <span class="nf">test_array_to_table</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of arrays to ASCII table and back.&quot;&quot;&quot;</span>
+    <span class="n">flist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;# </span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%lf</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s1">j</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">flist</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">arr0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+            <span class="n">arr0</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;hello&#39;</span>
+            <span class="n">tab</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">array_to_table</span><span class="p">(</span><span class="n">arr0</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">use_astropy</span><span class="o">=</span><span class="n">use_astropy</span><span class="p">)</span>
+            <span class="n">arr1</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">table_to_array</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">use_astropy</span><span class="o">=</span><span class="n">use_astropy</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">arr1</span><span class="p">,</span> <span class="n">arr0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_array_to_bytes"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_array_to_bytes">[docs]</a><span class="k">def</span> <span class="nf">test_array_to_bytes</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of arrays to bytes and back.&quot;&quot;&quot;</span>
+    <span class="n">names0</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f2&#39;</span><span class="p">,</span> <span class="s1">&#39;f3&#39;</span><span class="p">]</span>
+    <span class="c1"># names1 = [&quot;name&quot;, &quot;number&quot;, &quot;value&quot;, &quot;complex&quot;]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]</span>
+    <span class="n">dtype0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names0</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="c1"># dtype1 = np.dtype([(n, f) for n, f in zip(names1, dtypes)])</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">),</span> <span class="n">dtype0</span><span class="p">]:</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">dtype0</span><span class="p">:</span>
+                <span class="n">x0</span><span class="p">[</span><span class="s1">&#39;f0&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+            <span class="c1"># An array of the same type, dtype provided</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">bytes_to_array</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+            <span class="c1"># An array of the same type, dtype not provided</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">bytes_to_array</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x0</span><span class="p">)</span>
+        <span class="c1"># Tests with single array mapped onto structured array</span>
+        <span class="n">dtype2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="s1">&#39;f0&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;f1&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">)])</span>
+        <span class="n">nrow</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">ncol</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtype2</span><span class="p">)</span>
+        <span class="n">b0</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nrow</span><span class="p">,</span> <span class="n">dtype2</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">b1</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nrow</span><span class="p">,</span> <span class="n">ncol</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype2</span><span class="p">,</span>
+                                      <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b0</span><span class="p">)</span>
+        <span class="c1"># Error on incomplete serial array</span>
+        <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">bytes_to_array</span><span class="p">,</span>
+                      <span class="n">b0</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype2</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_format_header"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_format_header">[docs]</a><span class="k">def</span> <span class="nf">test_format_header</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test formatting header.&quot;&quot;&quot;</span>
+    <span class="n">kws_all</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">field_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;complex&#39;</span><span class="p">],</span>
+        <span class="n">field_units</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;n/a&#39;</span><span class="p">])</span>
+    <span class="n">res_all</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">names</span><span class="o">=</span><span class="s2">&quot;# name</span><span class="se">\t</span><span class="s2">number</span><span class="se">\t</span><span class="s2">value</span><span class="se">\t</span><span class="s2">complex</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">units</span><span class="o">=</span><span class="s2">&quot;# n/a</span><span class="se">\t</span><span class="s2">g</span><span class="se">\t</span><span class="s2">cm</span><span class="se">\t</span><span class="s2">n/a</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+        <span class="n">kws_all</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="se">\t</span><span class="s2">%l64d</span><span class="se">\t</span><span class="si">%g</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">res_all</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;# &quot;</span> <span class="o">+</span> <span class="n">kws_all</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kws_all</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%g</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">res_all</span><span class="p">[</span><span class="s1">&#39;format&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;# &quot;</span> <span class="o">+</span> <span class="n">kws_all</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span>
+    <span class="n">kws_all</span><span class="p">[</span><span class="s1">&#39;dtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">kws_all</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">],</span>
+                                                <span class="n">names</span><span class="o">=</span><span class="n">kws_all</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">kws_all</span><span class="p">,</span> <span class="n">res_all</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">iv</span><span class="p">)</span> <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+    <span class="n">test_list</span> <span class="o">=</span> <span class="p">[([</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">]),</span>
+                 <span class="p">([</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">]),</span>
+                 <span class="p">([</span><span class="s1">&#39;field_units&#39;</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">],</span>
+                  <span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">]),</span>
+                 <span class="p">([</span><span class="s1">&#39;field_names&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">]),</span>
+                 <span class="p">([</span><span class="s1">&#39;field_units&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">])]</span>
+    <span class="k">for</span> <span class="n">kws_keys</span><span class="p">,</span> <span class="n">res_keys</span> <span class="ow">in</span> <span class="n">test_list</span><span class="p">:</span>
+        <span class="n">kws</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kws_all</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kws_keys</span><span class="p">}</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">res_all</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">res_keys</span><span class="p">])</span>
+        <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">format_header</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">),</span> <span class="n">res</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format_header</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_parse_header"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_parse_header">[docs]</a><span class="k">def</span> <span class="nf">test_parse_header</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parsing header.&quot;&quot;&quot;</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;# name</span><span class="se">\t</span><span class="s2">number</span><span class="se">\t</span><span class="s2">value</span><span class="se">\t</span><span class="s2">complex</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;# n/a</span><span class="se">\t</span><span class="s2">g</span><span class="se">\t</span><span class="s2">cm</span><span class="se">\t</span><span class="s2">n/a</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;# </span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%lf</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;# &#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
+               <span class="n">format_str</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%lf</span><span class="se">\t</span><span class="si">%g%+g</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+               <span class="n">fmts</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%ld</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%lf</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%g%+g</span><span class="s1">j&#39;</span><span class="p">],</span>
+               <span class="n">field_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;number&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;complex&#39;</span><span class="p">],</span>
+               <span class="n">field_units</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">,</span> <span class="s1">&#39;n/a&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)):</span>
+        <span class="n">header</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">parse_header</span><span class="p">(</span><span class="n">header</span><span class="p">),</span> <span class="n">res</span><span class="p">)</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">parse_header</span><span class="p">(</span><span class="n">header</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">res</span><span class="p">)</span>
+    <span class="n">_empty</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">parse_header</span><span class="p">(</span><span class="n">_empty</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span><span class="p">)),</span> <span class="n">res</span><span class="p">)</span>
+    <span class="c1"># Test without formats</span>
+    <span class="n">header2</span> <span class="o">=</span> <span class="n">header</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">res2</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">res</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">res2</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span>
+    <span class="n">res2</span><span class="p">[</span><span class="s1">&#39;fmts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">parse_header</span><span class="p">(</span><span class="n">header2</span><span class="p">),</span> <span class="n">res2</span><span class="p">)</span>
+    <span class="c1"># Test with explicit line numbers</span>
+    <span class="n">assert_equal</span><span class="p">(</span><span class="n">serialize</span><span class="o">.</span><span class="n">parse_header</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">lineno_names</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lineno_units</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                 <span class="n">res</span><span class="p">)</span>
+    <span class="c1"># Test errors</span>
+    <span class="n">header3</span> <span class="o">=</span> <span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">parse_header</span><span class="p">,</span> <span class="n">header3</span><span class="p">)</span>
+    <span class="n">header4</span> <span class="o">=</span> <span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">header</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">parse_header</span><span class="p">,</span> <span class="n">header4</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_dict2list"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_dict2list">[docs]</a><span class="k">def</span> <span class="nf">test_dict2list</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of a dictionary to a list and back.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2list</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">list2dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_numpy2pandas"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_numpy2pandas">[docs]</a><span class="k">def</span> <span class="nf">test_numpy2pandas</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of a numpy array to a pandas data frame and back.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2pandas</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2numpy</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">nele</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;complex&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">,</span> <span class="s1">&#39;c16&#39;</span><span class="p">]</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">arr_mix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">arr_mix</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+    <span class="n">arr_obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(),</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;O&#39;</span><span class="p">)</span>
+    <span class="n">test_arrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr_mix</span><span class="p">,</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+                 <span class="n">arr_mix</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                 <span class="n">arr_obj</span><span class="p">,</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])]</span>
+    <span class="k">for</span> <span class="n">ans</span> <span class="ow">in</span> <span class="n">test_arrs</span><span class="p">:</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2pandas</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2numpy</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_numpy2list"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_numpy2list">[docs]</a><span class="k">def</span> <span class="nf">test_numpy2list</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of a numpy array to a list and back.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2list</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">list2numpy</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">nele</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;complex&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c16&#39;</span><span class="p">,</span> <span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">]</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">arr_mix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">arr_mix</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+    <span class="n">test_arrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr_mix</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ans</span> <span class="ow">in</span> <span class="n">test_arrs</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2list</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+        <span class="c1"># Name provided</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">list2numpy</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_numpy2dict"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_numpy2dict">[docs]</a><span class="k">def</span> <span class="nf">test_numpy2dict</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of a numpy array to a dictionary and back.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2numpy</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">nele</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;complex&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c16&#39;</span><span class="p">,</span> <span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">]</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">arr_mix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">arr_mix</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+    <span class="n">test_arrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr_mix</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ans</span> <span class="ow">in</span> <span class="n">test_arrs</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2dict</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+        <span class="c1"># Sorted</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2numpy</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="c1"># Provided</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2numpy</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_pandas2dict"><a class="viewcode-back" href="../../../../cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_serialize.test_pandas2dict">[docs]</a><span class="k">def</span> <span class="nf">test_pandas2dict</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test conversion of a Pandas data frame to a dictionary and back.&quot;&quot;&quot;</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2pandas</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">nele</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;complex&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">]</span>
+    <span class="n">dtypes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c16&#39;</span><span class="p">,</span> <span class="s1">&#39;S5&#39;</span><span class="p">,</span> <span class="s1">&#39;i8&#39;</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">]</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">dtypes</span><span class="p">)])</span>
+    <span class="n">arr_mix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">arr_mix</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span>
+    <span class="n">arr_obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(),</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;O&#39;</span><span class="p">)</span>
+    <span class="n">test_arrs</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr_mix</span><span class="p">,</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+                 <span class="n">arr_mix</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                 <span class="n">arr_obj</span><span class="p">,</span>
+                 <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])]</span>
+    <span class="k">for</span> <span class="n">ans</span> <span class="ow">in</span> <span class="n">test_arrs</span><span class="p">:</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2pandas</span><span class="p">(</span><span class="n">ans</span><span class="p">)</span>
+        <span class="c1"># Sorted</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2dict</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2pandas</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+        <span class="c1"># Provided</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2dict</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">dict2pandas</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">ans</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

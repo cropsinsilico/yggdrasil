@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.AsciiTableComm &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.communication.AsciiTableComm &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../index.html"/>
-        <link rel="up" title="yggdrasil.communication" href="../communication.html"/> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -182,9 +176,9 @@
 <span class="kn">from</span> <span class="nn">yggdrasil.serialize.AsciiTableSerialize</span> <span class="k">import</span> <span class="n">AsciiTableSerialize</span>
 
 
-<span class="nd">@register_component</span>
-<div class="viewcode-block" id="AsciiTableComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm">[docs]</a><span class="k">class</span> <span class="nc">AsciiTableComm</span><span class="p">(</span><span class="n">AsciiFileComm</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class for handling I/O from/to a file on disk.</span>
+<div class="viewcode-block" id="AsciiTableComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm">[docs]</a><span class="nd">@register_component</span>
+<span class="k">class</span> <span class="nc">AsciiTableComm</span><span class="p">(</span><span class="n">AsciiFileComm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a file on disk.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The environment variable where communication address is</span>
@@ -210,7 +204,7 @@
     <span class="n">_attr_conv</span> <span class="o">=</span> <span class="n">AsciiFileComm</span><span class="o">.</span><span class="n">_attr_conv</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;delimiter&#39;</span><span class="p">,</span> <span class="s1">&#39;format_str&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Set up dataio and attributes.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up dataio and attributes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTableComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -221,9 +215,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">True</span>
         
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="AsciiTableComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm.get_testing_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<div class="viewcode-block" id="AsciiTableComm.get_testing_options"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing. Key/value pairs:</span>
@@ -236,7 +230,7 @@
 <span class="sd">                    the messages in &#39;send&#39;.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiFileComm</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="n">as_array</span><span class="o">=</span><span class="n">as_array</span><span class="p">,</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiFileComm</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="n">as_array</span><span class="o">=</span><span class="n">as_array</span><span class="p">,</span>
                                                             <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span>
                        <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span><span class="p">[</span><span class="s1">&#39;kwargs&#39;</span><span class="p">][</span><span class="s1">&#39;field_names&#39;</span><span class="p">]]</span>
@@ -256,7 +250,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
     
 <div class="viewcode-block" id="AsciiTableComm.read_header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm.read_header">[docs]</a>    <span class="k">def</span> <span class="nf">read_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Read header lines from the file and update serializer info.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read header lines from the file and update serializer info.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_position</span><span class="p">()</span>
@@ -269,7 +263,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="AsciiTableComm.write_header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm.write_header">[docs]</a>    <span class="k">def</span> <span class="nf">write_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Write header lines to the file based on the serializer info.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write header lines to the file based on the serializer info.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">header_msg</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format_header</span><span class="p">(</span>
@@ -282,13 +276,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="AsciiTableComm.record_position"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm.record_position">[docs]</a>    <span class="k">def</span> <span class="nf">record_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Record the current position in the file/series.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Record the current position in the file/series.&quot;&quot;&quot;</span>
         <span class="n">pos</span><span class="p">,</span> <span class="n">ind</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTableComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">record_position</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">pos</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_read</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span></div>
 
 <div class="viewcode-block" id="AsciiTableComm.change_position"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm.change_position">[docs]</a>    <span class="k">def</span> <span class="nf">change_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">header_was_read</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header_was_written</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Change the position in the file/series.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the position in the file/series.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file_pos (int): Position that should be moved to in the file.</span>
@@ -312,7 +306,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">header_was_written</span> <span class="o">=</span> <span class="n">header_was_written</span></div>
 
 <div class="viewcode-block" id="AsciiTableComm.advance_in_series"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.AsciiTableComm.AsciiTableComm.advance_in_series">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Advance to a certain file in a series.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to a certain file in a series.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            index (int, optional): Index of file in the series that should be</span>
@@ -330,7 +324,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Write message to a file.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write message to a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (bytes, str): Data to write to the file.</span>
@@ -344,7 +338,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTableComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_send</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Reads message from a file.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reads message from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Time in seconds to wait for a message.</span>
@@ -359,9 +353,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -370,11 +362,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -389,37 +381,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

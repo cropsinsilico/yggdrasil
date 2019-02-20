@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.yamlfile &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.yamlfile &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -182,7 +176,7 @@
 
 
 <div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../code_python.html#yggdrasil.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Parse a yaml file defining a run.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml file defining a run.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str): Path to the yaml file.</span>
@@ -208,7 +202,7 @@
 
 
 <div class="viewcode-block" id="prep_yaml"><a class="viewcode-back" href="../../code_python.html#yggdrasil.yamlfile.prep_yaml">[docs]</a><span class="k">def</span> <span class="nf">prep_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Prepare yaml to be parsed by Cerberus using schema including covering</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare yaml to be parsed by Cerberus using schema including covering</span>
 <span class="sd">    backwards compatible options.</span>
 
 <span class="sd">    Args:</span>
@@ -242,7 +236,7 @@
 
 
 <div class="viewcode-block" id="parse_yaml"><a class="viewcode-back" href="../../code_python.html#yggdrasil.yamlfile.parse_yaml">[docs]</a><span class="k">def</span> <span class="nf">parse_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Parse list of yaml files.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse list of yaml files.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        files (str, list): Either the path to a single yaml file or a list of</span>
@@ -285,7 +279,7 @@
 
 
 <div class="viewcode-block" id="parse_component"><a class="viewcode-back" href="../../code_python.html#yggdrasil.yamlfile.parse_component">[docs]</a><span class="k">def</span> <span class="nf">parse_component</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">existing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
 <span class="sd">    existing components.</span>
 
 <span class="sd">    Args:</span>
@@ -340,7 +334,7 @@
 
 
 <div class="viewcode-block" id="parse_model"><a class="viewcode-back" href="../../code_python.html#yggdrasil.yamlfile.parse_model">[docs]</a><span class="k">def</span> <span class="nf">parse_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a model.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML dictionary for a model.</span>
@@ -380,7 +374,7 @@
             
     
 <div class="viewcode-block" id="parse_connection"><a class="viewcode-back" href="../../code_python.html#yggdrasil.yamlfile.parse_connection">[docs]</a><span class="k">def</span> <span class="nf">parse_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML dictionary for a connection.</span>
@@ -406,7 +400,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
                 <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;working_dir&#39;</span><span class="p">],</span> <span class="n">fname</span><span class="p">)</span>
             <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;wait_for_creation&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Input &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in any of the registered &quot;</span>
                                     <span class="o">+</span> <span class="s2">&quot;model outputs and is not a file.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
             <span class="n">x</span><span class="p">[</span><span class="s1">&#39;address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fname</span>
@@ -503,7 +497,7 @@
 
 
 <div class="viewcode-block" id="link_model_io"><a class="viewcode-back" href="../../code_python.html#yggdrasil.yamlfile.link_model_io">[docs]</a><span class="k">def</span> <span class="nf">link_model_io</span><span class="p">(</span><span class="n">existing</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Link I/O drivers back to the models they communicate with.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link I/O drivers back to the models they communicate with.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        existing (dict): Dictionary of existing components.</span>
@@ -528,9 +522,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -539,11 +531,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -558,37 +550,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

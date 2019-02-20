@@ -1,91 +1,91 @@
-cis_interface.tests package
-===========================
+cis\_interface.tests package
+============================
 
 Submodules
 ----------
 
-cis_interface.tests.test_backwards module
------------------------------------------
+cis\_interface.tests.test\_backwards module
+-------------------------------------------
 
 .. automodule:: cis_interface.tests.test_backwards
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_config module
---------------------------------------
+cis\_interface.tests.test\_config module
+----------------------------------------
 
 .. automodule:: cis_interface.tests.test_config
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_platform module
-----------------------------------------
+cis\_interface.tests.test\_platform module
+------------------------------------------
 
 .. automodule:: cis_interface.tests.test_platform
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_runner module
---------------------------------------
+cis\_interface.tests.test\_runner module
+----------------------------------------
 
 .. automodule:: cis_interface.tests.test_runner
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_scanf module
--------------------------------------
+cis\_interface.tests.test\_scanf module
+---------------------------------------
 
 .. automodule:: cis_interface.tests.test_scanf
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_schema module
---------------------------------------
+cis\_interface.tests.test\_schema module
+----------------------------------------
 
 .. automodule:: cis_interface.tests.test_schema
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_tests module
--------------------------------------
+cis\_interface.tests.test\_tests module
+---------------------------------------
 
 .. automodule:: cis_interface.tests.test_tests
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_timing module
---------------------------------------
+cis\_interface.tests.test\_timing module
+----------------------------------------
 
 .. automodule:: cis_interface.tests.test_timing
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_tools module
--------------------------------------
+cis\_interface.tests.test\_tools module
+---------------------------------------
 
 .. automodule:: cis_interface.tests.test_tools
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_units module
--------------------------------------
+cis\_interface.tests.test\_units module
+---------------------------------------
 
 .. automodule:: cis_interface.tests.test_units
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.tests.test_yamlfile module
-----------------------------------------
+cis\_interface.tests.test\_yamlfile module
+------------------------------------------
 
 .. automodule:: cis_interface.tests.test_yamlfile
     :members:

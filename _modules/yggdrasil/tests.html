@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.tests &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.tests &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../genindex.html"/>
-        <link rel="search" title="Search" href="../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../index.html"/>
-        <link rel="up" title="Module code" href="../index.html"/> 
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
 
   
   <script src="../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -179,13 +173,14 @@
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">difflib</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">unittest</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.config</span> <span class="k">import</span> <span class="n">ygg_cfg</span><span class="p">,</span> <span class="n">cfg_logging</span>
 <span class="kn">from</span> <span class="nn">yggdrasil.tools</span> <span class="k">import</span> <span class="n">get_default_comm</span><span class="p">,</span> <span class="n">YggClass</span>
 <span class="kn">from</span> <span class="nn">yggdrasil</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span><span class="p">,</span> <span class="n">units</span>
@@ -193,14 +188,14 @@
 
 
 <span class="c1"># Test data</span>
-<span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
 <span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s1">&#39;txt&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii_file.txt&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="s1">&#39;ascii_table.txt&#39;</span><span class="p">)]</span>
 <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data_list</span><span class="p">}</span>
 
 <span class="c1"># Test scripts</span>
-<span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;scripts&#39;</span><span class="p">)</span>
+<span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;scripts&#39;</span><span class="p">)</span>
 <span class="n">script_list</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gcc_model.c&#39;</span><span class="p">,</span> <span class="s1">&#39;hellofunc.c&#39;</span><span class="p">]),</span>
     <span class="p">(</span><span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;gcc_model.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;hellofunc.c&#39;</span><span class="p">]),</span>
@@ -220,7 +215,7 @@
 <span class="c1"># scripts = {k: os.path.join(script_dir, v) for k, v in script_list}</span>
     
 <span class="c1"># Test yamls</span>
-<span class="n">yaml_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;yamls&#39;</span><span class="p">)</span>
+<span class="n">yaml_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;yamls&#39;</span><span class="p">)</span>
 <span class="n">yaml_list</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;gcc_model.yml&#39;</span><span class="p">),</span>
     <span class="p">(</span><span class="s1">&#39;cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;gpp_model.yml&#39;</span><span class="p">),</span>
@@ -244,12 +239,52 @@
 <span class="n">enable_long_tests</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;YGG_ENABLE_LONG_TESTS&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">assert_raises</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Assert that a call raises an exception.</span>
+<span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+    <span class="c1"># Dummy TestCase instance, so we can initialize an instance</span>
+    <span class="c1"># and access the assert instance methods</span>
+    <span class="k">class</span> <span class="nc">DummyTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">DummyTestCase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;_dummy&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_dummy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+    <span class="c1"># A metaclass that makes __getattr__ static</span>
+    <span class="k">class</span> <span class="nc">AssertsAccessorType</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">dummy</span> <span class="o">=</span> <span class="n">DummyTestCase</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">AssertsAccessor</span><span class="o">.</span><span class="n">dummy</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+    <span class="c1"># The actual accessor, a static class, that redirect the asserts</span>
+    <span class="k">class</span> <span class="nc">AssertsAccessor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">AssertsAccessorType</span>
+        
+    <span class="n">ut</span> <span class="o">=</span> <span class="n">AssertsAccessor</span>
+        
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+
+    <span class="n">ut</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">long_running</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorator for marking long tests that should be skipped if</span>
+<span class="sd">    CIS_ENABLE_LONG_TESTS is set.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        func (callable): Test function or method.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="ow">not</span> <span class="n">enable_long_tests</span><span class="p">,</span> <span class="s2">&quot;Long tests not enabled.&quot;</span><span class="p">)(</span><span class="n">func</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">assert_raises</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that a call raises an exception.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        exception (Exception): Exception class that should be raised.</span>
-<span class="sd">        callable (function, class): Callable that should raise the exception.</span>
+<span class="sd">        callable (function, class, optional): Callable that should raise the</span>
+<span class="sd">            exception. If not provided, a context manager is returned.</span>
 <span class="sd">        *args: Additional arguments are passed to the callable.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to the callable.</span>
 
@@ -257,11 +292,48 @@
 <span class="sd">        AssertionError: If the correct exception is not raised.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ut</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
+<span class="k">def</span> <span class="nf">assert_warns</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that a call (or context) raises an exception.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        warning (Warning): Warning class that should be raised.</span>
+<span class="sd">        callable (function, class, optional): Function that should raise</span>
+<span class="sd">            the warning. If not provided, a context manager is returned.</span>
+<span class="sd">        *args: Additional arguments are passed to the callable.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the callable.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        AssertionError: If the correct warning is not caught.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;callable is None&quot;</span><span class="p">,</span>
+                          <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">w</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">w</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="n">callable_obj</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="n">callable_obj</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">iw</span> <span class="ow">in</span> <span class="n">w</span><span class="p">:</span>
+                    <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">iw</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">warning</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+        <span class="k">yield</span> <span class="n">ut</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">warning</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Assert that two messages are equivalent.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two messages are equivalent.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (object): Python object to compare against y.</span>
@@ -273,13 +345,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)))</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">iy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
-        <span class="c1"># nt.assert_equal(type(x), type(y))</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="c1"># ut.assertEqual(type(x), type(y))</span>
+        <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">iy</span> <span class="ow">in</span> <span class="n">y</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">ix</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="n">assert_equal</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span> <span class="n">iy</span><span class="p">)</span>
@@ -290,15 +362,19 @@
             <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="ow">and</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">convert_to</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">units</span><span class="o">.</span><span class="n">get_units</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+            <span class="n">assert_equal</span><span class="p">(</span><span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="ow">and</span> <span class="n">units</span><span class="o">.</span><span class="n">has_units</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">units</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">ut</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">assert_not_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Assert that two objects are NOT equivalent.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two objects are NOT equivalent.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (object): Python object to compare against y.</span>
@@ -308,11 +384,11 @@
 <span class="sd">        AssertionError: If the two objects are equivalent.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">nt</span><span class="o">.</span><span class="n">assert_not_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">ut</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
         
 
 <div class="viewcode-block" id="YggTestBase"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase">[docs]</a><span class="k">class</span> <span class="nc">YggTestBase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Wrapper for unittest.TestCase that allows use of nose setup and</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrapper for unittest.TestCase that allows use of setup and</span>
 <span class="sd">    teardown methods along with description prefix.</span>
 
 <span class="sd">    Args:</span>
@@ -334,11 +410,11 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description_prefix</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;description_prefix&#39;</span><span class="p">,</span>
-                                              <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                                              <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mf">10.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">=</span> <span class="mf">0.01</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_teardown_complete</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_new_default_comm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_default_comm</span> <span class="o">=</span> <span class="kc">None</span>
@@ -348,36 +424,36 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_first_test</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">skip_unittest</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;skip_unittest&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_unittest</span><span class="p">:</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="YggTestBase.assert_equal"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.assert_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assert that two values are equal.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that two values are equal.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">assert_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTestBase.assert_less_equal"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.assert_less_equal">[docs]</a>    <span class="k">def</span> <span class="nf">assert_less_equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assert that one value is less than or equal to another.&quot;&quot;&quot;</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_less_equal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that one value is less than or equal to another.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertLessEqual</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTestBase.assert_greater"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.assert_greater">[docs]</a>    <span class="k">def</span> <span class="nf">assert_greater</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assert that one value is greater than another.&quot;&quot;&quot;</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_greater</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that one value is greater than another.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTestBase.assert_raises"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.assert_raises">[docs]</a>    <span class="k">def</span> <span class="nf">assert_raises</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Assert that a function raises an error.&quot;&quot;&quot;</span>
-        <span class="n">assert_raises</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that a function raises an error.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">comm_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;int: The number of comms.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of comms.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_comm_classes</span><span class="p">:</span>
-            <span class="n">cls</span> <span class="o">=</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="n">cls</span><span class="o">.</span><span class="n">comm_count</span><span class="p">()</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">get_comm_class</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">comm_count</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fd_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;int: The number of open file descriptors.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of open file descriptors.&quot;&quot;&quot;</span>
         <span class="n">proc</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">num_handles</span><span class="p">()</span>
@@ -389,37 +465,37 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">thread_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;int: The number of active threads.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of active threads.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">threading</span><span class="o">.</span><span class="n">active_count</span><span class="p">()</span>
 
 <div class="viewcode-block" id="YggTestBase.set_utf8_encoding"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.set_utf8_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">set_utf8_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Set the encoding to utf-8 if it is not already.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the encoding to utf-8 if it is not already.&quot;&quot;&quot;</span>
         <span class="n">old_lang</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;LANG&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;UTF-8&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">old_lang</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_old_encoding</span> <span class="o">=</span> <span class="n">old_lang</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;LANG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;en_US.UTF-8&#39;</span></div>
             
 <div class="viewcode-block" id="YggTestBase.reset_encoding"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.reset_encoding">[docs]</a>    <span class="k">def</span> <span class="nf">reset_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Reset the encoding to the original value before the test.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset the encoding to the original value before the test.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_encoding</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;LANG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_encoding</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_old_encoding</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="YggTestBase.debug_log"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.debug_log">[docs]</a>    <span class="k">def</span> <span class="nf">debug_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sd">r&quot;&quot;&quot;Turn on debugging.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn on debugging.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">)</span>
         <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
         <span class="n">cfg_logging</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTestBase.reset_log"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.reset_log">[docs]</a>    <span class="k">def</span> <span class="nf">reset_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sd">r&quot;&quot;&quot;Resetting logging to prior value.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resetting logging to prior value.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ygg_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;ygg&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span><span class="p">)</span>
             <span class="n">cfg_logging</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="YggTestBase.set_default_comm"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.set_default_comm">[docs]</a>    <span class="k">def</span> <span class="nf">set_default_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Set the default comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the default comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_default_comm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">default_comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_default_comm</span>
@@ -427,7 +503,7 @@
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_comm</span></div>
 
 <div class="viewcode-block" id="YggTestBase.reset_default_comm"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.reset_default_comm">[docs]</a>    <span class="k">def</span> <span class="nf">reset_default_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Reset the default comm to the original value.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reset the default comm to the original value.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_default_comm</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
                 <span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;YGG_DEFAULT_COMM&#39;</span><span class="p">]</span>
@@ -441,7 +517,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTestBase.setup"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nprev_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nprev_thread</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nprev_fd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Record the number of open comms, threads, and file descriptors.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Record the number of open comms, threads, and file descriptors.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            nprev_comm (int, optional): Number of previous comm channels.</span>
@@ -470,7 +546,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nprev_fd</span> <span class="o">=</span> <span class="n">nprev_fd</span></div>
 
 <div class="viewcode-block" id="YggTestBase.teardown"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncurr_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ncurr_thread</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ncurr_fd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Check the number of open comms, threads, and file descriptors.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check the number of open comms, threads, and file descriptors.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ncurr_comm (int, optional): Number of current comms. If not</span>
@@ -524,28 +600,28 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cleanup_comm_classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: Comm classes that should be cleaned up following the test.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Comm classes that should be cleaned up following the test.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">get_default_comm</span><span class="p">()]</span>
 
 <div class="viewcode-block" id="YggTestBase.cleanup_comms"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.cleanup_comms">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_comms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Cleanup all comms.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cleanup all comms.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_comm_classes</span><span class="p">:</span>
             <span class="n">cleanup_comms</span><span class="p">(</span><span class="n">k</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;String prefix to prepend docstr test message with.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;String prefix to prepend docstr test message with.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description_prefix</span>
 
 <div class="viewcode-block" id="YggTestBase.shortDescription"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.shortDescription">[docs]</a>    <span class="k">def</span> <span class="nf">shortDescription</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Prefix first line of doc string.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prefix first line of doc string.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">shortDescription</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">description_prefix</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description_prefix</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="YggTestBase.check_file_exists"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.check_file_exists">[docs]</a>    <span class="k">def</span> <span class="nf">check_file_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Check that a file exists.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that a file exists.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file that should be checked.</span>
@@ -559,7 +635,7 @@
             <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;File &#39;</span><span class="si">%s</span><span class="s2">&#39; dosn&#39;t exist.&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTestBase.check_file_size"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.check_file_size">[docs]</a>    <span class="k">def</span> <span class="nf">check_file_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fsize</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Check that file is the correct size.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that file is the correct size.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file that should be checked.</span>
@@ -578,7 +654,7 @@
                                  <span class="o">%</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span> <span class="n">fsize</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="YggTestBase.check_file_contents"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.check_file_contents">[docs]</a>    <span class="k">def</span> <span class="nf">check_file_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Check that the contents of a file are correct.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that the contents of a file are correct.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file that should be checked.</span>
@@ -593,7 +669,7 @@
                                   <span class="s1">&#39;Diff:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">odiff</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="YggTestBase.check_file"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestBase.check_file">[docs]</a>    <span class="k">def</span> <span class="nf">check_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Check that a file exists, is the correct size, and has the correct</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check that a file exists, is the correct size, and has the correct</span>
 <span class="sd">        contents.</span>
 
 <span class="sd">        Args:</span>
@@ -607,7 +683,7 @@
 
 
 <div class="viewcode-block" id="YggTestClass"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass">[docs]</a><span class="k">class</span> <span class="nc">YggTestClass</span><span class="p">(</span><span class="n">YggTestBase</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test class for a YggClass.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for a YggClass.&quot;&quot;&quot;</span>
 
     <span class="n">testing_option_kws</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_mod</span> <span class="o">=</span> <span class="kc">None</span>
@@ -616,21 +692,21 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="YggTestClass.setup"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Create an instance of the class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an instance of the class.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_instance</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="YggTestClass.teardown"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Remove the instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clear_instance</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">description_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;String prefix to prepend docstr test message with.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;String prefix to prepend docstr test message with.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">description_prefix</span>
         <span class="k">else</span><span class="p">:</span>
@@ -638,52 +714,52 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Class to be tested.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Class to be tested.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cls</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mod</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Absolute name of module containing class to be tested.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Absolute name of module containing class to be tested.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mod</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: Arguments for creating a class instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Arguments for creating a class instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inst_args</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for creating a class instance.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inst_kwargs</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">import_cls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Import the tested class from its module&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import the tested class from its module&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No module registered.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No class registered.&quot;</span><span class="p">)</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mod</span><span class="p">)</span>
-        <span class="n">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cls</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span>
 
 <div class="viewcode-block" id="YggTestClass.get_options"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get testing options.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span> <span class="p">{}</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">testing_option_kws</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">testing_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Testing options.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Testing options.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_testing_options&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_testing_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_testing_options</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;object: Instance of the test driver.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;object: Instance of the test driver.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_teardown_complete</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Instance referenced after teardown.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_instance&#39;</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
@@ -691,18 +767,18 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span>
 
 <div class="viewcode-block" id="YggTestClass.create_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Create a new instance of the class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance of the class.&quot;&quot;&quot;</span>
         <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_cls</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">)</span>
         <span class="c1"># print(&quot;created instance&quot;)</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
 <div class="viewcode-block" id="YggTestClass.remove_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Remove an instance of the class.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove an instance of the class.&quot;&quot;&quot;</span>
         <span class="c1"># print(&quot;removed instance&quot;)</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="YggTestClass.clear_instance"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClass.clear_instance">[docs]</a>    <span class="k">def</span> <span class="nf">clear_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Clear the instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear the instance.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_instance&#39;</span><span class="p">):</span>
             <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_instance</span> <span class="o">=</span> <span class="kc">None</span>
@@ -711,34 +787,34 @@
 
 
 <div class="viewcode-block" id="IOInfo"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.IOInfo">[docs]</a><span class="k">class</span> <span class="nc">IOInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Simple class for useful IO attributes.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simple class for useful IO attributes.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;n/a&#39;</span><span class="p">,</span> <span class="s1">&#39;umol&#39;</span><span class="p">,</span> <span class="s1">&#39;cm&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nfields</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;# &#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">newline</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;# &#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newline</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="YggTestClassInfo"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.YggTestClassInfo">[docs]</a><span class="k">class</span> <span class="nc">YggTestClassInfo</span><span class="p">(</span><span class="n">YggTestClass</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Test class for a YggClass with IOInfo available.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for a YggClass with IOInfo available.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">IOInfo</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">YggTestClassInfo</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">IOInfo</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <span class="k">class</span> <span class="nc">MagicTestError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Special exception for testing.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Special exception for testing.&quot;&quot;&quot;</span>
     <span class="k">pass</span>
 
             
 <div class="viewcode-block" id="ErrorClass"><a class="viewcode-back" href="../../yggdrasil.tests.html#yggdrasil.tests.ErrorClass">[docs]</a><span class="k">def</span> <span class="nf">ErrorClass</span><span class="p">(</span><span class="n">base_class</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Wrapper to return errored version of a class.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wrapper to return errored version of a class.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        base_class (class): Base class to use.</span>
@@ -749,7 +825,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">class</span> <span class="nc">ErrorClass</span><span class="p">(</span><span class="n">base_class</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Dummy class that will raise an error for any requested method.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy class that will raise an error for any requested method.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            error_on_init (bool, optional): If True, an error will be raised</span>
@@ -767,48 +843,48 @@
             <span class="k">if</span> <span class="n">error_on_init</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">error_method</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_replaced_methods</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">ErrorClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">ErrorClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">empty_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Method that won&#39;t do anything.&quot;&quot;&quot;</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that won&#39;t do anything.&quot;&quot;&quot;</span>
             <span class="k">pass</span>
                 
         <span class="k">def</span> <span class="nf">error_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Method that will raise a MagicTestError.&quot;&quot;&quot;</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method that will raise a MagicTestError.&quot;&quot;&quot;</span>
             <span class="k">raise</span> <span class="n">MagicTestError</span><span class="p">(</span><span class="s2">&quot;This is a test error.&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Get the underlying object for an attribute name.&quot;&quot;&quot;</span>
-            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">mro</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the underlying object for an attribute name.&quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">mro</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span>  <span class="c1"># pragma: debug</span>
 
         <span class="k">def</span> <span class="nf">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Set the attribute at the class level.&quot;&quot;&quot;</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the attribute at the class level.&quot;&quot;&quot;</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">replace_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">,</span> <span class="n">replacement</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Temporarily replace method with another.&quot;&quot;&quot;</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Temporarily replace method with another.&quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_replaced_methods</span><span class="p">[</span><span class="n">method_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getattr</span><span class="p">(</span><span class="n">method_name</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="n">replacement</span><span class="p">)</span>
             
         <span class="k">def</span> <span class="nf">restore_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Restore the original method.&quot;&quot;&quot;</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restore the original method.&quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setattr</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_replaced_methods</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">method_name</span><span class="p">))</span>
 
         <span class="k">def</span> <span class="nf">restore_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Restored all replaced methods.&quot;&quot;&quot;</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Restored all replaced methods.&quot;&quot;&quot;</span>
             <span class="n">meth_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_replaced_methods</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meth_list</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">restore_method</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">empty_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Replace a method with an empty method.&quot;&quot;&quot;</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Replace a method with an empty method.&quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">replace_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">error_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Replace a method with an errored method.&quot;&quot;&quot;</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Replace a method with an errored method.&quot;&quot;&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">replace_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_method</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ErrorClass</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -820,9 +896,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -831,11 +905,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -850,37 +924,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

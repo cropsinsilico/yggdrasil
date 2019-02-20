@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.serialize.AsciiTableSerialize &mdash; cis_interface 0.7.4+3.g56c4bbe6 documentation</title>
+  <title>cis_interface.serialize.AsciiTableSerialize &mdash; cis_interface 0.7.10 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="cis_interface 0.7.4+3.g56c4bbe6 documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
+  <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.7.4
+                0.7.10
               </div>
             
           
@@ -105,9 +95,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">cis_interface</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -183,9 +178,9 @@
     <span class="n">definition2dtype</span><span class="p">)</span>
 
 
-<span class="nd">@register_serializer</span>
-<div class="viewcode-block" id="AsciiTableSerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize">[docs]</a><span class="k">class</span> <span class="nc">AsciiTableSerialize</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class for serialize table output into bytes messages comprising a</span>
+<div class="viewcode-block" id="AsciiTableSerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize">[docs]</a><span class="nd">@register_serializer</span>
+<span class="k">class</span> <span class="nc">AsciiTableSerialize</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serialize table output into bytes messages comprising a</span>
 <span class="sd">    formatted ASCII table.</span>
 
 <span class="sd">    Args:</span>
@@ -258,7 +253,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="AsciiTableSerialize.update_format_str"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.update_format_str">[docs]</a>    <span class="k">def</span> <span class="nf">update_format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Update the format string based on the type definition.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the format string based on the type definition.&quot;&quot;&quot;</span>
         <span class="c1"># Get format information from precision etc.</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
@@ -276,22 +271,22 @@
             <span class="k">if</span> <span class="n">fmts</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="o">=</span> <span class="n">table2format</span><span class="p">(</span>
                     <span class="n">fmts</span><span class="o">=</span><span class="n">fmts</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">,</span>
-                    <span class="n">comment</span><span class="o">=</span><span class="n">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+                    <span class="n">comment</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTableSerialize.update_field_names"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.update_field_names">[docs]</a>    <span class="k">def</span> <span class="nf">update_field_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: Names for each field in the data type.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Names for each field in the data type.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsciiTableSerialize.update_field_units"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.update_field_units">[docs]</a>    <span class="k">def</span> <span class="nf">update_field_units</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;list: Units for each field in the data type.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Units for each field in the data type.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_units</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typedef</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;array&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_field_units</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsciiTableSerialize.func_serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Serialize a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args: List of arguments to be formatted or numpy array to be</span>
@@ -313,7 +308,7 @@
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTableSerialize.func_deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Deserialize a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg: Message to be deserialized.</span>
@@ -336,24 +331,22 @@
             <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">units</span><span class="o">.</span><span class="n">add_units</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">field_units</span><span class="p">)]</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="AsciiTableSerialize.get_testing_options"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.get_testing_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
+<div class="viewcode-block" id="AsciiTableSerialize.get_testing_options"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.get_testing_options">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_testing_options</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Method to return a dictionary of testing options for this class.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary of variables to use for testing.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTableSerialize</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTableSerialize</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_testing_options</span><span class="p">(</span>
             <span class="n">as_format</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="n">as_array</span><span class="p">)</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;extra_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -362,11 +355,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -381,37 +374,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.7.4+3.g56c4bbe6',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../static/jquery.js"></script>
-      <script type="text/javascript" src="../../../static/underscore.js"></script>
-      <script type="text/javascript" src="../../../static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../static/jquery.js"></script>
+        <script type="text/javascript" src="../../../static/underscore.js"></script>
+        <script type="text/javascript" src="../../../static/doctools.js"></script>
+        <script type="text/javascript" src="../../../static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

@@ -1,85 +1,93 @@
-cis_interface.serialize.tests package
-=====================================
+cis\_interface.serialize.tests package
+======================================
 
 Submodules
 ----------
 
-cis_interface.serialize.tests.test_AsciiMapSerialize module
------------------------------------------------------------
+cis\_interface.serialize.tests.test\_AsciiMapSerialize module
+-------------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_AsciiMapSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_AsciiTableSerialize module
--------------------------------------------------------------
+cis\_interface.serialize.tests.test\_AsciiTableSerialize module
+---------------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_AsciiTableSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_DefaultSerialize module
-----------------------------------------------------------
+cis\_interface.serialize.tests.test\_DefaultSerialize module
+------------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_DefaultSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_JSONSerialize module
--------------------------------------------------------
+cis\_interface.serialize.tests.test\_JSONSerialize module
+---------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_JSONSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_MatSerialize module
-------------------------------------------------------
+cis\_interface.serialize.tests.test\_MatSerialize module
+--------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_MatSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_ObjSerialize module
-------------------------------------------------------
+cis\_interface.serialize.tests.test\_ObjSerialize module
+--------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_ObjSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_PandasSerialize module
----------------------------------------------------------
+cis\_interface.serialize.tests.test\_PandasSerialize module
+-----------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_PandasSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_PickleSerialize module
----------------------------------------------------------
+cis\_interface.serialize.tests.test\_PickleSerialize module
+-----------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_PickleSerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_PlySerialize module
-------------------------------------------------------
+cis\_interface.serialize.tests.test\_PlySerialize module
+--------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_PlySerialize
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.serialize.tests.test_YAMLSerialize module
--------------------------------------------------------
+cis\_interface.serialize.tests.test\_YAMLSerialize module
+---------------------------------------------------------
 
 .. automodule:: cis_interface.serialize.tests.test_YAMLSerialize
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis\_interface.serialize.tests.test\_serialize module
+-----------------------------------------------------
+
+.. automodule:: cis_interface.serialize.tests.test_serialize
     :members:
     :undoc-members:
     :show-inheritance:

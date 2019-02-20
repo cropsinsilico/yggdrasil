@@ -1,11 +1,11 @@
-cis_interface.interface.tests package
-=====================================
+cis\_interface.interface.tests package
+======================================
 
 Submodules
 ----------
 
-cis_interface.interface.tests.test_CisInterface module
-------------------------------------------------------
+cis\_interface.interface.tests.test\_CisInterface module
+--------------------------------------------------------
 
 .. automodule:: cis_interface.interface.tests.test_CisInterface
     :members:

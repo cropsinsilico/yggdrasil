@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.metaschema package &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.metaschema package &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,27 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="index.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -66,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -105,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -258,8 +253,8 @@
 <span id="yggdrasil-metaschema-encoder-module"></span><h2>yggdrasil.metaschema.encoder module<a class="headerlink" href="#module-yggdrasil.metaschema.encoder" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.metaschema.encoder.JSONReadableEncoder">
-<em class="property">class </em><code class="descclassname">yggdrasil.metaschema.encoder.</code><code class="descname">JSONReadableEncoder</code><span class="sig-paren">(</span><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONReadableEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONReadableEncoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<em class="property">class </em><code class="descclassname">yggdrasil.metaschema.encoder.</code><code class="descname">JSONReadableEncoder</code><span class="sig-paren">(</span><em>*</em>, <em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>default=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#JSONReadableEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.JSONReadableEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
 <p>Encoder class for Ygg messages.</p>
 <dl class="method">
 <dt id="yggdrasil.metaschema.encoder.JSONReadableEncoder.default">
@@ -269,20 +264,93 @@
 
 </dd></dl>
 
+<dl class="function">
+<dt id="yggdrasil.metaschema.encoder.decode_json">
+<code class="descclassname">yggdrasil.metaschema.encoder.</code><code class="descname">decode_json</code><span class="sig-paren">(</span><em>msg</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#decode_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.decode_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode a Python object from a JSON serialization.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – JSON serialization to decode.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to json.loads.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Deserialized Python object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.metaschema.encoder.encode_json">
+<code class="descclassname">yggdrasil.metaschema.encoder.</code><code class="descname">encode_json</code><span class="sig-paren">(</span><em>obj</em>, <em>fd=None</em>, <em>indent=None</em>, <em>sort_keys=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#encode_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.encode_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode a Python object in JSON format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Python object to encode.</li>
+<li><strong>fd</strong> (<em>file</em><em>, </em><em>optional</em>) – File descriptor for file that encoded object
+should be written to. Defaults to None and string is returned.</li>
+<li><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Indentation for new lines in encoded
+string. Defaults to None.</li>
+<li><strong>sort_keys</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the keys will be output in sorted
+order. Defaults to True.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to json.dumps.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Encoded object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="yggdrasil.metaschema.encoder.indent_char2int">
+<code class="descclassname">yggdrasil.metaschema.encoder.</code><code class="descname">indent_char2int</code><span class="sig-paren">(</span><em>indent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yggdrasil/metaschema/encoder.html#indent_char2int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.encoder.indent_char2int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a character indent into a number of spaces that should be used.
+Tabs are set to be equivalent to 4 spaces.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – String indent.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Number of whitespaces that is equivalent to the provided string.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-yggdrasil.metaschema.normalizer">
 <span id="yggdrasil-metaschema-normalizer-module"></span><h2>yggdrasil.metaschema.normalizer module<a class="headerlink" href="#module-yggdrasil.metaschema.normalizer" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="yggdrasil.metaschema.normalizer.UndefinedProperty">
 <em class="property">class </em><code class="descclassname">yggdrasil.metaschema.normalizer.</code><code class="descname">UndefinedProperty</code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UndefinedProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UndefinedProperty" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to be used as a flag for undefined properties.</p>
 </dd></dl>
 
 <dl class="class">
 <dt id="yggdrasil.metaschema.normalizer.UninitializedNormalized">
 <em class="property">class </em><code class="descclassname">yggdrasil.metaschema.normalizer.</code><code class="descname">UninitializedNormalized</code><a class="reference internal" href="_modules/yggdrasil/metaschema/normalizer.html#UninitializedNormalized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yggdrasil.metaschema.normalizer.UninitializedNormalized" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Class to be used as a flag for uninitialized normalized value.</p>
 </dd></dl>
 
@@ -296,16 +364,16 @@ the jsonschema validation class.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Keys are tuples representing paths that
+<li><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Keys are tuples representing paths that
 exist within the schema at which the normalization functions stored
 in lists as their value counterparts should be executed. Defaults to
 empty dictionary.</li>
-<li><strong>no_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, defaults will not be set during
+<li><strong>no_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will not be set during
 normalization. Defaults to False.</li>
-<li><strong>required_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, defaults will be set for
+<li><strong>required_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, defaults will be set for
 required properties, even if no_defaults is True. Defaults to False.</li>
-<li><strong>*args</strong> &#8211; Additional arguments are passed to jsonschema.validators.create.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to
+<li><strong>*args</strong> – Additional arguments are passed to jsonschema.validators.create.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to
 jsonschema.validators.create.</li>
 </ul>
 </td>
@@ -325,7 +393,7 @@ jsonschema.validators.create.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the existing meta schema will be
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing meta schema will be
 overwritten. If False and the metaschema exists, an error will be
 raised. Defaults to False.</td>
 </tr>
@@ -338,7 +406,7 @@ property definitions.</dd>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the file already exists and overwrite is False.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If the file already exists and overwrite is False.</td>
 </tr>
 </tbody>
 </table>
@@ -366,7 +434,7 @@ property definitions.</dd>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">This function should not be called at the module level as it can
-cause the metaschema (if it dosn&#8217;t exist) to be generated before
+cause the metaschema (if it dosn’t exist) to be generated before
 all of the necessary modules have been loaded.</p>
 </div>
 </dd></dl>
@@ -380,10 +448,10 @@ all of the necessary modules have been loaded.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the existing validator will be
+<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the existing validator will be
 overwritten. Defaults to False.</li>
-<li><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Additional normalizers to add.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to normalizer.create.</li>
+<li><strong>normalizers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) – Additional normalizers to add.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to normalizer.create.</li>
 </ul>
 </td>
 </tr>
@@ -412,9 +480,9 @@ overwritten. Defaults to False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to be normalized using the provided schema.</li>
-<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Schema to use to normalize the provided object.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to normalize.</li>
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Object to be normalized using the provided schema.</li>
+<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to use to normalize the provided object.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to normalize.</li>
 </ul>
 </td>
 </tr>
@@ -437,13 +505,13 @@ overwritten. Defaults to False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to be validated using the provided schema.</li>
-<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Schema to use to validate the provided object.</li>
-<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to validate.</li>
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – Object to be validated using the provided schema.</li>
+<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to use to validate the provided object.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to validate.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ValidationError</span></code> &#8211; If the object is not valid.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValidationError</span></code> – If the object is not valid.</p>
 </td>
 </tr>
 </tbody>
@@ -458,9 +526,9 @@ overwritten. Defaults to False.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Schema to be validated.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Schema to be validated.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValidationError</span></code> &#8211; If the schema is not valid.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValidationError</span></code> – If the schema is not valid.</td>
 </tr>
 </tbody>
 </table>
@@ -471,9 +539,7 @@ overwritten. Defaults to False.</li>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -482,11 +548,11 @@ overwritten. Defaults to False.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -501,37 +567,24 @@ overwritten. Defaults to False.</li>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

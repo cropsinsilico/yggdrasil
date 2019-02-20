@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.interface.YggInterface &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.interface.YggInterface &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -183,22 +177,22 @@
 
 
 <div class="viewcode-block" id="maxMsgSize"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.maxMsgSize">[docs]</a><span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;int: The maximum message size.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The maximum message size.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">YGG_MSG_MAX</span></div>
 
 
 <div class="viewcode-block" id="bufMsgSize"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.bufMsgSize">[docs]</a><span class="k">def</span> <span class="nf">bufMsgSize</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;int: Buffer size for average message.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Buffer size for average message.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">YGG_MSG_BUF</span></div>
 
 
 <div class="viewcode-block" id="eof_msg"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.eof_msg">[docs]</a><span class="k">def</span> <span class="nf">eof_msg</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;str: Message signalling end of file.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Message signalling end of file.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">YGG_MSG_EOF</span></div>
 
 
 <div class="viewcode-block" id="YggMatlab"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggMatlab">[docs]</a><span class="k">def</span> <span class="nf">YggMatlab</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sd">r&quot;&quot;&quot;Short interface to identify functions called by Matlab.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Short interface to identify functions called by Matlab.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        _type (str): Name of class that should be returned.</span>
@@ -219,17 +213,17 @@
         <span class="n">_type</span> <span class="o">=</span> <span class="n">_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Cis&#39;</span><span class="p">,</span> <span class="s1">&#39;Ygg&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;CIS&#39;</span><span class="p">):</span>
         <span class="n">_type</span> <span class="o">=</span> <span class="n">_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;CIS&#39;</span><span class="p">,</span> <span class="s1">&#39;YGG&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">cls</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode_type</span><span class="p">)):</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode_type</span><span class="p">)):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;matlab&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">obj</span></div>
 
 
 <div class="viewcode-block" id="YggInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggInput">[docs]</a><span class="k">def</span> <span class="nf">YggInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling input from a message queue.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling input from a message queue.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue. Combined with the</span>
@@ -253,7 +247,7 @@
     
 
 <div class="viewcode-block" id="YggOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggOutput">[docs]</a><span class="k">def</span> <span class="nf">YggOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling output to a message queue.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling output to a message queue.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue. Combined with the</span>
@@ -277,7 +271,7 @@
 
     
 <div class="viewcode-block" id="YggRpcServer"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggRpcServer">[docs]</a><span class="k">def</span> <span class="nf">YggRpcServer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling requests and response for an RPC Server.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling requests and response for an RPC Server.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the server queues.</span>
@@ -303,7 +297,7 @@
     
 
 <div class="viewcode-block" id="YggRpcClient"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggRpcClient">[docs]</a><span class="k">def</span> <span class="nf">YggRpcClient</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling requests and response to an RPC Server from a</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling requests and response to an RPC Server from a</span>
 <span class="sd">    client.</span>
 
 <span class="sd">    Args:</span>
@@ -331,7 +325,7 @@
 
 <span class="c1"># Specialized classes for ascii IO</span>
 <div class="viewcode-block" id="YggAsciiFileInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggAsciiFileInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiFileInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for generic ASCII input.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for generic ASCII input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -346,7 +340,7 @@
 
 
 <div class="viewcode-block" id="YggAsciiFileOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggAsciiFileOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiFileOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for generic ASCII output.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for generic ASCII output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -361,7 +355,7 @@
 
 <span class="c1"># Specialized classes for ascii table IO</span>
 <div class="viewcode-block" id="YggAsciiTableInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggAsciiTableInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiTableInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted input.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -380,7 +374,7 @@
 
 
 <div class="viewcode-block" id="YggAsciiTableOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggAsciiTableOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiTableOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted output.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -404,7 +398,7 @@
 
 <span class="c1"># Specialized classes for ascii table IO arrays</span>
 <div class="viewcode-block" id="YggAsciiArrayInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggAsciiArrayInput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiArrayInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted input as arrays.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted input as arrays.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -420,7 +414,7 @@
 
 
 <div class="viewcode-block" id="YggAsciiArrayOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggAsciiArrayOutput">[docs]</a><span class="k">def</span> <span class="nf">YggAsciiArrayOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted output as arrays.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling table-like formatted output as arrays.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -440,7 +434,7 @@
 
 <span class="c1"># Pickle io (for backwards compatibility)</span>
 <div class="viewcode-block" id="YggPickleInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggPickleInput">[docs]</a><span class="k">def</span> <span class="nf">YggPickleInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling pickled input.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pickled input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -455,7 +449,7 @@
 
 
 <div class="viewcode-block" id="YggPickleOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggPickleOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPickleOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling pickled output.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pickled output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -470,7 +464,7 @@
 
 <span class="c1"># Pandas io</span>
 <div class="viewcode-block" id="YggPandasInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggPandasInput">[docs]</a><span class="k">def</span> <span class="nf">YggPandasInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling Pandas input.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Pandas input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -489,7 +483,7 @@
 
 
 <div class="viewcode-block" id="YggPandasOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggPandasOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPandasOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling pandasd output.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling pandasd output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -508,7 +502,7 @@
 
 <span class="c1"># Ply io</span>
 <div class="viewcode-block" id="YggPlyInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggPlyInput">[docs]</a><span class="k">def</span> <span class="nf">YggPlyInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling Ply input.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Ply input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -524,7 +518,7 @@
 
 
 <div class="viewcode-block" id="YggPlyOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggPlyOutput">[docs]</a><span class="k">def</span> <span class="nf">YggPlyOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling Ply output.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Ply output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -540,7 +534,7 @@
 
 <span class="c1"># Obj io</span>
 <div class="viewcode-block" id="YggObjInput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggObjInput">[docs]</a><span class="k">def</span> <span class="nf">YggObjInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling Obj input.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Obj input.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the input message queue that input should be</span>
@@ -556,7 +550,7 @@
 
 
 <div class="viewcode-block" id="YggObjOutput"><a class="viewcode-back" href="../../../yggdrasil.interface.html#yggdrasil.interface.YggInterface.YggObjOutput">[docs]</a><span class="k">def</span> <span class="nf">YggObjOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get class for handling Obj output.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get class for handling Obj output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue where output should be sent.</span>
@@ -571,9 +565,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -582,11 +574,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -601,37 +593,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

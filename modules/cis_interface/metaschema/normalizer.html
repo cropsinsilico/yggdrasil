@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.metaschema.normalizer &mdash; cis_interface 0.7.4+3.g56c4bbe6 documentation</title>
+  <title>cis_interface.metaschema.normalizer &mdash; cis_interface 0.7.10 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="cis_interface 0.7.4+3.g56c4bbe6 documentation" href="../../../index.html"/>
-        <link rel="up" title="cis_interface.metaschema" href="../metaschema.html"/> 
+  <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.7.4
+                0.7.10
               </div>
             
           
@@ -105,9 +95,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">cis_interface</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -178,21 +173,21 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">jsonschema</span>
-<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span>
+<span class="kn">from</span> <span class="nn">cis_interface.metaschema.datatypes</span> <span class="k">import</span> <span class="n">get_type_class</span><span class="p">,</span> <span class="n">_jsonschema_ver_maj</span>
 
 
 <div class="viewcode-block" id="UndefinedProperty"><a class="viewcode-back" href="../../../cis_interface.metaschema.html#cis_interface.metaschema.normalizer.UndefinedProperty">[docs]</a><span class="k">class</span> <span class="nc">UndefinedProperty</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class to be used as a flag for undefined properties.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for undefined properties.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="UninitializedNormalized"><a class="viewcode-back" href="../../../cis_interface.metaschema.html#cis_interface.metaschema.normalizer.UninitializedNormalized">[docs]</a><span class="k">class</span> <span class="nc">UninitializedNormalized</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class to be used as a flag for uninitialized normalized value.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to be used as a flag for uninitialized normalized value.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="create"><a class="viewcode-back" href="../../../cis_interface.metaschema.html#cis_interface.metaschema.normalizer.create">[docs]</a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Dynamically create a validation/normalization class that subclasses</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically create a validation/normalization class that subclasses</span>
 <span class="sd">    the jsonschema validation class.</span>
 
 <span class="sd">    Args:</span>
@@ -215,7 +210,7 @@
     <span class="n">validator_class</span> <span class="o">=</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">Normalizer</span><span class="p">(</span><span class="n">validator_class</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Class that can be used to normalize (or validate) objects against</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that can be used to normalize (or validate) objects against</span>
 <span class="sd">        JSON schemas.</span>
 
 <span class="sd">        Args:</span>
@@ -238,7 +233,7 @@
         <span class="n">REQUIRED_DEFAULTS</span> <span class="o">=</span> <span class="n">required_defaults</span>
 
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">UninitializedNormalized</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_old_settings</span> <span class="o">=</span> <span class="p">{}</span>
@@ -247,7 +242,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_normalized_stack</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">def</span> <span class="nf">iter_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Iterate through all of the errors encountered during validation</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Iterate through all of the errors encountered during validation</span>
 <span class="sd">            of an instance at the current level or lower against properties in a</span>
 <span class="sd">            schema.</span>
 
@@ -271,8 +266,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
                 <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">u&quot;$ref&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">):</span>
-
+            <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span>
+                 <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_schema</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="sa">u</span><span class="s2">&quot;$ref&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_schema</span><span class="p">))):</span>
                 <span class="c1"># Path based normalization</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="c1"># print(self.current_schema_path, instance, type(instance), _schema)</span>
@@ -324,7 +319,7 @@
                             <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span>
                             <span class="n">schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">,</span>
                         <span class="p">)</span>
-                        <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">u&quot;$ref&quot;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="sa">u</span><span class="s2">&quot;$ref&quot;</span><span class="p">:</span>
                             <span class="n">error</span><span class="o">.</span><span class="n">schema_path</span><span class="o">.</span><span class="n">appendleft</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                         <span class="k">yield</span> <span class="n">error</span>
 
@@ -337,19 +332,19 @@
 
         <span class="nd">@property</span>
         <span class="k">def</span> <span class="nf">current_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;tuple: Current path from the top of the instance to the current</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the instance to the current</span>
 <span class="sd">            instance being validated/normalized.&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path_stack</span><span class="p">)</span>
 
         <span class="nd">@property</span>
         <span class="k">def</span> <span class="nf">current_schema_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;tuple: Current path from the top of the schema to the current</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Current path from the top of the schema to the current</span>
 <span class="sd">            schema being used for validation/normalization.&quot;&quot;&quot;</span>
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema_path_stack</span><span class="p">)</span>
 
         <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
         <span class="k">def</span> <span class="nf">normalizing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Context for normalization that records normalizers before</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Context for normalization that records normalizers before</span>
 <span class="sd">            context is initialized so that they can be restored once the context</span>
 <span class="sd">            exist.</span>
 
@@ -392,7 +387,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_normalizing</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="k">def</span> <span class="nf">descend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Descend along a path in the schema/instance, recording</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Descend along a path in the schema/instance, recording</span>
 <span class="sd">            information about the normalization state so that it can be replaced</span>
 <span class="sd">            with the original value if there is a validation error along the</span>
 <span class="sd">            descent path.</span>
@@ -444,7 +439,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_schema_path_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
         <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Validate an instance against a schema.</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an instance against a schema.</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                instance (object): Object to be validated.</span>
@@ -470,7 +465,7 @@
                 <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="n">_schema</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">_schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Normalize an instance during validation, allowing for aliases,</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an instance during validation, allowing for aliases,</span>
 <span class="sd">            defaults, or simple type conversions.</span>
 
 <span class="sd">            Args:</span>
@@ -496,30 +491,29 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalized</span>
 
-        <span class="k">def</span> <span class="nf">is_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
-            <span class="sd">r&quot;&quot;&quot;Determine if an object is an example of the given type.</span>
+        <span class="k">def</span> <span class="nf">is_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">types</span><span class="p">):</span>
+            <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if an object is an example of the given type.</span>
 
 <span class="sd">            Args:</span>
 <span class="sd">                instance (object): Object to test against to the type.</span>
-<span class="sd">                type (str): Name of type that object should be tested against.</span>
+<span class="sd">                type (str, list): Name of single type or a list of types that</span>
+<span class="sd">                    instance should be tested against.</span>
 
 <span class="sd">            Returns:</span>
-<span class="sd">                bool: True if the instance is of the specified type. False</span>
+<span class="sd">                bool: True if the instance is of the specified type(s). False</span>
 <span class="sd">                    otherwise.</span>
 
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_type</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">types</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">_jsonschema_ver_maj</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">get_type_class</span><span class="p">(</span><span class="n">types</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">return</span> <span class="n">Normalizer</span></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -528,11 +522,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -547,37 +541,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.7.4+3.g56c4bbe6',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../static/jquery.js"></script>
-      <script type="text/javascript" src="../../../static/underscore.js"></script>
-      <script type="text/javascript" src="../../../static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../static/jquery.js"></script>
+        <script type="text/javascript" src="../../../static/underscore.js"></script>
+        <script type="text/javascript" src="../../../static/doctools.js"></script>
+        <script type="text/javascript" src="../../../static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

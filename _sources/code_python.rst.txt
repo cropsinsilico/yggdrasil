@@ -9,7 +9,7 @@ Subpackages
 	   
    yggdrasil.interface
    yggdrasil.serialize
-   yggdrasil.dataio
+   yggdrasil.metaschema.datatypes
    yggdrasil.drivers
    yggdrasil.examples
 	      

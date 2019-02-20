@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.metaschema.properties &mdash; cis_interface 0.7.4+3.g56c4bbe6 documentation</title>
+  <title>cis_interface.metaschema.properties &mdash; cis_interface 0.7.10 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="cis_interface 0.7.4+3.g56c4bbe6 documentation" href="../../../index.html"/>
-        <link rel="up" title="cis_interface.metaschema" href="../metaschema.html"/> 
+  <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.7.4
+                0.7.10
               </div>
             
           
@@ -105,9 +95,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">cis_interface</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -185,7 +180,7 @@
 
 
 <div class="viewcode-block" id="register_metaschema_property"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.register_metaschema_property">[docs]</a><span class="k">def</span> <span class="nf">register_metaschema_property</span><span class="p">(</span><span class="n">prop_class</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Register a schema property.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Register a schema property.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        prop_class (class): Class to be registered.</span>
@@ -212,7 +207,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Replacement property &#39;</span><span class="si">%s</span><span class="s2">&#39; modifies the default schema.&quot;</span>
                              <span class="o">%</span> <span class="n">prop_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="p">(((</span><span class="n">prop_class</span><span class="o">.</span><span class="n">_validate</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
-             <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;validate&#39;</span> <span class="ow">in</span> <span class="n">prop_class</span><span class="o">.</span><span class="n">__dict__</span><span class="p">))):</span>
+             <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;validate&#39;</span> <span class="ow">in</span> <span class="n">prop_class</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">))):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Replacement property &#39;</span><span class="si">%s</span><span class="s2">&#39; modifies the default validator.&quot;</span>
                              <span class="o">%</span> <span class="n">prop_name</span><span class="p">)</span>
         <span class="n">prop_class</span><span class="o">.</span><span class="n">_validate</span> <span class="o">=</span> <span class="kc">False</span>
@@ -227,7 +222,7 @@
 
 
 <div class="viewcode-block" id="get_registered_properties"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.get_registered_properties">[docs]</a><span class="k">def</span> <span class="nf">get_registered_properties</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Return a dictionary of registered properties.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a dictionary of registered properties.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Registered property/class pairs.</span>
@@ -237,7 +232,7 @@
 
 
 <div class="viewcode-block" id="get_metaschema_property"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.get_metaschema_property">[docs]</a><span class="k">def</span> <span class="nf">get_metaschema_property</span><span class="p">(</span><span class="n">property_name</span><span class="p">,</span> <span class="n">skip_generic</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Get the property class associated with a metaschema property.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the property class associated with a metaschema property.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        property_name (str): Name of property to get class for.</span>
@@ -258,17 +253,15 @@
 
 
 <div class="viewcode-block" id="import_all_properties"><a class="viewcode-back" href="../../../cis_interface.metaschema.properties.html#cis_interface.metaschema.properties.import_all_properties">[docs]</a><span class="k">def</span> <span class="nf">import_all_properties</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Import all types to ensure they are registered.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;*.py&#39;</span><span class="p">)):</span>
         <span class="n">mod</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">x</span><span class="p">)[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">mod</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
             <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;cis_interface.metaschema.properties.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mod</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -277,11 +270,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -296,37 +289,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.7.4+3.g56c4bbe6',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../static/jquery.js"></script>
-      <script type="text/javascript" src="../../../static/underscore.js"></script>
-      <script type="text/javascript" src="../../../static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../static/jquery.js"></script>
+        <script type="text/javascript" src="../../../static/underscore.js"></script>
+        <script type="text/javascript" src="../../../static/doctools.js"></script>
+        <script type="text/javascript" src="../../../static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

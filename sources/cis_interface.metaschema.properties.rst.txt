@@ -1,5 +1,5 @@
-cis_interface.metaschema.properties package
-===========================================
+cis\_interface.metaschema.properties package
+============================================
 
 Subpackages
 -----------
@@ -11,64 +11,64 @@ Subpackages
 Submodules
 ----------
 
-cis_interface.metaschema.properties.ArrayMetaschemaProperties module
---------------------------------------------------------------------
+cis\_interface.metaschema.properties.ArrayMetaschemaProperties module
+---------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.ArrayMetaschemaProperties
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.properties.DefaultProperty module
-----------------------------------------------------------
+cis\_interface.metaschema.properties.DefaultProperty module
+-----------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.DefaultProperty
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.properties.JSONArrayMetaschemaProperties module
-------------------------------------------------------------------------
+cis\_interface.metaschema.properties.JSONArrayMetaschemaProperties module
+-------------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.JSONArrayMetaschemaProperties
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.properties.JSONObjectMetaschemaProperties module
--------------------------------------------------------------------------
+cis\_interface.metaschema.properties.JSONObjectMetaschemaProperties module
+--------------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.JSONObjectMetaschemaProperties
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.properties.MetaschemaProperty module
--------------------------------------------------------------
+cis\_interface.metaschema.properties.MetaschemaProperty module
+--------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.MetaschemaProperty
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.properties.ScalarMetaschemaProperties module
----------------------------------------------------------------------
+cis\_interface.metaschema.properties.ScalarMetaschemaProperties module
+----------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.ScalarMetaschemaProperties
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.properties.TitleMetaschemaProperty module
-------------------------------------------------------------------
+cis\_interface.metaschema.properties.TitleMetaschemaProperty module
+-------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.TitleMetaschemaProperty
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.properties.TypeMetaschemaProperty module
------------------------------------------------------------------
+cis\_interface.metaschema.properties.TypeMetaschemaProperty module
+------------------------------------------------------------------
 
 .. automodule:: cis_interface.metaschema.properties.TypeMetaschemaProperty
     :members:

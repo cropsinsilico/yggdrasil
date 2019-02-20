@@ -1,5 +1,5 @@
-cis_interface.metaschema package
-================================
+cis\_interface.metaschema package
+=================================
 
 Subpackages
 -----------
@@ -13,16 +13,16 @@ Subpackages
 Submodules
 ----------
 
-cis_interface.metaschema.encoder module
----------------------------------------
+cis\_interface.metaschema.encoder module
+----------------------------------------
 
 .. automodule:: cis_interface.metaschema.encoder
     :members:
     :undoc-members:
     :show-inheritance:
 
-cis_interface.metaschema.normalizer module
-------------------------------------------
+cis\_interface.metaschema.normalizer module
+-------------------------------------------
 
 .. automodule:: cis_interface.metaschema.normalizer
     :members:

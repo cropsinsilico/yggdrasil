@@ -13,3 +13,4 @@
 * Removed deprecated functions beginning with "Psi"
 * Removed send_line/recv_line methods (these were aliases for regular send/recv)
 * Removed send_row/recv_row methods (these were aliases for regular send/recv)
+* Removed deprecated 'local' input/output calls that interfaced directly with files to simply creation of new interfaces.

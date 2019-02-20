@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>yggdrasil.communication.ZMQComm &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="../../../index.html"/>
-        <link rel="up" title="yggdrasil.communication" href="../communication.html"/> 
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 
   
   <script src="../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -197,17 +191,17 @@
 <span class="n">_socket_send_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_socket_type_pairs</span><span class="p">]</span>
 <span class="n">_socket_recv_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_socket_type_pairs</span><span class="p">]</span>
 <span class="n">_socket_protocols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tcp&#39;</span><span class="p">,</span> <span class="s1">&#39;inproc&#39;</span><span class="p">,</span> <span class="s1">&#39;ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;udp&#39;</span><span class="p">,</span> <span class="s1">&#39;pgm&#39;</span><span class="p">,</span> <span class="s1">&#39;epgm&#39;</span><span class="p">]</span>
-<span class="n">_flag_zmq_filter</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;_ZMQFILTER_&#39;</span>
+<span class="n">_flag_zmq_filter</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;_ZMQFILTER_&#39;</span>
 <span class="n">_default_socket_type</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">_default_protocol</span> <span class="o">=</span> <span class="s1">&#39;tcp&#39;</span>
 <span class="n">_wait_send_t</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># 0.0001</span>
-<span class="n">_reply_msg</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;YGG_REPLY&#39;</span>
-<span class="n">_purge_msg</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;YGG_PURGE&#39;</span>
+<span class="n">_reply_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;YGG_REPLY&#39;</span>
+<span class="n">_purge_msg</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;YGG_PURGE&#39;</span>
 <span class="n">_global_context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="check_czmq"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.check_czmq">[docs]</a><span class="k">def</span> <span class="nf">check_czmq</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Determine if the necessary C/C++ libraries are installed for ZeroMQ.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary C/C++ libraries are installed for ZeroMQ.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if the libraries are installed, False otherwise.</span>
@@ -241,14 +235,14 @@
         <span class="c1"># except subprocess.TimeoutExpired:</span>
         <span class="c1">#     process.kill()</span>
         <span class="c1">#     outs, errs = process.communicate()</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">b</span><span class="s1">&#39;zmq&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;zmq&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">)</span></div>
 
 
 <span class="n">_zmq_installed_c</span> <span class="o">=</span> <span class="n">check_czmq</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="get_ipc_host"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.get_ipc_host">[docs]</a><span class="k">def</span> <span class="nf">get_ipc_host</span><span class="p">():</span>
-    <span class="sd">r&quot;&quot;&quot;Get an IPC host using uuid.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get an IPC host using uuid.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: File path for IPC transport created using uuid.</span>
@@ -258,7 +252,7 @@
 
         
 <div class="viewcode-block" id="get_socket_type_mate"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.get_socket_type_mate">[docs]</a><span class="k">def</span> <span class="nf">get_socket_type_mate</span><span class="p">(</span><span class="n">t_in</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Find the counterpart socket type.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find the counterpart socket type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        t_in (str): Socket type.</span>
@@ -283,7 +277,7 @@
 
 
 <div class="viewcode-block" id="format_address"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.format_address">[docs]</a><span class="k">def</span> <span class="nf">format_address</span><span class="p">(</span><span class="n">protocol</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Format an address based on its parts.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Format an address based on its parts.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        protocol (str): Communication protocol that should be used.</span>
@@ -312,7 +306,7 @@
 
                     
 <div class="viewcode-block" id="parse_address"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.parse_address">[docs]</a><span class="k">def</span> <span class="nf">parse_address</span><span class="p">(</span><span class="n">address</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Split an address into its parts.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Split an address into its parts.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        address (str): Address to be split.</span>
@@ -345,7 +339,7 @@
 
 
 <div class="viewcode-block" id="bind_socket"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.bind_socket">[docs]</a><span class="k">def</span> <span class="nf">bind_socket</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nretry</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Bind a socket to an address, getting a random port as necessary.</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind a socket to an address, getting a random port as necessary.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        socket (zmq.Socket): Socket that should be bound.</span>
@@ -383,7 +377,7 @@
 
     
 <div class="viewcode-block" id="ZMQProxy"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy">[docs]</a><span class="k">class</span> <span class="nc">ZMQProxy</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommServer</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Start a proxy in a new thread for a server address. A client-side</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a proxy in a new thread for a server address. A client-side</span>
 <span class="sd">    address will be randomly generated.</span>
 
 <span class="sd">    Args:</span>
@@ -442,11 +436,11 @@
         <span class="c1"># self.poller.register(frontend, zmq.POLLIN)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Set name</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ZMQProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ZMQProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;ZMQProxy.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">srv_address</span>
 
 <div class="viewcode-block" id="ZMQProxy.client_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.client_recv">[docs]</a>    <span class="k">def</span> <span class="nf">client_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Receive single message from the client.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive single message from the client.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="o">.</span><span class="n">recv_multipart</span><span class="p">()</span>
@@ -454,7 +448,7 @@
                 <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="ZMQProxy.server_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.server_send">[docs]</a>    <span class="k">def</span> <span class="nf">server_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Send single message to the server.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send single message to the server.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">:</span>
@@ -475,7 +469,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">out</span> <span class="o">==</span> <span class="n">zmq</span><span class="o">.</span><span class="n">POLLIN</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ZMQProxy.run_loop"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Forward messages from client to server.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Forward messages from client to server.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">poll</span><span class="p">():</span>
             <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client_recv</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -484,16 +478,16 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">server_send</span><span class="p">(</span><span class="n">message</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="ZMQProxy.after_loop"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Close sockets after the loop finishes.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close sockets after the loop finishes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ZMQProxy.cleanup"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Clean up sockets on exit.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clean up sockets on exit.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_sockets</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ZMQProxy.close_sockets"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQProxy.close_sockets">[docs]</a>    <span class="k">def</span> <span class="nf">close_sockets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Close the sockets.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the sockets.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Closing sockets&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -505,9 +499,9 @@
         <span class="n">CommBase</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;DEALER_server_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">)</span></div></div>
 
 
-<span class="nd">@register_component</span>
-<div class="viewcode-block" id="ZMQComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm">[docs]</a><span class="k">class</span> <span class="nc">ZMQComm</span><span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Class for handling I/O using ZeroMQ sockets.</span>
+<div class="viewcode-block" id="ZMQComm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm">[docs]</a><span class="nd">@register_component</span>
+<span class="k">class</span> <span class="nc">ZMQComm</span><span class="p">(</span><span class="n">AsyncComm</span><span class="o">.</span><span class="n">AsyncComm</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O using ZeroMQ sockets.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The environment variable where the socket address is</span>
@@ -547,7 +541,7 @@
                           <span class="n">socket_action</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">topic_filter</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                           <span class="n">dealer_identity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">reply_socket_address</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Initialize defaults for socket type/action based on direction.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize defaults for socket type/action based on direction.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
         <span class="c1"># Client/Server things</span>
@@ -614,7 +608,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZMQComm.printStatus"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span><span class="p">)</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">nindent</span> <span class="o">*</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nsent (zmq)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_sent</span><span class="p">))</span>
@@ -624,9 +618,9 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;nrecv reply (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">k</span><span class="p">,</span>
                                    <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_recv</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ZMQComm.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.is_installed">[docs]</a>    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
+<div class="viewcode-block" id="ZMQComm.is_installed"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.is_installed">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the necessary libraries are installed for this</span>
 <span class="sd">        communication class.</span>
 
 <span class="sd">        Args:</span>
@@ -643,17 +637,17 @@
         <span class="k">elif</span> <span class="n">language</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">_zmq_installed_c</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">is_installed</span><span class="p">(</span><span class="n">language</span><span class="o">=</span><span class="n">language</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ZMQComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.underlying_comm_class">[docs]</a>    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ZMQComm.underlying_comm_class"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;ZMQComm&#39;</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ZMQComm.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.close_registry_entry">[docs]</a>    <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ZMQComm.close_registry_entry"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
             <span class="n">value</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -662,27 +656,27 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">address_param</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Address parameters.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Address parameters.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">parse_address</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Protocol that socket uses.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Protocol that socket uses.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_param</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">host</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Host that socket is connected to.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Host that socket is connected to.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_param</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Port that socket is connected to.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Port that socket is connected to.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_param</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">]</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="ZMQComm.new_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.new_comm_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Initialize communication with new queue.</span>
+<div class="viewcode-block" id="ZMQComm.new_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new queue.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): Name of new socket.</span>
@@ -714,7 +708,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">opp_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: Address for opposite comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address for opposite comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_client</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The client proxy does not yet have an address.&quot;</span><span class="p">)</span>
@@ -723,7 +717,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span>
 
 <div class="viewcode-block" id="ZMQComm.opp_comm_kwargs"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.opp_comm_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">opp_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get keyword arguments to initialize communication with opposite</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments to initialize communication with opposite</span>
 <span class="sd">        comm object.</span>
 
 <span class="sd">        Returns:</span>
@@ -743,11 +737,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">registry_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;str: String used to register the socket.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: String used to register the socket.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_type_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZMQComm.bind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.bind">[docs]</a>    <span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Bind to address, getting random port as necessary.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind to address, getting random port as necessary.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">bind</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span>
@@ -779,7 +773,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ZMQComm.connect"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Connect to address.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Connect to address.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span><span class="p">:</span>
@@ -792,7 +786,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ZMQComm.unbind"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.unbind">[docs]</a>    <span class="k">def</span> <span class="nf">unbind</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_close</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Unbind from address.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Unbind from address.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bound</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Unbinding from </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
@@ -817,7 +811,7 @@
     <span class="c1">#     self.debug(&#39;Disconnected socket&#39;)</span>
 
     <span class="k">def</span> <span class="nf">_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Open connection by binding/connect to the specified socket.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open connection by binding/connect to the specified socket.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_open_direct</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
@@ -838,7 +832,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_openned</span> <span class="o">=</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="ZMQComm.set_reply_socket_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.set_reply_socket_send">[docs]</a>    <span class="k">def</span> <span class="nf">set_reply_socket_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Set the send reply socket if it dosn&#39;t exist.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the send reply socket if it dosn&#39;t exist.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">REP</span><span class="p">)</span>
             <span class="n">s</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -852,7 +846,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_address</span></div>
 
 <div class="viewcode-block" id="ZMQComm.set_reply_socket_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.set_reply_socket_recv">[docs]</a>    <span class="k">def</span> <span class="nf">set_reply_socket_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Set the recv reply socket if the address dosn&#39;t exist.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the recv reply socket if the address dosn&#39;t exist.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">address</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">REQ</span><span class="p">)</span>
             <span class="n">s</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -866,7 +860,7 @@
         <span class="k">return</span> <span class="n">address</span></div>
 
 <div class="viewcode-block" id="ZMQComm.check_reply_socket_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.check_reply_socket_send">[docs]</a>    <span class="k">def</span> <span class="nf">check_reply_socket_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Append reply socket address if it</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append reply socket address if it</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str): Message that will be piggy backed on.</span>
@@ -879,7 +873,7 @@
         <span class="k">return</span> <span class="n">msg</span></div>
         
 <div class="viewcode-block" id="ZMQComm.check_reply_socket_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.check_reply_socket_recv">[docs]</a>    <span class="k">def</span> <span class="nf">check_reply_socket_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Check incoming message for reply address.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check incoming message for reply address.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str): Incoming message to check.</span>
@@ -909,7 +903,7 @@
     <span class="c1">#     return sum(self._n_reply_recv.values())</span>
 
     <span class="k">def</span> <span class="nf">_reply_handshake_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Do send side of handshake.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do send side of handshake.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(((</span><span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
              <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span><span class="o">.</span><span class="n">closed</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
@@ -929,7 +923,7 @@
         <span class="k">return</span> <span class="n">msg</span>
 
     <span class="k">def</span> <span class="nf">_reply_handshake_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg_send</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Do recv side of handshake.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do recv side of handshake.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">socket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">socket</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">socket</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
@@ -965,7 +959,7 @@
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_close_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Close the connection.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            linger (bool, optional): If True, drain messages before closing the</span>
@@ -994,7 +988,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close_direct</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_close_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Close the backlog thread and the reply sockets.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the backlog thread and the reply sockets.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="n">wait</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_send</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
@@ -1006,7 +1000,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="s2">&quot;REPLY_RECV_&quot;</span> <span class="o">+</span> <span class="n">backwards</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
 
 <div class="viewcode-block" id="ZMQComm.server_exists"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.server_exists">[docs]</a>    <span class="k">def</span> <span class="nf">server_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Determine if a server exists.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if a server exists.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            srv_address (str): Address of server comm.</span>
@@ -1023,12 +1017,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: True if the socket is open.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the socket is open.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_openned</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">closed</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZMQComm.is_message"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.is_message">[docs]</a>    <span class="k">def</span> <span class="nf">is_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flags</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Poll the socket for a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Poll the socket for a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            flags (int): ZMQ poll flags.</span>
@@ -1050,14 +1044,14 @@
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;int: Number of messages currently being routed from recv.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed from recv.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_message</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">POLLIN</span><span class="p">))</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;int: Number of messages currently being routed.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_sent</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_sent</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span>
@@ -1071,7 +1065,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;bool: True if all received messages have been confirmed.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all received messages have been confirmed.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_confirmed_recv</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Work comm not confirmed&quot;</span><span class="p">)</span>
@@ -1082,7 +1076,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">get_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for an existing work comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for an existing work comm.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_work_comm_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;socket_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PAIR&#39;</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span>
@@ -1090,14 +1084,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">create_work_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for a new work comm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for a new work comm.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">create_work_comm_kwargs</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;socket_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PAIR&#39;</span>
         <span class="n">out</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span>
         <span class="k">return</span> <span class="n">out</span>
     
 <div class="viewcode-block" id="ZMQComm.workcomm2header"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.workcomm2header">[docs]</a>    <span class="k">def</span> <span class="nf">workcomm2header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_comm</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get header information from a comm.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get header information from a comm.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            work_comm (:class:.CommBase): Work comm that header describes.</span>
@@ -1113,7 +1107,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="ZMQComm.header2workcomm"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.header2workcomm">[docs]</a>    <span class="k">def</span> <span class="nf">header2workcomm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Get a work comm based on header info.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a work comm based on header info.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            header (dict): Information that will be sent in the message header</span>
@@ -1130,7 +1124,7 @@
         <span class="k">return</span> <span class="n">c</span></div>
     
 <div class="viewcode-block" id="ZMQComm.on_send_eof"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.on_send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Actions to perform when EOF being sent.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when EOF being sent.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if EOF message should be sent, False otherwise.</span>
@@ -1142,7 +1136,7 @@
         <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">out</span></div>
         
 <div class="viewcode-block" id="ZMQComm.on_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.on_send">[docs]</a>    <span class="k">def</span> <span class="nf">on_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Process message to be sent including handling serializing</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process message to be sent including handling serializing</span>
 <span class="sd">        message and handling EOF.</span>
 
 <span class="sd">        Args:</span>
@@ -1179,7 +1173,7 @@
     <span class="c1">#     return True</span>
 
     <span class="k">def</span> <span class="nf">_send_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">topic</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">identity</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Send a message.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to be sent.</span>
@@ -1227,7 +1221,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_recv_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Receive a message from the ZMQ socket.</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the ZMQ socket.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            **kwargs: Additional keyword arguments are passed to socket send.</span>
@@ -1247,7 +1241,7 @@
         <span class="c1">#     ret = self.socket.poll(timeout=max(1, 1000.0 * timeout))</span>
         <span class="c1">#     if ret == 0:</span>
         <span class="c1">#         self.verbose_debug(&quot;No messages waiting.&quot;)</span>
-        <span class="c1">#         return (True, self.empty_msg)</span>
+        <span class="c1">#         return (True, self.empty_bytes_msg)</span>
         <span class="c1">#     flags = zmq.NOBLOCK</span>
         <span class="c1"># else:</span>
         <span class="c1">#     flags = 0</span>
@@ -1257,7 +1251,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Socket closed&quot;</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket_type_name</span> <span class="o">==</span> <span class="s1">&#39;ROUTER&#39;</span><span class="p">:</span>
                     <span class="n">identity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_recv_identities</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">identity</span><span class="p">)</span>
@@ -1265,7 +1259,7 @@
                 <span class="n">total_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">zmq</span><span class="o">.</span><span class="n">ZMQError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error receiving&quot;</span><span class="p">)</span>
-                <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_bytes_msg</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Recv </span><span class="si">%d</span><span class="s2"> bytes from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">total_msg</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
         <span class="c1"># Interpret headers</span>
         <span class="n">total_msg</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_reply_socket_recv</span><span class="p">(</span><span class="n">total_msg</span><span class="p">)</span>
@@ -1282,7 +1276,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZMQComm.confirm_send"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.confirm_send">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that sent message was received.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">noblock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_sent</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_sent</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_sent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_zmq_sent</span>
@@ -1298,7 +1292,7 @@
         <span class="k">return</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="ZMQComm.confirm_recv"><a class="viewcode-back" href="../../../yggdrasil.communication.html#yggdrasil.communication.ZMQComm.ZMQComm.confirm_recv">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">noblock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Confirm that message was received.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_lock</span><span class="p">:</span>
             <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reply_socket_recv</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
         <span class="k">if</span> <span class="n">noblock</span><span class="p">:</span>
@@ -1347,9 +1341,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -1358,11 +1350,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -1377,37 +1369,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

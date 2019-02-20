@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.tests.test_ServerComm &mdash; cis_interface 0.7.4+3.g56c4bbe6 documentation</title>
+  <title>cis_interface.communication.tests.test_ServerComm &mdash; cis_interface 0.7.10 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="cis_interface 0.7.4+3.g56c4bbe6 documentation" href="../../../../index.html"/>
-        <link rel="up" title="cis_interface.communication" href="../../communication.html"/> 
+  <link rel="stylesheet" href="../../../../static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
   <script src="../../../../static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.7.4
+                0.7.10
               </div>
             
           
@@ -105,9 +95,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -121,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">cis_interface</a>
@@ -129,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -182,7 +177,7 @@
 
 
 <div class="viewcode-block" id="TestServerComm"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm">[docs]</a><span class="k">class</span> <span class="nc">TestServerComm</span><span class="p">(</span><span class="n">test_CommBase</span><span class="o">.</span><span class="n">TestCommBase</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Tests for ServerComm communication class.&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tests for ServerComm communication class.&quot;&quot;&quot;</span>
 
     <span class="n">comm</span> <span class="o">=</span> <span class="s1">&#39;ServerComm&#39;</span>
     <span class="n">attr_list</span> <span class="o">=</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">test_CommBase</span><span class="o">.</span><span class="n">TestCommBase</span><span class="o">.</span><span class="n">attr_list</span><span class="p">)</span>
@@ -190,42 +185,42 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">send_inst_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Keyword arguments for send instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;ClientComm&#39;</span><span class="p">}</span>
     
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="TestServerComm.test_error_send"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_send">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Disabled: Test error on send.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestServerComm.test_error_send"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_send">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_error_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test error on send.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
         
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="TestServerComm.test_error_recv"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_error_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Disabled: Test error on recv.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestServerComm.test_error_recv"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_recv">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_error_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test error on recv.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
         
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="TestServerComm.test_invalid_direction"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_invalid_direction">[docs]</a>    <span class="k">def</span> <span class="nf">test_invalid_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Disabled: Test of error on incorrect direction.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestServerComm.test_invalid_direction"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_invalid_direction">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_invalid_direction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test of error on incorrect direction.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
     
-    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
-<div class="viewcode-block" id="TestServerComm.test_work_comm"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_work_comm">[docs]</a>    <span class="k">def</span> <span class="nf">test_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Disabled: Test creating/removing a work comm.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="TestServerComm.test_work_comm"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_work_comm">[docs]</a>    <span class="nd">@unittest</span><span class="o">.</span><span class="n">skipIf</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;Server&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_work_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Disabled: Test creating/removing a work comm.&quot;&quot;&quot;</span>
         <span class="k">pass</span>  <span class="c1"># pragma: no cover</span></div>
 
 <div class="viewcode-block" id="TestServerComm.test_newcomm_server"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_newcomm_server">[docs]</a>    <span class="k">def</span> <span class="nf">test_newcomm_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test creation of server using newcomm.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test creation of server using newcomm.&quot;&quot;&quot;</span>
         <span class="n">inst</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="s1">&#39;testserver_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span> <span class="n">comm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="TestServerComm.test_eof_no_close"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_eof_no_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_eof_no_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test send/recv of EOF message with no close.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test send/recv of EOF message with no close.&quot;&quot;&quot;</span>
         <span class="c1"># Forwards</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close_on_eof_recv</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">send_meth</span><span class="o">=</span><span class="s1">&#39;send_eof&#39;</span><span class="p">,</span> <span class="n">close_on_recv_eof</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestServerComm.test_call"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call">[docs]</a>    <span class="k">def</span> <span class="nf">test_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test RPC call.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test RPC call.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">sched_task</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">rpcCall</span><span class="p">,</span>
                                       <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">],</span> <span class="n">store_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">rpcRecv</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
@@ -242,7 +237,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestServerComm.test_call_alias"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call_alias">[docs]</a>    <span class="k">def</span> <span class="nf">test_call_alias</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test RPC call aliases.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test RPC call aliases.&quot;&quot;&quot;</span>
         <span class="c1"># self.send_instance.sched_task(0.0, self.send_instance.rpcSend,</span>
         <span class="c1">#                               args=[self.test_msg], store_output=True)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">sched_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">rpcRecv</span><span class="p">,</span>
@@ -265,7 +260,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestServerComm.test_call_nolimit"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_call_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test RPC nolimit call.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test RPC nolimit call.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">sched_task</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">call_nolimit</span><span class="p">,</span>
                                       <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">],</span> <span class="n">store_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">recv_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
@@ -282,7 +277,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestServerComm.test_close_in_thread"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_close_in_thread">[docs]</a>    <span class="k">def</span> <span class="nf">test_close_in_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Test close of comm in thread.&quot;&quot;&quot;</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test close of comm in thread.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">close_in_thread</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recv_instance</span><span class="o">.</span><span class="n">close_in_thread</span><span class="p">()</span></div></div>
 
@@ -307,9 +302,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -318,11 +311,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -337,37 +330,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.7.4+3.g56c4bbe6',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

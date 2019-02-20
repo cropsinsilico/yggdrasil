@@ -1,0 +1,29 @@
+yggdrasil.interface package
+===========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    yggdrasil.interface.tests
+
+Submodules
+----------
+
+yggdrasil.interface.YggInterface module
+---------------------------------------
+
+.. automodule:: yggdrasil.interface.YggInterface
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: yggdrasil.interface
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.metaschema.datatypes.SchemaMetaschemaType &mdash; yggdrasil 0.8.3 documentation</title>
+  <title>cis_interface.metaschema.datatypes.SchemaMetaschemaType &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,28 +24,18 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../../search.html"/>
-    <link rel="top" title="yggdrasil 0.8.3 documentation" href="../../../../index.html"/>
-        <link rel="up" title="cis_interface.metaschema.datatypes" href="../datatypes.html"/> 
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
 
   
   <script src="../../../../_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -67,7 +57,7 @@
             
             
               <div class="version">
-                0.8.3
+                0.8.7
               </div>
             
           
@@ -106,9 +96,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -122,7 +115,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">yggdrasil</a>
@@ -130,9 +123,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -191,7 +185,7 @@
 
 
 <span class="k">def</span> <span class="nf">_normalize_schema</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Normalize a schema at the root to handle case where only type</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize a schema at the root to handle case where only type</span>
 <span class="sd">    string specified.&quot;&quot;&quot;</span>
     <span class="c1"># if isinstance(instance, str):</span>
     <span class="c1">#     instance = dict(type=instance)</span>
@@ -246,7 +240,7 @@
 
 
 <span class="k">def</span> <span class="nf">_validate_schema</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Validate a schema at the root to handle case where only type</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate a schema at the root to handle case where only type</span>
 <span class="sd">    string specified.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">validator</span><span class="o">.</span><span class="n">_normalizing</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ref</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">):</span>
         <span class="n">validator</span><span class="o">.</span><span class="n">_normalized</span> <span class="o">=</span> <span class="n">_normalize_schema</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
@@ -258,9 +252,9 @@
         <span class="n">instance</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">_normalizing</span>
 
         
-<span class="nd">@register_type</span>
-<div class="viewcode-block" id="SchemaMetaschemaType"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType">[docs]</a><span class="k">class</span> <span class="nc">SchemaMetaschemaType</span><span class="p">(</span><span class="n">JSONObjectMetaschemaType</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;Schema type.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="SchemaMetaschemaType"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType">[docs]</a><span class="nd">@register_type</span>
+<span class="k">class</span> <span class="nc">SchemaMetaschemaType</span><span class="p">(</span><span class="n">JSONObjectMetaschemaType</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schema type.&quot;&quot;&quot;</span>
 
     <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;schema&#39;</span>
     <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;A schema type for evaluating subschema.&#39;</span>
@@ -269,9 +263,9 @@
     <span class="n">metadata_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
     <span class="n">specificity</span> <span class="o">=</span> <span class="n">JSONObjectMetaschemaType</span><span class="o">.</span><span class="n">specificity</span> <span class="o">+</span> <span class="mi">1</span>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SchemaMetaschemaType.encode_data"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.encode_data">[docs]</a>    <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Encode an object&#39;s data.</span>
+<div class="viewcode-block" id="SchemaMetaschemaType.encode_data"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.encode_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode an object&#39;s data.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to encode.</span>
@@ -285,9 +279,9 @@
         <span class="c1"># Schemas should already be in JSON serializable format</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SchemaMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.decode_data">[docs]</a>    <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Decode an object.</span>
+<div class="viewcode-block" id="SchemaMetaschemaType.decode_data"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.decode_data">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">decode_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">typedef</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode an object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (string): Encoded object to decode.</span>
@@ -300,9 +294,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">obj</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SchemaMetaschemaType.validate"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
+<div class="viewcode-block" id="SchemaMetaschemaType.validate"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.validate">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">raise_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Validate an object to check if it could be of this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to validate.</span>
@@ -313,25 +307,25 @@
 <span class="sd">            bool: True if the object could be of this type, False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">SchemaMetaschemaType</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">SchemaMetaschemaType</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span>
                                                          <span class="n">raise_errors</span><span class="o">=</span><span class="n">raise_errors</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">metaschema</span><span class="p">())</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">metaschema</span><span class="p">())</span>
             <span class="n">x</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="p">[])</span>
             <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]:</span>
                 <span class="n">x</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span>
             <span class="n">x</span><span class="p">[</span><span class="s1">&#39;additionalProperties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">cls</span><span class="o">=</span><span class="n">cls</span><span class="o">.</span><span class="n">validator</span><span class="p">())</span>
+            <span class="n">jsonschema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">validator</span><span class="p">())</span>
         <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">raise_errors</span><span class="p">:</span>
                 <span class="k">raise</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="kc">True</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SchemaMetaschemaType.normalize"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.normalize">[docs]</a>    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sd">r&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
+<div class="viewcode-block" id="SchemaMetaschemaType.normalize"><a class="viewcode-back" href="../../../../cis_interface.metaschema.datatypes.html#cis_interface.metaschema.datatypes.SchemaMetaschemaType.SchemaMetaschemaType.normalize">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Normalize an object, if possible, to conform to this type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object to normalize.</span>
@@ -342,10 +336,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">metaschema</span><span class="p">())</span>
-        <span class="n">validators</span> <span class="o">=</span> <span class="p">{</span><span class="s1">u&#39;$ref&#39;</span><span class="p">:</span> <span class="n">_validate_schema</span><span class="p">}</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">metaschema</span><span class="p">())</span>
+        <span class="n">validators</span> <span class="o">=</span> <span class="p">{</span><span class="sa">u</span><span class="s1">&#39;$ref&#39;</span><span class="p">:</span> <span class="n">_validate_schema</span><span class="p">}</span>
         <span class="n">normalizers</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">():</span> <span class="p">[</span><span class="n">_normalize_schema</span><span class="p">]}</span>
-        <span class="n">validator_class</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">validator</span><span class="p">())</span>
+        <span class="n">validator_class</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">validator</span><span class="p">())</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="n">validator_class</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">no_defaults</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                            <span class="n">normalizers</span><span class="o">=</span><span class="n">normalizers</span><span class="p">,</span>
                                            <span class="n">validators</span><span class="o">=</span><span class="n">validators</span><span class="p">)</span>
@@ -353,9 +347,7 @@
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -364,11 +356,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -383,37 +375,24 @@
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../../',
-            VERSION:'0.8.3',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

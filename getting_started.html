@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting started &mdash; yggdrasil 0.8.5 documentation</title>
+  <title>Getting started &mdash; yggdrasil 0.8.7 documentation</title>
   
 
   
@@ -24,29 +24,20 @@
 
   
 
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="yggdrasil 0.8.5 documentation" href="index.html"/>
-        <link rel="next" title="Formatted I/O" href="formatted_io.html"/>
-        <link rel="prev" title="Installation" href="install.html"/> 
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Formatted I/O" href="formatted_io.html" />
+    <link rel="prev" title="Installation" href="install.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
@@ -68,7 +59,7 @@
             
             
               <div class="version">
-                0.8.5
+                0.8.7
               </div>
             
           
@@ -114,9 +105,12 @@
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_interface.html">Model Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metaschema.html">JSON Metaschema</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema.html">YAML Validation Schema</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
@@ -130,7 +124,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -138,9 +132,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -198,13 +193,13 @@ in different programming languages to allow models to access these comms.</p>
 code and the type of model. Consider the following model which just prints a
 single line of output to stdout:</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python&#39;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python&#39;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson1.html">Example in other languages</a>)</p>
 <p>The YAML file to run this model would then be:</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
@@ -219,25 +214,25 @@ should be associated with the model for logging, the third line tells the
 framework which driver should be used to run the model, and the forth line is
 the path to the model source code that should be run. There are specialized
 drivers for simple source written in Python, Matlab, C, and C++, but any
-executable can be run as a model using the &#8216;ModelDriver&#8217; driver. Then the &#8216;args&#8217;
+executable can be run as a model using the ‘ModelDriver’ driver. Then the ‘args’
 model parameter should be the path to the execuatable. Additional information on
 the format yggdrasil YAML files should take can be found in the
 <a class="reference internal" href="yaml.html#yaml-rst"><span class="std std-ref">YAML Files</span></a> section.</p>
 <p>This model can then be run using the yggdrasil framework by calling the
 commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ yggrun model.yml
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun model.yml
 </pre></div>
 </div>
 </div>
 <div class="section" id="running-multiple-models">
 <h2>Running multiple models<a class="headerlink" href="#running-multiple-models" title="Permalink to this headline">¶</a></h2>
 <p>Multiple models can be run by either passing multiple YAML files to <cite>yggrun</cite>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ yggrun model1.yml model2.yml
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ yggrun model1.yml model2.yml
 </pre></div>
 </div>
 <p>or including multiple models in a single YAML file.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -261,9 +256,9 @@ commandline entry point <cite>yggrun</cite> followed by the path to the YAML.:</
 <p>Models can get input from or send output to files via input and output channels.
 To do so yggdrasil provides several useful functions for interfacing with
 these channels. In the example below, the model receives input from a channel
-named &#8216;input&#8217; and sends output to a channel named &#8216;output&#8217;.</p>
+named ‘input’ and sends output to a channel named ‘output’.</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -318,10 +313,10 @@ named &#8216;input&#8217; and sends output to a channel named &#8216;output&#821
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson3.html">Example in other languages</a>)</p>
 <p>In the YAML used to run this model, those channels are declared in the model
-definition and then linked to files by entries in the <code class="docutils literal"><span class="pre">connections</span></code> section
+definition and then linked to files by entries in the <code class="docutils literal notranslate"><span class="pre">connections</span></code> section
 of the YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -351,10 +346,10 @@ of the YAML.</p>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson3.html">Example in other languages</a>)</p>
-<p>The <code class="docutils literal"><span class="pre">input_file</span></code> and <code class="docutils literal"><span class="pre">output_file</span></code> connection fields can either be
+<p>The <code class="docutils literal notranslate"><span class="pre">input_file</span></code> and <code class="docutils literal notranslate"><span class="pre">output_file</span></code> connection fields can either be
 the path to the file (either absolute or relative to the directory
 containing the YAML file) or a mapping with fields descripting the
-file. In particular, the &#8216;filetype&#8217; keyword specifies the format of
+file. In particular, the ‘filetype’ keyword specifies the format of
 the file being read/written. Supported values include:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -375,7 +370,7 @@ the file being read/written. Supported values include:</p>
 </tr>
 <tr class="row-even"><td>table</td>
 <td>The file is an ASCII table that will be read/written one row
-at a time. If <code class="docutils literal"><span class="pre">as_array:</span> <span class="pre">True</span></code> is also specified, the table
+at a time. If <code class="docutils literal notranslate"><span class="pre">as_array:</span> <span class="pre">True</span></code> is also specified, the table
 will be read/written all at once.</td>
 </tr>
 <tr class="row-odd"><td>pandas</td>
@@ -396,7 +391,7 @@ data format for 3D structures.</td>
 </table>
 <p>The above example shows the basic case of receiving raw messages from a channel,
 but there are also interface functions which can process these raw messages to
-extract variables and fields for the model <code class="docutils literal"><span class="pre">inputs</span></code> and <code class="docutils literal"><span class="pre">outputs</span></code> to
+extract variables and fields for the model <code class="docutils literal notranslate"><span class="pre">inputs</span></code> and <code class="docutils literal notranslate"><span class="pre">outputs</span></code> to
 specify how that should be done. For examples of how to use formatted messages
 with the above file types and input/output options, see
 <a class="reference internal" href="formatted_io.html#formatted-io-rst"><span class="std std-ref">Formatted I/O</span></a>.</p>
@@ -404,11 +399,11 @@ with the above file types and input/output options, see
 <div class="section" id="model-to-model-communication-with-connections">
 <h2>Model-to-model communication (with connections)<a class="headerlink" href="#model-to-model-communication-with-connections" title="Permalink to this headline">¶</a></h2>
 <p>Models can also communicate with each other in the same fashion. In the example
-below, model A receives input from a channel named &#8216;inputA&#8217; and sends output to
-a channel named &#8216;outputA&#8217;, while model B receives input from a channel named
-&#8216;inputB&#8217; and sends output to a channel named &#8216;outputB&#8217;.</p>
+below, model A receives input from a channel named ‘inputA’ and sends output to
+a channel named ‘outputA’, while model B receives input from a channel named
+‘inputB’ and sends output to a channel named ‘outputB’.</p>
 <p>Model Code:</p>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -459,7 +454,7 @@ a channel named &#8216;outputA&#8217;, while model B receives input from a chann
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.&quot;</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -511,11 +506,11 @@ a channel named &#8216;outputA&#8217;, while model B receives input from a chann
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson4.html">Example in other languages</a>)</p>
-<p>In the YAML, &#8216;inputA&#8217; is connected to a local file, &#8216;outputA&#8217; is connected to
-&#8216;inputB&#8217;, and &#8216;outputB&#8217; is connected to a local file in the <code class="docutils literal"><span class="pre">connections</span></code>
+<p>In the YAML, ‘inputA’ is connected to a local file, ‘outputA’ is connected to
+‘inputB’, and ‘outputB’ is connected to a local file in the <code class="docutils literal notranslate"><span class="pre">connections</span></code>
 section of the YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -561,11 +556,11 @@ section of the YAML.</p>
 <div class="section" id="model-to-model-communication-with-drivers">
 <h2>Model-to-model communication (with drivers)<a class="headerlink" href="#model-to-model-communication-with-drivers" title="Permalink to this headline">¶</a></h2>
 <p>For backwards compatibility, connections can also be specified in terms of
-the underlying drivers without an explicit <code class="docutils literal"><span class="pre">connections</span></code> section. The
+the underlying drivers without an explicit <code class="docutils literal notranslate"><span class="pre">connections</span></code> section. The
 exact same models from the previous example can be connected using the
 following YAML.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -623,7 +618,7 @@ following YAML.</p>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/gs_lesson4b.html">Example in other languages</a>)</p>
-<p>In this schema, model <code class="docutils literal"><span class="pre">input</span></code> and <code class="docutils literal"><span class="pre">output</span></code> entries
+<p>In this schema, model <code class="docutils literal notranslate"><span class="pre">input</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code> entries
 must have the following fields:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -643,8 +638,8 @@ must have the following fields:</p>
 <td>The name of the driver that should be used to process input/output.</td>
 </tr>
 <tr class="row-even"><td>args</td>
-<td>A string matching the args field of an opposing <code class="docutils literal"><span class="pre">input</span></code> /
-<code class="docutils literal"><span class="pre">output</span></code> field in another model or the path to a file that should
+<td>A string matching the args field of an opposing <code class="docutils literal notranslate"><span class="pre">input</span></code> /
+<code class="docutils literal notranslate"><span class="pre">output</span></code> field in another model or the path to a file that should
 be read/written.</td>
 </tr>
 </tbody>
@@ -659,9 +654,7 @@ be read/written.</td>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -679,11 +672,11 @@ be read/written.</td>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila.
+        &copy; Copyright 2017, Meagan Lang, David Raila
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -698,37 +691,24 @@ be read/written.</td>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.8.5',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
 
   
 
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
+  <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>
