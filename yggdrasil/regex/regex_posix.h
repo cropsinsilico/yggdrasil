@@ -4,6 +4,9 @@
 
 #include <regex.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {

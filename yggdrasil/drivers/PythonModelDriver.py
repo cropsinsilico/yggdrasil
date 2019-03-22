@@ -1,8 +1,7 @@
-#
-# This should not be used directly by modelers
-#
 import os
 import sys
+import importlib
+from yggdrasil import tools
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.schema import register_component
 
@@ -16,9 +15,22 @@ _incl_io = os.path.join(_top_dir, 'io')
 class PythonModelDriver(InterpretedModelDriver):
     r"""Class for running Python models."""
 
-    _language = 'python'
-    _language_ext = '.py'
-    _interpreter = sys.executable
+    language = 'python'
+    language_ext = '.py'
+    default_interpreter = sys.executable
+    interface_library = 'yggdrasil.interface.YggInterface'
+    supported_comms = tools.get_supported_comm()
+    supported_comm_options = {
+        'ipc': {'platforms': ['MacOS', 'Linux'],
+                'libraries': ['sysv_ipc']},
+        'zmq': {'libraries': ['zmq']}}
+    function_param = {
+        'comment': '#',
+        'indent': 4 * ' ',
+        'block_end': '',
+        'if_begin': 'if ({cond}):',
+        'for_begin': 'for {iter_var} in range({iter_begin}, {iter_end}):',
+        'while_begin': 'while ({cond}):'}
 
     @classmethod
     def is_language_installed(self):
@@ -31,4 +43,22 @@ class PythonModelDriver(InterpretedModelDriver):
 
         """
         # This is being run so python exists
+        return True
+
+    @classmethod
+    def is_library_installed(cls, lib, **kwargs):
+        r"""Determine if a dependency is installed.
+
+        Args:
+            lib (str): Name of the library that should be checked.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            bool: True if the library is installed, False otherwise.
+
+        """
+        try:
+            importlib.import_module(lib)
+        except ImportError:
+            return False
         return True

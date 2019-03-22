@@ -50,6 +50,7 @@ def register_component(component_class):
     if yaml_typ not in _registry:
         _registry[yaml_typ] = []
     if component_class not in _registry[yaml_typ]:
+        component_class.before_registration(component_class)
         _registry[yaml_typ].insert(0, component_class)
         # _registry[yaml_typ].append(component_class)
     return component_class
@@ -345,6 +346,7 @@ class ComponentSchema(object):
         for k, v in subtype.items():
             if not isinstance(v, list):
                 subtype[k] = [v]
+            subtype[k] += getattr(comp_cls, '_%s_aliases' % k, [])
         # if self.schema_type == 'connection':
         #     subtype['direction'] = [comp_cls.direction()]
         #     subtype_list = [tuple([subtype[ik][0] for ik in self.subtype_keys])]

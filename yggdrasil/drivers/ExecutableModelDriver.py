@@ -1,5 +1,13 @@
-from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil import platform
 from yggdrasil.schema import register_component
+from yggdrasil.drivers.ModelDriver import ModelDriver
+
+
+if platform._is_win:  # pragma: windows
+    _os_version_flags = ['winver']
+else:
+    _os_version_flags = ['uname', '-r']
+    # _os_version_flags = ['echo $0']
 
 
 @register_component
@@ -7,6 +15,7 @@ class ExecutableModelDriver(ModelDriver):
     r"""Class for running executable based models."""
 
     _language = 'executable'
+    _version_flags = _os_version_flags
 
     @classmethod
     def language_executable(cls):
@@ -22,6 +31,42 @@ class ExecutableModelDriver(ModelDriver):
         return None
 
     @classmethod
+    def executable_command(cls, args, unused_kwargs=None, **kwargs):
+        r"""Compose a command for running a program using the exectuable for
+        this language (compiler/interpreter) with the provided arguments.
+
+        Args:
+            args (list): The program that returned command should run and any
+                arguments that should be provided to it.
+            unused_kwargs (dict, optional): Existing dictionary that unused
+                keyword arguments should be added to. Defaults to None and is
+                ignored.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Arguments composing the command required to run the program
+                from the command line using the executable for this language.
+
+        """
+        if isinstance(unused_kwargs, dict):
+            unused_kwargs.update(kwargs)
+        return args
+        
+    @classmethod
+    def configure(cls, cfg):
+        r"""Add configuration options for this language.
+
+        Args:
+            cfg (CisConfigParser): Config class that options should be set for.
+        
+        Returns:
+            list: Section, option, description tuples for options that could not
+                be set.
+
+        """
+        return []
+        
+    @classmethod
     def is_language_installed(cls):
         r"""Determine if the interpreter/compiler for the associated programming
         language is installed.
@@ -33,7 +78,7 @@ class ExecutableModelDriver(ModelDriver):
         return True
 
     @classmethod
-    def is_language_configured(cls):
+    def is_configured(cls):
         r"""Determine if the appropriate configuration has been performed (e.g.
         installation of supporting libraries etc.)
 
@@ -44,7 +89,7 @@ class ExecutableModelDriver(ModelDriver):
         return True
 
     @classmethod
-    def is_comm_installed(self):
+    def is_comm_installed(self, **kwargs):
         r"""Determine if a comm is installed for the associated programming
         language.
 
@@ -52,4 +97,4 @@ class ExecutableModelDriver(ModelDriver):
             bool: True if a comm is installed for this language.
 
         """
-        return True  # executables presumable include comms
+        return True  # executables presumed include comms

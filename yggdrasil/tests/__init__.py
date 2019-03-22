@@ -29,7 +29,7 @@ data = {k: os.path.join(data_dir, v) for k, v in data_list}
 script_dir = os.path.join(os.path.dirname(__file__), 'scripts')
 script_list = [
     ('c', ['gcc_model.c', 'hellofunc.c']),
-    ('cpp', ['gcc_model.cpp', 'hellofunc.c']),
+    ('c++', ['gcc_model.cpp', 'hellofunc.c']),
     ('make', 'gcc_model'),
     ('cmake', 'gcc_model'),
     ('matlab', 'matlab_model.m'),

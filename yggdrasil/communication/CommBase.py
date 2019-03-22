@@ -491,18 +491,14 @@ class CommBase(tools.YggClass):
                 elif use_any:
                     out = True
                     break
-        elif language in ['cpp', 'c++', 'make', 'cmake']:
-            out = cls.is_installed(language='c')
-        elif language in ['lpy', 'matlab']:
-            out = cls.is_installed(language='python')
-        elif language in ['executable']:
-            out = True
         else:
             if comm_class in ['CommBase', 'AsyncComm', 'ForkComm', 'ErrorClass']:
                 out = (language in lang_list)
             else:
-                # Default to False for languages so subclasses must be explicit
-                out = False
+                # Check driver
+                from yggdrasil.drivers import import_language_driver
+                drv = import_language_driver(language)
+                out = drv.is_comm_installed(commtype=cls._commtype)
         return out
 
     @property

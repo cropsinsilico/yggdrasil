@@ -1,7 +1,7 @@
 import os
 import unittest
 from yggdrasil.tests import scripts, assert_raises
-import yggdrasil.drivers.tests.test_ModelDriver as parent
+import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 from yggdrasil.drivers.MakeModelDriver import MakeModelDriver
 
 
@@ -26,28 +26,26 @@ def test_MakeModelDriver_error_notarget():
 def test_MakeModelDriver_error_nofile():
     r"""Test MakeModelDriver error for missing Makefile."""
     makedir, target = os.path.split(scripts['make'])
-    assert_raises(IOError, MakeModelDriver, 'test', 'invalid')
+    assert_raises(RuntimeError, MakeModelDriver, 'test', 'invalid')
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
-class TestMakeModelParam(parent.TestModelParam):
+class TestMakeModelParam(parent.TestCompiledModelParam):
     r"""Test parameters for MakeModelDriver."""
 
     driver = 'MakeModelDriver'
     
     def __init__(self, *args, **kwargs):
         super(TestMakeModelParam, self).__init__(*args, **kwargs)
-        self.attr_list += ['compiled', 'target', 'make_command',
-                           'makedir', 'makefile']
-        self.makedir, self.target = os.path.split(scripts['make'])
+        self.attr_list += ['target', 'makedir', 'makefile']
+        self.makedir, self.target = os.path.split(self.src[0])
         self.makefile = os.path.join(self.makedir, 'Makefile')
         self.args = [self.target]
         self._inst_kwargs['makefile'] = self.makefile
+        del self._inst_kwargs['source_files']
         
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestMakeModelDriverNoStart(TestMakeModelParam,
-                                 parent.TestModelDriverNoStart):
+                                 parent.TestCompiledModelDriverNoStart):
     r"""Test runner for MakeModelDriver without start."""
     
     def __init__(self, *args, **kwargs):
@@ -55,16 +53,9 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
         # Version specifying makedir via working_dir
         self._inst_kwargs['yml']['working_dir'] = self.makedir
         del self._inst_kwargs['makefile']
-
-    # Done in driver, but driver not started
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        self.instance.cleanup()
-        super(TestMakeModelDriverNoStart, self).teardown()
         
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
-class TestMakeModelDriver(TestMakeModelParam, parent.TestModelDriver):
+class TestMakeModelDriver(TestMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for MakeModelDriver."""
 
     pass

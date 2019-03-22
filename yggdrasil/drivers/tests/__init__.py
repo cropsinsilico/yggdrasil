@@ -17,7 +17,7 @@ def test_import_driver():
 def test_create_driver():
     r"""Test driver creation w/ and w/o args."""
     drivers.create_driver('Driver', 'test_io_driver')
-    drivers.create_driver('ModelDriver', 'test_model_driver',
+    drivers.create_driver('ExecutableModelDriver', 'test_model_driver',
                           args=scripts['python'])
 
 

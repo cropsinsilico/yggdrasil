@@ -12,7 +12,7 @@ import logging
 import warnings
 import subprocess
 from yggdrasil.backwards import configparser
-from yggdrasil import platform, backwards, schema, drivers, tools
+from yggdrasil import platform, drivers, tools
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
 usr_config_file = os.path.expanduser(os.path.join('~', config_file))
@@ -97,11 +97,21 @@ def find_all(name, path):
     return result
 
 
-def locate_file(fname):
-    r"""Locate a file on PATH.
+def locate_file(fname, environment_variable='PATH', directory_list=None):
+    r"""Locate a file within a set of paths defined by a list or environment
+    variable.
 
     Args:
         fname (str): Name of the file that should be located.
+        environment_variable (str): Environment variable containing the set of
+            paths that should be searched. Defaults to 'PATH'. If None, this
+            keyword argument will be ignored. If a list is provided, it is
+            assumed to be a list of environment variables that should be
+            searched in the specified order.
+        directory_list (list): List of paths that should be searched in addition
+            to those specified by environment_variable. Defaults to None and is
+            ignored. These directories will be searched be for those in the
+            specified environment variables.
 
     Returns:
         bool, str: Full path to the located file if it was located, False
@@ -109,10 +119,18 @@ def locate_file(fname):
 
     """
     out = []
-    if platform._is_win:  # pragma: windows
+    if ((platform._is_win and (environment_variable == 'PATH')
+         and (directory_list is None))):  # pragma: windows
         out += find_all(fname, None)
     else:
-        for path in os.environ.get('PATH').split(os.pathsep):
+        if directory_list is None:
+            directory_list = []
+        if environment_variable is not None:
+            if not isinstance(environment_variable, list):
+                environment_variable = [environment_variable]
+            for x in environment_variable:
+                directory_list += os.environ.get(x, '').split(os.pathsep)
+        for path in directory_list:
             if path:
                 out += find_all(fname, path)
     if not out:
@@ -125,122 +143,7 @@ def locate_file(fname):
     return first
 
 
-def update_config_matlab(config):
-    r"""Update config options specific to matlab.
-
-    Args:
-        config (YggConfigParser): Config class that options should be set for.
-
-    Returns:
-        list: Section, option, description tuples for options that could not be
-            set.
-
-    """
-    out = []
-    # This should be uncommented if the matlab section is removed from the
-    # default config file
-    if not config.has_section('matlab'):  # pragma: debug
-        config.add_section('matlab')
-    opts = {
-        'startup_waittime_s': [('The time allowed for a Matlab engine to start'
-                               + 'before timing out and reporting an error.'),
-                               '10'],
-        'release': ['The version (release number) of matlab that is installed.',
-                    ''],
-        'matlabroot': ['The path to the default installation of matlab.', '']}
-    if config.get('matlab', 'disable', 'False').lower() != 'true':
-        mtl_id = '=MATLABROOT='
-        cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
-               + ",matlabroot,version('-release')); exit();")
-        mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
-                   '-r', '%s' % cmd]
-        try:  # pragma: matlab
-            mtl_proc = subprocess.check_output(mtl_cmd)
-            mtl_id = backwards.match_stype(mtl_proc, mtl_id)
-            if mtl_id not in mtl_proc:  # pragma: debug
-                raise RuntimeError(("Could not locate matlab root id (%s) in "
-                                    "output (%s).") % (mtl_id, mtl_proc))
-            opts['matlabroot'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-3])
-            opts['release'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-2])
-        except (subprocess.CalledProcessError, OSError):  # pragma: no matlab
-            pass
-    for k in opts.keys():
-        if not config.has_option('matlab', k):
-            if opts[k][1]:  # pragma: matlab
-                config.set('matlab', k, opts[k][1])
-            else:
-                out.append(('matlab', k, opts[k][0]))
-    return out
-
-
-def update_config_windows(config):  # pragma: windows
-    r"""Update config options specific to windows.
-
-    Args:
-        config (YggConfigParser): Config class that options should be set for.
-
-    Returns:
-        list: Section, option, description tuples for options that could not be
-            set.
-
-    """
-    out = []
-    if not config.has_section('windows'):
-        config.add_section('windows')
-    # Find paths
-    clibs = [('libzmq_include', 'zmq.h',
-              'The full path to the zmq.h header file.'),
-             ('libzmq_static', 'zmq.lib',
-              'The full path to the zmq.lib static library.'),
-             ('czmq_include', 'czmq.h',
-              'The full path to the czmq.h header file.'),
-             ('czmq_static', 'czmq.lib',
-              'The full path to the czmq.lib static library.')]
-    for opt, fname, desc in clibs:
-        if not config.has_option('windows', opt):
-            fpath = locate_file(fname)
-            if fpath:
-                logging.info('Located %s: %s' % (fname, fpath))
-                config.set('windows', opt, fpath)
-            else:
-                out.append(('windows', opt, desc))
-    return out
-
-
-def update_config_c(config):
-    r"""Update config options specific to C/C++.
-
-    Args:
-        config (CisConfigParser): Config class that options should be set for.
-
-    Returns:
-        list: Section, option, description tuples for options that could not be
-            set.
-
-    """
-    out = []
-    if not config.has_section('c'):
-        config.add_section('c')
-    # Find paths
-    clibs = [('rapidjson_include', 'rapidjson.h',
-              'The full path to the directory containing rapidjson headers.')]
-    for opt, fname, desc in clibs:
-        if not config.has_option('c', opt):
-            fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rapidjson',
-                                 'include', 'rapidjson', fname)
-            if not os.path.isfile(fpath):  # pragma: debug
-                fpath = locate_file(fname)
-            if fpath:
-                if opt == 'rapidjson_include':
-                    fpath = os.path.dirname(os.path.dirname(fpath))
-                logging.info('Located %s: %s' % (fname, fpath))
-                config.set('c', opt, fpath)
-            else:  # pragma: debug
-                out.append(('c', opt, desc))
-    return out
-
-
-def update_config(config_file, config_base=None):
+def update_config(config_file, config_base=None, skip_warnings=False):
     r"""Update config options for the current platform.
 
     Args:
@@ -249,6 +152,8 @@ def update_config(config_file, config_base=None):
         config_base (str, optional): Full path to existing config file that should
             be used as a base for building the new one if it dosn't already exist.
             Defaults to 'defaults.cfg' if not provided.
+        skip_warnings (bool, optional): If True, warnings about missing options
+            will not be raised. Defaults to False.
 
     """
     if config_base is None:
@@ -259,20 +164,20 @@ def update_config(config_file, config_base=None):
     cp = YggConfigParser()
     cp.read(config_file)
     miss = []
-    if platform._is_win:  # pragma: windows
-        miss += update_config_windows(cp)
-    s = schema.get_schema()
+    # if platform._is_win:  # pragma: windows
+    #     miss += update_config_windows(cp)
     for l in tools.get_supported_lang():
-        drv = drivers.import_driver(s['model'].subtype2class[l])
+        drv = drivers.import_language_driver(l)
         miss += drv.configure(cp)
     # miss += update_config_c(cp)
     # miss += update_config_matlab(cp)
     with open(config_file, 'w') as fd:
         cp.write(fd)
-    for sect, opt, desc in miss:  # pragma: windows
-        warnings.warn(("Could not set option %s in section %s. "
-                       + "Please set this in %s to: %s")
-                      % (opt, sect, config_file, desc), RuntimeWarning)
+    if not skip_warnings:
+        for sect, opt, desc in miss:  # pragma: windows
+            warnings.warn(("Could not set option %s in section %s. "
+                           + "Please set this in %s to: %s")
+                          % (opt, sect, config_file, desc), RuntimeWarning)
         
 
 # In order read: defaults, user, local files

@@ -187,25 +187,25 @@ class IPCComm(AsyncComm.AsyncComm):
         self._server_class = IPCServer
         super(IPCComm, self)._init_before_open(**kwargs)
             
-    @classmethod
-    def is_installed(cls, language=None):
-        r"""Determine if the necessary libraries are installed for this
-        communication class.
+    # @classmethod
+    # def is_installed(cls, language=None):
+    #     r"""Determine if the necessary libraries are installed for this
+    #     communication class.
 
-        Args:
-            language (str, optional): Specific language that should be checked
-                for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
+    #     Args:
+    #         language (str, optional): Specific language that should be checked
+    #             for compatibility. Defaults to None and all languages supported
+    #             on the current platform will be checked.
 
-        Returns:
-            bool: Is the comm installed.
+    #     Returns:
+    #         bool: Is the comm installed.
 
-        """
-        if language in ['python', 'c']:
-            out = _ipc_installed
-        else:
-            out = super(IPCComm, cls).is_installed(language=language)
-        return out
+    #     """
+    #     if language in ['python', 'c']:
+    #         out = _ipc_installed
+    #     else:
+    #         out = super(IPCComm, cls).is_installed(language=language)
+    #     return out
 
     @classmethod
     def underlying_comm_class(self):

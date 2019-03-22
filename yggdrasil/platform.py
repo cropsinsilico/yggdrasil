@@ -5,6 +5,7 @@ import sys
 _is_mac = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
+_supported_platforms = ['Windows', 'MacOS', 'Linux']
 
 if _is_win:  # pragma: windows
     _newline = b'\r\n'

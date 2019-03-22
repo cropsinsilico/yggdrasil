@@ -39,6 +39,28 @@ def determine_suffix(no_suffix=False, reverse_names=False,
     return suffix
 
 
+def import_comm(comm=None):
+    r"""Dynamically import a communication classed based on it's name.
+
+    Args:
+        comm (str, optional): Name of communicator class. Defaults to
+            tools.get_default_comm() if not provided.
+
+    Returns:
+        class: Communicator class.
+
+    """
+    from yggdrasil import schema
+    s = schema.get_schema()
+    if (comm is None) or (comm == 'DefaultComm'):
+        comm = tools.get_default_comm()
+    if comm in s['comm'].subtype2class:
+        comm = s['comm'].subtype2class[comm]
+    mod = importlib.import_module('yggdrasil.communication.%s' % comm)
+    comm_cls = getattr(mod, comm)
+    return comm_cls
+
+
 def get_comm_class(comm=None):
     r"""Return a communication class given it's name.
 
@@ -50,11 +72,7 @@ def get_comm_class(comm=None):
         class: Communicator class.
 
     """
-    if (comm is None) or (comm == 'DefaultComm'):
-        comm = tools.get_default_comm()
-    mod = importlib.import_module('yggdrasil.communication.%s' % comm)
-    comm_cls = getattr(mod, comm)
-    return comm_cls
+    return import_comm(comm)
 
 
 def new_comm(name, comm=None, **kwargs):
@@ -121,8 +139,8 @@ def import_all_comms():
     r"""Import all comms to ensure they are registered."""
     for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
         if not x.startswith('__'):
-            get_comm_class(os.path.basename(x)[:-3])
+            import_comm(os.path.basename(x)[:-3])
 
 
-__all__ = ['new_comm', 'get_comm', 'get_comm_class', 'cleanup_comms',
-           'DefaultComm']
+__all__ = ['new_comm', 'get_comm', 'import_comm', 'get_comm_class',
+           'cleanup_comms', 'DefaultComm']

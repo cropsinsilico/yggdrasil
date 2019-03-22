@@ -10,12 +10,33 @@ def import_driver(driver=None):
     Args:
         driver (str): Name of the driver that should be imported.
 
+    Returns:
+        class: Driver class for the specified language.
+
     """
     if driver is None:
         driver = 'Driver'
     drv = importlib.import_module('yggdrasil.drivers.%s' % driver)
     class_ = getattr(drv, driver)
     return class_
+
+
+def import_language_driver(language):
+    r"""Dynamically import a model driver based on the specified language.
+
+    Args:
+        language (str): Language of driver that should be imported.
+
+    Returns:
+        class: Model driver class for the specified language.
+
+    """
+    from yggdrasil import schema
+    s = schema.get_schema()
+    drv_name = s['model'].subtype2class.get(language, None)
+    if drv_name is None:
+        raise ValueError("No driver registered for language '%s'" % language)
+    return import_driver(drv_name)
                     
 
 def create_driver(driver=None, name=None, args=None, **kwargs):
@@ -52,7 +73,8 @@ def import_all_drivers():
 
 
 __all__ = ['import_driver', 'create_driver', 'Driver',
-           'ModelDriver', 'PythonModelDriver', 'GCCModelDriver',
+           'ModelDriver', 'PythonModelDriver',
+           'CModelDriver', 'CPPModelDriver',
            'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',
            'ConnectionDriver', 'InputDriver', 'OutputDriver',
            'FileInputDriver', 'FileOutputDriver',

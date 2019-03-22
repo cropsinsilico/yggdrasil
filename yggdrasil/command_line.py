@@ -5,7 +5,7 @@ import copy
 import logging
 import traceback
 from yggdrasil import runner, schema, config, timing, yamlfile
-from yggdrasil.drivers import GCCModelDriver
+from yggdrasil.drivers import CModelDriver, CPPModelDriver
 
 
 def yggrun():
@@ -30,7 +30,7 @@ def yggcc():
     r"""Compile C/C++ program."""
     # prog = sys.argv[0].split(os.path.sep)[-1]
     src = sys.argv[1:]
-    out = GCCModelDriver.do_compile(src)
+    out = CModelDriver.CModelDriver.call_compile(src)
     print("executable: %s" % out)
 
 
@@ -42,7 +42,7 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
-    print(' '.join(GCCModelDriver.get_flags()[0]))
+    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags()))
 
 
 def ld_flags():
@@ -53,14 +53,15 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
-    print(' '.join(GCCModelDriver.get_flags()[1]))
+    print(' '.join(CModelDriver.CModelDriver.get_linker_flags()))
 
 
 def rebuild_c_api():
     r"""Rebuild the C/C++ API."""
-    if GCCModelDriver._c_installed:
-        GCCModelDriver.build_api(cpp=False, overwrite=True)
-        GCCModelDriver.build_api(cpp=True, overwrite=True)
+    if CModelDriver.CModelDriver.is_installed():
+        CModelDriver.CModelDriver.compile_dependencies(overwrite=True)
+        # TODO: Check that this compiles library correctly
+        CPPModelDriver.CPPModelDriver.compile_dependencies(overwrite=True)
     else:
         raise Exception("The libraries necessary for running models written in "
                         "C/C++ could not be located.")

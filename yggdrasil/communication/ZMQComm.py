@@ -447,27 +447,27 @@ class ZMQComm(AsyncComm.AsyncComm):
             print('%s%-15s: %s' % (prefix, 'nrecv reply (%s)' % k,
                                    self._n_reply_recv[k]))
 
-    @classmethod
-    def is_installed(cls, language=None):
-        r"""Determine if the necessary libraries are installed for this
-        communication class.
+    # @classmethod
+    # def is_installed(cls, language=None):
+    #     r"""Determine if the necessary libraries are installed for this
+    #     communication class.
 
-        Args:
-            language (str, optional): Specific language that should be checked
-                for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
+    #     Args:
+    #         language (str, optional): Specific language that should be checked
+    #             for compatibility. Defaults to None and all languages supported
+    #             on the current platform will be checked.
 
-        Returns:
-            bool: Is the comm installed.
+    #     Returns:
+    #         bool: Is the comm installed.
 
-        """
-        if language == 'python':
-            out = True  # ZMQ is a requirement so it should always be installed
-        elif language == 'c':
-            out = _zmq_installed_c
-        else:
-            out = super(ZMQComm, cls).is_installed(language=language)
-        return out
+    #     """
+    #     if language == 'python':
+    #         out = True  # ZMQ is a requirement so it should always be installed
+    #     elif language == 'c':
+    #         out = _zmq_installed_c
+    #     else:
+    #         out = super(ZMQComm, cls).is_installed(language=language)
+    #     return out
 
     @classmethod
     def underlying_comm_class(self):

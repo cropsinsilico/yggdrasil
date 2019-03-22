@@ -215,13 +215,12 @@ definitions:
         args:
           items: {type: string}
           type: array
-        builddir: {type: string}
-        cc: &id008 {type: string}
+        builddir: &id008 {type: string}
         client_of:
           default: []
           items: {type: string}
           type: array
-        cmakeargs:
+        compiler_flags: &id009
           default: []
           items: {type: string}
           type: array
@@ -234,16 +233,20 @@ definitions:
         language:
           enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
           type: string
-        make_command: &id010 {default: make, type: string}
-        makedir: &id011 {type: string}
-        makefile: &id012 {default: Makefile, type: string}
+        linker_flags: &id010
+          default: []
+          items: {type: string}
+          type: array
+        makedir: &id014 {type: string}
+        makefile: &id015 {default: Makefile, type: string}
         name: {type: string}
         outputs:
           default: []
           items: {$ref: '#/definitions/comm'}
           type: array
-        overwrite: &id009 {default: true, type: boolean}
-        sourcedir: {type: string}
+        overwrite: &id011 {default: true, type: boolean}
+        preserve_cache: &id012 {default: false, type: boolean}
+        sourcedir: &id013 {type: string}
         strace_flags:
           default: []
           items: {type: string}
@@ -259,34 +262,71 @@ definitions:
       type: object
     - anyOf:
       - properties:
+          builddir: *id008
+          compiler_flags: *id009
           language:
             enum: [cmake]
+          linker_flags: *id010
+          overwrite: *id011
+          preserve_cache: *id012
+          sourcedir: *id013
         title: CMakeModelDriver
       - properties:
-          cc: *id008
+          compiler_flags:
+            default: []
+            items: {type: string}
+            type: array
           language:
-            enum: [c, c++, cpp]
-          overwrite: *id009
-        title: GCCModelDriver
+            enum: [c]
+          linker_flags:
+            default: []
+            items: {type: string}
+            type: array
+          overwrite: {default: true, type: boolean}
+          preserve_cache: {default: false, type: boolean}
+        title: CModelDriver
+      - properties:
+          compiler_flags:
+            default: []
+            items: {type: string}
+            type: array
+          language:
+            enum: [c++, cpp]
+          linker_flags:
+            default: []
+            items: {type: string}
+            type: array
+          overwrite: {default: true, type: boolean}
+          preserve_cache: {default: false, type: boolean}
+        title: CPPModelDriver
+      - properties:
+          language:
+            enum: [executable]
+        title: ExecutableModelDriver
       - properties:
           language:
             enum: [lpy]
         title: LPyModelDriver
       - properties:
+          compiler_flags:
+            default: []
+            items: {type: string}
+            type: array
           language:
             enum: [make]
-          make_command: *id010
-          makedir: *id011
-          makefile: *id012
+          linker_flags:
+            default: []
+            items: {type: string}
+            type: array
+          makedir: *id014
+          makefile: *id015
+          overwrite: {default: true, type: boolean}
+          preserve_cache: {default: false, type: boolean}
         title: MakeModelDriver
       - properties:
           language:
             enum: [matlab]
         title: MatlabModelDriver
-      - properties:
-          language:
-            enum: [executable]
-        title: ModelDriver
       - properties:
           language:
             enum: [python]

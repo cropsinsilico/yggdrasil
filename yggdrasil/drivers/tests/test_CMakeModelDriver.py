@@ -2,9 +2,8 @@ import os
 import unittest
 import tempfile
 from yggdrasil.tests import scripts, assert_raises, assert_equal
-import yggdrasil.drivers.tests.test_ModelDriver as parent
-from yggdrasil.drivers.CMakeModelDriver import (
-    CMakeModelDriver, create_include)
+import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
+from yggdrasil.drivers.CMakeModelDriver import CMakeModelDriver
 
 
 _driver_installed = CMakeModelDriver.is_installed()
@@ -31,17 +30,17 @@ def test_create_include():
                 ([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                 ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
     for c, l, lines in testlist:
-        out = create_include(None, target, compile_flags=c,
-                             linker_flags=l)
+        out = CMakeModelDriver.create_include(None, target, compile_flags=c,
+                                              linker_flags=l)
         for x in lines:
             assert(x in out)
     for fname in [fname_dll, fname_lib]:
         os.remove(fname)
-    assert_raises(ValueError, create_include,
+    assert_raises(ValueError, CMakeModelDriver.create_include,
                   None, target, compile_flags=['invalid'])
-    assert_raises(ValueError, create_include,
+    assert_raises(ValueError, CMakeModelDriver.create_include,
                   None, target, linker_flags=['-invalid'])
-    assert_raises(ValueError, create_include,
+    assert_raises(ValueError, CMakeModelDriver.create_include,
                   None, target, linker_flags=['/invalid'])
 
 
@@ -56,7 +55,7 @@ def test_CMakeModelDriver_error_cmake():
     r"""Test CMakeModelDriver error for invalid cmake args."""
     makedir, target = os.path.split(scripts['cmake'])
     assert_raises(RuntimeError, CMakeModelDriver, 'test', target,
-                  sourcedir=makedir, cmakeargs='-P')
+                  sourcedir=makedir, compiler_flags='-P')
 
 
 @unittest.skipIf(not _driver_installed, "C Library not installed")
@@ -70,20 +69,17 @@ def test_CMakeModelDriver_error_notarget():
 @unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_CMakeModelDriver_error_nofile():
     r"""Test CMakeModelDriver error for missing CMakeLists.txt."""
-    assert_raises(IOError, CMakeModelDriver, 'test', 'invalid')
+    assert_raises(RuntimeError, CMakeModelDriver, 'test', 'invalid')
 
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
-class TestCMakeModelParam(parent.TestModelParam):
+class TestCMakeModelParam(parent.TestCompiledModelParam):
     r"""Test parameters for CMakeModelDriver."""
 
     driver = 'CMakeModelDriver'
     
     def __init__(self, *args, **kwargs):
         super(TestCMakeModelParam, self).__init__(*args, **kwargs)
-        self.attr_list += ['compiled', 'target', 'sourcedir',
-                           'builddir', 'target_file', 'include_file',
-                           'cmakeargs']
+        self.attr_list += ['target', 'sourcedir', 'builddir']
         self.sourcedir, self.target = os.path.split(scripts['cmake'])
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
@@ -96,9 +92,8 @@ class TestCMakeModelParam(parent.TestModelParam):
         assert_equal(self.instance.builddir, self.builddir)
         
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
 class TestCMakeModelDriverNoStart(TestCMakeModelParam,
-                                  parent.TestModelDriverNoStart):
+                                  parent.TestCompiledModelDriverNoStart):
     r"""Test runner for CMakeModelDriver without start."""
     
     def __init__(self, *args, **kwargs):
@@ -106,18 +101,11 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
         # Version specifying sourcedir via working_dir
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
         # Relative paths
-        self._inst_kwargs['sourcedir'] = '.'
-        self._inst_kwargs['builddir'] = 'build'
-        self._inst_kwargs['cmakeargs'] = '-Wdev'
+        self._inst_kwargs.update(sourcedir='.',
+                                 builddir='build',
+                                 compiler_flags=['-Wdev'])
 
-    # Done in driver, but driver not started
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        self.instance.cleanup()
-        super(TestCMakeModelDriverNoStart, self).teardown()
-        
 
-@unittest.skipIf(not _driver_installed, "C Library not installed")
-class TestCMakeModelDriver(TestCMakeModelParam, parent.TestModelDriver):
+class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
     pass

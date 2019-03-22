@@ -1,25 +1,19 @@
 import unittest
-from yggdrasil import platform
-from yggdrasil.tests import assert_raises
+from yggdrasil.tests import assert_raises, scripts
 from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.drivers.CompiledModelDriver import CompiledModelDriver
+from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 import yggdrasil.drivers.tests.test_Driver as parent
 
 
-def test_error_valgrind_strace():
-    r"""Test error if both valgrind and strace set."""
-    assert_raises(RuntimeError, ModelDriver, 'test', 'test',
-                  with_strace=True, with_valgrind=True)
+def test_ModelDriver_implementation():
+    r"""Test that NotImplementedError raised for base class."""
+    assert_raises(NotImplementedError, ModelDriver.language_executable)
+    assert_raises(NotImplementedError, ModelDriver.executable_command, None)
+    assert_raises(NotImplementedError, CompiledModelDriver.compiler)
+    assert_raises(NotImplementedError, InterpretedModelDriver.interpreter)
 
-
-@unittest.skipIf(not platform._is_win, "Platform is not windows")
-def test_error_valgrind_strace_windows():  # pragma: windows
-    r"""Test error if strace or valgrind called on windows."""
-    assert_raises(RuntimeError, ModelDriver, 'test', 'test',
-                  with_strace=True)
-    assert_raises(RuntimeError, ModelDriver, 'test', 'test',
-                  with_valgrind=True)
-
-
+    
 class TestModelParam(parent.TestParam):
     r"""Test parameters for basic ModelDriver class."""
 
@@ -27,18 +21,36 @@ class TestModelParam(parent.TestParam):
     
     def __init__(self, *args, **kwargs):
         super(TestModelParam, self).__init__(*args, **kwargs)
-        if self.args is None:
-            if platform._is_win:  # pragma: windows
-                self.args = ['timeout', '0']
-            else:
-                self.args = ['sleep', '0.1']
         self.attr_list += ['args', 'process', 'queue', 'queue_thread',
                            'is_server', 'client_of',
                            'event_process_kill_called',
                            'event_process_kill_complete',
                            'with_strace', 'strace_flags',
                            'with_valgrind', 'valgrind_flags',
-                           'model_index']
+                           'model_index', 'model_file', 'model_args',
+                           'products', 'overwrite']
+        self.src = None
+        if self.import_cls.language is not None:
+            self.src = scripts[self.import_cls.language]
+            if not isinstance(self.src, list):
+                self.src = [self.src]
+
+    def tests_on_not_installed(self):
+        r"""Tests for when the driver is not installed."""
+        if self.import_cls.is_installed():
+            raise unittest.SkipTest("'%s' installed."
+                                    % self.import_cls.language)
+
+    def setup(self, *args, **kwargs):
+        if self.import_cls.language is None:
+            raise unittest.SkipTest("Driver dosn't have language.")
+        if not self.import_cls.is_installed():
+            self.assert_raises(RuntimeError, super(TestModelParam, self).setup,
+                               *args, **kwargs)
+            self.tests_on_not_installed()
+            raise unittest.SkipTest("'%s' not installed."
+                                    % self.import_cls.language)
+        super(TestModelParam, self).setup(*args, **kwargs)
         
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
@@ -46,37 +58,16 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
 
     def test_is_installed(self):
         r"""Assert that the tested model driver is installed."""
-        if self.driver == 'ModelDriver':
-            assert(not self.import_cls.is_installed())
-        else:
-            assert(self.import_cls.is_installed())
+        # if self.driver == 'ModelDriver':
+        #     assert(not self.import_cls.is_installed())
+        # else:
+        assert(self.import_cls.is_installed())
+
+    def test_language_version(self):
+        r"""Test language version."""
+        assert(self.import_cls.language_version())
 
 
 class TestModelDriver(TestModelParam, parent.TestDriver):
     r"""Test runner for basic ModelDriver class."""
-
     pass
-
-
-@unittest.skipIf(platform._is_win, "Platform is windows")
-class TestModelDriver_valgrind(TestModelDriver):
-    r"""Test with valgrind."""
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestModelDriver_valgrind, self).inst_kwargs
-        out['with_valgrind'] = True
-        return out
-
-
-@unittest.skipIf(platform._is_win, "Platform is windows")
-class TestModelDriver_strace(TestModelDriver):
-    r"""Test with strace."""
-
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for creating a class instance."""
-        out = super(TestModelDriver_strace, self).inst_kwargs
-        out['with_strace'] = True
-        return out

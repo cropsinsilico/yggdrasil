@@ -5,6 +5,7 @@ import logging
 import pprint
 import os
 import sys
+import copy
 import shutil
 import inspect
 import time
@@ -14,7 +15,6 @@ import uuid as uuid_gen
 import subprocess
 from yggdrasil import platform
 from yggdrasil import backwards
-from yggdrasil.config import ygg_cfg, cfg_logging
 
 
 YGG_MSG_EOF = b'EOF!!!'
@@ -138,6 +138,16 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
     return out
 
 
+def get_supported_platforms():
+    r"""Get a list of the platforms supported by yggdrasil.
+
+    Returns:
+        list: The name of platforms supported by yggdrasil.
+
+    """
+    return copy.deepcopy(platform._supported_platforms)
+
+
 def get_supported_lang():
     r"""Get a list of the model programming languages that are supported
     by yggdrasil.
@@ -163,8 +173,8 @@ def get_supported_comm():
     """
     from yggdrasil import schema
     s = schema.get_schema()
-    out = s['comm'].classes
-    for k in ['CommBase', 'DefaultComm']:
+    out = s['comm'].subtypes
+    for k in ['CommBase', 'DefaultComm', 'default']:
         if k in out:
             out.remove(k)
     return list(set(out))
@@ -182,9 +192,8 @@ def is_lang_installed(lang):
             machine, False otherwise.
 
     """
-    from yggdrasil import schema, drivers
-    s = schema.get_schema()
-    drv = drivers.import_driver(s['model'].subtype2class[lang])
+    from yggdrasil import drivers
+    drv = drivers.import_language_driver(lang)
     return drv.is_installed()
 
 
@@ -248,7 +257,7 @@ def get_installed_comm(language=None):
             out.append(k)
     # Fix order to denote preference
     out_sorted = []
-    for k in ['ZMQComm', 'IPCComm', 'RMQComm']:
+    for k in ['zmq', 'ipc', 'rmq']:
         if k in out:
             out.remove(k)
             out_sorted.append(k)
@@ -605,6 +614,12 @@ class YggClass(logging.LoggerAdapter):
         self._ygg_class = str(self.__class__).split("'")[1].split('.')[-1]
         super(YggClass, self).__init__(logging.getLogger(self.__module__), {})
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration."""
+        pass
+
     @property
     def name(self):
         r"""str: Name of the class object."""
@@ -617,12 +632,14 @@ class YggClass(logging.LoggerAdapter):
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
+        from yggdrasil.config import ygg_cfg, cfg_logging
         self._old_loglevel = ygg_cfg.get('debug', 'ygg')
         ygg_cfg.set('debug', 'ygg', 'DEBUG')
         cfg_logging()
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
+        from yggdrasil.config import ygg_cfg, cfg_logging
         if self._old_loglevel is not None:
             ygg_cfg.set('debug', 'ygg', self._old_loglevel)
             cfg_logging()

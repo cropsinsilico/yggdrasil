@@ -1,7 +1,7 @@
 import unittest
 from yggdrasil.tests import scripts, assert_raises
 from yggdrasil.drivers import LPyModelDriver
-import yggdrasil.drivers.tests.test_ModelDriver as parent
+import yggdrasil.drivers.tests.test_InterpretedModelDriver as parent
 
 
 @unittest.skipIf(LPyModelDriver._lpy_installed, "LPy is installed")
@@ -11,25 +11,21 @@ def test_LPyModelDriver_nolpy():  # pragma: no lpy
                   'test', scripts['lpy'])
 
 
-class TestLPyModelParam(parent.TestModelParam):
+class TestLPyModelParam(parent.TestInterpretedModelParam):
     r"""Test parameters for LPyModelDriver class."""
 
     driver = 'LPyModelDriver'
-    
-    def __init__(self, *args, **kwargs):
-        super(TestLPyModelParam, self).__init__(*args, **kwargs)
-        self.args = [scripts['lpy']]
 
         
 @unittest.skipIf(not LPyModelDriver._lpy_installed, "LPy is not installed")
-class TestLPyModelDriverNoStart(TestLPyModelParam,
-                                parent.TestModelDriverNoStart):  # pragma: lpy
+class TestLPyModelDriverNoStart(TestLPyModelParam,  # pragma: lpy
+                                parent.TestInterpretedModelDriverNoStart):
     r"""Test runner for LPyModelDriver class without starting the driver."""
     pass
 
 
 @unittest.skipIf(not LPyModelDriver._lpy_installed, "LPy is not installed")
 class TestLPyModelDriver(TestLPyModelParam,
-                         parent.TestModelDriver):  # pragma: lpy
+                         parent.TestInterpretedModelDriver):  # pragma: lpy
     r"""Test runner for LPyModelDriver class."""
     pass
