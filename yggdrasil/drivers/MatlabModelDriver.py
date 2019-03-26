@@ -586,7 +586,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 kwargs.setdefault('forward_signals', False)
                 if not kwargs['forward_signals']:
                     # TODO: For some reason using os.setpgrp causes Matlab
-                    # to hang indefinitely.
+                    # to hang indefinitely, but os.setsid does not.
                     kwargs.setdefault('preexec_fn', os.setsid)
                 out = super(MatlabModelDriver, cls).run_executable(args, **kwargs)
             else:

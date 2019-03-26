@@ -2,11 +2,14 @@ import unittest
 import copy
 from yggdrasil.tests import assert_raises
 from yggdrasil.communication import new_comm
-from yggdrasil.communication.RMQComm import _rmq_server_running
+from yggdrasil.communication.RMQComm import RMQComm
 from yggdrasil.communication.tests import test_AsyncComm
 
 
-@unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
+_rmq_installed = RMQComm.is_installed(language='python')
+
+
+@unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 class TestRMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for RMQComm communication class."""
 
@@ -16,7 +19,7 @@ class TestRMQComm(test_AsyncComm.TestAsyncComm):
                  + ['connection', 'channel'])
 
 
-@unittest.skipIf(_rmq_server_running, "RMQ Server running")
+@unittest.skipIf(_rmq_installed, "RMQ Server running")
 def test_not_running():
     r"""Test raise of an error if a RMQ server is not running."""
     comm_kwargs = dict(comm='RMQComm', direction='send', reverse_names=True)
