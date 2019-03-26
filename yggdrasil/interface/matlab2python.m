@@ -12,9 +12,17 @@ function x_py = matlab2python(x_ml)
     if isa(x_ml, 'complex');
       x_py = x_ml;
     elseif isa(x_ml, 'single');
-      x_py = py.numpy.float32(py.float(double(x_ml)));
+      if isreal(x_ml)
+        x_py = py.numpy.float32(py.float(double(x_ml)));
+      else
+        x_py = x_ml;
+      end
     elseif isa(x_ml, 'double');
-      x_py = py.numpy.float64(py.float(x_ml));
+      if isreal(x_ml)
+        x_py = py.numpy.float64(py.float(x_ml));
+      else
+        x_py = x_ml;
+      end;
     elseif isa(x_ml, 'float');
       if isreal(x_ml)
 	x_py = py.float(x_ml);
