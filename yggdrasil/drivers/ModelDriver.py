@@ -161,7 +161,7 @@ class ModelDriver(Driver):
             if k in ['name', 'language', 'args',
                      'inputs', 'outputs', 'working_dir']:
                 continue
-            default = v.get('default', None)
+            default = copy.deepcopy(v.get('default', None))
             setattr(self, k, kwargs.pop(k, default))
         for k in ['products']:
             v = getattr(self, k)
@@ -244,6 +244,8 @@ class ModelDriver(Driver):
             if os.path.isfile(model_file):
                 self.model_file = model_file
         self.model_dir = os.path.dirname(self.model_file)
+        self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",
+                   self.model_file, self.model_dir, self.model_args)
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -341,6 +343,8 @@ class ModelDriver(Driver):
             # Call command
             logging.info("Running '%s' from %s"
                          % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
+            logging.debug("Process keyword arguments:\n%s\n",
+                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             if return_process:
                 return proc
@@ -375,8 +379,9 @@ class ModelDriver(Driver):
         elif self.with_valgrind:
             pre_args += ['valgrind'] + self.valgrind_flags
         command = pre_args + self.model_command()
-        self.info('Working directory: %s', self.working_dir)
-        self.info('Command: %s', ' '.join(command))
+        self.debug('Working directory: %s', self.working_dir)
+        self.debug('Command: %s', ' '.join(command))
+        self.debug('Environment Variables:\n%s', self.pprint(env, block_indent=1))
         # Update keywords
         # NOTE: Setting forward_signals to False allows faster debugging
         # but should not be used in deployment for cases where models are not
@@ -680,7 +685,7 @@ class ModelDriver(Driver):
         if self.queue_thread is not None:
             self.queue_thread.join(self.sleeptime)
             if self.queue_thread.is_alive():
-                self.info("Queue thread still alive")
+                self.debug("Queue thread still alive")
                 # Loop was broken from outside, kill the queueing thread
                 self.kill_process()
                 # self.queue_thread.set_break_flag()

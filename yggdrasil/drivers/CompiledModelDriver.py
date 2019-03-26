@@ -1452,11 +1452,14 @@ class CompiledModelDriver(ModelDriver):
             if len(self.source_files) == 0:
                 self.source_files.append(self.model_file)
             self.model_file = model_base
+            if len(model_ext) > 1:
+                self.model_file += '_%s' % model_ext[1:]
         elif (len(self.source_files) == 0) and (self.language_ext is not None):
             self.source_files.append(os.path.splitext(self.model_file)[0]
                                      + self.language_ext[0])
         if self.language_ext is not None:
             assert(os.path.splitext(self.model_file)[-1] not in self.language_ext)
+        self.debug("source_files: %s", str(self.source_files))
         
     @staticmethod
     def before_registration(cls):

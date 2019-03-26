@@ -139,6 +139,8 @@ comm_t* init_comm_base(const char *name, const char *direction,
 	strcat(full_name, "_IN");
     }
     address = getenv(full_name);
+    ygglog_debug("init_comm_base: full_name = %s, address = %s",
+		 full_name, address);
   }
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
   if (ret == NULL) {
@@ -147,8 +149,9 @@ comm_t* init_comm_base(const char *name, const char *direction,
   }
   if (name == NULL) {
     ret->valid = 0;
-  } else
+  } else {
     strncpy(ret->name, full_name, COMM_NAME_SIZE);
+  }
   if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
     ygglog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);
