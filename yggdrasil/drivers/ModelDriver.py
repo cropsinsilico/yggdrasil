@@ -193,8 +193,10 @@ class ModelDriver(Driver):
             raise RuntimeError("%s is not installed" % self.language)
         # Parse arguments
         self.debug(str(args))
+        self.raw_model_file = None
         self.model_file = None
         self.model_args = []
+        self.model_dir = None
         self.products = []
         self.args = args
         self.parse_arguments(args)
@@ -228,10 +230,20 @@ class ModelDriver(Driver):
         if isinstance(args, backwards.string_types):
             args = args.split()
         assert(isinstance(args, list))
-        self.model_file = backwards.as_str(args[0])
+        self.raw_model_file = backwards.as_str(args[0])
+        self.model_file = self.raw_model_file
         self.model_args = []
         for a in args[1:]:
-            self.model_args.append(backwards.as_str(a))
+            try:
+                self.model_args.append(backwards.as_str(a))
+            except TypeError:
+                self.model_args.append(str(a))
+        if not os.path.isabs(self.model_file):
+            model_file = os.path.normpath(os.path.join(self.working_dir,
+                                                       self.model_file))
+            if os.path.isfile(model_file):
+                self.model_file = model_file
+        self.model_dir = os.path.dirname(self.model_file)
 
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -291,23 +303,25 @@ class ModelDriver(Driver):
             unused_kwargs.update(kwargs)
         raise NotImplementedError("executable_command not implemented for '%s'"
                                   % cls.language)
-        
+
     @classmethod
-    def run_executable(cls, args, verbose=False, **kwargs):
+    def run_executable(cls, args, return_process=False, **kwargs):
         r"""Run a program using the executable for this language and the
         provided arguments.
 
         Args:
             args (list): The program that should be run and any arguments
                 that should be provided to it.
-            verbose (bool, optional): If True, the executable command and any
-                output produced by the command will be displayed on success.
-                Defaults to False.
+            return_process (bool, optional): If True, the process class is
+                returned without checking the process output. If False,
+                communicate is called on the process and the output is parsed
+                for errors. Defaults to False.
             **kwargs: Additional keyword arguments are passed to
                 cls.executable_command and tools.popen_nobuffer.
 
         Returns:
-            str: Output to stdout from the run command.
+            str: Output to stdout from the run command if return_process is
+                False, the process if return_process is True.
         
         Raises:
             RuntimeError: If the language is not installed.
@@ -320,21 +334,59 @@ class ModelDriver(Driver):
         unused_kwargs = {}
         cmd = cls.executable_command(args, unused_kwargs=unused_kwargs, **kwargs)
         try:
-            # out = subprocess.check_output(cmd, **kwargs)
+            # Add default keyword arguments
+            if 'working_dir' in unused_kwargs:
+                unused_kwargs.setdefault('cwd', unused_kwargs.pop('working_dir'))
+            unused_kwargs.setdefault('shell', platform._is_win)
+            # Call command
+            logging.info("Running '%s' from %s"
+                         % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
+            if return_process:
+                return proc
             out, err = proc.communicate()
             if proc.returncode != 0:
                 logging.error(out)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
             out = backwards.as_str(out)
-            if verbose:  # pragma: debug
-                logging.info(' '.join(cmd))
-                tools.print_encoded(out, end="")
+            logging.debug('%s\n%s' % (' '.join(cmd), out))
             return out
         except (subprocess.CalledProcessError, OSError) as e:
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
+        
+    def run_model(self, **kwargs):
+        r"""Run the model. Unless overridden, the model will be run using
+        run_executable.
+
+        Args:
+            **kwargs: Keyword arguments are passed to run_executable.
+
+        """
+        env = self.set_env()
+        pre_args = []
+        if self.with_strace:
+            if platform._is_linux:
+                pre_cmd = 'strace'
+            elif platform._is_mac:
+                pre_cmd = 'dtrace'
+            pre_args += [pre_cmd] + self.strace_flags
+        elif self.with_valgrind:
+            pre_args += ['valgrind'] + self.valgrind_flags
+        command = pre_args + self.model_command()
+        self.info('Working directory: %s', self.working_dir)
+        self.info('Command: %s', ' '.join(command))
+        # Update keywords
+        # NOTE: Setting forward_signals to False allows faster debugging
+        # but should not be used in deployment for cases where models are not
+        # running locally.
+        default_kwargs = dict(env=env, working_dir=self.working_dir,
+                              forward_signals=False,
+                              shell=platform._is_win)
+        for k, v in default_kwargs.items():
+            kwargs.setdefault(k, v)
+        return self.run_executable(command, return_process=True, **kwargs)
         
     @classmethod
     def language_version(cls, **kwargs):
@@ -551,29 +603,22 @@ class ModelDriver(Driver):
         env['YGG_MODEL_INDEX'] = str(self.model_index)
         return env
 
-    def before_start(self):
-        r"""Actions to perform before the run starts."""
-        env = self.set_env()
-        pre_args = []
-        if self.with_strace:
-            if platform._is_linux:
-                pre_cmd = 'strace'
-            elif platform._is_mac:
-                pre_cmd = 'dtrace'
-            pre_args += [pre_cmd] + self.strace_flags
-        elif self.with_valgrind:
-            pre_args += ['valgrind'] + self.valgrind_flags
-        command = pre_args + self.model_command()
-        self.info(self.working_dir)
-        self.info(command)
-        self.model_process = tools.YggPopen(command, env=env,
-                                            cwd=self.working_dir,
-                                            forward_signals=False,
-                                            shell=platform._is_win)
+    def before_start(self, no_queue_thread=False, **kwargs):
+        r"""Actions to perform before the run starts.
+
+        Args:
+            no_queue_thread (bool, optional): If True, the queue_thread is not
+                created/started. Defaults to False.
+            **kwargs: Keyword arguments are pased to run_model.
+
+        """
+        self.model_process = self.run_model(**kwargs)
         # Start thread to queue output
-        self.queue_thread = tools.YggThreadLoop(target=self.enqueue_output_loop,
-                                                name=self.name + '.EnqueueLoop')
-        self.queue_thread.start()
+        if not no_queue_thread:
+            self.queue_thread = tools.YggThreadLoop(
+                target=self.enqueue_output_loop,
+                name=self.name + '.EnqueueLoop')
+            self.queue_thread.start()
 
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
@@ -778,6 +823,8 @@ class ModelDriver(Driver):
         # Opening for statement line
         out.append(cls.function_param['if_begin'].format(cond=cond))
         # Indent loop contents
+        if not isinstance(block_contents, (list, tuple)):
+            block_contents = [block_contents]
         for x in block_contents:
             out.append(cls.function_param['indent'] + x)
         # Close block
@@ -808,6 +855,8 @@ class ModelDriver(Driver):
         out.append(cls.function_param['for_begin'].format(
             iter_var=iter_var, iter_begin=iter_begin, iter_end=iter_end))
         # Indent loop contents
+        if not isinstance(loop_contents, (list, tuple)):
+            loop_contents = [loop_contents]
         for x in loop_contents:
             out.append(cls.function_param['indent'] + x)
         # Close block
@@ -835,9 +884,48 @@ class ModelDriver(Driver):
         # Opening for statement line
         out.append(cls.function_param['while_begin'].format(cond=cond))
         # Indent loop contents
+        if not isinstance(loop_contents, (list, tuple)):
+            loop_contents = [loop_contents]
         for x in loop_contents:
             out.append(cls.function_param['indent'] + x)
         # Close block
         out.append(cls.function_param.get('while_end',
+                                          cls.function_param['block_end']))
+        return out
+
+    @classmethod
+    def write_try_except(cls, try_contents, except_contents, error_var='e'):
+        r"""Return the lines required to complete a try/except block.
+
+        Args:
+            try_contents (list): Lines of code that should be executed inside
+                the try block.
+            except_contents (list): Lines of code that should be executed inside
+                the except block.
+            error_var (str, optional): Name of variable where the caught error
+                should be stored. Defaults to 'e'.
+
+        Returns:
+            Lines of code perfoming a try/except block.
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        out = []
+        # Try block contents
+        if not isinstance(try_contents, (list, tuple)):
+            try_contents = [try_contents]
+        out.append(cls.function_param['try_begin'])
+        for x in try_contents:
+            out.append(cls.function_param['indent'] + x)
+        # Except block contents
+        if not isinstance(except_contents, (list, tuple)):
+            except_contents = [except_contents]
+        out.append(cls.function_param['try_except'].format(error_var=error_var))
+        for x in except_contents:
+            out.append(cls.function_param['indent'] + x)
+        # Close block
+        out.append(cls.function_param.get('try_end',
                                           cls.function_param['block_end']))
         return out

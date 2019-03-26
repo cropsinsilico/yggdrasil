@@ -86,19 +86,6 @@ class InterpretedModelDriver(ModelDriver):
             if cls.default_interpreter is None:
                 cls.default_interpreter = cls.language
                     
-    def model_command(self):
-        r"""Return the command that should be used to run the model.
-
-        Returns:
-            list: Any commands/arguments needed to run the model from the
-                command line.
-
-        """
-        out = super(InterpretedModelDriver, self).model_command()
-        if not self.skip_interpreter:
-            out = self.executable_command(out)
-        return out
-        
     @classmethod
     def get_interpreter(cls):
         r"""Command required to run a model written in this language from
@@ -148,7 +135,8 @@ class InterpretedModelDriver(ModelDriver):
         return cls.get_interpreter()
 
     @classmethod
-    def executable_command(cls, args, unused_kwargs={}, **kwargs):
+    def executable_command(cls, args, exec_type='interpreter', unused_kwargs={},
+                           **kwargs):
         r"""Compose a command for running a program in this language with the
         provied arguments. If not already present, the interpreter command and
         interpreter flags are prepended to the provided arguments.
@@ -156,6 +144,10 @@ class InterpretedModelDriver(ModelDriver):
         Args:
             args (list): The program that returned command should run and any
                 arguments that should be provided to it.
+            exec_type (str, optional): Type of executable command that will be
+                returned. If 'interpreter', a command using the interpreter is
+                returned and if 'direct', the raw args being provided are
+                returned. Defaults to 'interpreter'.
             unused_kwargs (dict, optional): Existing dictionary that unused
                 keyword arguments should be added to. Defaults to {}.
             **kwargs: Additional keyword arguments are ignored.
@@ -164,14 +156,20 @@ class InterpretedModelDriver(ModelDriver):
             list: Arguments composing the command required to run the program
                 from the command line using the interpreter for this language.
 
+        Raises:
+            ValueError: If exec_type is not 'interpreter' or 'direct'.
+
         """
         ext = cls.language_ext
         if not isinstance(ext, list):
             ext = [ext]
-        # if (((cls.language not in args[0])
-        if (((tools.which(args[0]) is None)
-             or any([args[0].endswith(e) for e in ext]))):
-            args = [cls.get_interpreter()] + cls.get_interpreter_flags() + args
+        if exec_type == 'interpreter':
+            # if (((cls.language not in args[0])
+            if (((tools.which(args[0]) is None)
+                 or any([args[0].endswith(e) for e in ext]))):
+                args = [cls.get_interpreter()] + cls.get_interpreter_flags() + args
+        elif exec_type != 'direct':
+            raise ValueError("Invalid exec_type '%s'" % exec_type)
         unused_kwargs.update(kwargs)
         return args
 

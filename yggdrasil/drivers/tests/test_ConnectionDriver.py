@@ -13,7 +13,7 @@ from yggdrasil.communication import (
 _default_comm = tools.get_default_comm()
 _zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
 _ipc_installed = IPCComm.IPCComm.is_installed(language='python')
-_rmq_server_running = RMQComm._rmq_server_running
+_rmq_installed = RMQComm.RMQComm.is_installed(language='python')
 
             
 class TestConnectionParam(parent.TestParam):
@@ -398,7 +398,7 @@ for k in comm_types:
     # Flags
     flag_func = None
     if k in ['RMQComm', 'RMQAsyncComm']:
-        flag_func = unittest.skipIf(not _rmq_server_running,
+        flag_func = unittest.skipIf(not _rmq_installed,
                                     "RMQ Server not running")
     elif k in ['ZMQComm']:
         flag_func = unittest.skipIf(not _zmq_installed,

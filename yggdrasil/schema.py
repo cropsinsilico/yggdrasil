@@ -297,6 +297,11 @@ class ComponentSchema(object):
         out = []
         if self._base_schema is not None:
             out = list(self._base_schema['properties'].keys())
+        # Check if subtype is the subtype and not the class
+        if subtype not in self._storage:
+            s2c = self.subtype2class
+            if subtype in s2c:
+                subtype = s2c[subtype]
         out += list(self._storage[subtype]['properties'].keys())
         return sorted(list(set(out)))
 

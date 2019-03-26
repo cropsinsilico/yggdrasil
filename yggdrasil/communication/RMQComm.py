@@ -64,9 +64,6 @@ def check_rmq_server(url=None, **kwargs):
     return out
 
 
-_rmq_server_running = check_rmq_server()
-
-
 class RMQServer(CommBase.CommServer):
     r"""RMQ server object for cleaning up server connections."""
 
@@ -179,26 +176,6 @@ class RMQComm(AsyncComm.AsyncComm):
                 user, password, host, port, virtual_host)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
-
-    @classmethod
-    def is_installed(cls, language=None):
-        r"""Determine if the necessary libraries are installed for this
-        communication class.
-
-        Args:
-            language (str, optional): Specific language that should be checked
-                for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
-
-        Returns:
-            bool: Is the comm installed.
-
-        """
-        if language == 'python':
-            out = _rmq_server_running
-        else:
-            out = super(RMQComm, cls).is_installed(language=language)
-        return out
 
     @classmethod
     def underlying_comm_class(self):

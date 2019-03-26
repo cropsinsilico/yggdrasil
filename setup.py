@@ -93,6 +93,7 @@ requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 "perf",
                 "pint; python_version == '2.7'",
                 "unyt; python_version >= '3.4'",
+                "six",
                 'sysv_ipc; platform_system != "Windows"']
 test_requirements = ['pytest']
 # optional_requirements = ["pika<1.0", "astropy"]

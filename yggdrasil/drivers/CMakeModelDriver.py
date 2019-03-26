@@ -380,7 +380,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 ignored.
 
         Raises:
-            ValueError: If target is None.
+            ValueError: If a linker or compiler flag cannot be interpreted.
 
         """
         if target is None:

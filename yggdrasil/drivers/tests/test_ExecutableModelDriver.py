@@ -25,13 +25,6 @@ class TestExecutableModelParam(parent.TestModelParam):
 
     driver = 'ExecutableModelDriver'
 
-    def __init__(self, *args, **kwargs):
-        super(TestExecutableModelParam, self).__init__(*args, **kwargs)
-        if platform._is_win:  # pragma: windows
-            self.args = ['timeout', '0']
-        else:
-            self.args = ['sleep', '0.1']
-
             
 class TestExecutableModelDriverNoStart(TestExecutableModelParam,
                                        parent.TestModelDriverNoStart):

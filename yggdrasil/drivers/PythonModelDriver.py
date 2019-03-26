@@ -23,7 +23,8 @@ class PythonModelDriver(InterpretedModelDriver):
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux'],
                 'libraries': ['sysv_ipc']},
-        'zmq': {'libraries': ['zmq']}}
+        'zmq': {'libraries': ['zmq']},
+        'rmq': {'libraries': ['pika']}}
     function_param = {
         'comment': '#',
         'indent': 4 * ' ',
@@ -62,3 +63,22 @@ class PythonModelDriver(InterpretedModelDriver):
         except ImportError:
             return False
         return True
+
+    @classmethod
+    def is_comm_installed(cls, **kwargs):
+        r"""Determine if a comm is installed for the associated programming
+        language.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            bool: True if a comm is installed for this language.
+
+        """
+        out = super(PythonModelDriver, cls).is_comm_installed(**kwargs)
+        if out and (kwargs.get('commtype', None) in ['rmq', 'rmq_async']):
+            from yggdrasil.communication.RMQComm import check_rmq_server
+            out = check_rmq_server()
+        return out

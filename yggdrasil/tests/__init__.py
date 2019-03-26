@@ -44,6 +44,10 @@ for k, v in script_list:
     else:
         scripts[k] = os.path.join(script_dir, v)
 # scripts = {k: os.path.join(script_dir, v) for k, v in script_list}
+if platform._is_win:  # pragma: windows
+    scripts['executable'] = ['timeout', '0']
+else:
+    scripts['executable'] = ['sleep', '0.1']
     
 # Test yamls
 yaml_dir = os.path.join(os.path.dirname(__file__), 'yamls')

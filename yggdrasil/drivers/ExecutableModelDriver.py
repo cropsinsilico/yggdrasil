@@ -14,8 +14,8 @@ else:
 class ExecutableModelDriver(ModelDriver):
     r"""Class for running executable based models."""
 
-    _language = 'executable'
-    _version_flags = _os_version_flags
+    language = 'executable'
+    version_flags = _os_version_flags
 
     @classmethod
     def language_executable(cls):

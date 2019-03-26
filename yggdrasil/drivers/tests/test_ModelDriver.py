@@ -1,3 +1,4 @@
+import copy
 import unittest
 from yggdrasil.tests import assert_raises, scripts
 from yggdrasil.drivers.ModelDriver import ModelDriver
@@ -10,8 +11,8 @@ def test_ModelDriver_implementation():
     r"""Test that NotImplementedError raised for base class."""
     assert_raises(NotImplementedError, ModelDriver.language_executable)
     assert_raises(NotImplementedError, ModelDriver.executable_command, None)
-    assert_raises(NotImplementedError, CompiledModelDriver.compiler)
-    assert_raises(NotImplementedError, InterpretedModelDriver.interpreter)
+    assert_raises(NotImplementedError, CompiledModelDriver.get_tool, 'compiler')
+    assert_raises(NotImplementedError, InterpretedModelDriver.get_interpreter)
 
     
 class TestModelParam(parent.TestParam):
@@ -34,6 +35,8 @@ class TestModelParam(parent.TestParam):
             self.src = scripts[self.import_cls.language]
             if not isinstance(self.src, list):
                 self.src = [self.src]
+        if self.src is not None:
+            self.args = copy.deepcopy(self.src)
 
     def tests_on_not_installed(self):
         r"""Tests for when the driver is not installed."""

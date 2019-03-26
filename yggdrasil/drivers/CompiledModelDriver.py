@@ -1,5 +1,6 @@
 import os
 import re
+import six
 import copy
 import logging
 import warnings
@@ -99,7 +100,7 @@ def get_compilation_tool(tooltype, name):
     name = os.path.basename(name)
     if name in reg:
         return reg[name]
-    name = os.path.splitext(name)
+    name = os.path.splitext(name)[0]
     if name in reg:
         return name
     if name.lower() in reg:
@@ -143,8 +144,8 @@ class CompilationToolMeta(type):
         return cls
 
 
+@six.add_metaclass(CompilationToolMeta)
 class CompilationToolBase(object):
-    __metaclass__ = CompilationToolMeta
     r"""Base class for compilation command line tools.
 
     Attributes:
@@ -1422,10 +1423,6 @@ class CompiledModelDriver(ModelDriver):
         # Set tools
         for k in ['compiler', 'linker', 'archiver']:
             setattr(self, '%s_tool' % k, self.get_tool(k))
-        # Add model file to list of files
-        if (len(self.source_files) == 0) and (self.language_ext is not None):
-            self.source_files.append(os.path.splitext(self.model_file)[0]
-                                     + self.language_ext[0])
         # Compile
         try:
             self.compile_dependencies()
@@ -1434,10 +1431,30 @@ class CompiledModelDriver(ModelDriver):
         except BaseException:
             self.remove_products()
             raise
-        print(self.model_file)
         assert(os.path.isfile(self.model_file))
         self.debug("Compiled %s", self.model_file)
 
+    def parse_arguments(self, args):
+        r"""Sort model arguments to determine which one is the executable
+        and which ones are arguments.
+
+        Args:
+            args (list): List of arguments provided.
+
+        """
+        super(CompiledModelDriver, self).parse_arguments(args)
+        # Handle case where provided argument is source and not executable
+        # and case where provided argument is executable, but source files are
+        # not specified
+        model_base, model_ext = os.path.splitext(self.model_file)
+        if (self.language_ext is not None) and (model_ext in self.language_ext):
+            if len(self.source_files) == 0:
+                self.source_files.append(self.model_file)
+            self.model_file = model_base
+        elif (len(self.source_files) == 0) and (self.language_ext is not None):
+            self.source_files.append(os.path.splitext(self.model_file)[0]
+                                     + self.language_ext[0])
+        
     @staticmethod
     def before_registration(cls):
         r"""Operations that should be performed to modify class attributes prior
@@ -1855,13 +1872,25 @@ class CompiledModelDriver(ModelDriver):
             include_dirs = []
         if definitions is None:
             definitions = []
+        internal_dependencies = kwargs.pop('internal_dependencies', [])
+        external_dependencies = kwargs.pop('external_dependencies', [])
+        # Model specific compilation flags
+        if (for_model or for_api) and (not skip_interface_flags):
+            # Add comm flags
+            for c in tools.get_installed_comm(language=cls.language):
+                definitions.append('%sINSTALLED' % c[:3].upper())
+            if commtype is None:
+                commtype = tools.get_default_comm()
+            definitions.append('%sDEF' % commtype[:3].upper())
         # Add interface as internal_dependency for models and expand
         # dependencies to get entire chain including sub-dependencies and so on
-        internal_dependencies = kwargs.pop('internal_dependencies', [])
         if for_model and (not skip_interface_flags):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
+            for k in cls.external_libraries.keys():
+                if (k not in external_dependencies) and cls.is_library_installed(k):
+                    external_dependencies.append(k)
         all_internal_dependencies = cls.get_dependency_order(internal_dependencies)
         # Add internal libraries as objects for api
         additional_objs = kwargs.pop('additional_objs', [])
@@ -1874,20 +1903,11 @@ class CompiledModelDriver(ModelDriver):
         if additional_objs:
             kwargs['additional_objs'] = additional_objs
         # Add directories for internal/external dependencies
-        external_dependencies = kwargs.pop('external_dependencies', [])
         for dep in all_internal_dependencies + external_dependencies:
             include_dirs += cls.get_dependency_include_dirs(dep)
         # Add flags for included directories
         if directory is not None:
             include_dirs.insert(0, directory)
-        # Model specific compilation flags
-        if (for_model or for_api) and (not skip_interface_flags):
-            # Add comm flags
-            for c in tools.get_installed_comm(language=cls.language):
-                definitions.append('%sINSTALLED' % c[:3].upper())
-            if commtype is None:
-                commtype = tools.get_default_comm()
-            definitions.append('%sDEF' % commtype[:3].upper())
         # Update kwargs
         if include_dirs:
             kwargs['include_dirs'] = include_dirs
@@ -1949,10 +1969,13 @@ class CompiledModelDriver(ModelDriver):
         internal_dependencies = kwargs.pop('internal_dependencies', [])
         external_dependencies = kwargs.pop('external_dependencies', [])
         # Add interface as internal_dependency for models
-        if ((for_model and (cls.interface_library is not None)
-             and (not skip_interface_flags))):
-            if cls.interface_library not in internal_dependencies:
+        if for_model and (not skip_interface_flags):
+            if (((cls.interface_library is not None)
+                 and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
+            for k in cls.external_libraries.keys():
+                if (k not in external_dependencies) and cls.is_library_installed(k):
+                    external_dependencies.append(k)
         # TODO: Expand library flags to include subdependencies?
         # Add flags for internal/external depenencies
         for dep in internal_dependencies + external_dependencies:
@@ -1993,8 +2016,19 @@ class CompiledModelDriver(ModelDriver):
         kwargs['skip_flags'] = True
         return super(CompiledModelDriver, cls).language_version(**kwargs)
         
+    def run_model(self, **kwargs):
+        r"""Run the model. Unless overridden, the model will be run using
+        run_executable.
+
+        Args:
+            **kwargs: Keyword arguments are passed to run_executable.
+
+        """
+        kwargs.update(exec_type='direct')
+        return super(CompiledModelDriver, self).run_model(**kwargs)
+        
     @classmethod
-    def executable_command(cls, args, linker=False, **kwargs):
+    def executable_command(cls, args, exec_type='compiler', **kwargs):
         r"""Compose a command for running a program using the compiler for this
         language and the provied arguments. If not already present, the
         compiler command and compiler flags are prepended to the provided
@@ -2005,8 +2039,11 @@ class CompiledModelDriver(ModelDriver):
                 arguments that should be provided to it. For the compiler, this
                 means the source files, for the linker, this means the object
                 files.
-            linker (bool, optional): If True, the linker for this language will
-                be run instead of the compiler. Defaults to False.
+            exec_type (str, optional): Type of executable command that will be
+                returned. If 'compiler', a command using the compiler is
+                returned, if 'linker', a command using the linker is returned,
+                and if 'direct', the raw args being provided are returned.
+                Defaults to 'compiler'.
             **kwargs: Additional keyword arguments are passed to either
                 get_linker_flags or get_compiler_flags.
 
@@ -2014,11 +2051,20 @@ class CompiledModelDriver(ModelDriver):
             list: Arguments composing the command required to run the program
                 from the command line using the compiler for this language.
 
+        Raises:
+            ValueError: If exec_type is not 'compiler', 'linker', or 'direct'.
+
         """
-        if linker:
+        if exec_type == 'direct':
+            unused_kwargs = kwargs.pop('unused_kwargs', {})
+            unused_kwargs.update(kwargs)
+            return args
+        elif exec_type == 'linker':
             exec_cls = cls.get_tool('linker')
-        else:
+        elif exec_type == 'compiler':
             exec_cls = cls.get_tool('compiler')
+        else:
+            raise ValueError("Invalid exec_type '%s'" % exec_type)
         return exec_cls.get_executable_command(args, **kwargs)
     
     @classmethod
@@ -2124,7 +2170,7 @@ class CompiledModelDriver(ModelDriver):
             base_libraries.append(base_cls.interface_library)
             base_cls.compile_dependencies(**kwargs)
         if (((cls.interface_library is not None) and cls.is_installed()
-            and (cls.interface_library not in base_libraries))):
+             and (cls.interface_library not in base_libraries))):
             # cls.call_compiler(cls.interface_library)
             dep_order = cls.get_dependency_order(cls.interface_library)
             for k in dep_order[::-1]:

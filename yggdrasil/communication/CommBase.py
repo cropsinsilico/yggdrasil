@@ -497,8 +497,11 @@ class CommBase(tools.YggClass):
             else:
                 # Check driver
                 from yggdrasil.drivers import import_language_driver
-                drv = import_language_driver(language)
-                out = drv.is_comm_installed(commtype=cls._commtype)
+                try:
+                    drv = import_language_driver(language)
+                    out = drv.is_comm_installed(commtype=cls._commtype)
+                except ValueError:
+                    out = False
         return out
 
     @property

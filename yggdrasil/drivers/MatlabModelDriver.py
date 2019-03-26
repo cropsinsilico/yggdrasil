@@ -1,4 +1,5 @@
 import subprocess
+import uuid as uuid_gen
 from logging import debug, error, info
 from datetime import datetime
 import os
@@ -173,7 +174,8 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
         if backwards.PY2:
             matlab_engine.eval("py.reload(os);", nargout=0)
         else:
-            matlab_engine.eval("py.importlib.reload(os);", nargout=0)
+            # matlab_engine.eval("py.importlib.reload(os);", nargout=0)
+            pass
     return matlab_engine
 
 
@@ -432,22 +434,185 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
-        'while_begin': 'while ({cond})'}
+        'while_begin': 'while ({cond})',
+        'try_begin': 'try',
+        'try_except': 'catch {error_var}'}
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed
         if self.using_matlab_engine:
             kwargs['skip_interpreter'] = True
+        self.model_wrapper = None
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
         self.started_matlab = False
         self.screen_session = None
         self.mlengine = None
         self.mlsession = None
         self.mlprocess = None
-        if self.using_matlab_engine:
-            self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
-        self.check_exits()
 
+    def parse_arguments(self, args):
+        r"""Sort model arguments to determine which one is the executable
+        and which ones are arguments.
+
+        Args:
+            args (list): List of arguments provided.
+
+        """
+        super(MatlabModelDriver, self).parse_arguments(args)
+        model_base = os.path.basename(self.model_file)
+        self.model_wrapper = os.path.join(self.model_dir,
+                                          'wrapped_%s' % model_base)
+        # self.products.append(self.model_wrapper)
+        
+    # def write_wrappers(self, **kwargs):
+    #     r"""Write any wrappers needed to compile and/or run a model.
+
+    #     Args:
+    #         **kwargs: Keyword arguments are ignored (only included to
+    #            allow cascade from child classes).
+
+    #     Returns:
+    #         list: Full paths to any created wrappers.
+
+    #     """
+    #     out = super(MatlabModelDriver, self).write_wrappers(**kwargs)
+    #     self.check_exits()
+    #     # Write error wrapper
+    #     # TODO: Check that function wrapper not being used
+    #     model_base, model_ext = os.path.splitext(self.raw_model_file)
+    #     wrapper_fname = model_base + '_wrapped' + model_ext
+    #     self.write_error_wrapper(wrapper_fname, ['%s;' % self.model_file])
+    #     assert(os.path.isfile(wrapper_fname))
+    #     out.append(wrapper_fname)
+    #     self.model_file = os.path.splitext(os.path.basename(wrapper_fname))[0]
+    #     return out
+
+    @classmethod
+    def write_error_wrapper(cls, fname, try_lines, matlab_engine=None):
+        r"""Write a wrapper for the model that encloses it in a try except so
+        that the error can be propagated appropriately.
+
+        Args:
+            fname (str): File where the wrapper should be written.
+            try_lines (list): List of lines to go in the try block.
+            model_file (str): Path to model that should be wrapped.
+            matlab_engine (MatlabEngine, optional): Matlab engine that will be
+               used to call the wrapper. If not provided, it is assumed the
+               error will be called using the Matlab interpreter on the command
+               line. Defautls to None.
+
+        Raises:
+
+        """
+        # Create lines based on use of engine or not
+        if matlab_engine is not None:
+            catch_block = ["error(e.message);"]
+        else:
+            catch_block = ["fprintf('MATLAB ERROR:\\n%s\\n', e.message);",
+                           "exit(-1);"]
+        lines = cls.write_try_except(try_lines, catch_block)
+        if matlab_engine is None:
+            lines.append("exit(0);")
+        # Write lines
+        if fname is None:
+            return lines
+        else:
+            if os.path.isfile(fname):  # pragma: debug
+                os.remove(fname)
+            with open(fname, 'w') as fd:
+                fd.write('\n'.join(lines))
+
+    @classmethod
+    def run_executable(cls, args, dont_wrap_error=False, fname_wrapper=None,
+                       matlab_engine=None, **kwargs):
+        r"""Run a program using the executable for this language and the
+        provided arguments.
+
+        Args:
+            args (list): The program that should be run and any arguments
+                that should be provided to it.
+            dont_wrap_error (bool, optional): If False, the executable will be
+                wrapped in a try/catch block to prevent errors from stopping
+                Matlab shutdown. If True, the command will be executed as is
+                with the Matlab interpreter. Defaults to False.
+            fname_wrapper (str, optional): File where wrapper should be saved.
+                If not provided, one is created. Defaults to None.
+            matlab_engine (MatlabEngine, optional): Matlab engine that should be
+                used to run the command. If not provided, the Matlab interpreter
+                is used instead. Defaults to None.
+            **kwargs: Additional keyword arguments are passed to
+                cls.executable_command and tools.popen_nobuffer.
+
+        Returns:
+            str: Output to stdout from the run command.
+        
+        Raises:
+            RuntimeError: If the language is not installed.
+            RuntimeError: If there is an error when running the command.
+
+        """
+        # Strip file if first argument is a file
+        if os.path.isfile(args[0]):
+            kwargs.setdefault('working_dir', os.path.dirname(args[0]))
+            args = [os.path.splitext(os.path.basename(args[0]))[0]] + args[1:]
+        # Write wrapper
+        if (not dont_wrap_error) and (len(args) > 0):
+            if len(args) == 1:
+                # TODO: Will this work if there is a function defined in the
+                # script?
+                try_block = [args[0]]
+                if not try_block[0].endswith(';'):
+                    try_block[0] += ';'
+            else:
+                func_call = '%s(%s' % (args[0], args[1])
+                for a in args[2:]:
+                    func_call += (', %s' % a)
+                func_call += ');'
+                try_block = [func_call]
+            if fname_wrapper is None:
+                fname_wrapper = 'wrapper_%s%s' % (str(uuid_gen.uuid4()),
+                                                  cls.language_ext[0])
+                fname_wrapper = fname_wrapper.replace('-', '_')
+                working_dir = kwargs.get('working_dir', kwargs.get('cwd', None))
+                if working_dir is not None:
+                    fname_wrapper = os.path.join(working_dir, fname_wrapper)
+            cls.write_error_wrapper(fname_wrapper, try_block,
+                                    matlab_engine=matlab_engine)
+            assert(os.path.isfile(fname_wrapper))
+            args = [os.path.splitext(os.path.basename(fname_wrapper))[0]]
+        # Call base, catching error to remove temp wrapper
+        try:
+            if matlab_engine is None:
+                kwargs.setdefault('forward_signals', False)
+                if not kwargs['forward_signals']:
+                    # TODO: For some reason using os.setpgrp causes Matlab
+                    # to hang indefinitely.
+                    kwargs.setdefault('preexec_fn', os.setsid)
+                out = super(MatlabModelDriver, cls).run_executable(args, **kwargs)
+            else:
+                assert(kwargs.get('return_process', False))
+                # Add environment variables
+                env = kwargs.get('env', {})
+                old_env = {}
+                new_env_str = ''
+                for k, v in env.items():
+                    old_env[k] = matlab_engine.getenv(k)
+                    matlab_engine.setenv(k, v, nargout=0)
+                    new_env_str += "'%s', %s, " % (k, repr(v))
+                matlab_engine.eval('new_env = py.dict(pyargs(%s));'
+                                   % new_env_str[:-2], nargout=0)
+                matlab_engine.eval('os.environ.update(new_env);', nargout=0)
+                # Create matlab process using Matlab engine
+                out = MatlabProcess(name=args[0] + '.MatlabProcess',
+                                    target=getattr(matlab_engine, args[0]),
+                                    args=args[1:], matlab_engine=matlab_engine)
+                out.start()
+        finally:
+            if (((not kwargs.get('return_process', False))
+                 and (fname_wrapper is not None))):
+                os.remove(fname_wrapper)
+        return out
+        
     @classmethod
     def language_version(cls):
         r"""Determine the version of this language.
@@ -458,6 +623,26 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         """
         return cls.get_matlab_info()[1]
         
+    @classmethod
+    def executable_command(cls, args, **kwargs):
+        r"""Compose a command for running a program in this language with the
+        provied arguments. If not already present, the interpreter command and
+        interpreter flags are prepended to the provided arguments.
+
+        Args:
+            args (list): The program that returned command should run and any
+                arguments that should be provided to it.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Arguments composing the command required to run the program
+                from the command line using the interpreter for this language.
+
+        """
+        # if kwargs.get('exec_type', 'interpreter') == 'interpreter':
+        #     args = ["\"%s\"" % (' '.join(args))]
+        return super(MatlabModelDriver, cls).executable_command(args, **kwargs)
+    
     @classmethod
     def configure(cls, cfg):
         r"""Add configuration options for this language. This includes locating
@@ -507,7 +692,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         """
         mtl_id = '=MATLABROOT='
         cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
-               + ",matlabroot,version('-release')); exit();")
+               + ",matlabroot,version('-release'));")
         mtl_proc = cls.run_executable([cmd])
         mtl_id = backwards.match_stype(mtl_proc, mtl_id)
         if mtl_id not in mtl_proc:  # pragma: debug
@@ -548,7 +733,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 setattr(self, attr, out[i])
             self.started_matlab = True
         # Add things to Matlab environment
-        self.mlengine.addpath(self.fdir, nargout=0)
+        self.mlengine.addpath(self.model_dir, nargout=0)
         self.debug("Connected to matlab session '%s'" % self.mlsession)
 
     def set_env(self):
@@ -563,7 +748,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         prev_path = out.pop('MATLABPATH', '')
         if prev_path:
             path_list.append(prev_path)
-        for x in [_top_dir, _incl_interface]:
+        for x in [_top_dir, _incl_interface, self.model_dir]:
             if x not in prev_path:
                 path_list.append(x)
         if path_list:
@@ -572,41 +757,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         
     def before_start(self):
         r"""Actions to perform before the run loop."""
+        # TODO: Figure out why forward_signals=False causes matlab to hang
+        kwargs = dict(fname_wrapper=self.model_wrapper,
+                      forward_signals=False)
         if self.using_matlab_engine:
-            self.target_name = os.path.splitext(os.path.basename(self.args[0]))[0]
             self.start_matlab_engine()
-
-            # Add environment variables
-            self.debug('Setting environment variables for Matlab engine.')
-            env = self.set_env()
-            old_env = {}
-            new_env_str = ''
-            for k, v in env.items():
-                with self.lock:
-                    if self.mlengine is None:  # pragma: debug
-                        return
-                    old_env[k] = self.mlengine.getenv(k)
-                    self.mlengine.setenv(k, v, nargout=0)
-                    new_env_str += "'%s', %s, " % (k, repr(v))
-            with self.lock:
-                self.mlengine.eval('new_env = py.dict(pyargs(%s));' % new_env_str[:-2],
-                                   nargout=0)
-                self.mlengine.eval('os.environ.update(new_env);', nargout=0)
-
-            # Run
-            with self.lock:
-                if self.mlengine is None:  # pragma: debug
-                    self.debug('Matlab engine not set. Stopping')
-                    return
-                self.model_process = MatlabProcess(
-                    target=getattr(self.mlengine, self.target_name),
-                    name=self.name + '.MatlabProcess',
-                    args=self.args[1:], matlab_engine=self.mlengine)
-                self.debug('Starting MatlabProcess')
-                self.model_process.start()
-                self.debug('MatlabProcess running model.')
+            kwargs.update(matlab_engine=self.mlengine,
+                          no_queue_thread=True)
         else:
-            super(MatlabModelDriver, self).before_start()
+            kwargs.update(working_dir=self.model_dir)
+        with self.lock:
+            if self.using_matlab_engine and (self.mlengine is None):  # pragma: debug
+                self.debug('Matlab engine not set. Stopping')
+                return
+            super(MatlabModelDriver, self).before_start(**kwargs)
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
@@ -669,19 +833,15 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         has_exit = False
-        with open(self.args[0], 'r') as fd:
+        with open(self.raw_model_file, 'r') as fd:
             for i, line in enumerate(fd):
                 if line.strip().startswith('exit'):
                     has_exit = True
                     break
-        if self.using_matlab_engine:
-            if has_exit:
-                warnings.warn(
-                    "Line %d in '%s' contains an " % (
-                        i, self.args[0])
-                    + "'exit' call which will exit the MATLAB engine "
-                    + "such that it cannot be reused. Please replace 'exit' "
-                    + "with a return or error.")
-        else:
-            if not has_exit:
-                self.args[0] += ';exit();'
+        if self.using_matlab_engine and has_exit:
+            warnings.warn(
+                "Line %d in '%s' contains an " % (
+                    i, self.raw_model_file)
+                + "'exit' call which will exit the MATLAB engine "
+                + "such that it cannot be reused. Please replace 'exit' "
+                + "with a return or error.")

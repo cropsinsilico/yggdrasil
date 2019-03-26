@@ -30,6 +30,7 @@ requirements:
     - matplotlib
     - numpy
     - pandas
+    - perf
     - pint  # [py2k]
     - psutil
     - pystache
@@ -38,10 +39,10 @@ requirements:
     - pyyaml
     - pyzmq
     - scipy
+    - six
     - sysv_ipc  # [unix]
     - unyt  # [not py2k]
     - zeromq
-    - perf
 
 test:
   imports:
