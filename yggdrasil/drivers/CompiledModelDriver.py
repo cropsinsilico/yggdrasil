@@ -609,6 +609,7 @@ class CompilationToolBase(object):
             if overwrite:
                 if os.path.isfile(out):
                     os.remove(out)
+                    # raise RuntimeError("Output already exists: %s" % out)
                 elif os.path.isdir(out):
                     if not os.listdir(out):
                         os.rmdir(out)
@@ -1454,6 +1455,8 @@ class CompiledModelDriver(ModelDriver):
         elif (len(self.source_files) == 0) and (self.language_ext is not None):
             self.source_files.append(os.path.splitext(self.model_file)[0]
                                      + self.language_ext[0])
+        if self.language_ext is not None:
+            assert(os.path.splitext(self.model_file)[-1] not in self.language_ext)
         
     @staticmethod
     def before_registration(cls):

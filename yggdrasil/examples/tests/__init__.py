@@ -3,12 +3,11 @@ import uuid
 import unittest
 import tempfile
 from yggdrasil import runner, tools
-from yggdrasil.examples import yamls
+from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase
-from yggdrasil.drivers.MatlabModelDriver import _matlab_installed
 
 
-_c_comm_installed = tools.get_installed_comm(language='c')
+_ext2lang = {v: k for k, v in ext_map.items()}
 
 
 class TestExample(YggTestBase, tools.YggClass):
@@ -42,15 +41,26 @@ class TestExample(YggTestBase, tools.YggClass):
         return tempfile.gettempdir()
 
     @property
+    def languages_tested(self):
+        r"""list: Languages covered by the example."""
+        if self.name not in source:
+            return None
+        if self.language not in yamls[self.name]:
+            return None
+        if self.language in ['all', 'all_nomatlab']:
+            out = [_ext2lang[os.path.splitext(x)[-1]] for x in
+                   source[self.name][self.language]]
+        else:
+            out = [self.language]
+        return out
+
+    @property
     def yaml(self):
         r"""str: The full path to the yaml file for this example."""
         if self.name not in yamls:
             return None
         if self.language not in yamls[self.name]:
             return None
-        if not _matlab_installed:  # pragma: no matlab
-            if self.language == 'all':
-                return yamls[self.name].get('all_nomatlab', None)
         return yamls[self.name][self.language]
 
     @property
@@ -118,6 +128,11 @@ class TestExample(YggTestBase, tools.YggClass):
                 raise unittest.SkipTest("Could not locate example %s in language %s." %
                                         (self.name, self.language))
         else:
+            # Check that language is installed
+            for x in self.languages_tested:
+                if not tools.is_lang_installed(x):
+                    raise unittest.SkipTest("%s not installed." % x)
+            # Run
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
             self.runner.run()
@@ -135,10 +150,15 @@ class TestExample(YggTestBase, tools.YggClass):
                 if os.path.isfile(fout):
                     os.remove(fout)
 
-    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_all(self):
         r"""Test the version of the example that uses all languages."""
         self.language = 'all'
+        self.run_example()
+        self.language = None
+
+    def test_all_nomatlab(self):
+        r"""Test the version of the example that uses all languages."""
+        self.language = 'all_nomatlab'
         self.run_example()
         self.language = None
 
@@ -148,21 +168,18 @@ class TestExample(YggTestBase, tools.YggClass):
         self.run_example()
         self.language = None
 
-    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_c(self):
         r"""Test the C version of the example."""
         self.language = 'c'
         self.run_example()
         self.language = None
 
-    @unittest.skipIf(not _c_comm_installed, "C Library not installed")
     def test_cpp(self):
         r"""Test the C++ version of the example."""
         self.language = 'cpp'
         self.run_example()
         self.language = None
 
-    @unittest.skipIf(not _matlab_installed, "Matlab not installed")
     def test_matlab(self):  # pragma: matlab
         r"""Test the Matlab version of the example."""
         self.language = 'matlab'

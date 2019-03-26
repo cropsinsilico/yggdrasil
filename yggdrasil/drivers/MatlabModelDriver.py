@@ -462,7 +462,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         model_base = os.path.basename(self.model_file)
         self.model_wrapper = os.path.join(self.model_dir,
                                           'wrapped_%s' % model_base)
-        # self.products.append(self.model_wrapper)
+        self.products.append(self.model_wrapper)
         
     # def write_wrappers(self, **kwargs):
     #     r"""Write any wrappers needed to compile and/or run a model.

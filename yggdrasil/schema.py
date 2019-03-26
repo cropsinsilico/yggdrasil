@@ -1054,6 +1054,18 @@ def _normalize_model_driver(normalizer, value, instance, schema):
         s = getattr(normalizer, 'schema_registry', None)
         if s is not None:
             if ('language' not in instance) and ('driver' in instance):
+                if instance['driver'] == 'GCCModelDriver':
+                    # TODO: Fix this properly, checking the extension to
+                    # distinguish between C and C++
+                    if isinstance(instance['args'], list):
+                        args_ext = os.path.splitext(instance['args'][0])[-1]
+                    else:
+                        args_ext = os.path.splitext(instance['args'])[-1]
+                    from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
+                    if args_ext in CPPModelDriver.language_ext:
+                        instance['driver'] = 'CPPModelDriver'
+                    else:
+                        instance['driver'] = 'CModelDriver'
                 class2language = s['model'].class2subtype
                 instance['language'] = class2language[instance.pop('driver')][0]
     return instance
