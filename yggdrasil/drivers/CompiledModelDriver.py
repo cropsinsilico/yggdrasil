@@ -215,6 +215,8 @@ class CompilationToolBase(object):
     search_regex_end = None
     search_regex = ['([^\n]+)']
 
+    _language_ext = None  # only update once per class
+    
     def __init__(self, **kwargs):
         for k in ['executable', 'flags']:
             v = kwargs.pop(k, None)
@@ -247,6 +249,23 @@ class CompilationToolBase(object):
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.name
+
+    @classmethod
+    def get_language_ext(cls):
+        r"""Get the extensions associated with the language that this tool can
+        handle.
+
+        Returns:
+            list: Language file extensions.
+
+        """
+        if cls._language_ext is None:
+            cls._language_ext = []
+            for x in cls.languages:
+                new_ext = import_language_driver(x).language_ext
+                if new_ext is not None:
+                    cls._language_ext += new_ext
+        return cls._language_ext
 
     @classmethod
     def file2base(cls, fname):
@@ -415,6 +434,8 @@ class CompilationToolBase(object):
             flags = []
         flags = kwargs.pop('%s_flags' % cls.tooltype, flags)
         out = copy.deepcopy(flags)
+        if not isinstance(out, list):
+            out = [out]
         if output_first is None:
             output_first = cls.output_first
         # Add default & user defined flags
@@ -531,7 +552,7 @@ class CompilationToolBase(object):
         return cmd
 
     @classmethod
-    def call(cls, args, language=None, skip_flags=False,
+    def call(cls, args, language=None, skip_flags=False, dry_run=False,
              out=None, overwrite=False, products=None, allow_error=False,
              working_dir=None, additional_args=None, **kwargs):
         r"""Call the tool with the provided arguments. If the first argument
@@ -548,6 +569,8 @@ class CompilationToolBase(object):
                 any necessary flags. If False, args are assumed to the files
                 that the tool is called on and flags are determined from them.
                 Defaults to False.
+            dry_run (bool, optional): If True, the tool won't be called, but
+                the products will be updated. Defautls to False.
             out (str, optional): Full path to output file that should be created.
                 If None, the path will be determined from the path to the first
                 argument provided. Defaults to None. This keyword argument will
@@ -584,7 +607,7 @@ class CompilationToolBase(object):
         if (language is not None) and (language not in cls.languages):
             lang_drv = import_language_driver(language)
             lang_cls = lang_drv.get_tool(cls.tooltype)
-            return lang_cls.call(args, skip_flags=skip_flags,
+            return lang_cls.call(args, skip_flags=skip_flags, dry_run=dry_run,
                                  out=out, overwrite=overwrite, products=products,
                                  allow_error=allow_error, working_dir=working_dir,
                                  additional_args=additional_args, **kwargs)
@@ -605,9 +628,13 @@ class CompilationToolBase(object):
             elif (((out != 'clean') and (not os.path.isabs(out))
                    and (working_dir is not None))):
                 out = os.path.join(working_dir, out)
+            assert(out not in args)  # Don't remove source files
             # Check for file
-            if overwrite:
+            if overwrite and (not dry_run):
                 if os.path.isfile(out):
+                    if os.path.splitext(out)[-1] in cls.get_language_ext():
+                        raise RuntimeError("Source file will not be overwritten: "
+                                           + out)
                     os.remove(out)
                     # raise RuntimeError("Output already exists: %s" % out)
                 elif os.path.isdir(out):
@@ -616,7 +643,7 @@ class CompilationToolBase(object):
                     else:  # pragma: debug
                         raise RuntimeError("Output directory %s is not empty: %s."
                                            % (out, os.listdir(out)))
-            if os.path.isfile(out) or os.path.isdir(out):
+            if (not dry_run) and (os.path.isfile(out) or os.path.isdir(out)):
                 products.append(out)
                 return out
             kwargs['outfile'] = out
@@ -625,6 +652,14 @@ class CompilationToolBase(object):
         cmd = cls.get_executable_command(args, skip_flags=skip_flags,
                                          unused_kwargs=unused_kwargs,
                                          cwd=working_dir, **kwargs)
+        # Return if dry run, adding potential output to product
+        if dry_run:
+            if skip_flags:
+                return ''
+            else:
+                if out != 'clean':
+                    products.append(out)
+                return out
         # Run command
         output = ''
         try:
@@ -935,18 +970,31 @@ class CompilerBase(CompilationToolBase):
                 dont_link = True
             else:
                 dont_link = False
-        # Get file
-        if dont_link and (not cls.no_separate_linking):
-            src_base, src_ext = os.path.splitext(src)
-            if no_src_ext:
-                out = '%s%s' % (src_base, cls.object_ext)
+        # Get intermediate file
+        if cls.no_separate_linking:
+            obj = src
+        else:
+            if isinstance(src, list):
+                obj = []
+                for isrc in src:
+                    obj.append(cls.get_output_file(dont_link=True,
+                                                   working_dir=working_dir,
+                                                   no_src_ext=no_src_ext,
+                                                   libtype=libtype, **kwargs))
             else:
-                out = '%s_%s%s' % (src_base, src_ext[1:], cls.object_ext)
-            if (not os.path.isabs(out)) and (working_dir is not None):
-                out = os.path.normpath(os.path.join(working_dir, out))
+                src_base, src_ext = os.path.splitext(src)
+                if no_src_ext:
+                    obj = '%s%s' % (src_base, cls.object_ext)
+                else:
+                    obj = '%s_%s%s' % (src_base, src_ext[1:], cls.object_ext)
+                if (not os.path.isabs(obj)) and (working_dir is not None):
+                    obj = os.path.normpath(os.path.join(working_dir, obj))
+        # Pass to linker unless dont_link is True
+        if dont_link and (not cls.no_separate_linking):
+            out = obj
         else:
             tool = cls.get_library_tool(libtype=libtype, **kwargs)
-            out = tool.get_output_file(src, working_dir=working_dir, **kwargs)
+            out = tool.get_output_file(obj, working_dir=working_dir, **kwargs)
         return out
 
     @classmethod
@@ -1122,7 +1170,7 @@ class LinkerBase(CompilationToolBase):
         kws_link = ['build_library', 'skip_library_libs', 'use_library_path',
                     '%s_flags' % cls.tooltype, '%s_language' % cls.tooltype,
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
-        kws_both = ['overwrite', 'products', 'allow_error']
+        kws_both = ['overwrite', 'products', 'allow_error', 'dry_run']
         kwargs_link = {}
         # Move kwargs unique to linker
         for k in kws_link:
@@ -1225,6 +1273,9 @@ class LinkerBase(CompilationToolBase):
             str: Full path to file that will be produced.
 
         """
+        if isinstance(obj, list):
+            return [cls.get_output_file(obj[0], build_library=build_library,
+                                        working_dir=working_dir, **kwargs)]
         if build_library:
             prefix = cls.library_prefix
             out_ext = cls.library_ext
@@ -1435,31 +1486,48 @@ class CompiledModelDriver(ModelDriver):
         assert(os.path.isfile(self.model_file))
         self.debug("Compiled %s", self.model_file)
 
-    def parse_arguments(self, args):
+    def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
 
         Args:
             args (list): List of arguments provided.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         """
-        super(CompiledModelDriver, self).parse_arguments(args)
+        super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
         # not specified
-        model_base, model_ext = os.path.splitext(self.model_file)
+        model_ext = os.path.splitext(self.model_file)[-1]
+        model_is_source = False
         if (self.language_ext is not None) and (model_ext in self.language_ext):
+            model_is_source = True
             if len(self.source_files) == 0:
                 self.source_files.append(self.model_file)
-            self.model_file = model_base
-            if len(model_ext) > 1:
-                self.model_file += '_%s' % model_ext[1:]
         elif (len(self.source_files) == 0) and (self.language_ext is not None):
             self.source_files.append(os.path.splitext(self.model_file)[0]
                                      + self.language_ext[0])
+        # Add intermediate files and executable by doing a dry run
+        kwargs = dict(products=[], dry_run=True)
+        if model_is_source:
+            kwargs['out'] = None
+        out = self.compile_model(**kwargs)
+        if model_is_source:
+            self.info('Determined model file: %s', out)
+            self.model_file = out
+        for x in kwargs['products']:
+            if self.language_ext is not None:
+                x_ext = os.path.splitext(x)[-1]
+                if x_ext in self.language_ext:
+                    raise Exception("Product is source file: '%s'" % x)
+            if x not in self.products:
+                self.products.append(x)
         if self.language_ext is not None:
             assert(os.path.splitext(self.model_file)[-1] not in self.language_ext)
         self.debug("source_files: %s", str(self.source_files))
+        self.debug("model_file: %s", self.model_file)
         
     @staticmethod
     def before_registration(cls):
@@ -2195,6 +2263,9 @@ class CompiledModelDriver(ModelDriver):
             **kwargs: Keyword arguments are passed on to the call_compiler
                 method.
 
+        Returns:
+            str: Compiled model file path.
+
         """
         if source_files is None:
             source_files = self.source_files
@@ -2210,7 +2281,7 @@ class CompiledModelDriver(ModelDriver):
                               products=self.products)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
-        self.call_compiler(source_files, **kwargs)
+        return self.call_compiler(source_files, **kwargs)
     
     @classmethod
     def call_compiler(cls, src, language=None, **kwargs):

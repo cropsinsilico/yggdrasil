@@ -5,6 +5,7 @@ import logging
 import pprint
 import os
 import sys
+import pty
 import copy
 import shutil
 import inspect
@@ -426,7 +427,7 @@ class YggPopen(subprocess.Popen):
         **kwargs: Additional keywords arguments are passed to Popen.
 
     """
-    def __init__(self, cmd_args, forward_signals=True, **kwargs):
+    def __init__(self, cmd_args, forward_signals=True, for_matlab=False, **kwargs):
         # stdbuf only for linux
         if platform._is_linux:
             stdbuf_args = ['stdbuf', '-o0', '-e0']
@@ -437,11 +438,28 @@ class YggPopen(subprocess.Popen):
         kwargs.setdefault('bufsize', 0)
         kwargs.setdefault('stdout', subprocess.PIPE)
         kwargs.setdefault('stderr', subprocess.STDOUT)
+        # To prevent forward of signals, process will have a new process group
         if not forward_signals:
             if platform._is_win:  # pragma: windows
+                # TODO: Make sure that Matlab handled correctly since pty not
+                # guaranteed on windows
                 kwargs.setdefault('preexec_fn', None)
-                kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
+                kwargs.setdefault('creationflags',
+                                  subprocess.CREATE_NEW_PROCESS_GROUP)
             else:
+                if for_matlab:
+                    # Matlab requires a tty so a pty is used here to allow
+                    # the process to be lanched in a new process group.
+                    # Related Materials:
+                    # - https://www.mathworks.com/matlabcentral/answers/
+                    #       359992-system-call-bizarre-behavior
+                    # - https://gist.github.com/thepaul/1206753
+                    # - https://stackoverflow.com/questions/30139401/
+                    #       filter-out-command-that-needs-a-terminal-in-python-
+                    #       subprocess-module
+                    master_fd, slave_fd = pty.openpty()
+                    kwargs.setdefault('stdin', slave_fd)
+
                 kwargs.setdefault('preexec_fn', os.setpgrp)
         # if platform._is_win:  # pragma: windows
         #     kwargs.setdefault('universal_newlines', True)

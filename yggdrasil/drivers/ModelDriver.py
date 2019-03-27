@@ -141,6 +141,8 @@ class ModelDriver(Driver):
         'with_valgrind': {'type': 'boolean', 'default': False},
         'valgrind_flags': {'type': 'array', 'default': ['--leak-check=full'],  # '-v'
                            'items': {'type': 'string'}}}
+    _schema_excluded_from_class = ['name', 'language', 'args',
+                                   'inputs', 'outputs', 'working_dir']
     
     language = None
     language_ext = None
@@ -219,17 +221,22 @@ class ModelDriver(Driver):
              and (not isinstance(cls.language_ext, (list, tuple))))):
             cls.language_ext = [cls.language_ext]
         
-    def parse_arguments(self, args):
+    def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
         and which ones are arguments.
 
         Args:
             args (list): List of arguments provided.
+            default_model_dir (str, optional): Path to directory that should be
+                used to normalize the model file path if it is not absolute.
+                Defaults to None and is set to the working_dir.
 
         """
         if isinstance(args, backwards.string_types):
             args = args.split()
         assert(isinstance(args, list))
+        if default_model_dir is None:
+            default_model_dir = self.working_dir
         self.raw_model_file = backwards.as_str(args[0])
         self.model_file = self.raw_model_file
         self.model_args = []
@@ -239,10 +246,10 @@ class ModelDriver(Driver):
             except TypeError:
                 self.model_args.append(str(a))
         if not os.path.isabs(self.model_file):
-            model_file = os.path.normpath(os.path.join(self.working_dir,
+            model_file = os.path.normpath(os.path.join(default_model_dir,
                                                        self.model_file))
-            if os.path.isfile(model_file):
-                self.model_file = model_file
+            # if os.path.isfile(model_file):
+            self.model_file = model_file
         self.model_dir = os.path.dirname(self.model_file)
         self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",
                    self.model_file, self.model_dir, self.model_args)

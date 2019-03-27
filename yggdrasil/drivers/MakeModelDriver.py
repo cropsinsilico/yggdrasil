@@ -161,7 +161,9 @@ class MakeModelDriver(CompiledModelDriver):
             args (list): List of arguments provided.
 
         """
-        super(MakeModelDriver, self).parse_arguments(args)
+        # Set makedir before passing to parent class so that makedir is used
+        # to normalize the model file path rather than the working directory
+        # which may be different.
         if not os.path.isabs(self.makefile):
             if self.makedir is not None:
                 self.makefile = os.path.normpath(
@@ -171,9 +173,8 @@ class MakeModelDriver(CompiledModelDriver):
                     os.path.join(self.working_dir, self.makefile))
         if self.makedir is None:
             self.makedir = os.path.dirname(self.makefile)
-        if not os.path.isabs(self.model_file):
-            self.model_file = os.path.realpath(os.path.join(self.makedir,
-                                                            self.model_file))
+        kwargs = dict(default_model_dir=self.makedir)
+        super(MakeModelDriver, self).parse_arguments(args, **kwargs)
         
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s).

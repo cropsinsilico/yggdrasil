@@ -324,7 +324,6 @@ class CMakeModelDriver(CompiledModelDriver):
             args (list): List of arguments provided.
 
         """
-        super(CMakeModelDriver, self).parse_arguments(args)
         if self.sourcedir is None:
             self.sourcedir = self.working_dir
         elif not os.path.isabs(self.sourcedir):
@@ -336,12 +335,11 @@ class CMakeModelDriver(CompiledModelDriver):
         elif not os.path.isabs(self.builddir):
             self.builddir = os.path.realpath(os.path.join(self.working_dir,
                                                           self.builddir))
-        if not os.path.isabs(self.model_file):
-            self.model_file = os.path.realpath(os.path.join(self.builddir,
-                                                            self.model_file))
+        self.source_files = [self.sourcedir]
+        kwargs = dict(default_model_dir=self.builddir)
+        super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
         for x in self.cmake_products:
             self.products.append(os.path.join(self.builddir, x))
-        self.source_files = [self.sourcedir]
         
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.

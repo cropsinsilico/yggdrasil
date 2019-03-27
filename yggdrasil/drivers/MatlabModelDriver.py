@@ -1,6 +1,6 @@
 import subprocess
 import uuid as uuid_gen
-from logging import debug, error, info
+import logging
 from datetime import datetime
 import os
 import psutil
@@ -11,13 +11,13 @@ try:  # pragma: matlab
     disable_engine = config.ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
     if platform._is_win or (disable_engine == 'true'):
         _matlab_engine_installed = False
-        info("matlab.engine disabled")
+        logging.info("matlab.engine disabled")
     else:
         import matlab.engine
         _matlab_engine_installed = True
 except ImportError:  # pragma: no matlab
-    debug("Could not import matlab.engine. "
-          + "Matlab support for using a sharedEngine will be disabled.")
+    logging.debug("Could not import matlab.engine. "
+                  + "Matlab support for using a sharedEngine will be disabled.")
     _matlab_engine_installed = False
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.tools import TimeOut, sleep
@@ -129,7 +129,7 @@ def start_matlab_engine(skip_connect=False, timeout=None):  # pragma: matlab
         T = TimeOut(timeout)
         while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0)
                and not T.is_out):
-            debug('Waiting for matlab engine to start')
+            logging.debug('Waiting for matlab engine to start')
             sleep(1)  # Usually 3 seconds
     except KeyboardInterrupt:  # pragma: debug
         args = ['screen', '-X', '-S', screen_session, 'quit']
@@ -226,13 +226,13 @@ def stop_matlab_engine(screen_session, matlab_engine, matlab_session,
         T = TimeOut(5)
         while ((matlab_session in matlab.engine.find_matlab())
                and not T.is_out):
-            debug("Waiting for matlab engine to exit")
+            logging.debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
             if matlab_process is not None:
                 matlab_process.terminate()
-                error("stop_matlab_engine timed out at %f s. " % T.elapsed
-                      + "Killed Matlab sharedEngine process.")
+                logging.error("stop_matlab_engine timed out at %f s. " % T.elapsed
+                              + "Killed Matlab sharedEngine process.")
 
 
 class MatlabProcess(tools.YggClass):  # pragma: matlab
@@ -426,7 +426,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     language_ext = '.m'
     base_languages = ['python']
     default_interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop',
-                                 '-nojvm', '-r']
+                                 '-nojvm', '-batch']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
     function_param = {
         'comment': '%',
@@ -508,12 +508,16 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if matlab_engine is not None:
             catch_block = ["error(e.message);"]
         else:
-            catch_block = ["fprintf('MATLAB ERROR:\\n%s\\n', e.message);",
-                           "exit(-1);"]
+            catch_block = ["rethrow(e);"]
+            # catch_block = ["fprintf('MATLAB ERROR:\\n%s\\n', e.message);",
+            #                "disp(e.identifier);",
+            #                "disp(e.stack);",
+            #                "exit(0);"]
         lines = cls.write_try_except(try_lines, catch_block)
         if matlab_engine is None:
             lines.append("exit(0);")
         # Write lines
+        logging.debug('Wrapper:\n\t%s', '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -564,9 +568,11 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 if not try_block[0].endswith(';'):
                     try_block[0] += ';'
             else:
-                func_call = '%s(%s' % (args[0], args[1])
+                # Put quotes around arguments since they would be strings when
+                # passed from the command line
+                func_call = "%s('%s'" % (args[0], args[1])
                 for a in args[2:]:
-                    func_call += (', %s' % a)
+                    func_call += (", '%s'" % a)
                 func_call += ');'
                 try_block = [func_call]
             if fname_wrapper is None:
@@ -583,11 +589,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         # Call base, catching error to remove temp wrapper
         try:
             if matlab_engine is None:
-                kwargs.setdefault('forward_signals', False)
-                if not kwargs['forward_signals']:
-                    # TODO: For some reason using os.setpgrp causes Matlab
-                    # to hang indefinitely, but os.setsid does not.
-                    kwargs.setdefault('preexec_fn', os.setsid)
+                kwargs['for_matlab'] = True
                 out = super(MatlabModelDriver, cls).run_executable(args, **kwargs)
             else:
                 assert(kwargs.get('return_process', False))
@@ -757,9 +759,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         
     def before_start(self):
         r"""Actions to perform before the run loop."""
-        # TODO: Figure out why forward_signals=False causes matlab to hang
-        kwargs = dict(fname_wrapper=self.model_wrapper,
-                      forward_signals=False)
+        kwargs = dict(fname_wrapper=self.model_wrapper)
         if self.using_matlab_engine:
             self.start_matlab_engine()
             kwargs.update(matlab_engine=self.mlengine,
