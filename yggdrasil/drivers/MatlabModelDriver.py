@@ -461,10 +461,10 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         """
         super(MatlabModelDriver, self).parse_arguments(args)
         model_base, model_ext = os.path.splitext(os.path.basename(self.model_file))
-        self.model_wrapper = os.path.join(
-            self.model_dir, 'wrapped_%s%s%s' % (model_base,
-                                                self.uuid.replace('-', '_'),
-                                                model_ext))
+        wrap_base = 'warpped_%s_%s' % (model_base, self.uuid.replace('-', '_'))
+        # Matlab has a variable name limit of 62
+        wrap_base = wrap_base[:min(len(wrap_base), 60)]
+        self.model_wrapper = os.path.join(self.model_dir, wrap_base + model_ext)
         self.products.append(self.model_wrapper)
         
     @classmethod
