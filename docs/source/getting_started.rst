@@ -80,7 +80,7 @@ the file being read/written. Supported values include:
 ===========    =================================================================
 Value          Description
 ===========    =================================================================
-binary         The entire file is read/written all at once.
+binary         The entire file is read/written all at once as bytes.
 ascii          The file is read/written one line at a time.
 table          The file is an ASCII table that will be read/written one row
                at a time. If ``as_array: True`` is also specified, the table

@@ -5,9 +5,7 @@ TODO
 * Move all C/C++ code into dedicated folders such that include/lib can be single directories
 * Add Cis aliases to C and Python interface for backwards compat in yggdrasil
 * Move all specialized strings to a file that is read in and passed as definitions during compilation for C/C++ (or loaded at import in python/matlab)
-* Fix import order/build_api placement such that there is not a circular import if the api has not been built and the schema/metaschema needs to be generated
-* Update conda to reflect name change
-* Change client/server use of direction/serializer info to be more transparent
+* Change C client/server use of direction/serializer info to be more transparent
 * Go through docs to strip out deprecated info
 * Change "args" in drivers to more transparent wording (source_code, etc.)
 * Alias input/output keyword arguments for connections to from/to for clarity
@@ -31,3 +29,5 @@ TODO
 * Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors
 * Use return code to indicate specific errors when using a generated wrapper (e.g. missing comm class)
 * Consider passing input/output to/from Matlab function models directly through the matlab engine
+* Add link to paper & citation section once officially published
+* Update yaml.rst docs to reflect new schema

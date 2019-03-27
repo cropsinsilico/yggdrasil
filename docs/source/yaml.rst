@@ -60,7 +60,7 @@ At a minimum, each model entry should contain the following keys:
 |         +------------+-------------------------------------------------------+
 |         | c          | The model is written in C.                            |
 |         +------------+-------------------------------------------------------+
-|         | c++/c      | The model is written in C++.                          |
+|         | c++        | The model is written in C++.                          |
 |         +------------+-------------------------------------------------------+
 |         | make       | The model is written in C/C++ and has a Makefile.     |
 |         +------------+-------------------------------------------------------+
