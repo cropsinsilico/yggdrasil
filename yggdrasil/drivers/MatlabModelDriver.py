@@ -460,34 +460,13 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
         """
         super(MatlabModelDriver, self).parse_arguments(args)
-        model_base = os.path.basename(self.model_file)
-        self.model_wrapper = os.path.join(self.model_dir,
-                                          'wrapped_%s' % model_base)
+        model_base, model_ext = os.path.splitext(os.path.basename(self.model_file))
+        self.model_wrapper = os.path.join(
+            self.model_dir, 'wrapped_%s%s%s' % (model_base,
+                                                self.uuid.replace('-', '_'),
+                                                model_ext))
         self.products.append(self.model_wrapper)
         
-    # def write_wrappers(self, **kwargs):
-    #     r"""Write any wrappers needed to compile and/or run a model.
-
-    #     Args:
-    #         **kwargs: Keyword arguments are ignored (only included to
-    #            allow cascade from child classes).
-
-    #     Returns:
-    #         list: Full paths to any created wrappers.
-
-    #     """
-    #     out = super(MatlabModelDriver, self).write_wrappers(**kwargs)
-    #     self.check_exits()
-    #     # Write error wrapper
-    #     # TODO: Check that function wrapper not being used
-    #     model_base, model_ext = os.path.splitext(self.raw_model_file)
-    #     wrapper_fname = model_base + '_wrapped' + model_ext
-    #     self.write_error_wrapper(wrapper_fname, ['%s;' % self.model_file])
-    #     assert(os.path.isfile(wrapper_fname))
-    #     out.append(wrapper_fname)
-    #     self.model_file = os.path.splitext(os.path.basename(wrapper_fname))[0]
-    #     return out
-
     @classmethod
     def write_error_wrapper(cls, fname, try_lines, matlab_engine=None):
         r"""Write a wrapper for the model that encloses it in a try except so
@@ -526,6 +505,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 os.remove(fname)
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
+            logging.debug("Wrote wrapper to: %s" % fname)
 
     @classmethod
     def run_executable(cls, args, dont_wrap_error=False, fname_wrapper=None,
