@@ -63,6 +63,10 @@ class CPPModelDriver(CModelDriver):
     # To prevent inheritance
     default_compiler = None
     default_linker = None
+    function_param = dict(CModelDriver.function_param,
+                          try_begin='try {',
+                          try_error_type='const std::exception&',
+                          try_except='} catch ({try_error} {error_var}) {')
     
     @staticmethod
     def before_registration(cls):
@@ -77,3 +81,35 @@ class CPPModelDriver(CModelDriver):
         internal_libs[cls.interface_library]['source'] = os.path.splitext(
             internal_libs[cls.interface_library]['source'])[0] + cls.language_ext[0]
         cls.internal_libraries = internal_libs
+
+    @classmethod
+    def write_try_except(cls, try_contents, except_contents, error_var='e',
+                         error_type=None, **kwargs):
+        r"""Return the lines required to complete a try/except block.
+
+        Args:
+            try_contents (list): Lines of code that should be executed inside
+                the try block.
+            except_contents (list): Lines of code that should be executed inside
+                the except block.
+            error_var (str, optional): Name of variable where the caught error
+                should be stored. Defaults to 'e'. If '...', the catch clause
+                will catch all errors, but there will not be a name error.
+            error_type (str, optional): Name of error type that should be caught.
+                If not provided, defaults to None and will be set based on the
+                class function_param entry for 'try_error_type'. If '...', the
+                catch clause will catch all errors and error_var will be
+                ignored.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        Returns:
+            Lines of code perfoming a try/except block.
+
+        """
+        if (error_type == '...') or (error_var == '...'):
+            error_type = ''
+            error_var = '...'
+        kwargs.update(error_var=error_var, error_type=error_type)
+        return super(CPPModelDriver, cls).write_try_except(
+            try_contents, except_contents, **kwargs)

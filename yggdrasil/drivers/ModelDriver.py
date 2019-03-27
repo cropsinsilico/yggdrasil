@@ -905,7 +905,8 @@ class ModelDriver(Driver):
         return out
 
     @classmethod
-    def write_try_except(cls, try_contents, except_contents, error_var='e'):
+    def write_try_except(cls, try_contents, except_contents, error_var='e',
+                         error_type=None):
         r"""Return the lines required to complete a try/except block.
 
         Args:
@@ -915,6 +916,9 @@ class ModelDriver(Driver):
                 the except block.
             error_var (str, optional): Name of variable where the caught error
                 should be stored. Defaults to 'e'.
+            error_type (str, optional): Name of error type that should be caught.
+                If not provided, defaults to None and will be set based on the
+                class function_param entry for 'try_error_type'.
 
         Returns:
             Lines of code perfoming a try/except block.
@@ -923,6 +927,8 @@ class ModelDriver(Driver):
         if cls.function_param is None:
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
+        if error_type is None:
+            error_type = cls.function_param.get('try_error_type', None)
         out = []
         # Try block contents
         if not isinstance(try_contents, (list, tuple)):
@@ -933,7 +939,8 @@ class ModelDriver(Driver):
         # Except block contents
         if not isinstance(except_contents, (list, tuple)):
             except_contents = [except_contents]
-        out.append(cls.function_param['try_except'].format(error_var=error_var))
+        out.append(cls.function_param['try_except'].format(error_var=error_var,
+                                                           error_type=error_type))
         for x in except_contents:
             out.append(cls.function_param['indent'] + x)
         # Close block

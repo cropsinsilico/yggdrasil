@@ -31,7 +31,10 @@ class PythonModelDriver(InterpretedModelDriver):
         'block_end': '',
         'if_begin': 'if ({cond}):',
         'for_begin': 'for {iter_var} in range({iter_begin}, {iter_end}):',
-        'while_begin': 'while ({cond}):'}
+        'while_begin': 'while ({cond}):',
+        'try_begin': 'try:',
+        'try_error_type': 'BaseException',
+        'try_except': 'except {try_error} as {error_var}:'}
 
     @classmethod
     def is_language_installed(self):
