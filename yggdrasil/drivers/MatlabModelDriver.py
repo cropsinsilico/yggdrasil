@@ -11,7 +11,8 @@ try:  # pragma: matlab
     disable_engine = config.ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
     if platform._is_win or (disable_engine == 'true'):
         _matlab_engine_installed = False
-        logging.info("matlab.engine disabled")
+        if not tools.is_subprocess():
+            logging.info("matlab.engine disabled")
     else:
         import matlab.engine
         _matlab_engine_installed = True

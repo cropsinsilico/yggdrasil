@@ -3,7 +3,7 @@ TODO
 ====
 
 * Move all C/C++ code into dedicated folders such that include/lib can be single directories
-* Add Cis aliases to C and Python interface
+* Add Cis aliases to C and Python interface for backwards compat in yggdrasil
 * Move all specialized strings to a file that is read in and passed as definitions during compilation for C/C++ (or loaded at import in python/matlab)
 * Fix import order/build_api placement such that there is not a circular import if the api has not been built and the schema/metaschema needs to be generated
 * Update conda to reflect name change
@@ -17,17 +17,17 @@ TODO
 * Update/replace io_drivers section of docs
 * Remove IOInfo test class as no longer used
 * Add example of each supported language (missing LPy, cmake, make)
-* Replace nose with unittest/pytest
-* Create template model drivers for compiled/interpretted langauges
-* Change verbose flag in GCCModelDriver to use logging levels
 * Add map class for handling arbitrary objects in C/C++ and then update formatted_io 7, 8, and 9
 * change gs_lesson/formatted_io series to have more descriptive names
 * Docs on how nested data objects are represented in C/C++.
 * Preprocessor macro for dynamically determine message type?
 * Try to setup comm/connection testing at class level so that comms only created once
-* Fix circular dependency when determining if C/C++ models are supported via czmq
 * Regenerate metaschema with $schema entry
 * Refence metaschema on website in $id or $schema?
 * Clean up dependencies if possible
 * Test outside of conda on windows?
-* Silence warnings from pint/pika on model processes
+* Silence warnings from pint on model processes
+* Use metaclass for component registration rather than a decorator to make it easier for users
+* Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors
+* Use return code to indicate specific errors when using a generated wrapper (e.g. missing comm class)
+* Consider passing input/output to/from Matlab function models directly through the matlab engine

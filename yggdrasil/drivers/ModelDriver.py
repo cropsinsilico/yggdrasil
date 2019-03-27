@@ -245,10 +245,9 @@ class ModelDriver(Driver):
                 self.model_args.append(backwards.as_str(a))
             except TypeError:
                 self.model_args.append(str(a))
-        if not os.path.isabs(self.model_file):
+        if (self.language != 'executable') and (not os.path.isabs(self.model_file)):
             model_file = os.path.normpath(os.path.join(default_model_dir,
                                                        self.model_file))
-            # if os.path.isfile(model_file):
             self.model_file = model_file
         self.model_dir = os.path.dirname(self.model_file)
         self.debug("model_file = '%s', model_dir = '%s', model_args = '%s'",

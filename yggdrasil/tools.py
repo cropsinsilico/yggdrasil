@@ -75,11 +75,22 @@ def check_sockets():  # pragma: debug
         logging.info("%d sockets closed." % count)
 
 
+def is_subprocess():
+    r"""Determine if the current process is a subprocess.
+
+    Returns:
+        bool: True if YGG_SUBPROCESS environment variable is True, False
+            otherwise.
+
+    """
+    return (os.environ.get('YGG_SUBPROCESS', 'false').lower() == 'true')
+
+
 def ygg_atexit():  # pragma: debug
     r"""Things to do at exit."""
     check_locks()
     check_threads()
-    if not os.environ.get('YGG_SUBPROCESS', False):
+    if not is_subprocess():
         check_sockets()
     if backwards.PY34:
         # Print empty line to ensure close
