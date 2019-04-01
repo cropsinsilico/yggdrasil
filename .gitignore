@@ -23,6 +23,7 @@ docs/source/examples/*.rst
 .coveragerc
 .coverage
 htmlcov
+.coverage.*
 
 # temp for storing notes, whatever, etc.   not managed
 tmp/
