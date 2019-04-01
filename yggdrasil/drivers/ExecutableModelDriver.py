@@ -1,5 +1,4 @@
-from yggdrasil import platform
-from yggdrasil.schema import register_component
+from yggdrasil import platform, tools
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
@@ -10,7 +9,6 @@ else:
     # _os_version_flags = ['echo $0']
 
 
-@register_component
 class ExecutableModelDriver(ModelDriver):
     r"""Class for running executable based models."""
 
@@ -77,6 +75,19 @@ class ExecutableModelDriver(ModelDriver):
         """
         return True
 
+    @classmethod
+    def is_library_installed(cls, lib):
+        r"""Determine if a dependency is installed.
+
+        Args:
+            lib (str): Name of the library that should be checked.
+
+        Returns:
+            bool: True if the library is installed, False otherwise.
+
+        """
+        return (tools.which(lib) is not None)
+        
     @classmethod
     def is_configured(cls):
         r"""Determine if the appropriate configuration has been performed (e.g.

@@ -22,7 +22,6 @@ except ImportError:  # pragma: no matlab
     _matlab_engine_installed = False
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.tools import TimeOut, sleep
-from yggdrasil.schema import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -398,7 +397,6 @@ class MatlabProcess(tools.YggClass):  # pragma: matlab
                 pass
 
 
-@register_component
 class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     r"""Base class for running Matlab models.
 

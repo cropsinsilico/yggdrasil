@@ -6,7 +6,7 @@ from yggdrasil import platform
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase)
 from yggdrasil.drivers import CModelDriver
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 
 
 class CMakeConfigure(CompilerBase):
@@ -271,7 +271,6 @@ class CMakeBuilder(LinkerBase):
         return super(CMakeBuilder, cls).get_executable_command([], **kwargs)
     
 
-@register_component
 class CMakeModelDriver(CompiledModelDriver):
     r"""Class for running cmake compiled drivers. Before running the
     cmake command, the cmake commands for setting the necessary compiler & linker

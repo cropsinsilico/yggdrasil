@@ -1,9 +1,8 @@
 from yggdrasil.communication import FileComm
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 from yggdrasil.serialize.JSONSerialize import JSONSerialize
 
 
-@register_component
 class JSONFileComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a JSON file on disk.
 

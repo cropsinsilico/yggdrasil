@@ -1,11 +1,10 @@
 import numpy as np
 from yggdrasil import serialize, backwards, units
 from yggdrasil.communication.AsciiFileComm import AsciiFileComm
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
-@register_component
 class AsciiTableComm(AsciiFileComm):
     r"""Class for handling I/O from/to a file on disk.
 

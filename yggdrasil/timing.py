@@ -30,7 +30,7 @@ _perf_warmups = 0
 
 
 _lang_list = tools.get_installed_lang()
-for k in ['lpy', 'make', 'cmake']:
+for k in ['lpy', 'make', 'cmake', 'executable']:
     if k in _lang_list:
         _lang_list.remove(k)
 _comm_list = tools.get_installed_comm(language=_lang_list)

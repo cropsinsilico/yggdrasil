@@ -3,7 +3,6 @@ import copy
 from yggdrasil import platform
 from yggdrasil.drivers.CModelDriver import (
     CCompilerBase, CModelDriver, GCCCompiler, ClangCompiler)
-from yggdrasil.schema import register_component
 
 
 class CPPCompilerBase(CCompilerBase):
@@ -50,7 +49,6 @@ class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
     name = 'clang++'
 
 
-@register_component
 class CPPModelDriver(CModelDriver):
     r"""Class for running C++ models."""
                 

@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from yggdrasil import serialize
 from yggdrasil.communication.AsciiTableComm import AsciiTableComm
-from yggdrasil.schema import register_component
 from yggdrasil.serialize.PandasSerialize import PandasSerialize
 
 
@@ -44,7 +43,6 @@ def pandas_recv_converter(obj):
     return serialize.pandas2list(obj)
 
 
-@register_component
 class PandasFileComm(AsciiTableComm):
     r"""Class for handling I/O from/to a pandas csv file on disk.
 
@@ -60,10 +58,13 @@ class PandasFileComm(AsciiTableComm):
     _filetype = 'pandas'
     _default_serializer = PandasSerialize
 
-    def _init_before_open(self, **kwargs):
-        r"""Set up dataio and attributes."""
+    def __init__(self, *args, **kwargs):
         kwargs.setdefault('send_converter', pandas_send_converter)
         kwargs.setdefault('recv_converter', pandas_recv_converter)
+        super(PandasFileComm, self).__init__(*args, **kwargs)
+
+    def _init_before_open(self, **kwargs):
+        r"""Set up dataio and attributes."""
         super(PandasFileComm, self)._init_before_open(**kwargs)
         self.read_meth = 'read'
 

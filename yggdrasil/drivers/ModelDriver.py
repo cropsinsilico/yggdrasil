@@ -71,6 +71,10 @@ class ModelDriver(Driver):
             interface for the target language.
         interface_directories (list): Directories containing code in the
             interface library for the target language.
+        interface_dependencies (list): List of names of libraries that are
+            required to use the interface on the current platform. This dosn't
+            include libraries required by specific communication types which are
+            described by supported_comm_options.
         supported_comms (list): Name of comms supported in the target language.
         supported_comm_options (dict): Options for the supported comms like the
             platforms they are available on and the external libraries required
@@ -117,6 +121,7 @@ class ModelDriver(Driver):
     """
 
     _schema_type = 'model'
+    _schema_subtype_key = 'language'
     _schema_required = ['name', 'language', 'args', 'working_dir']
     _schema_properties = {
         'name': {'type': 'string'},
@@ -151,6 +156,7 @@ class ModelDriver(Driver):
     executable_type = None
     interface_library = None
     interface_directories = []
+    interface_dependencies = []
     supported_comms = []
     supported_comm_options = {}
     external_libraries = {}
@@ -159,18 +165,6 @@ class ModelDriver(Driver):
     version_flags = ['--version']
 
     def __init__(self, name, args, model_index=0, **kwargs):
-        for k, v in self._schema_properties.items():
-            if k in ['name', 'language', 'args',
-                     'inputs', 'outputs', 'working_dir']:
-                continue
-            default = copy.deepcopy(v.get('default', None))
-            setattr(self, k, kwargs.pop(k, default))
-        for k in ['products']:
-            v = getattr(self, k)
-            if isinstance(v, backwards.string_types):
-                setattr(self, k, v.split())
-            else:
-                setattr(self, k, copy.deepcopy(v))
         super(ModelDriver, self).__init__(name, **kwargs)
         # Setup process things
         self.model_process = None
@@ -422,8 +416,29 @@ class ModelDriver(Driver):
                 machine.
 
         """
-        return (cls.is_language_installed() and cls.is_comm_installed()
-                and cls.is_configured())
+        return (cls.is_language_installed() and cls.are_dependencies_installed()
+                and cls.is_comm_installed() and cls.is_configured())
+
+    @classmethod
+    def are_dependencies_installed(cls):
+        r"""Determine if the dependencies are installed for the interface (not
+        including dependencies needed by a particular communication type).
+
+        Returns:
+            bool: True if the dependencies are installed. False otherwise.
+
+        """
+        out = (cls.language is not None)
+        for x in cls.base_languages:
+            if not out:
+                break
+            out = import_language_driver(x).are_dependencies_installed()
+        if out:
+            for x in cls.interface_dependencies:
+                if not out:
+                    break
+                out = cls.is_library_installed(x)
+        return out
 
     @classmethod
     def is_language_installed(cls):

@@ -12,7 +12,6 @@ from yggdrasil.communication import import_all_comms
 _schema_fname = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '.ygg_schema.yml'))
 _schema = None
-_registry = {}
 _registry_complete = False
 
 
@@ -43,48 +42,6 @@ def ordered_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
     return yaml.dump(data, stream, OrderedDumper, **kwds)
 
 
-def register_component(component_class):
-    r"""Decorator for registering a class as a yaml component."""
-    global _registry
-    yaml_typ = component_class._schema_type
-    if yaml_typ not in _registry:
-        _registry[yaml_typ] = []
-    if component_class not in _registry[yaml_typ]:
-        component_class.before_registration(component_class)
-        _registry[yaml_typ].insert(0, component_class)
-        # _registry[yaml_typ].append(component_class)
-    return component_class
-
-
-def inherit_schema(orig, new_values=None, remove_keys=None, **kwargs):
-    r"""Create an inherited schema, adding new value to accepted ones for
-    dependencies.
-    
-    Args:
-        orig (dict): Schema that will be inherited.
-        new_values (dict, optional): Dictionary of new values to add. Defaults
-            to None and is ignored.
-        remove_keys (list, optional): Keys that should be removed form orig before
-            adding the new keys. Defaults to empty list.
-        **kwargs: Additional keyword arguments will be added to the schema
-            with dependency on the provided key/value pair.
-
-    Returns:
-        dict: New schema.
-
-    """
-    if remove_keys is None:
-        remove_keys = []
-    out = copy.deepcopy(orig)
-    for k in remove_keys:
-        if k in out:
-            out.pop(k)
-    if new_values is not None:
-        out.update(new_values)
-    out.update(**kwargs)
-    return out
-
-
 def init_registry():
     r"""Initialize the registries and schema."""
     global _registry_complete
@@ -109,7 +66,8 @@ def init_schema(fname=None):
 
 def create_schema():
     r"""Create a new schema from the registry."""
-    global _registry, _registry_complete
+    from yggdrasil.components import _registry
+    # global _registry, _registry_complete
     init_registry()
     x = SchemaRegistry(_registry)
     return x

@@ -19,6 +19,9 @@ class ServerComm(CommBase.CommBase):
         ocomm (Comm): Response comm for last request.
 
     """
+
+    _dont_register = True
+    
     def __init__(self, name, request_comm=None, response_kwargs=None,
                  dont_open=False, **kwargs):
         if response_kwargs is None:

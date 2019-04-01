@@ -2,11 +2,10 @@ import os
 import tempfile
 from yggdrasil import backwards, platform
 from yggdrasil.communication import CommBase
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 from yggdrasil.serialize.DirectSerialize import DirectSerialize
 
 
-@register_component
 class FileComm(CommBase.CommBase):
     r"""Class for handling I/O from/to a file on disk.
 
@@ -65,6 +64,7 @@ class FileComm(CommBase.CommBase):
     _filetype = 'binary'
     _datatype = {'type': 'bytes'}
     _schema_type = 'file'
+    _schema_subtype_key = 'filetype'
     _schema_required = ['name', 'filetype', 'working_dir']
     _schema_properties = inherit_schema(
         CommBase.CommBase._schema_properties,

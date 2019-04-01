@@ -8,7 +8,7 @@ from yggdrasil.metaschema.datatypes.tests import (
     test_JSONObjectMetaschemaType as parent)
 from yggdrasil.metaschema.datatypes import PlyMetaschemaType
 from yggdrasil.tests import YggTestClassInfo, assert_raises, assert_equal
-from yggdrasil.drivers.LPyModelDriver import _lpy_installed
+from yggdrasil.drivers.LPyModelDriver import LPyModelDriver
 
 
 vcoords = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
@@ -158,7 +158,7 @@ class TestPlyDict(YggTestClassInfo):
                                 no_copy=True)
             self.assert_equal(o1, o2)
 
-    @unittest.skipIf(not _lpy_installed, "LPy library not installed.")
+    @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
     def test_to_from_scene(self, _as_obj=False):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene."""
         o1 = self.instance

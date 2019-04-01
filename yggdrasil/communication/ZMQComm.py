@@ -8,7 +8,6 @@ import subprocess
 import warnings
 from yggdrasil import backwards, tools, platform
 from yggdrasil.config import ygg_cfg
-from yggdrasil.schema import register_component
 from yggdrasil.communication import CommBase, AsyncComm
 
 
@@ -328,7 +327,6 @@ class ZMQProxy(CommBase.CommServer):
         CommBase.unregister_comm('ZMQComm', 'DEALER_server_' + self.srv_address)
 
 
-@register_component
 class ZMQComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O using ZeroMQ sockets.
 

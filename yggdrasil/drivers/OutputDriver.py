@@ -1,8 +1,6 @@
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
-from yggdrasil.schema import register_component
 
 
-@register_component
 class OutputDriver(ConnectionDriver):
     r"""Driver for sending output to another model's comm via a local comm.
 

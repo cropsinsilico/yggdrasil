@@ -1,9 +1,8 @@
 from yggdrasil.communication import FileComm
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 from yggdrasil.serialize.AsciiMapSerialize import AsciiMapSerialize
 
 
-@register_component
 class AsciiMapComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a ASCII map on disk.
 

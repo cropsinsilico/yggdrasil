@@ -1,9 +1,7 @@
 from yggdrasil.communication.FileComm import FileComm
-from yggdrasil.schema import register_component
 from yggdrasil.serialize.PlySerialize import PlySerialize
 
 
-@register_component
 class PlyFileComm(FileComm):
     r"""Class for handling I/O from/to a .ply file on disk.
 

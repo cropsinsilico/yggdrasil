@@ -3,7 +3,7 @@ from collections import OrderedDict
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase)
 from yggdrasil.drivers.CModelDriver import CModelDriver
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 _default_makefile = 'Makefile'
 
 
@@ -110,7 +110,6 @@ class NMakeCompiler(MakeCompiler):
     flag_options = OrderedDict([('makefile', '/f')])
 
 
-@register_component
 class MakeModelDriver(CompiledModelDriver):
     r"""Class for running make file compiled drivers. Before running the
     make command, the necessary compiler & linker flags for the interface's

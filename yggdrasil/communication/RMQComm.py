@@ -9,7 +9,6 @@ except ImportError:
                     + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
-from yggdrasil.schema import register_component
 
 
 _rmq_param_sep = '_RMQPARAM_'
@@ -72,7 +71,6 @@ class RMQServer(CommBase.CommServer):
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
-@register_component
 class RMQComm(AsyncComm.AsyncComm):
     r"""Class for handling basic RabbitMQ communications.
 
@@ -96,9 +94,6 @@ class RMQComm(AsyncComm.AsyncComm):
         self.channel = None
         self._is_open = False
         self._bound = False
-        # Check that connection is possible
-        if not check_rmq_server(self.url):  # pragma: debug
-            raise RuntimeError("Could not connect to RabbitMQ server.")
         self._server_class = RMQServer
         super(RMQComm, self)._init_before_open(**kwargs)
 

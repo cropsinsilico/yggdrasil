@@ -1,9 +1,7 @@
 from yggdrasil.communication.PlyFileComm import PlyFileComm
-from yggdrasil.schema import register_component
 from yggdrasil.serialize.ObjSerialize import ObjSerialize
 
 
-@register_component
 class ObjFileComm(PlyFileComm):
     r"""Class for handling I/O from/to a .obj file on disk.
 

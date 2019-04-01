@@ -33,6 +33,9 @@ class ForkComm(CommBase.CommBase):
         curr_comm_index (int): Index comm that next receive will be from.
 
     """
+
+    _dont_register = True
+    
     def __init__(self, name, comm=None, **kwargs):
         self.comm_list = []
         self.curr_comm_index = 0

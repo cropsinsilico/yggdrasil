@@ -7,7 +7,7 @@ from yggdrasil.tests import assert_raises, assert_equal
 from yggdrasil.metaschema.datatypes.tests import (
     test_PlyMetaschemaType as parent)
 from yggdrasil.metaschema.datatypes import ObjMetaschemaType
-from yggdrasil.drivers.LPyModelDriver import _lpy_installed
+from yggdrasil.drivers.LPyModelDriver import LPyModelDriver
 
 
 old_value = parent._test_value
@@ -94,7 +94,7 @@ class TestObjDict(parent.TestPlyDict):
         r"""Test applying a scalar colormap."""
         super(TestObjDict, self).test_apply_scalar_map(_as_obj=True)
 
-    @unittest.skipIf(not _lpy_installed, "LPy library not installed.")
+    @unittest.skipIf(not LPyModelDriver.is_installed(), "LPy library not installed.")
     def test_to_from_scene(self):  # pragma: lpy
         r"""Test conversion to/from PlantGL scene."""
         super(TestObjDict, self).test_to_from_scene(_as_obj=True)

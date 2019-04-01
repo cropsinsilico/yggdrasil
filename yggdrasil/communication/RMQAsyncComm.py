@@ -1,7 +1,6 @@
 import threading
 from yggdrasil import backwards, tools
 from yggdrasil.communication import RMQComm
-from yggdrasil.schema import register_component
 if RMQComm._rmq_installed:
     import pika
     _pika_version_maj = int(float(pika.__version__.split('.')[0]))
@@ -12,7 +11,6 @@ else:
     _pika_version_maj = 0
 
 
-@register_component
 class RMQAsyncComm(RMQComm.RMQComm):
     r"""Class for handling asynchronous RabbitMQ communications. It is not
     recommended to use this class as it can leave hanging threads if not

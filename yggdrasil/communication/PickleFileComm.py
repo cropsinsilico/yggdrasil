@@ -1,10 +1,8 @@
 from yggdrasil import backwards
 from yggdrasil.communication import FileComm
-from yggdrasil.schema import register_component
 from yggdrasil.serialize.PickleSerialize import PickleSerialize
 
 
-@register_component
 class PickleFileComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a pickled file on disk.
 

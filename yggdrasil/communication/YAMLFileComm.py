@@ -1,9 +1,8 @@
 from yggdrasil.communication import FileComm
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 from yggdrasil.serialize.YAMLSerialize import YAMLSerialize
 
 
-@register_component
 class YAMLFileComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a YAML file on disk.
 

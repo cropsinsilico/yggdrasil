@@ -1,9 +1,8 @@
 from yggdrasil import serialize, backwards
 from yggdrasil.communication.FileComm import FileComm
-from yggdrasil.schema import register_component, inherit_schema
+from yggdrasil.components import inherit_schema
 
 
-@register_component
 class AsciiFileComm(FileComm):
     r"""Class for handling I/O from/to a file on disk.
 

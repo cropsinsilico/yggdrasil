@@ -1,8 +1,6 @@
 from yggdrasil.drivers.InputDriver import InputDriver
-from yggdrasil.schema import register_component
 
 
-@register_component
 class FileInputDriver(InputDriver):
     r"""Class that sends messages read from a file.
 

@@ -5,7 +5,8 @@ from yggdrasil.communication import get_comm, get_comm_class
 from yggdrasil.interface import YggInterface
 from yggdrasil.tools import YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF
 from yggdrasil.drivers import (
-    import_driver, InputDriver, OutputDriver, MatlabModelDriver)
+    import_driver, InputDriver, OutputDriver)
+from yggdrasil.drivers.MatlabModelDriver import MatlabModelDriver
 from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
 
 
@@ -33,7 +34,7 @@ def test_init():
     assert_raises(Exception, YggInterface.YggOutput, 'error')
     
 
-@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+@unittest.skipIf(not MatlabModelDriver.is_installed(), "Matlab not installed.")
 def test_YggMatlab_class():  # pragma: matlab
     r"""Test Matlab interface for classes."""
     name = 'test'
@@ -51,7 +52,7 @@ def test_YggMatlab_class():  # pragma: matlab
     drv.terminate()
 
 
-@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+@unittest.skipIf(not MatlabModelDriver.is_installed(), "Matlab not installed.")
 def test_YggMatlab_variables():  # pragma: matlab
     r"""Test Matlab interface for variables."""
     assert_equal(YggInterface.YggMatlab('YGG_MSG_MAX'), YGG_MSG_MAX)

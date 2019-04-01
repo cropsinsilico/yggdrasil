@@ -1,5 +1,5 @@
 from yggdrasil import tools
-from yggdrasil.schema import inherit_schema
+from yggdrasil.components import inherit_schema
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers.ModelDriver import ModelDriver
 

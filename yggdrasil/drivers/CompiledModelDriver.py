@@ -10,7 +10,7 @@ from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers import import_language_driver
 from yggdrasil.drivers.ModelDriver import ModelDriver
-from yggdrasil.schema import inherit_schema
+from yggdrasil.components import inherit_schema
 
 
 _compiler_registry = OrderedDict()
@@ -983,7 +983,7 @@ class CompilerBase(CompilationToolBase):
                                                    libtype=libtype, **kwargs))
             else:
                 src_base, src_ext = os.path.splitext(src)
-                if no_src_ext:
+                if no_src_ext or src_base.endswith('_%s' % src_ext[1:]):
                     obj = '%s%s' % (src_base, cls.object_ext)
                 else:
                     obj = '%s_%s%s' % (src_base, src_ext[1:], cls.object_ext)
@@ -1459,20 +1459,13 @@ class CompiledModelDriver(ModelDriver):
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('overwrite', (not kwargs.pop('preserve_cache', False)))
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
-        # Split lists
-        for k in ['source_files', 'compiler_flags', 'linker_flags']:
-            v = getattr(self, k)
-            if isinstance(v, backwards.string_types):
-                setattr(self, k, v.split())
-            else:
-                setattr(self, k, copy.deepcopy(v))
         # Set defaults from attributes
         for k0 in ['compiler', 'linker', 'archiver']:
             for k in [k0, '%s_flags' % k0]:
                 v = getattr(self, k, None)
                 if v is None:
                     setattr(self, k, getattr(self, 'default_%s' % k))
-        # Set tools
+        # Set tools so that they are cached
         for k in ['compiler', 'linker', 'archiver']:
             setattr(self, '%s_tool' % k, self.get_tool(k))
         # Compile
@@ -1502,10 +1495,23 @@ class CompiledModelDriver(ModelDriver):
         # not specified
         model_ext = os.path.splitext(self.model_file)[-1]
         model_is_source = False
-        if (self.language_ext is not None) and (model_ext in self.language_ext):
-            model_is_source = True
-            if len(self.source_files) == 0:
-                self.source_files.append(self.model_file)
+        if (self.language_ext is not None) and (len(model_ext) > 0):
+            if (model_ext in self.language_ext):
+                model_is_source = True
+                if len(self.source_files) == 0:
+                    self.source_files.append(self.model_file)
+            else:
+                # Assert that model file is not source code in any of the
+                # registered languages
+                from yggdrasil.components import _registry
+                for v in _registry['model'].values():
+                    if (((v.language_ext is not None)
+                         and (model_ext in v.language_ext))):  # pragma: debug
+                        raise RuntimeError(("Extension '%s' indicates that the "
+                                            "model language is '%s', not '%s' "
+                                            "as specified.")
+                                           % (model_ext, v.language,
+                                              self.language))
         elif (len(self.source_files) == 0) and (self.language_ext is not None):
             self.source_files.append(os.path.splitext(self.model_file)[0]
                                      + self.language_ext[0])

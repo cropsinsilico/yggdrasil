@@ -8,7 +8,7 @@ from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
-from yggdrasil.schema import register_component
+from yggdrasil.components import ComponentBase
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
@@ -198,8 +198,7 @@ class CommServer(tools.YggThreadLoop):
             _registered_servers.pop(self.srv_address)
 
 
-@register_component
-class CommBase(tools.YggClass):
+class CommBase(ComponentBase, tools.YggClass):
     r"""Class for handling I/O.
 
     Args:
@@ -298,8 +297,9 @@ class CommBase(tools.YggClass):
     """
 
     # TODO: Add serializer to comm schema
-    _commtype = 'default'
+    _commtype = 'default'  # Is this necessary?
     _schema_type = 'comm'
+    _schema_subtype_key = 'commtype'
     _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {'name': {'type': 'string'},
                           'commtype': {'type': 'string', 'default': _commtype},
@@ -310,6 +310,7 @@ class CommBase(tools.YggClass):
                           'field_names': {'type': 'array', 'items': {'type': 'string'}},
                           'field_units': {'type': 'array', 'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False}}
+    _schema_excluded_from_class = ['name']
     _default_serializer = DefaultSerialize
     is_file = False
     _maxMsgSize = 0
@@ -411,12 +412,6 @@ class CommBase(tools.YggClass):
                     datatype[k] = kwargs[k]
             self.debug('datatype = %s', str(datatype))
             self.serializer = cls(**datatype)
-        # Transfer keywords form the schema
-        for k, v in self._schema_properties.items():
-            if k in ['name']:
-                continue
-            default = v.get('default', None)
-            setattr(self, k, kwargs.get(k, default))
 
     @classmethod
     def get_testing_options(cls, **kwargs):

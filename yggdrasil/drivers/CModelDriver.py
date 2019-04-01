@@ -4,7 +4,6 @@ from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
-from yggdrasil.schema import register_component
 
 
 class CCompilerBase(CompilerBase):
@@ -120,7 +119,6 @@ _incl_seri = os.path.join(_top_dir, 'serialize')
 _incl_comm = os.path.join(_top_dir, 'communication')
 
 
-@register_component
 class CModelDriver(CompiledModelDriver):
     r"""Class for running C models."""
 

@@ -1,8 +1,6 @@
 from yggdrasil.drivers.OutputDriver import OutputDriver
-from yggdrasil.schema import register_component
 
 
-@register_component
 class FileOutputDriver(OutputDriver):
     r"""Class to handle output of received messages to a file.
 

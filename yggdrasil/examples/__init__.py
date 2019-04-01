@@ -27,10 +27,12 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'timed_pipe': ('python', 'matlab', 'c', 'cpp'),
            'fakeplant': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'root_to_shoot': ('python', 'c', 'all', 'all_nomatlab')}
+# TODO: This can be generated from the drivers
 ext_map = {'python': '.py',
            'matlab': '.m',
            'c': '.c',
-           'cpp': '.cpp'}
+           'cpp': '.cpp',
+           'executable': ''}
 _example_dir = os.path.dirname(__file__)
 
 

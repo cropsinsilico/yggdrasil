@@ -1,9 +1,7 @@
 from yggdrasil.communication import FileComm
-from yggdrasil.schema import register_component
 from yggdrasil.serialize.MatSerialize import MatSerialize
 
 
-@register_component
 class MatFileComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a Matlab .mat file on disk.
 

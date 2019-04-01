@@ -2,7 +2,6 @@ import sys
 import logging
 from subprocess import Popen, PIPE
 from yggdrasil import platform, tools
-from yggdrasil.schema import register_component
 from yggdrasil.communication import CommBase, AsyncComm
 try:
     import sysv_ipc
@@ -169,7 +168,6 @@ class IPCServer(CommBase.CommServer):
         super(IPCServer, self).terminate(*args, **kwargs)
 
 
-@register_component
 class IPCComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O via IPC message queues.
 

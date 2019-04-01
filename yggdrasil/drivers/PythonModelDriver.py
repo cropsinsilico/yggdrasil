@@ -3,7 +3,6 @@ import sys
 import importlib
 from yggdrasil import tools
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-from yggdrasil.schema import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -11,7 +10,6 @@ _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 
 
-@register_component
 class PythonModelDriver(InterpretedModelDriver):
     r"""Class for running Python models."""
 
@@ -81,6 +79,8 @@ class PythonModelDriver(InterpretedModelDriver):
 
         """
         out = super(PythonModelDriver, cls).is_comm_installed(**kwargs)
+        if not kwargs.get('skip_config'):
+            return out
         if out and (kwargs.get('commtype', None) in ['rmq', 'rmq_async']):
             from yggdrasil.communication.RMQComm import check_rmq_server
             out = check_rmq_server()

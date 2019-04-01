@@ -63,6 +63,7 @@ class ConnectionDriver(Driver):
     _ocomm_type = 'DefaultComm'
     _direction = 'any'
     _schema_type = 'connection'
+    _schema_subtype_key = 'connection_type'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
         'inputs': {'type': 'array', 'minItems': 1,

@@ -22,6 +22,9 @@ class ClientComm(CommBase.CommBase):
         ocomm (Comm): Request comm.
 
     """
+
+    _dont_register = True
+    
     def __init__(self, name, request_comm=None, response_kwargs=None,
                  dont_open=False, **kwargs):
         if response_kwargs is None:
