@@ -349,6 +349,18 @@ class ComponentSchema(object):
         for subt in self.subtype_keys:
             new_schema['properties'].setdefault(subt, {})
             new_schema['properties'][subt]['enum'] = subtype[subt]
+        # Add legacy properties
+        legacy_properties = {'driver': {'type': 'string',
+                                        'description': (
+                                            '[DEPRECATED] Name of driver '
+                                            'class that should be used.')},
+                             'args': {'type': 'string',
+                                      'description': (
+                                          '[DPRECATED] Arguments that should '
+                                          'be provided to the driver.')}}
+        for k, v in legacy_properties.items():
+            if k not in new_schema['properties']:
+                new_schema['properties'][k] = v
         # Create base schema
         is_base = False
         if self._base_schema is None:
@@ -360,18 +372,6 @@ class ComponentSchema(object):
                              % self.schema_type),
                 dependencies={'driver': ['args']},
                 additionalProperties=True)
-            # Add legacy properties
-            legacy_properties = {'driver': {'type': 'string',
-                                            'description': (
-                                                '[DEPRECATED] Name of driver '
-                                                'class that should be used.')},
-                                 'args': {'type': 'string',
-                                          'description': (
-                                              '[DPRECATED] Arguments that should '
-                                              'be provided to the driver.')}}
-            for k, v in legacy_properties.items():
-                if k not in self._base_schema['properties']:
-                    self._base_schema['properties'][k] = v
         # Update base schema, checking for compatiblity
         if not is_base:
             if 'required' in self._base_schema:

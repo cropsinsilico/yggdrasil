@@ -8,6 +8,8 @@ definitions:
         driver: [args]
       description: Base schema for all subtypes of comm components.
       properties:
+        args: {description: '[DPRECATED] Arguments that should be provided to the
+            driver.', type: string}
         as_array: {default: false, type: boolean}
         commtype:
           default: default
@@ -16,6 +18,8 @@ definitions:
         datatype:
           default: {type: bytes}
           type: schema
+        driver: {description: '[DEPRECATED] Name of driver class that should be used.',
+          type: string}
         field_names:
           items: {type: string}
           type: array
@@ -86,9 +90,13 @@ definitions:
         driver: [args]
       description: Base schema for all subtypes of connection components.
       properties:
+        args: {description: '[DPRECATED] Arguments that should be provided to the
+            driver.', type: string}
         connection_type:
           enum: [client, default, file_input, file_output, input, output, rmq_async_client,
             rmq_async_server, rmq_client, rmq_server, server]
+        driver: {description: '[DEPRECATED] Name of driver class that should be used.',
+          type: string}
         inputs:
           items:
             anyOf:
@@ -207,12 +215,16 @@ definitions:
       properties:
         append: {default: false, description: 'If True and writing, file is openned
             in append mode. Defaults to False.', type: boolean}
+        args: {description: '[DPRECATED] Arguments that should be provided to the
+            driver.', type: string}
         as_array: {default: false, type: boolean}
         comment: {default: '# ', type: string}
         default_flow_style: {default: false, type: boolean}
         delimiter: {default: "\t", description: 'String that should be used to separate
             columns. If not provided and format_str is not set prior to I/O, this
             defaults to whitespace.', type: string}
+        driver: {description: '[DEPRECATED] Name of driver class that should be used.',
+          type: string}
         encoding: {default: utf-8, type: string}
         field_names:
           items: {type: string}
@@ -420,6 +432,8 @@ definitions:
             default_compiler_flags class attribute.
           items: {type: string}
           type: array
+        driver: {description: '[DEPRECATED] Name of driver class that should be used.',
+          type: string}
         inputs:
           default: []
           description: Model inputs described as comm objects.
