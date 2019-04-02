@@ -1,11 +1,5 @@
 import os
 from yggdrasil.tests import YggTestClassInfo
-from yggdrasil import drivers
-
-
-def test_import_driver():
-    r"""Test creation of default driver."""
-    drivers.import_driver()
 
 
 class TestParam(YggTestClassInfo):

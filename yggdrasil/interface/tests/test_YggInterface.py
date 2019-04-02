@@ -1,11 +1,11 @@
 import os
 import numpy as np
 import unittest
-from yggdrasil.communication import get_comm, get_comm_class
+from yggdrasil.communication import get_comm
 from yggdrasil.interface import YggInterface
 from yggdrasil.tools import YGG_MSG_EOF, get_YGG_MSG_MAX, YGG_MSG_BUF
-from yggdrasil.drivers import (
-    import_driver, InputDriver, OutputDriver)
+from yggdrasil.components import import_component
+from yggdrasil.drivers import (InputDriver, OutputDriver)
 from yggdrasil.drivers.MatlabModelDriver import MatlabModelDriver
 from yggdrasil.tests import YggTestClassInfo, assert_equal, assert_raises
 
@@ -86,10 +86,10 @@ class TestBase(YggTestClassInfo):
         if self.direction is None:
             return None  # pragma: no cover
         elif (self.direction == 'output') and self.is_file:
-            return import_driver('FileOutputDriver')
+            return import_component('connection', 'file_output')
         elif (self.direction == 'input') and self.is_file:
             return None
-        return import_driver('OutputDriver')
+        return import_component('connection', 'output')
 
     @property
     def idriver_class(self):
@@ -99,8 +99,8 @@ class TestBase(YggTestClassInfo):
         elif (self.direction == 'output') and self.is_file:
             return None
         elif (self.direction == 'input') and self.is_file:
-            return import_driver('FileInputDriver')
-        return import_driver('InputDriver')
+            return import_component('connection', 'file_input')
+        return import_component('connection', 'input')
 
     @property
     def odriver_args(self):
@@ -146,10 +146,10 @@ class TestBase(YggTestClassInfo):
         out = {}
         if self.is_file:
             assert(self.filecomm is not None)
-            out = get_comm_class(self.filecomm).get_testing_options(
+            out = import_component('file', self.filecomm).get_testing_options(
                 **self.testing_option_kws)
         else:
-            out = get_comm_class().get_testing_options(
+            out = import_component('comm', 'default').get_testing_options(
                 **self.testing_option_kws)
         return out
 
@@ -324,12 +324,12 @@ class TestYggRpcClient(TestYggOutput):
     @property
     def odriver_class(self):
         r"""class: Output driver class."""
-        return import_driver('ClientDriver')
+        return import_component('connection', 'client')
 
     @property
     def idriver_class(self):
         r"""class: Input driver class."""
-        return import_driver('ServerDriver')
+        return import_component('connection', 'server')
     
     def test_msg(self):
         r"""Test sending/receiving message."""
@@ -363,12 +363,12 @@ class TestYggRpcServer(TestYggInput):
     @property
     def odriver_class(self):
         r"""class: Output driver class."""
-        return import_driver('ClientDriver')
+        return import_component('connection', 'client')
 
     @property
     def idriver_class(self):
         r"""class: Input driver class."""
-        return import_driver('ServerDriver')
+        return import_component('connection', 'server')
     
     def test_msg(self):
         r"""Test sending/receiving message."""

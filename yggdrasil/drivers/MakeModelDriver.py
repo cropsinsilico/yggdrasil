@@ -127,7 +127,7 @@ class MakeModelDriver(CompiledModelDriver):
         makedir (str, optional): Directory where make should be invoked from
             if it is not the same as the directory containing the makefile.
             Defaults to directory containing makefile if provided, otherwise
-            self.working_dir.
+            working_dir.
         target (str, optional): Make target that should be built to create the
             model executable. Defaults to None.
         **kwargs: Additional keyword arguments are passed to parent class.

@@ -3,11 +3,11 @@ import unittest
 from yggdrasil import tools, backwards
 from yggdrasil.tests import MagicTestError, assert_raises
 from yggdrasil.schema import get_schema
-from yggdrasil.drivers import import_driver
+from yggdrasil.components import import_component
 from yggdrasil.drivers.tests import test_Driver as parent
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 from yggdrasil.communication import (
-    new_comm, ZMQComm, IPCComm, RMQComm, get_comm_class)
+    new_comm, ZMQComm, IPCComm, RMQComm)
 
 
 _default_comm = tools.get_default_comm()
@@ -93,12 +93,12 @@ class TestConnectionParam(parent.TestParam):
     @property
     def icomm_import_cls(self):
         r"""class: Class used for connection input comm."""
-        return get_comm_class(self.icomm_name)
+        return import_component('comm', self.icomm_name)
 
     @property
     def ocomm_import_cls(self):
         r"""class: Class used for connection output comm."""
-        return get_comm_class(self.ocomm_name)
+        return import_component('comm', self.ocomm_name)
 
     @property
     def send_comm_kwargs(self):
@@ -205,7 +205,8 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
             kwargs['icomm_kws'].update(
                 base_comm=self.icomm_name, new_comm_class='ErrorComm',
                 error_on_init=error_on_init)
-        driver_class = import_driver(self.driver)
+        driver_class = import_component('connection', self.driver,
+                                        without_schema=True)
         if error_on_init:
             self.assert_raises(MagicTestError, driver_class, *args, **kwargs)
         else:

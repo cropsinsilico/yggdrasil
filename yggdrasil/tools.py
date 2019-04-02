@@ -16,6 +16,7 @@ import uuid as uuid_gen
 import subprocess
 from yggdrasil import platform
 from yggdrasil import backwards
+from yggdrasil.components import import_component
 
 
 YGG_MSG_EOF = b'EOF!!!'
@@ -204,8 +205,7 @@ def is_lang_installed(lang):
             machine, False otherwise.
 
     """
-    from yggdrasil import drivers
-    drv = drivers.import_language_driver(lang)
+    drv = import_component('model', lang)
     return drv.is_installed()
 
 
@@ -224,8 +224,7 @@ def is_comm_installed(comm, language=None):
             machine, False otherwise.
 
     """
-    from yggdrasil import communication
-    cmm = communication.get_comm_class(comm)
+    cmm = import_component('comm', comm)
     return cmm.is_installed(language=language)
 
 

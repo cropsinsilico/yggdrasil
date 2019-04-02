@@ -8,7 +8,7 @@ import shutil
 from pprint import pformat
 from yggdrasil import platform, tools, backwards
 from yggdrasil.config import ygg_cfg, locate_file
-from yggdrasil.drivers import import_language_driver
+from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from threading import Event
 try:
@@ -125,13 +125,17 @@ class ModelDriver(Driver):
     _schema_required = ['name', 'language', 'args', 'working_dir']
     _schema_properties = {
         'name': {'type': 'string'},
-        'language': {'type': 'string'},
+        'language': {'type': 'string', 'default': 'executable',
+                     'description': ('The programming language that the model '
+                                     'is written in.')},
         'args': {'type': 'array',
                  'items': {'type': 'string'}},
         'inputs': {'type': 'array', 'default': [],
-                   'items': {'$ref': '#/definitions/comm'}},
+                   'items': {'$ref': '#/definitions/comm'},
+                   'description': 'Model inputs described as comm objects.'},
         'outputs': {'type': 'array', 'default': [],
-                    'items': {'$ref': '#/definitions/comm'}},
+                    'items': {'$ref': '#/definitions/comm'},
+                    'description': 'Model outputs described as comm objects.'},
         'products': {'type': 'array', 'default': [],
                      'items': {'type': 'string'}},
         'working_dir': {'type': 'string'},
@@ -432,7 +436,7 @@ class ModelDriver(Driver):
         for x in cls.base_languages:
             if not out:
                 break
-            out = import_language_driver(x).are_dependencies_installed()
+            out = import_component('model', x).are_dependencies_installed()
         if out:
             for x in cls.interface_dependencies:
                 if not out:
@@ -455,7 +459,7 @@ class ModelDriver(Driver):
         for x in cls.base_languages:
             if not out:
                 break
-            out = import_language_driver(x).is_language_installed()
+            out = import_component('model', x).is_language_installed()
         return out
 
     @classmethod
@@ -492,7 +496,7 @@ class ModelDriver(Driver):
         for x in cls.base_languages:
             if not out:
                 break
-            out = import_language_driver(x).is_configured()
+            out = import_component('model', x).is_configured()
         return out
 
     @classmethod
@@ -533,7 +537,7 @@ class ModelDriver(Driver):
             for x in cls.base_languages:
                 if not out:
                     break
-                out = import_language_driver(x).is_comm_installed(
+                out = import_component('model', x).is_comm_installed(
                     commtype=commtype, skip_config=skip_config, **kwargs)
             return out
         # Check for installation based on config option

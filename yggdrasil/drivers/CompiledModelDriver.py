@@ -8,9 +8,8 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
-from yggdrasil.drivers import import_language_driver
 from yggdrasil.drivers.ModelDriver import ModelDriver
-from yggdrasil.components import inherit_schema
+from yggdrasil.components import inherit_schema, import_component
 
 
 _compiler_registry = OrderedDict()
@@ -262,7 +261,7 @@ class CompilationToolBase(object):
         if cls._language_ext is None:
             cls._language_ext = []
             for x in cls.languages:
-                new_ext = import_language_driver(x).language_ext
+                new_ext = import_component('model', x).language_ext
                 if new_ext is not None:
                     cls._language_ext += new_ext
         return cls._language_ext
@@ -605,7 +604,7 @@ class CompilationToolBase(object):
         # Call from another tool if the language dosn't match
         language = kwargs.pop('%s_language' % cls.tooltype, language)
         if (language is not None) and (language not in cls.languages):
-            lang_drv = import_language_driver(language)
+            lang_drv = import_component('model', language)
             lang_cls = lang_drv.get_tool(cls.tooltype)
             return lang_cls.call(args, skip_flags=skip_flags, dry_run=dry_run,
                                  out=out, overwrite=overwrite, products=products,
@@ -1503,8 +1502,11 @@ class CompiledModelDriver(ModelDriver):
             else:
                 # Assert that model file is not source code in any of the
                 # registered languages
-                from yggdrasil.components import _registry
-                for v in _registry['model'].values():
+                from yggdrasil.components import import_component
+                from yggdrasil.schema import get_schema
+                s = get_schema()['model']
+                for v_name in s.classes:
+                    v = import_component('model', v_name)
                     if (((v.language_ext is not None)
                          and (model_ext in v.language_ext))):  # pragma: debug
                         raise RuntimeError(("Extension '%s' indicates that the "
@@ -1694,7 +1696,7 @@ class CompiledModelDriver(ModelDriver):
                 if dep_lang == cls.language:
                     dep_drv = cls
                 else:
-                    dep_drv = import_language_driver(dep_lang)
+                    dep_drv = import_component('model', dep_lang)
                 out = dep + dep_drv.language_ext[0]
             if (((out is not None) and (out_dir is not None)
                  and (not os.path.isabs(out)))):
@@ -2246,7 +2248,7 @@ class CompiledModelDriver(ModelDriver):
         r"""Compile any required internal libraries, including the interface."""
         base_libraries = []
         for x in cls.base_languages:
-            base_cls = import_language_driver(x)
+            base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
             base_cls.compile_dependencies(**kwargs)
         if (((cls.interface_library is not None) and cls.is_installed()
@@ -2330,8 +2332,7 @@ class CompiledModelDriver(ModelDriver):
         language = kwargs.pop('compiler_language', language)
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
-            from yggdrasil.drivers import import_language_driver
-            drv = import_language_driver(cls.language)
+            drv = import_component('model', cls.language)
             return drv.call_compiler(src, **kwargs)
         # Handle internal library
         if isinstance(src, str) and (src in cls.internal_libraries):
@@ -2379,8 +2380,7 @@ class CompiledModelDriver(ModelDriver):
         language = kwargs.pop('linker_language', language)
         # Link using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
-            from yggdrasil.drivers import import_driver_language
-            drv = import_driver_language(cls.language)
+            drv = import_component('model', cls.language)
             return drv.call_linker(obj, **kwargs)
         # Determine tool that should be used
         if kwargs.get('libtype', 'object') == 'static':

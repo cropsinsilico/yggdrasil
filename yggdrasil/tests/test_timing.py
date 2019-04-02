@@ -10,7 +10,7 @@ _test_count = 1
 _test_nrep = 1
 _test_lang = 'c'
 # On windows, it's possible to not have a C/C++ communication library installed
-if 'c' not in timing._lang_list:  # pragma: windows
+if 'c' not in timing.get_lang_list():  # pragma: windows
     _test_lang = 'python'
 # _test_run = timing.TimedRun(_test_lang, _test_lang)
 # _test_run.time_run(_test_count, _test_size, nrep=_test_nrep)
@@ -31,7 +31,7 @@ _testfile_dat = 'test_run123.dat'
 
 def test_get_source():
     r"""Test getting source file for test."""
-    lang_list = timing._lang_list
+    lang_list = timing.get_lang_list()
     dir_list = ['src', 'dst']
     for l in lang_list:
         for d in dir_list:
@@ -320,7 +320,7 @@ class TestTimedRunTemp(TimedRunTestBase):
     def test_languages(self):
         r"""Test different combinations of source/destination languages."""
         kwargs = copy.deepcopy(self.inst_kwargs)
-        for l1 in timing._lang_list:
+        for l1 in timing.get_lang_list():
             args = (l1, l1)
             x = timing.TimedRun(*args, **kwargs)
             x.time_run(*self.time_run_args, **self.time_run_kwargs)
@@ -329,7 +329,7 @@ class TestTimedRunTemp(TimedRunTestBase):
         r"""Test different comm types."""
         args = copy.deepcopy(self.inst_args)
         kwargs = copy.deepcopy(self.inst_kwargs)
-        for c in timing._comm_list:
+        for c in timing.get_comm_list():
             kwargs['comm_type'] = c
             x = timing.TimedRun(*args, **kwargs)
             x.time_run(*self.time_run_args, **self.time_run_kwargs)

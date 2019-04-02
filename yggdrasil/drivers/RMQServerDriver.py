@@ -9,6 +9,9 @@ class RMQServerDriver(ServerDriver):
         **kwargs: Keyword arguments are passed to parent class.
 
     """
+
+    _connection_type = 'rmq_server'
+    
     def __init__(self, *args, **kwargs):
         kwargs['comm'] = 'RMQComm'
         super(RMQServerDriver, self).__init__(*args, **kwargs)

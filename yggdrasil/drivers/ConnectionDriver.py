@@ -3,8 +3,9 @@ import os
 import numpy as np
 import threading
 from yggdrasil import backwards
-from yggdrasil.communication import new_comm, get_comm_class
+from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
+from yggdrasil.components import import_component
 from yggdrasil.schema import get_schema
 
 
@@ -163,12 +164,13 @@ class ConnectionDriver(Driver):
             comm_kws['no_suffix'] = True
             ikws = []
             for x in comm_kws['comm']:
-                if get_comm_class(x['comm']).is_file:
+                icomm_cls = import_component('comm', x['comm'])
+                if icomm_cls.is_file:
                     any_files = True
-                    ikws += s['file'].get_subtype_properties(x['comm'])
+                    ikws += s['file'].get_subtype_properties(icomm_cls._filetype)
                 else:
                     all_files = False
-                    ikws += s['comm'].get_subtype_properties(x['comm'])
+                    ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
             ikws = list(set(ikws))
             for k in ikws:
                 if (k not in comm_kws) and (k in kwargs):

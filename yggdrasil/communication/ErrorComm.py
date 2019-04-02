@@ -1,5 +1,5 @@
 from yggdrasil.tests import ErrorClass
-from yggdrasil.communication import get_comm_class
+from yggdrasil.components import import_component
 
 
 def ErrorComm(name, base_comm='CommBase', **kwargs):  # pragma: debug
@@ -18,7 +18,7 @@ def ErrorComm(name, base_comm='CommBase', **kwargs):  # pragma: debug
             requested locaiton.
 
     """
-    base_class = get_comm_class(base_comm)
+    base_class = import_component('comm', base_comm)
     out = ErrorClass(base_class, name, **kwargs)
     if base_comm is None:
         base_comm = str(base_class).split("'")[1].split(".")[-1]

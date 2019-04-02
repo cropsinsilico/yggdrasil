@@ -6,8 +6,8 @@ definitions:
     - additionalProperties: false
       dependencies:
         driver: [args]
+      description: Base schema for all subtypes of comm components.
       properties:
-        args: {type: string}
         as_array: {default: false, type: boolean}
         commtype:
           default: default
@@ -16,39 +16,66 @@ definitions:
         datatype:
           default: {type: bytes}
           type: schema
-        driver: {type: string}
         field_names:
           items: {type: string}
           type: array
         field_units:
           items: {type: string}
           type: array
-        name: {type: string}
-        recv_converter: {type: function}
-        send_converter: {type: function}
-      required: [name, commtype, datatype]
+        name: {description: Class name., type: string}
+        recv_converter: {description: Converter that should be used on received objects.
+            Defaults to None., type: function}
+        send_converter: {description: Converter that should be used on sent objects.
+            Defaults to None., type: function}
+      required: [commtype, datatype, name]
+      title: comm_base
       type: object
     - anyOf:
-      - properties:
+      - additionalProperties: true
+        description: Schema for comm component ['zmq'] subtype.
+        properties:
           commtype:
-            enum: [default]
-        title: DefaultComm
-      - properties:
-          commtype:
-            enum: [ipc]
-        title: IPCComm
-      - properties:
-          commtype:
-            enum: [rmq_async]
-        title: RMQAsyncComm
-      - properties:
-          commtype:
-            enum: [rmq]
-        title: RMQComm
-      - properties:
-          commtype:
+            default: default
             enum: [zmq]
+            type: string
         title: ZMQComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['ipc'] subtype.
+        properties:
+          commtype:
+            default: default
+            enum: [ipc]
+            type: string
+        title: IPCComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['rmq_async'] subtype.
+        properties:
+          commtype:
+            default: default
+            enum: [rmq_async]
+            type: string
+        title: RMQAsyncComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['rmq'] subtype.
+        properties:
+          commtype:
+            default: default
+            enum: [rmq]
+            type: string
+        title: RMQComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['default'] subtype.
+        properties:
+          commtype:
+            default: default
+            enum: [default]
+            type: string
+        title: DefaultComm
+        type: object
     description: Schema for comm components.
     title: comm
   connection:
@@ -57,11 +84,11 @@ definitions:
     - additionalProperties: false
       dependencies:
         driver: [args]
+      description: Base schema for all subtypes of connection components.
       properties:
-        args: {type: string}
         connection_type:
-          enum: [file_input, file_output, input, output]
-        driver: {type: string}
+          enum: [client, default, file_input, file_output, input, output, rmq_async_client,
+            rmq_async_server, rmq_client, rmq_server, server]
         inputs:
           items:
             anyOf:
@@ -69,7 +96,8 @@ definitions:
             - {$ref: '#/definitions/file'}
           minItems: 1
           type: array
-        onexit: {type: string}
+        onexit: {description: 'Class method that should be called when the corresponding
+            model exits, but before the driver is shut down. Defaults to None.', type: string}
         outputs:
           items:
             anyOf:
@@ -78,27 +106,95 @@ definitions:
           minItems: 1
           type: array
         translator:
+          description: Function or string specifying function that should be used
+            to translate messages from the input communicator before passing them
+            to the output communicator. If a string, the format should be "<package.module>:<function>"
+            so that <function> can be imported from <package>. Defaults to None and
+            messages are passed directly. This can also be a list of functions/strings
+            that will be called on the messages in the order they are provided.
           items: {type: function}
           type: array
       required: [inputs, outputs]
+      title: connection_base
       type: object
     - anyOf:
-      - properties:
+      - additionalProperties: true
+        description: Schema for connection component ['rmq_async_client'] subtype.
+        properties:
+          connection_type:
+            enum: [rmq_async_client]
+        title: RMQAsyncClientDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['rmq_server'] subtype.
+        properties:
+          connection_type:
+            enum: [rmq_server]
+        title: RMQServerDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['file_input'] subtype.
+        properties:
           connection_type:
             enum: [file_input]
         title: FileInputDriver
-      - properties:
-          connection_type:
-            enum: [file_output]
-        title: FileOutputDriver
-      - properties:
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['input'] subtype.
+        properties:
           connection_type:
             enum: [input]
         title: InputDriver
-      - properties:
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['rmq_async_server'] subtype.
+        properties:
+          connection_type:
+            enum: [rmq_async_server]
+        title: RMQAsyncServerDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['server'] subtype.
+        properties:
+          connection_type:
+            enum: [server]
+        title: ServerDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['file_output'] subtype.
+        properties:
+          connection_type:
+            enum: [file_output]
+        title: FileOutputDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['output'] subtype.
+        properties:
           connection_type:
             enum: [output]
         title: OutputDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['rmq_client'] subtype.
+        properties:
+          connection_type:
+            enum: [rmq_client]
+        title: RMQClientDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['client'] subtype.
+        properties:
+          connection_type:
+            enum: [client]
+        title: ClientDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for connection component ['default'] subtype.
+        properties:
+          connection_type:
+            enum: [default]
+        title: ConnectionDriver
+        type: object
     description: Schema for connection components.
     title: connection
   file:
@@ -107,15 +203,17 @@ definitions:
     - additionalProperties: false
       dependencies:
         driver: [args]
+      description: Base schema for all subtypes of file components.
       properties:
-        append: {default: false, type: boolean}
-        args: {type: string}
+        append: {default: false, description: 'If True and writing, file is openned
+            in append mode. Defaults to False.', type: boolean}
         as_array: {default: false, type: boolean}
         comment: {default: '# ', type: string}
-        default_flow_style: &id006 {default: false, type: boolean}
-        delimiter: &id001 {default: "\t", type: string}
-        driver: {type: string}
-        encoding: &id007 {default: utf-8, type: string}
+        default_flow_style: {default: false, type: boolean}
+        delimiter: {default: "\t", description: 'String that should be used to separate
+            columns. If not provided and format_str is not set prior to I/O, this
+            defaults to whitespace.', type: string}
+        encoding: {default: utf-8, type: string}
         field_names:
           items: {type: string}
           type: array
@@ -126,83 +224,165 @@ definitions:
           default: binary
           enum: [ascii, binary, json, map, mat, obj, pandas, pickle, ply, table, yaml]
           type: string
-        format_str: &id002 {type: string}
-        in_temp: {default: false, type: boolean}
-        indent: &id004
+        format_str: {description: String that should be used to format/parse messages.
+            Default to None., type: string}
+        in_temp: {default: false, description: 'If True, the path will be considered
+            relative to the platform temporary directory. Defaults to False.', type: boolean}
+        indent:
           default: "\t"
           type: [string, int]
-        is_series: {default: false, type: boolean}
-        name: {type: string}
+        is_series: {default: false, description: 'If True, input/output will be done
+            to a series of files. If reading, each file will be processed until the
+            end is reached. If writing, each output will be to a new file in the series.
+            The addressed is assumed to contain a format for the index of the file.
+            Defaults to False.', type: boolean}
+        name: {description: Class name., type: string}
         newline: {default: '
 
-            ', type: string}
-        recv_converter: {type: function}
-        send_converter: {type: function}
-        sort_keys: &id005 {default: true, type: boolean}
-        use_astropy: &id003 {default: false, type: boolean}
-        wait_for_creation: {default: 0.0, type: float}
-        working_dir: {type: string}
-      required: [name, filetype, working_dir]
+            ', description: String indicating a new line. Defaults to serialize._default_newline.,
+          type: string}
+        recv_converter: {description: Converter that should be used on received objects.
+            Defaults to None., type: function}
+        send_converter: {description: Converter that should be used on sent objects.
+            Defaults to None., type: function}
+        sort_keys: {default: true, type: boolean}
+        use_astropy: {default: false, description: 'If True and the astropy package
+            is installed, it will be used to read/write the table. Defaults to False.',
+          type: boolean}
+        wait_for_creation: {default: 0.0, description: Time (in seconds) that should
+            be waited before opening for the file to be created if it dosn't exist.
+            Defaults to 0 s and file will attempt to be opened immediately., type: float}
+        working_dir: {description: 'Working directory. If not provided, the current
+            working directory is used.', type: string}
+      required: [filetype, name, working_dir]
+      title: file_base
       type: object
     - anyOf:
-      - properties:
+      - additionalProperties: true
+        description: Schema for file component ['pickle'] subtype.
+        properties:
           filetype:
-            enum: [ascii]
-        title: AsciiFileComm
-      - properties:
-          delimiter: *id001
-          filetype:
-            enum: [map]
-        title: AsciiMapComm
-      - properties:
-          delimiter: {default: "\t", type: string}
-          filetype:
-            enum: [table]
-          format_str: *id002
-          use_astropy: *id003
-        title: AsciiTableComm
-      - properties:
-          filetype:
-            enum: [binary]
-        title: FileComm
-      - properties:
-          filetype:
-            enum: [json]
-          indent: *id004
-          sort_keys: *id005
-        title: JSONFileComm
-      - properties:
-          filetype:
-            enum: [mat]
-        title: MatFileComm
-      - properties:
-          filetype:
-            enum: [obj]
-        title: ObjFileComm
-      - properties:
-          delimiter: {default: "\t", type: string}
-          filetype:
-            enum: [pandas]
-          format_str: {type: string}
-          use_astropy: {default: false, type: boolean}
-        title: PandasFileComm
-      - properties:
-          filetype:
+            default: binary
             enum: [pickle]
+            type: string
         title: PickleFileComm
-      - properties:
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['json'] subtype.
+        properties:
           filetype:
-            enum: [ply]
-        title: PlyFileComm
-      - properties:
-          default_flow_style: *id006
-          encoding: *id007
+            default: binary
+            enum: [json]
+            type: string
+          indent:
+            default: "\t"
+            type: [string, int]
+          sort_keys: {default: true, type: boolean}
+        title: JSONFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['yaml'] subtype.
+        properties:
+          default_flow_style: {default: false, type: boolean}
+          encoding: {default: utf-8, type: string}
           filetype:
+            default: binary
             enum: [yaml]
+            type: string
           indent:
             default: "\t"
             type: [string, int]
         title: YAMLFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['obj'] subtype.
+        properties:
+          filetype:
+            default: binary
+            enum: [obj]
+            type: string
+        title: ObjFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['pandas'] subtype.
+        properties:
+          delimiter: {default: "\t", description: 'String that should be used to separate
+              columns. If not provided and format_str is not set prior to I/O, this
+              defaults to whitespace.', type: string}
+          filetype:
+            default: binary
+            enum: [pandas]
+            type: string
+          format_str: {description: String that should be used to format/parse messages.
+              Default to None., type: string}
+          use_astropy: {default: false, description: 'If True and the astropy package
+              is installed, it will be used to read/write the table. Defaults to False.',
+            type: boolean}
+        title: PandasFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['mat'] subtype.
+        properties:
+          filetype:
+            default: binary
+            enum: [mat]
+            type: string
+        title: MatFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['table'] subtype.
+        properties:
+          delimiter: {default: "\t", description: 'String that should be used to separate
+              columns. If not provided and format_str is not set prior to I/O, this
+              defaults to whitespace.', type: string}
+          filetype:
+            default: binary
+            enum: [table]
+            type: string
+          format_str: {description: String that should be used to format/parse messages.
+              Default to None., type: string}
+          use_astropy: {default: false, description: 'If True and the astropy package
+              is installed, it will be used to read/write the table. Defaults to False.',
+            type: boolean}
+        title: AsciiTableComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['ascii'] subtype.
+        properties:
+          filetype:
+            default: binary
+            enum: [ascii]
+            type: string
+        title: AsciiFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['ply'] subtype.
+        properties:
+          filetype:
+            default: binary
+            enum: [ply]
+            type: string
+        title: PlyFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['map'] subtype.
+        properties:
+          delimiter: {default: "\t", type: string}
+          filetype:
+            default: binary
+            enum: [map]
+            type: string
+        title: AsciiMapComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['binary'] subtype.
+        properties:
+          filetype:
+            default: binary
+            enum: [binary]
+            type: string
+        title: FileComm
+        type: object
     description: Schema for file components.
     title: file
   model:
@@ -211,126 +391,412 @@ definitions:
     - additionalProperties: false
       dependencies:
         driver: [args]
+      description: Base schema for all subtypes of model components.
       properties:
         args:
+          description: Argument(s) for running the model on the command line. This
+            should be a complete command including the necessary executable and command
+            line arguments to that executable.
           items: {type: string}
           type: array
-        builddir: &id008 {type: string}
+        builddir: {description: Directory where the build should be saved. Defaults
+            to <sourcedir>/build. It can be relative to working_dir or absolute.,
+          type: string}
         client_of:
           default: []
+          description: The names of ne or more servers that this model is a client
+            of. Defaults to empty list.
           items: {type: string}
           type: array
-        compiler_flags: &id009
+        compiler: {description: 'Command or path to executable that should be used
+            to compile the model. If not provided, the compiler will be determined
+            based on configuration options for the language (if present) and the registered
+            compilers that are available on the current operating system.', type: string}
+        compiler_flags:
           default: []
+          description: Flags that should be passed to the compiler during compilation.
+            If nto provided, the compiler flags will be determined based on configuration
+            options for the language (if present), the compiler defaults, and the
+            default_compiler_flags class attribute.
           items: {type: string}
           type: array
-        driver: {type: string}
         inputs:
           default: []
+          description: Model inputs described as comm objects.
           items: {$ref: '#/definitions/comm'}
           type: array
-        is_server: {default: false, type: boolean}
+        interpreter: {description: 'Name or path of interpreter executable that should
+            be used to run the model. If not provided, the interpreter will be determined
+            based on configuration options for the language (if present) and the default_interpreter
+            class attribute.', type: string}
+        interpreter_flags:
+          default: []
+          description: Flags that should be passed to the interpreter when running
+            the model. If not provided, the flags are determined based on configuration
+            options for the language (if present) and the default_interpreter_flags
+            class attribute.
+          items: {type: string}
+          type: array
+        is_server: {default: false, description: 'If True, the model is assumed to
+            be a server and an instance of :class:`yggdrasil.drivers.ServerDriver`
+            is started. Defaults to False.', type: boolean}
         language:
+          default: executable
+          description: The programming language that the model is written in.
           enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
           type: string
-        linker_flags: &id010
+        linker: {description: 'Command or path to executable that should be used to
+            link the model. If not provided, the linker will be determined based on
+            configuration options for the language (if present) and the registered
+            linkers that are available on the current operating system', type: string}
+        linker_flags:
           default: []
+          description: Flags that should be passed to the linker during compilation.
+            If nto provided, the linker flags will be determined based on configuration
+            options for the language (if present), the linker defaults, and the default_linker_flags
+            class attribute.
           items: {type: string}
           type: array
-        makedir: &id014 {type: string}
-        makefile: &id015 {default: Makefile, type: string}
-        name: {type: string}
+        makedir: {description: 'Directory where make should be invoked from if it
+            is not the same as the directory containing the makefile. Defaults to
+            directory containing makefile if provided, otherwise working_dir.', type: string}
+        makefile: {default: Makefile, description: 'Path to make file either absolute,
+            relative to makedir (if provided), or relative to working_dir. Defaults
+            to Makefile.', type: string}
+        name: {description: Class name., type: string}
         outputs:
           default: []
+          description: Model outputs described as comm objects.
           items: {$ref: '#/definitions/comm'}
           type: array
-        overwrite: &id011 {default: true, type: boolean}
-        preserve_cache: &id012 {default: false, type: boolean}
-        sourcedir: &id013 {type: string}
+        overwrite: {default: true, description: 'If True, any existing model products
+            (compilation products, wrapper scripts, etc.) are removed prior to the
+            run. If False, the products are not removed. Defaults to True. Setting
+            this to False can improve the performance, particularly for models that
+            take a long time to compile, but this should only be done once the model
+            has been fully debugged to ensure that each run is tested on a clean copy
+            of the model. The value of this keyword also determines whether or not
+            products are removed after a run.', type: boolean}
+        preserve_cache: {default: false, description: 'If True model products will
+            be kept following the run, otherwise all products will be cleaned up.
+            Defaults to False. This keyword is superceeded by overwrite.', type: boolean}
+        products:
+          default: []
+          description: Paths to files created by the model that should be cleaned
+            up when the model exits. Entries can be absolute paths or paths relative
+            to the working directory. Defaults to [].
+          items: {type: string}
+          type: array
+        skip_interpreter: {default: false, description: 'If True, no interpreter will
+            be added to the arguments. This should only be used for subclasses that
+            will not be invoking the model via the command line. Defaults to False.',
+          type: boolean}
+        source_files:
+          default: []
+          description: Source files that should be compiled into an executable. Defaults
+            to an empty list and the driver will search for a source file based on
+            the model executable (the first model argument).
+          items: {type: string}
+          type: array
+        sourcedir: {description: Source directory to call cmake on. If not provided
+            it is set to working_dir. This should be the directory containing the
+            CMakeLists.txt file. It can be relative to working_dir or absolute., type: string}
         strace_flags:
           default: []
+          description: Flags to pass to strace (or dtrace). Defaults to [].
           items: {type: string}
           type: array
+        target: {description: Make target that should be built to create the model
+            executable. Defaults to None., type: string}
         valgrind_flags:
           default: [--leak-check=full]
+          description: Flags to pass to valgrind. Defaults to [].
           items: {type: string}
           type: array
-        with_strace: {default: false, type: boolean}
-        with_valgrind: {default: false, type: boolean}
-        working_dir: {type: string}
-      required: [name, language, args, working_dir]
+        with_strace: {default: false, description: 'If True, the command is run with
+            strace (on Linux) or dtrace (on MacOS). Defaults to False.', type: boolean}
+        with_valgrind: {default: false, description: 'If True, the command is run
+            with valgrind. Defaults to False.', type: boolean}
+        working_dir: {description: 'Working directory. If not provided, the current
+            working directory is used.', type: string}
+      required: [working_dir, args, name, language]
+      title: model_base
       type: object
     - anyOf:
-      - properties:
-          builddir: *id008
-          compiler_flags: *id009
-          language:
-            enum: [cmake]
-          linker_flags: *id010
-          overwrite: *id011
-          preserve_cache: *id012
-          sourcedir: *id013
-        title: CMakeModelDriver
-      - properties:
-          compiler_flags:
+      - additionalProperties: true
+        description: Schema for model component ['lpy'] subtype.
+        properties:
+          interpreter: {description: 'Name or path of interpreter executable that
+              should be used to run the model. If not provided, the interpreter will
+              be determined based on configuration options for the language (if present)
+              and the default_interpreter class attribute.', type: string}
+          interpreter_flags:
             default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
             items: {type: string}
             type: array
           language:
-            enum: [c]
-          linker_flags:
-            default: []
-            items: {type: string}
-            type: array
-          overwrite: {default: true, type: boolean}
-          preserve_cache: {default: false, type: boolean}
-        title: CModelDriver
-      - properties:
-          compiler_flags:
-            default: []
-            items: {type: string}
-            type: array
-          language:
-            enum: [c++, cpp]
-          linker_flags:
-            default: []
-            items: {type: string}
-            type: array
-          overwrite: {default: true, type: boolean}
-          preserve_cache: {default: false, type: boolean}
-        title: CPPModelDriver
-      - properties:
-          language:
-            enum: [executable]
-        title: ExecutableModelDriver
-      - properties:
-          language:
+            default: executable
+            description: The programming language that the model is written in.
             enum: [lpy]
+            type: string
+          skip_interpreter: {default: false, description: 'If True, no interpreter
+              will be added to the arguments. This should only be used for subclasses
+              that will not be invoking the model via the command line. Defaults to
+              False.', type: boolean}
         title: LPyModelDriver
-      - properties:
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['python'] subtype.
+        properties:
+          interpreter: {description: 'Name or path of interpreter executable that
+              should be used to run the model. If not provided, the interpreter will
+              be determined based on configuration options for the language (if present)
+              and the default_interpreter class attribute.', type: string}
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items: {type: string}
+            type: array
+          language:
+            default: executable
+            description: The programming language that the model is written in.
+            enum: [python]
+            type: string
+          skip_interpreter: {default: false, description: 'If True, no interpreter
+              will be added to the arguments. This should only be used for subclasses
+              that will not be invoking the model via the command line. Defaults to
+              False.', type: boolean}
+        title: PythonModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['executable'] subtype.
+        properties:
+          language:
+            default: executable
+            description: The programming language that the model is written in.
+            enum: [executable]
+            type: string
+        title: ExecutableModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['cmake'] subtype.
+        properties:
+          builddir: {description: Directory where the build should be saved. Defaults
+              to <sourcedir>/build. It can be relative to working_dir or absolute.,
+            type: string}
+          compiler: {description: 'Command or path to executable that should be used
+              to compile the model. If not provided, the compiler will be determined
+              based on configuration options for the language (if present) and the
+              registered compilers that are available on the current operating system.',
+            type: string}
           compiler_flags:
             default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
             items: {type: string}
             type: array
           language:
-            enum: [make]
+            default: executable
+            description: The programming language that the model is written in.
+            enum: [cmake]
+            type: string
+          linker: {description: 'Command or path to executable that should be used
+              to link the model. If not provided, the linker will be determined based
+              on configuration options for the language (if present) and the registered
+              linkers that are available on the current operating system', type: string}
           linker_flags:
             default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
             items: {type: string}
             type: array
-          makedir: *id014
-          makefile: *id015
-          overwrite: {default: true, type: boolean}
-          preserve_cache: {default: false, type: boolean}
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items: {type: string}
+            type: array
+          sourcedir: {description: Source directory to call cmake on. If not provided
+              it is set to working_dir. This should be the directory containing the
+              CMakeLists.txt file. It can be relative to working_dir or absolute.,
+            type: string}
+          target: {description: Make target that should be built to create the model
+              executable. Defaults to None., type: string}
+        title: CMakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['make'] subtype.
+        properties:
+          compiler: {description: 'Command or path to executable that should be used
+              to compile the model. If not provided, the compiler will be determined
+              based on configuration options for the language (if present) and the
+              registered compilers that are available on the current operating system.',
+            type: string}
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items: {type: string}
+            type: array
+          language:
+            default: executable
+            description: The programming language that the model is written in.
+            enum: [make]
+            type: string
+          linker: {description: 'Command or path to executable that should be used
+              to link the model. If not provided, the linker will be determined based
+              on configuration options for the language (if present) and the registered
+              linkers that are available on the current operating system', type: string}
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items: {type: string}
+            type: array
+          makedir: {description: 'Directory where make should be invoked from if it
+              is not the same as the directory containing the makefile. Defaults to
+              directory containing makefile if provided, otherwise working_dir.',
+            type: string}
+          makefile: {default: Makefile, description: 'Path to make file either absolute,
+              relative to makedir (if provided), or relative to working_dir. Defaults
+              to Makefile.', type: string}
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items: {type: string}
+            type: array
+          target: {description: Make target that should be built to create the model
+              executable. Defaults to None., type: string}
         title: MakeModelDriver
-      - properties:
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c++', 'cpp'] subtype.
+        properties:
+          compiler: {description: 'Command or path to executable that should be used
+              to compile the model. If not provided, the compiler will be determined
+              based on configuration options for the language (if present) and the
+              registered compilers that are available on the current operating system.',
+            type: string}
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items: {type: string}
+            type: array
           language:
+            default: executable
+            description: The programming language that the model is written in.
+            enum: [c++, cpp]
+            type: string
+          linker: {description: 'Command or path to executable that should be used
+              to link the model. If not provided, the linker will be determined based
+              on configuration options for the language (if present) and the registered
+              linkers that are available on the current operating system', type: string}
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items: {type: string}
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items: {type: string}
+            type: array
+        title: CPPModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['c'] subtype.
+        properties:
+          compiler: {description: 'Command or path to executable that should be used
+              to compile the model. If not provided, the compiler will be determined
+              based on configuration options for the language (if present) and the
+              registered compilers that are available on the current operating system.',
+            type: string}
+          compiler_flags:
+            default: []
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
+            items: {type: string}
+            type: array
+          language:
+            default: executable
+            description: The programming language that the model is written in.
+            enum: [c]
+            type: string
+          linker: {description: 'Command or path to executable that should be used
+              to link the model. If not provided, the linker will be determined based
+              on configuration options for the language (if present) and the registered
+              linkers that are available on the current operating system', type: string}
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items: {type: string}
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items: {type: string}
+            type: array
+        title: CModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['matlab'] subtype.
+        properties:
+          interpreter: {description: 'Name or path of interpreter executable that
+              should be used to run the model. If not provided, the interpreter will
+              be determined based on configuration options for the language (if present)
+              and the default_interpreter class attribute.', type: string}
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items: {type: string}
+            type: array
+          language:
+            default: executable
+            description: The programming language that the model is written in.
             enum: [matlab]
+            type: string
+          skip_interpreter: {default: false, description: 'If True, no interpreter
+              will be added to the arguments. This should only be used for subclasses
+              that will not be invoking the model via the command line. Defaults to
+              False.', type: boolean}
         title: MatlabModelDriver
-      - properties:
-          language:
-            enum: [python]
-        title: PythonModelDriver
+        type: object
     description: Schema for model components.
     title: model
 description: Schema for yggdrasil YAML input files.

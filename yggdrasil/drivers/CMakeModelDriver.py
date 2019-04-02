@@ -283,11 +283,11 @@ class CMakeModelDriver(CompiledModelDriver):
         args (str, list): Executable that should be created (cmake target) and
             any arguments for the executable.
         sourcedir (str, optional): Source directory to call cmake on. If not
-            provided it is set to self.working_dir. This should be the directory
+            provided it is set to working_dir. This should be the directory
             containing the CMakeLists.txt file. It can be relative to
-            self.working_dir or absolute.
+            working_dir or absolute.
         builddir (str, optional): Directory where the build should be saved.
-            Defaults to <sourcedir>/build. It can be relative to self.working_dir
+            Defaults to <sourcedir>/build. It can be relative to working_dir
             or absolute.
         target (str, optional): Make target that should be built to create the
             model executable. Defaults to None.

@@ -9,6 +9,9 @@ class RMQAsyncClientDriver(ClientDriver):
         **kwargs: Keyword arguments are passed to parent class.
 
     """
+
+    _connection_type = 'rmq_async_client'
+    
     def __init__(self, *args, **kwargs):
         kwargs['comm'] = 'RMQAsyncComm'
         super(RMQAsyncClientDriver, self).__init__(*args, **kwargs)

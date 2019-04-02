@@ -1,4 +1,5 @@
-from yggdrasil.communication import CommBase, get_comm, get_comm_class
+from yggdrasil.components import import_component
+from yggdrasil.communication import CommBase, get_comm
 
 
 class ServerComm(CommBase.CommBase):
@@ -57,7 +58,7 @@ class ServerComm(CommBase.CommBase):
             bool: Is the comm installed.
 
         """
-        return get_comm_class().is_installed(language=language)
+        return import_component('comm').is_installed(language=language)
 
     @property
     def maxMsgSize(self):
@@ -67,12 +68,12 @@ class ServerComm(CommBase.CommBase):
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""
-        return get_comm_class().underlying_comm_class()
+        return import_component('comm').underlying_comm_class()
 
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
-        return get_comm_class().comm_count()
+        return import_component('comm').comm_count()
 
     @classmethod
     def new_comm_kwargs(cls, name, request_comm=None, **kwargs):
@@ -85,7 +86,7 @@ class ServerComm(CommBase.CommBase):
 
         """
         args = [name]
-        icomm_class = get_comm_class(request_comm)
+        icomm_class = import_component('comm', request_comm)
         kwargs['direction'] = 'recv'
         if 'address' not in kwargs:
             iargs, kwargs = icomm_class.new_comm_kwargs(name, **kwargs)

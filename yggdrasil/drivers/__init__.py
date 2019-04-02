@@ -1,43 +1,9 @@
 r"""IO and Model drivers."""
-import os
-import glob
-import importlib
+from yggdrasil.components import import_component
 
 
-def import_driver(driver=None):
-    r"""Dynamically import a driver based on a string.
+_non_component_modules = ['lpy_model.py']
 
-    Args:
-        driver (str): Name of the driver that should be imported.
-
-    Returns:
-        class: Driver class for the specified language.
-
-    """
-    if driver is None:
-        driver = 'Driver'
-    drv = importlib.import_module('yggdrasil.drivers.%s' % driver)
-    class_ = getattr(drv, driver)
-    return class_
-
-
-def import_language_driver(language):
-    r"""Dynamically import a model driver based on the specified language.
-
-    Args:
-        language (str): Language of driver that should be imported.
-
-    Returns:
-        class: Model driver class for the specified language.
-
-    """
-    from yggdrasil import schema
-    s = schema.get_schema()
-    drv_name = s['model'].subtype2class.get(language, None)
-    if drv_name is None:
-        raise ValueError("No driver registered for language '%s'" % language)
-    return import_driver(drv_name)
-                    
 
 def create_driver(driver=None, name=None, args=None, **kwargs):
     r"""Dynamically create a driver based on a string and other driver
@@ -56,7 +22,7 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
         object: Instance of the requested driver.
 
     """
-    class_ = import_driver(driver)
+    class_ = import_component('model', driver, without_schema=True)
     if args is None:
         instance = class_(name, **kwargs)
     else:
@@ -64,15 +30,7 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
     return instance
 
 
-def import_all_drivers():
-    r"""Import all drivers to ensure they are registered."""
-    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
-        xbase = os.path.basename(x)
-        if (not xbase.startswith('__')) and (xbase != 'lpy_model.py'):
-            import_driver(xbase[:-3])
-
-
-__all__ = ['import_driver', 'create_driver', 'Driver',
+__all__ = ['create_driver', 'Driver',
            'ModelDriver', 'PythonModelDriver',
            'CModelDriver', 'CPPModelDriver',
            'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',

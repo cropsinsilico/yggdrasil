@@ -15,7 +15,8 @@ import copy
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil.tools import get_default_comm, YggClass
 from yggdrasil import backwards, platform, units
-from yggdrasil.communication import cleanup_comms, get_comm_class
+from yggdrasil.communication import cleanup_comms
+from yggdrasil.components import import_component
 
 
 # Test data
@@ -282,7 +283,7 @@ class YggTestBase(unittest.TestCase):
         r"""int: The number of comms."""
         out = 0
         for k in self.cleanup_comm_classes:
-            cls = get_comm_class(k)
+            cls = import_component('comm', k)
             out += cls.comm_count()
         return out
 

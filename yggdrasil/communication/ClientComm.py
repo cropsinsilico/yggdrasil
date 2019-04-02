@@ -1,6 +1,6 @@
 import uuid
-from yggdrasil.communication import (
-    CommBase, new_comm, get_comm, get_comm_class)
+from yggdrasil.components import import_component
+from yggdrasil.communication import (CommBase, new_comm, get_comm)
 
 
 class ClientComm(CommBase.CommBase):
@@ -60,7 +60,7 @@ class ClientComm(CommBase.CommBase):
             bool: Is the comm installed.
 
         """
-        return get_comm_class().is_installed(language=language)
+        return import_component('comm').is_installed(language=language)
 
     @property
     def maxMsgSize(self):
@@ -70,12 +70,12 @@ class ClientComm(CommBase.CommBase):
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""
-        return get_comm_class().underlying_comm_class()
+        return import_component('comm').underlying_comm_class()
 
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
-        return get_comm_class().comm_count()
+        return import_component('comm').comm_count()
 
     @classmethod
     def new_comm_kwargs(cls, name, request_comm=None, **kwargs):
@@ -88,7 +88,7 @@ class ClientComm(CommBase.CommBase):
 
         """
         args = [name]
-        ocomm_class = get_comm_class(request_comm)
+        ocomm_class = import_component('comm', request_comm)
         kwargs['direction'] = 'send'
         if 'address' not in kwargs:
             oargs, kwargs = ocomm_class.new_comm_kwargs(name, **kwargs)

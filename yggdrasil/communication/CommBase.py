@@ -6,9 +6,8 @@ import threading
 from logging import info
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
-from yggdrasil.communication import (
-    new_comm, get_comm, get_comm_class, determine_suffix)
-from yggdrasil.components import ComponentBase
+from yggdrasil.communication import new_comm, get_comm, determine_suffix
+from yggdrasil.components import ComponentBase, import_component
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
@@ -94,7 +93,7 @@ def unregister_comm(comm_class, key, dont_close=False):
         value = _registered_comms[comm_class].pop(key)
         if dont_close:
             return False
-        out = get_comm_class(comm_class).close_registry_entry(value)
+        out = import_component('comm', comm_class).close_registry_entry(value)
         del value
     return out
 
@@ -491,9 +490,8 @@ class CommBase(ComponentBase, tools.YggClass):
                 out = (language in lang_list)
             else:
                 # Check driver
-                from yggdrasil.drivers import import_language_driver
                 try:
-                    drv = import_language_driver(language)
+                    drv = import_component('model', language)
                     out = drv.is_comm_installed(commtype=cls._commtype)
                 except ValueError:
                     out = False
@@ -576,7 +574,7 @@ class CommBase(ComponentBase, tools.YggClass):
         else:
             args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
         if new_comm_class is not None:
-            new_cls = get_comm_class(new_comm_class)
+            new_cls = import_component('comm', new_comm_class)
             return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 

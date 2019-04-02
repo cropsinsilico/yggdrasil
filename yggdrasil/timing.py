@@ -29,23 +29,44 @@ mpl.rc('font', size=18)
 _perf_warmups = 0
 
 
-_lang_list = tools.get_installed_lang()
-for k in ['lpy', 'make', 'cmake', 'executable']:
-    if k in _lang_list:
-        _lang_list.remove(k)
-_comm_list = tools.get_installed_comm(language=_lang_list)
-if ((len(_lang_list) == 0) or (len(_comm_list) == 0)):  # pragma: debug
-    raise Exception("Timings cannot be performed if there is not at least one valid "
-                    + "language and one valid communication mechanism. "
-                    + "len(valid_languages) = %d, " % len(_lang_list)
-                    + "len(valid_comms) = %d " % len(_comm_list))
-
-
 # TODO:
 #  - Use pandas with Seaborn for plotting?
 #  - Converting to using sparse benchmark data
 #  - Create separate classes for saving/loading benchmarks and running tests
 #  - Add functions for overwriting specific entries
+
+
+def get_lang_list():
+    r"""Get the list of testable languages on the current platform.
+
+    Returns:
+        list: Names of testable languages using timed_pipe.
+
+    """
+    _lang_list = tools.get_installed_lang()
+    for k in ['lpy', 'make', 'cmake', 'executable']:
+        if k in _lang_list:
+            _lang_list.remove(k)
+    if (len(_lang_list) == 0):  # pragma: debug
+        raise Exception(("Timings cannot be performed if there is not at least "
+                         "one valid language. len(valid_languages) = %d")
+                        % len(_lang_list))
+    return _lang_list
+
+
+def get_comm_list():
+    r"""Get the list of testable communication methods on the current platform.
+
+    Returns:
+        list: Names of testable communication methods using timed_pipe.
+
+    """
+    _comm_list = tools.get_installed_comm(language=get_lang_list())
+    if (len(_comm_list) == 0):  # pragma: debug
+        raise Exception(("Timings cannot be performed if there is not at least "
+                         "one valid communication mechanism. len(valid_comms) "
+                         "= %d") % len(_comm_list))
+    return _comm_list
 
 
 def write_perf_script(script_file, nmsg, msg_size,
@@ -234,6 +255,8 @@ class TimedRun(YggTestBase, tools.YggClass):
         self.python_ver = python_ver
         self.max_errors = max_errors
         self.program_name = test_name
+        self._lang_list = get_lang_list()
+        self._comm_list = get_comm_list()
         name = '%s_%s_%s' % (test_name, lang_src, lang_dst)
         tools.YggClass.__init__(self, name)
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
@@ -266,9 +289,9 @@ class TimedRun(YggTestBase, tools.YggClass):
         out = ((self.platform.lower() == ygg_platform._platform.lower())
                and (self.python_ver == backwards._python_version)
                and (self.matlab_running == MatlabModelDriver.is_matlab_running())
-               and (self.lang_src in _lang_list)
-               and (self.lang_dst in _lang_list)
-               and (self.comm_type in _comm_list))
+               and (self.lang_src in self._lang_list)
+               and (self.lang_dst in self._lang_list)
+               and (self.comm_type in self._comm_list))
         if (not out) and raise_error:
             msg = ['Cannot run test with parameters:',
                    '\tOperating System: %s' % self.platform,
@@ -1149,6 +1172,8 @@ def plot_scalings(compare='comm_type', compare_values=None,
         str: Path where the figure was saved.
 
     """
+    _lang_list = get_lang_list()
+    _comm_list = get_comm_list()
     if use_paper_values:
         default_vars = {'comm_type': 'ZMQComm',
                         'lang_src': 'python',
