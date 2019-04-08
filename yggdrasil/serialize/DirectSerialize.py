@@ -11,6 +11,7 @@ class DirectSerialize(DefaultSerialize):
     _seritype = 'direct'
     _schema_subtype_description = ('Direct serialization of bytes.')
     _schema_properties = inherit_schema(
+        DefaultSerialize._schema_properties,
         {'newline': {'type': 'string',
                      'default': backwards.as_str(_default_newline),
                      'description': 'One or mroe characters indicating a newline.'},
