@@ -52,7 +52,7 @@ you will need to run the following from within the repository before calling
 
 If you do not have admin privileges on the target machine, ``--user`` can be
 added to the end of either the ``pip`` or ``setup.py`` installation commands.
-When using the ``--user``, you may need to add the directory containing the 
+When using the ``--user`` flag, you may need to add the directory containing the 
 entry point scripts to your ``PATH`` environment variable in order to use 
 |yggdrasil| command line tools (e.g. ``yggrun``) without specifying 
 their full path. Usually, this directory can be found using the following
@@ -159,7 +159,7 @@ RabbitMQ connections allow messages to be passed between models when the
 models are not running on the same machine. To use these connections, 
 the framework must have access to a
 RabbitMQ server. If you have access to an existing RabbitMQ server,
-the information for that server can either be provided via the |yggdrasil|
+the information for that server be provided via the |yggdrasil|
 config file (See
 :ref:`Configuration Options <config_rst>` for information on setting
 config options).

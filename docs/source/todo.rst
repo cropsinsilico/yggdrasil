@@ -25,9 +25,22 @@ TODO
 * Clean up dependencies if possible
 * Test outside of conda on windows?
 * Silence warnings from pint on model processes
-* Use metaclass for component registration rather than a decorator to make it easier for users
 * Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors
 * Use return code to indicate specific errors when using a generated wrapper (e.g. missing comm class)
 * Consider passing input/output to/from Matlab function models directly through the matlab engine
 * Add link to paper & citation section once officially published
 * Update yaml.rst docs to reflect new schema
+* Add deprecation warnings to handling of old syntax
+* Add serializers and datatypes as components?
+* Improve support for different string encodings (i.e. add datatype property to string)
+* Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.
+* Changes 'bytes' type to 'ascii' since that is really what it means
+* Allow model specification in JSON in addition to YAML
+* Add dedicated classes for schemas and change name of C MetaschemaType to schema?
+* Add flag to turn off validation
+* Add 'production' flag that turns off debug message, validation, and debug compilation flags for performance
+* Split drivers into separate directories for model drivers and connection drivers
+* Allow use of different 'default' communication mechanisms on different connections based on the languages involved
+* Clean up component doc strings (move component options descriptions to schema or another arguments section?)
+* Add automated deprecation marker for schema options
+* Add datatypes example that is automated for all registered languages and tests sending/receiving all supported datatypes

@@ -26,6 +26,7 @@ Welcome to yggdrasil's documentation!
    schema
    code
    examples/examples_toc
+   new_languages
    release
    hackathon2018/index
    

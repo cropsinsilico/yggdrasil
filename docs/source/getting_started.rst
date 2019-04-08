@@ -4,7 +4,7 @@ Getting started
 ===============
 
 
-The |yggdrasil| runs user defined models and orchestrates asynchronous 
+The |yggdrasil| framework runs user defined models and orchestrates asynchronous 
 communication between models using drivers that coordinate the different 
 components via threads. Model drivers run the models as seperate processes 
 and monitor them to redirect output to stdout and determine if the model 
@@ -29,11 +29,12 @@ The YAML file to run this model would then be:
 
 The first line signals that there is a model, the second line is the name that
 should be associated with the model for logging, the third line tells the
-framework which driver should be used to run the model, and the forth line is
+framework which language the model is written in (and therefore which driver
+should be used to execute the model), and the forth line is
 the path to the model source code that should be run. There are specialized
 drivers for simple source written in Python, Matlab, C, and C++, but any
-executable can be run as a model using the 'ModelDriver' driver. Then the 'args'
-model parameter should be the path to the execuatable. Additional information on 
+executable can be run as a model using ``language: executable`` and passing the
+path to the executable to the ``args`` parameter. Additional information on
 the format |yggdrasil| YAML files should take can be found in the 
 :ref:`YAML Files <yaml_rst>` section.
 
@@ -61,9 +62,14 @@ Model file input/output
 Models can get input from or send output to files via input and output channels.
 To do so |yggdrasil| provides several useful functions for interfacing with
 these channels. In the example below, the model receives input from a channel
-named 'input' and sends output to a channel named 'output'.
+named ``input`` and sends output to a channel named ``output``.
 
 .. include:: examples/gs_lesson3_src.rst
+
+.. note::
+   Real models YAMLs should use more description names for the input and output 
+   channels to make it easier for collaborators to determine the information 
+   begin passed through the channel.
 
 In the YAML used to run this model, those channels are declared in the model
 definition and then linked to files by entries in the ``connections`` section 
@@ -74,7 +80,7 @@ of the YAML.
 The ``input_file`` and ``output_file`` connection fields can either be 
 the path to the file (either absolute or relative to the directory 
 containing the YAML file) or a mapping with fields descripting the 
-file. In particular, the 'filetype' keyword specifies the format of 
+file. In particular, the ``filetype`` keyword specifies the format of 
 the file being read/written. Supported values include:
 
 ===========    =================================================================

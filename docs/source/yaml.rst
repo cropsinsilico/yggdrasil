@@ -209,6 +209,18 @@ Connection mappings can also have the following optional keys:
 |            | ply         | The file contains a 3D structure in Ply format.   |
 |            +-------------+---------------------------------------------------+
 |            | obj         | The file contains a 3D structure in Obj format.   |
+|            +-------------+---------------------------------------------------+
+|            | pickle      | The file is a Python pickle file containing one   |
+|            |             | more Python objects.                              |
+|            +-------------+---------------------------------------------------+
+|            | mat         | The file is a Matlab .mat file containing one or  |
+|            |             | more Matlab variables.                            |
+|            +-------------+---------------------------------------------------+
+|            | json        | The file contains one or more JSON encoded data   |
+|            |             | structures.                                       |
+|            +-------------+---------------------------------------------------+
+|            | yaml        | The file contains one or more YAML encoded data   |
+|            |             | structures.                                       |
 +------------+-------------+---------------------------------------------------+
 
 The connection entries are used to determine which driver should be used to 

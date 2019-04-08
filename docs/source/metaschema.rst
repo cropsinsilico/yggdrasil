@@ -19,11 +19,11 @@ metaschema include:
 :complex:
     Complex numbers.
 :float:
-    Floating point number with support for numpy floats in addition to the Python build-in.
+    Floating point number with support for numpy floats in addition to the Python built-in.
 :function:
     Python callable.
 :int:
-    Integer number with support for numpy ints in addition to the Python build-in.
+    Integer number with support for numpy ints in addition to the Python built-in.
 :ndarray:
     Multi-dimensional arrays with elements of uniform size that are continguous in memory in C order.
 :obj:
