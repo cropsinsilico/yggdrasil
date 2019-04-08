@@ -209,6 +209,22 @@ class CommBase(ComponentBase, tools.YggClass):
             through the connection. 'send' if the connection will send
             messages, 'recv' if the connecton will receive messages. Defaults
             to 'send'.
+        datatype (schema, optional): JSON schema (with expanded core types
+            defined by |yggdrasil|) that constrains the type of data that
+            should be sent/received by this object. Defaults to {'type': 'bytes'}.
+            Additional information on specifying datatypes can be found
+            :ref:`here <datatypes_rst>`.
+        field_names (list, optional): [DEPRECATED] Field names that should be
+            used to label fields in sent/received tables. This keyword is only
+            valid for table-like datatypes. If not provided, field names are
+            created based on the field order.
+        field_units (list, optional): [DEPRECATED] Field units that should be
+            used to convert fields in sent/received tables. This keyword is only
+            valid for table-like datatypes. If not provided, all fields are
+            assumed to be unitless.
+        as_array (bool, optional): [DEPRECATED] If True and the datatype is
+            table-like, tables are sent/recieved with either columns rather
+            than row by row. Defaults to False.
         serializer (:class:.DefaultSerialize, optional): Class with serialize and
             deserialize methods that should be used to process sent and received
             messages. Defaults to None and is constructed using provided
@@ -296,18 +312,22 @@ class CommBase(ComponentBase, tools.YggClass):
     """
 
     # TODO: Add serializer to comm schema
-    _commtype = 'default'  # Is this necessary?
+    _commtype = None
     _schema_type = 'comm'
     _schema_subtype_key = 'commtype'
     _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {'name': {'type': 'string'},
-                          'commtype': {'type': 'string', 'default': _commtype},
+                          'commtype': {'type': 'string', 'default': 'default',
+                                       'description': ('Communication mechanism '
+                                                       'that should be used.')},
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
                           'recv_converter': {'type': 'function'},
                           'send_converter': {'type': 'function'},
-                          'field_names': {'type': 'array', 'items': {'type': 'string'}},
-                          'field_units': {'type': 'array', 'items': {'type': 'string'}},
+                          'field_names': {'type': 'array',
+                                          'items': {'type': 'string'}},
+                          'field_units': {'type': 'array',
+                                          'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = DefaultSerialize

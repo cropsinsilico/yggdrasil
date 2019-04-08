@@ -580,7 +580,7 @@ class YggClass(logging.LoggerAdapter):
     r"""Base class for Ygg classes.
 
     Args:
-        name (str): Class name.
+        name (str): Name used for component in log messages.
         uuid (str, optional): Unique ID for this instance. Defaults to None
             and is assigned.
         working_dir (str, optional): Working directory. If not provided, the

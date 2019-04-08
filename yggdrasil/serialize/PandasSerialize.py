@@ -3,14 +3,13 @@ import copy
 import numpy as np
 import warnings
 from yggdrasil import backwards, platform
+from yggdrasil.components import inherit_schema
 from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
-from yggdrasil.serialize import (
-    register_serializer, pandas2numpy, list2pandas)
+from yggdrasil.serialize import pandas2numpy, list2pandas
 from yggdrasil.serialize.AsciiTableSerialize import AsciiTableSerialize
 
 
-@register_serializer
 class PandasSerialize(AsciiTableSerialize):
     r"""Class for serializing/deserializing Pandas data frames.
 
@@ -23,9 +22,10 @@ class PandasSerialize(AsciiTableSerialize):
     """
 
     _seritype = 'pandas'
-    _schema_properties = dict(
+    _schema_subtype_description = ('Serializes tables using the pandas package.')
+    _schema_properties = inherit_schema(
         AsciiTableSerialize._schema_properties,
-        write_header={'type': 'bool', 'default': True})
+        {'write_header': {'type': 'boolean', 'default': True}})
 
     @property
     def empty_msg(self):

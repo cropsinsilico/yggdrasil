@@ -3,8 +3,9 @@ import pprint
 import numpy as np
 import warnings
 from yggdrasil import backwards, tools, units
+from yggdrasil.components import ComponentBase
 from yggdrasil.serialize import (
-    register_serializer, extract_formats, cformat2nptype, consolidate_array)
+    extract_formats, cformat2nptype, consolidate_array)
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
@@ -14,8 +15,7 @@ from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
 
 
-@register_serializer
-class DefaultSerialize(tools.YggClass):
+class DefaultSerialize(ComponentBase, tools.YggClass):
     r"""Default class for serializing/deserializing a python object into/from
     a bytes message.
 
@@ -58,8 +58,15 @@ class DefaultSerialize(tools.YggClass):
 
     _seritype = 'default'
     _schema_type = 'serializer'
+    _schema_subtype_key = 'seritype'
+    _schema_subtype_description = ('Default serializer that uses |yggdrasil|\'s '
+                                   'extended JSON serialization based on a '
+                                   'provided type definition (See discussion '
+                                   ':ref:`here <serialization_rst>`).')
     _schema_requried = []
-    _schema_properties = {}
+    _schema_properties = {'seritype': {'type': 'string',
+                                       'default': _seritype,
+                                       'description': ('Serializer type.')}}
     _default_type = {'type': 'bytes'}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
     encode_func_serialize = False
@@ -69,7 +76,8 @@ class DefaultSerialize(tools.YggClass):
     def __init__(self, func_serialize=None, func_deserialize=None,
                  encode_func_serialize=None, decode_func_deserialize=None,
                  func_typedef=None, **kwargs):
-        super(DefaultSerialize, self).__init__()
+        super(DefaultSerialize, self).__init__(**kwargs)
+        kwargs = self.extra_kwargs
         self._alias = None
         self.is_user_defined = False
         self.extra_kwargs = {}
@@ -94,9 +102,6 @@ class DefaultSerialize(tools.YggClass):
             self.decode_func_deserialize = decode_func_deserialize
         if func_typedef is not None:
             self.func_typedef = func_typedef
-        # Set properties to None
-        for k, v in self._schema_properties.items():
-            setattr(self, k, v.get('default', None))
         # Update typedef
         self._initialized = False
         self.datatype = get_type_from_def(self._default_type,
@@ -212,7 +217,7 @@ class DefaultSerialize(tools.YggClass):
                                + "supplied functions.")
         # out = copy.deepcopy(self.typedef)
         out = copy.deepcopy(self.extra_kwargs)
-        out['seritype'] = self._seritype
+        out['seritype'] = self.seritype
         for k in self._schema_properties.keys():
             v = getattr(self, k, None)
             if v is not None:
@@ -405,10 +410,10 @@ class DefaultSerialize(tools.YggClass):
             old_datatype = copy.deepcopy(self.datatype)
         _metaschema = get_metaschema()
         # Create alias if another seritype is needed
-        seritype = kwargs.pop('seritype', self._seritype)
+        seritype = kwargs.pop('seritype', self.seritype)
         if (seritype != self._seritype) and (seritype != 'default'):  # pragma: debug
-            # kwargs.update(extract=extract, seritype=seritype)
-            # self._alias = get_serializer(**kwargs)
+            # kwargs.update(extract=extract)
+            # self._alias = import_component('serializer', seritype)(**kwargs)
             # assert(self._seritype == seritype)
             # return
             raise Exception("Cannot change types form %s to %s." %

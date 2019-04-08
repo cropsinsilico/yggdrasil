@@ -122,6 +122,7 @@ _incl_comm = os.path.join(_top_dir, 'communication')
 class CModelDriver(CompiledModelDriver):
     r"""Class for running C models."""
 
+    _schema_subtype_description = ('Model is written in C.')
     language = 'c'
     language_ext = ['.c', '.h']
     interface_library = 'ygg'

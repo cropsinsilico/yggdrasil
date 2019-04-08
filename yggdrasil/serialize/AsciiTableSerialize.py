@@ -1,6 +1,7 @@
 from yggdrasil import backwards, units
+from yggdrasil.components import inherit_schema
 from yggdrasil.serialize import (
-    register_serializer, _default_delimiter, _default_newline, _default_comment,
+    _default_delimiter, _default_newline, _default_comment,
     nptype2cformat, table2format, array_to_table, table_to_array,
     format_message, process_message)
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
@@ -9,7 +10,6 @@ from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
     definition2dtype)
 
 
-@register_serializer
 class AsciiTableSerialize(DefaultSerialize):
     r"""Class for serialize table output into bytes messages comprising a
     formatted ASCII table.
@@ -49,19 +49,20 @@ class AsciiTableSerialize(DefaultSerialize):
     """
 
     _seritype = 'ascii_table'
-    _schema_properties = dict(
+    _schema_subtype_description = ('ASCII tab (or otherwise) delimited table.')
+    _schema_properties = inherit_schema(
         DefaultSerialize._schema_properties,
-        format_str={'type': 'string'},
-        field_names={'type': 'array', 'items': {'type': 'string'}},
-        field_units={'type': 'array', 'items': {'type': 'string'}},
-        as_array={'type': 'boolean', 'default': False},
-        delimiter={'type': 'string',
-                   'default': backwards.as_str(_default_delimiter)},
-        newline={'type': 'string',
-                 'default': backwards.as_str(_default_newline)},
-        comment={'type': 'string',
-                 'default': backwards.as_str(_default_comment)},
-        use_astropy={'type': 'boolean', 'default': False})
+        {'format_str': {'type': 'string'},
+         'field_names': {'type': 'array', 'items': {'type': 'string'}},
+         'field_units': {'type': 'array', 'items': {'type': 'string'}},
+         'as_array': {'type': 'boolean', 'default': False},
+         'delimiter': {'type': 'string',
+                       'default': backwards.as_str(_default_delimiter)},
+         'newline': {'type': 'string',
+                     'default': backwards.as_str(_default_newline)},
+         'comment': {'type': 'string',
+                     'default': backwards.as_str(_default_comment)},
+         'use_astropy': {'type': 'boolean', 'default': False}})
 
     def update_serializer(self, *args, **kwargs):
         # Transform scalar into array for table

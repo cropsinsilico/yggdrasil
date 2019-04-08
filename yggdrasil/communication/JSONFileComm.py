@@ -13,6 +13,7 @@ class JSONFileComm(FileComm.FileComm):
     """
 
     _filetype = 'json'
+    _schema_subtype_description = ('The file contains a JSON serialized object.')
     _schema_properties = inherit_schema(
         FileComm.FileComm._schema_properties,
         **JSONSerialize._schema_properties)

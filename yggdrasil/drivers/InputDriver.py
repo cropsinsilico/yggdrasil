@@ -15,6 +15,8 @@ class InputDriver(ConnectionDriver):
 
     _connection_type = 'input'
     _direction = 'input'
+    _schema_subtype_description = ('Connection between one or more comms/files '
+                                   'and a model.')
 
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('icomm_kws', {})

@@ -1,15 +1,14 @@
 from yggdrasil import backwards
-from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.PlySerialize import PlySerialize
 from yggdrasil.metaschema.datatypes.ObjMetaschemaType import ObjDict
 
 
-@register_serializer
 class ObjSerialize(PlySerialize):
     r"""Class for serializing/deserializing .obj file formats. Reader
     adapted from https://www.pygame.org/wiki/OBJFileLoader."""
 
     _seritype = 'obj'
+    _schema_subtype_description = ('Serialize 3D structures using Obj format.')
     _default_type = {'type': 'obj'}
 
     def func_serialize(self, args):

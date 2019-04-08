@@ -303,6 +303,8 @@ class CMakeModelDriver(CompiledModelDriver):
 
     """
 
+    _schema_subtype_description = ('Model is written in C/C++ and has a '
+                                   'CMake build system.')
     _schema_properties = inherit_schema(
         CompiledModelDriver._schema_properties,
         {'sourcedir': {'type': 'string'},

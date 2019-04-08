@@ -30,6 +30,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
     """
     
     _commtype = 'rmq_async'
+    _schema_subtype_description = ('Asynchronous RabbitMQ connection.')
     
     def _init_before_open(self, **kwargs):
         r"""Initialize null variables and RMQ async thread."""

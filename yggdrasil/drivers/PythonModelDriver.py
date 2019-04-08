@@ -13,6 +13,7 @@ _incl_io = os.path.join(_top_dir, 'io')
 class PythonModelDriver(InterpretedModelDriver):
     r"""Class for running Python models."""
 
+    _schema_subtype_description = ('Model is written in Python.')
     language = 'python'
     language_ext = '.py'
     default_interpreter = sys.executable

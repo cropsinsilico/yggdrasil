@@ -13,6 +13,7 @@ class FileInputDriver(InputDriver):
 
     _connection_type = 'file_input'
     _icomm_type = 'FileComm'
+    _schema_subtype_description = ('Connection between a file and a model.')
 
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('icomm_kws', {})

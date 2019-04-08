@@ -77,11 +77,6 @@ def get_comm(name, **kwargs):
     return new_comm(name, **kwargs)
     
 
-def DefaultComm(*args, **kwargs):
-    r"""Construct a comm object of the default type."""
-    return import_component('comm', 'DefaultComm')(*args, **kwargs)
-
-
 def cleanup_comms(comm=None):
     r"""Call cleanup_comms for the appropriate communicator class.
 
@@ -96,4 +91,4 @@ def cleanup_comms(comm=None):
     return import_component('comm', comm).cleanup_comms()
 
 
-__all__ = ['new_comm', 'get_comm', 'cleanup_comms', 'DefaultComm']
+__all__ = ['new_comm', 'get_comm', 'cleanup_comms']

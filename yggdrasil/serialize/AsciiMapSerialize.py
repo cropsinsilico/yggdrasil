@@ -1,12 +1,11 @@
 import json
 from yggdrasil import backwards
-from yggdrasil.serialize import (
-    register_serializer, _default_delimiter, _default_newline)
+from yggdrasil.components import inherit_schema
+from yggdrasil.serialize import _default_delimiter, _default_newline
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
 
-@register_serializer
 class AsciiMapSerialize(DefaultSerialize):
     r"""Class for serializing/deserializing name/value mapping.
 
@@ -19,11 +18,16 @@ class AsciiMapSerialize(DefaultSerialize):
     """
     
     _seritype = 'ascii_map'
-    _schema_properties = {
-        'delimiter': {'type': 'string',
-                      'default': backwards.as_str(_default_delimiter)},
-        'newline': {'type': 'string',
-                    'default': backwards.as_str(_default_newline)}}
+    _schema_subtype_description = ('Serialzation of mapping between key/value '
+                                   'pairs with one pair per line and using a '
+                                   'character delimiter to separate keys and '
+                                   'values.')
+    _schema_properties = inherit_schema(
+        DefaultSerialize._schema_properties,
+        {'delimiter': {'type': 'string',
+                       'default': backwards.as_str(_default_delimiter)},
+         'newline': {'type': 'string',
+                     'default': backwards.as_str(_default_newline)}})
     _default_type = {'type': 'object'}
 
     def func_serialize(self, args):

@@ -1,17 +1,16 @@
 import numpy as np
 from scipy.io import savemat, loadmat
 from yggdrasil import backwards, platform
-from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
-@register_serializer
 class MatSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message using the
     Matlab .mat format."""
     
     _seritype = 'mat'
-    _schema_properties = {}
+    _schema_subtype_description = ('Serializes objects using the Matlab .mat '
+                                   'format.')
     _default_type = {'type': 'object'}
 
     def func_serialize(self, args):

@@ -360,6 +360,7 @@ class ZMQComm(AsyncComm.AsyncComm):
     """
 
     _commtype = 'zmq'
+    _schema_subtype_description = ('ZeroMQ socket.')
     # Based on limit of 32bit int, this could be 2**30, but this is
     # too large for stack allocation in C so 2**20 will be used.
     _maxMsgSize = 2**20

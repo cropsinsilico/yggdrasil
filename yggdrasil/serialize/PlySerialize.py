@@ -1,10 +1,10 @@
 from yggdrasil import backwards
-from yggdrasil.serialize import register_serializer, _default_newline
+from yggdrasil.components import inherit_schema
+from yggdrasil.serialize import _default_newline
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import PlyDict
 
 
-@register_serializer
 class PlySerialize(DefaultSerialize):
     r"""Class for serializing/deserializing .ply file formats.
 
@@ -24,9 +24,11 @@ class PlySerialize(DefaultSerialize):
     """
     
     _seritype = 'ply'
-    _schema_properties = dict(
-        newline={'type': 'string',
-                 'default': backwards.as_str(_default_newline)})
+    _schema_subtype_description = ('Serialize 3D structures using Ply format.')
+    _schema_properties = inherit_schema(
+        DefaultSerialize._schema_properties,
+        {'newline': {'type': 'string',
+                     'default': backwards.as_str(_default_newline)}})
     _default_type = {'type': 'ply'}
 
     def __init__(self, *args, **kwargs):

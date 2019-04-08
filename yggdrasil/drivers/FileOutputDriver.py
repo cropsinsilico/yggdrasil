@@ -13,7 +13,7 @@ class FileOutputDriver(OutputDriver):
 
     _connection_type = 'file_output'
     _ocomm_type = 'FileComm'
-    _direction = 'output'
+    _schema_subtype_description = ('Connection between a model and a file.')
 
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('ocomm_kws', {})

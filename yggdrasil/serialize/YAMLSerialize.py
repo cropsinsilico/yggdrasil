@@ -1,15 +1,28 @@
 import yaml
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import indent_char2int
-from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
-@register_serializer
 class YAMLSerialize(DefaultSerialize):
-    r"""Class for serializing a python object into a bytes message using YAML."""
+    r"""Class for serializing a python object into a bytes message using YAML.
+
+    Args:
+        indent (str, int, optional): String or number of spaces that should be
+            used to indent each level within the seiralized structure. Defaults
+            to '\t'.
+        encoding (str, optional): Encoding that should be used to serialize the
+            object. Defaults to 'utf-8'.
+        default_flow_style (bool, optional): If True, nested collections will
+            be serialized in the block style. If False, they will always be
+            serialized in the flow style. See
+            `PyYAML Documentation <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.
+
+    """
 
     _seritype = 'yaml'
+    _schema_subtype_description = ('Serializes Python objects using the YAML '
+                                   'standard.')
     _schema_properties = dict(
         DefaultSerialize._schema_properties,
         indent={'type': ['string', 'int'], 'default': '\t'},

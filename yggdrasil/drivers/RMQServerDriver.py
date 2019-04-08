@@ -11,6 +11,8 @@ class RMQServerDriver(ServerDriver):
     """
 
     _connection_type = 'rmq_server'
+    _schema_subtype_description = ('Connection between a RabbitMQ server request '
+                                   'comm and a model acting as a server.')
     
     def __init__(self, *args, **kwargs):
         kwargs['comm'] = 'RMQComm'

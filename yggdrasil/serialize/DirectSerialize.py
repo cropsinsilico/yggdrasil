@@ -1,19 +1,22 @@
 from yggdrasil import backwards
+from yggdrasil.components import inherit_schema
 from yggdrasil.serialize import (
-    register_serializer, _default_newline, _default_comment, format_message)
+    _default_newline, _default_comment, format_message)
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
-@register_serializer
 class DirectSerialize(DefaultSerialize):
     r"""Class for directly serializing bytes."""
 
     _seritype = 'direct'
-    _schema_properties = {
-        'newline': {'type': 'string',
-                    'default': backwards.as_str(_default_newline)},
-        'comment': {'type': 'string',
-                    'default': backwards.as_str(_default_comment)}}
+    _schema_subtype_description = ('Direct serialization of bytes.')
+    _schema_properties = inherit_schema(
+        {'newline': {'type': 'string',
+                     'default': backwards.as_str(_default_newline),
+                     'description': 'One or mroe characters indicating a newline.'},
+         'comment': {'type': 'string',
+                     'default': backwards.as_str(_default_comment),
+                     'description': 'One or more characters indicating a comment.'}})
     _default_type = {'type': 'bytes'}
 
     def func_serialize(self, args):

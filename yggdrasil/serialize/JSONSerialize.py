@@ -1,15 +1,24 @@
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import (
     indent_char2int, encode_json, decode_json, _use_rapidjson)
-from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
-@register_serializer
 class JSONSerialize(DefaultSerialize):
-    r"""Class for serializing a python object into a bytes message using JSON."""
+    r"""Class for serializing a python object into a bytes message using JSON.
+
+    Args:
+        indent (str, int, optional): String or number of spaces that should be
+            used to indent each level within the seiralized structure. Defaults
+            to '\t'.
+        sort_keys (bool, optional): If True, the serialization of dictionaries
+            will be in key sorted order. Defaults to True.
+
+    """
 
     _seritype = 'json'
+    _schema_subtype_description = ('Serializes Python objects using the JSON '
+                                   'standard.')
     _schema_properties = dict(
         DefaultSerialize._schema_properties,
         indent={'type': ['string', 'int'], 'default': '\t'},

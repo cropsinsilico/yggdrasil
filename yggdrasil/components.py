@@ -4,10 +4,19 @@ import copy
 import six
 import importlib
 import re
+from collections import OrderedDict
 from yggdrasil import backwards
 
 
 _registry = {}
+_registry_defaults = {}
+_registry_class2subtype = {}
+_comptype2key = {'comm': 'commtype',
+                 'file': 'filetype',
+                 'model': 'language',
+                 'connection': 'connection_type',
+                 # 'datatype': None,
+                 'serializer': 'seritype'}
 _comptype2mod = {'comm': 'communication',
                  'file': 'communication',
                  'model': 'drivers',
@@ -122,6 +131,14 @@ def import_component(comptype, subtype=None, without_schema=False):
     if (((comptype in ['comm', 'file']) and (subtype is not None)
          and ((subtype == 'CommBase') or subtype.endswith('Comm')))):
         without_schema = True
+    # Set default based on registry to avoid schema if possible
+    if (subtype is None) and (comptype in _registry_defaults):
+        subtype = _registry_defaults.get(comptype, None)
+    # Check registered components to prevent importing multiple times
+    if subtype in _registry.get(comptype, {}):
+        return _registry[comptype][subtype]
+    elif subtype in _registry_class2subtype.get(comptype, {}):
+        return _registry[comptype][_registry_class2subtype[comptype][subtype]]
     # Get class name
     if without_schema:
         if subtype is None:
@@ -203,11 +220,26 @@ class ComponentMeta(type):
                         v.setdefault('description', args_dict[k])
             # Register
             global _registry
+            global _registry_defaults
+            global _registry_class2subtype
             yaml_typ = cls._schema_type
+            default_subtype = cls._schema_properties.get(
+                cls._schema_subtype_key, {}).get('default', None)
             if yaml_typ not in _registry:
-                _registry[yaml_typ] = []
-            if cls not in _registry[yaml_typ]:
-                _registry[yaml_typ].insert(0, cls)
+                if default_subtype is None:
+                    default_subtype = subtype
+                _registry[yaml_typ] = OrderedDict()
+                _registry_defaults[yaml_typ] = default_subtype
+                _registry_class2subtype[yaml_typ] = {}
+            elif default_subtype is not None:
+                assert(_registry_defaults[yaml_typ] == default_subtype)
+            if cls.__name__ not in _registry[yaml_typ]:
+                _registry[yaml_typ][cls.__name__] = cls
+                if isinstance(subtype, list):
+                    for subt in subtype:
+                        _registry_class2subtype[yaml_typ][subt] = cls.__name__
+                else:
+                    _registry_class2subtype[yaml_typ][subtype] = cls.__name__
         return cls
 
 
@@ -217,6 +249,7 @@ class ComponentBase(object):
 
     _schema_type = None
     _schema_subtype_key = None
+    _schema_subtype_description = None
     _schema_required = []
     _schema_properties = {}
     _schema_excluded_from_class = []
@@ -227,7 +260,10 @@ class ComponentBase(object):
         for k, v in self._schema_properties.items():
             if k in self._schema_excluded_from_class:
                 continue
-            setattr(self, k, copy.deepcopy(kwargs.pop(k, v.get('default', None))))
+            default = v.get('default', None)
+            if k == self._schema_subtype_key:
+                default = getattr(self, '_%s' % k, default)
+            setattr(self, k, copy.deepcopy(kwargs.pop(k, default)))
             if v.get('type', None) == 'array':
                 x = getattr(self, k)
                 if isinstance(x, backwards.string_types):

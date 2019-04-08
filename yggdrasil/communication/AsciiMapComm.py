@@ -13,6 +13,9 @@ class AsciiMapComm(FileComm.FileComm):
     """
 
     _filetype = 'map'
+    _schema_subtype_description = ('The file contains a key/value mapping '
+                                   'with one key/value pair per line and '
+                                   'separated by some delimiter.')
     _schema_properties = inherit_schema(
         FileComm.FileComm._schema_properties,
         **AsciiMapSerialize._schema_properties)

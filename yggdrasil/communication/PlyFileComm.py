@@ -13,6 +13,9 @@ class PlyFileComm(FileComm):
     """
 
     _filetype = 'ply'
+    _schema_subtype_description = (
+        'The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_ '
+        'data format for 3D structures.')
     _default_serializer = PlySerialize
     _default_extension = '.ply'
 

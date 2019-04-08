@@ -2,7 +2,8 @@ import copy
 import numpy as np
 import unittest
 from yggdrasil.tests import YggTestClassInfo, assert_equal
-from yggdrasil import backwards, tools, serialize
+from yggdrasil import backwards, tools
+from yggdrasil.components import import_component
 from yggdrasil.serialize import DefaultSerialize
 from yggdrasil.metaschema.datatypes import encode_type
 
@@ -98,8 +99,8 @@ class TestDefaultSerialize(YggTestClassInfo):
         else:
             hout = copy.deepcopy(self._header_info)
             hout.update(self.instance.serializer_info)
-            temp_seri = serialize.get_serializer(
-                seritype=self.instance.serializer_info['seritype'])
+            temp_seri = import_component(
+                'serializer', self.instance.serializer_info['seritype'])()
             for iobj in self.testing_options['objects']:
                 hout.update(encode_type(iobj, typedef=self.instance.typedef))
                 msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
@@ -113,7 +114,8 @@ class TestDefaultSerialize(YggTestClassInfo):
                 iout, ihead = temp_seri.deserialize(msg)
                 self.assert_result_equal(iout, iobj)
                 self.assert_equal(ihead, hout)
-                new_seri = serialize.get_serializer(**ihead)
+                new_seri = import_component('serializer',
+                                            ihead.pop('seritype', None))(**ihead)
                 iout, ihead = new_seri.deserialize(msg)
                 self.assert_result_equal(iout, iobj)
                 self.assert_equal(ihead, hout)
@@ -262,6 +264,10 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
 
 
 class FakeSerializer(DefaultSerialize.DefaultSerialize):
+    r"""Fake serializer that mocks user defined serialization/deserialization
+    routines."""
+
+    _dont_register = True
 
     def func_serialize(self, args):  # pragma: no cover
         r"""Method that serializes using repr."""

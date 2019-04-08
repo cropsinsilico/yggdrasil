@@ -177,6 +177,7 @@ class IPCComm(AsyncComm.AsyncComm):
     """
 
     _commtype = 'ipc'
+    _schema_subtype_description = ('Interprocess communication (IPC) queue.')
     _maxMsgSize = 2048  # Based on IPC limit on MacOS
 
     def _init_before_open(self, **kwargs):

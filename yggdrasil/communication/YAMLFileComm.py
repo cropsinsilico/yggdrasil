@@ -13,6 +13,7 @@ class YAMLFileComm(FileComm.FileComm):
     """
 
     _filetype = 'yaml'
+    _schema_subtype_description = ('The file contains a YAML serialized object.')
     _schema_properties = inherit_schema(
         FileComm.FileComm._schema_properties,
         **YAMLSerialize._schema_properties)

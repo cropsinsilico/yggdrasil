@@ -33,9 +33,9 @@ class ConnectionDriver(Driver):
             waited before giving up on the first send. Defaults to self.timeout.
         single_use (bool, optional): If True, the driver will be stopped after
             one loop. Defaults to False.
-        onexit (str, optional): Class method that should be called when the
-            corresponding model exits, but before the driver is shut down.
-            Defaults to None.
+        onexit (str, optional): Class method that should be called when a
+            model that the connection interacts with exits, but before the
+            connection driver is shut down. Defaults to None.
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -65,14 +65,22 @@ class ConnectionDriver(Driver):
     _direction = 'any'
     _schema_type = 'connection'
     _schema_subtype_key = 'connection_type'
+    _schema_subtype_description = ('Connection between one or more comms/files '
+                                   'and one or more comms/files.')
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
-                                       {'$ref': '#/definitions/file'}]}},
+                                       {'$ref': '#/definitions/file'}]},
+                   'description': ('One or more name(s) of model output(s) '
+                                   'and/or new comm/file objects that the '
+                                   'connection should receive messages from.')},
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
-                                        {'$ref': '#/definitions/file'}]}},
+                                        {'$ref': '#/definitions/file'}]},
+                    'description': ('One or more name(s) of model input(s) '
+                                    'and/or new comm/file objects that the '
+                                    'connection should send messages to.')},
         'translator': {'type': 'array', 'items': {'type': 'function'}},
         'onexit': {'type': 'string'}}
 

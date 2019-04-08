@@ -11,6 +11,9 @@ class RMQAsyncServerDriver(ServerDriver):
     """
 
     _connection_type = 'rmq_async_server'
+    _schema_subtype_description = ('Connection between an asynchronous RabbitMQ '
+                                   'server request comm and a model acting as a '
+                                   'server.')
     
     def __init__(self, *args, **kwargs):
         kwargs['comm'] = 'RMQAsyncComm'

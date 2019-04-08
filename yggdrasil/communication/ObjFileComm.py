@@ -13,6 +13,9 @@ class ObjFileComm(PlyFileComm):
     """
 
     _filetype = 'obj'
+    _schema_subtype_description = (
+        'The file is in the `Obj <http://paulbourke.net/dataformats/obj/>`_ '
+        'data format for 3D structures.')
     _default_serializer = ObjSerialize
     _default_extension = '.obj'
 

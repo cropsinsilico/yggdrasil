@@ -260,8 +260,8 @@ def parse_connection(yml, existing):
         args = '%s_to_%s' % (iname, oname)
     name = args
     # TODO: Use RMQ drivers when models are on different machines
-    # ocomm_pair = ('DefaultComm', 'rmq')
-    # icomm_pair = ('rmq', 'DefaultComm')
+    # ocomm_pair = ('default', 'rmq')
+    # icomm_pair = ('rmq', 'default')
     # Output driver
     xo = None
     if iname:  # empty name results when all of the inputs are files

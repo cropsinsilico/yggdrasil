@@ -56,6 +56,7 @@ class PandasFileComm(AsciiTableComm):
     """
 
     _filetype = 'pandas'
+    _schema_subtype_description = ('The file is a Pandas frame output as a table.')
     _default_serializer = PandasSerialize
 
     def __init__(self, *args, **kwargs):

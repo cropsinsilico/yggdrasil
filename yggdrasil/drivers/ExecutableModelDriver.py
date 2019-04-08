@@ -14,6 +14,7 @@ class ExecutableModelDriver(ModelDriver):
 
     language = 'executable'
     version_flags = _os_version_flags
+    _schema_subtype_description = ('Model is an executable.')
 
     @classmethod
     def language_executable(cls):

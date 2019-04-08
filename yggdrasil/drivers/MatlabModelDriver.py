@@ -421,6 +421,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
 
     """
 
+    _schema_subtype_description = ('Model is written in Matlab.')
     language = 'matlab'
     language_ext = '.m'
     base_languages = ['python']

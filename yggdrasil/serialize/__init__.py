@@ -1,8 +1,5 @@
 import re
 import copy
-import os
-import glob
-import importlib
 import numpy as np
 import pandas
 from yggdrasil import backwards, platform, units
@@ -25,78 +22,6 @@ _fmt_char = b'%'
 _default_comment = b'# '
 _default_delimiter = b'\t'
 _default_newline = b'\n'
-_serializer_registry = {}
-
-
-def register_serializer(seri_class):
-    r"""Register a serializer class.
-
-    Args:
-        seri_class (class): Serialzier class to register.
-
-    Returns:
-        class: Registered serializer class.
-
-    Raises:
-        ValueError: If the serializer is already registered.
-
-    """
-    global _serializer_registry
-    seri_name = seri_class._seritype
-    if seri_name in _serializer_registry:
-        raise ValueError("Serializer '%s' already registered." % seri_name)
-    _serializer_registry[seri_name] = seri_class
-    return seri_class
-
-
-def get_registered_serializers():
-    r"""Return a dictionary of registered serializers.
-
-    Returns:
-        dict: Registered serializer/class pairs.
-
-    """
-    return _serializer_registry
-
-
-def import_all_serializers():
-    r"""Import all serializers to ensure they are registered."""
-    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*Serialize.py')):
-        seri_mod = os.path.basename(x)[:-3]
-        if not seri_mod.startswith('__'):
-            importlib.import_module('yggdrasil.serialize.%s' % seri_mod)
-
-
-def get_serializer_class(seri_name):
-    r"""Return a serializer class given it's name.
-
-    Args:
-        seri_name (str): Name of serializer class.
-
-    Returns:
-        class: Serializer class.
-
-    """
-    if seri_name not in _serializer_registry:
-        raise ValueError("Class for serializer '%s' could not be found." % seri_name)
-    return _serializer_registry[seri_name]
-
-
-def get_serializer(seritype='default', **kwargs):
-    r"""Create a serializer from the provided information.
-
-    Args:
-        seritype (str, optional): Name of serializer type to use. Defaults to
-            'default'.
-        **kwargs: Additional keyword arguments are passed to the serializer
-            class.
-
-    Returns:
-        DefaultSerializer: Serializer based on provided information.
-
-    """
-    cls = get_serializer_class(seritype)
-    return cls(**kwargs)
 
 
 def extract_formats(fmt_str):
@@ -1412,9 +1337,6 @@ def pandas2list(frame):
     if frame.empty:
         return []
     return numpy2list(pandas2numpy(frame))
-
-
-import_all_serializers()
 
 
 __all__ = []

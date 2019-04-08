@@ -1,5 +1,5 @@
 from yggdrasil import backwards, tools, serialize
-from yggdrasil.communication import DefaultComm
+from yggdrasil.communication.DefaultComm import DefaultComm
 
 
 YGG_MSG_MAX = tools.get_YGG_MSG_MAX()

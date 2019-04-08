@@ -65,11 +65,15 @@ class FileComm(CommBase.CommBase):
     _datatype = {'type': 'bytes'}
     _schema_type = 'file'
     _schema_subtype_key = 'filetype'
+    _schema_subtype_description = ('The entire file is read/written all at '
+                                   'once as bytes.')
     _schema_required = ['name', 'filetype', 'working_dir']
     _schema_properties = inherit_schema(
         CommBase.CommBase._schema_properties,
         {'working_dir': {'type': 'string'},
-         'filetype': {'type': 'string', 'default': _filetype},
+         'filetype': {'type': 'string', 'default': _filetype,
+                      'description': ('The type of file that will be read from '
+                                      'or written to.')},
          'append': {'type': 'boolean', 'default': False},
          'in_temp': {'type': 'boolean', 'default': False},
          'is_series': {'type': 'boolean', 'default': False},

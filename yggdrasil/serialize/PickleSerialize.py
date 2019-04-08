@@ -1,15 +1,14 @@
 from yggdrasil import backwards
-from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
-@register_serializer
 class PickleSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message by pickling.
     """
 
     _seritype = 'pickle'
-    _schema_properties = dict()
+    _schema_subtype_description = ('Serialize any Python object using a Python '
+                                   'pickle.')
     _default_type = {'type': 'bytes'}
 
     def func_serialize(self, args):
