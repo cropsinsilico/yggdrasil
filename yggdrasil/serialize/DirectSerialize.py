@@ -1,7 +1,5 @@
 from yggdrasil import backwards
-from yggdrasil.components import inherit_schema
-from yggdrasil.serialize import (
-    _default_newline, _default_comment, format_message)
+from yggdrasil.serialize import format_message
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
@@ -10,14 +8,6 @@ class DirectSerialize(DefaultSerialize):
 
     _seritype = 'direct'
     _schema_subtype_description = ('Direct serialization of bytes.')
-    _schema_properties = inherit_schema(
-        DefaultSerialize._schema_properties,
-        {'newline': {'type': 'string',
-                     'default': backwards.as_str(_default_newline),
-                     'description': 'One or mroe characters indicating a newline.'},
-         'comment': {'type': 'string',
-                     'default': backwards.as_str(_default_comment),
-                     'description': 'One or more characters indicating a comment.'}})
     _default_type = {'type': 'bytes'}
 
     def func_serialize(self, args):
@@ -67,5 +57,9 @@ class DirectSerialize(DefaultSerialize):
                     determined type definition.
 
         """
-        # Ensure that bytes returned
-        return super(DirectSerialize, cls).get_testing_options()
+        out = {'kwargs': {}, 'empty': b'', 'dtype': None,
+               'typedef': cls._default_type,
+               'extra_kwargs': {}}
+        out['objects'] = [b'Test message\n', b'Test message 2\n']
+        out['contents'] = b''.join(out['objects'])
+        return out

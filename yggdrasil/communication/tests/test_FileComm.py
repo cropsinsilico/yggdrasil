@@ -1,6 +1,7 @@
 import os
 import copy
 import unittest
+import jsonschema
 from yggdrasil.tests import assert_equal
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.tests import test_CommBase as parent
@@ -14,7 +15,7 @@ def test_wait_for_creation():
     # kwargs = {'wait_for_creation': 5, 'in_temp': True, comm='FileComm'}
     send_instance = new_comm(name, direction='send', **kwargs)
     recv_instance = new_comm(name, direction='recv',
-                             wait_for_creation=5, **kwargs)
+                             wait_for_creation=5.0, **kwargs)
     if os.path.isfile(send_instance.address):
         os.remove(send_instance.address)
     
@@ -45,7 +46,7 @@ class TestFileComm(parent.TestCommBase):
     comm = 'FileComm'
     attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
                  + ['fd', 'read_meth', 'append', 'in_temp',
-                    'open_as_binary', 'newline', 'is_series',
+                    'is_series', 'wait_for_creation', 'serializer',
                     'platform_newline'])
     
     def teardown(self):
@@ -72,9 +73,11 @@ class TestFileComm(parent.TestCommBase):
 
     def test_invalid_read_meth(self):
         r"""Test raise of error on invalid read_meth."""
-        kwargs = self.send_inst_kwargs
-        kwargs['read_meth'] = 'invalid'
-        self.assert_raises(ValueError, new_comm, self.name, **kwargs)
+        if self.comm == 'FileComm':
+            kwargs = self.send_inst_kwargs
+            kwargs['read_meth'] = 'invalid'
+            self.assert_raises(jsonschema.ValidationError, new_comm, self.name,
+                               **kwargs)
 
     def test_append(self):
         r"""Test open of file comm with append."""
@@ -156,9 +159,3 @@ class TestFileComm_readline(TestFileComm):
         out = super(TestFileComm_readline, self).testing_options
         out['recv'] = out['send']
         return out
-
-    
-class TestFileComm_ascii(TestFileComm):
-    r"""Test for FileComm communication class with open_as_binary = False."""
-
-    testing_option_kws = {'open_as_binary': False}

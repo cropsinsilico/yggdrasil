@@ -11,5 +11,4 @@ class DefaultComm(CommBase):
 
     def __new__(cls, *args, **kwargs):
         from yggdrasil.tools import get_default_comm
-        print('here', args, kwargs)
         return import_component('comm', get_default_comm())(*args, **kwargs)

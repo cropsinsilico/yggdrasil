@@ -145,17 +145,21 @@ class TestCommBase(YggTestClassInfo):
 
     def get_fresh_error_instance(self, recv=False):
         r"""Get comm instance with ErrorClass parent class."""
-        send_kwargs = self.send_inst_kwargs
-        err_kwargs = dict(base_comm=send_kwargs['comm'], new_comm_class='ErrorComm')
-        err_name = self.name + '_' + self.uuid
-        if not recv:
-            send_kwargs.update(**err_kwargs)
-        send_inst = new_comm(err_name, **send_kwargs)
-        recv_kwargs = send_inst.opp_comm_kwargs()
-        recv_kwargs['comm'] = send_kwargs['comm']
-        if recv:
-            recv_kwargs.update(**err_kwargs)
-        recv_inst = new_comm(err_name, **recv_kwargs)
+        try:
+            send_kwargs = self.send_inst_kwargs
+            err_kwargs = dict(base_comm=send_kwargs['comm'], new_comm_class='ErrorComm')
+            err_name = self.name + '_' + self.uuid
+            if not recv:
+                send_kwargs.update(**err_kwargs)
+            send_inst = new_comm(err_name, **send_kwargs)
+            recv_kwargs = send_inst.opp_comm_kwargs()
+            recv_kwargs['comm'] = send_kwargs['comm']
+            if recv:
+                recv_kwargs.update(**err_kwargs)
+            recv_inst = new_comm(err_name, **recv_kwargs)
+        except BaseException as e:  # pragma: debug
+            print(e)
+            raise
         return send_inst, recv_inst
 
     def test_empty_obj_recv(self):

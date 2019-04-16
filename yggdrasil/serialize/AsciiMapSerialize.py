@@ -1,7 +1,6 @@
 import json
 from yggdrasil import backwards
-from yggdrasil.components import inherit_schema
-from yggdrasil.serialize import _default_delimiter, _default_newline
+from yggdrasil.serialize import _default_delimiter
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
@@ -12,8 +11,6 @@ class AsciiMapSerialize(DefaultSerialize):
     Args:
         delimiter (str, optional): Delimiter that should be used to
             separate name/value pairs in the map. Defaults to \t.
-        newline (str, optional): Delimiter that should be used to
-            separate lines. Defaults to \n.
 
     """
     
@@ -22,13 +19,12 @@ class AsciiMapSerialize(DefaultSerialize):
                                    'pairs with one pair per line and using a '
                                    'character delimiter to separate keys and '
                                    'values.')
-    _schema_properties = inherit_schema(
-        DefaultSerialize._schema_properties,
-        {'delimiter': {'type': 'string',
-                       'default': backwards.as_str(_default_delimiter)},
-         'newline': {'type': 'string',
-                     'default': backwards.as_str(_default_newline)}})
+    _schema_properties = {
+        'delimiter': {'type': 'string',
+                      'default': backwards.as_str(_default_delimiter)}}
     _default_type = {'type': 'object'}
+    _attr_conv = DefaultSerialize._attr_conv + ['delimiter']
+    concats_as_str = False
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -81,6 +77,23 @@ class AsciiMapSerialize(DefaultSerialize):
                 raise ValueError("Line has more than one delimiter: " + l)
         return out
 
+    @classmethod
+    def concatenate(cls, objects):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        total = dict()
+        for x in objects:
+            total.update(x)
+        return [total]
+        
     @classmethod
     def get_testing_options(cls):
         r"""Method to return a dictionary of testing options for this class.

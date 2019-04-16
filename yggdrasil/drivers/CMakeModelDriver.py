@@ -6,7 +6,6 @@ from yggdrasil import platform
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase)
 from yggdrasil.drivers import CModelDriver
-from yggdrasil.components import inherit_schema
 
 
 class CMakeConfigure(CompilerBase):
@@ -305,12 +304,9 @@ class CMakeModelDriver(CompiledModelDriver):
 
     _schema_subtype_description = ('Model is written in C/C++ and has a '
                                    'CMake build system.')
-    _schema_properties = inherit_schema(
-        CompiledModelDriver._schema_properties,
-        {'sourcedir': {'type': 'string'},
-         'builddir': {'type': 'string'},
-         'target': {'type': 'string'}})
-    
+    _schema_properties = {'sourcedir': {'type': 'string'},
+                          'builddir': {'type': 'string'},
+                          'target': {'type': 'string'}}
     language = 'cmake'
     base_languages = ['c']
     cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',

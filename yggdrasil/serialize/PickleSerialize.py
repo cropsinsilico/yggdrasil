@@ -10,6 +10,7 @@ class PickleSerialize(DefaultSerialize):
     _schema_subtype_description = ('Serialize any Python object using a Python '
                                    'pickle.')
     _default_type = {'type': 'bytes'}
+    is_framed = True
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -36,6 +37,28 @@ class PickleSerialize(DefaultSerialize):
         """
         out = backwards.pickle.loads(msg)
         return out
+
+    @classmethod
+    def get_first_frame(cls, msg):
+        r"""Extract one frame from the provided message that may contain one
+        or more frames.
+
+        Args:
+            msg (bytes): Message containing one or more frames.
+
+        Returns:
+            bytes: Portion of message containing the first frame. If no frames
+                are found, an empty string will be returned.
+
+        """
+        fd = backwards.BytesIO(msg)
+        try:
+            backwards.pickle.load(fd)
+            used = fd.tell()
+        except BaseException:
+            used = 0
+        fd.close()
+        return msg[:used]
 
     @classmethod
     def get_testing_options(cls, **kwargs):

@@ -1,6 +1,4 @@
 from yggdrasil.communication import FileComm
-from yggdrasil.components import inherit_schema
-from yggdrasil.serialize.JSONSerialize import JSONSerialize
 
 
 class JSONFileComm(FileComm.FileComm):
@@ -14,26 +12,4 @@ class JSONFileComm(FileComm.FileComm):
 
     _filetype = 'json'
     _schema_subtype_description = ('The file contains a JSON serialized object.')
-    _schema_properties = inherit_schema(
-        FileComm.FileComm._schema_properties,
-        **JSONSerialize._schema_properties)
-    _default_serializer = JSONSerialize
-
-    @classmethod
-    def get_testing_options(cls):
-        r"""Method to return a dictionary of testing options for this class.
-
-        Returns:
-            dict: Dictionary of variables to use for testing. Key/value pairs:
-                kwargs (dict): Keyword arguments for comms tested with the
-                    provided content.
-                send (list): List of objects to send to test file.
-                recv (list): List of objects that will be received from a test
-                    file that was sent the messages in 'send'.
-                contents (bytes): Bytes contents of test file created by sending
-                    the messages in 'send'.
-
-        """
-        out = super(JSONFileComm, cls).get_testing_options()
-        out['recv'] = out['send']
-        return out
+    _default_serializer = 'json'

@@ -1,10 +1,10 @@
 import yaml
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import indent_char2int
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.JSONSerialize import JSONSerialize
 
 
-class YAMLSerialize(DefaultSerialize):
+class YAMLSerialize(JSONSerialize):
     r"""Class for serializing a python object into a bytes message using YAML.
 
     Args:
@@ -23,12 +23,11 @@ class YAMLSerialize(DefaultSerialize):
     _seritype = 'yaml'
     _schema_subtype_description = ('Serializes Python objects using the YAML '
                                    'standard.')
-    _schema_properties = dict(
-        DefaultSerialize._schema_properties,
-        indent={'type': ['string', 'int'], 'default': '\t'},
-        encoding={'type': 'string', 'default': 'utf-8'},
-        default_flow_style={'type': 'boolean', 'default': False})
-    _default_type = {'type': 'object'}
+    _schema_properties = {
+        'indent': {'type': ['string', 'int'], 'default': '\t'},
+        'encoding': {'type': 'string', 'default': 'utf-8'},
+        'default_flow_style': {'type': 'boolean', 'default': False}}
+    _schema_excluded_from_inherit = ['sort_keys']
 
     def func_serialize(self, args):
         r"""Serialize a message.

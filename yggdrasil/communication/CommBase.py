@@ -7,8 +7,7 @@ from logging import info
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
-from yggdrasil.components import ComponentBase, import_component
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.components import import_component
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -197,7 +196,7 @@ class CommServer(tools.YggThreadLoop):
             _registered_servers.pop(self.srv_address)
 
 
-class CommBase(ComponentBase, tools.YggClass):
+class CommBase(tools.YggClass):
     r"""Class for handling I/O.
 
     Args:
@@ -330,7 +329,7 @@ class CommBase(ComponentBase, tools.YggClass):
                                           'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
-    _default_serializer = DefaultSerialize
+    _default_serializer = 'default'
     is_file = False
     _maxMsgSize = 0
 
@@ -413,28 +412,53 @@ class CommBase(ComponentBase, tools.YggClass):
         else:
             self.open()
 
-    def _init_before_open(self, serializer=None, **kwargs):
+    def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
-        datatype = kwargs.get('datatype', None)
-        if datatype is None:
-            datatype = {}
-        datatype.update(kwargs.pop('serializer_kwargs', {}))
-        if serializer is not None:
-            self.serializer = serializer
-        else:
-            cls = kwargs.pop('serializer_class', self._default_serializer)
-            for k in cls.seri_kws():
+        seri_cls = kwargs.pop('serializer_class', None)
+        seri_kws = kwargs.pop('serializer_kwargs', {})
+        if 'datatype' in self._schema_properties:
+            seri_kws.update(self.datatype)
+        if ((('serializer' not in self._schema_properties)
+             and (not hasattr(self, 'serializer')))):
+            self.serializer = self._default_serializer
+        if isinstance(self.serializer, str):
+            seri_kws.setdefault('seritype', self.serializer)
+            self.serializer = None
+        elif isinstance(self.serializer, dict):
+            seri_kws.update(self.serializer)
+            self.serializer = None
+        # Only update serializer if not already set
+        if self.serializer is None:
+            # Get serializer class
+            if seri_cls is None:
+                if seri_kws['seritype'] == self._default_serializer:
+                    seri_cls = self._default_serializer_class
+                else:
+                    seri_cls = import_component('serializer',
+                                                subtype=seri_kws['seritype'])
+            # Recover keyword arguments for serializer passed to comm class
+            for k in seri_cls.seri_kws():
                 if k in kwargs:
-                    # TODO: Change to pop once old seri keywords not in comm
-                    # schema directly
-                    datatype[k] = kwargs[k]
-            self.debug('datatype = %s', str(datatype))
-            self.serializer = cls(**datatype)
+                    seri_kws.setdefault(k, kwargs[k])
+            # Create serializer instance
+            self.debug('seri_kws = %s', str(seri_kws))
+            self.serializer = seri_cls(**seri_kws)
+        # Set send/recv converter based on the serializer
+        for k in ['recv_converter', 'send_converter']:
+            if getattr(self, k, None) is None:
+                v = getattr(self.serializer, k, None)
+                if v is not None:
+                    setattr(self, k, v)
 
     @classmethod
-    def get_testing_options(cls, **kwargs):
+    def get_testing_options(cls, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            serializer (str, optional): The name of the serializer that should
+                be used. If not provided, the _default_serializer class
+                attribute will be used.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -447,17 +471,31 @@ class CommBase(ComponentBase, tools.YggClass):
                     the messages in 'send'.
 
         """
-        out = cls._default_serializer.get_testing_options(**kwargs)
-        out = {'kwargs': out['kwargs'],
-               'send': copy.deepcopy(out['objects']),
-               'msg': out['objects'][0],
-               'contents': out['contents']}
+        if serializer is None:
+            serializer = cls._default_serializer
+        if serializer == cls._default_serializer:
+            seri_cls = cls._default_serializer_class
+        else:
+            seri_cls = import_component('serializer', serializer)
+        out_seri = seri_cls.get_testing_options(**kwargs)
+        out = {'kwargs': out_seri['kwargs'],
+               'send': copy.deepcopy(out_seri['objects']),
+               'msg': out_seri['objects'][0],
+               'contents': out_seri['contents']}
         out['recv'] = copy.deepcopy(out['send'])
-        out['dict'] = {'f0': out['msg']}
+        out['dict'] = seri_cls.object2dict(out['msg'], **out['kwargs'])
+        if not out_seri.get('exact_contents', True):
+            out['exact_contents'] = False
+        msg_array = seri_cls.object2array(out['msg'], **out['kwargs'])
+        if msg_array is not None:
+            out['msg_array'] = msg_array
         if isinstance(out['msg'], backwards.bytes_type):
             out['msg_long'] = out['msg'] + (cls._maxMsgSize * b'0')
         else:
             out['msg_long'] = out['msg']
+        for k in ['field_names', 'field_units']:
+            if k in out_seri:
+                out[k] = copy.deepcopy(out_seri[k])
         return out
 
     def printStatus(self, nindent=0):
@@ -624,6 +662,8 @@ class CommBase(ComponentBase, tools.YggClass):
         else:
             kwargs['direction'] = 'send'
         for k in self.serializer._schema_properties.keys():
+            if k in self.serializer._schema_excluded_from_class:
+                continue
             kwargs[k] = getattr(self.serializer, k)
         return kwargs
 

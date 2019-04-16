@@ -1,9 +1,9 @@
 import os
 import tempfile
 from yggdrasil import backwards, platform
+from yggdrasil.components import import_component
+from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.communication import CommBase
-from yggdrasil.components import inherit_schema
-from yggdrasil.serialize.DirectSerialize import DirectSerialize
 
 
 class FileComm(CommBase.CommBase):
@@ -28,10 +28,6 @@ class FileComm(CommBase.CommBase):
             mode. Defaults to False.
         in_temp (bool, optional): If True, the path will be considered relative
             to the platform temporary directory. Defaults to False.
-        open_as_binary (bool, optional): If True, the file is opened in binary
-            mode. Defaults to True.
-        newline (str, optional): String indicating a new line. Defaults to
-            serialize._default_newline.
         is_series (bool, optional): If True, input/output will be done to
             a series of files. If reading, each file will be processed until
             the end is reached. If writing, each output will be to a new
@@ -48,8 +44,6 @@ class FileComm(CommBase.CommBase):
         append (bool): If True and writing, file is openned in append mode.
         in_temp (bool): If True, the path will be considered relative to the
             platform temporary directory.
-        open_as_binary (bool): If True, the file is opened in binary mode.
-        newline (str): String indicating a new line.
         is_series (bool): If True, input/output will be done to a series of
             files. If reading, each file will be processed until the end is
             reached. If writing, each output will be to a new file in the series.
@@ -67,56 +61,81 @@ class FileComm(CommBase.CommBase):
     _schema_subtype_key = 'filetype'
     _schema_subtype_description = ('The entire file is read/written all at '
                                    'once as bytes.')
-    _schema_required = ['name', 'filetype', 'working_dir']
-    _schema_properties = inherit_schema(
-        CommBase.CommBase._schema_properties,
-        {'working_dir': {'type': 'string'},
-         'filetype': {'type': 'string', 'default': _filetype,
-                      'description': ('The type of file that will be read from '
-                                      'or written to.')},
-         'append': {'type': 'boolean', 'default': False},
-         'in_temp': {'type': 'boolean', 'default': False},
-         'is_series': {'type': 'boolean', 'default': False},
-         'wait_for_creation': {'type': 'float', 'default': 0.0}},
-        remove_keys=['commtype', 'datatype'], **DirectSerialize._schema_properties)
-    _default_serializer = DirectSerialize
-    _attr_conv = ['newline', 'platform_newline']
+    _schema_required = ['name', 'filetype', 'working_dir', 'serializer']
+    _schema_properties = {
+        'working_dir': {'type': 'string'},
+        'filetype': {'type': 'string', 'default': _filetype,
+                     'description': ('The type of file that will be read from '
+                                     'or written to.')},
+        'read_meth': {'type': 'string', 'default': 'read',
+                      'enum': ['read', 'readline']},
+        'append': {'type': 'boolean', 'default': False},
+        'in_temp': {'type': 'boolean', 'default': False},
+        'is_series': {'type': 'boolean', 'default': False},
+        'wait_for_creation': {'type': 'float', 'default': 0.0},
+        'serializer': {'$ref': '#/definitions/serializer',
+                       'default': {'seritype': 'direct'}}}
+    _schema_excluded_from_inherit = ['commtype', 'datatype', 'read_meth',
+                                     'serializer']
+    _default_serializer = 'direct'
     _default_extension = '.txt'
     is_file = True
     _maxMsgSize = 0
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
+        if isinstance(kwargs.get('serializer', None), DefaultSerialize):
+            self.serializer = kwargs.pop('serializer')
+            kwargs['serializer'] = {'seritype': 'direct'}
         return super(FileComm, self).__init__(*args, **kwargs)
 
-    def _init_before_open(self, read_meth='read', open_as_binary=True, **kwargs):
+    def _init_before_open(self, **kwargs):
         r"""Get absolute path and set attributes."""
+        self.header_was_read = False
+        self.header_was_written = False
         super(FileComm, self)._init_before_open(**kwargs)
         # Process file class keywords
         if not hasattr(self, '_fd'):
             self._fd = None
-        if read_meth not in ['read', 'readline']:
-            raise ValueError("read_meth '%s' not supported." % read_meth)
-        self.read_meth = read_meth
         self.platform_newline = platform._newline
         if self.in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
-        self.open_as_binary = open_as_binary
         self._series_index = 0
-        # Put string attributes in the correct format
-        if self.open_as_binary:
-            func_conv = backwards.as_bytes
-        else:
-            func_conv = backwards.as_unicode
-        for k in self._attr_conv:
-            v = getattr(self, k)
-            if v is not None:
-                setattr(self, k, func_conv(v))
+        if self.append:
+            self.header_was_written = True
+        if 'read_meth' not in self._schema_properties:
+            self.read_meth = self.serializer.read_meth
+        assert(self.read_meth in ['read', 'readline'])
+        # Force overwrite for concatenation in append mode
+        if self.append and (not self.serializer.concats_as_str):
+            self.append = 'ow'
+
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration."""
+        CommBase.CommBase.before_registration(cls)
+        cls._default_serializer_class = import_component('serializer',
+                                                         cls._default_serializer)
+        # Add serializer properties to schema
+        if cls._filetype != 'binary':
+            assert('serializer' not in cls._schema_properties)
+            cls._schema_properties.update(
+                cls._default_serializer_class._schema_properties)
+            del cls._schema_properties['seritype']
 
     @classmethod
-    def get_testing_options(cls, read_meth='read', open_as_binary=True, **kwargs):
+    def get_testing_options(cls, read_meth=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            read_meth (str, optional): Read method that will be used by the test
+                class. Defaults to None and will be set by the serialier.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method and the serializers methods for determining the
+                default read_meth and concatenating the sent objects into the
+                objects that are expected to be received.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -130,14 +149,19 @@ class FileComm(CommBase.CommBase):
 
         """
         out = super(FileComm, cls).get_testing_options(**kwargs)
-        out['kwargs']['read_meth'] = read_meth
-        out['kwargs']['open_as_binary'] = open_as_binary
-        if (read_meth == 'read') and isinstance(out['recv'][0], backwards.bytes_type):
-            out['recv'] = [b''.join(out['recv'])]
-        if not open_as_binary:
-            out['contents'] = out['contents'].replace(
-                backwards.match_stype(out['contents'], '\n'),
-                backwards.match_stype(out['contents'], platform._newline))
+        if 'read_meth' in cls._schema_properties:
+            if read_meth is None:
+                read_meth = cls._schema_properties['read_meth']['default']
+            out['kwargs']['read_meth'] = read_meth
+        if read_meth == 'readline':
+            if cls._default_serializer == 'direct':
+                comment = backwards.as_bytes(
+                    cls._schema_properties['comment']['default'] + 'Comment\n')
+                out['send'].append(comment)
+                out['contents'] += comment
+        else:
+            seri_cls = cls._default_serializer_class
+            out['recv'] = seri_cls.concatenate(out['recv'], **out['kwargs'])
         return out
         
     @classmethod
@@ -188,8 +212,7 @@ class FileComm(CommBase.CommBase):
             io_mode = 'a'
         else:
             io_mode = 'w'
-        if self.open_as_binary:
-            io_mode += 'b'
+        io_mode += 'b'
         return io_mode
 
     def opp_comm_kwargs(self):
@@ -201,8 +224,6 @@ class FileComm(CommBase.CommBase):
 
         """
         kwargs = super(FileComm, self).opp_comm_kwargs()
-        kwargs['newline'] = self.newline
-        kwargs['open_as_binary'] = self.open_as_binary
         kwargs['is_series'] = self.is_series
         return kwargs
 
@@ -212,13 +233,36 @@ class FileComm(CommBase.CommBase):
         # return self.address
         return '%s_%s_%s' % (self.address, self.direction, self.uuid)
 
+    # Methods related to header
+    def read_header(self):
+        r"""Read header lines from the file and update serializer info."""
+        if self.header_was_read:
+            return
+        if self.serializer.has_header:
+            pos = self.record_position()
+            self.serializer.deserialize_header(self.fd)
+            self.change_position(*pos)
+        self.header_was_read = True
+
+    def write_header(self):
+        r"""Write header lines to the file based on the serializer info."""
+        if self.header_was_written:
+            return
+        if self.serializer.has_header:
+            header_msg = self.serializer.serialize_header()
+            if header_msg:
+                self.fd.write(header_msg)
+        self.header_was_written = True
+
+    # Methods related to position in the file/series
     def record_position(self):
         r"""Record the current position in the file/series."""
         _rec_pos = self.fd.tell()
         _rec_ind = self._series_index
-        return _rec_pos, _rec_ind
+        return _rec_pos, _rec_ind, self.header_was_read, self.header_was_written
 
-    def change_position(self, file_pos, series_index=None):
+    def change_position(self, file_pos, series_index=None,
+                        header_was_read=None, header_was_written=None):
         r"""Change the position in the file/series.
 
         Args:
@@ -226,12 +270,24 @@ class FileComm(CommBase.CommBase):
             series_index (int, optinal): Index of the file in the series that
                 should be moved to. Defaults to None and will be set to the
                 current series index.
+            header_was_read (bool, optional): Status of if header has been
+                read or not. Defaults to None and will be set to the current
+                value.
+            header_was_written (bool, optional): Status of if header has been
+                written or not. Defaults to None and will be set to the current
+                value.
 
         """
         if series_index is None:
             series_index = self._series_index
+        if header_was_read is None:
+            header_was_read = self.header_was_read
+        if header_was_written is None:
+            header_was_written = self.header_was_written
         self.advance_in_series(series_index)
         self.advance_in_file(file_pos)
+        self.header_was_read = header_was_read
+        self.header_was_written = header_was_written
 
     def advance_in_file(self, file_pos):
         r"""Advance to a certain position in the current file.
@@ -272,6 +328,9 @@ class FileComm(CommBase.CommBase):
                     self._open()
                     out = True
                     self.debug("Advanced to %d", series_index)
+        if out:
+            self.header_was_read = False
+            self.header_was_written = False
         return out
 
     def get_series_address(self, index=None):
@@ -297,7 +356,8 @@ class FileComm(CommBase.CommBase):
         else:
             address = self.address
         return address
-        
+
+    # Methods related to opening/closing the file
     def _open(self):
         address = self.current_address
         if self.fd is None:
@@ -449,10 +509,24 @@ class FileComm(CommBase.CommBase):
             bool: Success or failure of writing to the file.
 
         """
+        # Read previous contents of current file and append new values
+        if (((not self.serializer.concats_as_str) and (msg != self.eof_msg)
+             and (self.fd.tell() != 0))):
+            with open(self.current_address, 'rb') as fd:
+                old_obj = self.deserialize(fd.read())[0]
+            new_obj = self.deserialize(msg)[0]
+            obj = self.serializer.concatenate([old_obj, new_obj])
+            assert(len(obj) == 1)
+            msg = self.serialize(obj[0])
+            self.fd.seek(0)
+            self.fd.truncate()
+            self.header_was_written = False
+        # Write header
+        if msg != self.eof_msg:
+            self.write_header()
+        # Write message
         try:
             if msg != self.eof_msg:
-                if not self.open_as_binary:
-                    msg = backwards.as_unicode(msg)
                 self.fd.write(msg)
                 if self.append == 'ow':
                     self.fd.truncate()
@@ -478,6 +552,8 @@ class FileComm(CommBase.CommBase):
                 the read messages as bytes.
 
         """
+        self.read_header()
+        prev_pos = self.fd.tell()
         flag = True
         try:
             if self.read_meth == 'read':
@@ -495,9 +571,19 @@ class FileComm(CommBase.CommBase):
             else:
                 out = self.eof_msg
         else:
-            out = out.replace(self.platform_newline, self.newline)
-        if not self.open_as_binary:
-            out = backwards.as_bytes(out)
+            out = out.replace(self.platform_newline, self.serializer.newline)
+            if flag and (out != self.eof_msg):
+                if (((self.read_meth == 'readline')
+                     and out.startswith(self.serializer.comment))):
+                    # Exclude comments
+                    flag, out = self._recv()
+                elif (self.read_meth == 'read') and self.serializer.is_framed:
+                    # Rewind if more than one frame read
+                    len0 = len(out)
+                    out = self.serializer.get_first_frame(out)
+                    len1 = len(out)
+                    if (len1 > 0) and (len0 != len1):
+                        self.fd.seek(prev_pos + len1)
         return (flag, out)
 
     def purge(self):

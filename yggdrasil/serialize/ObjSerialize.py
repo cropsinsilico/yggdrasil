@@ -63,5 +63,4 @@ class ObjSerialize(PlySerialize):
                            + b'v 0.0000 1.0000 1.0000\n'
                            + b'f 1// 2// 3//\n'
                            + b'f 4// 5// 6//\n')
-        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

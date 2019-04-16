@@ -12,6 +12,7 @@ class MatSerialize(DefaultSerialize):
     _schema_subtype_description = ('Serializes objects using the Matlab .mat '
                                    'format.')
     _default_type = {'type': 'object'}
+    concats_as_str = False
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -54,6 +55,23 @@ class MatSerialize(DefaultSerialize):
         return out
 
     @classmethod
+    def concatenate(cls, objects):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        total = {}
+        for x in objects:
+            total.update(x)
+        return [total]
+        
+    @classmethod
     def get_testing_options(cls):
         r"""Method to return a dictionary of testing options for this class.
 
@@ -67,4 +85,5 @@ class MatSerialize(DefaultSerialize):
         out['empty'] = dict()
         out['contents'] = cls().func_serialize(msg)
         out['contents'] = out['contents'].replace(b'\n', platform._newline)
+        out['exact_contents'] = False  # Contains a time stamp
         return out

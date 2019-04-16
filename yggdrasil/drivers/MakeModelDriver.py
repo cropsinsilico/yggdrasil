@@ -3,7 +3,8 @@ from collections import OrderedDict
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase)
 from yggdrasil.drivers.CModelDriver import CModelDriver
-from yggdrasil.components import inherit_schema
+
+
 _default_makefile = 'Makefile'
 
 
@@ -144,12 +145,10 @@ class MakeModelDriver(CompiledModelDriver):
 
     _schema_subtype_description = ('Model is written in C/C++ and has a '
                                    'Makefile for compilation.')
-    _schema_properties = inherit_schema(
-        CompiledModelDriver._schema_properties,
-        {'makefile': {'type': 'string', 'default': _default_makefile},
-         'makedir': {'type': 'string'},  # default will depend on makefile
-         'target': {'type': 'string'}})
-    
+    _schema_properties = {
+        'makefile': {'type': 'string', 'default': _default_makefile},
+        'makedir': {'type': 'string'},  # default will depend on makefile
+        'target': {'type': 'string'}}
     language = 'make'
     base_languages = ['c']
 

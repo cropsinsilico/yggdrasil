@@ -9,7 +9,7 @@ from collections import OrderedDict
 from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers.ModelDriver import ModelDriver
-from yggdrasil.components import inherit_schema, import_component
+from yggdrasil.components import import_component
 
 
 _compiler_registry = OrderedDict()
@@ -1437,16 +1437,15 @@ class CompiledModelDriver(ModelDriver):
 
     """
 
-    _schema_properties = inherit_schema(
-        ModelDriver._schema_properties,
-        {'source_files': {'type': 'array', 'items': {'type': 'string'},
-                          'default': []},
-         'compiler': {'type': 'string'},
-         'compiler_flags': {'type': 'array', 'items': {'type': 'string'},
-                            'default': []},
-         'linker': {'type': 'string'},
-         'linker_flags': {'type': 'array', 'items': {'type': 'string'},
-                          'default': []}})
+    _schema_properties = {
+        'source_files': {'type': 'array', 'items': {'type': 'string'},
+                         'default': []},
+        'compiler': {'type': 'string'},
+        'compiler_flags': {'type': 'array', 'items': {'type': 'string'},
+                           'default': []},
+        'linker': {'type': 'string'},
+        'linker_flags': {'type': 'array', 'items': {'type': 'string'},
+                         'default': []}}
     executable_type = 'compiler'
     default_compiler = None
     default_compiler_flags = None

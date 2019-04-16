@@ -19,11 +19,11 @@ class JSONSerialize(DefaultSerialize):
     _seritype = 'json'
     _schema_subtype_description = ('Serializes Python objects using the JSON '
                                    'standard.')
-    _schema_properties = dict(
-        DefaultSerialize._schema_properties,
-        indent={'type': ['string', 'int'], 'default': '\t'},
-        sort_keys={'type': 'boolean', 'default': True})
+    _schema_properties = {
+        'indent': {'type': ['string', 'int'], 'default': '\t'},
+        'sort_keys': {'type': 'boolean', 'default': True}}
     _default_type = {'type': 'object'}
+    concats_as_str = False
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -51,6 +51,34 @@ class JSONSerialize(DefaultSerialize):
         """
         return decode_json(msg)
 
+    @classmethod
+    def concatenate(cls, objects):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        if all([isinstance(x, dict) for x in objects]):
+            total = dict()
+            for x in objects:
+                total.update(x)
+            out = [total]
+        elif all([isinstance(x, list) for x in objects]):
+            total = list()
+            for x in objects:
+                total += x
+            out = [total]
+        else:
+            # Adding additional list then causes set of objects to be serialized
+            # as a JSON array
+            out = [objects]
+        return out
+        
     @classmethod
     def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.

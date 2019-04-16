@@ -88,7 +88,6 @@ class ModelDriver(Driver):
             loops, while loops).
         version_flags (list): Flags that should be called with the language
             executable to determine the version of the compiler/interpreter.
-        
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
@@ -213,6 +212,7 @@ class ModelDriver(Driver):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
+        Driver.before_registration(cls)
         cls._language = cls.language
         cls._language_aliases = cls.language_aliases
         if (((cls.language_ext is not None)

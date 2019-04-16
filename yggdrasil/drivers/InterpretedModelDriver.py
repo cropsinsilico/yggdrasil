@@ -1,5 +1,4 @@
 from yggdrasil import tools
-from yggdrasil.components import inherit_schema
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
@@ -41,12 +40,11 @@ class InterpretedModelDriver(ModelDriver):
 
     """
 
-    _schema_properties = inherit_schema(
-        ModelDriver._schema_properties,
-        {'interpreter': {'type': 'string'},
-         'interpreter_flags': {'type': 'array', 'items': {'type': 'string'},
-                               'default': []},
-         'skip_interpreter': {'type': 'boolean', 'default': False}})
+    _schema_properties = {
+        'interpreter': {'type': 'string'},
+        'interpreter_flags': {'type': 'array', 'items': {'type': 'string'},
+                              'default': []},
+        'skip_interpreter': {'type': 'boolean', 'default': False}}
     executable_type = 'interpreter'
     default_interpreter = None
     default_interpreter_flags = []

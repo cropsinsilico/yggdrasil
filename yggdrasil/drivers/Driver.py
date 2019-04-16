@@ -1,10 +1,9 @@
 import os
 from yggdrasil.config import ygg_cfg
 from yggdrasil import tools
-from yggdrasil.components import ComponentBase
 
 
-class Driver(ComponentBase, tools.YggThreadLoop):
+class Driver(tools.YggThreadLoop):
     r"""Base class for all drivers.
 
     Args:

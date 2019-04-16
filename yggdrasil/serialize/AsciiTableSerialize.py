@@ -1,9 +1,5 @@
-from yggdrasil import backwards, units
-from yggdrasil.components import inherit_schema
-from yggdrasil.serialize import (
-    _default_delimiter, _default_newline, _default_comment,
-    nptype2cformat, table2format, array_to_table, table_to_array,
-    format_message, process_message)
+from yggdrasil import backwards, units, serialize
+from yggdrasil.serialize import _default_delimiter
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.properties.ScalarMetaschemaProperties import (
@@ -50,19 +46,17 @@ class AsciiTableSerialize(DefaultSerialize):
 
     _seritype = 'ascii_table'
     _schema_subtype_description = ('ASCII tab (or otherwise) delimited table.')
-    _schema_properties = inherit_schema(
-        DefaultSerialize._schema_properties,
-        {'format_str': {'type': 'string'},
-         'field_names': {'type': 'array', 'items': {'type': 'string'}},
-         'field_units': {'type': 'array', 'items': {'type': 'string'}},
-         'as_array': {'type': 'boolean', 'default': False},
-         'delimiter': {'type': 'string',
-                       'default': backwards.as_str(_default_delimiter)},
-         'newline': {'type': 'string',
-                     'default': backwards.as_str(_default_newline)},
-         'comment': {'type': 'string',
-                     'default': backwards.as_str(_default_comment)},
-         'use_astropy': {'type': 'boolean', 'default': False}})
+    _schema_properties = {
+        'format_str': {'type': 'string'},
+        'field_names': {'type': 'array', 'items': {'type': 'string'}},
+        'field_units': {'type': 'array', 'items': {'type': 'string'}},
+        'as_array': {'type': 'boolean', 'default': False},
+        'delimiter': {'type': 'string',
+                      'default': backwards.as_str(_default_delimiter)},
+        'use_astropy': {'type': 'boolean', 'default': False}}
+    _attr_conv = DefaultSerialize._attr_conv + ['format_str', 'delimiter']
+    has_header = True
+    default_read_meth = 'readline'  # because default for as_array is False
 
     def update_serializer(self, *args, **kwargs):
         # Transform scalar into array for table
@@ -75,10 +69,6 @@ class AsciiTableSerialize(DefaultSerialize):
             new_typedef = {'type': 'array', 'items': [old_typedef]}
             kwargs.update(new_typedef)
         out = super(AsciiTableSerialize, self).update_serializer(*args, **kwargs)
-        for k in ['format_str', 'delimiter', 'newline', 'comment']:
-            v = getattr(self, k, None)
-            if isinstance(v, backwards.string_types):
-                setattr(self, k, backwards.as_bytes(v))
         self.update_format_str()
         self.update_field_names()
         self.update_field_units()
@@ -92,16 +82,16 @@ class AsciiTableSerialize(DefaultSerialize):
             fmts = []
             if isinstance(self.typedef['items'], dict):  # pragma: debug
                 idtype = definition2dtype(self.typedef['items'])
-                ifmt = nptype2cformat(idtype, asbytes=True)
+                ifmt = serialize.nptype2cformat(idtype, asbytes=True)
                 # fmts = [ifmt for x in msg]
                 raise Exception("Variable number of items not yet supported.")
             elif isinstance(self.typedef['items'], list):
                 for x in self.typedef['items']:
                     idtype = definition2dtype(x)
-                    ifmt = nptype2cformat(idtype, asbytes=True)
+                    ifmt = serialize.nptype2cformat(idtype, asbytes=True)
                     fmts.append(ifmt)
             if fmts:
-                self.format_str = table2format(
+                self.format_str = serialize.table2format(
                     fmts=fmts, delimiter=self.delimiter, newline=self.newline,
                     comment=b'')
 
@@ -133,10 +123,10 @@ class AsciiTableSerialize(DefaultSerialize):
         args = self.datatype.coerce_type(args,
                                          key_order=self.get_field_names())
         if self.as_array:
-            out = array_to_table(args, self.format_str,
-                                 use_astropy=self.use_astropy)
+            out = serialize.array_to_table(args, self.format_str,
+                                           use_astropy=self.use_astropy)
         else:
-            out = format_message(args, self.format_str)
+            out = serialize.format_message(args, self.format_str)
         return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
@@ -152,12 +142,12 @@ class AsciiTableSerialize(DefaultSerialize):
         if self.format_str is None:
             raise RuntimeError("Format string is not defined.")
         if self.as_array:
-            out = table_to_array(msg, self.format_str,
-                                 use_astropy=self.use_astropy,
-                                 names=self.get_field_names(as_bytes=True))
+            out = serialize.table_to_array(msg, self.format_str,
+                                           use_astropy=self.use_astropy,
+                                           names=self.get_field_names(as_bytes=True))
             out = self.datatype.coerce_type(out)
         else:
-            out = list(process_message(msg, self.format_str))
+            out = list(serialize.process_message(msg, self.format_str))
         field_units = self.get_field_units()
         if field_units is not None:
             out = [units.add_units(x, u) for x, u in zip(out, field_units)]
@@ -175,3 +165,38 @@ class AsciiTableSerialize(DefaultSerialize):
             as_format=True, as_array=as_array)
         out['extra_kwargs'] = {}
         return out
+
+    @property
+    def read_meth(self):
+        r"""str: Method that should be used to read data for deserialization."""
+        if self.as_array:
+            return 'read'
+        else:
+            return 'readline'
+
+    def serialize_header(self):
+        r"""Return the serialized header information that should be prepended
+        to files serialized using this class.
+
+        Returns:
+            bytes: Header string that should be written to the file.
+
+        """
+        out = serialize.format_header(
+            format_str=self.format_str,
+            field_names=self.get_field_names(as_bytes=True),
+            field_units=self.get_field_units(as_bytes=True),
+            comment=self.comment, newline=self.newline, delimiter=self.delimiter)
+        return out
+
+    def deserialize_header(self, fd):
+        r"""Deserialize the header information from the file and update the
+        serializer.
+
+        Args:
+            fd (file): File containing header.
+
+        """
+        fd.seek(0)
+        serialize.discover_header(fd, self, newline=self.newline,
+                                  comment=self.comment, delimiter=self.delimiter)

@@ -6,12 +6,13 @@ class TestPandasFileComm(parent.TestAsciiTableComm):
     r"""Test for PandasFileComm communication class."""
 
     comm = 'PandasFileComm'
+    testing_option_kws = {'not_as_frames': True}
 
 
 class TestPandasFileComm_nonames(TestPandasFileComm):
     r"""Test for PandasFileComm communication class without field names sent."""
 
-    testing_option_kws = {'no_names': True}
+    testing_option_kws = {'not_as_frames': True, 'no_names': True}
 
 
 class TestPandasFileComm_single(TestPandasFileComm):

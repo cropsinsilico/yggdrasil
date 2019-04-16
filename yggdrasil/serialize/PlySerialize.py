@@ -1,5 +1,4 @@
 from yggdrasil import backwards
-from yggdrasil.components import inherit_schema
 from yggdrasil.serialize import _default_newline
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import PlyDict
@@ -25,11 +24,11 @@ class PlySerialize(DefaultSerialize):
     
     _seritype = 'ply'
     _schema_subtype_description = ('Serialize 3D structures using Ply format.')
-    _schema_properties = inherit_schema(
-        DefaultSerialize._schema_properties,
-        {'newline': {'type': 'string',
-                     'default': backwards.as_str(_default_newline)}})
+    _schema_properties = {
+        'newline': {'type': 'string',
+                    'default': backwards.as_str(_default_newline)}}
     _default_type = {'type': 'ply'}
+    concats_as_str = False
 
     def __init__(self, *args, **kwargs):
         r"""Initialize immediately as default is only type."""
@@ -63,6 +62,25 @@ class PlySerialize(DefaultSerialize):
                                                  self.typedef))
 
     @classmethod
+    def concatenate(cls, objects):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        if len(objects) == 0:
+            return []
+        total = objects[0]
+        for x in objects[1:]:
+            total = total.merge(x)
+        return [total]
+        
+    @classmethod
     def get_testing_options(cls):
         r"""Method to return a dictionary of testing options for this class.
 
@@ -95,5 +113,4 @@ class PlySerialize(DefaultSerialize):
                              + b'0.0000 1.0000 1.0000\n'
                              + b'3 0 1 2\n'
                              + b'3 3 4 5\n'))
-        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out

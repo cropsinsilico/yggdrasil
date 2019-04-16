@@ -2,10 +2,7 @@ import copy
 import pprint
 import numpy as np
 import warnings
-from yggdrasil import backwards, tools, units
-from yggdrasil.components import ComponentBase
-from yggdrasil.serialize import (
-    extract_formats, cformat2nptype, consolidate_array)
+from yggdrasil import backwards, tools, units, serialize
 from yggdrasil.metaschema import get_metaschema
 from yggdrasil.metaschema.datatypes import (
     guess_type_from_obj, get_type_from_def, get_type_class, compare_schema)
@@ -15,11 +12,15 @@ from yggdrasil.metaschema.datatypes.ArrayMetaschemaType import (
     OneDArrayMetaschemaType)
 
 
-class DefaultSerialize(ComponentBase, tools.YggClass):
+class DefaultSerialize(tools.YggClass):
     r"""Default class for serializing/deserializing a python object into/from
     a bytes message.
 
     Args:
+        newline (str, optional): One or more characters indicating a newline.
+            Defaults to '\n'.
+        comment (str, optional): One or more characters indicating a comment.
+            Defaults to '# '.
         func_serialize (func, optional): Callable object that takes python
             objects as input and returns a bytes string representation. Defaults
             to None.
@@ -54,6 +55,16 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
         func_typedef (dict): Type definition for encoding/decoding messages
             returned/passed by/to func_serialize/func_deserialize.
 
+    Class Attributes:
+        has_header (bool): True if the serialization has a header when written
+            to a file.
+        default_read_meth (str): Default method that data should be read from
+            a file for deserialization.
+        is_framed (bool): True if the serialization has a frame allowing
+            multiple serialized objects to be recovered from a single message.
+        concats_as_str (bool): True if serialized objects can be concatenated
+            directly as strings.
+
     """
 
     _seritype = 'default'
@@ -64,14 +75,34 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
                                    'provided type definition (See discussion '
                                    ':ref:`here <serialization_rst>`).')
     _schema_requried = []
-    _schema_properties = {'seritype': {'type': 'string',
-                                       'default': _seritype,
-                                       'description': ('Serializer type.')}}
+    _schema_properties = {
+        'seritype': {'type': 'string',
+                     'default': _seritype,
+                     'description': ('Serializer type.')},
+        'newline': {'type': 'string',
+                    'default': backwards.as_str(serialize._default_newline)},
+        'comment': {'type': 'string',
+                    'default': backwards.as_str(serialize._default_comment)},
+        'func_serialize': {'type': 'function'},
+        'func_deserialize': {'type': 'function'},
+        'encode_func_serialize': {'type': 'boolean'},
+        'decode_func_deserialize': {'type': 'boolean'},
+        'func_typedef': {'type': 'schema'}}
+    _schema_excluded_from_class = ['func_serialize', 'func_deserialize',
+                                   'encode_func_serialize',
+                                   'decode_func_deserialize',
+                                   'func_typedef']
+    _schema_excluded_from_inherit = copy.deepcopy(_schema_excluded_from_class)
     _default_type = {'type': 'bytes'}
     _oldstyle_kws = ['format_str', 'field_names', 'field_units', 'as_array']
+    _attr_conv = ['newline', 'comment']
     encode_func_serialize = False
     decode_func_deserialize = False
     func_typedef = {'type': 'bytes'}
+    has_header = False
+    default_read_meth = 'read'
+    is_framed = False
+    concats_as_str = True
     
     def __init__(self, func_serialize=None, func_deserialize=None,
                  encode_func_serialize=None, decode_func_deserialize=None,
@@ -112,8 +143,97 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
         self._initialized = (self.typedef != self._default_type)
 
     @classmethod
+    def object2dict(cls, obj, as_array=False, field_names=None, **kwargs):
+        r"""Convert a message object into a dictionary.
+
+        Args:
+            obj (object): Object that would be serialized by this class and
+                should be returned in a dictionary form.
+            as_array (bool, optional): If True, the objects in the list
+                are complete columns in a table and as_format is set to True.
+                Defaults to False.
+            field_names (list, optional): The field names associated with a
+                table-like data type. Defaults to None. This keyword must be
+                provided if as_array is True.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            dict: Dictionary version of the provided object.
+
+        """
+        if field_names is None:
+            assert(not as_array)
+            out = {'f0': obj}
+        else:
+            out = serialize.list2dict(obj, names=field_names)
+        return out
+
+    @classmethod
+    def object2array(cls, obj, as_array=False, field_names=None, **kwargs):
+        r"""Convert a message object into an array.
+
+        Args:
+            obj (object): Object that would be serialized by this class and
+                should be returned in an array form.
+            as_array (bool, optional): If True, the objects in the list
+                are complete columns in a table and as_format is set to True.
+                Defaults to False.
+            field_names (list, optional): The field names associated with a
+                table-like data type. Defaults to None. This keyword must be
+                provided if as_array is True.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            np.array: Array version of the provided object.
+
+        """
+        if as_array:
+            assert(field_names is not None)
+            out = serialize.list2numpy(obj, names=field_names)
+        else:
+            out = None
+        return out
+
+    @classmethod
+    def concatenate(cls, objects, as_array=False, **kwargs):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+            as_array (bool, optional): If True, the objects in the list
+                are complete columns in a table and as_format is set to True.
+                Defaults to False.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        if len(objects) == 0:
+            return []
+        if as_array:
+            units_list = [units.get_units(ix) for ix in objects[0]]
+            out = [[units.add_units(np.hstack([x[i] for x in objects]), u)
+                    for i, u in enumerate(units_list)]]
+        elif isinstance(objects[0], backwards.bytes_type):
+            out = [b''.join(objects)]
+        else:
+            out = objects
+        return out
+
+    @classmethod
     def get_testing_options(cls, as_format=False, as_array=False):
         r"""Method to return a dictionary of testing options for this class.
+
+        Arguments:
+            as_format (bool, optional): If True, the returned options will be
+                for a table-like datatype with kwargs that include the old-style
+                options. Defaults to False.
+            as_array (bool, optional): If True, the returned options will be for
+                serializing/deserializing a table as column arrays. Setting
+                as_array to True forces as_format to also be True. Defaults to
+                False.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -129,6 +249,10 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
               kwargs.
             * dtype (np.dtype): Numpy data types that is consistent with the
               determined type definition.
+            * contents (bytes): Concatenated serialization that will result from
+              deserializing the serialized objects.
+            * contents_recv (list): List of objects that would be deserialized
+              from contents.
 
         """
         if as_array:
@@ -185,8 +309,12 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
                    'extra_kwargs': {}}
             out['objects'] = [b'Test message\n', b'Test message 2\n']
             out['contents'] = b''.join(out['objects'])
-        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
         return out
+        
+    @property
+    def read_meth(self):
+        r"""str: Method that should be used to read data for deserialization."""
+        return self.default_read_meth
         
     @classmethod
     def seri_kws(cls):
@@ -460,6 +588,11 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
                          + "    New:\n%s\nOld:\n%s\n") % (
                              pprint.pformat(self.typedef),
                              pprint.pformat(old_datatype._typedef)))
+        # Enfore that strings used with messages are in bytes
+        for k in self._attr_conv:
+            v = getattr(self, k, None)
+            if isinstance(v, backwards.string_types):
+                setattr(self, k, backwards.as_bytes(v))
 
     def update_typedef_from_oldstyle(self, typedef):
         r"""Update a given typedef using an old, table-style serialization spec.
@@ -485,7 +618,7 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
             # Key specific changes to type
             if k == 'format_str':
                 v = backwards.as_str(v)
-                fmts = extract_formats(v)
+                fmts = serialize.extract_formats(v)
                 if 'type' in typedef:
                     if (typedef.get('type', None) == 'array'):
                         assert(len(typedef.get('items', [])) == len(fmts))
@@ -498,7 +631,7 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
                                                  getattr(self, 'as_array', False))
                 typedef.update(type='array', items=[])
                 for i, fmt in enumerate(fmts):
-                    nptype = cformat2nptype(fmt)
+                    nptype = serialize.cformat2nptype(fmt)
                     itype = OneDArrayMetaschemaType.encode_type(np.ones(1, nptype))
                     itype = OneDArrayMetaschemaType.extract_typedef(itype)
                     if (fmt == '%s') and ('precision' in itype):
@@ -646,6 +779,26 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
             self.initialize_serializer(typedef, extract=True)
         return out, metadata
 
+    def serialize_header(self):
+        r"""Return the serialized header information that should be prepended
+        to files serialized using this class.
+
+        Returns:
+            bytes: Header string that should be written to the file.
+
+        """
+        return b''
+
+    def deserialize_header(self, fd):
+        r"""Deserialize the header information from the file and update the
+        serializer.
+
+        Args:
+            fd (file): File containing header.
+
+        """
+        pass
+
     def consolidate_array(self, out):
         r"""Consolidate message into a structure numpy array if possible.
 
@@ -662,7 +815,7 @@ class DefaultSerialize(ComponentBase, tools.YggClass):
         """
         np_dtype = self.numpy_dtype
         if np_dtype and isinstance(out, (list, tuple, np.ndarray)):
-            out = consolidate_array(out, dtype=np_dtype)
+            out = serialize.consolidate_array(out, dtype=np_dtype)
         else:
             warnings.warn(("Cannot consolidate message into a structured "
                            + "numpy array: %s") % str(out))
