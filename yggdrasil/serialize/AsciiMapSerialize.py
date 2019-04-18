@@ -1,11 +1,11 @@
 import json
 from yggdrasil import backwards
 from yggdrasil.serialize import _default_delimiter
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
 
-class AsciiMapSerialize(DefaultSerialize):
+class AsciiMapSerialize(SerializeBase):
     r"""Class for serializing/deserializing name/value mapping.
 
     Args:
@@ -14,7 +14,7 @@ class AsciiMapSerialize(DefaultSerialize):
 
     """
     
-    _seritype = 'ascii_map'
+    _seritype = 'map'
     _schema_subtype_description = ('Serialzation of mapping between key/value '
                                    'pairs with one pair per line and using a '
                                    'character delimiter to separate keys and '
@@ -22,8 +22,8 @@ class AsciiMapSerialize(DefaultSerialize):
     _schema_properties = {
         'delimiter': {'type': 'string',
                       'default': backwards.as_str(_default_delimiter)}}
-    _default_type = {'type': 'object'}
-    _attr_conv = DefaultSerialize._attr_conv + ['delimiter']
+    _attr_conv = SerializeBase._attr_conv + ['delimiter']
+    default_datatype = {'type': 'object'}
     concats_as_str = False
 
     def func_serialize(self, args):
@@ -78,12 +78,13 @@ class AsciiMapSerialize(DefaultSerialize):
         return out
 
     @classmethod
-    def concatenate(cls, objects):
+    def concatenate(cls, objects, **kwargs):
         r"""Concatenate objects to get object that would be recieved if
         the concatenated serialization were deserialized.
 
         Args:
             objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             list: Set of objects that results from concatenating those provided.

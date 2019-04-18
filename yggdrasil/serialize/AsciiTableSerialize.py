@@ -44,7 +44,7 @@ class AsciiTableSerialize(DefaultSerialize):
 
     """
 
-    _seritype = 'ascii_table'
+    _seritype = 'table'
     _schema_subtype_description = ('ASCII tab (or otherwise) delimited table.')
     _schema_properties = {
         'format_str': {'type': 'string'},
@@ -77,7 +77,7 @@ class AsciiTableSerialize(DefaultSerialize):
     def update_format_str(self):
         r"""Update the format string based on the type definition."""
         # Get format information from precision etc.
-        if (self.format_str is None) and self._initialized:
+        if (self.format_str is None) and self.initialized:
             assert(self.typedef['type'] == 'array')
             fmts = []
             if isinstance(self.typedef['items'], dict):  # pragma: debug
@@ -97,13 +97,13 @@ class AsciiTableSerialize(DefaultSerialize):
 
     def update_field_names(self):
         r"""list: Names for each field in the data type."""
-        if (self.field_names is None) and self._initialized:
+        if (self.field_names is None) and self.initialized:
             assert(self.typedef['type'] == 'array')
             self.field_names = self.get_field_names()
 
     def update_field_units(self):
         r"""list: Units for each field in the data type."""
-        if (self.field_units is None) and self._initialized:
+        if (self.field_units is None) and self.initialized:
             assert(self.typedef['type'] == 'array')
             self.field_units = self.get_field_units()
 
@@ -154,15 +154,18 @@ class AsciiTableSerialize(DefaultSerialize):
         return out
 
     @classmethod
-    def get_testing_options(cls, as_array=False):
+    def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the parent class's method.
 
         Returns:
             dict: Dictionary of variables to use for testing.
 
         """
         out = super(AsciiTableSerialize, cls).get_testing_options(
-            as_format=True, as_array=as_array)
+            table_example=True, include_oldkws=True, **kwargs)
         out['extra_kwargs'] = {}
         return out
 
@@ -174,7 +177,7 @@ class AsciiTableSerialize(DefaultSerialize):
         else:
             return 'readline'
 
-    def serialize_header(self):
+    def serialize_file_header(self):
         r"""Return the serialized header information that should be prepended
         to files serialized using this class.
 
@@ -189,7 +192,7 @@ class AsciiTableSerialize(DefaultSerialize):
             comment=self.comment, newline=self.newline, delimiter=self.delimiter)
         return out
 
-    def deserialize_header(self, fd):
+    def deserialize_file_header(self, fd):
         r"""Deserialize the header information from the file and update the
         serializer.
 

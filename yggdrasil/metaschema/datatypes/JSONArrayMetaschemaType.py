@@ -87,6 +87,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         elif isinstance(obj, dict):
             if (key_order is not None) or (len(obj) == 1):
                 obj = dict2list(obj, order=key_order)
+            else:
+                obj = [obj]
         elif isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
             typedef_validated = kwargs.get('typedef_validated', False)
             if cls.check_decoded([obj], typedef,

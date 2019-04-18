@@ -508,7 +508,7 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
-        if (self.ocomm._send_serializer) and self.icomm.serializer._initialized:
+        if (self.ocomm._send_serializer) and self.icomm.serializer.initialized:
             self.update_serializer(msg)
         for t in self.translator:
             msg = t(msg)
@@ -553,7 +553,7 @@ class ConnectionDriver(Driver):
         #     sinfo.pop('seritype', None)
         #     self.ocomm.serializer = self.icomm.serializer
         #     inter_model = True
-        # if (not inter_model) and self.ocomm.serializer._initialized:  # pragma: debug
+        # if (not inter_model) and self.ocomm.serializer.initialized:  # pragma: debug
         #     self.ocomm.serializer.update_serializer(**sinfo)
         # else:
         #     self.ocomm.serializer.initialize_serializer(sinfo)

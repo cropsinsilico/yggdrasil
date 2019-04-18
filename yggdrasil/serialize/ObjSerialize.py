@@ -9,7 +9,7 @@ class ObjSerialize(PlySerialize):
 
     _seritype = 'obj'
     _schema_subtype_description = ('Serialize 3D structures using Obj format.')
-    _default_type = {'type': 'obj'}
+    default_datatype = {'type': 'obj'}
 
     def func_serialize(self, args):
         r"""Serialize a message.

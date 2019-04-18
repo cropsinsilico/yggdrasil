@@ -16,7 +16,7 @@ import uuid as uuid_gen
 import subprocess
 from yggdrasil import platform
 from yggdrasil import backwards
-from yggdrasil.components import import_component
+from yggdrasil.components import import_component, ComponentBase
 
 
 YGG_MSG_EOF = b'EOF!!!'
@@ -576,7 +576,7 @@ class TimeOut(object):
 #     return wrapper
 
 
-class YggClass(logging.LoggerAdapter):
+class YggClass(ComponentBase, logging.LoggerAdapter):
     r"""Base class for Ygg classes.
 
     Args:
@@ -589,8 +589,8 @@ class YggClass(logging.LoggerAdapter):
             spent waiting on a process. Defaults to 60.
         sleeptime (float, optional): Time that class should sleep for when
             sleep is called. Defaults to 0.01.
-        **kwargs: Additional keyword arguments are assigned to the extra_kwargs
-            dictionary.
+        **kwargs: Additional keyword arguments are passed to the ComponentBase
+            initializer.
 
     Attributes:
         name (str): Class name.
@@ -601,7 +601,6 @@ class YggClass(logging.LoggerAdapter):
         timeout (float): Maximum time that should be spent waiting on a process.
         working_dir (str): Working directory.
         errors (list): List of errors.
-        extra_kwargs (dict): Keyword arguments that were not parsed.
         sched_out (obj): Output from the last scheduled task with output.
         logger (logging.Logger): Logger object for this object.
         suppress_special_debug (bool): If True, special_debug log messages
@@ -609,25 +608,26 @@ class YggClass(logging.LoggerAdapter):
 
     """
 
+    _base_defaults = ['name', 'uuid', 'working_dir', 'timeout', 'sleeptime']
+
     def __init__(self, name=None, uuid=None, working_dir=None,
                  timeout=60.0, sleeptime=0.01, **kwargs):
+        # Defaults
         if name is None:
             name = ''
-        self._name = name
         if uuid is None:
             uuid = str(uuid_gen.uuid4())
+        if working_dir is None:
+            working_dir = os.getcwd()
+        # Assign attributes
+        self._name = name
         self.uuid = uuid
         self.sleeptime = sleeptime
         self.longsleep = self.sleeptime * 10
         self.timeout = timeout
         self._timeouts = {}
-        # Set defaults
-        if working_dir is None:
-            working_dir = os.getcwd()
-        # Assign things
         self.working_dir = working_dir
         self.errors = []
-        self.extra_kwargs = kwargs
         self.sched_out = None
         self.suppress_special_debug = False
         self._periodic_logs = {}
@@ -640,13 +640,16 @@ class YggClass(logging.LoggerAdapter):
         self._old_encoding = None
         self.debug_flag = False
         self._ygg_class = str(self.__class__).split("'")[1].split('.')[-1]
-        super(YggClass, self).__init__(logging.getLogger(self.__module__), {})
+        # Call super class, adding in schema properties
+        for k in self._base_defaults:
+            if k in self._schema_properties:
+                kwargs[k] = getattr(self, k)
+        super(YggClass, self).__init__(**kwargs)
+        logging.LoggerAdapter.__init__(self, logging.getLogger(self.__module__), {})
 
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
-        pass
+    def __deepcopy__(self, memo):
+        r"""Don't deep copy since threads cannot be copied."""
+        return self
 
     @property
     def name(self):
@@ -965,7 +968,7 @@ class YggClass(logging.LoggerAdapter):
                 self.error("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
-
+        
 
 class YggThread(threading.Thread, YggClass):
     r"""Thread for Ygg that tracks when the thread is started and joined.

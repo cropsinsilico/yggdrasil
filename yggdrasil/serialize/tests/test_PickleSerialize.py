@@ -1,7 +1,7 @@
-from yggdrasil.serialize.tests import test_DefaultSerialize as parent
+from yggdrasil.serialize.tests import test_SerializeBase as parent
 
 
-class TestPickleSerialize(parent.TestDefaultSerialize):
+class TestPickleSerialize(parent.TestSerializeBase):
     r"""Test class for TestPickleSerialize class."""
 
     _cls = 'PickleSerialize'

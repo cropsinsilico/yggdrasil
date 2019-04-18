@@ -31,7 +31,7 @@ TODO
 * Add link to paper & citation section once officially published
 * Update yaml.rst docs to reflect new schema
 * Add deprecation warnings to handling of old syntax
-* Add serializers and datatypes as components?
+* Add datatypes as components?
 * Improve support for different string encodings (i.e. add datatype property to string)
 * Create a set of fundamental tests that every language implementation needs to pass including files containing serialized data that needs to be deserialized and then serialized.
 * Changes 'bytes' type to 'ascii' since that is really what it means
@@ -44,3 +44,5 @@ TODO
 * Clean up component doc strings (move component options descriptions to schema or another arguments section?)
 * Add automated deprecation marker for schema options
 * Add datatypes example that is automated for all registered languages and tests sending/receiving all supported datatypes
+* Simplify input arguments to connection drivers to match schema
+* Streamline normalization to speed it up

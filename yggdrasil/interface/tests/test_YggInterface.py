@@ -236,7 +236,7 @@ class TestYggInput(TestBase):
         self._cls = 'YggInput'
         self.direction = 'input'
         if self.__class__ == TestYggInput:
-            self.testing_option_kws = {'as_format': True}
+            self.testing_option_kws = {'table_example': True}
             self._inst_kwargs = {'format_str': self.fmt_str}
 
     def test_msg(self):
@@ -262,7 +262,7 @@ class TestYggInputMatlab(TestYggInput):
     def __init__(self, *args, **kwargs):
         super(TestYggInputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
-        self.testing_option_kws = {'as_format': True}
+        self.testing_option_kws = {'table_example': True}
         self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
@@ -273,7 +273,7 @@ class TestYggOutput(TestBase):
         self._cls = 'YggOutput'
         self.direction = 'output'
         if self.__class__ == TestYggOutput:
-            self.testing_option_kws = {'as_format': True}
+            self.testing_option_kws = {'table_example': True}
             self._inst_kwargs = {'format_str': self.fmt_str}
 
     def test_msg(self):
@@ -307,7 +307,7 @@ class TestYggOutputMatlab(TestYggOutput):
     def __init__(self, *args, **kwargs):
         super(TestYggOutputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
-        self.testing_option_kws = {'as_format': True}
+        self.testing_option_kws = {'table_example': True}
         self._inst_kwargs = {'format_str': self.fmt_str_matlab}
 
 
@@ -445,7 +445,7 @@ class TestYggAsciiArrayInput(TestYggAsciiTableInput):
         self._cls = 'YggAsciiArrayInput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
-        self.testing_option_kws = {'as_array': True}
+        self.testing_option_kws = {'array_columns': True}
 
 
 class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
@@ -455,7 +455,7 @@ class TestYggAsciiArrayOutput(TestYggAsciiTableOutput):
         self._cls = 'YggAsciiArrayOutput'
         self.is_file = True
         self.filecomm = 'AsciiTableComm'
-        self.testing_option_kws = {'as_array': True}
+        self.testing_option_kws = {'array_columns': True}
         
 
 # Pickle
@@ -485,7 +485,7 @@ class TestYggPandasInput(TestYggInput):
         self._cls = 'YggPandasInput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
-        self.testing_option_kws = {'as_frames': True}
+        # self.testing_option_kws = {'as_frames': True}
 
 
 class TestYggPandasOutput(TestYggOutput):
@@ -495,7 +495,7 @@ class TestYggPandasOutput(TestYggOutput):
         self._cls = 'YggPandasOutput'
         self.is_file = True
         self.filecomm = 'PandasFileComm'
-        self.testing_option_kws = {'as_frames': True}
+        # self.testing_option_kws = {'as_frames': True}
 
 
 # Ply

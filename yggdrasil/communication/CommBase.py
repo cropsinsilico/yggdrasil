@@ -8,6 +8,7 @@ from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
 from yggdrasil.components import import_component
+from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -146,8 +147,6 @@ class CommThreadLoop(tools.YggThreadLoop):
 
     def on_main_terminated(self):  # pragma: debug
         r"""Actions taken on the backlog thread when the main thread stops."""
-        # for i in threading.enumerate():
-        #     print(i.name)
         self.debug('is_interface = %s, direction = %s',
                    self.comm.is_interface, self.comm.direction)
         if self.comm.is_interface:
@@ -208,6 +207,8 @@ class CommBase(tools.YggClass):
             through the connection. 'send' if the connection will send
             messages, 'recv' if the connecton will receive messages. Defaults
             to 'send'.
+        partner_language (str, optional): Programming language of this comm's
+            partner comm. Defaults to 'python'.
         datatype (schema, optional): JSON schema (with expanded core types
             defined by |yggdrasil|) that constrains the type of data that
             should be sent/received by this object. Defaults to {'type': 'bytes'}.
@@ -277,6 +278,7 @@ class CommBase(tools.YggClass):
         address (str): Communication info.
         direction (str): The direction that messages should flow through the
             connection.
+        partner_language (str): Programming language of this comm's partner comm.
         serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
         is_interface (bool): True if this comm is a Python interface binding.
@@ -321,7 +323,7 @@ class CommBase(tools.YggClass):
                                                        'that should be used.')},
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
-                          'recv_converter': {'type': 'function'},
+                          'recv_converter': {'type': ['function', 'string']},
                           'send_converter': {'type': 'function'},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
@@ -330,12 +332,13 @@ class CommBase(tools.YggClass):
                           'as_array': {'type': 'boolean', 'default': False}}
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
+    _default_serializer_class = None
     is_file = False
     _maxMsgSize = 0
 
     def __init__(self, name, address=None, direction='send',
-                 dont_open=False, is_interface=False, recv_timeout=0.0,
-                 close_on_eof_recv=True, close_on_eof_send=False,
+                 partner_language='python', dont_open=False, is_interface=False,
+                 recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
@@ -343,6 +346,11 @@ class CommBase(tools.YggClass):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
+        if kwargs.get('commtype', None) == 'default':
+            # TODO: Check that the class is the default?
+            kwargs.pop('commtype')
+        if isinstance(kwargs.get('datatype', None), MetaschemaType):
+            self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
         if not self.__class__.is_installed(language='python'):
             raise RuntimeError("Comm class %s not installed" % self.__class__)
@@ -359,6 +367,7 @@ class CommBase(tools.YggClass):
         else:
             self.address = address
         self.direction = direction
+        self.partner_language = partner_language
         self.is_client = is_client
         self.is_server = is_server
         self.is_response_client = is_response_client
@@ -417,8 +426,8 @@ class CommBase(tools.YggClass):
         before the comm is opened."""
         seri_cls = kwargs.pop('serializer_class', None)
         seri_kws = kwargs.pop('serializer_kwargs', {})
-        if 'datatype' in self._schema_properties:
-            seri_kws.update(self.datatype)
+        if ('datatype' in self._schema_properties) and (self.datatype is not None):
+            seri_kws.setdefault('datatype', self.datatype)
         if ((('serializer' not in self._schema_properties)
              and (not hasattr(self, 'serializer')))):
             self.serializer = self._default_serializer
@@ -432,7 +441,8 @@ class CommBase(tools.YggClass):
         if self.serializer is None:
             # Get serializer class
             if seri_cls is None:
-                if seri_kws['seritype'] == self._default_serializer:
+                if (((seri_kws['seritype'] == self._default_serializer)
+                     and (self._default_serializer_class is not None))):
                     seri_cls = self._default_serializer_class
                 else:
                     seri_cls = import_component('serializer',
@@ -451,6 +461,14 @@ class CommBase(tools.YggClass):
                 if v is not None:
                     setattr(self, k, v)
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration."""
+        tools.YggClass.before_registration(cls)
+        cls._default_serializer_class = import_component('serializer',
+                                                         cls._default_serializer)
+        
     @classmethod
     def get_testing_options(cls, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
@@ -473,7 +491,8 @@ class CommBase(tools.YggClass):
         """
         if serializer is None:
             serializer = cls._default_serializer
-        if serializer == cls._default_serializer:
+        if (((serializer == cls._default_serializer)
+             and (cls._default_serializer_class is not None))):
             seri_cls = cls._default_serializer_class
         else:
             seri_cls = import_component('serializer', serializer)
@@ -664,7 +683,9 @@ class CommBase(tools.YggClass):
         for k in self.serializer._schema_properties.keys():
             if k in self.serializer._schema_excluded_from_class:
                 continue
-            kwargs[k] = getattr(self.serializer, k)
+            v = getattr(self.serializer, k)
+            if v is not None:
+                kwargs[k] = v
         return kwargs
 
     def bind(self):
@@ -1343,7 +1364,7 @@ class CommBase(tools.YggClass):
             ret = self.send_multipart(args, **kwargs)
             if ret:
                 self._used = True
-                if self.serializer._initialized:
+                if self.serializer.initialized:
                     self._send_serializer = False
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
@@ -1661,7 +1682,7 @@ class CommBase(tools.YggClass):
              and isinstance(args_dict, dict)
              and (len(args_dict) <= 1))):
             metadata['key_order'] = [k for k in args_dict.keys()]
-        if not self.serializer._initialized:
+        if not self.serializer.initialized:
             if (metadata['key_order'] is None) and isinstance(args_dict, dict):
                 metadata['key_order'] = sorted(list(args_dict.keys()))
             metadata['field_names'] = metadata['key_order']

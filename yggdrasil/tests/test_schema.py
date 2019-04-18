@@ -29,6 +29,7 @@ _normalize_objects = [
                        'outputs': [{'name': 'fileA.txt',
                                     'filetype': 'binary',
                                     'working_dir': os.getcwd(),
+                                    'serializer': {'seritype': 'direct'},
                                     'field_names': ['a', 'b'],
                                     'field_units': ['cm', 'g']}]}]})]
                                     
@@ -109,7 +110,9 @@ def test_normalize():
         try:
             assert_equal(a, y)
         except BaseException:  # pragma: debug
+            print("Unexpected Normalization:\n\nA:")
             pprint.pprint(a)
+            print('\nB:')
             pprint.pprint(y)
             raise
 

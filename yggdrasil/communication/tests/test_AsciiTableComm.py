@@ -44,4 +44,4 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""
 
-    testing_option_kws = {'as_array': True}
+    testing_option_kws = {'array_columns': True}

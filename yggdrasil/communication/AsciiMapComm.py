@@ -14,4 +14,4 @@ class AsciiMapComm(FileComm.FileComm):
     _schema_subtype_description = ('The file contains a key/value mapping '
                                    'with one key/value pair per line and '
                                    'separated by some delimiter.')
-    _default_serializer = 'ascii_map'
+    _default_serializer = 'map'

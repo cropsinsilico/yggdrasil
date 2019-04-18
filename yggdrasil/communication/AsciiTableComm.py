@@ -9,4 +9,4 @@ class AsciiTableComm(FileComm):
                                    'read/written one row at a time. If '
                                    '``as_array`` is ``True``, the table will '
                                    'be read/written all at once.')
-    _default_serializer = 'ascii_table'
+    _default_serializer = 'table'

@@ -52,13 +52,16 @@ def new_comm(name, comm=None, **kwargs):
     """
     if isinstance(comm, list):
         if len(comm) == 1:
-            name = comm[0].pop('name', name)
             kwargs.update(comm[0])
-            return new_comm(name, **kwargs)
+            kwargs.setdefault('name', name)
+            return new_comm(**kwargs)
         else:
             kwargs['comm'] = comm
             comm = 'ForkComm'
     comm_cls = import_component('comm', comm)
+    if comm in ['DefaultComm', 'default']:
+        commtype = kwargs.pop('commtype', 'default')
+        assert(commtype == 'default')
     return comm_cls.new_comm(name, **kwargs)
 
 

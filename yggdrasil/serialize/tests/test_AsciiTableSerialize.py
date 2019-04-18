@@ -18,7 +18,7 @@ def test_deserialize_nofmt():
     r"""Test error on deserialization without a format."""
     inst = AsciiTableSerialize.AsciiTableSerialize()
     test_msg = b'lskdbjs;kfbj'
-    test_msg = inst.func_datatype.serialize(test_msg, metadata={})
+    test_msg = inst.encoded_datatype.serialize(test_msg, metadata={})
     assert_raises(RuntimeError, inst.deserialize, test_msg)
 
 
@@ -28,7 +28,7 @@ class TestAsciiTableSerialize(parent.TestDefaultSerialize):
     _cls = 'AsciiTableSerialize'
     attr_list = (copy.deepcopy(parent.TestDefaultSerialize.attr_list),
                  ['format_str', 'field_names', 'field_units', 'as_array'])
-
+    
     def test_field_specs(self):
         r"""Test field specifiers."""
         super(TestAsciiTableSerialize, self).test_field_specs()
@@ -72,4 +72,4 @@ class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
 class TestAsciiTableSerialize_asarray(TestAsciiTableSerialize):
     r"""Test class for AsciiTableSerialize class with as_array."""
 
-    testing_option_kws = {'as_array': True}
+    testing_option_kws = {'array_columns': True}

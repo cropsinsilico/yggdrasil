@@ -1,8 +1,7 @@
 import os
 import tempfile
 from yggdrasil import backwards, platform
-from yggdrasil.components import import_component
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.communication import CommBase
 
 
@@ -84,7 +83,8 @@ class FileComm(CommBase.CommBase):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
-        if isinstance(kwargs.get('serializer', None), DefaultSerialize):
+        kwargs['partner_language'] = None  # Files don't have partner comms
+        if isinstance(kwargs.get('serializer', None), SerializeBase):
             self.serializer = kwargs.pop('serializer')
             kwargs['serializer'] = {'seritype': 'direct'}
         return super(FileComm, self).__init__(*args, **kwargs)
@@ -103,21 +103,23 @@ class FileComm(CommBase.CommBase):
         self.address = os.path.abspath(self.address)
         self._series_index = 0
         if self.append:
-            self.header_was_written = True
+            self.disable_header()
         if 'read_meth' not in self._schema_properties:
             self.read_meth = self.serializer.read_meth
         assert(self.read_meth in ['read', 'readline'])
         # Force overwrite for concatenation in append mode
         if self.append and (not self.serializer.concats_as_str):
             self.append = 'ow'
-
+        # Assert that keyword args match serilization parameters
+        if not self.serializer.concats_as_str:
+            assert(self.read_meth == 'read')
+            assert(not self.serializer.is_framed)
+            
     @staticmethod
     def before_registration(cls):
         r"""Operations that should be performed to modify class attributes prior
         to registration."""
         CommBase.CommBase.before_registration(cls)
-        cls._default_serializer_class = import_component('serializer',
-                                                         cls._default_serializer)
         # Add serializer properties to schema
         if cls._filetype != 'binary':
             assert('serializer' not in cls._schema_properties)
@@ -234,13 +236,27 @@ class FileComm(CommBase.CommBase):
         return '%s_%s_%s' % (self.address, self.direction, self.uuid)
 
     # Methods related to header
+    def enable_header(self):
+        r"""Turn on header so that it will be written."""
+        self.header_was_read = False
+        self.header_was_written = False
+        if self.serializer.has_header:
+            self.serializer.enable_file_header()
+    
+    def disable_header(self):
+        r"""Turn off header so that it will not be written."""
+        self.header_was_read = True
+        self.header_was_written = True
+        if self.serializer.has_header:
+            self.serializer.disable_file_header()
+    
     def read_header(self):
         r"""Read header lines from the file and update serializer info."""
         if self.header_was_read:
             return
         if self.serializer.has_header:
             pos = self.record_position()
-            self.serializer.deserialize_header(self.fd)
+            self.serializer.deserialize_file_header(self.fd)
             self.change_position(*pos)
         self.header_was_read = True
 
@@ -249,7 +265,7 @@ class FileComm(CommBase.CommBase):
         if self.header_was_written:
             return
         if self.serializer.has_header:
-            header_msg = self.serializer.serialize_header()
+            header_msg = self.serializer.serialize_file_header()
             if header_msg:
                 self.fd.write(header_msg)
         self.header_was_written = True
@@ -260,6 +276,20 @@ class FileComm(CommBase.CommBase):
         _rec_pos = self.fd.tell()
         _rec_ind = self._series_index
         return _rec_pos, _rec_ind, self.header_was_read, self.header_was_written
+
+    def reset_position(self, truncate=False):
+        r"""Move to the front of the file and allow header to be read again.
+
+        Args:
+            truncate (bool, optional): If True, the file will be truncated after
+                moving to the beginning, effectively erasing the file. Defaults
+                to False.
+
+        """
+        self.change_position(0)
+        self.enable_header()
+        if truncate:
+            self.fd.truncate()
 
     def change_position(self, file_pos, series_index=None,
                         header_was_read=None, header_was_written=None):
@@ -499,6 +529,19 @@ class FileComm(CommBase.CommBase):
         # self.close()
         return flag, msg_s
 
+    def serialize(self, obj, **kwargs):
+        r"""Serialize a message using the associated serializer."""
+        if (not self.serializer.concats_as_str) and (self.fd.tell() != 0):
+            new_obj = obj
+            with open(self.current_address, 'rb') as fd:
+                old_obj = self.deserialize(fd.read())[0]
+            obj = self.serializer.concatenate([old_obj, new_obj])
+            assert(len(obj) == 1)
+            obj = obj[0]
+            # Reset file so that header will be written
+            self.reset_position(truncate=True)
+        return super(FileComm, self).serialize(obj, **kwargs)
+            
     def _send(self, msg):
         r"""Write message to a file.
 
@@ -509,18 +552,6 @@ class FileComm(CommBase.CommBase):
             bool: Success or failure of writing to the file.
 
         """
-        # Read previous contents of current file and append new values
-        if (((not self.serializer.concats_as_str) and (msg != self.eof_msg)
-             and (self.fd.tell() != 0))):
-            with open(self.current_address, 'rb') as fd:
-                old_obj = self.deserialize(fd.read())[0]
-            new_obj = self.deserialize(msg)[0]
-            obj = self.serializer.concatenate([old_obj, new_obj])
-            assert(len(obj) == 1)
-            msg = self.serialize(obj[0])
-            self.fd.seek(0)
-            self.fd.truncate()
-            self.header_was_written = False
         # Write header
         if msg != self.eof_msg:
             self.write_header()
@@ -576,6 +607,13 @@ class FileComm(CommBase.CommBase):
                 if (((self.read_meth == 'readline')
                      and out.startswith(self.serializer.comment))):
                     # Exclude comments
+                    flag, out = self._recv()
+                elif (((self.read_meth == 'read') and (prev_pos > 0)
+                       and (not self.serializer.concats_as_str))):
+                    # Rewind file and read entire contents if data was added to
+                    # the file type using a serialization method that dosn't
+                    # concatenate
+                    self.reset_position()
                     flag, out = self._recv()
                 elif (self.read_meth == 'read') and self.serializer.is_framed:
                     # Rewind if more than one frame read

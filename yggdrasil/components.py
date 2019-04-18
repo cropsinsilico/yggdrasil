@@ -4,6 +4,7 @@ import copy
 import six
 import importlib
 import re
+import warnings
 from collections import OrderedDict
 from yggdrasil import backwards
 
@@ -136,40 +137,41 @@ def import_component(comptype, subtype=None, without_schema=False):
         subtype = _registry_defaults.get(comptype, None)
     # Check registered components to prevent importing multiple times
     if subtype in _registry.get(comptype, {}):
-        return _registry[comptype][subtype]
+        out_cls = _registry[comptype][subtype]
     elif subtype in _registry_class2subtype.get(comptype, {}):
-        return _registry[comptype][_registry_class2subtype[comptype][subtype]]
-    # Get class name
-    if without_schema:
-        if subtype is None:
-            raise ValueError("subtype must be provided if without_schema is True.")
-        class_name = subtype
+        out_cls = _registry[comptype][_registry_class2subtype[comptype][subtype]]
     else:
-        from yggdrasil.schema import get_schema
-        s = get_schema().get(comptype, None)
-        if s is None:
-            raise ValueError("Unrecognized component type: %s" % comptype)
-        if subtype is None:
-            subtype = s.default_subtype
-        if subtype in s.class2subtype:
+        # Get class name
+        if without_schema:
+            if subtype is None:
+                raise ValueError("subtype must be provided if without_schema is True.")
             class_name = subtype
         else:
-            class_name = s.subtype2class.get(subtype, None)
-            if class_name is None:
-                # Attempt file since they are subclass of comm
-                if (comptype == 'comm'):
-                    try:
-                        return import_component('file', subtype)
-                    except ValueError:
-                        pass
-                raise ValueError("Unrecognized %s subtype: %s"
-                                 % (comptype, subtype))
-    # Import
-    if (comptype == 'comm') and (class_name == 'DefaultComm'):
-        from yggdrasil.tools import get_default_comm
-        return import_component('comm', get_default_comm())
-    out = importlib.import_module('yggdrasil.%s.%s' % (mod, class_name))
-    return getattr(out, class_name)
+            from yggdrasil.schema import get_schema
+            s = get_schema().get(comptype, None)
+            if s is None:
+                raise ValueError("Unrecognized component type: %s" % comptype)
+            if subtype is None:
+                subtype = s.default_subtype
+            if subtype in s.class2subtype:
+                class_name = subtype
+            else:
+                class_name = s.subtype2class.get(subtype, None)
+                if class_name is None:
+                    # Attempt file since they are subclass of comm
+                    if (comptype == 'comm'):
+                        try:
+                            return import_component('file', subtype)
+                        except ValueError:
+                            pass
+                    raise ValueError("Unrecognized %s subtype: %s"
+                                     % (comptype, subtype))
+        out_mod = importlib.import_module('yggdrasil.%s.%s' % (mod, class_name))
+        out_cls = getattr(out_mod, class_name)
+    # Check for an aliased class
+    if hasattr(out_cls, '_get_alias'):
+        out_cls = out_cls._get_alias()
+    return out_cls
 
 
 def create_component(comptype, subtype=None, **kwargs):
@@ -329,6 +331,14 @@ class ComponentMeta(type):
                     _registry_class2subtype[yaml_typ][subtype] = cls.__name__
         return cls
 
+    # def __getattribute__(cls, key):
+    #     r"""If the class is an alias for another class and has been initialized,
+    #     call getattr on the aliased class."""
+    #     if key not in ['__dict__', '_get_alias']:
+    #         if hasattr(cls, '_get_alias') and (key not in cls.__dict__):
+    #             return getattr(cls._get_alias(), key)
+    #     return super(ComponentMeta, cls).__getattribute__(key)
+
 
 @six.add_metaclass(ComponentMeta)
 class ComponentBase(object):
@@ -355,7 +365,7 @@ class ComponentBase(object):
             can be supplied to the class constructor and used to specify
             component behavior in YAML/JSON files. At initialization, these
             keywords are added to the class instance as attributes of the
-            same name unless they are in _schema_excluded_from_class. Unless 
+            same name unless they are in _schema_excluded_from_class. Unless
             _schema_inherit is False, these properties will be added in addition
             to the schema properties defined by the class base.
         _schema_excluded_from_class (list): Keywords in _schema_properties that
@@ -395,8 +405,8 @@ class ComponentBase(object):
             if k in self._schema_excluded_from_class:
                 continue
             default = v.get('default', None)
-            if k == self._schema_subtype_key:
-                default = getattr(self, '_%s' % k, default)
+            if (k == self._schema_subtype_key) and (subtype is not None):
+                default = subtype
             if default is not None:
                 kwargs.setdefault(k, default)
             if v.get('type', None) == 'array':
@@ -406,18 +416,15 @@ class ComponentBase(object):
         if (comptype is not None) and (subtype is not None):
             from yggdrasil.schema import get_schema
             from yggdrasil import metaschema
-            s = get_schema().get_component_schema(comptype, subtype)
+            s = get_schema().get_component_schema(comptype, subtype, relaxed=True)
             props = s['properties']
             kwargs.setdefault(self._schema_subtype_key, subtype)
             # Validate and normalize
-            kwargs_comp = {}
-            for k in props.keys():
-                if k in kwargs:
-                    kwargs_comp[k] = kwargs[k]
-            metaschema.validate_instance(kwargs_comp, s, normalize=False)
-            import pprint
-            print('before')
-            pprint.pprint(kwargs_comp)
+            metaschema.validate_instance(kwargs, s, normalize=False)
+            # TODO: Normalization performance needs improvement
+            # import pprint
+            # print('before')
+            # pprint.pprint(kwargs_comp)
             # kwargs_comp = metaschema.validate_instance(kwargs_comp, s,
             #                                            normalize=True)
             # kwargs.update(kwargs_comp)
@@ -432,8 +439,12 @@ class ComponentBase(object):
             v = kwargs.pop(k, None)
             if getattr(self, k, None) is None:
                 setattr(self, k, v)
-            elif getattr(self, k) != v:
-                print("didn't set %s to %s, it is %s" % (k, v, getattr(self, k)))
+            elif (getattr(self, k) != v) and (v is not None):
+                warnings.warn(("The schema property '%s' is provided as a "
+                               "keyword with a value of %s, but the class "
+                               "already has an attribute of the same name "
+                               "with the value %s.")
+                              % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
 
     @staticmethod

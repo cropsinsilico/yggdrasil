@@ -180,6 +180,8 @@ def parse_model(yml, existing):
     # Add server driver
     if yml.get('is_server', False):
         srv = {'name': yml['name'],
+               'commtype': 'default',
+               'datatype': {'type': 'bytes'},
                'driver': 'ServerDriver',
                'args': yml['name'] + '_SERVER',
                'working_dir': yml['working_dir']}
@@ -191,6 +193,8 @@ def parse_model(yml, existing):
         yml['client_of'] = srv_names
         for srv in srv_names:
             cli = {'name': '%s_%s' % (srv, yml['name']),
+                   'commtype': 'default',
+                   'datatype': {'type': 'bytes'},
                    'driver': 'ClientDriver',
                    'args': srv + '_SERVER',
                    'working_dir': yml['working_dir']}

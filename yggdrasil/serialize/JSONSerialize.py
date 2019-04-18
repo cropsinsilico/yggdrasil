@@ -1,10 +1,10 @@
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import (
     indent_char2int, encode_json, decode_json, _use_rapidjson)
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
-class JSONSerialize(DefaultSerialize):
+class JSONSerialize(SerializeBase):
     r"""Class for serializing a python object into a bytes message using JSON.
 
     Args:
@@ -22,7 +22,7 @@ class JSONSerialize(DefaultSerialize):
     _schema_properties = {
         'indent': {'type': ['string', 'int'], 'default': '\t'},
         'sort_keys': {'type': 'boolean', 'default': True}}
-    _default_type = {'type': 'object'}
+    default_datatype = {'type': 'object'}
     concats_as_str = False
 
     def func_serialize(self, args):
@@ -52,12 +52,13 @@ class JSONSerialize(DefaultSerialize):
         return decode_json(msg)
 
     @classmethod
-    def concatenate(cls, objects):
+    def concatenate(cls, objects, **kwargs):
         r"""Concatenate objects to get object that would be recieved if
         the concatenated serialization were deserialized.
 
         Args:
             objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             list: Set of objects that results from concatenating those provided.

@@ -40,8 +40,10 @@ definitions:
           items: {type: string}
           type: array
         name: {description: Name used for component in log messages., type: string}
-        recv_converter: {description: Converter that should be used on received objects.
-            Defaults to None., type: function}
+        recv_converter:
+          description: Converter that should be used on received objects. Defaults
+            to None.
+          type: [function, string]
         send_converter: {description: Converter that should be used on sent objects.
             Defaults to None., type: function}
       required: [commtype, datatype, name]
@@ -262,13 +264,18 @@ definitions:
             is table-like, tables are sent/recieved with either columns rather than
             row by row. Defaults to False.', type: boolean}
         comment: {default: '# ', description: One or more characters indicating a
-            comment., type: string}
+            comment. Defaults to '# '., type: string}
+        datatype: {description: JSON schema defining the type of object that the serializer
+            will be used to serialize/deserialize. Defaults to default_datatype.,
+          type: schema}
         default_flow_style: {default: false, description: 'If True, nested collections
             will be serialized in the block style. If False, they will always be serialized
             in the flow style. See `PyYAML Documentation <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.',
           type: boolean}
         delimiter: {default: "\t", description: Delimiter that should be used to separate
             name/value pairs in the map. Defaults to \t., type: string}
+        dont_write_header: {default: false, description: 'If True, headers will not
+            be added to serialized tables. Defaults to False.', type: boolean}
         driver: {description: '[DEPRECATED] Name of driver class that should be used.',
           type: string}
         encoding: {default: utf-8, description: Encoding that should be used to serialize
@@ -309,12 +316,26 @@ definitions:
         name: {description: Name used for component in log messages., type: string}
         newline: {default: '
 
-            ', description: One or mroe characters indicating a newline., type: string}
-        recv_converter: {description: Converter that should be used on received objects.
-            Defaults to None., type: function}
+            ', description: One or more characters indicating a newline. Defaults
+            to '\n'., type: string}
+        read_meth:
+          default: read
+          description: Method that should be used to read data from the file. Defaults
+            to 'read'. Ignored if direction is 'send'.
+          enum: [read, readline]
+          type: string
+        recv_converter:
+          description: Converter that should be used on received objects. Defaults
+            to None.
+          type: [function, string]
         send_converter: {description: Converter that should be used on sent objects.
             Defaults to None., type: function}
-        seritype: {default: default, description: Serializer type., type: string}
+        serializer:
+          $ref: '#/definitions/serializer'
+          default: {seritype: direct}
+          description: Class with serialize and deserialize methods that should be
+            used to process sent and received messages. Defaults to None and is constructed
+            using provided 'serializer_kwargs'.
         sort_keys: {default: true, description: 'If True, the serialization of dictionaries
             will be in key sorted order. Defaults to True.', type: boolean}
         use_astropy: {default: false, description: 'If True, the astropy package will
@@ -336,11 +357,29 @@ definitions:
             description: The entire file is read/written all at once as bytes.
             enum: [binary]
             type: string
+          read_meth:
+            default: read
+            description: Method that should be used to read data from the file. Defaults
+              to 'read'. Ignored if direction is 'send'.
+            enum: [read, readline]
+            type: string
+          serializer:
+            $ref: '#/definitions/serializer'
+            default: {seritype: direct}
+            description: Class with serialize and deserialize methods that should
+              be used to process sent and received messages. Defaults to None and
+              is constructed using provided 'serializer_kwargs'.
+        required: [serializer]
         title: FileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['map'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           delimiter: {default: "\t", description: Delimiter that should be used to
               separate name/value pairs in the map. Defaults to \t., type: string}
           filetype:
@@ -349,33 +388,40 @@ definitions:
               pair per line and separated by some delimiter.
             enum: [map]
             type: string
-          seritype: {default: default, description: Serializer type., type: string}
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
         title: AsciiMapComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['ply'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           filetype:
             default: binary
             description: The file is in the `Ply <http://paulbourke.net/dataformats/ply/>`_
               data format for 3D structures.
             enum: [ply]
             type: string
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
         title: PlyFileComm
-        type: object
-      - additionalProperties: true
-        description: Schema for file component ['ascii'] subtype.
-        properties:
-          filetype:
-            default: binary
-            description: This file is read/written as encoded text one line at a time.
-            enum: [ascii]
-            type: string
-        title: AsciiFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['table'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           delimiter: {default: "\t", description: Character(s) that should be used
               to separate columns. Defaults to '\t'., type: string}
           filetype:
@@ -389,7 +435,10 @@ definitions:
               messages from a list of arguments and parse messages to get a list of
               arguments in C printf/scanf style. Defaults to None and messages are
               assumed to already be bytes.', type: string}
-          seritype: {default: default, description: Serializer type., type: string}
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
           use_astropy: {default: false, description: 'If True, the astropy package
               will be used to serialize/deserialize table. Defaults to False.', type: boolean}
         title: AsciiTableComm
@@ -397,19 +446,54 @@ definitions:
       - additionalProperties: true
         description: Schema for file component ['mat'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           filetype:
             default: binary
             description: The file is a Matlab .mat file containing one or more serialized
               Matlab variables.
             enum: [mat]
             type: string
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
         title: MatFileComm
+        type: object
+      - additionalProperties: true
+        description: Schema for file component ['ascii'] subtype.
+        properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
+          filetype:
+            default: binary
+            description: This file is read/written as encoded text one line at a time.
+            enum: [ascii]
+            type: string
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
+        title: AsciiFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['pandas'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           delimiter: {default: "\t", description: Character(s) that should be used
               to separate columns. Defaults to '\t'., type: string}
+          dont_write_header: {default: false, description: 'If True, headers will
+              not be added to serialized tables. Defaults to False.', type: boolean}
           filetype:
             default: binary
             description: The file is a Pandas frame output as a table.
@@ -419,7 +503,10 @@ definitions:
               messages from a list of arguments and parse messages to get a list of
               arguments in C printf/scanf style. Defaults to None and messages are
               assumed to already be bytes.', type: string}
-          seritype: {default: default, description: Serializer type., type: string}
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
           use_astropy: {default: false, description: 'If True, the astropy package
               will be used to serialize/deserialize table. Defaults to False.', type: boolean}
         title: PandasFileComm
@@ -427,17 +514,31 @@ definitions:
       - additionalProperties: true
         description: Schema for file component ['obj'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           filetype:
             default: binary
             description: The file is in the `Obj <http://paulbourke.net/dataformats/obj/>`_
               data format for 3D structures.
             enum: [obj]
             type: string
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
         title: ObjFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['yaml'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           default_flow_style: {default: false, description: 'If True, nested collections
               will be serialized in the block style. If False, they will always be
               serialized in the flow style. See `PyYAML Documentation <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.',
@@ -454,12 +555,20 @@ definitions:
             description: String or number of spaces that should be used to indent
               each level within the seiralized structure. Defaults to '\t'.
             type: [string, int]
-          seritype: {default: default, description: Serializer type., type: string}
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
         title: YAMLFileComm
         type: object
       - additionalProperties: true
         description: Schema for file component ['json'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           filetype:
             default: binary
             description: The file contains a JSON serialized object.
@@ -470,7 +579,10 @@ definitions:
             description: String or number of spaces that should be used to indent
               each level within the seiralized structure. Defaults to '\t'.
             type: [string, int]
-          seritype: {default: default, description: Serializer type., type: string}
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
           sort_keys: {default: true, description: 'If True, the serialization of dictionaries
               will be in key sorted order. Defaults to True.', type: boolean}
         title: JSONFileComm
@@ -478,11 +590,20 @@ definitions:
       - additionalProperties: true
         description: Schema for file component ['pickle'] subtype.
         properties:
+          comment: {default: '# ', description: One or more characters indicating
+              a comment. Defaults to '# '., type: string}
+          datatype: {description: JSON schema defining the type of object that the
+              serializer will be used to serialize/deserialize. Defaults to default_datatype.,
+            type: schema}
           filetype:
             default: binary
             description: The file contains one or more pickled Python objects.
             enum: [pickle]
             type: string
+          newline: {default: '
+
+              ', description: One or more characters indicating a newline. Defaults
+              to '\n'., type: string}
         title: PickleFileComm
         type: object
     description: Schema for file components.
@@ -911,23 +1032,27 @@ definitions:
         driver: [args]
       description: Base schema for all subtypes of serializer components.
       properties:
-        args: {description: '[DEPRECATED] Arguments that should be provided to the
-            driver.', type: string}
         as_array: {default: false, description: 'If True, each of the arguments being
             serialized/deserialized will be arrays that are converted to/from bytes
             in column major (''F'') order. Otherwise, each argument should be a scalar.
             Defaults to False.', type: boolean}
-        comment: {default: '# ', description: 'String indicating a comment. If ''read_meth''
-            is ''readline'' and this is provided, lines starting with a comment will
-            be skipped.', type: string}
+        comment: {default: '# ', description: One or more characters indicating a
+            comment. Defaults to '# '., type: string}
+        datatype: {description: JSON schema defining the type of object that the serializer
+            will be used to serialize/deserialize. Defaults to default_datatype.,
+          type: schema}
         default_flow_style: {default: false, description: 'If True, nested collections
             will be serialized in the block style. If False, they will always be serialized
             in the flow style. See `PyYAML Documentation <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.',
           type: boolean}
         delimiter: {default: "\t", description: Character(s) that should be used to
             separate columns. Defaults to '\t'., type: string}
-        driver: {description: '[DEPRECATED] Name of driver class that should be used.',
-          type: string}
+        dont_write_header: {default: false, description: 'If True, headers will not
+            be added to serialized tables. Defaults to False.', type: boolean}
+        encoded_datatype: {description: 'JSON schema describing the type that serialized
+            objects should conform to. Defaults to the class attribute default_encoded_datatype.
+            If either func_serialize or func_deserialize are not provided, this needs
+            to be specified in order to serialize non-bytes objects.', type: schema}
         encoding: {default: utf-8, description: Encoding that should be used to serialize
             the object. Defaults to 'utf-8'., type: string}
         field_names:
@@ -944,6 +1069,14 @@ definitions:
             messages from a list of arguments and parse messages to get a list of
             arguments in C printf/scanf style. Defaults to None and messages are assumed
             to already be bytes.', type: string}
+        func_deserialize: {description: Callable object that takes objects of a type
+            that conforms to encoded_datatype and returns a deserialized Python object.
+            Defaults to None and the default deserialization for encoded_datatype
+            will be used., type: function}
+        func_serialize: {description: Callable object that takes Python objects as
+            input and returns a representation that conforms to encoded_datatype.
+            Defaults to None and the default serialization for encoded_datatype will
+            be used., type: function}
         indent:
           default: "\t"
           description: String or number of spaces that should be used to indent each
@@ -951,20 +1084,18 @@ definitions:
           type: [string, int]
         newline: {default: '
 
-            ', description: String indicating a new line. Defaults to serialize._default_newline.,
-          type: string}
+            ', description: One or more characters indicating a newline. Defaults
+            to '\n'., type: string}
         seritype:
           default: default
           description: Serializer type.
-          enum: [ascii_map, ascii_table, default, direct, json, mat, obj, pandas,
-            pickle, ply, yaml]
+          enum: [default, direct, functional, json, map, mat, obj, pandas, pickle,
+            ply, table, yaml]
           type: string
         sort_keys: {default: true, description: 'If True, the serialization of dictionaries
             will be in key sorted order. Defaults to True.', type: boolean}
         use_astropy: {default: false, description: 'If True, the astropy package will
             be used to serialize/deserialize table. Defaults to False.', type: boolean}
-        write_header: {default: true, description: 'If True, headers will be added
-            to serialized tables. Defaults to True.', type: boolean}
       title: serializer_base
       type: object
     - anyOf:
@@ -981,15 +1112,12 @@ definitions:
         title: DefaultSerialize
         type: object
       - additionalProperties: true
-        description: Schema for serializer component ['ascii_table'] subtype.
+        description: Schema for serializer component ['table'] subtype.
         properties:
           as_array: {default: false, description: 'If True, each of the arguments
               being serialized/deserialized will be arrays that are converted to/from
               bytes in column major (''F'') order. Otherwise, each argument should
               be a scalar. Defaults to False.', type: boolean}
-          comment: {default: '# ', description: 'String indicating a comment. If ''read_meth''
-              is ''readline'' and this is provided, lines starting with a comment
-              will be skipped.', type: string}
           delimiter: {default: "\t", description: Character(s) that should be used
               to separate columns. Defaults to '\t'., type: string}
           field_names:
@@ -1006,14 +1134,10 @@ definitions:
               messages from a list of arguments and parse messages to get a list of
               arguments in C printf/scanf style. Defaults to None and messages are
               assumed to already be bytes.', type: string}
-          newline: {default: '
-
-              ', description: String indicating a new line. Defaults to serialize._default_newline.,
-            type: string}
           seritype:
             default: default
             description: ASCII tab (or otherwise) delimited table.
-            enum: [ascii_table]
+            enum: [table]
             type: string
           use_astropy: {default: false, description: 'If True, the astropy package
               will be used to serialize/deserialize table. Defaults to False.', type: boolean}
@@ -1022,13 +1146,10 @@ definitions:
       - additionalProperties: true
         description: Schema for serializer component ['pandas'] subtype.
         properties:
-          as_array: {default: false, description: 'If True, each of the arguments
-              being serialized/deserialized will be arrays that are converted to/from
-              bytes in column major (''F'') order. Otherwise, each argument should
-              be a scalar. Defaults to False.', type: boolean}
-          comment: {default: '# ', type: string}
           delimiter: {default: "\t", description: Character(s) that should be used
               to separate columns. Defaults to '\t'., type: string}
+          dont_write_header: {default: false, description: 'If True, headers will
+              not be added to serialized tables. Defaults to False.', type: boolean}
           field_names:
             description: The names of fields in the format string. If not provided,
               names are set based on the order of the fields in the format string.
@@ -1043,9 +1164,6 @@ definitions:
               messages from a list of arguments and parse messages to get a list of
               arguments in C printf/scanf style. Defaults to None and messages are
               assumed to already be bytes.', type: string}
-          newline: {default: '
-
-              ', type: string}
           seritype:
             default: default
             description: Serializes tables using the pandas package.
@@ -1053,9 +1171,29 @@ definitions:
             type: string
           use_astropy: {default: false, description: 'If True, the astropy package
               will be used to serialize/deserialize table. Defaults to False.', type: boolean}
-          write_header: {default: true, description: 'If True, headers will be added
-              to serialized tables. Defaults to True.', type: boolean}
         title: PandasSerialize
+        type: object
+      - additionalProperties: true
+        description: Schema for serializer component ['functional'] subtype.
+        properties:
+          encoded_datatype: {description: 'JSON schema describing the type that serialized
+              objects should conform to. Defaults to the class attribute default_encoded_datatype.
+              If either func_serialize or func_deserialize are not provided, this
+              needs to be specified in order to serialize non-bytes objects.', type: schema}
+          func_deserialize: {description: Callable object that takes objects of a
+              type that conforms to encoded_datatype and returns a deserialized Python
+              object. Defaults to None and the default deserialization for encoded_datatype
+              will be used., type: function}
+          func_serialize: {description: Callable object that takes Python objects
+              as input and returns a representation that conforms to encoded_datatype.
+              Defaults to None and the default serialization for encoded_datatype
+              will be used., type: function}
+          seritype:
+            default: default
+            description: Serializer that uses provied function to serialize messages.
+            enum: [functional]
+            type: string
+        title: FunctionalSerialize
         type: object
       - additionalProperties: true
         description: Schema for serializer component ['mat'] subtype.
@@ -1070,14 +1208,11 @@ definitions:
       - additionalProperties: true
         description: Schema for serializer component ['direct'] subtype.
         properties:
-          comment: {default: '# ', description: One or more characters indicating
-              a comment., type: string}
-          newline: {default: '
-
-              ', description: One or mroe characters indicating a newline., type: string}
           seritype:
+            default: default
             description: Direct serialization of bytes.
             enum: [direct]
+            type: string
         title: DirectSerialize
         type: object
       - additionalProperties: true
@@ -1100,10 +1235,6 @@ definitions:
       - additionalProperties: true
         description: Schema for serializer component ['ply'] subtype.
         properties:
-          newline: {default: '
-
-              ', description: String that should be used for new lines. Defaults to
-              '\n'., type: string}
           seritype:
             default: default
             description: Serialize 3D structures using Ply format.
@@ -1112,29 +1243,21 @@ definitions:
         title: PlySerialize
         type: object
       - additionalProperties: true
-        description: Schema for serializer component ['ascii_map'] subtype.
+        description: Schema for serializer component ['map'] subtype.
         properties:
           delimiter: {default: "\t", description: Delimiter that should be used to
               separate name/value pairs in the map. Defaults to \t., type: string}
-          newline: {default: '
-
-              ', description: Delimiter that should be used to separate lines. Defaults
-              to \n., type: string}
           seritype:
             default: default
             description: Serialzation of mapping between key/value pairs with one
               pair per line and using a character delimiter to separate keys and values.
-            enum: [ascii_map]
+            enum: [map]
             type: string
         title: AsciiMapSerialize
         type: object
       - additionalProperties: true
         description: Schema for serializer component ['obj'] subtype.
         properties:
-          newline: {default: '
-
-              ', description: String that should be used for new lines. Defaults to
-              '\n'., type: string}
           seritype:
             default: default
             description: Serialize 3D structures using Obj format.

@@ -61,6 +61,21 @@ class PickleSerialize(DefaultSerialize):
         return msg[:used]
 
     @classmethod
+    def concatenate(cls, objects, **kwargs):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        return objects
+    
+    @classmethod
     def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
 

@@ -303,6 +303,8 @@ class TestCommBase(YggTestClassInfo):
                 msg_send = self.test_msg
         if msg_recv is None:
             msg_recv = msg_send
+        # print('send', msg_send)
+        # print('recv', msg_recv)
         if send_kwargs is None:
             send_kwargs = dict()
         if recv_kwargs is None:
@@ -461,6 +463,10 @@ class TestCommBase(YggTestClassInfo):
         msg_send = self.testing_options['dict']
         self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
                           msg_send=msg_send)
+        
+    def test_send_recv_dict_names(self):
+        r"""Test send/recv message as dict with names."""
+        msg_send = self.testing_options['dict']
         field_order = self.testing_options.get('field_names', None)
         if field_order is not None:
             self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',

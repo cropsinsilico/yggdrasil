@@ -674,6 +674,9 @@ def ErrorClass(base_class, *args, **kwargs):
                 an error.
 
         """
+
+        _is_error_class = True
+        
         def __init__(self, *args, **kwargs):
             error_on_init = kwargs.pop('error_on_init', False)
             if error_on_init:

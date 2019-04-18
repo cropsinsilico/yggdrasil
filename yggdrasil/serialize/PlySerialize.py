@@ -1,10 +1,10 @@
 from yggdrasil import backwards
 from yggdrasil.serialize import _default_newline
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import PlyDict
 
 
-class PlySerialize(DefaultSerialize):
+class PlySerialize(SerializeBase):
     r"""Class for serializing/deserializing .ply file formats.
 
     Args:
@@ -27,13 +27,13 @@ class PlySerialize(DefaultSerialize):
     _schema_properties = {
         'newline': {'type': 'string',
                     'default': backwards.as_str(_default_newline)}}
-    _default_type = {'type': 'ply'}
+    default_datatype = {'type': 'ply'}
     concats_as_str = False
 
     def __init__(self, *args, **kwargs):
         r"""Initialize immediately as default is only type."""
         super(PlySerialize, self).__init__(*args, **kwargs)
-        self._initialized = True
+        self.initialized = True
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -62,12 +62,13 @@ class PlySerialize(DefaultSerialize):
                                                  self.typedef))
 
     @classmethod
-    def concatenate(cls, objects):
+    def concatenate(cls, objects, **kwargs):
         r"""Concatenate objects to get object that would be recieved if
         the concatenated serialization were deserialized.
 
         Args:
             objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             list: Set of objects that results from concatenating those provided.

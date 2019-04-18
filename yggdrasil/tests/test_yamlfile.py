@@ -610,7 +610,6 @@ class TestYamlMissingModelArgsError(YamlTestBaseError):
     _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
-                  '    args: ./src/modelA.c',
                   '    inputs:',
                   '      name: inputA',
                   '      driver: FileInputDriver',

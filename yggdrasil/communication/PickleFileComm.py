@@ -14,3 +14,4 @@ class PickleFileComm(FileComm.FileComm):
     _schema_subtype_description = ('The file contains one or more pickled '
                                    'Python objects.')
     _default_serializer = 'pickle'
+    _default_extension = '.pkl'

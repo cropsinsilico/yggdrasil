@@ -1,17 +1,17 @@
 import numpy as np
 from scipy.io import savemat, loadmat
 from yggdrasil import backwards, platform
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
-class MatSerialize(DefaultSerialize):
+class MatSerialize(SerializeBase):
     r"""Class for serializing a python object into a bytes message using the
     Matlab .mat format."""
     
     _seritype = 'mat'
     _schema_subtype_description = ('Serializes objects using the Matlab .mat '
                                    'format.')
-    _default_type = {'type': 'object'}
+    default_datatype = {'type': 'object'}
     concats_as_str = False
 
     def func_serialize(self, args):
@@ -55,12 +55,13 @@ class MatSerialize(DefaultSerialize):
         return out
 
     @classmethod
-    def concatenate(cls, objects):
+    def concatenate(cls, objects, **kwargs):
         r"""Concatenate objects to get object that would be recieved if
         the concatenated serialization were deserialized.
 
         Args:
             objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             list: Set of objects that results from concatenating those provided.
