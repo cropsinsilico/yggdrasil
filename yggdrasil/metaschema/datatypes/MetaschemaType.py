@@ -3,7 +3,8 @@ import uuid
 import pprint
 import jsonschema
 from yggdrasil import backwards, tools
-from yggdrasil.metaschema import get_metaschema, get_validator, encoder
+from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
+                                  validate_instance)
 from yggdrasil.metaschema.datatypes import (
     MetaschemaTypeError, compare_schema, YGG_MSG_HEAD, get_type_class,
     conversions)
@@ -53,6 +54,7 @@ class MetaschemaType(object):
     is_fixed = False
     _empty_msg = b''
     _replaces_existing = False
+    _json_type = None
     
     def __init__(self, **typedef):
         self._typedef = {}
@@ -340,11 +342,12 @@ class MetaschemaType(object):
         return out
 
     @classmethod
-    def validate_metadata(cls, obj):
+    def validate_metadata(cls, obj, **kwargs):
         r"""Validates an encoded object.
 
         Args:
             obj (string): Encoded object to validate.
+            **kwargs: Additional keyword arguments are passed to the validator.
 
         """
         if ((isinstance(obj, dict) and ('type' in obj)
@@ -353,30 +356,35 @@ class MetaschemaType(object):
             if type_cls.is_fixed and type_cls.issubtype(cls.name):
                 obj = type_cls.typedef_fixed2base(obj)
         # jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
-        jsonschema.validate(obj, cls.metadata_schema(), cls=cls.validator())
+        # jsonschema.validate(obj, cls.metadata_schema(), cls=cls.validator())
+        return validate_instance(obj, cls.metadata_schema(), **kwargs)
 
     @classmethod
-    def validate_definition(cls, obj):
+    def validate_definition(cls, obj, **kwargs):
         r"""Validates a type definition.
 
         Args:
             obj (object): Type definition to validate.
+            **kwargs: Additional keyword arguments are passed to the validator.
 
         """
         # jsonschema.validate(obj, cls.metaschema(), cls=cls.validator())
-        jsonschema.validate(obj, cls.definition_schema(), cls=cls.validator())
+        # jsonschema.validate(obj, cls.definition_schema(), cls=cls.validator())
+        return validate_instance(obj, cls.definition_schema(), **kwargs)
 
     @classmethod
-    def validate_instance(cls, obj, typedef):
+    def validate_instance(cls, obj, typedef, **kwargs):
         r"""Validates an object against a type definition.
 
         Args:
             obj (object): Object to validate against a type definition.
             typedef (dict): Type definition to validate against.
+            **kwargs: Additional keyword arguments are passed to the validator.
 
         """
         # cls.validate_definition(typedef)
-        jsonschema.validate(obj, typedef, cls=cls.validator())
+        # jsonschema.validate(obj, typedef, cls=cls.validator())
+        return validate_instance(obj, typedef, **kwargs)
 
     @classmethod
     def normalize_definition(cls, obj):

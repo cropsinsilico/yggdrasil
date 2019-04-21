@@ -4,7 +4,7 @@ import copy
 import six
 import importlib
 import re
-import warnings
+# import warnings
 from collections import OrderedDict
 from yggdrasil import backwards
 
@@ -439,12 +439,12 @@ class ComponentBase(object):
             v = kwargs.pop(k, None)
             if getattr(self, k, None) is None:
                 setattr(self, k, v)
-            elif (getattr(self, k) != v) and (v is not None):
-                warnings.warn(("The schema property '%s' is provided as a "
-                               "keyword with a value of %s, but the class "
-                               "already has an attribute of the same name "
-                               "with the value %s.")
-                              % (k, v, getattr(self, k)))
+            # elif (getattr(self, k) != v) and (v is not None):
+            #     warnings.warn(("The schema property '%s' is provided as a "
+            #                    "keyword with a value of %s, but the class "
+            #                    "already has an attribute of the same name "
+            #                    "with the value %s.")
+            #                   % (k, v, getattr(self, k)))
         self.extra_kwargs = kwargs
 
     @staticmethod

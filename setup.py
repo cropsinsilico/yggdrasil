@@ -144,6 +144,7 @@ setup(
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',
                             'yggtest=yggdrasil:run_tsts',
+                            'yggmetaschema=yggdrasil.command_line:regen_metaschema',
                             'yggschema=yggdrasil.command_line:regen_schema',
                             'yggbuildapi_c=yggdrasil.command_line:rebuild_c_api',
                             'yggconfig=yggdrasil.command_line:update_config',

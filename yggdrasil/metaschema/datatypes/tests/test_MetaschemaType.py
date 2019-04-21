@@ -173,7 +173,7 @@ class TestMetaschemaType(YggTestClassInfo):
                                self._valid_encoded[0], {}, raise_errors=True)
         # Test valid
         for x in self._valid_encoded:
-            self.assert_equal(self.import_cls.check_encoded(x, self.typedef), True)
+            assert(self.import_cls.check_encoded(x, self.typedef, raise_errors=True))
         # Test invalid
         for x in self._invalid_encoded:
             self.assert_equal(self.import_cls.check_encoded(x, self.typedef), False)

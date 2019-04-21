@@ -66,6 +66,16 @@ def rebuild_c_api():
         raise Exception("The libraries necessary for running models written in "
                         "C/C++ could not be located.")
 
+    
+def regen_metaschema():
+    r"""Regenerate the yggdrasil metaschema."""
+    from yggdrasil import metaschema
+    if os.path.isfile(metaschema._metaschema_fname):
+        os.remove(metaschema._metaschema_fname)
+    metaschema._metaschema = None
+    metaschema._validator = None
+    metaschema.get_metaschema()
+    
 
 def regen_schema():
     r"""Regenerate the yggdrasil schema."""

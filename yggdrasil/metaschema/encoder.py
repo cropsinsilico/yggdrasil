@@ -1,15 +1,17 @@
+import importlib
 from yggdrasil import backwards
 import json as stdjson
 json = stdjson
+_json_encoder = stdjson.JSONEncoder
+_json_decoder = stdjson.JSONDecoder
 _use_rapidjson = True
 if _use_rapidjson:
     try:  # pragma: Python 3
         import rapidjson as json
+        _json_encoder = json.Encoder
+        _json_decoder = json.Decoder
     except ImportError:  # pragma: Python 2
         _use_rapidjson = False
-
-
-_json_encoder = None
 
 
 def indent_char2int(indent):
@@ -28,6 +30,83 @@ def indent_char2int(indent):
     return indent
 
 
+class JSONReadableEncoder(_json_encoder):
+    r"""Encoder class for Ygg messages."""
+
+    def default(self, o):  # pragma: no cover
+        r"""Encoder that allows for expansion types."""
+        from yggdrasil.metaschema.datatypes import get_registered_types
+        for cls in get_registered_types().values():
+            if (not cls._replaces_existing) and cls.validate(o):
+                new_o = cls.encode_data_readable(o, None)
+                return new_o
+        return _json_encoder.default(self, o)
+
+
+class JSONEncoder(_json_encoder):
+    r"""Encoder class for Ygg messages."""
+
+    def default(self, o):
+        r"""Encoder that allows for expansion types."""
+        from yggdrasil.metaschema.datatypes import get_registered_types
+        for cls in get_registered_types().values():
+            if cls.validate(o):
+                new_o = cls.encode_data(o, None)
+                return new_o
+        return _json_encoder.default(self, o)
+    
+
+class JSONDecoder(_json_decoder):
+    r"""Decoder class for Ygg messages."""
+
+    def __init__(self, *args, **kwargs):
+        super(JSONDecoder, self).__init__(*args, **kwargs)
+        if not _use_rapidjson:
+            from json.scanner import py_make_scanner
+            self.scan_once = py_make_scanner(self)
+
+    def string(self, s):
+        r"""Try to parse string with class."""
+        # TODO: Do this dynamically for classes based on an attribute
+        pkg_mod = s.split(u':')
+        if len(pkg_mod) == 2:
+            try:
+                mod = importlib.import_module(pkg_mod[0])
+                s = getattr(mod, pkg_mod[1])
+            except (ImportError, AttributeError):
+                pass
+        return s
+
+    @property
+    def parse_string(self):
+        r"""function: Wrapper for function that parses strings."""
+        def parse_string_ygg(*args, **kwargs):
+            out, end = self._parse_string(*args, **kwargs)
+            return self.string(out), end
+        return parse_string_ygg
+
+    @parse_string.setter
+    def parse_string(self, x):
+        self._parse_string = x
+
+    # @property
+    # def scan_once(self):
+    #     r"""function: Wrapper for function that decodes JSON documents."""
+    #     def scan_once_ygg(string, idx):
+    #         try:
+    #             if string[idx] == '"':
+    #                 return self.parse_string(string, idx + 1, self.encoding,
+    #                                          self.strict)
+    #         except IndexError:
+    #             pass
+    #         return self._scan_once(string, idx)
+    #     return scan_once_ygg
+
+    # @scan_once.setter
+    # def scan_once(self, x):
+    #     self._scan_once = x
+
+    
 def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     r"""Encode a Python object in JSON format.
 
@@ -50,6 +129,10 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
         indent = indent_char2int(indent)
     kwargs['indent'] = indent
     kwargs['sort_keys'] = sort_keys
+    if _use_rapidjson:
+        kwargs.setdefault('default', JSONEncoder().default)
+    else:
+        kwargs.setdefault('cls', JSONEncoder)
     if fd is None:
         return backwards.as_bytes(json.dumps(obj, **kwargs))
     else:
@@ -73,39 +156,13 @@ def decode_json(msg, **kwargs):
     """
     if isinstance(msg, backwards.string_types):
         # Should this be unicode?
-        return json.loads(backwards.as_str(msg), **kwargs)
+        msg_decode = backwards.as_str(msg)
+        func_decode = json.loads
     else:
-        # For files
-        return json.load(msg, **kwargs)
-    
-
-class JSONReadableEncoder(stdjson.JSONEncoder):
-    r"""Encoder class for Ygg messages."""
-
-    def default(self, o):  # pragma: no cover
-        r"""Encoder that allows for expansion types."""
-        from yggdrasil.metaschema.datatypes import get_registered_types
-        for cls in get_registered_types().values():
-            if (not cls._replaces_existing) and cls.validate(o):
-                new_o = cls.encode_data_readable(o, None)
-                return new_o
-        return stdjson.JSONEncoder.default(self, o)
-
-
-# class JSONEncoder(stdjson.JSONEncoder):
-#     r"""Encoder class for Ygg messages."""
-
-#     def default(self, o):
-#         r"""Encoder that allows for expansion types."""
-#         for cls in get_registered_types():
-#             if cls.validate(o):
-#                 new_o = cls.encode_data(o, None)
-#                 return new_o
-#         return stdjson.JSONEncoder.default(self, o)
-
-    
-# class JSONDecoder(stdjson.JSONDecoder):
-#     r"""Decoder class for Ygg messages."""
-#
-#     def raw_decode(self, s, idx=0):
-#         r"""Decoder that further decodes objects."""
+        msg_decode = msg
+        func_decode = json.load
+    if _use_rapidjson:
+        func_decode = JSONDecoder()
+    else:
+        kwargs.setdefault('cls', JSONDecoder)
+    return func_decode(msg_decode, **kwargs)

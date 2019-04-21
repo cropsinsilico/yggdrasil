@@ -125,7 +125,9 @@ def create(*args, **kwargs):
                              or (k in self._normalized))):
                             continue
                         default = _schema['properties'][k].get('default', None)
-                        self._normalized[k] = default
+                        # TODO: Make sure this dosn't cause issues
+                        # if default is not None:
+                        self._normalized[k] = copy.deepcopy(default)
                     instance = self._normalized
 
                 # Do default and type first so normalization can be validated
@@ -252,6 +254,8 @@ def create(*args, **kwargs):
                                                              path=path,
                                                              schema_path=schema_path):
                     failed = True
+                    # if path:
+                    #     print(error)
                     yield error
             finally:
                 if self._normalizing:

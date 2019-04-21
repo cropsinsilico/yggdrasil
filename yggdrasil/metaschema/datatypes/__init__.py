@@ -156,14 +156,14 @@ def import_all_types():
     # TODO: Need to make sure metaschema updated if it was already loaded
     from yggdrasil.metaschema import _metaschema
     if _metaschema is not None:
-        reload = False
+        reload_ygg = False
         curr = _metaschema
         new_names = []
         for n in names:
             if n not in curr['definitions']['simpleTypes']['enum']:  # pragma: debug
-                reload = True
+                reload_ygg = True
                 new_names.append(n)
-        if reload:  # pragma: debug
+        if reload_ygg:  # pragma: debug
             raise Exception("The metaschema needs to be regenerated to include the "
                             + "following new schemas found in schema files: %s"
                             % new_names)

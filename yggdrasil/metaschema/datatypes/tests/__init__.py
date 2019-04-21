@@ -45,11 +45,12 @@ def test_guess_type_from_msg():
 
 def test_guess_type_from_obj():
     r"""Test guess_type_from_obj."""
-    invalid_objects = [object, object()]
+    invalid_objects = [object()]  # , object()]
     for t, x in _valid_objects.items():
         assert_equal(datatypes.guess_type_from_obj(x).name, t)
     for x in invalid_objects:
-        assert_raises(datatypes.MetaschemaTypeError, datatypes.guess_type_from_obj, x)
+        assert_raises(datatypes.MetaschemaTypeError,
+                      datatypes.guess_type_from_obj, x)
 
 
 def test_encode_decode():

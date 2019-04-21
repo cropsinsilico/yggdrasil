@@ -57,6 +57,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         """
         if isinstance(obj, str):
             obj = [v.strip() for v in obj.split(',')]
+        elif isinstance(obj, tuple):
+            obj = list(obj)
         return obj
 
     @classmethod

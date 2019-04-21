@@ -111,6 +111,7 @@ class MetaschemaProperty(object):
             object: Normalized object.
 
         """
+        # return instance
         return validator._normalized
 
     @classmethod
