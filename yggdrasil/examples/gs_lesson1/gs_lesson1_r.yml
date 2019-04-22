@@ -1,0 +1,4 @@
+models:
+  - name: R_model
+    language: R  # Runs the R script using default R
+    args: ./src/gs_lesson1.R
