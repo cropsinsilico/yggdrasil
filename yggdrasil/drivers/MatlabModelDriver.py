@@ -429,8 +429,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                                  '-nojvm', '-batch']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
     function_param = {
+        'input': '{channel} = YggInterface(\'YggInput\', \'{channel_name}\');',
+        'output': '{channel} = YggInterface(\'YggOutput\', \'{channel_name}\');',
+        'recv': '[{flag_var}, {recv_var}] = {channel}.recv();',
+        'send': '{flag_var} = {channel}.send({send_var});',
+        'function_call': '{output_var} = {function_name}({input_var});',
+        'define': '{variable} = {value};',
         'comment': '%',
         'indent': 2 * ' ',
+        'quote': '\'',
+        'true': 'true',
+        'break': 'break;',
+        'error': 'error(\'{message}\');',
+        'print': 'disp(\'{message}\');',
+        'fprintf': 'fprintf(\'{message}\', {variables});',
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
@@ -825,3 +837,19 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 + "'exit' call which will exit the MATLAB engine "
                 + "such that it cannot be reused. Please replace 'exit' "
                 + "with a return or error.")
+
+    @classmethod
+    def prepare_output_variables(cls, vars_list):
+        r"""Concatenate a set of output variables such that it can be passed as
+        a single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable names to concatenate as output
+                from a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        return '[%s]' % super(MatlabModelDriver, cls).prepare_output_variables(
+            vars_list)

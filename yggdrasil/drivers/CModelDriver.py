@@ -172,8 +172,25 @@ class CModelDriver(CompiledModelDriver):
                       'external_dependencies': ['rapidjson'],
                       'include_dirs': []}}
     function_param = {
+        'import': '#include \"{filename}\"',
+        'interface': '#include \"{interface_library}\"',
+        'input': 'yggInput_t {channel} = yggInput(\"{channel_name}\");',
+        'output': 'yggOutput_t {channel} = yggOutput(\"{channel_name}\");',
+        'recv': '{flag_var} = yggRecv({channel}, {recv_var});',
+        'send': '{flag_var} = yggSend({channel}, {send_var});',
+        'flag_cond': '{flag_var} >= 0',
+        # Model functions should return non-zero integer codes to indicate errors
+        'function_call': '{flag_var} = {function_name}({input_var}, {output_var});',
+        'declare': '{type_name} {variable};',
+        'define': '{variable} = {value};',
         'comment': '//',
         'indent': 2 * ' ',
+        'quote': '\"',
+        'true': '1',
+        'break': 'break;',
+        'error': 'printf(\"{message}\"); return -1;',
+        'print': 'printf(\"{message}\");',
+        'fprintf': 'printf(\"{message}\", {variables});',
         'block_end': '}',
         'if_begin': 'if ({cond}) {',
         'for_begin': ('for ({iter_var} = {iter_begin}; {iter_var} < {iter_end}; '
@@ -244,3 +261,19 @@ class CModelDriver(CompiledModelDriver):
                 base = os.path.splitext(x)[0]
                 self.products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
         return out
+
+    @classmethod
+    def prepare_output_variables(cls, vars_list):
+        r"""Concatenate a set of output variables such that it can be passed as
+        a single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable names to concatenate as output
+                from a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        return super(CModelDriver, cls).prepare_output_variables(
+            ['&' + x for x in vars_list])

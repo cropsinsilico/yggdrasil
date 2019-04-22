@@ -63,6 +63,11 @@ class CPPModelDriver(CModelDriver):
     default_compiler = None
     default_linker = None
     function_param = dict(CModelDriver.function_param,
+                          input='YggInput {channel}(\"{channel_name}\");',
+                          output='YggOutput {channel}(\"{channel_name}\");',
+                          recv='{flag_var} = {channel}.recv({recv_num}, {recv_var});',
+                          send='{flag_var} = {channel}.send({send_num}, {send_var});',
+                          error='error(\"{message}\");',
                           try_begin='try {',
                           try_error_type='const std::exception&',
                           try_except='} catch ({try_error} {error_var}) {')
