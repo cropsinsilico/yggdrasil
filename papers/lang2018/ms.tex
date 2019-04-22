@@ -1332,7 +1332,7 @@ The authors would like to thank Mike Lambert and Craig Willis for their ongoing 
 	% PAGE BREAK
 		\EndFor
 	\EndFor
-	\ForAll{$m in models$}
+	\ForAll{$m \in models$}
 		\ForAll{$o \in m.outputs$}
 			\If{$o.isFile$}
 				\State $outputAddress \gets o.address$
@@ -1347,29 +1347,29 @@ The authors would like to thank Mike Lambert and Craig Willis for their ongoing 
 			\State $outputChannels[o.name] = o$
 		\EndFor
 	\EndFor
-	\ForAll{$m in models$}
+	\ForAll{$m \in models$}
 		\State $m.driver \gets$ \Call{ModelDriver}{$m.name$, $m.args$, $m$}
 	\EndFor
 	% START DRIVERS
 	\item[] \Comment Start Drivers	
-	\ForAll{$m in models$}
-		\ForAll{$i in m.inputs$}
+	\ForAll{$m \in models$}
+		\ForAll{$i \in m.inputs$}
 			\State $i.driver.$\Call{Start}{}
 		\EndFor
 	\EndFor
-	\ForAll{$m in models$}
+	\ForAll{$m \in models$}
 		\ForAll{$o \in m.outputs$}
 			\State $o.driver.$\Call{Start}{}
 		\EndFor
 	\EndFor
-	\ForAll{$m in models$}
+	\ForAll{$m \in models$}
 		\State $m.driver.$\Call{Start}{}
 	\EndFor
 	% MONITOR DRIVERS
 	\item[] \Comment Monitor Drivers
 	\State $errorFlag \gets false$
 	\While{not $errorFlag$}
-		\ForAll{$m in models$}
+		\ForAll{$m \in models$}
 			\If{$m.driver.errors$}
 				\State $errorFlag \gets true$
 				\State \textbf{break}
@@ -1380,13 +1380,13 @@ The authors would like to thank Mike Lambert and Craig Willis for their ongoing 
 	\item[] \Comment Stop Drivers
 	\If{$errorFlag$}
 		\State $allErrors \gets []$
-		\ForAll{$m in models$}
+		\ForAll{$m \in models$}
 			\State $m.$\Call{Terminate}{}
 			\State \textbf{Append} $allErrors$, $m.errors$
 		\EndFor
 		\State \Call{Error}{$allErrors$}
 	\Else
-		\ForAll{$m in models$}
+		\ForAll{$m \in models$}
 			\State $m.$\Call{Stop}{}
 		\EndFor
 	\EndIf

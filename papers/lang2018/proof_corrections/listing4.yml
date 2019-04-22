@@ -1,0 +1,16 @@
+model:
+  name: ShootModel
+  language: python
+  args: ./src/shoot_wrapper.py
+  inputs:
+    - name: shoot_growth_rate
+      units: d**-1
+    - name: init_shoot_mass
+      units: kg
+    - name: shoot_time_step
+      units: d
+    - name: next_root_mass
+      units: kg
+  outputs:
+    - name: next_shoot_mass
+      units: kg
