@@ -1,5 +1,4 @@
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 
 
 class RModelDriver(InterpretedModelDriver):  # pragma: R
@@ -15,10 +14,13 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     """
     _schema_subtype_description = ('Model is written in R.')
     language = 'R'
+    language_aliases = ['r']
     language_ext = '.R'
     base_languages = ['python']
     default_interpreter = 'Rscript'
-    interface_library = PythonModelDriver.interface_library
+    # Dynamically setting the interface library cause circular logic
+    interface_library = 'yggdrasil.interface.YggInterface'
+    # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
     # stdout
     # default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']

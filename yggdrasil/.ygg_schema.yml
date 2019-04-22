@@ -668,7 +668,7 @@ definitions:
         language:
           default: executable
           description: The programming language that the model is written in.
-          enum: [c, c++, cmake, cpp, executable, lpy, make, matlab, python]
+          enum: [R, c, c++, cmake, cpp, executable, lpy, make, matlab, python, r]
           type: string
         linker: {description: 'Command or path to executable that should be used to
             link the model. If not provided, the linker will be determined based on
@@ -908,6 +908,32 @@ definitions:
           target: {description: Make target that should be built to create the model
               executable. Defaults to None., type: string}
         title: MakeModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['R', 'r'] subtype.
+        properties:
+          interpreter: {description: 'Name or path of interpreter executable that
+              should be used to run the model. If not provided, the interpreter will
+              be determined based on configuration options for the language (if present)
+              and the default_interpreter class attribute.', type: string}
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items: {type: string}
+            type: array
+          language:
+            default: executable
+            description: Model is written in R.
+            enum: [R, r]
+            type: string
+          skip_interpreter: {default: false, description: 'If True, no interpreter
+              will be added to the arguments. This should only be used for subclasses
+              that will not be invoking the model via the command line. Defaults to
+              False.', type: boolean}
+        title: RModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['cmake'] subtype.

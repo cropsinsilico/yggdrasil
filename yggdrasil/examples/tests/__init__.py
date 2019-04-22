@@ -150,38 +150,26 @@ class TestExample(YggTestBase, tools.YggClass):
                 if os.path.isfile(fout):
                     os.remove(fout)
 
-    def test_all(self):
-        r"""Test the version of the example that uses all languages."""
-        self.language = 'all'
+    def run_language(self, lang):
+        r"""Run a test for the specified language."""
+        self.language = lang
         self.run_example()
         self.language = None
+
+    def test_all(self):
+        r"""Test the version of the example that uses all languages."""
+        self.run_language('all')
 
     def test_all_nomatlab(self):
         r"""Test the version of the example that uses all languages."""
-        self.language = 'all_nomatlab'
-        self.run_example()
-        self.language = None
+        self.run_language('all_nomatlab')
 
-    def test_python(self):
-        r"""Test the Python version of the example."""
-        self.language = 'python'
-        self.run_example()
-        self.language = None
 
-    def test_c(self):
-        r"""Test the C version of the example."""
-        self.language = 'c'
-        self.run_example()
-        self.language = None
+def make_lang_test(lang):
+    def itest(self):
+        self.run_language(lang.lower())
+    return itest
 
-    def test_cpp(self):
-        r"""Test the C++ version of the example."""
-        self.language = 'cpp'
-        self.run_example()
-        self.language = None
 
-    def test_matlab(self):  # pragma: matlab
-        r"""Test the Matlab version of the example."""
-        self.language = 'matlab'
-        self.run_example()
-        self.language = None
+for l in tools.get_supported_lang():
+    setattr(TestExample, 'test_%s' % l, make_lang_test(l))
