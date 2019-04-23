@@ -1,11 +1,9 @@
 # Import library for input/output
-library(reticulate)
-library(zeallot)
-ygg <- import('yggdrasil.interface.YggInterface')
+library(yggdrasil)
 
 # Initialize input/output channels
-in_channel <- ygg$YggInput('inputB')
-out_channel <- ygg$YggOutput('outputB')
+in_channel <- YggInterface('YggInput', 'inputB')
+out_channel <- YggInterface('YggOutput', 'outputB')
 
 # Loop until there is no longer input or the queues are closed
 while(TRUE) {
