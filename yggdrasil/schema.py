@@ -993,7 +993,6 @@ def _normalize_modelio_elements(normalizer, value, instance, schema):
             else:
                 iodict['%s_drivers' % io[:-1]].append(
                     (instance['args'], instance['name']))
-    print("here", instance)
     return instance
 
 
