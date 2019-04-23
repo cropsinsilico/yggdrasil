@@ -993,6 +993,7 @@ def _normalize_modelio_elements(normalizer, value, instance, schema):
             else:
                 iodict['%s_drivers' % io[:-1]].append(
                     (instance['args'], instance['name']))
+    print("here", instance)
     return instance
 
 
@@ -1237,6 +1238,9 @@ def _normalize_datatype(normalizer, value, instance, schema):
     r"""Normalize the datatype if the type information is in the comm."""
     if isinstance(instance, dict) and ('datatype' not in instance):
         type_keys = list(metaschema.get_metaschema()['properties'].keys())
+        # Don't include args in type_keys if driver in the instance
+        if ('driver' in instance) and ('args' in type_keys):
+            type_keys.remove('args')
         datatype = {}
         migrate_keys(instance, [datatype], include_key_list=type_keys)
         if datatype:
