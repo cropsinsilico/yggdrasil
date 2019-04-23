@@ -30,6 +30,9 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
                       'ygg <- import(\"{interface_library}\")'],
         'input': '{channel} <- ygg$YggInput(\"{channel_name}\")',
         'output': '{channel} <- ygg$YggOutput(\"{channel_name}\")',
+        'table_input': '{channel} <- ygg$YggAsciiTableInput(\"{channel_name}\")',
+        'table_output': ('{channel} <- ygg$YggAsciiTableOutput('
+                         '\"{channel_name}\", \"{format_str}\")'),
         'recv': 'c({flag_var}, {recv_var}) %<-% {channel}$recv()',
         'send': '{flag_var} <- {channel}$send({send_var})',
         'true': 'TRUE',

@@ -46,3 +46,7 @@ TODO
 * Add datatypes example that is automated for all registered languages and tests sending/receiving all supported datatypes
 * Simplify input arguments to connection drivers to match schema
 * Streamline normalization to speed it up
+* Add automation of example code generation
+* autodoc for R
+* testing for R
+* installation for R
