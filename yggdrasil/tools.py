@@ -76,6 +76,26 @@ def check_sockets():  # pragma: debug
         logging.info("%d sockets closed." % count)
 
 
+def get_subprocess_language():
+    r"""Determine the language of the calling process.
+
+    Returns:
+        str: Name of the programming language responsible for the subprocess.
+
+    """
+    return os.environ.get('YGG_MODEL_LANGUAGE', 'python')
+
+
+def get_subprocess_language_driver():
+    r"""Determine the driver for the langauge of the calling process.
+
+    Returns:
+        ModelDriver: Class used to handle running a model of the process language.
+
+    """
+    return import_component('model', get_subprocess_language())
+
+
 def is_subprocess():
     r"""Determine if the current process is a subprocess.
 

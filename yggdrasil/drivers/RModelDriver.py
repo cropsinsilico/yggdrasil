@@ -1,3 +1,4 @@
+import numpy as np
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
@@ -49,3 +50,46 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'try_begin': 'tryCatch({',
         'try_except': '}, error = function({error_var}) {',
         'try_end': '})'}
+
+    @classmethod
+    def language2python(cls, robj):
+        r"""Prepare an R object for serialization in Python.
+
+        Args:
+           robj (object): Python object prepared in R.
+
+        Returns:
+            object: Python object in a form that is serialization friendly.
+
+        """
+        # print("language2python", robj, type(robj))
+        if isinstance(robj, tuple):
+            return tuple([cls.language2python(x) for x in robj])
+        elif isinstance(robj, list):
+            return [cls.language2python(x) for x in robj]
+        elif isinstance(robj, dict):
+            return {k: cls.language2python(v) for k,v in robj.items()}
+        elif isinstance(robj, int):
+            # R integers are 32bit
+            return np.int32(robj)
+        return robj
+
+    # @classmethod
+    # def python2language(cls, pyobj):
+    #     r"""Prepare a python object for transformation in R.
+
+    #     Args:
+    #         pyobj (object): Python object.
+
+    #     Returns:
+    #         object: Python object in a form that is R friendly.
+
+    #     """
+    #     print("python2language", pyobj, type(pyobj))
+    #     if isinstance(pyobj, tuple):
+    #         return tuple([cls.python2language(x) for x in pyobj])
+    #     elif isinstance(pyobj, list):
+    #         return [cls.python2language(x) for x in pyobj]
+    #     elif isinstance(pyobj, dict):
+    #         return {k: cls.python2language(v) for k, v in pyobj.items()}
+    #     return pyobj

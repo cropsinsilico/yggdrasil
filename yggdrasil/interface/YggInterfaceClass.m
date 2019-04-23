@@ -9,7 +9,7 @@ classdef YggInterfaceClass
       end
     end
     function delete(obj)
-      obj.pyobj.matlab_atexit();
+      obj.pyobj.language_atexit();
     end
     function ml_res = eval_pyobj(obj, cmd, nargs, args)
       py_cmd = sprintf('obj.pyobj.%s(', cmd);

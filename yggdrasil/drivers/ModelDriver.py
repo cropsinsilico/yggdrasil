@@ -619,7 +619,7 @@ class ModelDriver(Driver):
 
         """
         return []
-        
+
     def set_env(self):
         r"""Get environment variables that should be set for the model process.
 
@@ -631,6 +631,7 @@ class ModelDriver(Driver):
         env.update(os.environ)
         env['YGG_SUBPROCESS'] = "True"
         env['YGG_MODEL_INDEX'] = str(self.model_index)
+        env['YGG_MODEL_LANGUAGE'] = self.language
         return env
 
     def before_start(self, no_queue_thread=False, **kwargs):

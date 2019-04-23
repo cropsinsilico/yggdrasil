@@ -56,6 +56,10 @@ yggdrasil.egg-info
 dist/
 build/
 
+# R things
+yggdrasil/languages/*.tar.gz
+yggdrasil/languages/*.RData
+yggdrasil/languages/*.RHistory
 
 # Windows image file caches
 Thumbs.db
