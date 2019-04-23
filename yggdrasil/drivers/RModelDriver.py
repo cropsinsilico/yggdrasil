@@ -38,6 +38,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'indent': 2 * ' ',
         'quote': '\"',
         'print': 'print(\"{message}\")',
+        'fprintf': 'print(sprintf(\"{message}\", {variables}))',
         'block_end': '}',
         'if_begin': 'if({cond}) {',
         'for_begin': 'for ({iter_var} in {iter_begin}:{iter_end}) {',
