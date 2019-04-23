@@ -1,0 +1,22 @@
+models:
+  - name: R_modelA
+    language: R
+    args: ./src/formatted_io1_modelA.R
+    inputs: inputA
+    outputs: outputA
+
+  - name: R_modelB
+    language: R
+    args: ./src/formatted_io1_modelB.R
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+    filetype: ascii
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
+    filetype: ascii
