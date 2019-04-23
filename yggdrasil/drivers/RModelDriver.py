@@ -26,11 +26,14 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     # default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
     function_param = {
         'interface': ['library(reticulate)',
+                      'library(zeallot)',
                       'ygg <- import(\"{interface_library}\")'],
         'input': '{channel} <- ygg$YggInput(\"{channel_name}\")',
         'output': '{channel} <- ygg$YggOutput(\"{channel_name}\")',
-        'recv': 'list[{flag_var}, {recv_var}] <- {channel}$recv()',
+        'recv': 'c({flag_var}, {recv_var}) %<-% {channel}$recv()',
         'send': '{flag_var} <- {channel}$send({send_var})',
+        'true': 'TRUE',
+        'not': '!',
         'comment': '#',
         'indent': 2 * ' ',
         'quote': '\"',
