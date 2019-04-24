@@ -209,6 +209,8 @@ class CModelDriver(CompiledModelDriver):
             cls.internal_libraries['datatypes']['include_dirs'] += [_top_dir]
         if platform._is_linux:
             for x in ['ygg', 'datatypes']:
+                if 'compiler_flags' not in cls.internal_libraries[x]:
+                    cls.internal_libraries[x]['compiler_flags'] = []
                 cls.internal_libraries[x]['compiler_flags'].append('-fPIC')
         
     @classmethod
