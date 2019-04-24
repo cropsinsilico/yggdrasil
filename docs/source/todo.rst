@@ -50,4 +50,3 @@ TODO
 * autodoc for R
 * testing for R
 * installation for R
-* abstract away recv_converter argument for pandas specific inteface class to model driver

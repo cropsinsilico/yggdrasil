@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
@@ -74,22 +75,27 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             return np.int32(robj)
         return robj
 
-    # @classmethod
-    # def python2language(cls, pyobj):
-    #     r"""Prepare a python object for transformation in R.
+    @classmethod
+    def python2language(cls, pyobj):
+        r"""Prepare a python object for transformation in R.
 
-    #     Args:
-    #         pyobj (object): Python object.
+        Args:
+            pyobj (object): Python object.
 
-    #     Returns:
-    #         object: Python object in a form that is R friendly.
+        Returns:
+            object: Python object in a form that is R friendly.
 
-    #     """
-    #     print("python2language", pyobj, type(pyobj))
-    #     if isinstance(pyobj, tuple):
-    #         return tuple([cls.python2language(x) for x in pyobj])
-    #     elif isinstance(pyobj, list):
-    #         return [cls.python2language(x) for x in pyobj]
-    #     elif isinstance(pyobj, dict):
-    #         return {k: cls.python2language(v) for k, v in pyobj.items()}
-    #     return pyobj
+        """
+        # print("python2language", pyobj, type(pyobj))
+        if isinstance(pyobj, tuple):
+            return tuple([cls.python2language(x) for x in pyobj])
+        elif isinstance(pyobj, list):
+            return [cls.python2language(x) for x in pyobj]
+        elif isinstance(pyobj, dict):
+            return {k: cls.python2language(v) for k, v in pyobj.items()}
+        elif isinstance(pyobj, pd.DataFrame):
+            # R dosn't have int64 and will cast as float if passed
+            for n in pyobj.columns:
+                if pyobj[n].dtype == np.dtype('int64'):
+                    pyobj[n] = pyobj[n].astype('int32')
+        return pyobj

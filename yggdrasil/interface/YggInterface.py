@@ -1,4 +1,4 @@
-from yggdrasil import backwards, tools, serialize
+from yggdrasil import backwards, tools
 from yggdrasil.communication.DefaultComm import DefaultComm
 
 
@@ -235,7 +235,7 @@ def YggAsciiArrayInput(name, **kwargs):
         DefaultComm: Communication object.
         
     """
-    kwargs['as_array'] = True
+    kwargs.update(as_array=True, recv_converter='table')
     return YggAsciiTableInput(name, **kwargs)
 
 
@@ -254,9 +254,7 @@ def YggAsciiArrayOutput(name, fmt, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] != 'python':
-        kwargs['send_converter'] = serialize.consolidate_array
-    kwargs['as_array'] = True
+    kwargs.update(as_array=True, send_converter='table')
     return YggAsciiTableOutput(name, fmt, **kwargs)
 
 
@@ -305,10 +303,7 @@ def YggPandasInput(name, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] == 'matlab':  # pragma: matlab
-        kwargs['recv_converter'] = 'array'
-    else:
-        kwargs['recv_converter'] = 'pandas'
+    kwargs['recv_converter'] = 'pandas'
     return YggInput(name, **kwargs)
 
 
@@ -325,10 +320,7 @@ def YggPandasOutput(name, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] == 'matlab':  # pragma: matlab
-        kwargs['send_converter'] = serialize.consolidate_array
-    else:
-        kwargs['send_converter'] = serialize.pandas2list
+    kwargs['send_converter'] = 'pandas'
     return YggOutput(name, **kwargs)
 
 

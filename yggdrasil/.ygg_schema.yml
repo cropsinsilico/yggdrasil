@@ -44,8 +44,10 @@ definitions:
           description: Converter that should be used on received objects. Defaults
             to None.
           type: [function, string]
-        send_converter: {description: Converter that should be used on sent objects.
-            Defaults to None., type: function}
+        send_converter:
+          description: Converter that should be used on sent objects. Defaults to
+            None.
+          type: [function, string]
       required: [commtype, datatype, name]
       title: comm_base
       type: object
@@ -328,8 +330,10 @@ definitions:
           description: Converter that should be used on received objects. Defaults
             to None.
           type: [function, string]
-        send_converter: {description: Converter that should be used on sent objects.
-            Defaults to None., type: function}
+        send_converter:
+          description: Converter that should be used on sent objects. Defaults to
+            None.
+          type: [function, string]
         serializer:
           $ref: '#/definitions/serializer'
           default: {seritype: direct}

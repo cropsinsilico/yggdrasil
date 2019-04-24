@@ -6,7 +6,7 @@ import os
 import psutil
 import warnings
 import weakref
-from yggdrasil import backwards, tools, platform, config
+from yggdrasil import backwards, tools, platform, config, serialize
 try:  # pragma: matlab
     disable_engine = config.ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
     if platform._is_win or (disable_engine == 'true'):
@@ -427,6 +427,9 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
     path_env_variable = 'MATLABPATH'
     comm_linger = (os.environ.get('YGG_MATLAB_ENGINE', '').lower() == 'true')
+    send_converters = {'pandas': serialize.consolidate_array,
+                       'table': serialize.consolidate_array}
+    recv_converters = {'pandas': 'array'}
     function_param = {
         'comment': '%',
         'indent': 2 * ' ',

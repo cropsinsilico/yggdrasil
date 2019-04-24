@@ -1,5 +1,5 @@
 import os
-from yggdrasil import tools
+from yggdrasil import tools, serialize
 from yggdrasil.config import ygg_cfg, locate_file
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
@@ -59,6 +59,12 @@ class InterpretedModelDriver(ModelDriver):
         language2python (function): Function preparing objects native to this
             language for transfer to Python. If None, no additional actions are
             taken.
+        recv_converters (dict): Mapping between the names of message types (e.g.
+            'array', 'pandas') and functions that should be used to prepare such
+            objects for return when they are received.
+        send_converters (dict): Mapping between the names of message types (e.g.
+            'array', 'pandas') and functions that should be used to prepare such
+            objects for sending.
 
     """
 
@@ -77,6 +83,8 @@ class InterpretedModelDriver(ModelDriver):
     decode_format = None
     python2language = None
     language2python = None
+    recv_converters = {'pandas': 'pandas'}
+    send_converters = {'pandas': serialize.pandas2list}
 
     def __init__(self, name, args, **kwargs):
         super(InterpretedModelDriver, self).__init__(name, args, **kwargs)

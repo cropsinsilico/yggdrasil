@@ -312,7 +312,6 @@ class CommBase(tools.YggClass):
 
     """
 
-    # TODO: Add serializer to comm schema
     _commtype = None
     _schema_type = 'comm'
     _schema_subtype_key = 'commtype'
@@ -324,7 +323,7 @@ class CommBase(tools.YggClass):
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
                           'recv_converter': {'type': ['function', 'string']},
-                          'send_converter': {'type': 'function'},
+                          'send_converter': {'type': ['function', 'string']},
                           'field_names': {'type': 'array',
                                           'items': {'type': 'string'}},
                           'field_units': {'type': 'array',
@@ -464,10 +463,13 @@ class CommBase(tools.YggClass):
             self.serializer = seri_cls(**seri_kws)
         # Set send/recv converter based on the serializer
         for k in ['recv_converter', 'send_converter']:
-            if getattr(self, k, None) is None:
+            v = getattr(self, k, None)
+            if v is None:
                 v = getattr(self.serializer, k, None)
-                if v is not None:
-                    setattr(self, k, v)
+            if isinstance(v, str):
+                cls_conv = getattr(self.language_driver, k + 's')
+                v = cls_conv.get(v, None)
+            setattr(self, k, v)
 
     @staticmethod
     def before_registration(cls):
@@ -919,6 +921,9 @@ class CommBase(tools.YggClass):
             return msg_in
         elif isinstance(self.recv_converter, str):
             if self.recv_converter in ['array', 'pandas']:
+                # These are referenced by string since they require the
+                # serializer customized with information from the received
+                # message(s) (e.g. column names).
                 msg_out = self.serializer.consolidate_array(msg_in)
                 if self.recv_converter == 'pandas':
                     msg_out = serialize.numpy2pandas(msg_out)
@@ -942,7 +947,7 @@ class CommBase(tools.YggClass):
         if (self.send_converter is None):
             return msg_in
         elif isinstance(self.send_converter, str):  # pragma: debug
-            raise RuntimeError("String send_converter not supported: '%s'." %
+            raise RuntimeError("Unrecognized send_converter string: '%s'." %
                                self.send_converter)
         else:
             return self.send_converter(msg_in)
