@@ -278,6 +278,21 @@ class SerializeBase(tools.YggClass):
         return self.encoded_datatype._typedef
 
     @property
+    def input_kwargs(self):
+        r"""dict: Get the input keyword arguments used to create this class."""
+        out = {}
+        for k in self._schema_properties.keys():
+            if k in self._schema_excluded_from_class:
+                continue
+            v = getattr(self, k, None)
+            if v is not None:
+                out[k] = copy.deepcopy(v)
+        for k in self._attr_conv:
+            if (k in out) and isinstance(out[k], backwards.string_types):
+                out[k] = backwards.as_str(out[k])
+        return out
+        
+    @property
     def serializer_info(self):
         r"""dict: Serializer info."""
         out = copy.deepcopy(self.extra_kwargs)

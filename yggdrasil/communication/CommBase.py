@@ -680,12 +680,7 @@ class CommBase(tools.YggClass):
             kwargs['direction'] = 'recv'
         else:
             kwargs['direction'] = 'send'
-        for k in self.serializer._schema_properties.keys():
-            if k in self.serializer._schema_excluded_from_class:
-                continue
-            v = getattr(self.serializer, k)
-            if v is not None:
-                kwargs[k] = v
+        kwargs.update(self.serializer.input_kwargs)
         return kwargs
 
     def bind(self):
