@@ -53,6 +53,25 @@ class YggConfigParser(configparser.ConfigParser):
             return default
 
 
+def load_config_files():
+    r"""Load the config files and set the module level object."""
+    global ygg_cfg
+    files = [def_config_file, usr_config_file, loc_config_file]
+    ygg_cfg.read(files)
+    # Aliases for old versions of config options
+    alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
+                 (('debug', 'cis'), ('debug', 'ygg'))]
+    for old, new in alias_map:
+        v = ygg_cfg.get(*old)
+        if v:  # pragma: debug
+            ygg_cfg.set(new[0], new[1], v)
+
+
+# Initialize config
+ygg_cfg = YggConfigParser()
+load_config_files()
+    
+
 def find_all(name, path):
     r"""Find all instances of a file with a given name within the directory
     tree starting at a given path.
@@ -179,26 +198,15 @@ def update_config(config_file, config_base=None, skip_warnings=False):
             warnings.warn(("Could not set option %s in section %s. "
                            + "Please set this in %s to: %s")
                           % (opt, sect, config_file, desc), RuntimeWarning)
-        
+            
 
 # In order read: defaults, user, local files
 if not os.path.isfile(usr_config_file):
     logging.info('Creating user config file: "%s".' % usr_config_file)
     update_config(usr_config_file)
+    load_config_files()
 assert(os.path.isfile(usr_config_file))
 assert(os.path.isfile(def_config_file))
-files = [def_config_file, usr_config_file, loc_config_file]
-ygg_cfg = YggConfigParser()
-ygg_cfg.read(files)
-
-
-# Aliases for old versions of config options
-alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
-             (('debug', 'cis'), ('debug', 'ygg'))]
-for old, new in alias_map:
-    v = ygg_cfg.get(*old)
-    if v:  # pragma: debug
-        ygg_cfg.set(new[0], new[1], v)
 
 
 # Set associated environment variables
