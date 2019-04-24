@@ -305,7 +305,7 @@ def YggPandasInput(name, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] != 'python':
+    if kwargs['language'] == 'matlab':  # pragma: matlab
         kwargs['recv_converter'] = 'array'
     else:
         kwargs['recv_converter'] = 'pandas'
@@ -325,7 +325,7 @@ def YggPandasOutput(name, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] != 'python':
+    if kwargs['language'] == 'matlab':  # pragma: matlab
         kwargs['send_converter'] = serialize.consolidate_array
     else:
         kwargs['send_converter'] = serialize.pandas2list
