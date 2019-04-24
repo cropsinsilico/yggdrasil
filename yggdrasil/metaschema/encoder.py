@@ -53,10 +53,12 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     if fd is None:
         return backwards.as_bytes(json.dumps(obj, **kwargs))
     else:
-        if backwards.PY2:  # pragma: Python 2
-            kwargs.setdefault('indent', 4)
-        else:  # pragma: Python 3
-            kwargs.setdefault('indent', '\t')
+        if kwargs['indent'] is None:
+            if backwards.PY2:  # pragma: Python 2
+                # This is not necessary with most recent version of json
+                kwargs['indent'] = 4
+            else:  # pragma: Python 3
+                kwargs['indent'] = '\t'
         return json.dump(obj, fd, **kwargs)
 
 
