@@ -232,7 +232,8 @@ class SerializeBase(tools.YggClass):
                 out['kwargs'].update({'format_str': b'%5s\t%d\t%f\n',
                                       'field_names': [b'name', b'count', b'size'],
                                       'field_units': [b'n/a', b'umol', b'cm']})
-                out['extra_kwargs'].update({'format_str': out['kwargs']['format_str']})
+                out['extra_kwargs'].update(
+                    {'format_str': backwards.as_str(out['kwargs']['format_str'])})
             if array_columns:
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
