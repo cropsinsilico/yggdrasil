@@ -30,7 +30,7 @@ def indent_char2int(indent):
     return indent
 
 
-class JSONReadableEncoder(_json_encoder):
+class JSONReadableEncoder(stdjson.JSONEncoder):
     r"""Encoder class for Ygg messages."""
 
     def default(self, o):  # pragma: no cover
