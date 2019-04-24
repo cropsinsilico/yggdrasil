@@ -603,7 +603,7 @@ class ModelDriver(Driver):
             for c in tools.get_supported_comm():
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
-            cfg.set(cls.language, 'commtypes', comms)
+            cfg.set(cls.language, 'commtypes', str(comms))
         return out
 
     @classmethod
