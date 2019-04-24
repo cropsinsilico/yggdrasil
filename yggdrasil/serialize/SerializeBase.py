@@ -229,9 +229,9 @@ class SerializeBase(tools.YggClass):
                    'field_names': ['name', 'count', 'size'],
                    'field_units': ['n/a', 'umol', 'cm']}
             if include_oldkws:
-                out['kwargs'].update({'format_str': b'%5s\t%d\t%f\n',
-                                      'field_names': [b'name', b'count', b'size'],
-                                      'field_units': [b'n/a', b'umol', b'cm']})
+                out['kwargs'].update({'format_str': '%5s\t%d\t%f\n',
+                                      'field_names': ['name', 'count', 'size'],
+                                      'field_units': ['n/a', 'umol', 'cm']})
                 out['extra_kwargs'].update(
                     {'format_str': backwards.as_str(out['kwargs']['format_str'])})
             if array_columns:
