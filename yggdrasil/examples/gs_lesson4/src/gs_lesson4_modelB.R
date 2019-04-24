@@ -17,7 +17,7 @@ while(TRUE) {
   }
 
   # Print received message
-  print(sprintf('Model B: %s', msg))
+  fprintf('Model B: %s', msg)
 
   # Send output to output channel
   # If there is an error, the flag will be False

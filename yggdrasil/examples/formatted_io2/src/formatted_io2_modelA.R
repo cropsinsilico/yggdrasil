@@ -18,7 +18,7 @@ while(TRUE) {
   c(name, count, size) %<-% msg
 
   # Print received message
-  print(sprintf('Model A: %s, %d, %f', name, count, size))
+  fprintf('Model A: %s, %d, %f', name, count, size)
 
   # Send output to output channel
   # If there is an error, the flag will be False
