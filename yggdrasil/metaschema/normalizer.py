@@ -1,4 +1,5 @@
 # Normalizer adapated from the jsonschema validator
+import pprint
 import copy
 import contextlib
 import jsonschema
@@ -297,7 +298,7 @@ def create(*args, **kwargs):
             else:
                 super(Normalizer, self).validate(instance, _schema=_schema)
 
-        def normalize(self, instance, _schema=None, **kwargs):
+        def normalize(self, instance, _schema=None, show_errors=False, **kwargs):
             r"""Normalize an instance during validation, allowing for aliases,
             defaults, or simple type conversions.
 
@@ -306,6 +307,8 @@ def create(*args, **kwargs):
                 _schema (dict, optional): Schema by which the instance should be
                     normalized and validated. Defaults to None and will be set
                     to the schema used to create the class.
+                show_errors (bool, optional): If True, any errors during the
+                    normalization are displayed. Defaults to False.
                 **kwargs: Additional keyword arguments are passed to the
                     'normalizing' context.
 
@@ -315,10 +318,14 @@ def create(*args, **kwargs):
             """
             with self.normalizing(**kwargs):
                 errors = list(self.iter_errors(instance, _schema=_schema))
-                # for e in errors[::-1]:
-                #     print(80 * '-')
-                #     print(e)
-                # print(80 * '-')
+                if show_errors:  # pragma: debug
+                    for e in errors[::-1]:
+                        if e:
+                            print(80 * '-')
+                            print(e)
+                    if errors:
+                        print(80 * '-')
+                        pprint.pprint(self._normalized)
             if errors:
                 return instance
             else:

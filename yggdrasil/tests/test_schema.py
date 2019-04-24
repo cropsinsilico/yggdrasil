@@ -106,7 +106,7 @@ def test_normalize():
     r"""Test normalization of legacy formats."""
     s = schema.get_schema()
     for x, y in _normalize_objects:
-        a = s.normalize(x, backwards_compat=True)
+        a = s.normalize(x, backwards_compat=True)  # , show_errors=True)
         try:
             assert_equal(a, y)
         except BaseException:  # pragma: debug

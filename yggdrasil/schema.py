@@ -223,7 +223,7 @@ class ComponentSchema(object):
         """
         r"""dict: Schema for this component."""
         out = {'description': 'Schema for %s components.' % self.schema_type,
-               'title': self.schema_type, '$id': '#%s' % self.schema_type,
+               'title': self.schema_type,
                'allOf': [self.get_subtype_schema('base', relaxed=relaxed),
                          {'anyOf': [self.get_subtype_schema(x, unique=True)
                                     for x in self._storage.keys()]}]}
@@ -242,7 +242,7 @@ class ComponentSchema(object):
         # to reconcile that with schema normalization which uses the
         # position in the schema
         out = {'description': 'Schema for %s components.' % self.schema_type,
-               'title': self.schema_type, '$id': '#%s' % self.schema_type,
+               'title': self.schema_type,
                'allOf': [self.get_subtype_schema('base', unique=True),
                          {'anyOf': [self.get_subtype_schema(x)
                                     for x in self._storage.keys()]}]}
