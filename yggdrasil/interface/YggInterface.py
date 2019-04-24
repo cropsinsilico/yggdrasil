@@ -118,7 +118,7 @@ def YggRpcServer(name, infmt='%s', outfmt='%s', language=None):
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
     if language is None:
-        language=tools.get_subprocess_language()
+        language = tools.get_subprocess_language()
     out = ServerComm.ServerComm(name, response_kwargs=ocomm_kwargs,
                                 language=language, is_interface=True,
                                 **icomm_kwargs)
@@ -144,7 +144,7 @@ def YggRpcClient(name, outfmt='%s', infmt='%s', language=None):
     icomm_kwargs = dict(format_str=infmt)
     ocomm_kwargs = dict(format_str=outfmt)
     if language is None:
-        language=tools.get_subprocess_language()
+        language = tools.get_subprocess_language()
     out = ClientComm.ClientComm(name, response_kwargs=icomm_kwargs,
                                 language=language, is_interface=True,
                                 **ocomm_kwargs)
@@ -254,7 +254,7 @@ def YggAsciiArrayOutput(name, fmt, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] in ['matlab']:  # pragma: matlab
+    if kwargs['language'] != 'python':
         kwargs['send_converter'] = serialize.consolidate_array
     kwargs['as_array'] = True
     return YggAsciiTableOutput(name, fmt, **kwargs)
@@ -305,7 +305,7 @@ def YggPandasInput(name, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] in ['matlab']:  # pragma: matlab
+    if kwargs['language'] != 'python':
         kwargs['recv_converter'] = 'array'
     else:
         kwargs['recv_converter'] = 'pandas'
@@ -325,7 +325,7 @@ def YggPandasOutput(name, **kwargs):
     """
     if 'language' not in kwargs:
         kwargs['language'] = tools.get_subprocess_language()
-    if kwargs['language'] in ['matlab']:  # pragma: matlab
+    if kwargs['language'] != 'python':
         kwargs['send_converter'] = serialize.consolidate_array
     else:
         kwargs['send_converter'] = serialize.pandas2list

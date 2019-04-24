@@ -68,7 +68,7 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         elif isinstance(robj, list):
             return [cls.language2python(x) for x in robj]
         elif isinstance(robj, dict):
-            return {k: cls.language2python(v) for k,v in robj.items()}
+            return {k: cls.language2python(v) for k, v in robj.items()}
         elif isinstance(robj, int):
             # R integers are 32bit
             return np.int32(robj)

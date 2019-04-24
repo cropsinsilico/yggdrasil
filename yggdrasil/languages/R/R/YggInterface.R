@@ -1,3 +1,8 @@
+fprintf <- function(...) {
+  print(sprintf(...))
+}
+
+
 YggInterfaceClass <- setRefClass("YggInterfaceClass",
   fields=list(pyobj="ANY"),
   methods=list(
