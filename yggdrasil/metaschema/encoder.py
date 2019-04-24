@@ -124,6 +124,8 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
         str, bytes: Encoded object.
 
     """
+    if (indent is None) and (fd is not None):
+        indent = '\t'
     if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
         # Character indents not allowed in Python 2 json
         indent = indent_char2int(indent)
@@ -136,10 +138,6 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     if fd is None:
         return backwards.as_bytes(json.dumps(obj, **kwargs))
     else:
-        if backwards.PY2:  # pragma: Python 2
-            kwargs.setdefault('indent', 4)
-        else:  # pragma: Python 3
-            kwargs.setdefault('indent', '\t')
         return json.dump(obj, fd, **kwargs)
 
 
