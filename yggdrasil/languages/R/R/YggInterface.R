@@ -3,21 +3,26 @@ fprintf <- function(...) {
 }
 
 
+call_python_method <- function(pyobj, method_name, ...) {
+  method = reticulate::py_get_attr(pyobj, method_name)
+  return(reticulate::py_call(method, ...))
+}
+
+
 YggInterfaceClass <- setRefClass("YggInterfaceClass",
   fields=list(pyobj="ANY"),
   methods=list(
     eval_pyobj = function(cmd, ...) {
       args <- list(...)
       nargs <- length(args)
-      rapply(args, R2python, classes='ANY', how='replace')
+      args <- R2python(args)
       arg_name <- vector("list", length = nargs)
       if (nargs > 0) {
         for (i in 1:nargs) {
           arg_name[i] = sprintf('args[[%d]]', i)
         }
       }
-      py_cmd <- sprintf('pyobj$%s(%s)', cmd, paste(arg_name, sep=',', collapse=','))
-      py_res <- eval(parse(text=py_cmd))
+      py_res <- do.call('call_python_method', c(pyobj, cmd, args))
       r_res <- python2R(py_res)
       return(r_res)
     },

@@ -52,28 +52,25 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'try_except': '}, error = function({error_var}) {',
         'try_end': '})'}
 
-    @classmethod
-    def language2python(cls, robj):
-        r"""Prepare an R object for serialization in Python.
+    # @classmethod
+    # def language2python(cls, robj):
+    #     r"""Prepare an R object for serialization in Python.
 
-        Args:
-           robj (object): Python object prepared in R.
+    #     Args:
+    #        robj (object): Python object prepared in R.
 
-        Returns:
-            object: Python object in a form that is serialization friendly.
+    #     Returns:
+    #         object: Python object in a form that is serialization friendly.
 
-        """
-        # print("language2python", robj, type(robj))
-        if isinstance(robj, tuple):
-            return tuple([cls.language2python(x) for x in robj])
-        elif isinstance(robj, list):
-            return [cls.language2python(x) for x in robj]
-        elif isinstance(robj, dict):
-            return {k: cls.language2python(v) for k, v in robj.items()}
-        elif isinstance(robj, int):
-            # R integers are 32bit
-            return np.int32(robj)
-        return robj
+    #     """
+    #     # print("language2python", robj, type(robj))
+    #     if isinstance(robj, tuple):
+    #         return tuple([cls.language2python(x) for x in robj])
+    #     elif isinstance(robj, list):
+    #         return [cls.language2python(x) for x in robj]
+    #     elif isinstance(robj, dict):
+    #         return {k: cls.language2python(v) for k, v in robj.items()}
+    #     return robj
 
     @classmethod
     def python2language(cls, pyobj):

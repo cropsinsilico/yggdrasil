@@ -9,6 +9,8 @@ License: BSD 3-clause
 LazyData: true
 Imports:
     reticulate,
-    zeallot
+    zeallot,
+    float,
+    bit64
 Depends:
     zeallot

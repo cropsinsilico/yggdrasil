@@ -17,8 +17,8 @@ while(TRUE) {
   }
 
   # Print received message
-  fprintf('Model B: (%d verts, %d faces)', ply$nvert, ply$nface)
-  print(ply)
+  fprintf('Model B: (%d verts, %d faces)',
+          length(ply[['vertices']]), length(ply[['faces']]))
 
   # Send output to output channel
   # If there is an error, the flag will be False
