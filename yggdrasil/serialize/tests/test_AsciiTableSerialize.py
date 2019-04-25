@@ -34,7 +34,8 @@ class TestAsciiTableSerialize(parent.TestDefaultSerialize):
         super(TestAsciiTableSerialize, self).test_field_specs()
         # Specific to this class
         self.assert_equal(self.instance.format_str,
-                          self.testing_options['kwargs']['format_str'])
+                          backwards.as_bytes(
+                              self.testing_options['kwargs']['format_str']))
         field_names = self.testing_options['kwargs'].get('field_names', None)
         if field_names is not None:
             field_names = [backwards.as_str(x) for x in field_names]
@@ -54,11 +55,11 @@ class TestAsciiTableSerializeSingle(parent.TestDefaultSerialize):
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableSerializeSingle, self).__init__(*args, **kwargs)
-        self._inst_kwargs['format_str'] = b'%d\n'
+        self._inst_kwargs['format_str'] = '%d\n'
 
     def get_options(self):
         r"""Get testing options."""
-        out = {'kwargs': {'format_str': b'%d\n'},
+        out = {'kwargs': {'format_str': '%d\n'},
                'empty': [],
                'objects': [(1, )],
                'extra_kwargs': {},

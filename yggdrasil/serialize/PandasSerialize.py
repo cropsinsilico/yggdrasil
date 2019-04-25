@@ -156,7 +156,7 @@ class PandasSerialize(AsciiTableSerialize):
         if not backwards.PY2:
             # For Python 3 and higher, make sure strings are bytes
             for c, d in zip(out.columns, out.dtypes):
-                if d == object:
+                if (d == object) and isinstance(out[c][0], backwards.unicode_type):
                     out[c] = out[c].apply(lambda s: s.encode('utf-8'))
         # On windows, long != longlong and longlong requires special cformat
         # For now, long will be used to preserve the use of %ld to match long

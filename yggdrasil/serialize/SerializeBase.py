@@ -233,10 +233,11 @@ class SerializeBase(tools.YggClass):
                    'field_names': ['name', 'count', 'size'],
                    'field_units': ['n/a', 'umol', 'cm']}
             if include_oldkws:
-                out['kwargs'].update({'format_str': b'%5s\t%d\t%f\n',
-                                      'field_names': [b'name', b'count', b'size'],
-                                      'field_units': [b'n/a', b'umol', b'cm']})
-                out['extra_kwargs'].update({'format_str': out['kwargs']['format_str']})
+                out['kwargs'].update({'format_str': '%5s\t%d\t%f\n',
+                                      'field_names': ['name', 'count', 'size'],
+                                      'field_units': ['n/a', 'umol', 'cm']})
+                out['extra_kwargs'].update(
+                    {'format_str': backwards.as_str(out['kwargs']['format_str'])})
             if array_columns:
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
@@ -280,6 +281,21 @@ class SerializeBase(tools.YggClass):
         r"""dict: Type definition for encoded data objects."""
         return self.encoded_datatype._typedef
 
+    @property
+    def input_kwargs(self):
+        r"""dict: Get the input keyword arguments used to create this class."""
+        out = {}
+        for k in self._schema_properties.keys():
+            if k in self._schema_excluded_from_class:
+                continue
+            v = getattr(self, k, None)
+            if v is not None:
+                out[k] = copy.deepcopy(v)
+        for k in self._attr_conv:
+            if (k in out) and isinstance(out[k], backwards.string_types):
+                out[k] = backwards.as_str(out[k])
+        return out
+        
     @property
     def serializer_info(self):
         r"""dict: Serializer info."""
