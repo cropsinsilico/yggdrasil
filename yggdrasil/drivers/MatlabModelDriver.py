@@ -6,9 +6,10 @@ import os
 import psutil
 import warnings
 import weakref
-from yggdrasil import backwards, tools, platform, config
+from yggdrasil import backwards, tools, platform
+from yggdrasil.config import ygg_cfg
 try:  # pragma: matlab
-    disable_engine = config.ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
+    disable_engine = ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
     if platform._is_win or (disable_engine == 'true'):
         _matlab_engine_installed = False
         if not tools.is_subprocess():
@@ -115,7 +116,7 @@ def start_matlab_engine(skip_connect=False, timeout=None):  # pragma: matlab
     if not _matlab_engine_installed:  # pragma: no matlab
         raise RuntimeError("Matlab engine is not installed.")
     if timeout is None:
-        timeout = float(config.ygg_cfg.get('matlab', 'startup_waittime_s', 10))
+        timeout = float(ygg_cfg.get('matlab', 'startup_waittime_s', 10))
     old_process = set(locate_matlab_engine_processes())
     old_matlab = set(matlab.engine.find_matlab())
     screen_session = str('ygg_matlab' + datetime.today().strftime("%Y%j%H%M%S")
