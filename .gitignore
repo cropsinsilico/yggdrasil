@@ -20,6 +20,9 @@ docs/source/modules.rst
 docs/source/examples/*.rst
 docs/source/schema_table_*.rst
 
+# Profiling
+prof
+
 # Coverage
 .coveragerc
 .coverage
@@ -52,6 +55,9 @@ tmp/
 
 
 # Packaging things
+cis_interface
+cis_interface.egg-info
+yggdrasil_framework.egg-info
 yggdrasil.egg-info
 dist/
 build/

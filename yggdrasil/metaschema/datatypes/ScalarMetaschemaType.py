@@ -155,7 +155,7 @@ class ScalarMetaschemaType(MetaschemaType):
         elif subtype in ['complex']:
             return str(complex(arr[0]))
         elif subtype in ['bytes', 'unicode']:
-            return backwards.as_str(arr[0])
+            return str(backwards.as_str(arr[0]))
         else:  # pragma: debug
             warnings.warn(("No method for handling readable serialization of "
                            + "subtype '%s', falling back to default.") % subtype)

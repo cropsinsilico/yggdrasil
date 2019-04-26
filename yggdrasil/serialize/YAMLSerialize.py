@@ -1,5 +1,4 @@
 import yaml
-from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import indent_char2int
 from yggdrasil.serialize.JSONSerialize import JSONSerialize
 
@@ -39,8 +38,10 @@ class YAMLSerialize(JSONSerialize):
             bytes, str: Serialized message.
 
         """
-        # Convert bytes to str because YAML can't process unicode by default
-        args = backwards.as_str(args, recurse=True, allow_pass=True)
+        # Convert objects to built-in python types where possible for
+        # readable encoding
+        args = self.datatype.encode_data_readable(args, None)
+        # args = backwards.as_str(args, recurse=True, allow_pass=True)
         # Convert character indent to an integer (tabs are 4 spaces)
         indent = indent_char2int(self.indent)
         out = yaml.dump(args, indent=indent, encoding=self.encoding,

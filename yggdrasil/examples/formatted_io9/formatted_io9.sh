@@ -23,6 +23,10 @@ case $1 in
 	echo "Running C++"
 	yaml='formatted_io9_cpp.yml'
 	;;
+    -r | -R)
+	echo "Running R"
+	yaml='formatted_io9_r.yml'
+	;;
 esac
 
 yggrun $yaml
