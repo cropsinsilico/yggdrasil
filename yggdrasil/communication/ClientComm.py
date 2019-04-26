@@ -40,6 +40,7 @@ class ClientComm(CommBase.CommBase):
         self.icomm_order = []
         self.response_kwargs.setdefault('comm', self.ocomm.comm_class)
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
+        self.response_kwargs.setdefault('language', self.ocomm.language)
         super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
                                          recv_timeout=self.ocomm.recv_timeout,
                                          is_interface=self.ocomm.is_interface,

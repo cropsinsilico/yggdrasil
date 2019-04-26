@@ -747,7 +747,6 @@ class CommBase(tools.YggClass):
                 this will block until the comm is closed.
 
         """
-        print(self.language_driver, self.language_driver.comm_linger)
         if self.language_driver.comm_linger:  # pragma: matlab
             self.linger_close()
             self._closing_thread.set_terminated_flag()

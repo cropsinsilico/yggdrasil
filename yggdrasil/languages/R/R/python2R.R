@@ -1,7 +1,7 @@
 
 
 python2R <- function(pyobj) {
-  # Uncomment if special treatment required
+  # print(class(pyobj))
   np <- reticulate::import('numpy', convert=FALSE)
   if (is(pyobj, "python.builtin.tuple")
       || is(pyobj, "python.builtin.list")) {
@@ -31,6 +31,8 @@ python2R <- function(pyobj) {
   } else if (is(pyobj, "numpy.int64")) {
     out <- bit64::as.integer64(reticulate::py_to_r(pyobj))
     return(out)
+  } else if (is(pyobj, "python.builtin.bytes")) {
+    pyobj <- pyobj$decode('utf-8')
   # TODO: There dosn't seem to be variable integer precision in R
   } else if (is(pyobj, "numpy.ndarray")) {
     type_len <- reticulate::py_len(pyobj$dtype)

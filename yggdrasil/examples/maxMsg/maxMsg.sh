@@ -38,6 +38,11 @@ case $1 in
 	yaml1='maxMsgSrv_cpp.yml'
 	yaml2='maxMsgCli_cpp.yml'
 	;;
+    -r | -R)
+	echo "Running R"
+	yaml1='maxMsgSrv_r.yml'
+	yaml2='maxMsgCli_r.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1
