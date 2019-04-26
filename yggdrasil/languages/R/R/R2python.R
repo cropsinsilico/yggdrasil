@@ -4,7 +4,6 @@ R2python <- function(robj) {
   numpy <- reticulate::import('numpy', convert=FALSE)
   if (is(robj, "list")) {
     robj <- lapply(robj, R2python)
-    return(robj)
   } else if (is(robj, "float32")) {
     out <- call_python_method(numpy, 'float32',
       reticulate::r_to_py(float::dbl(robj)))

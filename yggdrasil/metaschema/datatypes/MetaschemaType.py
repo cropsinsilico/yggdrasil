@@ -405,7 +405,7 @@ class MetaschemaType(object):
 
     @classmethod
     def check_encoded(cls, metadata, typedef=None, raise_errors=False,
-                      typedef_validated=False):
+                      typedef_validated=False, metadata_validated=False):
         r"""Checks if the metadata for an encoded object matches the type
         definition.
 
@@ -421,18 +421,22 @@ class MetaschemaType(object):
             typedef_validated (bool, optional): If True, the type definition
                 is taken as already having been validated and will not be
                 validated again during the encoding process. Defaults to False.
+            metadata_validated (bool, optional): If True, the metadata definition
+                is taken as already having been valdiated and will not be
+                validated again. Defaults to False.
 
         Returns:
             bool: True if the metadata matches the type definition, False
                 otherwise.
 
         """
-        try:
-            cls.validate_metadata(metadata)
-        except jsonschema.exceptions.ValidationError:
-            if raise_errors:
-                raise
-            return False
+        if not metadata_validated:
+            try:
+                cls.validate_metadata(metadata)
+            except jsonschema.exceptions.ValidationError:
+                if raise_errors:
+                    raise
+                return False
         if typedef is not None:
             if not typedef_validated:
                 try:

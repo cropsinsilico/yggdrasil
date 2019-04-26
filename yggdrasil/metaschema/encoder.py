@@ -35,12 +35,14 @@ class JSONReadableEncoder(stdjson.JSONEncoder):
 
     def default(self, o):  # pragma: no cover
         r"""Encoder that allows for expansion types."""
-        from yggdrasil.metaschema.datatypes import get_registered_types
-        for cls in get_registered_types().values():
-            if (not cls._replaces_existing) and cls.validate(o):
-                new_o = cls.encode_data_readable(o, cls.encode_type(o))
-                return new_o
-        return _json_encoder.default(self, o)
+        from yggdrasil.metaschema.datatypes import (
+            guess_type_from_obj, MetaschemaTypeError)
+        try:
+            cls = guess_type_from_obj(o)
+            out = cls.encode_data_readable(o, None)
+        except MetaschemaTypeError:
+            out = _json_encoder.default(self, o)
+        return out
 
 
 class JSONEncoder(_json_encoder):
@@ -48,12 +50,14 @@ class JSONEncoder(_json_encoder):
 
     def default(self, o):
         r"""Encoder that allows for expansion types."""
-        from yggdrasil.metaschema.datatypes import get_registered_types
-        for cls in get_registered_types().values():
-            if cls.validate(o):
-                new_o = cls.encode_data(o, cls.encode_type(o))
-                return new_o
-        return _json_encoder.default(self, o)
+        from yggdrasil.metaschema.datatypes import (
+            guess_type_from_obj, MetaschemaTypeError)
+        try:
+            cls = guess_type_from_obj(o)
+            out = cls.encode_data(o, None)
+        except MetaschemaTypeError:
+            out = _json_encoder.default(self, o)
+        return out
     
 
 class JSONDecoder(_json_decoder):
@@ -132,7 +136,10 @@ def encode_json(obj, fd=None, indent=None, sort_keys=True, **kwargs):
     kwargs['indent'] = indent
     kwargs['sort_keys'] = sort_keys
     if _use_rapidjson:
-        kwargs.setdefault('default', JSONEncoder().default)
+        if 'cls' in kwargs:
+            kwargs.setdefault('default', kwargs.pop('cls')().default)
+        else:
+            kwargs.setdefault('default', JSONEncoder().default)
     else:
         kwargs.setdefault('cls', JSONEncoder)
     if fd is None:

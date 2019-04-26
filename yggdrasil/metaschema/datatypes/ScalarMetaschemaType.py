@@ -6,7 +6,8 @@ from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
     create_fixed_type_class)
-from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
+from yggdrasil.metaschema.properties import (
+    get_metaschema_property, ScalarMetaschemaProperties)
 
 
 @register_type
@@ -139,7 +140,11 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         arr = cls.to_array(obj)
-        subtype = typedef.get('subtype', typedef.get('type', None))
+        if typedef is None:
+            subtype_prop = get_metaschema_property('subtype')
+            subtype = subtype_prop.encode(obj)
+        else:
+            subtype = typedef.get('subtype', typedef.get('type', None))
         if (cls.name in ['1darray', 'ndarray']):
             return arr.tolist()
         assert(arr.ndim > 0)

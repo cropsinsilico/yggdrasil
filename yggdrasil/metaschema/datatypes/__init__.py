@@ -304,9 +304,9 @@ def encode_data(obj, typedef=None):
         cls = get_type_class(typedef['type'])
     else:
         cls = guess_type_from_obj(obj)
-        if typedef is None:
-            metadata = cls.encode_type(obj)
-            typedef = cls.extract_typedef(metadata)
+        # if typedef is None:
+        #     metadata = cls.encode_type(obj)
+        #     typedef = cls.extract_typedef(metadata)
     return cls.encode_data(obj, typedef=typedef)
 
 
