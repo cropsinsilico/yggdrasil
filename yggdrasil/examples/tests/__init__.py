@@ -1,7 +1,9 @@
 import os
+import six
 import uuid
 import unittest
 import tempfile
+from yggdrasil.components import ComponentMeta
 from yggdrasil import runner, tools
 from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase
@@ -10,6 +12,24 @@ from yggdrasil.tests import YggTestBase
 _ext2lang = {v: k for k, v in ext_map.items()}
 
 
+def make_lang_test(lang):
+    def itest(self):
+        self.run_language(lang.lower())
+    return itest
+
+
+class ExampleMeta(ComponentMeta):
+    def __new__(cls, name, bases, dct):
+        for l in tools.get_supported_lang():
+            itest_name = 'test_%s' % l
+            if itest_name not in dct:
+                itest_func = make_lang_test(l)
+                itest_func.__name__ = itest_name
+                dct[itest_name] = itest_func
+        return super(ExampleMeta, cls).__new__(cls, name, bases, dct)
+
+
+@six.add_metaclass(ExampleMeta)
 class TestExample(YggTestBase, tools.YggClass):
     r"""Base class for running examples."""
 
@@ -163,13 +183,3 @@ class TestExample(YggTestBase, tools.YggClass):
     def test_all_nomatlab(self):
         r"""Test the version of the example that uses all languages."""
         self.run_language('all_nomatlab')
-
-
-def make_lang_test(lang):
-    def itest(self):
-        self.run_language(lang.lower())
-    return itest
-
-
-for l in tools.get_supported_lang():
-    setattr(TestExample, 'test_%s' % l, make_lang_test(l))

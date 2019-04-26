@@ -19,17 +19,11 @@ YggInterfaceClass <- setRefClass("YggInterfaceClass",
     eval_pyobj = function(cmd, ...) {
       args <- list(...)
       nargs <- length(args)
-      args <- R2python(args)
-      # arg_name <- vector("list", length = nargs)
-      # if (nargs > 0) {
-      #   for (i in 1:nargs) {
-      #     arg_name[i] = sprintf('args[[%d]]', i)
-      #   }
-      # }
-      if (nargs == 0) {
-        new_args = c(pyobj, cmd)
-      } else {
-        new_args = c(pyobj, cmd, args)
+      new_args <- list(pyobj, cmd)
+      if (nargs > 0) {
+        for (i in 1:nargs) {
+          new_args[[2 + i]] = R2python(args[[i]])
+        }
       }
       py_res <- do.call('call_python_method', new_args)
       r_res <- python2R(py_res)

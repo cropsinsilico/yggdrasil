@@ -1,4 +1,5 @@
 import os
+import unittest
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import _use_rapidjson
 from yggdrasil.examples.tests import TestExample
@@ -24,3 +25,8 @@ class TestExampleFIO8(TestExample):
     def output_files(self):
         r"""Output file."""
         return [os.path.join(self.yamldir, 'output.txt')]
+
+    @unittest.skipIf(backwards.PY2, "Python 2 causes seg fault inside pytest")
+    def test_R(self):
+        r"""Test R version of the example."""
+        super(TestExampleFIO8, self).test_R()
