@@ -30,6 +30,7 @@ case $1 in
     -r | -R)
 	echo "Running R"
 	yaml='hello_r.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1
