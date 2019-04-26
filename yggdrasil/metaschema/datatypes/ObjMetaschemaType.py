@@ -602,6 +602,29 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
         return ObjDict(out)
 
     @classmethod
+    def coerce_type(cls, obj, typedef=None, **kwargs):
+        r"""Coerce objects of specific types to match the data type.
+
+        Args:
+            obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
+            **kwargs: Additional keyword arguments are metadata entries that may
+                aid in coercing the type.
+
+        Returns:
+            object: Coerced object.
+
+        """
+        if not backwards.PY2:
+            try:
+                obj['material'] = backwards.as_str(obj['material'])
+            except BaseException:
+                pass
+        return super(ObjMetaschemaType, cls).coerce_type(obj, typedef=typedef,
+                                                         **kwargs)
+        
+    @classmethod
     def updated_fixed_properties(cls, obj):
         r"""Get a version of the fixed properties schema that includes information
         from the object.

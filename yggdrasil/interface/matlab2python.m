@@ -1,4 +1,5 @@
 function x_py = matlab2python(x_ml)
+  [version, executable, isloaded] = pyversion;
   if isa(x_ml, 'py.object')
     x_py = x_ml;
   elseif isa(x_ml, 'containers.Map');

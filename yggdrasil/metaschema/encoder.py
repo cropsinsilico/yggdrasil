@@ -38,7 +38,7 @@ class JSONReadableEncoder(stdjson.JSONEncoder):
         from yggdrasil.metaschema.datatypes import get_registered_types
         for cls in get_registered_types().values():
             if (not cls._replaces_existing) and cls.validate(o):
-                new_o = cls.encode_data_readable(o, None)
+                new_o = cls.encode_data_readable(o, cls.encode_type(o))
                 return new_o
         return _json_encoder.default(self, o)
 
@@ -51,7 +51,7 @@ class JSONEncoder(_json_encoder):
         from yggdrasil.metaschema.datatypes import get_registered_types
         for cls in get_registered_types().values():
             if cls.validate(o):
-                new_o = cls.encode_data(o, None)
+                new_o = cls.encode_data(o, cls.encode_type(o))
                 return new_o
         return _json_encoder.default(self, o)
     

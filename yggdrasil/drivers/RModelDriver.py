@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from yggdrasil import serialize, backwards
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 
 
@@ -21,19 +22,19 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     base_languages = ['python']
     default_interpreter = 'Rscript'
     # Dynamically setting the interface library cause circular logic
-    interface_library = 'yggdrasil.interface.YggInterface'
+    interface_library = 'yggdrasil'
     # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
     # stdout
     # default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
+    send_converters = {'table': serialize.consolidate_array}
     function_param = {
-        'interface': ['library(reticulate)',
-                      'library(zeallot)',
-                      'ygg <- import(\"{interface_library}\")'],
-        'input': '{channel} <- ygg$YggInput(\"{channel_name}\")',
-        'output': '{channel} <- ygg$YggOutput(\"{channel_name}\")',
-        'table_input': '{channel} <- ygg$YggAsciiTableInput(\"{channel_name}\")',
-        'table_output': ('{channel} <- ygg$YggAsciiTableOutput('
+        'interface': 'library(yggdrasil)',
+        'input': '{channel} <- YggInterface(\"YggInput\", \"{channel_name}\")',
+        'output': '{channel} <- YggInterface(\"YggOutput\", \"{channel_name}\")',
+        'table_input': ('{channel} <- YggInterface(\"YggAsciiTableInput\", '
+                        '\"{channel_name}\")'),
+        'table_output': ('{channel} <- YggInterface(\"YggAsciiTableOutput\", '
                          '\"{channel_name}\", \"{format_str}\")'),
         'recv': 'c({flag_var}, {recv_var}) %<-% {channel}$recv()',
         'send': '{flag_var} <- {channel}$send({send_var})',
@@ -52,6 +53,24 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'try_except': '}, error = function({error_var}) {',
         'try_end': '})'}
 
+    @classmethod
+    def is_library_installed(cls, lib, **kwargs):
+        r"""Determine if a dependency is installed.
+
+        Args:
+            lib (str): Name of the library that should be checked.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            bool: True if the library is installed, False otherwise.
+
+        """
+        try:
+            cls.run_executable(['-e', '\"library(%s)\"' % lib])
+        except RuntimeError:
+            return False
+        return True
+        
     # @classmethod
     # def language2python(cls, robj):
     #     r"""Prepare an R object for serialization in Python.
@@ -95,4 +114,8 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
             for n in pyobj.columns:
                 if pyobj[n].dtype == np.dtype('int64'):
                     pyobj[n] = pyobj[n].astype('int32')
+                elif ((not backwards.PY2)
+                      and (pyobj[n].dtype == np.dtype('object'))
+                      and isinstance(pyobj[n][0], backwards.bytes_type)):
+                    pyobj[n] = pyobj[n].apply(backwards.as_str)
         return pyobj

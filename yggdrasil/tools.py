@@ -194,6 +194,10 @@ def get_supported_lang():
     out = s['model'].subtypes
     if 'c++' in out:
         out[out.index('c++')] = 'cpp'
+    # if 'R' in out:
+    #     out[out.index('R')] = 'r'
+    if 'r' in out:
+        out[out.index('r')] = 'R'
     return list(set(out))
 
 

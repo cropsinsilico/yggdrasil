@@ -55,6 +55,26 @@ class ScalarMetaschemaType(MetaschemaType):
                                      (str(dtype), str(type_list)))
         return False
         
+    # @classmethod
+    # def coerce_type(cls, obj, typedef=None, **kwargs):
+    #     r"""Coerce objects of specific types to match the data type.
+
+    #     Args:
+    #         obj (object): Object to be coerced.
+    #         typedef (dict, optional): Type defintion that object should be
+    #             coerced to. Defaults to None.
+    #         **kwargs: Additional keyword arguments are metadata entries that may
+    #             aid in coercing the type.
+
+    #     Returns:
+    #         object: Coerced object.
+
+    #     """
+    #     if ((cls.is_fixed and ('subtype' in cls.fixed_properties)
+    #          and (cls.fixed_properties['subtype'] in ['bytes', 'unicode']))):
+    #         obj = cls.normalize(obj)
+    #     return obj
+        
     @classmethod
     def normalize(cls, obj):
         r"""Normalize an object, if possible, to conform to this type.

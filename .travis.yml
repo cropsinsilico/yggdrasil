@@ -10,6 +10,7 @@ addons:
     packages: &native_deps_apt
       - strace
       - valgrind
+      - r-base
       # - ccache
     update: true
   homebrew: &native_deps_brew
@@ -57,6 +58,9 @@ before_install:
     fi
     echo "CONDA = $CONDA"
     echo "PYTHON = $PYTHON"
+
+    # Install R package (should be done by setup.py)
+    source "$TRAVIS_BUILD_DIR/ci/install-r-posix.sh"
 
     # Install from source in virtual env
     if [[ -n "$PYTHON" && $TRAVIS_OS_NAME == 'osx' ]]; then

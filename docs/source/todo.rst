@@ -50,3 +50,4 @@ TODO
 * autodoc for R
 * testing for R
 * installation for R
+* improve speed of validation
