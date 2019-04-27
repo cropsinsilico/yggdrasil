@@ -104,12 +104,16 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
 s = get_schema()
 file_types = list(s['file'].schema_subtypes.keys())
 for k in file_types:
+    attr_dict = {'icomm_name': k}
+    if k == 'PandasFileComm':
+        attr_dict['testing_option_kws'] = {'not_as_frames': True}
     cls_exp = type('Test%sInputDriver' % k,
-                   (TestFileInputDriver, ), {'icomm_name': k})
+                   (TestFileInputDriver, ), attr_dict)
     globals()[cls_exp.__name__] = cls_exp
     if k == 'AsciiTableComm':
+        attr_dict = dict(attr_dict, testing_option_kws={'array_columns': True})
         cls_exp2 = type('Test%sArrayInputDriver' % k,
-                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+                        (cls_exp, ), attr_dict)
         globals()[cls_exp2.__name__] = cls_exp2
         del cls_exp2
     del cls_exp

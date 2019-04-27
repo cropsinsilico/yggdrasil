@@ -131,7 +131,8 @@ for k in file_types:
     globals()[cls_exp.__name__] = cls_exp
     if k == 'AsciiTableComm':
         cls_exp2 = type('Test%sArrayOutputDriver' % k,
-                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+                        (cls_exp, ),
+                        {'testing_option_kws': {'array_columns': True}})
         globals()[cls_exp2.__name__] = cls_exp2
         del cls_exp2
     del cls_exp
