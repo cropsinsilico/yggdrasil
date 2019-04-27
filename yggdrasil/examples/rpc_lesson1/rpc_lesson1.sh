@@ -29,6 +29,11 @@ case $1 in
 	yaml1='server_python.yml'
 	yaml2='client_cpp.yml'
 	;;
+    -r | -R )
+	echo "Running R"
+	yaml1='server_python.yml'
+	yaml2='client_r.yml'
+	;;
 esac
 
 yggrun $yaml1 $yaml2
