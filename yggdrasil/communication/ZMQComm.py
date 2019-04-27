@@ -148,7 +148,8 @@ def parse_address(address):
 
     """
     if '://' not in address:
-        raise ValueError("Address must contain '://'")
+        raise ValueError("Address must contain '://' (address provided = '%s')"
+                         % address)
     protocol, res = address.split('://')
     if protocol not in _socket_protocols:
         raise ValueError("Protocol '%s' not supported." % protocol)
