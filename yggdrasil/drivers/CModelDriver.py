@@ -149,7 +149,7 @@ class CModelDriver(CompiledModelDriver):
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
                 'external_dependencies': ['rapidjson'],
-                'include_dirs': [_top_dir, _incl_io, _incl_comm, _incl_seri],
+                'include_dirs': [_incl_io, _incl_comm, _incl_seri],
                 'compiler_flags': []},
         'regex_win32': {'source': 'regex_win32.cpp',
                         'directory': os.path.join(_top_dir, 'regex'),
@@ -206,8 +206,10 @@ class CModelDriver(CompiledModelDriver):
         cls.internal_libraries['regex'] = regex_lib
         # Platform specific internal library options
         if platform._is_win:  # pragma: windows
-            cls.internal_libraries['datatypes']['include_dirs'] += [_top_dir]
+            for x in ['ygg', 'datatypes']:
+                cls.internal_libraries[x]['include_dirs'] += [_top_dir]
         if platform._is_linux:
+            cls.internal_libraries['ygg']['include_dirs'] += [_top_dir]
             for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
