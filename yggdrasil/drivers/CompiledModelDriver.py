@@ -2062,7 +2062,8 @@ class CompiledModelDriver(ModelDriver):
         for dep in internal_dependencies + external_dependencies:
             dep_lib = cls.get_dependency_library(dep)
             if dep_lib and (dep_lib not in libraries):
-                assert(os.path.isfile(dep_lib))
+                if not kwargs.get('dry_run', False):
+                    assert(os.path.isfile(dep_lib))
                 libraries.append(dep_lib)
         # Update kwargs
         if libraries:
