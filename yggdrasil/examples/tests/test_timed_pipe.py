@@ -57,7 +57,7 @@ for c in tools.get_installed_comm():
         continue
     new_cls = unittest.skipIf(not tools.is_comm_installed(c),
                               "%s library not installed." % c)(
-                                  type('TestExampleTimedPipe%s' % c,
+                                  type('TestExampleTimedPipe_%s' % c,
                                        (ExampleTimedPipeTestBase, ),
                                        {'__new_default_comm': c}))
     globals()[new_cls.__name__] = new_cls

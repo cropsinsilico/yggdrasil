@@ -336,7 +336,9 @@ class YggTestBase(unittest.TestCase):
         if default_comm is None:
             default_comm = self._new_default_comm
         if default_comm is not None:
+            from yggdrasil.communication.DefaultComm import DefaultComm
             os.environ['YGG_DEFAULT_COMM'] = default_comm
+            DefaultComm._reset_alias()
 
     def reset_default_comm(self):
         r"""Reset the default comm to the original value."""
