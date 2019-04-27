@@ -1,0 +1,28 @@
+---
+
+models:
+  - name: timed_pipe_src
+    language: r
+    args:
+      - ./src/timed_pipe_src.R
+      - "{{PIPE_MSG_COUNT}}"
+      - "{{PIPE_MSG_SIZE}}"
+    outputs:
+      - output_pipe
+
+  - name: timed_pipe_dst
+    language: r
+    args: ./src/timed_pipe_dst.R
+    inputs:
+      - input_pipe
+    outputs:
+      - output_file
+
+connections:
+  - input: output_pipe
+    output: input_pipe
+  - input: output_file
+    output_file:
+      name: output_timed_pipe.txt
+      filetype: ascii
+      in_temp: True
