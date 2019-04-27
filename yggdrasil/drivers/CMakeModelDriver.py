@@ -15,8 +15,8 @@ class CMakeConfigure(CompilerBase):
     is_linker = False
     default_flags = []  # '-H']
     flag_options = OrderedDict([('definitions', '-D%s'),
-                                ('sourcedir', '-S'),
-                                ('builddir', '-B')])
+                                ('sourcedir', ''),  # '-S'
+                                ('builddir', '-B%s')])
     output_key = None
     compile_only_flag = None
     default_builddir = '.'
