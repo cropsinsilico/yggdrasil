@@ -1823,6 +1823,8 @@ class CompiledModelDriver(ModelDriver):
         elif dep in cls.external_libraries:
             dep_lang = cls.external_libraries[dep].get('language', cls.language)
             out = ygg_cfg.get(dep_lang, '%s_include' % dep, None)
+            if os.path.isfile(out):
+                out = os.path.dirname(out)
         elif os.path.isfile(dep):
             out = os.path.dirname(dep)
         if out is None:
