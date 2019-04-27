@@ -48,7 +48,7 @@ class TestFileOutputDriverNoStart(TestFileOutputParam,
     def inst_kwargs(self):
         r"""dict: Keyword arguments for creating a class instance."""
         out = super(TestFileOutputDriverNoStart, self).inst_kwargs
-        out['in_temp'] = 'True'
+        out['in_temp'] = True  # 'True'
         return out
 
 

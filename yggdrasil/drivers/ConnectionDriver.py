@@ -83,6 +83,7 @@ class ConnectionDriver(Driver):
                                     'connection should send messages to.')},
         'translator': {'type': 'array', 'items': {'type': 'function'}},
         'onexit': {'type': 'string'}}
+    _schema_excluded_from_class_validation = ['inputs', 'outputs']
 
     @property
     def _is_input(self):

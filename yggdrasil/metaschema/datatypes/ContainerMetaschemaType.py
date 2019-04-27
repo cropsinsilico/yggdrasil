@@ -96,7 +96,7 @@ class ContainerMetaschemaType(MetaschemaType):
         container = cls._container_type()
         for k, v in cls._iterate(obj):
             vtypedef = None
-            if cls._json_property in typedef:
+            if isinstance(typedef, dict) and (cls._json_property in typedef):
                 vtypedef = cls._get_element(typedef[cls._json_property], k, None)
             vbytes = encode_data(v, typedef=vtypedef)
             cls._assign(container, k, vbytes)
@@ -117,10 +117,9 @@ class ContainerMetaschemaType(MetaschemaType):
         """
         container = cls._container_type()
         for k, v in cls._iterate(obj):
-            if cls._json_property in typedef:
+            vtypedef = None
+            if isinstance(typedef, dict) and (cls._json_property in typedef):
                 vtypedef = cls._get_element(typedef[cls._json_property], k, None)
-            else:
-                vtypedef = None
             vbytes = encode_data_readable(v, typedef=vtypedef)
             cls._assign(container, k, vbytes)
         return container

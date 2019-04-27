@@ -345,6 +345,10 @@ class ComponentBase(object):
     r"""Base class for schema components.
 
     Args:
+        skip_component_schema_normalization (bool, optional): If True, the
+            schema will not be used to normalize/validate input keyword
+            arguments (e.g. in case they were already parsed). Defaults to
+            False.
         **kwargs: Keyword arguments are added to the class as attributes
             according to the class attributes _schema_properties and
             _schema_excluded_from_class. Keyword arguments not added to the
@@ -390,11 +394,15 @@ class ComponentBase(object):
     _schema_properties = {}
     _schema_excluded_from_class = []
     _schema_excluded_from_inherit = []
+    _schema_excluded_from_class_validation = []
     _schema_inherit = True
     _dont_register = False
     
-    def __init__(self, **kwargs):
+    def __init__(self, skip_component_schema_normalization=False, **kwargs):
         comptype = self._schema_type
+        if (comptype is None) and (not self._schema_properties):
+            self.extra_kwargs = kwargs
+            return
         subtype = None
         if self._schema_subtype_key is not None:
             subtype = getattr(self, self._schema_subtype_key,
@@ -415,25 +423,33 @@ class ComponentBase(object):
         # Parse keyword arguments using schema
         if (comptype is not None) and (subtype is not None):
             from yggdrasil.schema import get_schema
-            from yggdrasil import metaschema
             s = get_schema().get_component_schema(comptype, subtype, relaxed=True)
-            props = s['properties']
-            kwargs.setdefault(self._schema_subtype_key, subtype)
-            # Validate and normalize
-            metaschema.validate_instance(kwargs, s, normalize=False)
-            # TODO: Normalization performance needs improvement
-            # import pprint
-            # print('before')
-            # pprint.pprint(kwargs_comp)
-            # kwargs_comp = metaschema.validate_instance(kwargs_comp, s,
-            #                                            normalize=True)
-            # kwargs.update(kwargs_comp)
-            # print('normalized')
-            # pprint.pprint(kwargs_comp)
+            props = list(s['properties'].keys())
+            if not skip_component_schema_normalization:
+                from yggdrasil import metaschema
+                kwargs.setdefault(self._schema_subtype_key, subtype)
+                # Remove properties that shouldn't ve validated in class
+                for k in self._schema_excluded_from_class_validation:
+                    if k in s['properties']:
+                        if 'type' in s['properties'][k]:
+                            s['properties'][k] = {'type': s['properties'][k]['type']}
+                        else:
+                            del s['properties'][k]
+                # Validate and normalize
+                metaschema.validate_instance(kwargs, s, normalize=False)
+                # TODO: Normalization performance needs improvement
+                # import pprint
+                # print('before')
+                # pprint.pprint(kwargs_comp)
+                # kwargs_comp = metaschema.validate_instance(kwargs_comp, s,
+                #                                            normalize=True)
+                # kwargs.update(kwargs_comp)
+                # print('normalized')
+                # pprint.pprint(kwargs_comp)
         else:
-            props = self._schema_properties
+            props = self._schema_properties.keys()
         # Set attributes based on properties
-        for k in props.keys():
+        for k in props:
             if k in self._schema_excluded_from_class:
                 continue
             v = kwargs.pop(k, None)

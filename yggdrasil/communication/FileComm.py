@@ -72,10 +72,13 @@ class FileComm(CommBase.CommBase):
         'in_temp': {'type': 'boolean', 'default': False},
         'is_series': {'type': 'boolean', 'default': False},
         'wait_for_creation': {'type': 'float', 'default': 0.0},
-        'serializer': {'$ref': '#/definitions/serializer',
+        'serializer': {'oneOf': [{'$ref': '#/definitions/serializer'},
+                                 {'type': 'instance',
+                                  'class': SerializeBase}],
                        'default': {'seritype': 'direct'}}}
     _schema_excluded_from_inherit = ['commtype', 'datatype', 'read_meth',
                                      'serializer']
+    _schema_excluded_from_class_validation = ['serializer']
     _default_serializer = 'direct'
     _default_extension = '.txt'
     is_file = True
@@ -84,9 +87,6 @@ class FileComm(CommBase.CommBase):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
         kwargs['partner_language'] = None  # Files don't have partner comms
-        if isinstance(kwargs.get('serializer', None), SerializeBase):
-            self.serializer = kwargs.pop('serializer')
-            kwargs['serializer'] = {'seritype': 'direct'}
         return super(FileComm, self).__init__(*args, **kwargs)
 
     def _init_before_open(self, **kwargs):

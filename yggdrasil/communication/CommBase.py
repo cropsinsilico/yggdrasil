@@ -333,6 +333,7 @@ class CommBase(tools.YggClass):
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
+    _schema_excluded_from_class_validation = ['datatype']
     is_file = False
     _maxMsgSize = 0
 

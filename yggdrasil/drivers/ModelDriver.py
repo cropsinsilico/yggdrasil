@@ -151,6 +151,7 @@ class ModelDriver(Driver):
                            'items': {'type': 'string'}}}
     _schema_excluded_from_class = ['name', 'language', 'args',
                                    'inputs', 'outputs', 'working_dir']
+    _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
     language = None
     language_ext = None

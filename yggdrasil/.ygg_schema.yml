@@ -441,12 +441,15 @@ definitions:
             None.
           type: function
         serializer:
-          $ref: '#/definitions/serializer'
           default:
             seritype: direct
           description: Class with serialize and deserialize methods that should be
             used to process sent and received messages. Defaults to None and is constructed
             using provided 'serializer_kwargs'.
+          oneOf:
+          - $ref: '#/definitions/serializer'
+          - class: yggdrasil.serialize.SerializeBase:SerializeBase
+            type: instance
         sort_keys:
           default: true
           description: If True, the serialization of dictionaries will be in key sorted
@@ -492,12 +495,15 @@ definitions:
             - readline
             type: string
           serializer:
-            $ref: '#/definitions/serializer'
             default:
               seritype: direct
             description: Class with serialize and deserialize methods that should
               be used to process sent and received messages. Defaults to None and
               is constructed using provided 'serializer_kwargs'.
+            oneOf:
+            - $ref: '#/definitions/serializer'
+            - class: yggdrasil.serialize.SerializeBase:SerializeBase
+              type: instance
         required:
         - serializer
         title: FileComm
@@ -1764,14 +1770,14 @@ definitions:
     title: serializer
 description: Schema for yggdrasil YAML input files.
 properties:
+  connections:
+    items:
+      $ref: '#/definitions/connection'
+    type: array
   models:
     items:
       $ref: '#/definitions/model'
     minItems: 1
-    type: array
-  connections:
-    items:
-      $ref: '#/definitions/connection'
     type: array
 required:
 - models
