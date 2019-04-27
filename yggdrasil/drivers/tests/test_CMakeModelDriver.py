@@ -29,6 +29,7 @@ def test_create_include():
                 ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target]),
                 ([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                 ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
+    CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
         out = CMakeModelDriver.create_include(None, target, compile_flags=c,
                                               linker_flags=l)
