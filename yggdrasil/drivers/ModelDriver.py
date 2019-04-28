@@ -597,7 +597,7 @@ class ModelDriver(Driver):
         for x in cls.base_languages:
             x_drv = import_component('model', x)
             if not x_drv.is_configured():
-                x_drv.configure()
+                x_drv.configure(cfg)
         # Section and executable
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)
