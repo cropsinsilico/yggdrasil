@@ -329,6 +329,7 @@ class ComponentMeta(type):
                         _registry_class2subtype[yaml_typ][subt] = cls.__name__
                 else:
                     _registry_class2subtype[yaml_typ][subtype] = cls.__name__
+            cls.after_registration(cls)
         return cls
 
     # def __getattribute__(cls, key):
@@ -467,4 +468,10 @@ class ComponentBase(object):
     def before_registration(cls):
         r"""Operations that should be performed to modify class attributes prior
         to registration."""
+        pass
+
+    @staticmethod
+    def after_registration(cls):
+        r"""Operations that should be preformed to modify class attributes after
+        registration."""
         pass

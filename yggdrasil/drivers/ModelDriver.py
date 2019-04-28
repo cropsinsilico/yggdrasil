@@ -219,6 +219,11 @@ class ModelDriver(Driver):
         if (((cls.language_ext is not None)
              and (not isinstance(cls.language_ext, (list, tuple))))):
             cls.language_ext = [cls.language_ext]
+            
+    @staticmethod
+    def after_registration(cls):
+        r"""Operations that should be preformed to modify class attributes after
+        registration."""
         if (not cls.is_configured()):
             cls.configure(ygg_cfg)
         
