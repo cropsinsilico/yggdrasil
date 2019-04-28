@@ -4,7 +4,8 @@ import sys
 import copy
 import logging
 import traceback
-from yggdrasil import runner, schema, config, timing, yamlfile
+from yggdrasil import runner, schema, config, timing, yamlfile, tools
+from yggdrasil.components import import_component
 from yggdrasil.drivers import CModelDriver, CPPModelDriver
 
 
@@ -94,7 +95,8 @@ def validate_yaml():
 
 def update_config():
     r"""Update the user config file for yggdrasil."""
-    config.update_config(config.usr_config_file, config.def_config_file)
+    drv = [import_component('model', l) for l in tools.get_supported_lang()]
+    config.update_language_config(drv)
 
 
 def yggtime_comm():

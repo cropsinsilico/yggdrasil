@@ -7,7 +7,7 @@ import subprocess
 import shutil
 from pprint import pformat
 from yggdrasil import platform, tools, backwards
-from yggdrasil.config import ygg_cfg, locate_file
+from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from threading import Event
@@ -225,7 +225,7 @@ class ModelDriver(Driver):
         r"""Operations that should be preformed to modify class attributes after
         registration."""
         if (not cls.is_configured()):
-            cls.configure(ygg_cfg)
+            update_language_config(cls)
         
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
@@ -592,6 +592,12 @@ class ModelDriver(Driver):
                 be set.
 
         """
+        # Base languages
+        # TODO: Verify that this dosn't cause issues
+        for x in cls.base_languages:
+            x_drv = import_component('model', x)
+            if not x_drv.is_configured():
+                x_drv.configure()
         # Section and executable
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)

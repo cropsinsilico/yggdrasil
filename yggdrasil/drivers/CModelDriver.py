@@ -228,7 +228,9 @@ class CModelDriver(CompiledModelDriver):
                 be set.
 
         """
-        out = super(CModelDriver, cls).configure(cfg)
+        # Call __func__ to avoid direct invoking of class which dosn't exist
+        # in after_registration where this is called
+        out = CompiledModelDriver.configure.__func__(cls, cfg)
         # Change configuration to be directory containing include files
         rjlib = cfg.get(cls._language, 'rapidjson_include', None)
         if (rjlib is not None) and os.path.isfile(rjlib):

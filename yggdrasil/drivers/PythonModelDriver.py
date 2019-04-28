@@ -79,7 +79,9 @@ class PythonModelDriver(InterpretedModelDriver):
             bool: True if a comm is installed for this language.
 
         """
-        out = super(PythonModelDriver, cls).is_comm_installed(**kwargs)
+        # Call __func__ to avoid direct invoking of class which dosn't exist
+        # in after_registration where this is called
+        out = InterpretedModelDriver.is_comm_installed.__func__(cls, **kwargs)
         if not kwargs.get('skip_config'):
             return out
         if out and (kwargs.get('commtype', None) in ['rmq', 'rmq_async']):

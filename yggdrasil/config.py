@@ -12,16 +12,84 @@ import logging
 import warnings
 import subprocess
 from yggdrasil.backwards import configparser
-from yggdrasil import platform, tools
-from yggdrasil.components import import_component
+from yggdrasil import platform
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
 usr_config_file = os.path.expanduser(os.path.join('~', config_file))
 loc_config_file = os.path.join(os.getcwd(), config_file)
+if not os.path.isfile(usr_config_file):
+    shutil.copy(def_config_file, usr_config_file)
 
 
-class YggConfigParser(configparser.ConfigParser):
+class YggConfigParser(configparser.ConfigParser, object):
     r"""Config parser that returns None if option not provided on get."""
+
+    def __init__(self, files=None):
+        self.files = files
+        super(YggConfigParser, self).__init__()
+
+    def reload(self):
+        r"""Reload parameters from the original files."""
+        # TODO: Clear first?
+        if self.files is not None:
+            self.read(self.files)
+
+    @property
+    def file_to_update(self):
+        r"""str: Full path to file that should be updated if update_file is
+        called without an explicit file path."""
+        if self.files is None:
+            out = None
+        else:
+            out = self.files[-1]
+        return out
+
+    def update_file(self, fname=None):
+        r"""Write out updated contents to a file.
+
+        Args:
+            fname (str, optional): Full path to file where contents should be
+               saved. If None, file_to_update is used. Defaults to None.
+
+        Raises:
+            RuntimeError: If fname is None and file_to_update is None.
+
+        """
+        if fname is None:
+            fname = self.file_to_update
+        if fname is None:  # pragma: debug
+            raise RuntimeError("No file provided or set at creation.")
+        with open(fname, 'w') as fd:
+            self.write(fd)
+
+    def read(self, *args, **kwargs):
+        out = super(YggConfigParser, self).read(*args, **kwargs)
+        alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
+                     (('debug', 'cis'), ('debug', 'ygg'))]
+        for old, new in alias_map:
+            v = self.get(*old)
+            if v:  # pragma: debug
+                self.set(new[0], new[1], v)
+        return out
+
+    @classmethod
+    def from_files(cls, files, **kwargs):
+        r"""Construct a config parser from a set of files.
+
+        Args:
+            files (list): One or more files that options should be read from in
+                the order they should be loaded.
+            **kwargs: Additional keyword arguments are passed to the class
+                constructor.
+
+        Returns:
+           YggConfigParser: Config parser with information loaded from the
+               provided files.
+
+        """
+        out = cls(files=files, **kwargs)
+        out.reload()
+        return out
 
     def get(self, section, option, default=None, **kwargs):
         r"""Return None if the section/option does not exist.
@@ -51,24 +119,37 @@ class YggConfigParser(configparser.ConfigParser):
                 return out
         else:
             return default
-        
-
-def load_config_files(cfg):
-    r"""Load the config files and set the module level object."""
-    files = [def_config_file, usr_config_file, loc_config_file]
-    cfg.read(files)
-    # Aliases for old versions of config options
-    alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
-                 (('debug', 'cis'), ('debug', 'ygg'))]
-    for old, new in alias_map:
-        v = cfg.get(*old)
-        if v:  # pragma: debug
-            cfg.set(new[0], new[1], v)
 
 
 # Initialize config
-ygg_cfg = YggConfigParser()
-load_config_files(ygg_cfg)
+ygg_cfg_usr = YggConfigParser.from_files([usr_config_file])
+ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
+                                      loc_config_file])
+
+
+def update_language_config(drv, skip_warnings=False):
+    r"""Update configuration options for a language driver.
+
+    Args:
+        drv (list, class): One or more language drivers that should be
+            configured.
+        skip_warnings (bool, optional): If True, warnings about missing options
+            will not be raised. Defaults to False.
+
+    """
+    miss = []
+    if not isinstance(drv, list):
+        drv = [drv]
+    for idrv in drv:
+        miss += idrv.configure(ygg_cfg_usr)
+    ygg_cfg_usr.update_file()
+    ygg_cfg.reload()
+    if not skip_warnings:
+        for sect, opt, desc in miss:  # pragma: windows
+            warnings.warn(("Could not set option %s in section %s. "
+                           + "Please set this in %s to: %s")
+                          % (opt, sect, ygg_cfg_usr.file_to_update, desc),
+                          RuntimeWarning)
     
 
 def find_all(name, path):
@@ -160,58 +241,6 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
                        + "Using first match (%s)") %
                       (len(out), fname, first), RuntimeWarning)
     return first
-
-
-def update_config(config_file, config_base=None, skip_warnings=False):
-    r"""Update config options for the current platform.
-
-    Args:
-        config_file (str): Full path to the config file that should be created
-            and/or updated.
-        config_base (str, optional): Full path to existing config file that should
-            be used as a base for building the new one if it dosn't already exist.
-            Defaults to 'defaults.cfg' if not provided.
-        skip_warnings (bool, optional): If True, warnings about missing options
-            will not be raised. Defaults to False.
-
-    """
-    if config_base is None:
-        config_base = def_config_file
-    assert(os.path.isfile(config_base))
-    created = False
-    if not os.path.isfile(config_file):
-        created = True
-        shutil.copy(config_base, config_file)
-    try:
-        cp = YggConfigParser()
-        cp.read(config_file)
-        miss = []
-        # if platform._is_win:  # pragma: windows
-        #     miss += update_config_windows(cp)
-        for l in tools.get_supported_lang():
-            drv = import_component('model', l)
-            miss += drv.configure(cp)
-        # miss += update_config_c(cp)
-        # miss += update_config_matlab(cp)
-        with open(config_file, 'w') as fd:
-            cp.write(fd)
-        if not skip_warnings:
-            for sect, opt, desc in miss:  # pragma: windows
-                warnings.warn(("Could not set option %s in section %s. "
-                               + "Please set this in %s to: %s")
-                              % (opt, sect, config_file, desc), RuntimeWarning)
-    except BaseException:  # pragma: debug
-        if created:
-            os.remove(config_file)
-            
-
-# In order read: defaults, user, local files
-if not os.path.isfile(usr_config_file):
-    logging.info('Creating user config file: "%s".' % usr_config_file)
-    update_config(usr_config_file)
-    load_config_files(ygg_cfg)
-assert(os.path.isfile(usr_config_file))
-assert(os.path.isfile(def_config_file))
 
 
 # Set associated environment variables

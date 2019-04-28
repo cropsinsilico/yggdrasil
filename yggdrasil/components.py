@@ -265,6 +265,7 @@ def inherit_schema(orig, new_properties=None, new_required=None,
 
 class ComponentMeta(type):
     r"""Meta class for registering schema components."""
+    
     def __new__(meta, name, bases, class_dict):
         cls = type.__new__(meta, name, bases, class_dict)
         # Return early for error classes which should be unregistered duplicates
@@ -331,7 +332,7 @@ class ComponentMeta(type):
                     _registry_class2subtype[yaml_typ][subtype] = cls.__name__
             cls.after_registration(cls)
         return cls
-
+    
     # def __getattribute__(cls, key):
     #     r"""If the class is an alias for another class and has been initialized,
     #     call getattr on the aliased class."""

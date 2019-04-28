@@ -182,7 +182,7 @@ def decode_json(msg, **kwargs):
     return func_decode(msg_decode, **kwargs)
 
 
-def encode_yaml(obj, fd=None, indent=None, sort_keys=True,
+def encode_yaml(obj, fd=None, indent=None,
                 sorted_dict_type=None, **kwargs):
     r"""Encode a Python object in YAML format.
 
@@ -192,8 +192,6 @@ def encode_yaml(obj, fd=None, indent=None, sort_keys=True,
             should be written to. Defaults to None and string is returned.
         indent (int, str, optional): Indentation for new lines in encoded
             string. Defaults to None.
-        sort_keys (bool, optional): If True, the keys will be output in sorted
-            order. Defaults to True.
         **kwargs: Additional keyword arguments are passed to yaml.dump.
 
     Returns:
@@ -205,7 +203,6 @@ def encode_yaml(obj, fd=None, indent=None, sort_keys=True,
         indent = '\t'
     indent = indent_char2int(indent)
     kwargs['indent'] = indent
-    kwargs['sort_keys'] = sort_keys
     if fd is not None:
         assert('stream' not in kwargs)
         kwargs['stream'] = fd
