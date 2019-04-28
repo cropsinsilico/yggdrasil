@@ -219,6 +219,8 @@ class ModelDriver(Driver):
         if (((cls.language_ext is not None)
              and (not isinstance(cls.language_ext, (list, tuple))))):
             cls.language_ext = [cls.language_ext]
+        if (not cls.is_configured()):
+            cls.configure(ygg_cfg)
         
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
