@@ -2255,6 +2255,7 @@ class CompiledModelDriver(ModelDriver):
     def compile_dependencies(cls, **kwargs):
         r"""Compile any required internal libraries, including the interface."""
         base_libraries = []
+        print(cls.language, 'base_classes', cls.base_languages)
         for x in cls.base_languages:
             base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
@@ -2263,6 +2264,7 @@ class CompiledModelDriver(ModelDriver):
              and (cls.interface_library not in base_libraries))):
             # cls.call_compiler(cls.interface_library)
             dep_order = cls.get_dependency_order(cls.interface_library)
+            print(cls.language, 'compile_dependencies', dep_order)
             for k in dep_order[::-1]:
                 cls.call_compiler(k, **kwargs)
 

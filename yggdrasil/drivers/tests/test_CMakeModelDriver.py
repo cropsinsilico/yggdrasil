@@ -29,6 +29,9 @@ def test_create_include():
                 ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target]),
                 ([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                 ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
+    from yggdrasil.drivers.CModelDriver import CModelDriver
+    CModelDriver.compile_dependencies()
+    print('calling cmake compile')
     CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
         out = CMakeModelDriver.create_include(None, target, compile_flags=c,
