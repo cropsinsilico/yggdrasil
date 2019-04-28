@@ -2011,7 +2011,7 @@ class CompiledModelDriver(ModelDriver):
     @classmethod
     def update_linker_kwargs(cls, for_api=False, for_model=False, commtype=None,
                              libtype='object', skip_interface_flags=False,
-                             **kwargs):
+                             use_library_path_internal=False, **kwargs):
         r"""Update keyword arguments supplied to the linker/archiver get_flags
         method for various options.
 
@@ -2039,6 +2039,8 @@ class CompiledModelDriver(ModelDriver):
             external_dependencies (list, optional): If provided, a list of names
                 of external libraries that are required or linkable object files
                 for dependencies. Defaults to an empty list.
+            use_library_path_internal (bool, optional): If True, internal
+                dependencies are included as full paths. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the linker
                 (or archiver if static is True) 'get_flags' method.
 
@@ -2066,7 +2068,11 @@ class CompiledModelDriver(ModelDriver):
             if dep_lib and (dep_lib not in libraries):
                 if not kwargs.get('dry_run', False):
                     assert(os.path.isfile(dep_lib))
-                libraries.append(dep_lib)
+                if use_library_path_internal and (dep in internal_dependencies):
+                    kwargs.setdefault('flags', [])
+                    kwargs['flags'].append(dep_lib)
+                else:
+                    libraries.append(dep_lib)
         # Update kwargs
         if libraries:
             kwargs['libraries'] = libraries

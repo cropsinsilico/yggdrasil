@@ -385,11 +385,11 @@ class CMakeModelDriver(CompiledModelDriver):
         if linker_flags is None:
             linker_flags = []
         compile_flags = CModelDriver.CModelDriver.get_compiler_flags(
-            flags=compile_flags, use_library_path=True, dont_link=True,
+            flags=compile_flags, use_library_path=platform._is_win, dont_link=True,
             for_model=True, skip_defaults=True, logging_level=logging_level)
         linker_flags = CModelDriver.CModelDriver.get_linker_flags(
-            flags=linker_flags, use_library_path=True, for_model=True,
-            skip_defaults=True)
+            flags=linker_flags, use_library_path=platform._is_win, for_model=True,
+            skip_defaults=True, use_library_path_internal=True)
         lines = []
         var_count = 0
         for x in compile_flags:
