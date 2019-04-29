@@ -81,3 +81,19 @@ C++ API
   float c = 2;
   int flag = input.recv(&a);
   flag = output.send(b, c);
+
+R API
+-----
+
+::
+   library(yggdrasil)
+
+   input <- YggInterface('YggInput', 'input_name')
+   output <- YggInterface('YggOutput', 'output_name', '%f\t%f\n')
+
+   c(flag, data) %<-% input$recv()
+   flag <- output$send(1.0, 2.0)
+
+.. note::
+   The R API is only available on the development branch 'topic/R' at the
+   moment, but will be part of the release in the coming month.
