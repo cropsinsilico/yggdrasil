@@ -226,6 +226,8 @@ class MakeModelDriver(CompiledModelDriver):
                 for_model=True, skip_defaults=True)
             out['YGGCCFLAGS'] = ' '.join(compile_flags)
             out['YGGLDFLAGS'] = ' '.join(linker_flags)
+        else:
+            out = CModelDriver.update_ld_library_path(out)
         return out
         
     def remove_products(self):

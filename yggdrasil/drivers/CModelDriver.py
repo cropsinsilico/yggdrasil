@@ -250,3 +250,39 @@ class CModelDriver(CompiledModelDriver):
                 base = os.path.splitext(x)[0]
                 self.products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
         return out
+
+    @classmethod
+    def update_ld_library_path(cls, env):
+        r"""Update provided dictionary of environment variables so that
+        LD_LIBRARY_PATH includes the interface directory containing the interface
+        libraries.
+
+        Args:
+            env (dict): Dictionary of enviroment variables to be updated.
+
+        Returns:
+            dict: Updated dictionary of environment variables.
+
+        """
+        if platform._is_linux:
+            path_list = []
+            prev_path = env.pop('LD_LIBRARY_PATH', '')
+            if prev_path:
+                prev_path.append(prev_path)
+            for x in [_incl_interface]:
+                if x not in prev_path:
+                    path_list.append(x)
+            if path_list:
+                env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
+        return env
+
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CModelDriver, self).set_env()
+        out = self.update_ld_library_path(out)
+        return out

@@ -513,6 +513,17 @@ class CMakeModelDriver(CompiledModelDriver):
                 kwargs.setdefault(k, v)
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CMakeModelDriver, self).set_env()
+        out = CModelDriver.CModelDriver.update_ld_library_path(out)
+        return out
+    
     def remove_products(self):
         r"""Delete products produced during the compilation process."""
         if (self.model_file is not None) and os.path.isfile(self.model_file):
