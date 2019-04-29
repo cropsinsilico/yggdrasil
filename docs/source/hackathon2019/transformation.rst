@@ -19,7 +19,7 @@ the file.::
 
   $ cp growth.py growth_mlang.py
 
-Then move back up into the ``ygg_home`` direcotry.
+Then move back up into the ``ygg_home`` direcotry.::
 
   $ cd ../
 
@@ -30,7 +30,7 @@ Adding API Calls
 The first step in transforming this model is to replace the calls 
 reading/writing input/output from/to files with API calls that will 
 instead receive/send input/output from/to the |yggdrasil| framework. 
-There is a |yggdrasil| API in C, C++, Python and Matlab. 
+There is a |yggdrasil| API in C, C++, Python and Matlab (R is under development). 
 
 
 Importing the API
