@@ -225,7 +225,9 @@ class ModelDriver(Driver):
         r"""Operations that should be preformed to modify class attributes after
         registration."""
         if (not cls.is_configured()):
+            print(cls.language, 'configuring')
             update_language_config(cls)
+            print(cls.language, 'is_configured', cls.is_configured())
         
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
