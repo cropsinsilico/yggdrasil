@@ -2,7 +2,7 @@
 Model Transformation
 ####################
 
-For the first part of this example we will be transforming a 
+For the next part of this example we will be transforming a 
 toy growth model written in Python. Within the ``hackathon2019`` 
 repository directory this model is ``growth.py``. The model takes 
 command line arguments defining the path to an input file and 
@@ -136,21 +136,12 @@ ensure that you do not continue looping in the event that the output channel
 was closed due to an error.
 
 
-Registering Model
-=================
+Adding a Model to the UI
+========================
 
-Next we will use the user-interface to register the model and connect it to 
-some files to replicate the original behavior of the model. First, go to 
-the user interface located `here <https://hackathon.cis.ndslabs.org/>`_. 
-
-.. image:: interface_images/interface_empty.png
-
-To register a new model, you will need to log in using your GitHub credentials 
-in the upper left hand corner.
-
-.. image:: interface_images/interface_login.png
-
-Once you are logged in, a new menu item will appear for adding a new model.
+To add your growth model to the model palatte first clear your canvas by
+clicking on the ``Clear`` button and then clicked the ``Create a New Model``
+link in the top left of the ``Model Composer`` tab.
 
 .. image:: interface_images/interface_create_model.png
 
@@ -163,10 +154,10 @@ You can give your model any name, but make sure that you select ``Python`` as
 the model language, use the name of your transformed model with the ``hackathon2019``
 directory included (e.g. ``hackathon2019/growth_mlang.py``), 
 and the correct names of your input and output channels. For the example we have an 
-input channel called ``photosynthesis_rate`` and an output channel called ``growth_rate``. 
-For the input and output channels to be added, you will need to click on the blue ``+`` 
-buttons after filling in the name. You can enter as many channels as your model requires, 
-but for now our model only requires one of each.
+input channel called ``photosynthesis_rate`` and an output channel called
+``growth_rate``. For the input and output channels to be added, you will need to click
+on the blue ``+`` buttons after filling in the name. You can enter as many channels
+as your model requires, but for now our model only requires one of each.
 
 Once you have finished entering information for your model, you can save your model by 
 clicking submit. Now, if you click on the magnifying glass, 
@@ -218,7 +209,10 @@ For this example
 you should select the ``file`` type, a file name of 
 ``hackathon2019/Input/photosynthesis_rate.txt`` 
 and a read method of ``table``. This tells the input port that it should read values 
-from a tab-delimited table line-by-line from the indicated file.
+from a tab-delimited table line-by-line from the indicated file. Once you click
+``Submit``, you may need to move the input port into a better location.
+
+.. image:: interface_images/interface_no_connections_input.png
 
 
 Output File
@@ -271,7 +265,7 @@ Creating the YAML
 -----------------
 
 Once you are finished creating your input and output connections, you can 
-use the interface to create your YAML file. If you click the ``Generate Manifest`` 
+use the interface to create your YAML file. If you click the ``Manifest`` 
 button, 
 
 .. image:: interface_images/interface_generate.png

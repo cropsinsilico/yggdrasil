@@ -3,55 +3,15 @@ Connecting Models to Models
 ###########################
 
 
-Next we will connect your growth model to an existing network of models. From 
+Next we will connect your growth model to the existing network of models by 
+replacing the existing growth model. From 
 the user interface, load the ``hackathon2019`` integration network. 
 
 .. image:: interface_images/interface_load.png
 
-You will see a network of 4 models connected to 6 input files.
+You will see the network of 4 models connected to 6 input files from before.
 
 .. image:: interface_images/network_original.png
-
-By right clicking on each model, you can get information about the model's 
-inputs and outputs.
-
-
-Model Overview
-==============
-
-The canopy model takes as input an initial canopy structure, a growth rate, 
-a plant layout describing how the plant grows in x, y, and z, and a time step. 
-From this information it grows the canopy structure and outputs the updated 
-structure. The canopy model is written in C++.
-
-.. image:: interface_images/network_canopy.png
-
-The light model takes as input an ambient light level and the 3D structure of 
-the canopy. It then calculates the light incident on each facet of the canopy 
-structure which it outputs.
-
-.. image:: interface_images/network_light.png
-
-The photosynthesis model takes as input a light intensity, temperature, and 
-CO2. From this information, it calculates and output the photosynthesis rate. 
-
-.. image:: interface_images/network_photosynthesis.png
-
-The growth model in this network is an alternative to the growth model we 
-were working with in the previous section. It takes photosynthesis rate as 
-an input and outputs the growth rate. We will be replacing this growth model 
-with the one you created.
-
-.. image:: interface_images/network_growth.png
-
-You can trace the data as it flows from files and from one model to the next.
-
-
-Replacing the Growth Model
-==========================
-
-For the next exercise, we will replace the existing growth model, with the 
-one you just created.
 
 
 Deleting the Old Model
