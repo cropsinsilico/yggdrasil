@@ -77,15 +77,15 @@ def test_find_all():
     assert_equal(mout, mans)
 
 
-def test_update_config():
-    r"""Test update_config."""
-    test_cfg = os.path.join(tempfile.gettempdir(), 'test.cfg')
-    assert(not os.path.isfile(test_cfg))
-    if not tools.is_lang_installed('matlab'):  # pragma: no matlab
-        assert_warns(RuntimeWarning, config.update_config, test_cfg)
-    config.update_config(test_cfg)
-    assert(os.path.isfile(test_cfg))
-    os.remove(test_cfg)
+# def test_update_config():
+#     r"""Test update_config."""
+#     test_cfg = os.path.join(tempfile.gettempdir(), 'test.cfg')
+#     assert(not os.path.isfile(test_cfg))
+#     if not tools.is_lang_installed('matlab'):  # pragma: no matlab
+#         assert_warns(RuntimeWarning, config.update_config, test_cfg)
+#     config.update_config(test_cfg)
+#     assert(os.path.isfile(test_cfg))
+#     os.remove(test_cfg)
 
 
 def test_cfg_logging():
