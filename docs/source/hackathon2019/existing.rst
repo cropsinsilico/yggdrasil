@@ -1,6 +1,9 @@
 
-User Interface Introduction
-===========================
+Introduction to the User Interface
+##################################
+
+Starting the Jupyter Hub
+========================
 
 During the hackathon we will be using the user interface (UI) located
 `here <https://cropsinsilico.ndslabs.org>`_.
@@ -18,10 +21,11 @@ and then start a server.
 
 This may take a moment.
    
-.. image:: interface_images/interface_server_creation.png	   
+.. image:: interface_images/interface_server_creation.png
+	   
 
 Orientation
------------
+===========
 
 Once the server is started, you will see a Jupyter hub interface that includes
 a ``Model Composer`` tab. Within the ``Model Composer`` tab you have a canvas (the black
@@ -40,7 +44,7 @@ the models are loaded into the workspace).
 
 
 Loading & Running an Existing Integration
------------------------------------------
+=========================================
 
 First we will load and execute an existing integration graph that is pre-loaded into
 the Jupyter hub. From the ``Load`` drop down menu, select the ``Fakeplant`` option to
@@ -96,5 +100,10 @@ running, a window display the output log will pop up.
 
 .. image:: interface_images/network_original_log.png
 
-Next we will integrate a new growth model and add it to this integration network as a
-replacement for the existing growth model. 
+The output log will include log messages from |yggdrasil| about the model execution 
+intermingled with output from the models themselves. Because the model run in parallel
+and communication output at different rates, the model output may or may not be
+sequential.
+
+In the next we will integrate a new growth model and add it to this integration
+network as a replacement for the existing growth model. 

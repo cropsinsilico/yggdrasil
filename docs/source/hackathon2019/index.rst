@@ -8,5 +8,6 @@ Welcome to the 2019 Crops in Silico Hackathon!
    
    setup
    intro
+   existing
    transformation
    connection

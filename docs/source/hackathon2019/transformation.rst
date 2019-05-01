@@ -210,7 +210,7 @@ you should select the ``file`` type, a file name of
 ``hackathon2019/Input/photosynthesis_rate.txt`` 
 and a read method of ``table``. This tells the input port that it should read values 
 from a tab-delimited table line-by-line from the indicated file. Once you click
-``Submit``, you may need to move the input port into a better location.
+``Save``, you may need to move the input port into a better location.
 
 .. image:: interface_images/interface_no_connections_input.png
 

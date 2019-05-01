@@ -1,6 +1,6 @@
 
-Introduction
-############
+Introduction to Yggdrasil
+#########################
 
 
 Parallel Processing
@@ -86,6 +86,7 @@ R API
 -----
 
 ::
+   
    library(yggdrasil)
 
    input <- YggInterface('YggInput', 'input_name')
