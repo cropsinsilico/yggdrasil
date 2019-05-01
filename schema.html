@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Validation Schema &mdash; yggdrasil 0.8.7 documentation</title>
+  <title>YAML Validation Schema &mdash; yggdrasil 0.8.7+10.gd8f2fc6d.dirty documentation</title>
   
 
   
@@ -24,20 +24,29 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Code" href="code.html" />
-    <link rel="prev" title="JSON Metaschema" href="metaschema.html" /> 
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="yggdrasil 0.8.7+10.gd8f2fc6d.dirty documentation" href="index.html"/>
+        <link rel="next" title="Code" href="code.html"/>
+        <link rel="prev" title="JSON Metaschema" href="metaschema.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
-<body class="wy-body-for-nav">
+<body class="wy-body-for-nav" role="document">
 
    
   <div class="wy-grid-for-nav">
@@ -106,6 +115,7 @@
 <li class="toctree-l1"><a class="reference internal" href="release.html#updating-and-testing-the-conda-recipe">Updating and Testing the Conda Recipe</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2019/index.html">Welcome to the 2019 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -117,7 +127,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" aria-label="top navigation">
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">yggdrasil</a>
@@ -125,10 +135,9 @@
       </nav>
 
 
+      
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
           
 
 
@@ -483,320 +492,322 @@ defining a run.</p>
 304
 305
 306
-307</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">additionalProperties</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="l l-Scalar l-Scalar-Plain">definitions</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">comm</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">$id</span><span class="p p-Indicator">:</span> <span class="s">&#39;#comm&#39;</span>
-    <span class="l l-Scalar l-Scalar-Plain">allOf</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">additionalProperties</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-      <span class="l l-Scalar l-Scalar-Plain">dependencies</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">as_array</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">commtype</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
-          <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">default</span><span class="p p-Indicator">,</span> <span class="nv">ipc</span><span class="p p-Indicator">,</span> <span class="nv">rmq</span><span class="p p-Indicator">,</span> <span class="nv">rmq_async</span><span class="p p-Indicator">,</span> <span class="nv">zmq</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-        <span class="l l-Scalar l-Scalar-Plain">datatype</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">bytes</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">schema</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">field_units</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">recv_converter</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">send_converter</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
-      <span class="l l-Scalar l-Scalar-Plain">required</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">name</span><span class="p p-Indicator">,</span> <span class="nv">commtype</span><span class="p p-Indicator">,</span> <span class="nv">datatype</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">anyOf</span><span class="p p-Indicator">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">commtype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">default</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">DefaultComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">commtype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">ipc</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">IPCComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">commtype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">rmq_async</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">RMQAsyncComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">commtype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">rmq</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">RMQComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">commtype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">zmq</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ZMQComm</span>
-    <span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for comm components.</span>
-    <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">comm</span>
-  <span class="l l-Scalar l-Scalar-Plain">connection</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">$id</span><span class="p p-Indicator">:</span> <span class="s">&#39;#connection&#39;</span>
-    <span class="l l-Scalar l-Scalar-Plain">allOf</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">additionalProperties</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-      <span class="l l-Scalar l-Scalar-Plain">dependencies</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">connection_type</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">file_input</span><span class="p p-Indicator">,</span> <span class="nv">file_output</span><span class="p p-Indicator">,</span> <span class="nv">input</span><span class="p p-Indicator">,</span> <span class="nv">output</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">anyOf</span><span class="p p-Indicator">:</span>
-            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
-            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/file&#39;</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">minItems</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">onexit</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">anyOf</span><span class="p p-Indicator">:</span>
-            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
-            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/file&#39;</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">minItems</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">translator</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-      <span class="l l-Scalar l-Scalar-Plain">required</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">inputs</span><span class="p p-Indicator">,</span> <span class="nv">outputs</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">anyOf</span><span class="p p-Indicator">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">connection_type</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">file_input</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">connection_type</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">file_output</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">connection_type</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">input</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">InputDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">connection_type</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">output</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">OutputDriver</span>
-    <span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for connection components.</span>
-    <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">connection</span>
-  <span class="l l-Scalar l-Scalar-Plain">file</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">$id</span><span class="p p-Indicator">:</span> <span class="s">&#39;#file&#39;</span>
-    <span class="l l-Scalar l-Scalar-Plain">allOf</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">additionalProperties</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-      <span class="l l-Scalar l-Scalar-Plain">dependencies</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">append</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">as_array</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">comment</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="s">&#39;#</span><span class="nv"> </span><span class="s">&#39;</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">default_flow_style</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id006</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">delimiter</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id001</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="s">&quot;\t&quot;</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">encoding</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id007</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">utf-8</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">field_units</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">binary</span>
-          <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">ascii</span><span class="p p-Indicator">,</span> <span class="nv">binary</span><span class="p p-Indicator">,</span> <span class="nv">json</span><span class="p p-Indicator">,</span> <span class="nv">map</span><span class="p p-Indicator">,</span> <span class="nv">mat</span><span class="p p-Indicator">,</span> <span class="nv">obj</span><span class="p p-Indicator">,</span> <span class="nv">pandas</span><span class="p p-Indicator">,</span> <span class="nv">pickle</span><span class="p p-Indicator">,</span> <span class="nv">ply</span><span class="p p-Indicator">,</span> <span class="nv">table</span><span class="p p-Indicator">,</span> <span class="nv">yaml</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-        <span class="l l-Scalar l-Scalar-Plain">format_str</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id002</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">in_temp</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">indent</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id004</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="s">&quot;\t&quot;</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span> <span class="nv">int</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">is_series</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">newline</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="s">&#39;</span>
+307</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nt">definitions</span><span class="p">:</span>
+  <span class="nt">comm</span><span class="p">:</span>
+    <span class="nt">$id</span><span class="p">:</span> <span class="s">&#39;#comm&#39;</span>
+    <span class="nt">allOf</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">dependencies</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">as_array</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">commtype</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">default</span>
+          <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">default</span><span class="p p-Indicator">,</span> <span class="nv">ipc</span><span class="p p-Indicator">,</span> <span class="nv">rmq</span><span class="p p-Indicator">,</span> <span class="nv">rmq_async</span><span class="p p-Indicator">,</span> <span class="nv">zmq</span><span class="p p-Indicator">]</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">datatype</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">bytes</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">schema</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">field_names</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">field_units</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">recv_converter</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
+        <span class="nt">send_converter</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
+      <span class="nt">required</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">name</span><span class="p p-Indicator">,</span> <span class="nv">commtype</span><span class="p p-Indicator">,</span> <span class="nv">datatype</span><span class="p p-Indicator">]</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">commtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">default</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DefaultComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">commtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">ipc</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">IPCComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">commtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">rmq_async</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RMQAsyncComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">commtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">rmq</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">RMQComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">commtype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">zmq</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ZMQComm</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for comm components.</span>
+    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">comm</span>
+  <span class="nt">connection</span><span class="p">:</span>
+    <span class="nt">$id</span><span class="p">:</span> <span class="s">&#39;#connection&#39;</span>
+    <span class="nt">allOf</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">dependencies</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">connection_type</span><span class="p">:</span>
+          <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">file_input</span><span class="p p-Indicator">,</span> <span class="nv">file_output</span><span class="p p-Indicator">,</span> <span class="nv">input</span><span class="p p-Indicator">,</span> <span class="nv">output</span><span class="p p-Indicator">]</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">inputs</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">anyOf</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
+            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/file&#39;</span><span class="p p-Indicator">}</span>
+          <span class="nt">minItems</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">onexit</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">outputs</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span>
+            <span class="nt">anyOf</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
+            <span class="p p-Indicator">-</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/file&#39;</span><span class="p p-Indicator">}</span>
+          <span class="nt">minItems</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">translator</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+      <span class="nt">required</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">inputs</span><span class="p p-Indicator">,</span> <span class="nv">outputs</span><span class="p p-Indicator">]</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">connection_type</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">file_input</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileInputDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">connection_type</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">file_output</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileOutputDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">connection_type</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">input</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">InputDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">connection_type</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">output</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">OutputDriver</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for connection components.</span>
+    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">connection</span>
+  <span class="nt">file</span><span class="p">:</span>
+    <span class="nt">$id</span><span class="p">:</span> <span class="s">&#39;#file&#39;</span>
+    <span class="nt">allOf</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">dependencies</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">append</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">args</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">as_array</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">comment</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="s">&#39;#</span><span class="nv"> </span><span class="s">&#39;</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">default_flow_style</span><span class="p">:</span> <span class="nl">&amp;id006</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">delimiter</span><span class="p">:</span> <span class="nl">&amp;id001</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="s">&quot;\t&quot;</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">encoding</span><span class="p">:</span> <span class="nl">&amp;id007</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">utf-8</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">field_names</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">field_units</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">filetype</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">binary</span>
+          <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">ascii</span><span class="p p-Indicator">,</span> <span class="nv">binary</span><span class="p p-Indicator">,</span> <span class="nv">json</span><span class="p p-Indicator">,</span> <span class="nv">map</span><span class="p p-Indicator">,</span> <span class="nv">mat</span><span class="p p-Indicator">,</span> <span class="nv">obj</span><span class="p p-Indicator">,</span> <span class="nv">pandas</span><span class="p p-Indicator">,</span> <span class="nv">pickle</span><span class="p p-Indicator">,</span> <span class="nv">ply</span><span class="p p-Indicator">,</span> <span class="nv">table</span><span class="p p-Indicator">,</span> <span class="nv">yaml</span><span class="p p-Indicator">]</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">format_str</span><span class="p">:</span> <span class="nl">&amp;id002</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">in_temp</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">indent</span><span class="p">:</span> <span class="nl">&amp;id004</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="s">&quot;\t&quot;</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span> <span class="nv">int</span><span class="p p-Indicator">]</span>
+        <span class="nt">is_series</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">newline</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="s">&#39;</span>
 
-            <span class="s">&#39;</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">recv_converter</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">send_converter</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">sort_keys</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id005</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">true</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">use_astropy</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id003</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">wait_for_creation</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">0.0</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">float</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">working_dir</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-      <span class="l l-Scalar l-Scalar-Plain">required</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">name</span><span class="p p-Indicator">,</span> <span class="nv">filetype</span><span class="p p-Indicator">,</span> <span class="nv">working_dir</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">anyOf</span><span class="p p-Indicator">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">ascii</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">AsciiFileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">delimiter</span><span class="p p-Indicator">:</span> <span class="nv">*id001</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">map</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">AsciiMapComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">delimiter</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="s">&quot;\t&quot;</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">table</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">format_str</span><span class="p p-Indicator">:</span> <span class="nv">*id002</span>
-          <span class="l l-Scalar l-Scalar-Plain">use_astropy</span><span class="p p-Indicator">:</span> <span class="nv">*id003</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">AsciiTableComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">binary</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">FileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">json</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">indent</span><span class="p p-Indicator">:</span> <span class="nv">*id004</span>
-          <span class="l l-Scalar l-Scalar-Plain">sort_keys</span><span class="p p-Indicator">:</span> <span class="nv">*id005</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">JSONFileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">mat</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MatFileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">obj</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ObjFileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">delimiter</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="s">&quot;\t&quot;</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">pandas</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">format_str</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">use_astropy</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PandasFileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">pickle</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PickleFileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">ply</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PlyFileComm</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default_flow_style</span><span class="p p-Indicator">:</span> <span class="nv">*id006</span>
-          <span class="l l-Scalar l-Scalar-Plain">encoding</span><span class="p p-Indicator">:</span> <span class="nv">*id007</span>
-          <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">yaml</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">indent</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="s">&quot;\t&quot;</span>
-            <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span> <span class="nv">int</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">YAMLFileComm</span>
-    <span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for file components.</span>
-    <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">file</span>
-  <span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">$id</span><span class="p p-Indicator">:</span> <span class="s">&#39;#model&#39;</span>
-    <span class="l l-Scalar l-Scalar-Plain">allOf</span><span class="p p-Indicator">:</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">additionalProperties</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-      <span class="l l-Scalar l-Scalar-Plain">dependencies</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-        <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">builddir</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">cc</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id008</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">client_of</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[]</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">cmakeargs</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[]</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[]</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">c</span><span class="p p-Indicator">,</span> <span class="nv">c++</span><span class="p p-Indicator">,</span> <span class="nv">cmake</span><span class="p p-Indicator">,</span> <span class="nv">cpp</span><span class="p p-Indicator">,</span> <span class="nv">executable</span><span class="p p-Indicator">,</span> <span class="nv">lpy</span><span class="p p-Indicator">,</span> <span class="nv">make</span><span class="p p-Indicator">,</span> <span class="nv">matlab</span><span class="p p-Indicator">,</span> <span class="nv">python</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-        <span class="l l-Scalar l-Scalar-Plain">make_command</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id010</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">make</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">makedir</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id011</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">makefile</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id012</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">Makefile</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[]</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">overwrite</span><span class="p p-Indicator">:</span> <span class="nl">&amp;id009</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">true</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">sourcedir</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">strace_flags</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[]</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">valgrind_flags</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">default</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">--leak-check=full</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-          <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-        <span class="l l-Scalar l-Scalar-Plain">with_strace</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">with_valgrind</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">default</span><span class="p p-Indicator">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span> <span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
-        <span class="l l-Scalar l-Scalar-Plain">working_dir</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">type</span><span class="p p-Indicator">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
-      <span class="l l-Scalar l-Scalar-Plain">required</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">name</span><span class="p p-Indicator">,</span> <span class="nv">language</span><span class="p p-Indicator">,</span> <span class="nv">args</span><span class="p p-Indicator">,</span> <span class="nv">working_dir</span><span class="p p-Indicator">]</span>
-      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">anyOf</span><span class="p p-Indicator">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">cmake</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">CMakeModelDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">cc</span><span class="p p-Indicator">:</span> <span class="nv">*id008</span>
-          <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">c</span><span class="p p-Indicator">,</span> <span class="nv">c++</span><span class="p p-Indicator">,</span> <span class="nv">cpp</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">overwrite</span><span class="p p-Indicator">:</span> <span class="nv">*id009</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">lpy</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">LPyModelDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">make</span><span class="p p-Indicator">]</span>
-          <span class="l l-Scalar l-Scalar-Plain">make_command</span><span class="p p-Indicator">:</span> <span class="nv">*id010</span>
-          <span class="l l-Scalar l-Scalar-Plain">makedir</span><span class="p p-Indicator">:</span> <span class="nv">*id011</span>
-          <span class="l l-Scalar l-Scalar-Plain">makefile</span><span class="p p-Indicator">:</span> <span class="nv">*id012</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MakeModelDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">matlab</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">executable</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">ModelDriver</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-          <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span>
-            <span class="l l-Scalar l-Scalar-Plain">enum</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">python</span><span class="p p-Indicator">]</span>
-        <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
-    <span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model components.</span>
-    <span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
-<span class="l l-Scalar l-Scalar-Plain">description</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for yggdrasil YAML input files.</span>
-<span class="l l-Scalar l-Scalar-Plain">properties</span><span class="p p-Indicator">:</span>
-  <span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/model&#39;</span><span class="p p-Indicator">}</span>
-    <span class="l l-Scalar l-Scalar-Plain">minItems</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
-    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-  <span class="l l-Scalar l-Scalar-Plain">connections</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">items</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{</span><span class="nv">$ref</span><span class="p p-Indicator">:</span> <span class="s">&#39;#/definitions/connection&#39;</span><span class="p p-Indicator">}</span>
-    <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
-<span class="l l-Scalar l-Scalar-Plain">required</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">[</span><span class="nv">models</span><span class="p p-Indicator">]</span>
-<span class="l l-Scalar l-Scalar-Plain">title</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">YAML Schema</span>
-<span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+            <span class="s">&#39;</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">recv_converter</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
+        <span class="nt">send_converter</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">function</span><span class="p p-Indicator">}</span>
+        <span class="nt">sort_keys</span><span class="p">:</span> <span class="nl">&amp;id005</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">use_astropy</span><span class="p">:</span> <span class="nl">&amp;id003</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">wait_for_creation</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">0.0</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">float</span><span class="p p-Indicator">}</span>
+        <span class="nt">working_dir</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+      <span class="nt">required</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">name</span><span class="p p-Indicator">,</span> <span class="nv">filetype</span><span class="p p-Indicator">,</span> <span class="nv">working_dir</span><span class="p p-Indicator">]</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">ascii</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">AsciiFileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">delimiter</span><span class="p">:</span> <span class="nv">*id001</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">map</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">AsciiMapComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">delimiter</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="s">&quot;\t&quot;</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">table</span><span class="p p-Indicator">]</span>
+          <span class="nt">format_str</span><span class="p">:</span> <span class="nv">*id002</span>
+          <span class="nt">use_astropy</span><span class="p">:</span> <span class="nv">*id003</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">AsciiTableComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">binary</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">FileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">json</span><span class="p p-Indicator">]</span>
+          <span class="nt">indent</span><span class="p">:</span> <span class="nv">*id004</span>
+          <span class="nt">sort_keys</span><span class="p">:</span> <span class="nv">*id005</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">JSONFileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">mat</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatFileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">obj</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ObjFileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">delimiter</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="s">&quot;\t&quot;</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">pandas</span><span class="p p-Indicator">]</span>
+          <span class="nt">format_str</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">use_astropy</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PandasFileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">pickle</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PickleFileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">ply</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PlyFileComm</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">default_flow_style</span><span class="p">:</span> <span class="nv">*id006</span>
+          <span class="nt">encoding</span><span class="p">:</span> <span class="nv">*id007</span>
+          <span class="nt">filetype</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">yaml</span><span class="p p-Indicator">]</span>
+          <span class="nt">indent</span><span class="p">:</span>
+            <span class="nt">default</span><span class="p">:</span> <span class="s">&quot;\t&quot;</span>
+            <span class="nt">type</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span> <span class="nv">int</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">YAMLFileComm</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for file components.</span>
+    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">file</span>
+  <span class="nt">model</span><span class="p">:</span>
+    <span class="nt">$id</span><span class="p">:</span> <span class="s">&#39;#model&#39;</span>
+    <span class="nt">allOf</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">dependencies</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">args</span><span class="p p-Indicator">]</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">args</span><span class="p">:</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">builddir</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">cc</span><span class="p">:</span> <span class="nl">&amp;id008</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">client_of</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">cmakeargs</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">inputs</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">is_server</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">language</span><span class="p">:</span>
+          <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">c</span><span class="p p-Indicator">,</span> <span class="nv">c++</span><span class="p p-Indicator">,</span> <span class="nv">cmake</span><span class="p p-Indicator">,</span> <span class="nv">cpp</span><span class="p p-Indicator">,</span> <span class="nv">executable</span><span class="p p-Indicator">,</span> <span class="nv">lpy</span><span class="p p-Indicator">,</span> <span class="nv">make</span><span class="p p-Indicator">,</span> <span class="nv">matlab</span><span class="p p-Indicator">,</span> <span class="nv">python</span><span class="p p-Indicator">]</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">make_command</span><span class="p">:</span> <span class="nl">&amp;id010</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">make</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">makedir</span><span class="p">:</span> <span class="nl">&amp;id011</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">makefile</span><span class="p">:</span> <span class="nl">&amp;id012</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">Makefile</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">outputs</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/comm&#39;</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">overwrite</span><span class="p">:</span> <span class="nl">&amp;id009</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">sourcedir</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+        <span class="nt">strace_flags</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">valgrind_flags</span><span class="p">:</span>
+          <span class="nt">default</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">--leak-check=full</span><span class="p p-Indicator">]</span>
+          <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+        <span class="nt">with_strace</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">with_valgrind</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">default</span><span class="p">:</span> <span class="nv">false</span><span class="p p-Indicator">,</span><span class="nt"> type</span><span class="p">:</span> <span class="nv">boolean</span><span class="p p-Indicator">}</span>
+        <span class="nt">working_dir</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span> <span class="nv">string</span><span class="p p-Indicator">}</span>
+      <span class="nt">required</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">name</span><span class="p p-Indicator">,</span> <span class="nv">language</span><span class="p p-Indicator">,</span> <span class="nv">args</span><span class="p p-Indicator">,</span> <span class="nv">working_dir</span><span class="p p-Indicator">]</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="p p-Indicator">-</span> <span class="nt">anyOf</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">cmake</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">CMakeModelDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">cc</span><span class="p">:</span> <span class="nv">*id008</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">c</span><span class="p p-Indicator">,</span> <span class="nv">c++</span><span class="p p-Indicator">,</span> <span class="nv">cpp</span><span class="p p-Indicator">]</span>
+          <span class="nt">overwrite</span><span class="p">:</span> <span class="nv">*id009</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">lpy</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">LPyModelDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">make</span><span class="p p-Indicator">]</span>
+          <span class="nt">make_command</span><span class="p">:</span> <span class="nv">*id010</span>
+          <span class="nt">makedir</span><span class="p">:</span> <span class="nv">*id011</span>
+          <span class="nt">makefile</span><span class="p">:</span> <span class="nv">*id012</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MakeModelDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">matlab</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">executable</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ModelDriver</span>
+      <span class="p p-Indicator">-</span> <span class="nt">properties</span><span class="p">:</span>
+          <span class="nt">language</span><span class="p">:</span>
+            <span class="nt">enum</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">python</span><span class="p p-Indicator">]</span>
+        <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+    <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for model components.</span>
+    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">model</span>
+<span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Schema for yggdrasil YAML input files.</span>
+<span class="nt">properties</span><span class="p">:</span>
+  <span class="nt">models</span><span class="p">:</span>
+    <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/model&#39;</span><span class="p p-Indicator">}</span>
+    <span class="nt">minItems</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">1</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+  <span class="nt">connections</span><span class="p">:</span>
+    <span class="nt">items</span><span class="p">:</span> <span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/definitions/connection&#39;</span><span class="p p-Indicator">}</span>
+    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">array</span>
+<span class="nt">required</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">models</span><span class="p p-Indicator">]</span>
+<span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">YAML Schema</span>
+<span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
 </pre></div>
 </td></tr></table></div>
 </div>
 
 
            </div>
-           
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -814,11 +825,11 @@ defining a run.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Meagan Lang, David Raila
+        &copy; Copyright 2017, Meagan Lang, David Raila.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -833,24 +844,37 @@ defining a run.</p>
 
   
 
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.8.7+10.gd8f2fc6d.dirty',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
+  
+  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          SphinxRtdTheme.StickyNav.enable();
       });
-  </script> 
+  </script>
+   
 
 </body>
 </html>
