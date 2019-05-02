@@ -29,7 +29,7 @@ if platform._is_win:  # pragma: windows
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
 
 
-def run_tsts(verbose=False, nocapture=False, stop=True,
+def run_tsts(verbose=False, nocapture=True, stop=True,
              nologcapture=False, withcoverage=True):  # pragma: no cover
     r"""Run tests for the package. Relative paths are interpreted to be
     relative to the package root directory.
