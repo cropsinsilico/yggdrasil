@@ -9,6 +9,7 @@ from yggdrasil.drivers.CMakeModelDriver import CMakeModelDriver
 _driver_installed = CMakeModelDriver.is_installed()
 
 
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_create_include():
     r"""Test create_include."""
     target = 'target'
