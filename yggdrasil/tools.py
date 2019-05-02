@@ -5,7 +5,6 @@ import logging
 import pprint
 import os
 import sys
-import pty
 import copy
 import shutil
 import inspect
@@ -458,6 +457,7 @@ class YggPopen(subprocess.Popen):
                                   subprocess.CREATE_NEW_PROCESS_GROUP)
             else:
                 if for_matlab:
+                    import pty
                     # Matlab requires a tty so a pty is used here to allow
                     # the process to be lanched in a new process group.
                     # Related Materials:
