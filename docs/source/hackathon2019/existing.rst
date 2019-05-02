@@ -11,7 +11,7 @@ During the hackathon we will be using the user interface (UI) located
 .. image:: interface_images/interface_landing.png
 
 
-You will need to log in with your Github username and password::
+You will need to log in with your Github username and password
 
 .. image:: interface_images/interface_login.png
 	  
