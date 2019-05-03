@@ -490,8 +490,10 @@ class CompilationToolBase(object):
                     paths.append(x)
         # Get flags based on path
         if cls.search_path_flags is not None:
+            print('search_path_flags', cls.search_path_flags)
             output = cls.call(cls.search_path_flags, skip_flags=True,
                               allow_error=True)
+            print('output', output)
             # Split on beginning & ending regexes if they exist
             if cls.search_regex_begin is not None:
                 output = re.split(cls.search_regex_begin, output)[-1]
