@@ -804,6 +804,7 @@ class CompilerBase(CompilationToolBase):
                          'default_executable', 'default_executable_env']
             linker_name = '%sLinker' % cls.__name__.split('Compiler')[0]
             linker_attr = copy.deepcopy(cls.linker_attributes)
+            linker_attr.setdefault('name', cls.default_linker)
             for k in copy_attr:
                 linker_attr.setdefault(k, getattr(cls, k))
             linker_base_cls = cls.linker_base_classes
