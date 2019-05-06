@@ -136,6 +136,7 @@ class CompilationToolMeta(type):
                     raise ValueError("%s name '%s' already registered."
                                      % (cls.tooltype.title(), x))
                 reg[x] = cls
+                print('registered', cls.tooltype, cls, x)
                 # Register by language
                 for l in cls.languages:
                     if x in reg['by_language'][l]:
