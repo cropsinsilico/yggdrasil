@@ -499,7 +499,6 @@ class CompilationToolBase(object):
                 cls.search_path_env = [cls.search_path_env]
             for ienv in cls.search_path_env:
                 ienv_paths = os.environ.get(ienv, '').split(os.pathsep)
-                print('search_path_env', cls.search_path_env, ienv_paths)
                 for x in ienv_paths:
                     if x:
                         paths.append(x)
@@ -514,10 +513,8 @@ class CompilationToolBase(object):
                     paths.append(ienv_path)
         # Get flags based on path
         if cls.search_path_flags is not None:
-            print('search_path_flags', cls.search_path_flags)
             output = cls.call(cls.search_path_flags, skip_flags=True,
                               allow_error=True)
-            print('output', output)
             # Split on beginning & ending regexes if they exist
             if cls.search_regex_begin is not None:
                 output = re.split(cls.search_regex_begin, output)[-1]
@@ -1866,6 +1863,7 @@ class CompiledModelDriver(ModelDriver):
                 out = default
         if not isinstance(out, list):
             out = [out]
+        print(dep, out, default)
         return out
 
     @classmethod
@@ -2003,6 +2001,7 @@ class CompiledModelDriver(ModelDriver):
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
             for k in cls.external_libraries.keys():
+                print('is_installed', k, cls.is_library_installed(k))
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
         all_internal_dependencies = cls.get_dependency_order(internal_dependencies)
@@ -2267,6 +2266,7 @@ class CompiledModelDriver(ModelDriver):
                 else:
                     fpath = os.path.join(os.getcwd(), fname)
                 fname = os.path.basename(fpath)
+                search_list = None
                 if not os.path.isfile(fpath):
                     # Search the compiler/linker's search path, then the
                     # PATH environment variable.
@@ -2279,6 +2279,8 @@ class CompiledModelDriver(ModelDriver):
                     logging.info('Located %s: %s' % (fname, fpath))
                     cfg.set(k_lang, opt, fpath)
                 else:
+                    logging.info('Could not locate %s (search_list = %s)'
+                                 % (fname, search_list))
                     out.append((k_lang, opt, desc))
         return out
 
