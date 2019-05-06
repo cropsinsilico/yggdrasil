@@ -384,7 +384,7 @@ class CMakeModelDriver(CompiledModelDriver):
             compile_flags = []
         if linker_flags is None:
             linker_flags = []
-        use_library_path = True  # platform._is_win
+        use_library_path = platform._is_win
         compile_flags = CModelDriver.CModelDriver.get_compiler_flags(
             flags=compile_flags, use_library_path=use_library_path, dont_link=True,
             for_model=True, skip_defaults=True, logging_level=logging_level)

@@ -1,5 +1,6 @@
 import os
 import copy
+import shutil
 from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -208,6 +209,9 @@ class CModelDriver(CompiledModelDriver):
         cls.internal_libraries['regex'] = regex_lib
         # Platform specific internal library options
         if platform._is_win:  # pragma: windows
+            stdint_win = os.path.join(_top_dir, 'windows_stdint.h')
+            assert(os.path.isfile(stdint_win))
+            shutil.copy(stdint_win, os.path.join(_top_dir, 'stdint.h'))
             for x in ['ygg', 'datatypes']:
                 cls.internal_libraries[x]['include_dirs'] += [_top_dir]
         if platform._is_linux:
