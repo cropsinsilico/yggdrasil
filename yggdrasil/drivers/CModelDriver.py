@@ -60,6 +60,7 @@ class MSVCCompiler(CCompilerBase):
     # TODO: This class dosn't check the CXX and CXXFLAGS environment variables
     # for C++ currently because it is a C subclass.
     name = 'cl'
+    default_executable = 'cl'
     languages = ['c', 'c++']
     platforms = ['Windows']
     # TODO: Currently everything compiled as C++ on windows to allow use

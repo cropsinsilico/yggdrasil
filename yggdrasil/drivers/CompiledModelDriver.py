@@ -251,6 +251,10 @@ class CompilationToolBase(object):
         # Set default_executable to name
         if cls.default_executable is None:
             cls.default_executable = cls.name
+        # Add executable extension
+        if platform._is_win:  # pragma: windows
+            if not cls.default_executable.endswith('.exe'):
+                cls.default_executable += '.exe'
 
     @classmethod
     def get_language_ext(cls):
