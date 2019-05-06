@@ -14,7 +14,9 @@ class CCompilerBase(CompilerBase):
     default_executable_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
-    linker_attributes = {'default_executable_flags_env': 'LDFLAGS'}
+    linker_attributes = {'default_executable_flags_env': 'LDFLAGS',
+                         'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
+    search_path_env = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
     search_regex_begin = '#include "..." search starts here:'
     search_regex_end = 'End of search list.'

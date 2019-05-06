@@ -485,9 +485,14 @@ class CompilationToolBase(object):
         paths = []
         # Get flags from environment variable
         if cls.search_path_env is not None:
-            for x in os.environ.get(cls.search_path_env, '').split(os.pathsep):
-                if x:
-                    paths.append(x)
+            if not isinstance(cls.search_path_env, list):
+                cls.search_path_env = [cls.search_path_env]
+            for ienv in cls.search_path_env:
+                ienv_paths = os.environ.get(ienv, '').split(os.pathsep)
+                print('search_path_env', cls.search_path_env, ienv_paths)
+                for x in ienv_paths:
+                    if x:
+                        paths.append(x)
         # Get flags based on path
         if cls.search_path_flags is not None:
             print('search_path_flags', cls.search_path_flags)
@@ -504,6 +509,7 @@ class CompilationToolBase(object):
                 for x in re.findall(r, output):
                     if os.path.isdir(x):
                         paths.append(x)
+        print('search paths', paths)
         return paths
 
     @classmethod
