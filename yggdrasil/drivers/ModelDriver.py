@@ -465,7 +465,10 @@ class ModelDriver(Driver):
         """
         out = False
         if cls.language is not None:
-            out = (tools.which(cls.language_executable()) is not None)
+            try:
+                out = (tools.which(cls.language_executable()) is not None)
+            except NotImplementedError:
+                out = False
         for x in cls.base_languages:
             if not out:
                 break
