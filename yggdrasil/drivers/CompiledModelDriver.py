@@ -1699,9 +1699,13 @@ class CompiledModelDriver(ModelDriver):
             raise ValueError("Invalid return_prop: '%s'" % return_prop)
 
     @classmethod
-    def get_external_libraries(cls):
+    def get_external_libraries(cls, no_comm_libs=False):
         r"""Determine the external libraries that are required based on the
         default comm.
+
+        Args:
+            no_comm_libs (bool, optional): If True, libraries for the installed
+                comms are not included in the returned list. Defaults to False.
 
         Returns:
             list: The names of external libraries required by the interface
@@ -1711,7 +1715,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = copy.deepcopy(cls.internal_libraries.get(cls.interface_library, {}).get(
             'external_dependencies', []))
-        if cls.language is not None:
+        if (not no_comm_libs) and (cls.language is not None):
             for x in tools.get_installed_comm(language=cls.language):
                 out += cls.supported_comm_options.get(x, {}).get('libraries', [])
         return out
@@ -2005,11 +2009,13 @@ class CompiledModelDriver(ModelDriver):
             definitions = []
         internal_dependencies = kwargs.pop('internal_dependencies', [])
         external_dependencies = kwargs.pop('external_dependencies', [])
-        # Model specific compilation flags
+        # Communication specific compilation flags
         if (for_model or for_api) and (not skip_interface_flags):
-            # Add comm flags
             for c in tools.get_installed_comm(language=cls.language):
                 definitions.append('%sINSTALLED' % c[:3].upper())
+                for x in cls.supported_comm_options.get(c, {}).get('libraries', []):
+                    if x not in external_dependencies:
+                        external_dependencies.append(x)
             if commtype is None:
                 commtype = tools.get_default_comm()
             definitions.append('%sDEF' % commtype[:3].upper())
@@ -2019,7 +2025,7 @@ class CompiledModelDriver(ModelDriver):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
-            for k in cls.get_external_libraries():
+            for k in cls.get_external_libraries(no_comm_libs=True):
                 print('is_installed', k, cls.is_library_installed(k))
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
@@ -2102,12 +2108,18 @@ class CompiledModelDriver(ModelDriver):
         libraries = kwargs.pop('libraries', [])
         internal_dependencies = kwargs.pop('internal_dependencies', [])
         external_dependencies = kwargs.pop('external_dependencies', [])
+        # Communication specific compilation flags
+        if (for_model or for_api) and (not skip_interface_flags):
+            for c in tools.get_installed_comm(language=cls.language):
+                for x in cls.supported_comm_options.get(c, {}).get('libraries', []):
+                    if x not in external_dependencies:
+                        external_dependencies.append(x)
         # Add interface as internal_dependency for models
         if for_model and (not skip_interface_flags):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
-            for k in cls.get_external_libraries():
+            for k in cls.get_external_libraries(no_comm_libs=True):
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
         # TODO: Expand library flags to include subdependencies?
