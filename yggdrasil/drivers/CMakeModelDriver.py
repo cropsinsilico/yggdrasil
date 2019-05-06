@@ -393,16 +393,17 @@ class CMakeModelDriver(CompiledModelDriver):
             skip_defaults=True, use_library_path_internal=True)
         lines = []
         var_count = 0
+        preamble_lines = []
         for x in compile_flags:
             if x.startswith('-D'):
-                lines.append('ADD_DEFINITIONS(%s)' % x)
+                preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
             elif x.startswith('-I'):
                 xdir = x.split('-I', 1)[-1]
                 if platform._is_win:  # pragma: windows
                     xdir = xdir.replace('\\', re.escape('\\'))
-                lines.append('INCLUDE_DIRECTORIES(%s)' % xdir)
+                preamble_lines.append('INCLUDE_DIRECTORIES(%s)' % xdir)
             elif x.startswith('-') or x.startswith('/'):
-                lines.append('ADD_DEFINITIONS(%s)' % x)
+                preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
             else:
                 raise ValueError("Could not parse compiler flag '%s'." % x)
         for x in linker_flags:
@@ -412,14 +413,14 @@ class CMakeModelDriver(CompiledModelDriver):
                 libdir = x.split('-L')[-1]
                 if platform._is_win:  # pragma: windows
                     libdir = libdir.replace('\\', re.escape('\\'))
-                lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif x.startswith('/LIBPATH:'):  # pragma: windows
                 libdir = x.split('/LIBPATH:')[-1]
                 if '"' in libdir:
                     libdir = libdir.split('"')[1]
                 if platform._is_win:
                     libdir = libdir.replace('\\', re.escape('\\'))
-                lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif os.path.isfile(x):
                 xd, xf = os.path.split(x)
                 xl, xe = os.path.splitext(xf)
@@ -443,6 +444,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 raise ValueError("Could not parse linker flag '%s'." % x)
             else:
                 lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+        lines = preamble_lines + lines
         import pprint
         pprint.pprint(lines)
         if fname is None:
