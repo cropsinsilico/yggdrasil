@@ -1699,6 +1699,24 @@ class CompiledModelDriver(ModelDriver):
             raise ValueError("Invalid return_prop: '%s'" % return_prop)
 
     @classmethod
+    def get_external_libraries(cls):
+        r"""Determine the external libraries that are required based on the
+        default comm.
+
+        Returns:
+            list: The names of external libraries required by the interface
+                library, including the dependency libraries for the installed
+                comm libraries.
+
+        """
+        out = copy.deepcopy(cls.internal_libraries[cls.interface_library][
+                  'external_dependencies'])
+        if cls.language is not None:
+            for x in tools.get_installed_comm(language=cls.language):
+                out += cls.supported_comm_options.get(x, {}).get('libraries', [])
+        return out
+
+    @classmethod
     def get_dependency_source(cls, dep, default=None):
         r"""Get the path to the library source files (or header files) for a
         dependency.
@@ -2001,7 +2019,7 @@ class CompiledModelDriver(ModelDriver):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
-            for k in cls.external_libraries.keys():
+            for k in cls.get_external_libraries():
                 print('is_installed', k, cls.is_library_installed(k))
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
@@ -2089,7 +2107,7 @@ class CompiledModelDriver(ModelDriver):
             if (((cls.interface_library is not None)
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
-            for k in cls.external_libraries.keys():
+            for k in cls.get_external_libraries():
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
         # TODO: Expand library flags to include subdependencies?
@@ -2225,7 +2243,7 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = super(CompiledModelDriver, cls).is_configured()
-        for k in cls.external_libraries.keys():
+        for k in cls.get_external_libraries():
             if not out:
                 break
             out = cls.is_library_installed(k)
