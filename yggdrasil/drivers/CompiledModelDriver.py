@@ -73,7 +73,7 @@ def find_compilation_tool(tooltype, language, allow_failure=False):
     for kname, v in reg.get(language, {}).items():
         if (platform._platform in v.platforms) and v.is_installed():
             out = kname
-    if out is None:
+    if (out is None) and (not allow_failure):
         raise RuntimeError("Could not locate a %s tool." % tooltype)
     return out
 
