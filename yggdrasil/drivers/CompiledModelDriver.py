@@ -1709,8 +1709,8 @@ class CompiledModelDriver(ModelDriver):
                 comm libraries.
 
         """
-        out = copy.deepcopy(cls.internal_libraries[cls.interface_library][
-                  'external_dependencies'])
+        out = copy.deepcopy(cls.internal_libraries.get(cls.interface_library, {}).get(
+            'external_dependencies', []))
         if cls.language is not None:
             for x in tools.get_installed_comm(language=cls.language):
                 out += cls.supported_comm_options.get(x, {}).get('libraries', [])
