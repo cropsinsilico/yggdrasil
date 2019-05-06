@@ -183,6 +183,8 @@ class CompilationToolBase(object):
             the list.
         search_path_env (str): Environment variables containing a list of paths
             to search for library files.
+        search_path_conda (str): Path relative to the conda prefix that should
+            be searched if the CONDA_PREFIX environment variable is set.
         search_path_flags (list): Flags that should be passed to the tool
             executable in order to locate the search path.
         search_regex_begin (str): Search string indicating where the set of
@@ -212,6 +214,7 @@ class CompilationToolBase(object):
     output_first = False
     flag_options = OrderedDict()
     search_path_env = None
+    search_path_conda = None
     search_path_flags = None
     search_regex_begin = None
     search_regex_end = None
@@ -490,7 +493,7 @@ class CompilationToolBase(object):
             raise NotImplementedError("get_search_path method not implemented for "
                                       "%s tool '%s'" % (cls.tooltype, cls.name))
         paths = []
-        # Get flags from environment variable
+        # Get search paths from environment variable
         if cls.search_path_env is not None:
             if not isinstance(cls.search_path_env, list):
                 cls.search_path_env = [cls.search_path_env]
@@ -500,6 +503,15 @@ class CompilationToolBase(object):
                 for x in ienv_paths:
                     if x:
                         paths.append(x)
+        # Get search paths from the conda environment
+        if (cls.search_path_conda is not None) and ('CONDA_PREFIX' in os.environ):
+            prefix = os.environ['CONDA_PREFIX']
+            if not isinstance(cls.search_path_conda, list):
+                cls.search_path_conda = [cls.search_path_conda]
+            for ienv in cls.search_path_conda:
+                ienv_path = os.path.join(prefix, ienv)
+                if os.path.isdir(ienv_path):
+                    paths.append(ienv_path)
         # Get flags based on path
         if cls.search_path_flags is not None:
             print('search_path_flags', cls.search_path_flags)
@@ -761,6 +773,7 @@ class CompilerBase(CompilationToolBase):
     linker_attributes = {}
     linker_base_classes = None
     combine_with_linker = None
+    search_path_conda = 'include'
 
     def __init__(self, linker=None, archiver=None, linker_flags=None,
                  archiver_flags=None, **kwargs):
@@ -1126,6 +1139,7 @@ class LinkerBase(CompilationToolBase):
     library_ext = None  # depends on the OS
     executable_ext = '.out'
     output_first_library = None
+    search_path_conda = 'lib'
 
     @staticmethod
     def before_registration(cls):
