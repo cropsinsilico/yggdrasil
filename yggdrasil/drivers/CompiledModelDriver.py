@@ -503,15 +503,6 @@ class CompilationToolBase(object):
                 for x in ienv_paths:
                     if x:
                         paths.append(x)
-        # Get search paths from the conda environment
-        if (cls.search_path_conda is not None) and ('CONDA_PREFIX' in os.environ):
-            prefix = os.environ['CONDA_PREFIX']
-            if not isinstance(cls.search_path_conda, list):
-                cls.search_path_conda = [cls.search_path_conda]
-            for ienv in cls.search_path_conda:
-                ienv_path = os.path.join(prefix, ienv)
-                if os.path.isdir(ienv_path):
-                    paths.append(ienv_path)
         # Get flags based on path
         if cls.search_path_flags is not None:
             output = cls.call(cls.search_path_flags, skip_flags=True,
@@ -526,6 +517,15 @@ class CompilationToolBase(object):
                 for x in re.findall(r, output):
                     if os.path.isdir(x):
                         paths.append(x)
+        # Get search paths from the conda environment
+        if (cls.search_path_conda is not None) and ('CONDA_PREFIX' in os.environ):
+            prefix = os.environ['CONDA_PREFIX']
+            if not isinstance(cls.search_path_conda, list):
+                cls.search_path_conda = [cls.search_path_conda]
+            for ienv in cls.search_path_conda:
+                ienv_path = os.path.join(prefix, ienv)
+                if os.path.isdir(ienv_path):
+                    paths.append(ienv_path)
         print('search paths', paths)
         return paths
 
