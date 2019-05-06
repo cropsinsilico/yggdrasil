@@ -49,20 +49,23 @@ def get_compilation_tool_registry(tooltype):
     return reg
 
 
-def find_compilation_tool(tooltype, language):
+def find_compilation_tool(tooltype, language, allow_failure=False):
     r"""Return the prioritized class for a compilation tool of a certain type
     that can handle the specified language.
 
     Args:
         tooltype (str): Type of tool. Valid values include 'compiler', 'linker',
             and 'archiver'.
+        allow_failure (bool, optional): If True and a tool cannot be located,
+            None will be returned. Otherwise, an error will be raised if a tool
+            cannot be located. Defaults to False.
 
     Returns:
         str: Name of the determined tool type.
 
     Raises:
         RuntimeError: If a tool cannot be located for the specified language on
-            the current platform.
+            the current platform and allow_failure is False.
 
     """
     out = None
@@ -1582,7 +1585,8 @@ class CompiledModelDriver(ModelDriver):
                         default_tool_name = None
                 # Determine compilation tools based on language/platform
                 if default_tool_name is None:
-                    default_tool_name = find_compilation_tool(k, cls.language)
+                    default_tool_name = find_compilation_tool(k, cls.language,
+                                                              allow_failure=True)
                 # Set default tool attribute & record compiler tool if set
                 setattr(cls, 'default_%s' % k, default_tool_name)
                 if (default_tool_name is not None) and (k == 'compiler'):
