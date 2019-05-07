@@ -225,9 +225,7 @@ class ModelDriver(Driver):
         r"""Operations that should be preformed to modify class attributes after
         registration."""
         if (not cls.is_configured()):
-            print(cls.language, 'configuring')
             update_language_config(cls)
-            print(cls.language, 'is_configured', cls.is_configured())
         
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
@@ -473,6 +471,24 @@ class ModelDriver(Driver):
             if not out:
                 break
             out = import_component('model', x).is_language_installed()
+        return out
+
+    @classmethod
+    def is_source_file(cls, fname):
+        r"""Determine if the provided file name points to a source files for
+        the associated programming language by checking the extension.
+
+        Args:
+            fname (str): Path to file.
+
+        Returns:
+            bool: True if the provided file is a source file, False otherwise.
+
+        """
+        out = False
+        model_ext = os.path.splitext(fname)[-1]
+        if (cls.language_ext is not None) and (len(model_ext) > 0):
+            out = (model_ext in cls.language_ext)
         return out
 
     @classmethod

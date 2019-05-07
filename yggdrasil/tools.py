@@ -987,6 +987,9 @@ class YggThread(threading.Thread, YggClass):
         global _lock_registry
         if kwargs is None:
             kwargs = {}
+        if (target is not None) and ('target' in self._schema_properties):
+            ygg_kwargs['target'] = target
+            target = None
         thread_kwargs = dict(name=name, target=target, group=group,
                              args=args, kwargs=kwargs)
         super(YggThread, self).__init__(**thread_kwargs)

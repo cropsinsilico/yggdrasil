@@ -23,6 +23,9 @@ case $1 in
 	echo "Running C++"
 	yaml='gs_lesson4_cpp.yml'
 	;;
+    --cmake )
+	echo "Running CMake"
+	yaml='gs_lesson4_cmake.yml'
 esac
 
 yggrun $yaml

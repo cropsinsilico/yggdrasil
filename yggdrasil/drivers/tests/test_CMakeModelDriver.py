@@ -14,7 +14,7 @@ def test_create_include():
     r"""Test create_include."""
     target = 'target'
     tempdir = tempfile.gettempdir()
-    fname_dll = os.path.join(tempdir, 'test.dll')
+    fname_dll = os.path.join(tempdir, 'libtest.dll')
     fname_lib = os.path.join(tempdir, 'test.lib')
     for fname in [fname_dll, fname_lib]:
         with open(fname, 'w') as fd:
@@ -27,9 +27,15 @@ def test_create_include():
                 ([], ['-lm'], ['TARGET_LINK_LIBRARIES(%s -lm)' % target]),
                 ([], ['-Llib_dir'], ['LINK_DIRECTORIES(lib_dir)']),
                 ([], ['/LIBPATH:"lib_dir"'], ['LINK_DIRECTORIES(lib_dir)']),
-                ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target]),
-                ([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
-                ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
+                ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target])]
+    if CMakeModelDriver.add_libraries:
+        testlist += [([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
+                     ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
+    else:
+        testlist += [([], [fname_dll], ['FIND_LIBRARY(TEST_LIBRARY test %s)'
+                                        % tempdir]),
+                     ([], [fname_lib], ['FIND_LIBRARY(TEST_LIBRARY test %s)'
+                                        % tempdir])]
     from yggdrasil.drivers.CModelDriver import CModelDriver
     CModelDriver.compile_dependencies()
     print('calling cmake compile')

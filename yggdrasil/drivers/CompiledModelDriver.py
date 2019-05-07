@@ -136,7 +136,6 @@ class CompilationToolMeta(type):
                     raise ValueError("%s name '%s' already registered."
                                      % (cls.tooltype.title(), x))
                 reg[x] = cls
-                print('registered', cls.tooltype, cls, x)
                 # Register by language
                 for l in cls.languages:
                     if x in reg['by_language'][l]:
@@ -526,7 +525,6 @@ class CompilationToolBase(object):
                 ienv_path = os.path.join(prefix, ienv)
                 if os.path.isdir(ienv_path):
                     paths.append(ienv_path)
-        print('search paths', paths)
         return paths
 
     @classmethod
@@ -689,11 +687,11 @@ class CompilationToolBase(object):
         try:
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
+            output = backwards.as_str(output)
             if (proc.returncode != 0) and (not allow_error):
                 logging.error(output)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
-            output = backwards.as_str(output)
             logging.debug('%s\n%s' % (' '.join(cmd), output))
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
@@ -1520,28 +1518,27 @@ class CompiledModelDriver(ModelDriver):
         # and case where provided argument is executable, but source files are
         # not specified
         model_ext = os.path.splitext(self.model_file)[-1]
-        model_is_source = False
-        if (self.language_ext is not None) and (len(model_ext) > 0):
-            if (model_ext in self.language_ext):
-                model_is_source = True
-                if len(self.source_files) == 0:
-                    self.source_files.append(self.model_file)
-            else:
-                # Assert that model file is not source code in any of the
-                # registered languages
-                from yggdrasil.components import import_component
-                from yggdrasil.schema import get_schema
-                s = get_schema()['model']
-                for v_name in s.classes:
-                    v = import_component('model', v_name)
-                    if (((v.language_ext is not None)
-                         and (model_ext in v.language_ext))):  # pragma: debug
-                        raise RuntimeError(("Extension '%s' indicates that the "
-                                            "model language is '%s', not '%s' "
-                                            "as specified.")
-                                           % (model_ext, v.language,
-                                              self.language))
+        model_is_source = self.is_source_file(self.model_file)
+        if model_is_source:
+            if len(self.source_files) == 0:
+                self.source_files.append(self.model_file)
+        elif len(model_ext) > 0:
+            # Assert that model file is not source code in any of the
+            # registered languages
+            from yggdrasil.components import import_component
+            from yggdrasil.schema import get_schema
+            s = get_schema()['model']
+            for v_name in s.classes:
+                v = import_component('model', v_name)
+                if (((v.language_ext is not None)
+                     and (model_ext in v.language_ext))):  # pragma: debug
+                    raise RuntimeError(("Extension '%s' indicates that the "
+                                        "model language is '%s', not '%s' "
+                                        "as specified.")
+                                       % (model_ext, v.language,
+                                          self.language))
         elif (len(self.source_files) == 0) and (self.language_ext is not None):
+            # Add source file based on the model file
             self.source_files.append(os.path.splitext(self.model_file)[0]
                                      + self.language_ext[0])
         # Add intermediate files and executable by doing a dry run
@@ -1550,7 +1547,7 @@ class CompiledModelDriver(ModelDriver):
             kwargs['out'] = None
         out = self.compile_model(**kwargs)
         if model_is_source:
-            self.info('Determined model file: %s', out)
+            self.debug('Determined model file: %s', out)
             self.model_file = out
         for x in kwargs['products']:
             if self.language_ext is not None:
@@ -1886,7 +1883,6 @@ class CompiledModelDriver(ModelDriver):
                 out = default
         if not isinstance(out, list):
             out = [out]
-        print(dep, out, default)
         return out
 
     @classmethod
@@ -2026,7 +2022,6 @@ class CompiledModelDriver(ModelDriver):
                  and (cls.interface_library not in internal_dependencies))):
                 internal_dependencies.append(cls.interface_library)
             for k in cls.get_external_libraries(no_comm_libs=True):
-                print('is_installed', k, cls.is_library_installed(k))
                 if (k not in external_dependencies) and cls.is_library_installed(k):
                     external_dependencies.append(k)
         all_internal_dependencies = cls.get_dependency_order(internal_dependencies)
@@ -2130,8 +2125,12 @@ class CompiledModelDriver(ModelDriver):
                 if not kwargs.get('dry_run', False):
                     assert(os.path.isfile(dep_lib))
                 if use_library_path_internal and (dep in internal_dependencies):
-                    kwargs.setdefault('flags', [])
-                    kwargs['flags'].append(dep_lib)
+                    if kwargs.get('skip_library_libs', False):
+                        libkey = 'library_flags'
+                    else:
+                        libkey = 'flags'
+                    kwargs.setdefault(libkey, [])
+                    kwargs[libkey].append(dep_lib)
                 else:
                     libraries.append(dep_lib)
         # Update kwargs
@@ -2319,20 +2318,14 @@ class CompiledModelDriver(ModelDriver):
     def compile_dependencies(cls, **kwargs):
         r"""Compile any required internal libraries, including the interface."""
         base_libraries = []
-        print('compile_dependencies', cls.language, cls.base_languages,
-              cls.interface_library, cls.is_installed(),
-              cls.is_language_installed(), cls.are_dependencies_installed(),
-              cls.is_comm_installed(), cls.is_configured())
         for x in cls.base_languages:
             base_cls = import_component('model', x)
             base_libraries.append(base_cls.interface_library)
-            print(base_cls, 'calling compile')
             base_cls.compile_dependencies(**kwargs)
         if (((cls.interface_library is not None) and cls.is_installed()
              and (cls.interface_library not in base_libraries))):
             # cls.call_compiler(cls.interface_library)
             dep_order = cls.get_dependency_order(cls.interface_library)
-            print('dep_order', cls.language, dep_order)
             for k in dep_order[::-1]:
                 cls.call_compiler(k, **kwargs)
 
