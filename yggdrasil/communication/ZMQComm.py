@@ -11,6 +11,7 @@ from yggdrasil.config import ygg_cfg
 from yggdrasil.communication import CommBase, AsyncComm
 
 
+logger = logging.getLogger(__name__)
 _socket_type_pairs = [('PUSH', 'PULL'),
                       ('PUB', 'SUB'),
                       ('REP', 'REQ'),
@@ -198,7 +199,7 @@ def bind_socket(socket, address, retry_timeout=-1, nretry=1):
             # print(e, e.errno)
             raise e
         else:
-            logging.debug("Retrying bind in %f s", retry_timeout)
+            logger.debug("Retrying bind in %f s", retry_timeout)
             tools.sleep(retry_timeout)
             address = bind_socket(socket, address, nretry=nretry - 1,
                                   retry_timeout=retry_timeout)

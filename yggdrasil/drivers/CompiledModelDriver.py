@@ -12,6 +12,7 @@ from yggdrasil.drivers.ModelDriver import ModelDriver
 from yggdrasil.components import import_component
 
 
+logger = logging.getLogger(__name__)
 _compiler_registry = OrderedDict()
 _linker_registry = OrderedDict()
 _archiver_registry = OrderedDict()
@@ -704,10 +705,10 @@ class CompilationToolBase(object):
             output, err = proc.communicate()
             output = backwards.as_str(output)
             if (proc.returncode != 0) and (not allow_error):
-                logging.error(output)
+                logger.error(output)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
-            logging.debug('%s\n%s' % (' '.join(cmd), output))
+            logger.debug('%s\n%s' % (' '.join(cmd), output))
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
                 raise RuntimeError("Could not call command '%s': %s"
@@ -717,12 +718,12 @@ class CompilationToolBase(object):
             if (out != 'clean'):
                 if not (os.path.isfile(out)
                         or os.path.isdir(out)):  # pragma: debug
-                    logging.error('%s\n%s' % (' '.join(cmd), output))
+                    logger.error('%s\n%s' % (' '.join(cmd), output))
                     raise RuntimeError(("%s tool, %s, failed to produce "
                                         "result '%s'")
                                        % (cls.tooltype.title(), cls.name, out))
-                logging.debug("%s %s produced %s"
-                              % (cls.tooltype.title(), cls.name, out))
+                logger.debug("%s %s produced %s"
+                             % (cls.tooltype.title(), cls.name, out))
                 products.append(out)
             return out
         return output
@@ -2321,11 +2322,11 @@ class CompiledModelDriver(ModelDriver):
                         search_list = cls.get_tool('linker').get_search_path()
                     fpath = locate_file(fname, directory_list=search_list)
                 if fpath:
-                    logging.info('Located %s: %s' % (fname, fpath))
+                    logger.info('Located %s: %s' % (fname, fpath))
                     cfg.set(k_lang, opt, fpath)
                 else:
-                    logging.info('Could not locate %s (search_list = %s)'
-                                 % (fname, search_list))
+                    logger.info('Could not locate %s (search_list = %s)'
+                                % (fname, search_list))
                     out.append((k_lang, opt, desc))
         return out
 

@@ -9,6 +9,9 @@ from yggdrasil.components import import_component
 from yggdrasil.drivers import CModelDriver, CPPModelDriver
 
 
+logger = logging.getLogger(__name__)
+
+
 def yggrun():
     r"""Start a run."""
     prog = sys.argv[0].split(os.path.sep)[-1]
@@ -90,7 +93,7 @@ def validate_yaml():
     r"""Validate a set of or or more YAMLs defining an integration."""
     files = sys.argv[1:]
     yamlfile.parse_yaml(files)
-    logging.info("Validation succesful.")
+    logger.info("Validation succesful.")
 
 
 def update_config():

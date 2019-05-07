@@ -1,12 +1,13 @@
 from yggdrasil.communication import CommBase, AsyncComm
 from yggdrasil.config import ygg_cfg
 import logging
+logger = logging.getLogger(__name__)
 try:
     import pika
     _rmq_installed = True
 except ImportError:
-    logging.warning("Could not import pika. "
-                    + "RabbitMQ support will be disabled.")
+    logger.warning("Could not import pika. "
+                   + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
 

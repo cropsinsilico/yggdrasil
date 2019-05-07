@@ -18,6 +18,7 @@ from yggdrasil import backwards
 from yggdrasil.components import import_component, ComponentBase
 
 
+logger = logging.getLogger(__name__)
 YGG_MSG_EOF = b'EOF!!!'
 YGG_MSG_BUF = 1024 * 2
 
@@ -45,26 +46,26 @@ except AttributeError:
 def check_threads():  # pragma: debug
     r"""Check for threads that are still running."""
     global _thread_registry
-    # logging.info("Checking %d threads" % len(_thread_registry))
+    # logger.info("Checking %d threads" % len(_thread_registry))
     for k, v in _thread_registry.items():
         if v.is_alive():
-            logging.error("Thread is alive: %s" % k)
+            logger.error("Thread is alive: %s" % k)
     if threading.active_count() > 1:
-        logging.info("%d threads running" % threading.active_count())
+        logger.info("%d threads running" % threading.active_count())
         for t in threading.enumerate():
-            logging.info("%s thread running" % t.name)
+            logger.info("%s thread running" % t.name)
 
 
 def check_locks():  # pragma: debug
     r"""Check for locks in lock registry that are locked."""
     global _lock_registry
-    # logging.info("Checking %d locks" % len(_lock_registry))
+    # logger.info("Checking %d locks" % len(_lock_registry))
     for k, v in _lock_registry.items():
         res = v.acquire(False)
         if res:
             v.release()
         else:
-            logging.error("Lock could not be acquired: %s" % k)
+            logger.error("Lock could not be acquired: %s" % k)
 
 
 def check_sockets():  # pragma: debug
@@ -72,7 +73,7 @@ def check_sockets():  # pragma: debug
     from yggdrasil.communication import cleanup_comms
     count = cleanup_comms('ZMQComm')
     if count > 0:
-        logging.info("%d sockets closed." % count)
+        logger.info("%d sockets closed." % count)
 
 
 def is_subprocess():
@@ -519,8 +520,8 @@ def print_encoded(msg, *args, **kwargs):
     try:
         print(backwards.as_unicode(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
-        logging.debug("sys.stdout.encoding = %s, cannot print unicode",
-                      sys.stdout.encoding)
+        logger.debug("sys.stdout.encoding = %s, cannot print unicode",
+                     sys.stdout.encoding)
         kwargs.pop('end', None)
         try:
             print(msg, *args, **kwargs)
@@ -568,7 +569,7 @@ class TimeOut(object):
 #     r"""Decorator for marking functions that should only be called once."""
 #     def wrapper(*args, **kwargs):
 #         if getattr(func, '_single_use_method_called', False):
-#             logging.info("METHOD %s ALREADY CALLED" % func)
+#             logger.info("METHOD %s ALREADY CALLED" % func)
 #             return
 #         else:
 #             func._single_use_method_called = True

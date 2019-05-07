@@ -3,7 +3,7 @@ import copy
 import uuid
 import atexit
 import threading
-from logging import info
+import logging
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
@@ -15,6 +15,7 @@ from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 
 
+logger = logging.getLogger(__name__)
 _registered_servers = dict()
 _registered_comms = dict()
 _server_lock = threading.RLock()
@@ -626,9 +627,9 @@ class CommBase(tools.YggClass):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
         if out > 0:
-            info('There are %d %s comms: %s',
-                 len(cls.comm_registry()), cls.__name__,
-                 [k for k in cls.comm_registry().keys()])
+            logger.info('There are %d %s comms: %s',
+                        len(cls.comm_registry()), cls.__name__,
+                        [k for k in cls.comm_registry().keys()])
         return out
 
     @classmethod

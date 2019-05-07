@@ -23,6 +23,7 @@ if os.environ.get('DISPLAY', '') == '':  # pragma: debug
 elif ygg_platform._is_mac:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
+logger = logging.getLogger(__name__)
 _linewidth = 2
 _legend_fontsize = 14
 mpl.rc('font', size=18)
@@ -1310,7 +1311,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         print(fmt_row % (k, v[0], v[1]))
     # Save plot
     plt.savefig(plotfile, dpi=600)
-    logging.info('plotfile: %s', plotfile)
+    logger.info('plotfile: %s', plotfile)
     if cleanup_plot:
         os.remove(plotfile)
     return plotfile

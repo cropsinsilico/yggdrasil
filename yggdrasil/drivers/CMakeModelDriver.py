@@ -10,6 +10,9 @@ from yggdrasil.drivers.CompiledModelDriver import (
 from yggdrasil.drivers import CModelDriver, CPPModelDriver
 
 
+logger = logging.getLogger(__name__)
+
+
 class CMakeConfigure(CompilerBase):
     r"""CMake configuration tool."""
     name = 'cmake'
@@ -503,7 +506,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xl.upper()))
         lines = preamble_lines + lines
-        logging.debug('CMake include file:\n\t' + '\n\t'.join(lines))
+        logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
             return lines
         else:

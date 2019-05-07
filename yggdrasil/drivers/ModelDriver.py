@@ -15,6 +15,7 @@ try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
+logger = logging.getLogger(__name__)
 
 
 class ModelDriver(Driver):
@@ -353,20 +354,20 @@ class ModelDriver(Driver):
                 unused_kwargs.setdefault('cwd', unused_kwargs.pop('working_dir'))
             unused_kwargs.setdefault('shell', platform._is_win)
             # Call command
-            logging.info("Running '%s' from %s"
-                         % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
-            logging.debug("Process keyword arguments:\n%s\n",
-                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
+            logger.info("Running '%s' from %s"
+                        % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
+            logger.debug("Process keyword arguments:\n%s\n",
+                         '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             if return_process:
                 return proc
             out, err = proc.communicate()
             if proc.returncode != 0:
-                logging.error(out)
+                logger.error(out)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
             out = backwards.as_str(out)
-            logging.debug('%s\n%s' % (' '.join(cmd), out))
+            logger.debug('%s\n%s' % (' '.join(cmd), out))
             return out
         except (subprocess.CalledProcessError, OSError) as e:
             raise RuntimeError("Could not call command '%s': %s"

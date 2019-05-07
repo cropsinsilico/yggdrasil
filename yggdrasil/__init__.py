@@ -9,6 +9,7 @@ import importlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
+logger = logging.getLogger(__name__)
 order = ['pytest', 'nose']
 # order = ['nose', 'pytest']
 try:
@@ -129,7 +130,7 @@ def run_tsts(verbose=False, nocapture=True, stop=True,
         # else:
         #     raise RuntimeError("No test runner.")
     except BaseException:
-        logging.exception('Error in running test.')
+        logger.exception('Error in running test.')
         error_code = -1
     finally:
         os.chdir(initial_dir)

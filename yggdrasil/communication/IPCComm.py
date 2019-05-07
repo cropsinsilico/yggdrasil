@@ -3,12 +3,13 @@ import logging
 from subprocess import Popen, PIPE
 from yggdrasil import platform, tools
 from yggdrasil.communication import CommBase, AsyncComm
+logger = logging.getLogger(__name__)
 try:
     import sysv_ipc
     _ipc_installed = (platform._is_linux or platform._is_mac)
 except ImportError:  # pragma: windows
-    logging.warn("Could not import sysv_ipc. "
-                 + "IPC support will be disabled.")
+    logger.warn("Could not import sysv_ipc. "
+                + "IPC support will be disabled.")
     sysv_ipc = None
     _ipc_installed = False
 
@@ -33,7 +34,7 @@ def get_queue(qid=None):
         CommBase.register_comm('IPCComm', key, mq)
         return mq
     else:  # pragma: windows
-        logging.warning("IPC not installed. Queue cannot be returned.")
+        logger.warning("IPC not installed. Queue cannot be returned.")
         return None
 
 
@@ -75,7 +76,7 @@ def ipcs(options=[]):
             raise Exception("Error on spawned process. See output.")
         return output.decode('utf-8')
     else:  # pragma: windows
-        logging.warn("IPC not installed. ipcs cannot be run.")
+        logger.warn("IPC not installed. ipcs cannot be run.")
         return ''
 
 
@@ -138,7 +139,7 @@ def ipcrm(options=[]):
         if not output.isspace():
             print(output.decode('utf-8'))
     else:  # pragma: windows
-        logging.warn("IPC not installed. ipcrm cannot be run.")
+        logger.warn("IPC not installed. ipcrm cannot be run.")
 
 
 def ipcrm_queues(queue_keys=None):
@@ -157,7 +158,7 @@ def ipcrm_queues(queue_keys=None):
         for q in queue_keys:
             ipcrm(["-Q %s" % q])
     else:  # pragma: windows
-        logging.warn("IPC not installed. ipcrm cannot be run.")
+        logger.warn("IPC not installed. ipcrm cannot be run.")
 
 
 class IPCServer(CommBase.CommServer):
