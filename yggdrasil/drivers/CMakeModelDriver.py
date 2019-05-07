@@ -104,6 +104,11 @@ class CMakeConfigure(CompilerBase):
         # Pop target (used for build stage file name, but not for any other
         # part of the build stage)
         kwargs.pop('target', None)
+        # Add conda prefix
+        conda_prefix = cls.get_conda_prefix()
+        if conda_prefix:
+            kwargs.setdefault('definitions', [])
+            kwargs['definitions'].append('CMAKE_PREFIX_PATH=%s' % conda_prefix)
         out = super(CMakeConfigure, cls).get_flags(sourcedir=sourcedir,
                                                    builddir=builddir, **kwargs)
         return out

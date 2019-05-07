@@ -482,6 +482,20 @@ class CompilationToolBase(object):
         return out
 
     @classmethod
+    def get_conda_prefix(cls):
+        r"""Determine the conda path prefix.
+
+        Returns:
+            str: Conda path prefix. None will be returned if conda is not
+                installed.
+
+        """
+        conda_prefix = os.environ.get('CONDA_PREFIX', '')
+        if not conda_prefix:
+            conda_prefix = tools.which('conda')
+        return conda_prefix
+            
+    @classmethod
     def get_search_path(cls):
         r"""Determine the paths searched by the tool for external library files.
 
@@ -517,14 +531,15 @@ class CompilationToolBase(object):
                     if os.path.isdir(x):
                         paths.append(x)
         # Get search paths from the conda environment
-        if (cls.search_path_conda is not None) and ('CONDA_PREFIX' in os.environ):
-            prefix = os.environ['CONDA_PREFIX']
-            if not isinstance(cls.search_path_conda, list):
-                cls.search_path_conda = [cls.search_path_conda]
-            for ienv in cls.search_path_conda:
-                ienv_path = os.path.join(prefix, ienv)
-                if os.path.isdir(ienv_path):
-                    paths.append(ienv_path)
+        if (cls.search_path_conda is not None):
+            conda_prefix = cls.get_conda_prefix()
+            if conda_prefix:
+                if not isinstance(cls.search_path_conda, list):
+                    cls.search_path_conda = [cls.search_path_conda]
+                for ienv in cls.search_path_conda:
+                    ienv_path = os.path.join(conda_prefix, ienv)
+                    if os.path.isdir(ienv_path):
+                        paths.append(ienv_path)
         return paths
 
     @classmethod
