@@ -477,21 +477,20 @@ class CMakeModelDriver(CompiledModelDriver):
             xd, xf = os.path.split(x)
             xl, xe = os.path.splitext(xf)
             xl = CModelDriver.CModelDriver.get_tool('linker').libpath2libname(xf)
+            if platform._is_win:  # pragma: windows
+                x = x.replace('\\', re.escape('\\'))
+                xd = xd.replace('\\', re.escape('\\'))
             if cls.add_libraries:
                 # Version adding library
                 if xe.lower() in ['.so', '.dll', '.dylib']:
                     lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
                 else:
                     lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
-                lines.append('SET_TARGET_PROPERTIES(')
-                lines.append('    %s PROPERTIES' % xl)
-                # lines.append('    PROPERTIES LINKER_LANGUAGE CXX')
-                if platform._is_win:  # pragma: windows
-                    lines.append('    IMPORTED_LOCATION %s)' %
-                                 x.replace('\\', re.escape('\\')))
-                else:
-                    lines.append('    IMPORTED_LOCATION %s)' % x)
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, xl))
+                lines += ['SET_TARGET_PROPERTIES(',
+                          '    %s PROPERTIES' % xl,
+                          # '    LINKER_LANGUAGE CXX',
+                          '    IMPORTED_LOCATION %s)' % x,
+                          'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
                 # Version finding library
                 lines.append('FIND_LIBRARY(%s_LIBRARY %s %s)'

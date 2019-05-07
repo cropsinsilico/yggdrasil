@@ -1,6 +1,8 @@
 import os
+import re
 import unittest
 import tempfile
+from yggdrasil import platform
 from yggdrasil.tests import scripts, assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
 from yggdrasil.drivers.CMakeModelDriver import CMakeModelDriver
@@ -32,13 +34,16 @@ def test_create_include():
         testlist += [([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                      ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
     else:
+        if platform._is_win:  # pragma: windows
+            tempdir_cp = tempdir.replace('\\', re.escape('\\'))
+        else:
+            tempdir_cp = tempdir
         testlist += [([], [fname_dll], ['FIND_LIBRARY(TEST_LIBRARY test %s)'
-                                        % tempdir]),
+                                        % tempdir_cp]),
                      ([], [fname_lib], ['FIND_LIBRARY(TEST_LIBRARY test %s)'
-                                        % tempdir])]
+                                        % tempdir_cp])]
     from yggdrasil.drivers.CModelDriver import CModelDriver
     CModelDriver.compile_dependencies()
-    print('calling cmake compile')
     CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
         out = CMakeModelDriver.create_include(None, target, compile_flags=c,
