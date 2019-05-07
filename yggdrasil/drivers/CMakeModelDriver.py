@@ -488,6 +488,7 @@ class CMakeModelDriver(CompiledModelDriver):
             if platform._is_win:  # pragma: windows
                 x = x.replace('\\', re.escape('\\'))
                 xd = xd.replace('\\', re.escape('\\'))
+            xn = os.path.splitext(xl)[0]
             if cls.add_libraries:
                 # Version adding library
                 if xe.lower() in ['.so', '.dll', '.dylib']:
@@ -502,9 +503,9 @@ class CMakeModelDriver(CompiledModelDriver):
             else:
                 # Version finding library
                 lines.append('FIND_LIBRARY(%s_LIBRARY %s %s)'
-                             % (xl.upper(), xl, xd))
+                             % (xn.upper(), xl, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
-                             % (target, xl.upper()))
+                             % (target, xn.upper()))
         lines = preamble_lines + lines
         logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
