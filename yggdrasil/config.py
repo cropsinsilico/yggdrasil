@@ -12,7 +12,7 @@ import logging
 import warnings
 import subprocess
 from yggdrasil.backwards import configparser
-from yggdrasil import platform
+from yggdrasil import platform, tools
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
 usr_config_file = os.path.expanduser(os.path.join('~', config_file))
@@ -256,6 +256,53 @@ env_map = [('debug', 'ygg', 'YGG_DEBUG'),
            ]
 
 
+def get_ygg_loglevel(cfg=None, default='DEBUG'):
+    r"""Get the current log level.
+
+    Args:
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
+            Config parser with options that should be used to determine the
+            log level. Defaults to :data:`yggdrasil.config.ygg_cfg`.
+        default (str, optional): Log level that should be returned if the log
+            level option is not set in cfg. Defaults to 'DEBUG'.
+
+    Returns:
+        str: Log level string.
+
+    """
+    is_model = tools.is_subprocess()
+    if cfg is None:
+        cfg = ygg_cfg
+    if is_model:
+        opt = 'client'
+    else:
+        opt = 'ygg'
+    return cfg.get('debug', opt, default)
+
+
+def set_ygg_loglevel(level, cfg=None):
+    r"""Set the current log level.
+
+    Args:
+        level (str): Level that the log should be set to.
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
+            Config parser with options that should be used to update the
+            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
+    
+    """
+    is_model = tools.is_subprocess()
+    if cfg is None:
+        cfg = ygg_cfg
+    if is_model:
+        opt = 'client'
+    else:
+        opt = 'ygg'
+    cfg.set('debug', opt, level)
+    logLevelYGG = eval('logging.%s' % level)
+    ygg_logger = logging.getLogger("yggdrasil")
+    ygg_logger.setLevel(level=logLevelYGG)
+        
+    
 def cfg_logging(cfg=None):
     r"""Set logging levels from config options.
 
@@ -265,22 +312,28 @@ def cfg_logging(cfg=None):
             environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
 
     """
-    is_model = (os.environ.get('YGG_SUBPROCESS', "False") == "True")
+    is_model = tools.is_subprocess()
     if cfg is None:
         cfg = ygg_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
     logLevelYGG = eval('logging.%s' % cfg.get('debug', 'ygg', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
+    logLevelCLI = eval('logging.%s' % cfg.get('debug', 'client', 'INFO'))
     ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
-    ygg_logger.setLevel(level=logLevelYGG)
+    print('log levels', cfg.get('debug', 'ygg', 'NOTSET'),
+          cfg.get('debug', 'client', 'INFO'))
+    if is_model:
+        ygg_logger.setLevel(level=logLevelCLI)
+    else:
+        ygg_logger.setLevel(level=logLevelYGG)
     rmq_logger.setLevel(level=logLevelRMQ)
     # For models, route the loggs to stdout so that they are displayed by the
     # model driver.
     if is_model:
         handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logLevelYGG)
+        handler.setLevel(logLevelCLI)
         ygg_logger.addHandler(handler)
         rmq_logger.addHandler(handler)
 

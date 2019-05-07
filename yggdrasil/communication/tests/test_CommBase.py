@@ -291,7 +291,7 @@ class TestCommBase(YggTestClassInfo):
                      msg_send=None, msg_recv=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
-                     n_send=1, n_recv=1,
+                     n_send=1, n_recv=1, print_status=False,
                      close_on_send_eof=None, close_on_recv_eof=None):
         r"""Generic send/recv of a message."""
         tkey = 'do_send_recv'
@@ -380,8 +380,9 @@ class TestCommBase(YggTestClassInfo):
             send_instance.sleep()
         send_instance.stop_timeout(key_suffix=tkey)
         # Print status of comms
-        send_instance.printStatus()
-        recv_instance.printStatus()
+        if print_status:
+            send_instance.printStatus()
+            recv_instance.printStatus()
         # Confirm recept of messages
         if not (is_eof or reverse_comms):
             send_instance.wait_for_confirm(timeout=self.timeout)
@@ -416,7 +417,7 @@ class TestCommBase(YggTestClassInfo):
 
     def test_send_recv(self):
         r"""Test send/recv of a small message."""
-        self.do_send_recv()
+        self.do_send_recv(print_status=True)
 
     def test_send_recv_nolimit(self):
         r"""Test send/recv of a large message."""

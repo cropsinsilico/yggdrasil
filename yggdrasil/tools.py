@@ -663,18 +663,16 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
-        from yggdrasil.config import ygg_cfg, cfg_logging
-        self._old_loglevel = ygg_cfg.get('debug', 'ygg')
-        ygg_cfg.set('debug', 'ygg', 'DEBUG')
-        cfg_logging()
+        self.info("Setting debug_log")
+        from yggdrasil.config import get_ygg_loglevel, set_ygg_loglevel
+        self._old_loglevel = get_ygg_loglevel()
+        set_ygg_loglevel('DEBUG')
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
-        from yggdrasil.config import ygg_cfg, cfg_logging
+        from yggdrasil.config import set_ygg_loglevel
         if self._old_loglevel is not None:
-            ygg_cfg.set('debug', 'ygg', self._old_loglevel)
-            cfg_logging()
-            self._old_loglevel = None
+            set_ygg_loglevel(self._old_loglevel)
 
     def pprint(self, obj, block_indent=0, indent_str='    ', **kwargs):
         r"""Use pprint to represent an object as a string.
