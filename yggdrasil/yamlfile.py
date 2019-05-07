@@ -1,4 +1,5 @@
 import os
+import copy
 import pprint
 import pystache
 import yaml
@@ -10,42 +11,58 @@ def load_yaml(fname):
     r"""Parse a yaml file defining a run.
 
     Args:
-        fname (str): Path to the yaml file.
+        fname (str, file, dict): Path to a YAML file, an open file descriptor
+            to a file containing a YAML, or a loaded YAML document.
 
     Returns:
         dict: Contents of yaml file.
 
     """
-    fname = os.path.realpath(fname)
-    if not os.path.isfile(fname):
-        raise IOError("Unable locate yaml file %s" % fname)
-    # Open file and parse yaml
-    with open(fname, 'r') as f:
-        # Mustache replace vars
-        yamlparsed = f.read()
-        yamlparsed = pystache.render(
-            backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
-        yamlparsed = yaml.safe_load(yamlparsed)
+    opened = False
+    if isinstance(fname, dict):
+        yamlparsed = copy.deepcopy(fname)
+        yamlparsed.setdefault('working_dir', os.getcwd())
+        return yamlparsed
+    elif isinstance(fname, str):
+        fname = os.path.realpath(fname)
+        if not os.path.isfile(fname):
+            raise IOError("Unable locate yaml file %s" % fname)
+        fd = open(fname, 'r')
+        opened = True
+    else:
+        fd = fname
+        if (hasattr(fd, 'name') and (not fd.name.startswith('<'))):
+            fname = fd.name
+        else:
+            fname = os.getcwd()
+    # Mustache replace vars
+    yamlparsed = fd.read()
+    yamlparsed = pystache.render(
+        backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
+    yamlparsed = yaml.safe_load(yamlparsed)
     if not isinstance(yamlparsed, dict):  # pragma: debug
         raise ValueError("Loaded yaml is not a dictionary.")
     yamlparsed['working_dir'] = os.path.dirname(fname)
+    if opened:
+        fd.close()
     return yamlparsed
 
 
 def prep_yaml(files):
-    r"""Prepare yaml to be parsed by Cerberus using schema including covering
-    backwards compatible options.
+    r"""Prepare yaml to be parsed by jsonschema including covering backwards
+    compatible options.
 
     Args:
         files (str, list): Either the path to a single yaml file or a list of
-            yaml files.
+            yaml files. Entries can also be opened file descriptors for files
+            containing YAML documents or pre-loaded YAML documents.
 
     Returns:
         dict: YAML ready to be parsed using schema.
 
     """
     # Load each file
-    if isinstance(files, str):
+    if not isinstance(files, list):
         files = [files]
     yamls = [load_yaml(f) for f in files]
     # Standardize format of models and connections to be lists and
