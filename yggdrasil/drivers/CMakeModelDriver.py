@@ -506,7 +506,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xl.upper()))
         lines = preamble_lines + lines
-        logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
+        logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -551,6 +551,10 @@ class CMakeModelDriver(CompiledModelDriver):
         # Set keyword arguments based on cmake mappings/aliases
         if dont_build is not None:
             kwargs['dont_link'] = dont_build
+        # Add conda prefix
+        conda_prefix = cls.get_tool('compiler').get_conda_prefix()
+        if conda_prefix:
+            os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
         return super(CMakeModelDriver, cls).call_compiler(src, **kwargs)
 
     def compile_model(self, target=None, **kwargs):
