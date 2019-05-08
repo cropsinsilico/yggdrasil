@@ -4,7 +4,7 @@ import copy
 import shutil
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, backwards
+from yggdrasil import platform, backwards, tools
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase)
 from yggdrasil.drivers import CModelDriver, CPPModelDriver
@@ -556,6 +556,12 @@ class CMakeModelDriver(CompiledModelDriver):
         conda_prefix = cls.get_tool('compiler').get_conda_prefix()
         if conda_prefix:
             os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
+        import pprint
+        pprint.pprint(os.environ)
+        cc = CModelDriver.CModelDriver.get_tool('compiler').get_executable()
+        cxx = CPPModelDriver.CPPModelDriver.get_tool('compiler').get_executable()
+        print('cc', cc, tools.which(cc))
+        print('cxx', cxx, tools.which(cxx))
         return super(CMakeModelDriver, cls).call_compiler(src, **kwargs)
 
     def compile_model(self, target=None, **kwargs):
