@@ -553,10 +553,14 @@ class CMakeModelDriver(CompiledModelDriver):
         if dont_build is not None:
             kwargs['dont_link'] = dont_build
         # Add conda prefix
+        import pprint
+        import glob
         conda_prefix = cls.get_tool('compiler').get_conda_prefix()
         if conda_prefix:
             os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
-        import pprint
+            print('conda_prefix', conda_prefix)
+            pprint.pprint(glob.glob(os.path.join(os.path.join(conda_prefix, 'lib'),
+                                                 '*')))
         pprint.pprint(os.environ)
         cc = CModelDriver.CModelDriver.get_tool('compiler').get_executable()
         cxx = CPPModelDriver.CPPModelDriver.get_tool('compiler').get_executable()
