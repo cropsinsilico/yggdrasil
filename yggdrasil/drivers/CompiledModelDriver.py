@@ -1172,6 +1172,7 @@ class LinkerBase(CompilationToolBase):
             # TODO: Dynamic library by default on windows?
             # cls.shared_library_flag = '-dynamiclib'
             cls.library_ext = '.dylib'
+            cls.flag_options['library_rpath'] = '-rpath'
         else:
             cls.library_ext = '.so'
 
@@ -1186,7 +1187,7 @@ class LinkerBase(CompilationToolBase):
             str: Library name.
 
         """
-        print(libpath, cls.library_prefix, cls.library_ext)
+        # Is this necessary?
         # if platform._is_win:  # pragma: windows
         #     libname = os.path.basename(libpath)
         # else:
@@ -1266,19 +1267,29 @@ class LinkerBase(CompilationToolBase):
         libraries = kwargs.pop('libraries', [])
         library_dirs = kwargs.pop('library_dirs', [])
         library_libs = kwargs.pop('library_libs', [])
+        library_rpath = kwargs.pop('library_rpath', [])
         library_flags = kwargs.pop('library_flags', [])
         flags = copy.deepcopy(kwargs.pop('flags', []))
         # Get list of libraries
         for x in libraries:
             if use_library_path:
                 if skip_library_libs:
-                    library_flags.append(x)
+                    dest_flags = library_flags
                 else:
-                    flags.append(x)
+                    dest_flags = flags
+                if x not in dest_flags:
+                    dest_flags.append(x)
             else:
                 x_d, x_f = os.path.split(x)
-                library_dirs.append(x_d)
-                library_libs.append(cls.libpath2libname(x_f))
+                if x_d not in library_dirs:
+                    library_dirs.append(x_d)
+                x_l = cls.libpath2libname(x_f)
+                if x_l not in library_libs:
+                    library_libs.append(x_l)
+                if (((cls.tooltype == 'linker') and x_f.endswith(cls.library_ext)
+                     and ('library_rpath' in cls.flag_options))):
+                    if x_d not in library_rpath:
+                        library_rpath.append(x_d)
         # Add libraries to library_flags instead of flags so they can be
         # used elsewhere
         if skip_library_libs and library_libs:
@@ -1290,6 +1301,8 @@ class LinkerBase(CompilationToolBase):
             kwargs['library_dirs'] = library_dirs
         if library_libs:
             kwargs['library_libs'] = library_libs
+        if library_rpath:
+            kwargs['library_rpath'] = library_rpath
         out = super(LinkerBase, cls).get_flags(flags=flags, **kwargs)
         # Add flag specifying the shared library
         if build_library and (cls.shared_library_flag is not None):

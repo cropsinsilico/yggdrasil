@@ -141,10 +141,10 @@ class CModelDriver(CompiledModelDriver):
                       'libtype': 'header_only',
                       'language': 'c'},
         'zmq': {'include': 'zmq.h',
-                'libtype': 'static',
+                'libtype': 'shared',
                 'language': 'c'},  # static added in before_registration
         'czmq': {'include': 'czmq.h',
-                 'libtype': 'static',
+                 'libtype': 'shared',
                  'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': 'YggInterface.c',
@@ -198,9 +198,11 @@ class CModelDriver(CompiledModelDriver):
             libtype = cls.external_libraries[x]['libtype']
             if libtype == 'static':
                 tool = archiver
+                kwargs = {}
             else:
                 tool = linker
-            cls.external_libraries[x][libtype] = tool.get_output_file(x)
+                kwargs = {'build_library': True}
+            cls.external_libraries[x][libtype] = tool.get_output_file(x, **kwargs)
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']

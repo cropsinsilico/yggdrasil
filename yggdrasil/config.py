@@ -178,7 +178,7 @@ def find_all(name, path):
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
         else:
-            args = ["find", path, "-type", "f", "-name", name]
+            args = ["find", "-L", path, "-type", "f", "-name", name]
             pfind = subprocess.Popen(args, env=os.environ,
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE)
@@ -322,8 +322,6 @@ def cfg_logging(cfg=None):
     logLevelCLI = eval('logging.%s' % cfg.get('debug', 'client', 'INFO'))
     ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
-    print('log levels', cfg.get('debug', 'ygg', 'NOTSET'),
-          cfg.get('debug', 'client', 'INFO'))
     if is_model:
         ygg_logger.setLevel(level=logLevelCLI)
     else:

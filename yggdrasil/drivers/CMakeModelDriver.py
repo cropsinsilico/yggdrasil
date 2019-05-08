@@ -502,8 +502,9 @@ class CMakeModelDriver(CompiledModelDriver):
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
                 # Version finding library
-                lines.append('FIND_LIBRARY(%s_LIBRARY %s %s)'
-                             % (xn.upper(), xl, xd))
+                preamble_lines.append('LINK_DIRECTORIES(%s)' % xd)
+                lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
+                             % (xn.upper(), xf, xl, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
@@ -554,13 +555,9 @@ class CMakeModelDriver(CompiledModelDriver):
             kwargs['dont_link'] = dont_build
         # Add conda prefix
         import pprint
-        import glob
         conda_prefix = cls.get_tool('compiler').get_conda_prefix()
         if conda_prefix:
             os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
-            print('conda_prefix', conda_prefix)
-            pprint.pprint(glob.glob(os.path.join(os.path.join(conda_prefix, 'lib'),
-                                                 '*')))
         pprint.pprint(os.environ)
         cc = CModelDriver.CModelDriver.get_tool('compiler').get_executable()
         cxx = CPPModelDriver.CPPModelDriver.get_tool('compiler').get_executable()
