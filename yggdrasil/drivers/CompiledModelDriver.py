@@ -1186,10 +1186,11 @@ class LinkerBase(CompilationToolBase):
             str: Library name.
 
         """
-        if platform._is_win:  # pragma: windows
-            libname = os.path.basename(libpath)
-        else:
-            libname = cls.file2base(libpath)
+        print(libpath, cls.library_prefix, cls.library_ext)
+        # if platform._is_win:  # pragma: windows
+        #     libname = os.path.basename(libpath)
+        # else:
+        libname = cls.file2base(libpath)
         if cls.library_prefix:
             libname = libname.split(cls.library_prefix)[-1]
         return libname
