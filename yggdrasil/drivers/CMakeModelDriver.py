@@ -4,7 +4,7 @@ import copy
 import shutil
 import logging
 from collections import OrderedDict
-from yggdrasil import platform, backwards, tools
+from yggdrasil import platform, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase)
 from yggdrasil.drivers import CModelDriver, CPPModelDriver
@@ -108,10 +108,13 @@ class CMakeConfigure(CompilerBase):
         # part of the build stage)
         kwargs.pop('target', None)
         # Add conda prefix
-        conda_prefix = cls.get_conda_prefix()
-        if conda_prefix:
-            kwargs.setdefault('definitions', [])
-            kwargs['definitions'].append('CMAKE_PREFIX_PATH=%s' % conda_prefix)
+        # conda_prefix = cls.get_conda_prefix()
+        # if conda_prefix:
+        #     kwargs.setdefault('definitions', [])
+        #     kwargs['definitions'].append('CMAKE_PREFIX_PATH=%s'
+        #                                  % os.path.join(conda_prefix, 'lib'))
+        #     kwargs['definitions'].append('CMAKE_LIBRARY_PATH=%s'
+        #                                  % os.path.join(conda_prefix, 'lib'))
         out = super(CMakeConfigure, cls).get_flags(sourcedir=sourcedir,
                                                    builddir=builddir, **kwargs)
         return out
@@ -408,8 +411,17 @@ class CMakeModelDriver(CompiledModelDriver):
         if os.path.isfile(self.cmakelists):
             if not os.path.isfile(self.cmakelists_copy):
                 shutil.copy2(self.cmakelists, self.cmakelists_copy)
-            with open(self.cmakelists, 'rb+') as fd:
+            with open(self.cmakelists, 'rb') as fd:
                 contents = fd.read()
+            with open(self.cmakelists, 'wb') as fd:
+                # Add conda prefix as first line
+                conda_prefix = self.get_tool('compiler').get_conda_prefix()
+                if conda_prefix:
+                    newline = backwards.as_bytes('LINK_DIRECTORIES(%s)\n'
+                                                 % os.path.join(conda_prefix, 'lib'))
+                    if newline not in contents:
+                        fd.write(newline)
+                fd.write(contents)
                 newline = backwards.as_bytes('\nINCLUDE(%s)\n'
                                              % os.path.basename(include_file))
                 if newline not in contents:
@@ -503,6 +515,9 @@ class CMakeModelDriver(CompiledModelDriver):
                 x = x.replace('\\', re.escape('\\'))
                 xd = xd.replace('\\', re.escape('\\'))
             xn = os.path.splitext(xl)[0]
+            new_dir = 'LINK_DIRECTORIES(%s)' % xd
+            if new_dir not in preamble_lines:
+                preamble_lines.append(new_dir)
             if cls.add_libraries:
                 # Version adding library
                 if xe.lower() in ['.so', '.dll', '.dylib']:
@@ -512,19 +527,17 @@ class CMakeModelDriver(CompiledModelDriver):
                 lines += ['SET_TARGET_PROPERTIES(',
                           '    %s PROPERTIES' % xl,
                           # '    LINKER_LANGUAGE CXX',
+                          # '    CXX_STANDARD 11',
                           '    IMPORTED_LOCATION %s)' % x,
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
                 # Version finding library
-                new_dir = 'LINK_DIRECTORIES(%s)' % xd
-                if new_dir not in preamble_lines:
-                    preamble_lines.append(new_dir)
                 lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
                              % (xn.upper(), xf, xl, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
-        logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
+        logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -570,15 +583,12 @@ class CMakeModelDriver(CompiledModelDriver):
         if dont_build is not None:
             kwargs['dont_link'] = dont_build
         # Add conda prefix
-        import pprint
-        conda_prefix = cls.get_tool('compiler').get_conda_prefix()
-        if conda_prefix:
-            os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
-        pprint.pprint(os.environ)
-        cc = CModelDriver.CModelDriver.get_tool('compiler').get_executable()
-        cxx = CPPModelDriver.CPPModelDriver.get_tool('compiler').get_executable()
-        print('cc', cc, tools.which(cc))
-        print('cxx', cxx, tools.which(cxx))
+        # import pprint
+        # conda_prefix = cls.get_tool('compiler').get_conda_prefix()
+        # if conda_prefix:
+        #     os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
+        #     os.environ['CMAKE_LIBRARY_PATH'] = conda_prefix
+        # pprint.pprint(os.environ)
         return super(CMakeModelDriver, cls).call_compiler(src, **kwargs)
 
     def compile_model(self, target=None, **kwargs):
