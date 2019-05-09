@@ -1204,6 +1204,7 @@ class LinkerBase(CompilationToolBase):
             cls.flag_options['library_rpath'] = '-rpath'
         else:
             cls.library_ext = '.so'
+            cls.flag_options['library_rpath'] = '-Wl,-rpath'
 
     @classmethod
     def libpath2libname(cls, libpath):
