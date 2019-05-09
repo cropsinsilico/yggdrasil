@@ -142,7 +142,7 @@ class CModelDriver(CompiledModelDriver):
                       'language': 'c'},
         'zmq': {'include': 'zmq.h',
                 'libtype': 'shared',
-                'language': 'c'},  # static added in before_registration
+                'language': 'c'},
         'czmq': {'include': 'czmq.h',
                  'libtype': 'shared',
                  'language': 'c'}}

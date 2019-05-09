@@ -300,6 +300,12 @@ class CompilationToolBase(object):
                 additional details.
             value (object): Value that should be set in the flag. If a list,
                 multiple flags are added, one for each item in the list.
+            prefix_value (object, optional): Value/flag that should be added to
+                the list before the values. If a list, this must be the same
+                length as value (i.e. one prefix per value).
+            suffix_value (object, optional): Value/flag that should be added to
+                the list after the values. If a list, this must be the same
+                length as value (i.e. one suffix per value).
             prepend (bool, optional): If True, new flags are prepended to the
                 front of the list rather than the end. Defaults to False. This
                 keyword argument is ignoerd if position is provided.
@@ -328,9 +334,22 @@ class CompilationToolBase(object):
                 if k != 'key':
                     kwargs.setdefault(k, v)
             key = key['key']
+        # Get prefixes & suffixes
+        prefix_value = kwargs.pop('prefix_value', None)
+        suffix_value = kwargs.pop('suffix_value', None)
         # Loop over list
         if isinstance(value, list):
-            for v in value:
+            if prefix_value:
+                assert(isinstance(prefix_value, list))
+                assert(len(prefix_value) == len(value))
+            if suffix_value:
+                assert(isinstance(suffix_value, list))
+                assert(len(suffix_value) == len(value))
+            for i, v in enumerate(value):
+                if prefix_value:
+                    kwargs['prefix_value'] = prefix_value[i]
+                if suffix_value:
+                    kwargs['suffix_value'] = suffix_value[i]
                 cls.append_flags(out, key, v, **kwargs)
             return
         # Unpack keyword arguments
@@ -341,6 +360,16 @@ class CompilationToolBase(object):
             raise ValueError("Unexpected keyword arguments: %s" % kwargs)
         # Create flags and check for duplicates
         new_flags = cls.create_flag(key, value)
+        if prefix_value:
+            if isinstance(prefix_value, list):
+                new_flags = prefix_value + new_flags
+            else:
+                new_flags.insert(0, prefix_value)
+        if suffix_value:
+            if isinstance(suffix_value, list):
+                new_flags += suffix_value
+            else:
+                new_flags.append(suffix_value)
         if no_duplicates:
             for o in out:
                 if scanf.scanf(key, o):
@@ -2337,6 +2366,12 @@ class CompiledModelDriver(ModelDriver):
                     fpath = locate_file(fname, directory_list=search_list)
                 if fpath:
                     logger.info('Located %s: %s' % (fname, fpath))
+                    # if (t in ['static']) and platform._is_mac:
+                    #     fpath_orig = fpath
+                    #     fpath = '_s'.join(os.path.splitext(fpath))
+                    #     logger.info('Using symbolic link: %s' % fpath)
+                    #     if not os.path.isfile(fpath):
+                    #         os.symlink(fpath_orig, fpath)
                     cfg.set(k_lang, opt, fpath)
                 else:
                     logger.info('Could not locate %s (search_list = %s)'

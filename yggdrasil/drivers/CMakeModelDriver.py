@@ -453,9 +453,13 @@ class CMakeModelDriver(CompiledModelDriver):
                 xdir = x.split('-I', 1)[-1]
                 if platform._is_win:  # pragma: windows
                     xdir = xdir.replace('\\', re.escape('\\'))
-                preamble_lines.append('INCLUDE_DIRECTORIES(%s)' % xdir)
+                new_dir = 'INCLUDE_DIRECTORIES(%s)' % xdir
+                if new_dir not in preamble_lines:
+                    preamble_lines.append(new_dir)
             elif x.startswith('-') or x.startswith('/'):
-                preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
+                new_def = 'ADD_DEFINITIONS(%s)' % x
+                if new_def not in preamble_lines:
+                    preamble_lines.append(new_def)
             else:
                 raise ValueError("Could not parse compiler flag '%s'." % x)
         # Linker flags
@@ -502,7 +506,9 @@ class CMakeModelDriver(CompiledModelDriver):
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
                 # Version finding library
-                preamble_lines.append('LINK_DIRECTORIES(%s)' % xd)
+                new_dir = 'LINK_DIRECTORIES(%s)' % xd
+                if new_dir not in preamble_lines:
+                    preamble_lines.append(new_dir)
                 lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
                              % (xn.upper(), xf, xl, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
