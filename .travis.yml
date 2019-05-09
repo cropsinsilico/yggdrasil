@@ -170,6 +170,7 @@ install:
       fi
       conda build recipe/meta.yaml --python $CONDA
       conda install --use-local yggdrasil
+      conda list
     fi
 
 script:
