@@ -1181,12 +1181,12 @@ def plot_scalings(compare='comm_type', compare_values=None,
     _lang_list = get_lang_list()
     _comm_list = get_comm_list()
     if use_paper_values:
-        default_vars = {'comm_type': 'ZMQComm',
+        default_vars = {'comm_type': 'zmq',
                         'lang_src': 'python',
                         'lang_dst': 'python',
                         'platform': 'Linux',
                         'python_ver': '2.7'}
-        default_vals = {'comm_type': ['ZMQComm', 'IPCComm'],
+        default_vals = {'comm_type': ['zmq', 'ipc'],
                         'language': ['c', 'cpp', 'python'],
                         'platform': ['Linux', 'MacOS', 'Windows'],
                         'python_ver': ['2.7', '3.5']}
@@ -1209,9 +1209,9 @@ def plot_scalings(compare='comm_type', compare_values=None,
     per_message = kwargs.get('per_message', False)
     if compare == 'comm_type':
         color_var = 'comm_type'
-        color_map = {'ZMQComm': 'b', 'IPCComm': 'r', 'RMQComm': 'g'}
+        color_map = {'zmq': 'b', 'ipc': 'r', 'rmq': 'g'}
         style_var = 'comm_type'
-        style_map = {'ZMQComm': '-', 'IPCComm': '--', 'RMQComm': ':'}
+        style_map = {'zmq': '-', 'ipc': '--', 'rmq': ':'}
         var_list = compare_values
         var_kws = [{color_var: k} for k in var_list]
         kws2label = lambda x: x['comm_type'].split('Comm')[0]  # noqa: E731

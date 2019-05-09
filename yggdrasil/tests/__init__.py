@@ -105,7 +105,7 @@ else:  # pragma: Python 3
 
 def long_running(func):
     r"""Decorator for marking long tests that should be skipped if
-    CIS_ENABLE_LONG_TESTS is set.
+    YGG_ENABLE_LONG_TESTS is set.
 
     Args:
         func (callable): Test function or method.

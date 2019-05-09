@@ -298,8 +298,10 @@ def get_default_comm():
             _default_comm = max(tally)
             if tally[_default_comm] == 0:  # pragma: debug
                 raise Exception('Could not locate an installed comm.')
-    if _default_comm == 'RMQComm':  # pragma: debug
-        raise NotImplementedError('RMQComm cannot be the default comm because '
+    if _default_comm.endswith('Comm'):
+        _default_comm = import_component('comm', _default_comm)._commtype
+    if _default_comm == 'rmq':  # pragma: debug
+        raise NotImplementedError('RMQ cannot be the default comm because '
                                   + 'there is not an RMQ C interface.')
     return _default_comm
 

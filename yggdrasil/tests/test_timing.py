@@ -19,12 +19,12 @@ _this_platform = (platform._platform,
                   tools.get_default_comm())
 _base_environment = {'platform': 'Linux',
                      'python_ver': '2.7',
-                     'comm_type': 'ZMQComm'}
-_valid_platforms = [('Linux', '2.7', 'ZMQComm'),
-                    ('Linux', '2.7', 'IPCComm'),
-                    ('Linux', '3.5', 'ZMQComm'),
-                    ('MacOS', '2.7', 'ZMQComm'),
-                    ('Windows', '2.7', 'ZMQComm')]
+                     'comm_type': 'zmq'}
+_valid_platforms = [('Linux', '2.7', 'zmq'),
+                    ('Linux', '2.7', 'ipc'),
+                    ('Linux', '3.5', 'zmq'),
+                    ('MacOS', '2.7', 'zmq'),
+                    ('Windows', '2.7', 'zmq')]
 _testfile_json = 'test_run123.json'
 _testfile_dat = 'test_run123.dat'
 
@@ -248,7 +248,7 @@ class TestTimedRun(TimedRunTestBase):
         # Errors
         assert_raises(ValueError, timing.plot_scalings, compare='invalid')
         assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
-                      comm_type='ZMQComm')
+                      comm_type='zmq')
 
     def test_production_runs(self):
         r"""Test production tests (those used in paper)."""
