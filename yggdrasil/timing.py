@@ -298,10 +298,15 @@ class TimedRun(YggTestBase, tools.YggClass):
                    '\tOperating System: %s' % self.platform,
                    '\tPython Version: %s' % self.python_ver,
                    '\tMatlab Running: %s' % self.matlab_running,
+                   '\tSource Language: %s' % self.lang_src,
+                   '\tDestination Language: %s' % self.lang_dst,
+                   '\tCommunication Method: %s' % self.comm_type,
                    'Because one or more platform properties are incompatible:',
                    '\tOperating System: %s' % ygg_platform._platform,
                    '\tPython Version: %s' % backwards._python_version,
-                   '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running()]
+                   '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running(),
+                   '\tSupported Languages: %s' % ', '.join(self._lang_list),
+                   '\tSupported Communication: %s' % ', '.join(self._comm_list)]
             raise RuntimeError('\n'.join(msg))
         return out
 
