@@ -230,21 +230,19 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
     def test_error_close_icomm(self):
         r"""Test forwarding of error from close of icomm."""
         inst = self.get_fresh_error_instance('icomm')
-        inst.info('MSG %d' % 0)
         inst.open_comm()
-        inst.info('MSG %d' % 1)
+        inst.info('before')
+        inst.icomm.printStatus()
+        inst.ocomm.printStatus()
         inst.icomm.error_replace('close')
-        inst.info('MSG %d' % 2)
         self.assert_raises(MagicTestError, inst.close_comm)
-        inst.info('MSG %d' % 3)
         assert(inst.ocomm.is_closed)
-        inst.info('MSG %d' % 4)
         inst.icomm.restore_all()
-        inst.info('MSG %d' % 5)
         inst.icomm.close()
-        inst.info('MSG %d' % 6)
         assert(inst.icomm.is_closed)
-        inst.info('MSG %d' % 7)
+        inst.info('after')
+        inst.icomm.printStatus()
+        inst.ocomm.printStatus()
         
     def test_error_close_ocomm(self):
         r"""Test forwarding of error from close of ocomm."""
