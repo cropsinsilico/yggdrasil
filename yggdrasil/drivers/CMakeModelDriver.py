@@ -156,6 +156,16 @@ class CMakeBuilder(LinkerBase):
                                 ('target', '--target')])
     executable_ext = ''
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        LinkerBase.before_registration(cls)
+        if platform._is_win:  # pragma: windows
+            cls.executable_ext = '.exe'
+        
     @classmethod
     def extract_kwargs(cls, kwargs):
         r"""Extract linker kwargs, leaving behind just compiler kwargs.
