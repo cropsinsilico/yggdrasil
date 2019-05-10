@@ -39,21 +39,31 @@ class AsyncComm(CommBase.CommBase):
         self._used_direct = False
         super(AsyncComm, self).__init__(name, **kwargs)
 
-    def printStatus(self, nindent=0):
-        r"""Print status of the communicator."""
-        super(AsyncComm, self).printStatus(nindent=nindent)
-        prefix = '\t' + nindent * '\t'
-        print('%s%-15s: %s' % (prefix, 'open (backlog)', self.is_open_backlog))
-        print('%s%-15s: %s' % (prefix, 'open (direct)', self.is_open_direct))
-        print('%s%-15s: %s' % (prefix, 'nsent (backlog)', self.n_msg_backlog_send))
-        print('%s%-15s: %s' % (prefix, 'nrecv (backlog)', self.n_msg_backlog_recv))
-        print('%s%-15s: %s' % (prefix, 'nsent (direct)', self.n_msg_direct_send))
-        print('%s%-15s: %s' % (prefix, 'nrecv (direct)', self.n_msg_direct_recv))
-        if len(self._work_comms) > 0:
-            print('%sWork comms:' % prefix)
-            for v in self._work_comms.values():
-                v.printStatus(nindent=nindent + 1)
+    def get_status_message(self, nindent=0):
+        r"""Return lines composing a status message.
+        
+        Args:
+            nindent (int, optional): Number of tabs that should be used to
+                indent each line. Defaults to 0.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
 
+        """
+        lines, prefix = super(AsyncComm, self).get_status_message(nindent=nindent)
+        lines += ['%s%-15s: %s' % (prefix, 'open (backlog)', self.is_open_backlog),
+                  '%s%-15s: %s' % (prefix, 'open (direct)', self.is_open_direct),
+                  '%s%-15s: %s' % (prefix, 'nsent (backlog)', self.n_msg_backlog_send),
+                  '%s%-15s: %s' % (prefix, 'nrecv (backlog)', self.n_msg_backlog_recv),
+                  '%s%-15s: %s' % (prefix, 'nsent (direct)', self.n_msg_direct_send),
+                  '%s%-15s: %s' % (prefix, 'nrecv (direct)', self.n_msg_direct_recv)]
+        if len(self._work_comms) > 0:
+            lines.append('%sWork comms:' % prefix)
+            for v in self._work_comms.values():
+                lines += v.get_status_message(nindent=nindent + 1)[0]
+        return lines, prefix
+        
     @property
     def backlog_thread(self):
         r"""tools.YggThread: Thread that will handle sinding or receiving

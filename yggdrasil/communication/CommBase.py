@@ -519,16 +519,32 @@ class CommBase(tools.YggClass):
                 out[k] = copy.deepcopy(out_seri[k])
         return out
 
-    def printStatus(self, nindent=0):
-        r"""Print status of the communicator."""
+    def get_status_message(self, nindent=0):
+        r"""Return lines composing a status message.
+        
+        Args:
+            nindent (int, optional): Number of tabs that should be used to
+                indent each line. Defaults to 0.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
+
+        """
         prefix = nindent * '\t'
-        print('%s%s:' % (prefix, self.name))
+        lines = ['%s%s:' % (prefix, self.name)]
         prefix += '\t'
-        print('%s%-15s: %s' % (prefix, 'address', self.address))
-        print('%s%-15s: %s' % (prefix, 'direction', self.direction))
-        print('%s%-15s: %s' % (prefix, 'open', self.is_open))
-        print('%s%-15s: %s' % (prefix, 'nsent', self._n_sent))
-        print('%s%-15s: %s' % (prefix, 'nrecv', self._n_recv))
+        lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
+                  '%s%-15s: %s' % (prefix, 'direction', self.direction),
+                  '%s%-15s: %s' % (prefix, 'open', self.is_open),
+                  '%s%-15s: %s' % (prefix, 'nsent', self._n_sent),
+                  '%s%-15s: %s' % (prefix, 'nrecv', self._n_recv)]
+        return lines, prefix
+
+    def printStatus(self, *args, **kwargs):
+        r"""Print status of the communicator."""
+        lines, _ = self.get_status_message(*args, **kwargs)
+        self.info('\n'.join(lines))
 
     @classmethod
     def is_installed(cls, language=None):
@@ -589,8 +605,13 @@ class CommBase(tools.YggClass):
     @property
     def comm_class(self):
         r"""str: Name of communication class."""
+        # TODO: Change this to return self._commtype
         if self._comm_class is None:
-            self._comm_class = str(self.__class__).split("'")[1].split(".")[-1]
+            if getattr(self, '_is_error_class', False):
+                name_cls = self.__class__.__bases__[0]
+            else:
+                name_cls = self.__class__
+            self._comm_class = str(name_cls).split("'")[1].split(".")[-1]
         return self._comm_class
 
     @classmethod
@@ -615,11 +636,13 @@ class CommBase(tools.YggClass):
 
     def register_comm(self, key, value):
         r"""Register a comm."""
-        self.debug("Registering comm: %s", key)
+        self.debug("Registering %s comm: %s", self.comm_class, key)
         register_comm(self.comm_class, key, value)
 
     def unregister_comm(self, key, dont_close=False):
         r"""Unregister a comm."""
+        self.debug("Unregistering %s comm: %s (dont_close = %s)",
+                   self.comm_class, key, dont_close)
         unregister_comm(self.comm_class, key, dont_close=dont_close)
 
     @classmethod
