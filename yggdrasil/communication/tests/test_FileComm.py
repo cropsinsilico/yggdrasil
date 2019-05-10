@@ -76,6 +76,7 @@ class TestFileComm(parent.TestCommBase):
         if self.comm == 'FileComm':
             kwargs = self.send_inst_kwargs
             kwargs['read_meth'] = 'invalid'
+            kwargs['skip_component_schema_normalization'] = False
             self.assert_raises(jsonschema.ValidationError, new_comm, self.name,
                                **kwargs)
 

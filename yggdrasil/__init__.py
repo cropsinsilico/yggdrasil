@@ -120,6 +120,10 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
     print("running", argv)
     print(os.getcwd())
     try:
+        # Set env
+        old_skip_norm = os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', None)
+        if old_skip_norm is None:
+            os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
         error_code = subprocess.call(argv)
         # if _test_package_name == 'nose':
         #     result = _test_package.run(argv=argv)
@@ -134,6 +138,8 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         error_code = -1
     finally:
         os.chdir(initial_dir)
+        if old_skip_norm is None:
+            del os.environ['YGG_SKIP_COMPONENT_VALIDATION']
     return error_code
 
 

@@ -532,7 +532,7 @@ class CommBase(tools.YggClass):
 
         """
         prefix = nindent * '\t'
-        lines = ['%s%s:' % (prefix, self.name)]
+        lines = ['', '%s%s:' % (prefix, self.name)]
         prefix += '\t'
         lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
                   '%s%-15s: %s' % (prefix, 'direction', self.direction),
