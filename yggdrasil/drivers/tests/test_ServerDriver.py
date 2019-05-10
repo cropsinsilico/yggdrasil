@@ -87,6 +87,12 @@ class TestServerDriverNoStart(TestServerParam,
             assert_raises(AttributeError, getattr, self.instance, k)
 
 
+class TestServerDriverNoInit(TestServerParam,
+                             parent.TestConnectionDriverNoInit):
+    r"""Test class for ServerDriver class without init."""
+    pass
+            
+
 class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
     r"""Test class for ServerDriver class."""
 

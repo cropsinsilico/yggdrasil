@@ -35,6 +35,13 @@ class TestFileOutputParam(parent.TestConnectionParam):
         if os.path.isfile(self.filepath):
             os.remove(self.filepath)
 
+    def remove_instance(self, inst):
+        r"""Remove an instance include the input file."""
+        filename = inst.ocomm.address
+        super(TestFileOutputParam, self).remove_instance(inst)
+        if os.path.isfile(filename):
+            os.remove(filename)
+
 
 class TestFileOutputDriverNoStart(TestFileOutputParam,
                                   parent.TestConnectionDriverNoStart):
@@ -48,10 +55,26 @@ class TestFileOutputDriverNoStart(TestFileOutputParam,
     def inst_kwargs(self):
         r"""dict: Keyword arguments for creating a class instance."""
         out = super(TestFileOutputDriverNoStart, self).inst_kwargs
-        out['in_temp'] = True  # 'True'
+        out['in_temp'] = True
         return out
 
 
+class TestFileOutputDriverNoInit(TestFileOutputParam,
+                                 parent.TestConnectionDriverNoInit):
+    r"""Test runner for FileOutputDriver without init."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestFileOutputDriverNoInit, self).__init__(*args, **kwargs)
+        self.args = os.path.basename(self.filepath)
+        
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestFileOutputDriverNoInit, self).inst_kwargs
+        out['in_temp'] = True
+        return out
+
+    
 class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     r"""Test runner for FileOutputDriver."""
 
@@ -69,14 +92,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         # self.instance._comm_opened.wait(self.timeout)
         # print(self.instance._comm_opened.is_set())
         self.send_file_contents()
-
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        filename = self.instance.ocomm.address
-        super(TestFileOutputDriver, self).teardown()
-        if os.path.isfile(filename):  # pragma: debug
-            os.remove(filename)
-
+        
     # def run_before_stop(self):
     #     r"""Commands to run while the instance is running."""
     #     self.send_file_contents()

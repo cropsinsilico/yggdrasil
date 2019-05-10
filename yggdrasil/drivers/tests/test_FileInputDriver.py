@@ -45,8 +45,14 @@ class TestFileInputParam(parent.TestConnectionParam):
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
-        filename = self.instance.icomm.address
         super(TestFileInputParam, self).teardown()
+        if os.path.isfile(self.filepath):  # pragma: debug
+            os.remove(self.filepath)
+
+    def remove_instance(self, inst):
+        r"""Remove an instance include the input file."""
+        filename = inst.icomm.address
+        super(TestFileInputParam, self).remove_instance(inst)
         if os.path.isfile(filename):
             os.remove(filename)
 
@@ -54,6 +60,12 @@ class TestFileInputParam(parent.TestConnectionParam):
 class TestFileInputDriverNoStart(TestFileInputParam,
                                  parent.TestConnectionDriverNoStart):
     r"""Test runner for FileInputDriver without start."""
+    pass
+
+
+class TestFileInputDriverNoInit(TestFileInputParam,
+                                parent.TestConnectionDriverNoInit):
+    r"""Test runner for FileInputDriver without init."""
     pass
 
 

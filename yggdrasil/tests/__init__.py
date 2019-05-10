@@ -526,21 +526,30 @@ class YggTestClass(YggTestBase):
     testing_option_kws = {}
     _mod = None
     _cls = None
+    skip_init = False
 
     def __init__(self, *args, **kwargs):
         self._inst_args = list()
         self._inst_kwargs = dict()
+        self._extra_instances = []
         super(YggTestClass, self).__init__(*args, **kwargs)
 
     def setup(self, *args, **kwargs):
         r"""Create an instance of the class."""
         super(YggTestClass, self).setup(*args, **kwargs)
-        self._instance = self.create_instance()
+        if not self.skip_init:
+            self._instance = self.create_instance()
 
     def teardown(self, *args, **kwargs):
         r"""Remove the instance."""
         self.clear_instance()
         super(YggTestClass, self).teardown(*args, **kwargs)
+        for i in range(len(self._extra_instances)):
+            inst = self._extra_instances[i]
+            self._extra_instances[i] = None
+            self.remove_instance(inst)
+            del inst
+        self._extra_instances = []
 
     @property
     def description_prefix(self):
@@ -600,19 +609,48 @@ class YggTestClass(YggTestBase):
         r"""object: Instance of the test driver."""
         if self._teardown_complete:
             raise RuntimeError("Instance referenced after teardown.")
+        if self.skip_init:  # pragma: debug
+            raise RuntimeError("skip_init is True, so instance cannot be used.")
         if not hasattr(self, '_instance'):  # pragma: debug
             self._instance = self.create_instance()
         return self._instance
 
-    def create_instance(self):
+    def create_error_instance(self, inst_class=None, args=None, kwargs=None,
+                              error_class=None, error_on_init=False):
+        r"""Create a new instance of the class that is wrapped in ErrorClass."""
+        if inst_class is None:
+            inst_class = self.import_cls
+        if args is None:
+            args = self.inst_args
+        if kwargs is None:
+            kwargs = self.inst_kwargs
+        if error_class is None:
+            error_class = ErrorClass
+        if error_class == ErrorClass:
+            # This could be a normal class that contains error classes
+            args.insert(0, inst_class)
+            kwargs['error_on_init'] = error_on_init
+        error_kwargs = dict(inst_class=error_class, args=args, kwargs=kwargs)
+        if error_on_init:
+            self.assert_raises(MagicTestError, self.create_instance, **error_kwargs)
+        else:
+            out = self.create_instance(**error_kwargs)
+            self._extra_instances.append(out)
+            return out
+
+    def create_instance(self, inst_class=None, args=None, kwargs=None):
         r"""Create a new instance of the class."""
-        inst = self.import_cls(*self.inst_args, **self.inst_kwargs)
-        # print("created instance")
+        if inst_class is None:
+            inst_class = self.import_cls
+        if args is None:
+            args = self.inst_args
+        if kwargs is None:
+            kwargs = self.inst_kwargs
+        inst = inst_class(*args, **kwargs)
         return inst
 
     def remove_instance(self, inst):
         r"""Remove an instance of the class."""
-        # print("removed instance")
         pass
 
     def clear_instance(self):

@@ -1,4 +1,5 @@
 import os
+import uuid
 from yggdrasil.tests import YggTestClassInfo
 
 
@@ -28,6 +29,10 @@ class TestParam(YggTestClassInfo):
                              'namespace': self.namespace}
         self.debug_flag = False
 
+    def get_fresh_name(self):
+        r"""Get a fresh name for a new instance that won't overlap with the base."""
+        return 'Test%s_%s' % (self.cls, str(uuid.uuid4()))
+    
     @property
     def working_dir(self):
         r"""str: Working directory."""
@@ -37,6 +42,12 @@ class TestParam(YggTestClassInfo):
     def skip_start(self):
         r"""bool: True if driver shouldn't be started. False otherwise."""
         return ('NoStart' in str(self.__class__))
+
+    @property
+    def skip_init(self):
+        r"""bool: True fi driver shouldn't be initialized during startup.
+        False otherwise."""
+        return ('NoInit' in str(self.__class__))
 
     @property
     def cls(self):
@@ -67,7 +78,7 @@ class TestParam(YggTestClassInfo):
     def setup(self, *args, **kwargs):
         r"""Create a driver instance and start the driver."""
         super(TestParam, self).setup(*args, **kwargs)
-        if not self.skip_start:
+        if not (self.skip_init or self.skip_start):
             self.instance.start()
 
     @property
@@ -75,11 +86,11 @@ class TestParam(YggTestClassInfo):
         r"""str: Name of the test driver."""
         return 'Test%s_%s' % (self.cls, self.uuid)
 
-    def create_instance(self):
+    def create_instance(self, *args, **kwargs):
         r"""Create a new instance object."""
         curpath = os.getcwd()
         os.chdir(self.working_dir)
-        inst = super(TestParam, self).create_instance()
+        inst = super(TestParam, self).create_instance(*args, **kwargs)
         os.chdir(curpath)
         return inst
 
