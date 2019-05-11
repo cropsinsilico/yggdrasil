@@ -232,6 +232,7 @@ class CMakeBuilder(LinkerBase):
                 target = os.path.splitext(os.path.basename(obj))[0]
         elif target == 'clean':
             return target
+        print('cmake output exe', cls.executable_ext, builddir, target, kwargs)
         out = super(CMakeBuilder, cls).get_output_file(
             os.path.join(builddir, target), **kwargs)
         return out
@@ -609,10 +610,11 @@ class CMakeModelDriver(CompiledModelDriver):
         if target is None:
             target = self.target
         if target == 'clean':
-            return self.call_linker(self.builddir, target=target,
+            return self.call_linker(self.builddir, target=target, out=target,
                                     overwrite=True, working_dir=self.working_dir,
                                     **kwargs)
         else:
+            self.info('model_file = %s', self.model_file)
             default_kwargs = dict(target=target,
                                   sourcedir=self.sourcedir,
                                   builddir=self.builddir,
