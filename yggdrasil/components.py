@@ -24,9 +24,6 @@ _comptype2mod = {'comm': 'communication',
                  'connection': 'drivers',
                  'datatype': ['metaschema', 'datatypes'],
                  'serializer': 'serialize'}
-_default_skip_normalization = (
-    os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', 'False').lower()
-    in ['true', '1'])
     
 
 def docs2args(docs):
@@ -406,7 +403,7 @@ class ComponentBase(object):
     def __init__(self, skip_component_schema_normalization=None, **kwargs):
         if skip_component_schema_normalization is None:
             skip_component_schema_normalization = (
-                os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', None).lower()
+                os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', 'None').lower()
                 in ['true', '1'])
         comptype = self._schema_type
         if (comptype is None) and (not self._schema_properties):

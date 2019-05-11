@@ -247,6 +247,8 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
 env_map = [('debug', 'ygg', 'YGG_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
            ('debug', 'client', 'YGG_CLIENT_DEBUG'),
+           ('jsonschema', 'validate_components', 'YGG_SKIP_COMPONENT_VALIDATION'),
+           ('jsonschema', 'validate_all_messages', 'YGG_VALIDATE_ALL_MESSAGES'),
            ('rmq', 'namespace', 'YGG_NAMESPACE'),
            ('rmq', 'host', 'YGG_MSG_HOST'),
            ('rmq', 'vhost', 'YGG_MSG_VHOST'),

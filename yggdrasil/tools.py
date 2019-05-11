@@ -76,6 +76,24 @@ def check_sockets():  # pragma: debug
         logger.info("%d sockets closed." % count)
 
 
+def check_environ_bool(name, valid_values=['true', '1']):
+    r"""Check to see if a boolean environment variable is set to True.
+
+    Args:
+        name (str): Name of environment variable to check.
+        valid_values (list, optional): Values for the environment variable
+            that indicate it is True. These should all be lower case as
+            the lower case version of the variable contents will be compared
+            to the list. Defaults to ['true', '1'].
+
+    Returns:
+        bool: True if the environment variables is set and is one of the
+            list valid_values (after being transformed to lower case).
+
+    """
+    return (os.environ.get(name, '').lower() in valid_values)
+
+
 def is_subprocess():
     r"""Determine if the current process is a subprocess.
 
@@ -84,7 +102,7 @@ def is_subprocess():
             otherwise.
 
     """
-    return (os.environ.get('YGG_SUBPROCESS', 'false').lower() == 'true')
+    return check_environ_bool('YGG_SUBPROCESS')
 
 
 def ygg_atexit():  # pragma: debug
