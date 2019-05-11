@@ -72,7 +72,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         elif x.endswith('yggtest'):
             # if _test_package_name == 'nose':
             #     argv.append(x)
-            print(x)  # pass
+            pass
         elif x == '--nocover':
             withcoverage = False
         elif x.startswith('-'):
@@ -117,8 +117,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
                         test_paths[i] = os.path.join(package_dir, test_paths[i])
     # os.chdir(package_dir)
     argv += test_paths
-    print("running", argv)
-    print(os.getcwd())
+    logger.info("Running %s from %s", argv, os.getcwd())
     try:
         # Set env
         old_skip_norm = os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', None)

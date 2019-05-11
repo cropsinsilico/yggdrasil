@@ -16,7 +16,7 @@ try:  # pragma: matlab
     if platform._is_win or (disable_engine == 'true'):
         _matlab_engine_installed = False
         if not tools.is_subprocess():
-            logger.info("matlab.engine disabled")
+            logger.debug("matlab.engine disabled")
     else:
         import matlab.engine
         _matlab_engine_installed = True

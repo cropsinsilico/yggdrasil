@@ -467,6 +467,11 @@ class CMakeModelDriver(CompiledModelDriver):
             skip_library_libs=True, library_flags=library_flags)
         lines = []
         preamble_lines = []
+        # Suppress warnings on windows about the security of strcpy etc.
+        if platform._is_win:  # pragma: windows
+            new_flag = "-D_CRT_SECURE_NO_WARNINGS"
+            if new_flag not in compile_flags:
+                compile_flags.append(new_flag)
         # Compilation flags
         for x in compile_flags:
             if x.startswith('-D'):
@@ -604,7 +609,7 @@ class CMakeModelDriver(CompiledModelDriver):
         if target is None:
             target = self.target
         if target == 'clean':
-            return self.call_linker(self.builddir, target=target, out=target,
+            return self.call_linker(self.builddir, target=target,
                                     overwrite=True, working_dir=self.working_dir,
                                     **kwargs)
         else:
