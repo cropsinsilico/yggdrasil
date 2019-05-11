@@ -701,6 +701,9 @@ class SerializeBase(tools.YggClass):
                     if not no_metadata:
                         metadata['metadata'] = self.datatype.encode_type(
                             args, typedef=self.typedef)
+        if ((self.initialized
+             and (not tools.check_environ_bool('YGG_VALIDATE_ALL_MESSAGES')))):
+            metadata.setdefault('dont_check', True)
         out = self.encoded_datatype.serialize(data, **metadata)
         return out
 
@@ -722,6 +725,9 @@ class SerializeBase(tools.YggClass):
         if (((self.func_deserialize is not None)
              and (self.encoded_typedef['type'] == 'bytes'))):
             kwargs['dont_decode'] = True
+        if ((self.initialized
+             and (not tools.check_environ_bool('YGG_VALIDATE_ALL_MESSAGES')))):
+            kwargs.setdefault('dont_check', True)
         out, metadata = self.encoded_datatype.deserialize(msg, **kwargs)
         if (self.func_deserialize is not None):
             if metadata['size'] == 0:
