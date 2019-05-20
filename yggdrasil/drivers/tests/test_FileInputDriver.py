@@ -76,19 +76,7 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
         r"""Assertions to make before stopping the driver instance."""
         super(TestFileInputDriver, self).assert_before_stop(check_open=False)
         self.instance.sleep()
-        # File contents
-        flag = True
-        msg_list = []
-        while flag:
-            flag, msg_recv = self.recv_comm.recv(self.timeout)
-            if flag:
-                msg_list.append(msg_recv)
-            else:
-                self.assert_equal(msg_recv, self.recv_comm.eof_msg)
-        recv_objects = self.testing_options['recv']
-        self.assert_equal(len(msg_list), len(recv_objects))
-        for x, y in zip(msg_list, recv_objects):
-            self.assert_msg_equal(x, y)
+        self.recv_message_list(self.recv_comm, self.testing_options['recv'])
 
     def assert_after_terminate(self):
         r"""Assertions to make after stopping the driver instance."""

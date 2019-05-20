@@ -86,7 +86,7 @@ class MatSerialize(SerializeBase):
         out = super(MatSerialize, cls).get_testing_options()
         out['objects'] = [msg1, msg2]
         out['empty'] = dict()
-        out['contents'] = cls().func_serialize(msg1)
+        out['contents'] = cls().func_serialize(cls.concatenate(out['objects'])[0])
         out['contents'] = out['contents'].replace(b'\n', platform._newline)
         out['exact_contents'] = False  # Contains a time stamp
         return out

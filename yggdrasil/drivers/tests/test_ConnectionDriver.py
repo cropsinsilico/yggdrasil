@@ -56,6 +56,46 @@ class TestConnectionParam(parent.TestParam):
         r"""Assert that two messages are equivalent."""
         self.assert_equal(x, y)
 
+    def assert_msg_lists_equal(self, x, y):
+        r"""Assert that two lists of messages are equivalent."""
+        self.assert_equal(len(x), len(y))
+        for ix, iy in zip(x, y):
+            self.assert_msg_equal(ix, iy)
+
+    def recv_message_list(self, recv_inst, expected_result=None,
+                          break_on_empty=False):
+        r"""Continue receiving from a receive instance until flag is False (or
+        an empty messages is received and break_on_empty is True). On receipt of
+        a False flag, the recieved message is checked against the EOF message.
+
+        Args:
+            recv_inst (yggdrasil.communication.CommBase.CommBase): Communication
+                instance that should be received from.
+            expected_result (list, optional): A list of messages that the
+                recieved messages should be compared against. Defaults to None
+                and is ignored.
+            break_on_empty (bool, optional): If True, messages will stop being
+                received from the communication instance when an empty message
+                is received. Defaults to False.
+
+        Returns:
+            list: Received messages.
+
+        """
+        flag = True
+        msg_list = []
+        while flag:
+            flag, msg_recv = recv_inst.recv(self.timeout)
+            if flag:
+                if break_on_empty and recv_inst.is_empty_recv(msg_recv):
+                    break
+                msg_list.append(msg_recv)
+            else:
+                self.assert_equal(msg_recv, recv_inst.eof_msg)
+        if expected_result is not None:
+            self.assert_msg_lists_equal(msg_list, expected_result)
+        return msg_list
+
     def get_options(self):
         r"""Get testing options."""
         if self.is_output:
