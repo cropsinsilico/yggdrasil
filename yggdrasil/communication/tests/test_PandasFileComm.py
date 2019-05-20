@@ -27,6 +27,7 @@ class TestPandasFileComm_single(TestPandasFileComm):
                'contents': (b'f0\n' + 2 * nele * b'0.0\n'),
                'send': [[arr['f0']], [arr['f0']]],
                'recv': [[np.hstack([arr, arr])['f0']]],
+               'recv_partial': [[[arr['f0']]], [[np.hstack([arr, arr])['f0']]]],
                'dict': {'f0': arr['f0']}}
         out['msg'] = out['send'][0]
         out['msg_array'] = arr

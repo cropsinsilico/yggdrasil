@@ -50,3 +50,4 @@ TODO
 * Add papers section for listing publication using yggdrasil
 * Split ld off as its own linker
 * Spearate config files for each conda environment
+* Add comm for using files as temporary storage in passing information between models

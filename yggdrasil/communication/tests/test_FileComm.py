@@ -84,29 +84,29 @@ class TestFileComm(parent.TestCommBase):
         r"""Test open of file comm with append."""
         send_objects = self.testing_options['send']
         recv_objects = self.testing_options['recv']
+        recv_objects_partial = self.testing_options['recv_partial']
         # Write to file
         flag = self.send_instance.send(send_objects[0])
         assert(flag)
+        # Create temp file for receving
+        recv_kwargs = copy.deepcopy(self.inst_kwargs)
+        recv_kwargs['append'] = True
+        new_inst_recv = new_comm('partial%s' % self.uuid, **recv_kwargs)
+        self.recv_message_list(new_inst_recv, recv_objects_partial[0],
+                               break_on_empty=True)
         # Open file in append
-        kwargs = self.send_inst_kwargs
-        kwargs['append'] = True
-        new_inst = new_comm('append%s' % self.uuid, **kwargs)
-        for x in send_objects[1:]:
-            flag = new_inst.send(x)
+        send_kwargs = copy.deepcopy(self.send_inst_kwargs)
+        send_kwargs['append'] = True
+        new_inst_send = new_comm('append%s' % self.uuid, **send_kwargs)
+        for i in range(1, len(send_objects)):
+            flag = new_inst_send.send(send_objects[i])
             assert(flag)
-        self.remove_instance(new_inst)
+            self.recv_message_list(new_inst_recv, recv_objects_partial[i],
+                                   break_on_empty=True)
+        self.remove_instance(new_inst_send)
+        self.remove_instance(new_inst_recv)
         # Read entire contents
-        flag = True
-        msg_list = []
-        while flag:
-            flag, msg_recv = self.recv_instance.recv()
-            if flag:
-                msg_list.append(msg_recv)
-            else:
-                self.assert_equal(msg_recv, self.recv_instance.eof_msg)
-        self.assert_equal(len(msg_list), len(recv_objects))
-        for x, y in zip(msg_list, recv_objects):
-            self.assert_msg_equal(x, y)
+        self.recv_message_list(self.recv_instance, recv_objects)
         # Check file contents
         if self.testing_options.get('exact_contents', True):
             with open(self.send_instance.address, 'rb') as fd:

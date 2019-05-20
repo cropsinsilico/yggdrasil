@@ -477,7 +477,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_closed:
                 return False
             flag, msg = self.icomm.recv(**kwargs)
-        if isinstance(msg, backwards.bytes_type) and (msg == self.icomm.eof_msg):
+        if self.icomm.is_eof(msg):
             return self.on_eof()
         if flag:
             return msg

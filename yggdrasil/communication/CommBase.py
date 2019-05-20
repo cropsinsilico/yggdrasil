@@ -348,9 +348,6 @@ class CommBase(tools.YggClass):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
-        if kwargs.get('commtype', None) == 'default':
-            # TODO: Check that the class is the default?
-            kwargs.pop('commtype')
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
@@ -1703,8 +1700,6 @@ class CommBase(tools.YggClass):
              and (len(args_dict) <= 1))):
             metadata['key_order'] = [k for k in args_dict.keys()]
         if not self.serializer.initialized:
-            if (metadata['key_order'] is None) and isinstance(args_dict, dict):
-                metadata['key_order'] = sorted(list(args_dict.keys()))
             metadata['field_names'] = metadata['key_order']
         args = JSONArrayMetaschemaType.coerce_type(args_dict, **metadata)
         # Add field order to kwargs so it can be reconstructed

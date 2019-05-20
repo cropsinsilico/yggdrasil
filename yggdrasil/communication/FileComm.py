@@ -1,4 +1,5 @@
 import os
+import copy
 import tempfile
 from yggdrasil import backwards, platform
 from yggdrasil.serialize.SerializeBase import SerializeBase
@@ -24,7 +25,9 @@ class FileComm(CommBase.CommBase):
         read_meth (str, optional): Method that should be used to read data
             from the file. Defaults to 'read'. Ignored if direction is 'send'.
         append (bool, optional): If True and writing, file is openned in append
-            mode. Defaults to False.
+            mode. If True and reading, file is kept open even if the end of the
+            file is reached to allow for another process to write to the file in
+            append mode. Defaults to False.
         in_temp (bool, optional): If True, the path will be considered relative
             to the platform temporary directory. Defaults to False.
         is_series (bool, optional): If True, input/output will be done to
@@ -108,9 +111,12 @@ class FileComm(CommBase.CommBase):
             self.read_meth = self.serializer.read_meth
         assert(self.read_meth in ['read', 'readline'])
         # Force overwrite for concatenation in append mode
-        if self.append and (not self.serializer.concats_as_str):
-            self.append = 'ow'
-        # Assert that keyword args match serilization parameters
+        if self.append:
+            if self.direction == 'recv':
+                self.close_on_eof_recv = False
+            elif (not self.serializer.concats_as_str):
+                self.append = 'ow'
+        # Assert that keyword args match serialization parameters
         if not self.serializer.concats_as_str:
             assert(self.read_meth == 'read')
             assert(not self.serializer.is_framed)
@@ -156,14 +162,24 @@ class FileComm(CommBase.CommBase):
                 read_meth = cls._schema_properties['read_meth']['default']
             out['kwargs']['read_meth'] = read_meth
         if read_meth == 'readline':
+            out['recv_partial'] = [[x] for x in out['recv']]
             if cls._default_serializer == 'direct':
                 comment = backwards.as_bytes(
                     cls._schema_properties['comment']['default'] + 'Comment\n')
                 out['send'].append(comment)
                 out['contents'] += comment
+                out['recv_partial'].append([])
         else:
             seri_cls = cls._default_serializer_class
-            out['recv'] = seri_cls.concatenate(out['recv'], **out['kwargs'])
+            if seri_cls.concats_as_str:
+                out['recv_partial'] = [[x] for x in out['recv']]
+                out['recv'] = seri_cls.concatenate(out['recv'], **out['kwargs'])
+            else:
+                out['recv_partial'] = [[out['recv'][0]]]
+                for i in range(1, len(out['recv'])):
+                    out['recv_partial'].append(seri_cls.concatenate(
+                        out['recv_partial'][-1] + [out['recv'][i]], **out['kwargs']))
+                out['recv'] = copy.deepcopy(out['recv_partial'][-1])
         return out
         
     @classmethod
@@ -599,11 +615,14 @@ class FileComm(CommBase.CommBase):
             if self.advance_in_series():
                 self.debug("Advanced to %d", self._series_index)
                 flag, out = self._recv()
+            elif self.append:
+                self.fd.seek(prev_pos)
+                out = self.empty_bytes_msg
             else:
                 out = self.eof_msg
         else:
             out = out.replace(self.platform_newline, self.serializer.newline)
-            if flag and (out != self.eof_msg):
+            if flag and (not self.is_eof(out)):
                 if (((self.read_meth == 'readline')
                      and out.startswith(self.serializer.comment))):
                     # Exclude comments

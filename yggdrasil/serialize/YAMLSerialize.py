@@ -63,11 +63,21 @@ class YAMLSerialize(JSONSerialize):
             dict: Dictionary of variables to use for testing.
 
         """
-        iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        # iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj1 = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj2 = {'d': 'new field'}
+        # iobj3 = int(2)
+        # iobj4 = [float(2.0)]
         out = {'kwargs': {},
                'empty': {}, 'dtype': None,
                'extra_kwargs': {},
-               'objects': [iobj],
+               'objects': [iobj1, iobj2],  # , iobj3, iobj4],
                'typedef': {'type': 'object'}}
-        out['contents'] = b'a:\n- b\n- 1\n- 1.0\nc:\n    z: hello\n'
+        out['contents'] = (b'a:\n- b\n- 1\n- 1.0\n'
+                           b'c:\n    z: hello\n'
+                           b'd: new field\n')
+        # out['contents'] = (b'-   a:\n    - b\n    - 1\n    - 1.0\n'
+        #                    b'    c:\n        z: hello\n'
+        #                    b'    d: new field\n'
+        #                    b'- 2\n- 2.0\n')
         return out
