@@ -351,7 +351,7 @@ class CMakeModelDriver(CompiledModelDriver):
             args (list): List of arguments provided.
 
         """
-        print('before', self.sourcedir, self.builddir, self.target)
+        print('before', self.sourcedir, self.builddir, self.target, args)
         if self.sourcedir is None:
             self.sourcedir = os.path.dirname(args[0])
         if not os.path.isabs(self.sourcedir):
@@ -368,11 +368,15 @@ class CMakeModelDriver(CompiledModelDriver):
                                                           self.builddir))
         self.source_files = [self.sourcedir]
         kwargs = dict(default_model_dir=self.builddir)
+        print('after', self.sourcedir, self.builddir, self.target, kwargs)
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
         self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
         self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
         for x in self.cmake_products:
             self.products.append(os.path.join(self.builddir, x))
+        # Add executable extension
+        if not os.path.splitext(self.model_file)[-1]:
+            self.model_file += self.get_tool('linker').executable_ext
         
     @classmethod
     def is_source_file(cls, fname):
