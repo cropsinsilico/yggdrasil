@@ -193,16 +193,16 @@ class CModelDriver(CompiledModelDriver):
         archiver = cls.get_tool('archiver')
         linker = cls.get_tool('linker')
         for x in ['zmq', 'czmq']:
-            if x not in cls.external_libraries:
-                continue
-            libtype = cls.external_libraries[x]['libtype']
-            if libtype == 'static':
-                tool = archiver
-                kwargs = {}
-            else:
-                tool = linker
-                kwargs = {'build_library': True}
-            cls.external_libraries[x][libtype] = tool.get_output_file(x, **kwargs)
+            if x in cls.external_libraries:
+                libtype = cls.external_libraries[x]['libtype']
+                if libtype == 'static':  # pragma: debug
+                    tool = archiver
+                    kwargs = {}
+                else:
+                    tool = linker
+                    kwargs = {'build_library': True}
+                cls.external_libraries[x][libtype] = tool.get_output_file(
+                    x, **kwargs)
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -276,7 +276,7 @@ class CModelDriver(CompiledModelDriver):
             path_list = []
             prev_path = env.pop('LD_LIBRARY_PATH', '')
             if prev_path:
-                prev_path.append(prev_path)
+                path_list.append(prev_path)
             for x in [_incl_interface]:
                 if x not in prev_path:
                     path_list.append(x)

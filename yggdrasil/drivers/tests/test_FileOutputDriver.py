@@ -32,7 +32,7 @@ class TestFileOutputParam(parent.TestConnectionParam):
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileOutputParam, self).teardown()
-        if os.path.isfile(self.filepath):
+        if os.path.isfile(self.filepath):  # pragma: debug
             os.remove(self.filepath)
 
     def remove_instance(self, inst):
