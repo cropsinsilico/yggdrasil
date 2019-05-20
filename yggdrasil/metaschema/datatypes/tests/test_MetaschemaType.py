@@ -160,8 +160,9 @@ class TestMetaschemaType(YggTestClassInfo):
                 z = self.import_cls.encode_data(x, y, **self._encode_data_kwargs)
                 x2 = self.import_cls.decode_data(z, y)
                 self.assert_result_equal(x2, x)
-            if self._cls != 'JSONNullMetaschemaType':
-                self.assert_raises(MetaschemaTypeError, self.import_cls.encode_type, None)
+            if self._cls not in ['JSONNullMetaschemaType', 'AnyMetaschemaType']:
+                self.assert_raises(MetaschemaTypeError,
+                                   self.import_cls.encode_type, None)
 
     def test_check_encoded(self):
         r"""Test check_encoded."""
@@ -209,20 +210,26 @@ class TestMetaschemaType(YggTestClassInfo):
     def test_encode_errors(self):
         r"""Test error on encode."""
         if self._cls == 'MetaschemaType':
-            self.assert_raises(NotImplementedError, self.import_cls.encode,
-                               self._invalid_validate[0], self.typedef)
+            if self._invalid_validate:
+                self.assert_raises(NotImplementedError, self.import_cls.encode,
+                                   self._invalid_validate[0], self.typedef)
         else:
-            self.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
-                               self.import_cls.encode,
-                               self._invalid_validate[0], self.typedef)
-            self.assert_raises(RuntimeError, self.import_cls.encode,
-                               self._valid_decoded[0], self.typedef, type='invalid')
+            if self._invalid_validate:
+                self.assert_raises((ValueError,
+                                    jsonschema.exceptions.ValidationError),
+                                   self.import_cls.encode,
+                                   self._invalid_validate[0], self.typedef)
+            if self._valid_decoded:
+                self.assert_raises(RuntimeError, self.import_cls.encode,
+                                   self._valid_decoded[0], self.typedef,
+                                   type='invalid')
 
     def test_decode_errors(self):
         r"""Test error on decode."""
-        self.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
-                           self.import_cls.decode,
-                           self._invalid_encoded[0], self.typedef)
+        if self._invalid_encoded:
+            self.assert_raises((ValueError, jsonschema.exceptions.ValidationError),
+                               self.import_cls.decode,
+                               self._invalid_encoded[0], self.typedef)
 
     def test_transform_type(self):
         r"""Test transform_type."""

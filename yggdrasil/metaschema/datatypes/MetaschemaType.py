@@ -583,21 +583,6 @@ class MetaschemaType(object):
         if (not conv_func) and (not dont_check):
             cls.check_encoded(metadata, typedef, raise_errors=True,
                               typedef_validated=typedef_validated)
-        # if not cls.check_encoded(metadata, typedef,
-        #                          typedef_validated=typedef_validated):
-        #     if ('type' in metadata) and (typedef == {'type': 'bytes'}):
-        #         new_cls = get_type_class(metadata['type'])
-        #         return new_cls.decode(metadata, data)
-        #     if ((isinstance(metadata, dict)
-        #          and (len(metadata.get('items', [])) == 1)
-        #          and cls.check_encoded(metadata['items'][0], typedef))):
-        #         conv_func = _get_single_array_element
-        #     else:
-        #         conv_func = conversions.get_conversion(metadata.get('type', None),
-        #                                                cls.name)
-        #     if not conv_func:
-        #         cls.check_encoded(metadata, typedef, raise_errors=True,
-        #                           typedef_validated=typedef_validated)
         if conv_func:
             new_cls = get_type_class(metadata['type'])
             out = conv_func(new_cls.decode(metadata, data, dont_check=dont_check))

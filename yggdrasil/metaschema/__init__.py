@@ -166,6 +166,20 @@ def validate_schema(obj):
     cls.check_schema(obj)
 
 
+# def normalize_schema(obj):
+#     r"""Normalize a schema against the metaschema.
+
+#     Args:
+#         obj (dict): Schema to be normalized.
+
+#     Returns:
+#         dict: Normalized schema.
+
+#     """
+#     cls = get_validator()
+#     return cls.normalize_schema(obj)
+
+
 def validate_instance(obj, schema, **kwargs):
     r"""Validate an instance against a schema.
 

@@ -270,7 +270,23 @@ def guess_type_from_obj(obj):
     return cls
 
 
-def encode_type(obj, typedef=None):
+def transform_type(obj, typedef=None):
+    r"""Transform an object based on type info.
+
+    Args:
+        obj (object): Object to transform.
+        typedef (dict): Type definition that should be used to transform the
+            object.
+
+    Returns:
+        object: Transformed object.
+
+    """
+    cls = guess_type_from_obj(obj)
+    return cls.transform_type(obj, typedef=typedef)
+
+    
+def encode_type(obj, typedef=None, **kwargs):
     r"""Encode an object into a JSON schema that can be used to both
     describe the object and validate others.
 
@@ -279,13 +295,15 @@ def encode_type(obj, typedef=None):
         typedef (dict, optional): Type properties that should be used to
             initialize the encoded type definition in certain cases.
             Defaults to None and is ignored.
+        **kwargs: Additional keyword arguments are passed to the identified
+            type class's encode_type method.
 
     Returns:
         dict: Encoded JSON schema describing the object.
 
     """
     cls = guess_type_from_obj(obj)
-    return cls.encode_type(obj, typedef=typedef)
+    return cls.encode_type(obj, typedef=typedef, **kwargs)
 
 
 def encode_data(obj, typedef=None):
@@ -325,6 +343,26 @@ def encode_data_readable(obj, typedef=None):
     else:
         cls = guess_type_from_obj(obj)
     return cls.encode_data_readable(obj, typedef=typedef)
+
+
+def decode_data(obj, typedef):
+    r"""Decode a JSON serializable object to get the corresponding Python
+    variable.
+
+    Args:
+        obj (object): JSON serializable object representing an encoded form of
+            a message.
+        typedef (dict): JSON schema describing the object.
+
+    Returns:
+        object: Deserialized version of the object.
+
+    """
+    if isinstance(typedef, dict) and ('type' in typedef):
+        cls = get_type_class(typedef['type'])
+    else:
+        raise ValueError("Type not properly specified.")
+    return cls.decode_data(obj, typedef)
 
 
 def encode(obj):

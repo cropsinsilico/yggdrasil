@@ -32,7 +32,7 @@ class TypeMetaschemaProperty(MetaschemaProperty):
         """
         type_registry = get_registered_types()
         for t, cls in sorted(type_registry.items(), key=_specificity_sort_key):
-            if cls.validate(instance):
+            if (t != 'any') and cls.validate(instance):
                 return t
         raise MetaschemaTypeError(
             "Could not encode 'type' property for Python type: %s"

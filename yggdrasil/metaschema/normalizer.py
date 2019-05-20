@@ -71,6 +71,11 @@ def create(*args, **kwargs):
             self._schema_path_stack = []
             self._normalized_stack = []
 
+        @classmethod
+        def normalize_schema(cls, schema):
+            r"""Normalize a schema against the metaschema."""
+            return cls(cls.META_SCHEMA).normalize(schema)
+
         def iter_errors(self, instance, _schema=None):
             r"""Iterate through all of the errors encountered during validation
             of an instance at the current level or lower against properties in a

@@ -17,8 +17,9 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
     def encode(cls, instance, typedef=None):
         r"""Encoder for the 'properties' container property."""
         if typedef is None:
-            typedef = {k: None for k in instance.keys()}
-        return {k: encode_type(v, typedef=typedef[k]) for k, v in instance.items()}
+            typedef = {}
+        return {k: encode_type(v, typedef=typedef.get(k, None))
+                for k, v in instance.items()}
 
     @classmethod
     def compare(cls, prop1, prop2, root1=None, root2=None):

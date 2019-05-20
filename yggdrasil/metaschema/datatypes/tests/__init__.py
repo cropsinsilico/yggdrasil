@@ -59,7 +59,11 @@ def test_encode_decode():
         y = datatypes.encode(x)
         z = datatypes.decode(y)
         assert_equal(z, x)
-        datatypes.encode_data(x)
+        t = datatypes.encode_type(x)
+        d = datatypes.encode_data(x)
+        w = datatypes.decode_data(d, t)
+        assert_equal(w, x)
+    assert_raises(ValueError, datatypes.decode_data, b'', None)
 
 
 def test_encode_decode_readable():
