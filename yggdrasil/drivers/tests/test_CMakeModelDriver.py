@@ -30,7 +30,7 @@ def test_create_include():
                 ([], ['-Llib_dir'], ['LINK_DIRECTORIES(lib_dir)']),
                 ([], ['/LIBPATH:"lib_dir"'], ['LINK_DIRECTORIES(lib_dir)']),
                 ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target])]
-    if CMakeModelDriver.add_libraries:
+    if CMakeModelDriver.add_libraries:  # pragma: debug
         testlist += [([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
                      ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
     else:

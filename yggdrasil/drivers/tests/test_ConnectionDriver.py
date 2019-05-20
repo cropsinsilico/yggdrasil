@@ -388,7 +388,7 @@ def test_ConnectionDriverTranslate_errors():
 s = get_schema()
 comm_types = list(s['comm'].schema_subtypes.keys())
 for k in comm_types:
-    if k == _default_comm:
+    if k == _default_comm:  # pragma: debug
         continue
     # Output
     ocls = type('Test%sOutputDriver' % k,
