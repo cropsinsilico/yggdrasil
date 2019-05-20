@@ -220,6 +220,7 @@ class CMakeBuilder(LinkerBase):
             RuntimeError: If target is None.
 
         """
+        print('get_output_file input', obj, target, builddir, kwargs)
         if builddir is None:
             if os.path.isdir(obj):
                 builddir = obj
@@ -232,7 +233,7 @@ class CMakeBuilder(LinkerBase):
                 target = os.path.splitext(os.path.basename(obj))[0]
         elif target == 'clean':
             return target
-        print('cmake output exe', cls.executable_ext, builddir, target, kwargs)
+        print('get_output_file input modified', obj, target, builddir, kwargs)
         out = super(CMakeBuilder, cls).get_output_file(
             os.path.join(builddir, target), **kwargs)
         return out
@@ -350,6 +351,7 @@ class CMakeModelDriver(CompiledModelDriver):
             args (list): List of arguments provided.
 
         """
+        print('before', self.sourcedir, self.builddir, self.target)
         if self.sourcedir is None:
             self.sourcedir = os.path.dirname(args[0])
         if not os.path.isabs(self.sourcedir):
