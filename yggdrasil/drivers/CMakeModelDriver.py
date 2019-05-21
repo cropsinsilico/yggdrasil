@@ -339,7 +339,12 @@ class CMakeModelDriver(CompiledModelDriver):
     language = 'cmake'
     base_languages = ['c']
     cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',
-                      'CMakeFiles']
+                      'CMakeFiles',
+                      'ALL_BUILD.vcxproj', 'ALL_BUILD.vcxproj.filters', 'Debug',
+                      'Win32', 'ZERO_CHECK.vcxproj', 'ZERO_CHECK.vcxproj.filters']
+    # TODO: These are only on Windows using MSVC
+    cmake_products_ext = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
+                          '.vcxproj.filters']
     add_libraries = False
 
     def parse_arguments(self, args):
@@ -374,8 +379,11 @@ class CMakeModelDriver(CompiledModelDriver):
         self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
         for x in self.cmake_products:
             self.products.append(os.path.join(self.builddir, x))
+        model_base, model_ext = os.path.splitext(self.model_file)
+        for x in self.cmake_products_ext:
+            self.products.append(model_base + x)
         # Add executable extension
-        if not os.path.splitext(self.model_file)[-1]:
+        if not model_ext:
             self.model_file += self.get_tool('linker').executable_ext
         
     @classmethod
@@ -592,6 +600,9 @@ class CMakeModelDriver(CompiledModelDriver):
             out = kwargs.get('out', None)
             if out is not None:
                 rm_files.append(out)
+                out_base = os.path.splitext(out)[0]
+                for x in cls.cmake_products_ext:
+                    rm_files.append(out_base + x)
             for x in rm_files:
                 xfile = x
                 if (not os.path.isabs(xfile)) and (builddir is not None):
@@ -600,7 +611,9 @@ class CMakeModelDriver(CompiledModelDriver):
                     xfile = os.path.join(working_dir, xfile)
                 if os.path.isfile(xfile):
                     os.remove(xfile)
-                elif os.path.isdir(xfile) and xfile.endswith('CMakeFiles'):
+                elif os.path.isdir(xfile) and (xfile.endswith('CMakeFiles')
+                                               or xfile.endswith('Debug')
+                                               or xfile.endswith('Win32')):
                     shutil.rmtree(xfile)
         # Set keyword arguments based on cmake mappings/aliases
         if dont_build is not None:
