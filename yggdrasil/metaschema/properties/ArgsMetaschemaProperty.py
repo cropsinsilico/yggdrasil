@@ -39,8 +39,8 @@ class ArgsMetaschemaProperty(MetaschemaProperty):
     def encode(cls, instance, typedef=None):
         r"""Encoder for the 'args' property."""
         typedef_args = None
-        if isinstance(typedef, dict) and ('args' in typedef):
-            typedef_args = typedef['args']
+        # if isinstance(typedef, dict) and ('args' in typedef):
+        #     typedef_args = typedef['args']
         args = cls.instance2args(instance)
         return PropertiesMetaschemaProperty.encode(args, typedef_args)
 

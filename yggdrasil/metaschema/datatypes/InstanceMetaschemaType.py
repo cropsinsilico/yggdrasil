@@ -59,8 +59,11 @@ class InstanceMetaschemaType(MetaschemaType):
 
         """
         args = ArgsMetaschemaProperty.instance2args(obj)
-        return JSONObjectMetaschemaType.encode_data(
-            args, {'properties': typedef.get('args', {})})
+        if isinstance(typedef, dict) and ('args' in typedef):
+            typedef_args = {'properties': typedef['args']}
+        else:
+            typedef_args = None
+        return JSONObjectMetaschemaType.encode_data(args, typedef_args)
 
     @classmethod
     def decode_data(cls, obj, typedef):

@@ -74,9 +74,7 @@ class InterpretedModelDriver(ModelDriver):
                     ka = 'default_%s' % k0
                     if k0.endswith('_flags'):
                         old_val = getattr(cls, ka)
-                        new_val = ygg_cfg.get(cls.language, k0, '').split()
-                        for v in new_val:
-                            old_val.append(v)
+                        old_val += ygg_cfg.get(cls.language, k0, '').split()
                     else:
                         setattr(cls, ka, ygg_cfg.get(cls.language, k0,
                                                      getattr(cls, ka)))
@@ -115,9 +113,6 @@ class InterpretedModelDriver(ModelDriver):
         """
         out = getattr(cls, 'interpreter_flags',
                       getattr(cls, 'default_interpreter_flags'))
-        if out is None:
-            raise NotImplementedError("Interpreter flags not set for language '%s'."
-                                      % cls.language)
         return out
 
     @classmethod
@@ -159,8 +154,7 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         ext = cls.language_ext
-        if not isinstance(ext, list):
-            ext = [ext]
+        assert(isinstance(ext, (tuple, list)))
         if exec_type == 'interpreter':
             # if (((cls.language not in args[0])
             if (((tools.which(args[0]) is None)

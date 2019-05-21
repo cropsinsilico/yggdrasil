@@ -6,7 +6,7 @@ class ValidClass(object):
         self._input_args = {'a': int(a), 'b': int(b)}
 
     def __eq__(self, solf):
-        if not isinstance(solf, self.__class__):
+        if not isinstance(solf, self.__class__):  # pragma: debug
             return False
         return (self._input_args == solf._input_args)
 

@@ -158,6 +158,8 @@ class TestMetaschemaType(YggTestClassInfo):
             for x in self._valid_decoded:
                 y = self.import_cls.encode_type(x, **self._encode_type_kwargs)
                 z = self.import_cls.encode_data(x, y, **self._encode_data_kwargs)
+                self.import_cls.encode_data_readable(x, None)
+                self.import_cls.encode_data_readable(x, y)
                 x2 = self.import_cls.decode_data(z, y)
                 self.assert_result_equal(x2, x)
             if self._cls not in ['JSONNullMetaschemaType', 'AnyMetaschemaType']:

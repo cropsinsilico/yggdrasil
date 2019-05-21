@@ -615,10 +615,11 @@ class ModelDriver(Driver):
 
         """
         # Base languages
-        # TODO: Verify that this dosn't cause issues
         for x in cls.base_languages:
             x_drv = import_component('model', x)
-            if not x_drv.is_configured():
+            if not x_drv.is_configured():  # pragma: debug
+                # This shouldn't actually be called because configuration should
+                # occur on import
                 x_drv.configure(cfg)
         # Section and executable
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
