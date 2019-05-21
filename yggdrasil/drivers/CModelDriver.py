@@ -176,12 +176,15 @@ class CModelDriver(CompiledModelDriver):
                       'include_dirs': []}}
     function_param = {
         'comment': '//',
+        'true': '1',
         'indent': 2 * ' ',
-        'block_end': '}',
-        'if_begin': 'if ({cond}) {',
+        'block_end': '}}',
+        'if_begin': 'if ({cond}) {{',
         'for_begin': ('for ({iter_var} = {iter_begin}; {iter_var} < {iter_end}; '
-                      '{iter_var}++) {'),
-        'while_begin': 'while ({cond}) {'}
+                      '{iter_var}++) {{'),
+        'while_begin': 'while ({cond}) {{',
+        'declare': '{type} {name};',
+        'assign': '{name} = {value};'}
 
     @staticmethod
     def before_registration(cls):

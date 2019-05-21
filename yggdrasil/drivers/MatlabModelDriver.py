@@ -432,13 +432,15 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
     function_param = {
         'comment': '%',
+        'true': 'true',
         'indent': 2 * ' ',
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
         'while_begin': 'while ({cond})',
         'try_begin': 'try',
-        'try_except': 'catch {error_var}'}
+        'try_except': 'catch {error_var}',
+        'assign': '{name} = {value};'}
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed

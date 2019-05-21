@@ -70,6 +70,78 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
         r"""Test language version."""
         assert(self.import_cls.language_version())
 
+    # Tests for code generation
+    def tests_on_not_installed(self):
+        r"""Tests for when the driver is not installed."""
+        super(TestModelDriverNoStart, self).tests_on_not_installed()
+        self.test_write_if_block()
+        self.test_write_for_loop()
+        self.test_write_while_loop()
+        self.test_write_try_except()
+        
+    def run_generated_code(self, lines):
+        r"""Write and run generated code."""
+        if not self.import_cls.is_installed():
+            return
+        # TODO: Actually run it
+
+    def test_write_if_block(self):
+        r"""Test writing an if block."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError, self.import_cls.write_if_block,
+                               None, None)
+        else:
+            lines = []
+            if 'declare' in self.import_cls.function_param:
+                lines.append(self.import_cls.function_param['declare'].format(
+                    type='int', name='x'))
+            cond = self.import_cls.function_param['true']
+            block_contents = self.import_cls.function_param['assign'].format(
+                name='x', value='1')
+            lines += self.import_cls.write_if_block(cond, block_contents)
+            self.run_generated_code(lines)
+
+    def test_write_for_loop(self):
+        r"""Test writing a for loop."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError, self.import_cls.write_for_loop,
+                               None, None, None, None)
+        else:
+            lines = []
+            if 'declare' in self.import_cls.function_param:
+                lines.append(self.import_cls.function_param['declare'].format(
+                    type='int', name='i'))
+                lines.append(self.import_cls.function_param['declare'].format(
+                    type='int', name='x'))
+            loop_contents = self.import_cls.function_param['assign'].format(
+                name='x', value='i')
+            lines += self.import_cls.write_for_loop('i', 0, 1, loop_contents)
+            self.run_generated_code(lines)
+
+    def test_write_while_loop(self):
+        r"""Test writing a while loop."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError, self.import_cls.write_while_loop,
+                               None, None)
+        else:
+            lines = []
+            cond = self.import_cls.function_param['true']
+            loop_contents = self.import_cls.function_param.get('break', 'break')
+            lines += self.import_cls.write_while_loop(cond, loop_contents)
+            self.run_generated_code(lines)
+
+    def test_write_try_except(self):
+        r"""Test writing a try/except block."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError, self.import_cls.write_try_except,
+                               None, None)
+        else:
+            lines = []
+            try_contents = 'dummy code'
+            except_contents = 'dummy code'
+            lines += self.import_cls.write_try_except(try_contents, except_contents)
+            self.run_generated_code(lines)
+
 
 class TestModelDriver(TestModelParam, parent.TestDriver):
     r"""Test runner for basic ModelDriver class."""

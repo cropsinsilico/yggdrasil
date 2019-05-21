@@ -33,6 +33,12 @@ class TestCModelDriverNoStart(TestCModelParam,
         env = self.import_cls.update_ld_library_path(env)
         self.assert_equal(env['LD_LIBRARY_PATH'], total)
 
+    def test_write_try_except(self):
+        r"""Test writing a try/except block."""
+        if self.import_cls.language == 'c':
+            self.assert_raises(NotImplementedError, self.import_cls.write_try_except,
+                               None, None)
+        
 
 class TestCModelDriver(TestCModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CModelDriver."""

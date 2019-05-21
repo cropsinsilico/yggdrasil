@@ -26,14 +26,17 @@ class PythonModelDriver(InterpretedModelDriver):
         'rmq': {'libraries': ['pika']}}
     function_param = {
         'comment': '#',
+        'true': 'True',
         'indent': 4 * ' ',
+        'error': 'raise Exception("{error_msg}")',
         'block_end': '',
         'if_begin': 'if ({cond}):',
         'for_begin': 'for {iter_var} in range({iter_begin}, {iter_end}):',
         'while_begin': 'while ({cond}):',
         'try_begin': 'try:',
         'try_error_type': 'BaseException',
-        'try_except': 'except {try_error} as {error_var}:'}
+        'try_except': 'except {error_type} as {error_var}:',
+        'assign': '{name} = {value}'}
 
     @classmethod
     def is_language_installed(self):

@@ -982,7 +982,7 @@ class ModelDriver(Driver):
             Lines of code perfoming a try/except block.
 
         """
-        if cls.function_param is None:
+        if (cls.function_param is None) or ('try_begin' not in cls.function_param):
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         if error_type is None:
