@@ -640,7 +640,7 @@ def get_key_order(all_keys, default_order):
 
     def sort_key(x):
         if x in default_order:
-            return default_order.index(x)
+            return str(default_order.index(x))
         else:
             return x
 
