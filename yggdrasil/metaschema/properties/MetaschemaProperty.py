@@ -21,6 +21,8 @@ class MetaschemaProperty(object):
     _validate = None
     _compare = None
     _replaces_existing = False
+    _skip_existing_validator = False
+    _skip_formulaic_validator = False
 
     @classmethod
     def encode(cls, instance, typedef=None):
@@ -62,7 +64,7 @@ class MetaschemaProperty(object):
             pass
         elif cls._validate is not None:
             errors = cls._validate(validator, value, instance, schema) or ()
-        else:
+        elif not cls._skip_formulaic_validator:
             is_type = False
             for t in cls.types:
                 if validator.is_type(instance, t):
@@ -111,8 +113,7 @@ class MetaschemaProperty(object):
             object: Normalized object.
 
         """
-        # return instance
-        return validator._normalized
+        return instance
 
     @classmethod
     def normalize_in_schema(cls, schema):
@@ -145,7 +146,8 @@ class MetaschemaProperty(object):
 
         """
         if validator._normalizing:
-            validator._normalized = cls.normalize(validator, value, instance, schema)
+            validator._normalized = cls.normalize(validator, value,
+                                                  validator._normalized, schema)
             instance = validator._normalized
         try:
             failed = False
@@ -153,7 +155,8 @@ class MetaschemaProperty(object):
             for e in errors:
                 failed = True
                 yield jsonschema.ValidationError(e)
-            if (not failed) and (cls.name in validator._base_validator.VALIDATORS):
+            if (((not failed) and (not cls._skip_existing_validator)
+                 and (cls.name in validator._base_validator.VALIDATORS))):
                 errors = validator._base_validator.VALIDATORS[cls.name](
                     validator, value, instance, schema) or ()
                 for e in errors:

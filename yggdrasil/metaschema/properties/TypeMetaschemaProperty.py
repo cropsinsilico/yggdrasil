@@ -75,6 +75,7 @@ class TypeMetaschemaProperty(MetaschemaProperty):
             v0 = value[0]
             for v in value:
                 t = get_type_class(v)
+                # if normalizer.is_type(instance, v):
                 if t.validate(v):
                     v0 = v
                     break

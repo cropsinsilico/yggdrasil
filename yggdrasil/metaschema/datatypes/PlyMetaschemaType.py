@@ -622,6 +622,31 @@ class PlyDict(dict):
                 out['vertices'][i][k] = c[j]
         return out
 
+
+def get_key_order(all_keys, default_order):
+    r"""Determine the order of keys based on the keys and default order. Keys
+    are added first in the default order and then alphabetically.
+
+    Args:
+        all_keys (list): List of all keys that should be present in the returned
+            list.
+        default_order (list): Default order for keys that may or may not be in
+            all_keys.
+
+    Returns:
+        list: Key order.
+
+    """
+
+    def sort_key(x):
+        if x in default_order:
+            return default_order.index(x)
+        else:
+            return x
+
+    out = sorted(all_keys, key=sort_key)
+    return out
+
    
 # The base class could be anything since it is discarded during registration,
 # but is set to JSONObjectMetaschemaType here for transparancy since this is
@@ -672,13 +697,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                 comments.append(c)
         # Default order to allow user definited elements
         if element_order is None:
-            element_order = []
-            for k in _default_element_order:
-                if (k in obj):
-                    element_order.append(k)
-            for k in sorted(obj.keys()):
-                if k not in element_order:
-                    element_order.append(k)
+            element_order = get_key_order(obj.keys(), _default_element_order)
         if property_order is None:
             property_order = {}
             for e in element_order:
@@ -687,14 +706,8 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                 assert(isinstance(obj[e], (list, tuple)))
                 if len(obj[e]) == 0:
                     continue
-                property_order[e] = []
-                if e in _default_property_order:
-                    for k in _default_property_order[e]:
-                        if k in obj[e][0]:
-                            property_order[e].append(k)
-                for k in sorted(obj[e][0].keys()):
-                    if k not in property_order[e]:
-                        property_order[e].append(k)
+                property_order[e] = get_key_order(obj[e][0].keys(),
+                                                  _default_property_order.get(e, []))
         # Get information needed
         size_map = {}
         type_map = {}
@@ -704,7 +717,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
             assert(isinstance(obj[e], (list, tuple)))
             type_map[e] = {}
             size_map[e] = len(obj[e])
-            if len(obj[e]) == 0:
+            if size_map[e] == 0:
                 continue
             for p in property_order[e]:
                 if isinstance(obj[e][0][p], list):
@@ -748,7 +761,22 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
                         iline += translate_ply2fmt(type_map[e][p]) % x[p]
                 body.append(iline.strip())  # Ensure trailing spaces are removed
         return newline.join(header + body) + newline
+        
+    @classmethod
+    def encode_data_readable(cls, obj, typedef):
+        r"""Encode an object's data in a readable format.
 
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        return cls.encode_data(obj, typedef)
+    
     @classmethod
     def decode_data(cls, msg, typedef):
         r"""Decode an object.

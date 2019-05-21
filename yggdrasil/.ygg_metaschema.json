@@ -93,8 +93,7 @@
             "type": "object"
         }, 
         "class": {
-            "description": "One or more classes that the object should be an instance of.", 
-            "oneOf": [
+            "anyOf": [
                 {
                     "type": "class"
                 }, 
@@ -105,7 +104,8 @@
                     "minItems": 1, 
                     "type": "array"
                 }
-            ]
+            ], 
+            "description": "One or more classes that the object should be an instance of."
         }, 
         "const": true, 
         "contains": {

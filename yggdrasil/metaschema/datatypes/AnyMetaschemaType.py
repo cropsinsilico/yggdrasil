@@ -20,6 +20,19 @@ class AnyMetaschemaType(MetaschemaType):
         return True
         
     @classmethod
+    def issubtype(cls, t):
+        r"""Determine if this type is a subclass of the provided type.
+
+        Args:
+            t (str): Type name to check against.
+
+        Returns:
+            bool: True if this type is a subtype of the specified type t.
+
+        """
+        return True
+    
+    @classmethod
     def get_temptype(cls, typedef):
         r"""Extract temporary type from type definition.
         

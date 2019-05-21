@@ -81,6 +81,33 @@ class ContainerMetaschemaType(MetaschemaType):
         return out
 
     @classmethod
+    def _encode_data_alias(cls, obj, typedef, func_encode):
+        r"""Encode an object's data using a sepcified function.
+
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+            func_encode (callable): Function that should be used to encode
+                elements in the container. Defaults to encode_data.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        container = cls._container_type()
+        vtypedef_avail = False
+        if isinstance(typedef, dict) and (cls._json_property in typedef):
+            vtypedef_avail = typedef[cls._json_property]
+        for k, v in cls._iterate(obj):
+            vtypedef = None
+            if vtypedef_avail:
+                vtypedef = cls._get_element(vtypedef_avail, k, None)
+            vbytes = func_encode(v, typedef=vtypedef)
+            cls._assign(container, k, vbytes)
+        return container
+
+    @classmethod
     def encode_data(cls, obj, typedef):
         r"""Encode an object's data.
 
@@ -93,14 +120,7 @@ class ContainerMetaschemaType(MetaschemaType):
             string: Encoded object.
 
         """
-        container = cls._container_type()
-        for k, v in cls._iterate(obj):
-            vtypedef = None
-            if isinstance(typedef, dict) and (cls._json_property in typedef):
-                vtypedef = cls._get_element(typedef[cls._json_property], k, None)
-            vbytes = encode_data(v, typedef=vtypedef)
-            cls._assign(container, k, vbytes)
-        return container
+        return cls._encode_data_alias(obj, typedef, encode_data)
 
     @classmethod
     def encode_data_readable(cls, obj, typedef):
@@ -115,14 +135,7 @@ class ContainerMetaschemaType(MetaschemaType):
             string: Encoded object.
 
         """
-        container = cls._container_type()
-        for k, v in cls._iterate(obj):
-            vtypedef = None
-            if isinstance(typedef, dict) and (cls._json_property in typedef):
-                vtypedef = cls._get_element(typedef[cls._json_property], k, None)
-            vbytes = encode_data_readable(v, typedef=vtypedef)
-            cls._assign(container, k, vbytes)
-        return container
+        return cls._encode_data_alias(obj, typedef, encode_data_readable)
     
     @classmethod
     def decode_data(cls, obj, typedef):

@@ -23,6 +23,21 @@ class TemptypeMetaschemaProperty(MetaschemaProperty):
             yield e
 
     @classmethod
-    def normalize(cls, validator, value, instance, schema):
-        r"""Normalization method for 'temptype' property."""
-        return validator.__class__(value).normalize(instance)
+    def validate(cls, validator, value, instance, schema):
+        r"""Validator for JSON schema validation of an instance by this property.
+        If there is not a user provided validate function, the instance will be
+        encoded and then the encoded value will be checked against the provided
+        value using cls.compare.
+
+        Args:
+            validator (jsonschmea.Validator): JSON schema validator.
+            value (object): Value of the property in the schema.
+            instance (object): Instance to validate.
+            schema (dict): Schema that instance should be validated against.
+            
+        Yields:
+            str: Error messages associated with failed validation.
+
+        """
+        for error in validator.descend(instance, value):
+            yield error
