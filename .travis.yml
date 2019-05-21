@@ -29,6 +29,7 @@ env:
     NUMPY=numpy
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
+    JSONSCHEMA=jsonschema
     INSTALLZMQ=1
     INSTALLRMQ=0
     INSTALLAPY=0
@@ -146,6 +147,7 @@ install:
       # May need to uninstall conda version of numpy and matplotlib on LPy test
       pip install $NUMPY
       pip install $MATPLOTLIB
+      pip install $JSONSCHEMA
       pip install nose
       pip install pytest "pytest-cov<2.6"
       pip install coverage coveralls codecov flake8
@@ -162,6 +164,7 @@ install:
       pip uninstall -y matplotlib
       conda install $NUMPY
       conda install $MATPLOTLIB
+      conda install $JSONSCHEMA
       conda install nose
       conda install pytest "pytest-cov<2.6"
       conda install coverage coveralls codecov flake8
@@ -196,7 +199,7 @@ jobs:
     - stage: test
       os: linux
       python: 2.7
-      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 JSONSCHEMA=jsonschema==2.6.0 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
       services:
         - rabbitmq
     - os: linux
