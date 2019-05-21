@@ -428,7 +428,18 @@ class CMakeModelDriver(CompiledModelDriver):
                                                  % os.path.join(conda_prefix, 'lib'))
                     if newline not in contents:
                         fd.write(newline)
+                # Explicitly set Release/Debug directories to builddir on windows
+                if platform._is_win:  # pragma: windows
+                    for artifact in ['runtime', 'library', 'archive']:
+                        for conf in ['release', 'debug']:
+                            newline = backwards.as_bytes(
+                                'SET( CMAKE_%s_OUTPUT_DIRECTORY_%s '
+                                % (artifact.upper(), conf.upper())
+                                + '"${OUTPUT_DIRECTORY}")\n')
+                            if newline not in contents:
+                                fd.write(newline)
                 fd.write(contents)
+                # Add include if not already in the file
                 newline = backwards.as_bytes('\nINCLUDE(%s)\n'
                                              % os.path.basename(include_file))
                 if newline not in contents:
