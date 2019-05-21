@@ -6,6 +6,10 @@ class TestCPPModelParam(parent.TestCModelParam):
 
     driver = 'CPPModelDriver'
 
+    def __init__(self, *args, **kwargs):
+        super(TestCPPModelParam, self).__init__(*args, **kwargs)
+        self._inst_kwargs['compiler_flags'].append('-std=c++11')
+    
     
 class TestCPPModelDriverNoStart(TestCPPModelParam,
                                 parent.TestCModelDriverNoStart):
