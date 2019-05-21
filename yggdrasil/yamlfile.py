@@ -34,7 +34,7 @@ def load_yaml(fname):
         if (hasattr(fd, 'name') and (not fd.name.startswith('<'))):
             fname = fd.name
         else:
-            fname = os.getcwd()
+            fname = os.path.join(os.getcwd(), 'stream')
     # Mustache replace vars
     yamlparsed = fd.read()
     yamlparsed = pystache.render(

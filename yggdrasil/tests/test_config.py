@@ -1,6 +1,6 @@
 import os
 import tempfile
-from yggdrasil.tests import assert_equal, assert_warns
+from yggdrasil.tests import assert_equal, assert_warns, assert_raises
 from yggdrasil import config, backwards
 
 
@@ -37,6 +37,8 @@ def test_YggConfigParser():
     x = config.YggConfigParser()
     x.add_section('test_section')
     x.set('test_section', 'test_option', 'test_value')
+    assert_raises(RuntimeError, x.update_file)
+    assert_equal(x.file_to_update, None)
     assert_equal(x.get('test_section', 'test_option'), 'test_value')
     assert_equal(x.get('test_section', 'fake_option'), None)
     assert_equal(x.get('test_section', 'fake_option', 5), 5)
@@ -90,6 +92,10 @@ def test_find_all():
 
 def test_cfg_logging():
     r"""Test cfg_logging."""
+    lvl = config.get_ygg_loglevel()
+    config.set_ygg_loglevel(lvl)
     os.environ['YGG_SUBPROCESS'] = 'True'
+    lvl = config.get_ygg_loglevel()
+    config.set_ygg_loglevel(lvl)
     config.cfg_logging()
     del os.environ['YGG_SUBPROCESS']

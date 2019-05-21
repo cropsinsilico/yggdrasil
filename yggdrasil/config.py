@@ -38,9 +38,8 @@ class YggConfigParser(configparser.ConfigParser, object):
     def file_to_update(self):
         r"""str: Full path to file that should be updated if update_file is
         called without an explicit file path."""
-        if self.files is None:
-            out = None
-        else:
+        out = None
+        if self.files is not None:
             out = self.files[-1]
         return out
 
@@ -57,7 +56,7 @@ class YggConfigParser(configparser.ConfigParser, object):
         """
         if fname is None:
             fname = self.file_to_update
-        if fname is None:  # pragma: debug
+        if fname is None:
             raise RuntimeError("No file provided or set at creation.")
         with open(fname, 'w') as fd:
             self.write(fd)

@@ -81,9 +81,11 @@ def import_all_components(comptype):
     # Get module and directory
     mod = copy.deepcopy(_comptype2mod[comptype])
     moddir = copy.deepcopy(_comptype2mod[comptype])
-    if isinstance(mod, list):
-        mod = '.'.join(mod)
-        moddir = os.path.join(*moddir)
+    # The next three lines will be required if there are ever any components
+    # nested in multiple directories (e.g. metaschema/datatypes)
+    # if isinstance(mod, list):
+    #     mod = '.'.join(mod)
+    #     moddir = os.path.join(*moddir)
     moddir = os.path.join(os.path.dirname(__file__), moddir)
     modbase = importlib.import_module('yggdrasil.%s' % mod)
     non_comp = [os.path.splitext(x)[0] for x in
@@ -124,8 +126,8 @@ def import_component(comptype, subtype=None, without_schema=False):
     """
     # Get module
     mod = _comptype2mod[comptype]
-    if isinstance(mod, list):
-        mod = '.'.join(mod)
+    # if isinstance(mod, list):
+    #     mod = '.'.join(mod)
     # Set direct import shortcuts for unregistered classes
     if (comptype == 'comm') and (subtype is None):
         subtype = 'DefaultComm'
@@ -143,13 +145,13 @@ def import_component(comptype, subtype=None, without_schema=False):
     else:
         # Get class name
         if without_schema:
-            if subtype is None:
+            if subtype is None:  # pragma: debug
                 raise ValueError("subtype must be provided if without_schema is True.")
             class_name = subtype
         else:
             from yggdrasil.schema import get_schema
             s = get_schema().get(comptype, None)
-            if s is None:
+            if s is None:  # pragma: debug
                 raise ValueError("Unrecognized component type: %s" % comptype)
             if subtype is None:
                 subtype = s.default_subtype
@@ -201,7 +203,7 @@ def create_component(comptype, subtype=None, **kwargs):
     """
     from yggdrasil.schema import get_schema
     s = get_schema().get(comptype, None)
-    if s is None:
+    if s is None:  # pragma: debug
         raise ValueError("Unrecognized component type: %s" % comptype)
     if s.subtype_key in kwargs:
         subtype = kwargs[s.subtype_key]

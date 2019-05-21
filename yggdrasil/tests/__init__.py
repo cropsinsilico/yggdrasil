@@ -616,7 +616,7 @@ class YggTestClass(YggTestBase):
         return self._instance
 
     def create_error_instance(self, inst_class=None, args=None, kwargs=None,
-                              error_class=None, error_on_init=False):
+                              error_class=None, error_on_init=False):  # pragma: no cover
         r"""Create a new instance of the class that is wrapped in ErrorClass."""
         if inst_class is None:
             inst_class = self.import_cls

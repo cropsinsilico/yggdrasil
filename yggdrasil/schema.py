@@ -211,7 +211,7 @@ class ComponentSchema(object):
                 for k in self._base_schema['properties'].keys():
                     if (k != self.subtype_key) and (k in out['properties']):
                         del out['properties'][k]
-                if not out['properties']:
+                if not out['properties']:  # pragma: no cover
                     del out['properties']
         if relaxed:
             out['additionalProperties'] = True
@@ -380,8 +380,6 @@ class ComponentSchema(object):
         assert(comp_cls._schema_type == self.schema_type)
         assert(comp_cls._schema_subtype_key == self.subtype_key)
         name = comp_cls.__name__
-        if name in ['CommBase', 'AsyncComm']:
-            name = 'DefaultComm'
         # Append subtype
         subtype_list = getattr(comp_cls, '_%s' % self.subtype_key, None)
         if not isinstance(subtype_list, list):
@@ -436,7 +434,7 @@ class ComponentSchema(object):
                 self._base_schema['required'] = list(
                     set(self._base_schema['required'])
                     & set(new_schema['required']))
-                if not self._base_schema['required']:
+                if not self._base_schema['required']:  # pragma: no cover
                     del self._base_schema['required']
             prop_overlap = list(
                 set([self.subtype_key])  # Force subtype keys to be included
@@ -718,7 +716,7 @@ class SchemaRegistry(object):
             dict: Schema for the specified component.
 
         """
-        if comp_name not in self._storage:
+        if comp_name not in self._storage:  # pragma: debug
             raise ValueError("Unrecognized component: %s" % comp_name)
         if subtype is None:
             out = self._storage[comp_name].get_schema(relaxed=relaxed)

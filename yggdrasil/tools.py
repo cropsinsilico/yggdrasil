@@ -477,7 +477,7 @@ class YggPopen(subprocess.Popen):
                 kwargs.setdefault('creationflags',
                                   subprocess.CREATE_NEW_PROCESS_GROUP)
             else:
-                if for_matlab:
+                if for_matlab:  # pragma: matlab
                     import pty
                     # Matlab requires a tty so a pty is used here to allow
                     # the process to be lanched in a new process group.
