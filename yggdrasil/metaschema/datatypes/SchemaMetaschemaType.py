@@ -163,7 +163,7 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
         """
         if isinstance(obj, str):
             obj = {'type': obj}
-        x = copy.deepcopy(cls.metaschema())
+        x = cls.metaschema()
         validators = {u'$ref': _validate_schema}
         normalizers = {tuple(): [_normalize_schema]}
         validator_class = copy.deepcopy(cls.validator())

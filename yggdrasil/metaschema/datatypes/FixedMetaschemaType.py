@@ -86,9 +86,8 @@ class FixedMetaschemaType(MetaschemaType):
 
         out = copy.deepcopy(typedef)
         if out.get('type', None) == cls.base().name:
-            typedef_base = copy.deepcopy(typedef)
-            typedef_base.update(cls.fixed_properties)
-            errors = [e for e in compare_schema(typedef, typedef_base)]
+            out.update(cls.fixed_properties)
+            errors = [e for e in compare_schema(typedef, out)]
             if errors:
                 error_msg = "Error(s) in comparison with fixed properties.\n"
                 for e in errors:
