@@ -613,7 +613,8 @@ class CMakeModelDriver(CompiledModelDriver):
                     os.remove(xfile)
                 elif os.path.isdir(xfile) and (xfile.endswith('CMakeFiles')
                                                or xfile.endswith('Debug')
-                                               or xfile.endswith('Win32')):
+                                               or xfile.endswith('Win32')
+                                               or xfile.endswith('.dir')):
                     shutil.rmtree(xfile)
         # Set keyword arguments based on cmake mappings/aliases
         if dont_build is not None:
