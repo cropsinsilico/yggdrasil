@@ -76,7 +76,7 @@ def check_sockets():  # pragma: debug
         logger.info("%d sockets closed." % count)
 
 
-def check_environ_bool(name, valid_values=['true', '1']):
+def check_environ_bool(name, valid_values=['true', '1', True, 1]):
     r"""Check to see if a boolean environment variable is set to True.
 
     Args:

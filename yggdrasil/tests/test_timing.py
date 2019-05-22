@@ -31,6 +31,8 @@ _testfile_dat = 'test_run123.dat'
 
 def test_get_source():
     r"""Test getting source file for test."""
+    from yggdrasil.tests import enable_long_tests
+    print("**88**YGG_ENABLE_LONG_TESTS", enable_long_tests)
     lang_list = timing.get_lang_list()
     dir_list = ['src', 'dst']
     for l in lang_list:

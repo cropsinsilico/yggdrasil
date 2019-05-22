@@ -14,8 +14,7 @@ import psutil
 import copy
 import pprint
 from yggdrasil.config import ygg_cfg, cfg_logging
-from yggdrasil.tools import get_default_comm, YggClass
-from yggdrasil import backwards, platform, units
+from yggdrasil import tools, backwards, platform, units
 from yggdrasil.communication import cleanup_comms
 from yggdrasil.components import import_component
 
@@ -73,7 +72,7 @@ shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 
 # Flag for enabling tests that take a long time
-enable_long_tests = os.environ.get("YGG_ENABLE_LONG_TESTS", False)
+enable_long_tests = tools.check_environ_bool("YGG_ENABLE_LONG_TESTS")
 
 
 if backwards.PY2:  # pragma: Python 2
@@ -408,7 +407,7 @@ class YggTestBase(unittest.TestCase):
 
         """
         self._teardown_complete = True
-        x = YggClass('dummy', timeout=self.timeout, sleeptime=self.sleeptime)
+        x = tools.YggClass('dummy', timeout=self.timeout, sleeptime=self.sleeptime)
         # Give comms time to close
         if ncurr_comm is None:
             Tout = x.start_timeout()
@@ -450,7 +449,7 @@ class YggTestBase(unittest.TestCase):
     @property
     def cleanup_comm_classes(self):
         r"""list: Comm classes that should be cleaned up following the test."""
-        return [get_default_comm()]
+        return [tools.get_default_comm()]
 
     def cleanup_comms(self):
         r"""Cleanup all comms."""
