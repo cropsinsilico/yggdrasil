@@ -13,9 +13,14 @@ import warnings
 import subprocess
 from yggdrasil.backwards import configparser
 from yggdrasil import platform, tools
+conda_prefix = os.environ.get('CONDA_PREFIX', '')
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
-usr_config_file = os.path.expanduser(os.path.join('~', config_file))
+if conda_prefix:
+    usr_dir = conda_prefix
+else:
+    usr_dir = os.path.expanduser('~')
+usr_config_file = os.path.join(usr_dir, config_file)
 loc_config_file = os.path.join(os.getcwd(), config_file)
 if not os.path.isfile(usr_config_file):
     shutil.copy(def_config_file, usr_config_file)
