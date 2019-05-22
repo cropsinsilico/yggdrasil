@@ -429,6 +429,9 @@ class ModelDriver(Driver):
                 machine.
 
         """
+        if cls.language == 'cmake':
+            print(('cmake installed:\n\tlanguage: %s\n\tdependencies: %s\n\t'
+                   'comms: %s\n\tconfigured: %s\n'))
         return (cls.is_language_installed() and cls.are_dependencies_installed()
                 and cls.is_comm_installed() and cls.is_configured())
 
@@ -446,11 +449,10 @@ class ModelDriver(Driver):
             if not out:
                 break
             out = import_component('model', x).are_dependencies_installed()
-        if out:
-            for x in cls.interface_dependencies:
-                if not out:
-                    break
-                out = cls.is_library_installed(x)
+        for x in cls.interface_dependencies:
+            if not out:
+                break
+            out = cls.is_library_installed(x)
         return out
 
     @classmethod
