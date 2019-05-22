@@ -5,7 +5,7 @@ import os
 ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson3': ('python', 'matlab', 'c', 'cpp'),
-           'gs_lesson4': ('python', 'matlab', 'c', 'cpp'),
+           'gs_lesson4': ('python', 'matlab', 'c', 'cpp', 'cmake'),
            'gs_lesson4b': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io1': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io2': ('python', 'matlab', 'c', 'cpp'),
@@ -32,7 +32,8 @@ ext_map = {'python': '.py',
            'matlab': '.m',
            'c': '.c',
            'cpp': '.cpp',
-           'executable': ''}
+           'executable': '',
+           'cmake': '.cpp'}
 _example_dir = os.path.dirname(__file__)
 
 

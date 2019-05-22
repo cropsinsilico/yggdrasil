@@ -180,6 +180,12 @@ class TestExample(YggTestBase, tools.YggClass):
         self.run_example()
         self.language = None
 
+    def test_cmake(self):
+        r"""Test the CMake version of the example."""
+        self.language = 'cmake'
+        self.run_example()
+        self.language = None
+
     def test_matlab(self):  # pragma: matlab
         r"""Test the Matlab version of the example."""
         self.language = 'matlab'
