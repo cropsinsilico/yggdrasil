@@ -312,6 +312,9 @@ class RMQComm(AsyncComm.AsyncComm):
                 res = self.channel.queue_declare(queue=self.queue,
                                                  auto_delete=True,
                                                  passive=True)
+            except BlockingIOError:  # pragma: debug
+                self.sleep()
+                res = self.get_queue_result()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
                     AttributeError):  # pragma: debug
