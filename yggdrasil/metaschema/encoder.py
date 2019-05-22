@@ -63,7 +63,10 @@ class JSONReadableEncoder(stdjson.JSONEncoder):
         try:
             return encode_data_readable(o)
         except MetaschemaTypeError:
-            return _json_encoder.default(self, o)
+            if _use_rapidjson:
+                raise TypeError("Cannot encode %s" % o)
+            else:
+                return _json_encoder.default(self, o)
 
 
 class JSONEncoder(_json_encoder):
@@ -76,7 +79,10 @@ class JSONEncoder(_json_encoder):
         try:
             return encode_data(o)
         except MetaschemaTypeError:
-            return _json_encoder.default(self, o)
+            if _use_rapidjson:
+                raise TypeError("Cannot encode %s" % o)
+            else:
+                return _json_encoder.default(self, o)
     
 
 class JSONDecoder(_json_decoder):

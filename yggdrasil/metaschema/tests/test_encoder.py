@@ -11,8 +11,7 @@ class TestClass(object):  # pragma: no cover
 def test_JSONEncoder():
     r"""Test JSONEncoder error."""
     x = TestClass()
-    enc = encoder.JSONEncoder()
-    assert_raises(TypeError, enc.encode, x)
+    assert_raises(TypeError, encoder.encode_json, x)
 
 
 def test_encode_yaml():
