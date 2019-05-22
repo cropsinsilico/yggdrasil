@@ -1218,10 +1218,10 @@ class LinkerBase(CompilationToolBase):
 
         """
         # Is this necessary?
-        # if platform._is_win:  # pragma: windows
-        #     libname = os.path.basename(libpath)
-        # else:
-        libname = cls.file2base(libpath)
+        if platform._is_win:  # pragma: windows
+            libname = os.path.basename(libpath)
+        else:
+            libname = cls.file2base(libpath)
         if cls.library_prefix:
             libname = libname.split(cls.library_prefix)[-1]
         return libname
