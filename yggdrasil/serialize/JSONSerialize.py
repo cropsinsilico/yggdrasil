@@ -101,6 +101,9 @@ class JSONSerialize(SerializeBase):
         out['contents'] = (b'{\n\t"a": [\n\t\t"b",\n\t\t1,\n\t\t1.0\n\t],'
                            b'\n\t"c": {\n\t\t"z": "hello"\n\t},'
                            b'\n\t"d": "new field"\n}')
+        out['concatenate'] = [([{'a': 1}, {'b': 2}], [{'a': 1, 'b': 2}]),
+                              ([['a'], ['b']], [['a', 'b']]),
+                              ([['a'], {'b': 2}], [[['a'], {'b': 2}]])]
         # Version that allows for list concatentation
         # out['contents'] = (b'[\n\t'
         #                    b'{\n\t\t"a": [\n\t\t\t"b",\n\t\t\t1,\n\t\t\t1.0\n\t\t],'

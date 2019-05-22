@@ -1,6 +1,4 @@
 from yggdrasil.serialize.SerializeBase import SerializeBase
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
-from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
 class FunctionalSerialize(SerializeBase):
@@ -38,21 +36,19 @@ class FunctionalSerialize(SerializeBase):
     func_deserialize = None
     
     def __init__(self, **kwargs):
-        if isinstance(kwargs.get('encoded_datatype', None), MetaschemaType):
-            self.encoded_datatype = kwargs.pop('encoded_datatype')
         if isinstance(kwargs.get('func_serialize', None), SerializeBase):
             kwargs['func_serialize'] = kwargs['func_serialize'].func_serialize
         if isinstance(kwargs.get('func_deserialize', None), SerializeBase):
             kwargs['func_deserialize'] = kwargs['func_deserialize'].func_deserialize
         super(FunctionalSerialize, self).__init__(**kwargs)
 
-    @property
-    def base_class(self):
-        r"""DefaultSerialize: Default version of serialization."""
-        if getattr(self, '_base_class', None) is None:
-            self._base_class = DefaultSerialize(datatype=self.typedef,
-                                                **self.serializer_info)
-        return self._base_class
+    # @property
+    # def base_class(self):
+    #     r"""DefaultSerialize: Default version of serialization."""
+    #     if getattr(self, '_base_class', None) is None:
+    #         self._base_class = DefaultSerialize(datatype=self.typedef,
+    #                                             **self.serializer_info)
+    #     return self._base_class
 
     # TODO: In some cases this should be the object typedef
     # @property

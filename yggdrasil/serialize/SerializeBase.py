@@ -752,7 +752,7 @@ class SerializeBase(tools.YggClass):
             self.initialize_serializer(typedef, extract=True)
         return out, metadata
 
-    def enable_file_header(self):
+    def enable_file_header(self):  # pragma: no cover
         r"""Set serializer attributes to enable file headers to be included in
         the serializations."""
         pass
@@ -762,7 +762,7 @@ class SerializeBase(tools.YggClass):
         included in the serializations."""
         pass
 
-    def serialize_file_header(self):
+    def serialize_file_header(self):  # pragma: no cover
         r"""Return the serialized header information that should be prepended
         to files serialized using this class.
 
@@ -772,7 +772,7 @@ class SerializeBase(tools.YggClass):
         """
         return b''
 
-    def deserialize_file_header(self, fd):
+    def deserialize_file_header(self, fd):  # pragma: no cover
         r"""Deserialize the header information from the file and update the
         serializer.
 
