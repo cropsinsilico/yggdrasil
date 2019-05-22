@@ -431,7 +431,9 @@ class ModelDriver(Driver):
         """
         if cls.language == 'cmake':
             print(('cmake installed:\n\tlanguage: %s\n\tdependencies: %s\n\t'
-                   'comms: %s\n\tconfigured: %s\n'))
+                   'comms: %s\n\tconfigured: %s\n')
+                  % (cls.is_language_installed(), cls.are_dependencies_installed(),
+                     cls.is_comm_installed() and cls.is_configured()))
         return (cls.is_language_installed() and cls.are_dependencies_installed()
                 and cls.is_comm_installed() and cls.is_configured())
 
