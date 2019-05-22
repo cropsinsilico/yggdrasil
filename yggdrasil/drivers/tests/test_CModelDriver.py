@@ -2,7 +2,7 @@ import os
 import unittest
 from yggdrasil import platform
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
-from yggdrasil.drivers.CModelDriver import _incl_interface
+from yggdrasil.drivers.CModelDriver import _incl_interface, CModelDriver
 
 
 class TestCModelParam(parent.TestCompiledModelParam):
@@ -14,8 +14,13 @@ class TestCModelParam(parent.TestCompiledModelParam):
         super(TestCModelParam, self).__init__(*args, **kwargs)
         script_dir = os.path.dirname(self.src[0])
         self.args = [self.args[0], '1']
-        self._inst_kwargs.update(compiler_flags=['-I' + script_dir],
-                                 linker_flags=['-L' + script_dir])
+        if CModelDriver.is_installed():
+            compiler = CModelDriver.get_tool('compiler')
+            linker = CModelDriver.get_tool('linker')
+            include_flag = compiler.create_flag('include_dirs', script_dir)
+            library_flag = linker.create_flag('library_dirs', script_dir)
+            self._inst_kwargs.update(compiler_flags=include_flag,
+                                     linker_flags=library_flag)
 
 
 class TestCModelDriverNoStart(TestCModelParam,
