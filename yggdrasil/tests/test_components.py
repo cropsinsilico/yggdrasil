@@ -10,6 +10,8 @@ def test_import_component():
     components.import_component('serializer', 'direct')
     # Test after registration
     components.import_component('serializer', 'direct')
+    # Test using class name
+    components.import_component('serializer', 'DefaultSerialize')
     # Test access to file through comm (including error)
     components.import_component('comm', 'pickle')
     assert_raises(ValueError, components.import_component, 'comm', 'invalid')

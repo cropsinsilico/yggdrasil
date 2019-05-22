@@ -153,7 +153,9 @@ def import_component(comptype, subtype=None, without_schema=False):
             s = get_schema().get(comptype, None)
             if s is None:  # pragma: debug
                 raise ValueError("Unrecognized component type: %s" % comptype)
-            if subtype is None:
+            if subtype is None:  # pragma: no cover
+                # This will only be called if the test is run before the component
+                # module is imported
                 subtype = s.default_subtype
             if subtype in s.class2subtype:
                 class_name = subtype
@@ -212,7 +214,7 @@ def create_component(comptype, subtype=None, **kwargs):
 
 
 def inherit_schema(orig, new_properties=None, new_required=None,
-                   remove_keys=None, **kwargs):
+                   remove_keys=[], **kwargs):
     r"""Create an inherited schema, adding new value to accepted ones for
     dependencies.
     
@@ -231,24 +233,19 @@ def inherit_schema(orig, new_properties=None, new_required=None,
         tuple(dict, list): New schema properties and a list of requried.
 
     """
+    remove_keys = copy.deepcopy(remove_keys)
     # Get set of original properties
-    if issubclass(orig, ComponentBase):
-        out_prp = copy.deepcopy(orig._schema_properties)
-        if orig._schema_excluded_from_inherit is not None:
-            remove_keys += orig._schema_excluded_from_inherit
-        out_req = copy.deepcopy(orig._schema_required)
-    else:
-        assert(isinstance(orig, dict))
-        out_prp = copy.deepcopy(orig)
-        out_req = []
+    assert(issubclass(orig, ComponentBase))
+    out_prp = copy.deepcopy(orig._schema_properties)
+    if orig._schema_excluded_from_inherit is not None:
+        remove_keys += orig._schema_excluded_from_inherit
+    out_req = copy.deepcopy(orig._schema_required)
     # Don't add duplicates
     if new_properties == out_prp:
         new_properties = None
     if new_required == out_req:
         new_required = None
     # Remove keys
-    if remove_keys is None:
-        remove_keys = []
     for k in remove_keys:
         if k in out_prp:
             out_prp.pop(k)
@@ -281,17 +278,15 @@ class ComponentMeta(type):
                               getattr(cls, '_' + cls._schema_subtype_key, None))
         # Inherit new schema properties
         if cls._schema_inherit and (cls.__name__ != 'ComponentBase'):
-            if isinstance(cls._schema_inherit, bool):
-                inherit_from = None
-                for x in bases:
-                    if hasattr(x, '_schema_properties'):
-                        inherit_from = x
-                        break
-                if inherit_from is None:  # pragma: debug
-                    raise RuntimeError(("Class %s dosn't have a component "
-                                        "parent class.") % cls)
-            else:
-                inherit_from = cls._schema_inherit
+            assert(isinstance(cls._schema_inherit, bool))
+            inherit_from = None
+            for x in bases:
+                if hasattr(x, '_schema_properties'):
+                    inherit_from = x
+                    break
+            if inherit_from is None:  # pragma: debug
+                raise RuntimeError(("Class %s dosn't have a component "
+                                    "parent class.") % cls)
             # Dont inherit if the base is ComponentBase (empty schema)
             if inherit_from.__name__ != ComponentBase:
                 cls._schema_properties, cls._schema_required = inherit_schema(
@@ -327,11 +322,7 @@ class ComponentMeta(type):
                 assert(_registry_defaults[yaml_typ] == default_subtype)
             if cls.__name__ not in _registry[yaml_typ]:
                 _registry[yaml_typ][cls.__name__] = cls
-                if isinstance(subtype, list):
-                    for subt in subtype:
-                        _registry_class2subtype[yaml_typ][subt] = cls.__name__
-                else:
-                    _registry_class2subtype[yaml_typ][subtype] = cls.__name__
+                _registry_class2subtype[yaml_typ][subtype] = cls.__name__
             cls.after_registration(cls)
         return cls
     
@@ -439,10 +430,7 @@ class ComponentBase(object):
                 # Remove properties that shouldn't ve validated in class
                 for k in self._schema_excluded_from_class_validation:
                     if k in s['properties']:
-                        if 'type' in s['properties'][k]:
-                            s['properties'][k] = {'type': s['properties'][k]['type']}
-                        else:
-                            del s['properties'][k]
+                        del s['properties'][k]
                 # Validate and normalize
                 metaschema.validate_instance(kwargs, s, normalize=False)
                 # TODO: Normalization performance needs improvement
