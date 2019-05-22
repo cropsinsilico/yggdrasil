@@ -11,6 +11,11 @@ class ValidClass(object):
         return (self._input_args == solf._input_args)
 
 
+class InvalidClass:  # pragma: no cover
+    # Old style class dosn't inherit from object
+    pass
+
+
 class TestInstanceMetaschemaType(parent.TestMetaschemaType):
     r"""Test class for InstanceMetaschemaType class."""
 
@@ -28,4 +33,5 @@ class TestInstanceMetaschemaType(parent.TestMetaschemaType):
         self._valid_decoded = [self._value]
         self._invalid_encoded = [{}]
         self._invalid_decoded = [int(1), 'hello']
+        self._invalid_validate += [InvalidClass()]
         self._compatible_objects = [(self._value, self._value, None)]
