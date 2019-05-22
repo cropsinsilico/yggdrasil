@@ -111,6 +111,7 @@ def long_running(func):
         func (callable): Test function or method.
 
     """
+    print('enable_long_tests', enable_long_tests)
     return unittest.skipIf(not enable_long_tests, "Long tests not enabled.")(func)
 
 
