@@ -74,14 +74,14 @@ before_install:
     if [[ -n "$CONDA" || $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
-      wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      # wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
       bash miniconda.sh -b -p $HOME/miniconda
       export PATH="$HOME/miniconda/bin:$PATH"
       hash -r
       conda config --set always_yes yes --set changeps1 no
       conda config --add channels conda-forge
       conda update -q conda
-      conda install -q conda-build
       conda create -q -n test-environment python=$CONDA
       source activate test-environment
       conda install -q conda-build
