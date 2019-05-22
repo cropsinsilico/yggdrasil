@@ -129,9 +129,3 @@ def test_normalize_instance():
         except BaseException:  # pragma: debug
             print(schema, x, y, z)
             raise
-        
-
-def test_create_normalizer():
-    r"""Test create normalizer with default types."""
-    cls = metaschema.normalizer.create(metaschema.get_metaschema())
-    assert_equal(cls({'type': 'int'}).normalize('1'), '1')

@@ -80,9 +80,19 @@ def create(*args, **kwargs):
             self._normalized_stack = []
 
         @classmethod
-        def normalize_schema(cls, schema):
-            r"""Normalize a schema against the metaschema."""
-            return cls(cls.META_SCHEMA).normalize(schema)
+        def normalize_schema(cls, schema, **kwargs):
+            r"""Normalize a schema against the metaschema.
+
+            Args:
+                schema (dict): Schema that should be normalized.
+                **kwargs: Additional keyword arguments are passed to the
+                    normalize method.
+
+            Returns:
+                dict: Normalized schema.
+
+            """
+            return cls(cls.META_SCHEMA).normalize(schema, **kwargs)
 
         @property
         def current_path(self):
