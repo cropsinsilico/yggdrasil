@@ -12,6 +12,7 @@ class AnyMetaschemaType(MetaschemaType):
     description = 'A type allowing any value that is expresible in some type.'
     properties = MetaschemaType.properties + ['temptype']
     metadata_properties = MetaschemaType.metadata_properties + ['temptype']
+    python_types = (object, )
 
     @classmethod
     def validate(cls, *args, **kwargs):

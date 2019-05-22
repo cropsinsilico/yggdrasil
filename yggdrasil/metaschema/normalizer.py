@@ -240,8 +240,8 @@ def create(*args, **kwargs):
                         #                 % (k, error))
                         yield error
 
-            for e in validator_class.iter_errors(self, self._normalized,
-                                                 _schema=_schema):
+            for e in self._old_settings['iter_errors'](self._normalized,
+                                                       _schema=_schema):
                 # if self.VERBOSE:  # pragma: debug
                 #     logger.info('Error in base iter_errors: %s' % e)
                 yield e
@@ -279,9 +279,9 @@ def create(*args, **kwargs):
                 self._schema_path_stack.append(schema_path)
             failed = False
             try:
-                for error in validator_class.descend(self, instance,
-                                                     schema, path=path,
-                                                     schema_path=schema_path):
+                for error in self._old_settings['descend'](instance, schema,
+                                                           path=path,
+                                                           schema_path=schema_path):
                     failed = True
                     # if self.VERBOSE:
                     #     logger.info("Error in descent (path=%s, schema_path=%s): %s"
@@ -362,22 +362,42 @@ def create(*args, **kwargs):
             else:
                 return self._normalized
 
-        def is_type(self, instance, types):
-            r"""Determine if an object is an example of the given type.
+    def iter_errors_js2(self, instance, _schema=None):
+        r"""Wrapper that can be added to classes for jsonschema < 3.0 to allow
+        for boolean schema."""
+        if _schema is True:
+            return
+        elif _schema is False:
+            yield jsonschema.exceptions.ValidationError(
+                "False schema does not allow %r" % (instance,),
+                validator=None,
+                validator_value=None,
+                instance=instance,
+                schema=_schema)
+            return
+        for e in super(Normalizer, self).iter_errors(instance, _schema=_schema):
+            yield e
 
-            Args:
-                instance (object): Object to test against to the type.
-                type (str, list): Name of single type or a list of types that
-                    instance should be tested against.
+    def is_type_js2(self, instance, types):
+        r"""Jsonschema < 3.0 wrapper for method that determines if an object is
+        an example of the given type.
 
-            Returns:
-                bool: True if the instance is of the specified type(s). False
-                    otherwise.
+        Args:
+            instance (object): Object to test against to the type.
+            type (str, list): Name of single type or a list of types that
+                instance should be tested against.
 
-            """
-            out = super(Normalizer, self).is_type(instance, types)
-            if (_jsonschema_ver_maj < 3) and out:
-                out = get_type_class(types).validate(instance)
-            return out
+        Returns:
+            bool: True if the instance is of the specified type(s). False
+                otherwise.
 
+        """
+        out = super(Normalizer, self).is_type(instance, types)
+        if out:
+            out = get_type_class(types).validate(instance)
+        return out
+
+    if _jsonschema_ver_maj < 3:
+        Normalizer.iter_errors = iter_errors_js2
+        Normalizer.is_type = is_type_js2
     return Normalizer

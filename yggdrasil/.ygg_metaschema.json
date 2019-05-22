@@ -1,16 +1,15 @@
 {
-    "$id": "http://json-schema.org/draft-07/schema#", 
-    "$schema": "http://json-schema.org/draft-07/schema#", 
-    "default": true, 
+    "$schema": "http://json-schema.org/draft-04/schema#", 
+    "default": {}, 
     "definitions": {
-        "nonNegativeInteger": {
+        "positiveInteger": {
             "minimum": 0, 
             "type": "integer"
         }, 
-        "nonNegativeIntegerDefault0": {
+        "positiveIntegerDefault0": {
             "allOf": [
                 {
-                    "$ref": "#/definitions/nonNegativeInteger"
+                    "$ref": "#/definitions/positiveInteger"
                 }, 
                 {
                     "default": 0
@@ -52,35 +51,50 @@
             ]
         }, 
         "stringArray": {
-            "default": [], 
             "items": {
                 "type": "string"
             }, 
+            "minItems": 1, 
             "type": "array", 
             "uniqueItems": true
         }
     }, 
+    "dependencies": {
+        "exclusiveMaximum": [
+            "maximum"
+        ], 
+        "exclusiveMinimum": [
+            "minimum"
+        ]
+    }, 
+    "description": "Core schema meta-schema", 
+    "id": "http://json-schema.org/draft-04/schema#", 
     "properties": {
-        "$comment": {
-            "type": "string"
-        }, 
-        "$id": {
-            "format": "uri-reference", 
-            "type": "string"
-        }, 
-        "$ref": {
-            "format": "uri-reference", 
-            "type": "string"
-        }, 
         "$schema": {
             "format": "uri", 
             "type": "string"
         }, 
         "additionalItems": {
-            "$ref": "#"
+            "anyOf": [
+                {
+                    "type": "boolean"
+                }, 
+                {
+                    "$ref": "#"
+                }
+            ], 
+            "default": {}
         }, 
         "additionalProperties": {
-            "$ref": "#"
+            "anyOf": [
+                {
+                    "type": "boolean"
+                }, 
+                {
+                    "$ref": "#"
+                }
+            ], 
+            "default": {}
         }, 
         "allOf": {
             "$ref": "#/definitions/schemaArray"
@@ -107,17 +121,7 @@
             ], 
             "description": "One or more classes that the object should be an instance of."
         }, 
-        "const": true, 
-        "contains": {
-            "$ref": "#"
-        }, 
-        "contentEncoding": {
-            "type": "string"
-        }, 
-        "contentMediaType": {
-            "type": "string"
-        }, 
-        "default": true, 
+        "default": {}, 
         "definitions": {
             "additionalProperties": {
                 "$ref": "#"
@@ -141,28 +145,23 @@
         "description": {
             "type": "string"
         }, 
-        "else": {
-            "$ref": "#"
-        }, 
         "enum": {
-            "items": true, 
-            "type": "array"
-        }, 
-        "examples": {
-            "items": true, 
             "type": "array"
         }, 
         "exclusiveMaximum": {
-            "type": "number"
+            "default": false, 
+            "type": "boolean"
         }, 
         "exclusiveMinimum": {
-            "type": "number"
+            "default": false, 
+            "type": "boolean"
         }, 
         "format": {
             "type": "string"
         }, 
-        "if": {
-            "$ref": "#"
+        "id": {
+            "format": "uri", 
+            "type": "string"
         }, 
         "items": {
             "anyOf": [
@@ -173,7 +172,7 @@
                     "$ref": "#/definitions/schemaArray"
                 }
             ], 
-            "default": true
+            "default": {}
         }, 
         "length": {
             "description": "Number of elements in the 1D array.", 
@@ -181,31 +180,32 @@
             "type": "number"
         }, 
         "maxItems": {
-            "$ref": "#/definitions/nonNegativeInteger"
+            "$ref": "#/definitions/positiveInteger"
         }, 
         "maxLength": {
-            "$ref": "#/definitions/nonNegativeInteger"
+            "$ref": "#/definitions/positiveInteger"
         }, 
         "maxProperties": {
-            "$ref": "#/definitions/nonNegativeInteger"
+            "$ref": "#/definitions/positiveInteger"
         }, 
         "maximum": {
             "type": "number"
         }, 
         "minItems": {
-            "$ref": "#/definitions/nonNegativeIntegerDefault0"
+            "$ref": "#/definitions/positiveIntegerDefault0"
         }, 
         "minLength": {
-            "$ref": "#/definitions/nonNegativeIntegerDefault0"
+            "$ref": "#/definitions/positiveIntegerDefault0"
         }, 
         "minProperties": {
-            "$ref": "#/definitions/nonNegativeIntegerDefault0"
+            "$ref": "#/definitions/positiveIntegerDefault0"
         }, 
         "minimum": {
             "type": "number"
         }, 
         "multipleOf": {
-            "exclusiveMinimum": 0, 
+            "exclusiveMinimum": true, 
+            "minimum": 0, 
             "type": "number"
         }, 
         "not": {
@@ -223,9 +223,6 @@
                 "$ref": "#"
             }, 
             "default": {}, 
-            "propertyNames": {
-                "format": "regex"
-            }, 
             "type": "object"
         }, 
         "precision": {
@@ -239,13 +236,6 @@
             }, 
             "default": {}, 
             "type": "object"
-        }, 
-        "propertyNames": {
-            "$ref": "#"
-        }, 
-        "readOnly": {
-            "default": false, 
-            "type": "boolean"
         }, 
         "required": {
             "$ref": "#/definitions/stringArray"
@@ -273,9 +263,6 @@
         "temptype": {
             "description": "The type of the data for a single message.", 
             "type": "schema"
-        }, 
-        "then": {
-            "$ref": "#"
         }, 
         "title": {
             "type": "string"
@@ -305,8 +292,5 @@
         }
     }, 
     "title": "Ygg meta-schema for data type schemas", 
-    "type": [
-        "object", 
-        "boolean"
-    ]
+    "type": "object"
 }

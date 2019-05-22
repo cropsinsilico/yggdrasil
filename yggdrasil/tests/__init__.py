@@ -12,6 +12,7 @@ import pandas as pd
 import threading
 import psutil
 import copy
+import pprint
 from yggdrasil.config import ygg_cfg, cfg_logging
 from yggdrasil.tools import get_default_comm, YggClass
 from yggdrasil import backwards, platform, units
@@ -181,13 +182,23 @@ def assert_equal(x, y):
     """
     if isinstance(y, (list, tuple)):
         assert(isinstance(x, (list, tuple)))
-        ut.assertEqual(len(x), len(y))
+        try:
+            ut.assertEqual(len(x), len(y))
+        except AssertionError:  # pragma: debug
+            print('first = %s\nsecond = %s\n' % (
+                pprint.pformat(x), pprint.pformat(y)))
+            raise
         for ix, iy in zip(x, y):
             assert_equal(ix, iy)
     elif isinstance(y, dict):
         assert(issubclass(y.__class__, dict))
         # ut.assertEqual(type(x), type(y))
-        ut.assertEqual(len(x), len(y))
+        try:
+            ut.assertEqual(len(x), len(y))
+        except AssertionError:  # pragma: debug
+            print('first = %s\nsecond = %s\n' % (
+                pprint.pformat(x), pprint.pformat(y)))
+            raise
         for k, iy in y.items():
             ix = x[k]
             assert_equal(ix, iy)
