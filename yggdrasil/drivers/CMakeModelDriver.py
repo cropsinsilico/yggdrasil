@@ -564,7 +564,7 @@ class CMakeModelDriver(CompiledModelDriver):
             else:
                 # Version finding library
                 lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
-                             % (xn.upper(), xf, xl, xd))
+                             % (xn.upper(), xf, xn, xd))
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines

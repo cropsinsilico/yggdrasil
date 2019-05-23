@@ -1,5 +1,6 @@
 import os
 import re
+import pprint
 import unittest
 import tempfile
 from yggdrasil import platform
@@ -51,7 +52,12 @@ def test_create_include():
         out = CMakeModelDriver.create_include(None, target, compile_flags=c,
                                               linker_flags=l)
         for x in lines:
-            assert(x in out)
+            try:
+                assert(x in out)
+            except AssertionError:  # pragma: debug
+                print("Could not find '%s':" % x)
+                pprint.pprint(out)
+                raise
     for fname in [fname_dll, fname_lib]:
         os.remove(fname)
     assert_raises(ValueError, CMakeModelDriver.create_include,

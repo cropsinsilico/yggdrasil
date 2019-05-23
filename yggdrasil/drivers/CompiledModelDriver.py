@@ -1217,8 +1217,9 @@ class LinkerBase(CompilationToolBase):
             str: Library name.
 
         """
-        # Is this necessary?
         if platform._is_win:  # pragma: windows
+            # Extension must remain or else the MSVC linker assumes the name
+            # refers to a .obj file
             libname = os.path.basename(libpath)
         else:
             libname = cls.file2base(libpath)
