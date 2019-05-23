@@ -274,16 +274,19 @@ else:  # pragma: Python 3
     ut = WrappedTestCase()
 
 
-def long_running(func):
-    r"""Decorator for marking long tests that should be skipped if
-    YGG_ENABLE_LONG_TESTS is set.
+print('enable_long_tests', enable_long_tests)
+long_running = unittest.skipIf(not enable_long_tests, "Long tests not enabled.")
 
-    Args:
-        func (callable): Test function or method.
 
-    """
-    print('enable_long_tests', enable_long_tests)
-    return unittest.skipIf(not enable_long_tests, "Long tests not enabled.")(func)
+# def long_running(func):
+#     r"""Decorator for marking long tests that should be skipped if
+#     YGG_ENABLE_LONG_TESTS is set.
+
+#     Args:
+#         func (callable): Test function or method.
+
+#     """
+#     return unittest.skipIf(not enable_long_tests, "Long tests not enabled.")(func)
 
 
 def assert_raises(exception, *args, **kwargs):
