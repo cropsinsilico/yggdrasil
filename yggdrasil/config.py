@@ -7,6 +7,7 @@ This module imports the configuration for yggdrasil.
 """
 import os
 import sys
+import json
 import shutil
 import logging
 import warnings
@@ -24,6 +25,7 @@ usr_config_file = os.path.join(usr_dir, config_file)
 loc_config_file = os.path.join(os.getcwd(), config_file)
 if not os.path.isfile(usr_config_file):
     shutil.copy(def_config_file, usr_config_file)
+logger = logging.getLogger(__name__)
 
 
 class YggConfigParser(configparser.ConfigParser, object):
@@ -35,7 +37,7 @@ class YggConfigParser(configparser.ConfigParser, object):
 
     def reload(self):
         r"""Reload parameters from the original files."""
-        # TODO: Clear first?
+        self._sections = self._dict()
         if self.files is not None:
             self.read(self.files)
 
@@ -95,6 +97,28 @@ class YggConfigParser(configparser.ConfigParser, object):
         out.reload()
         return out
 
+    def set(self, section, option, value=None):
+        """Set an option."""
+        if not isinstance(value, str):
+            value = json.dumps(value)
+        super(YggConfigParser, self).set(section, option, value=value)
+
+    def backwards_str2val(self, val):  # pragma: no cover
+        try:
+            out = json.loads(val)
+        except ValueError:
+            if val.startswith('[') and val.endswith(']'):
+                if val[1:-1]:
+                    out = [self.backwards_str2val(x.strip())
+                           for x in val[1:-1].split(',')]
+                else:
+                    out = []
+            elif val.startswith("'") and val.endswith("'"):
+                out = val.strip("'")
+            else:
+                out = val
+        return out
+
     def get(self, section, option, default=None, **kwargs):
         r"""Return None if the section/option does not exist.
 
@@ -120,7 +144,7 @@ class YggConfigParser(configparser.ConfigParser, object):
             if not out:
                 return default
             else:
-                return out
+                return self.backwards_str2val(out)
         else:
             return default
 
@@ -131,7 +155,8 @@ ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
                                       loc_config_file])
 
 
-def update_language_config(drv, skip_warnings=False):
+def update_language_config(drv, skip_warnings=False, overwrite=False,
+                           verbose=False):
     r"""Update configuration options for a language driver.
 
     Args:
@@ -139,11 +164,21 @@ def update_language_config(drv, skip_warnings=False):
             configured.
         skip_warnings (bool, optional): If True, warnings about missing options
             will not be raised. Defaults to False.
+        overwrite (bool, optional): If True, the existing file will be overwritten.
+            Defaults to False.
+        verbose (bool, optional): If True, information about the config file
+            will be displayed. Defaults to False.
 
     """
+    if verbose:  # pragma: no cover
+        logger.info("Updating user configuration file for yggdrasil at:\n\t%s"
+                    % usr_config_file)
     miss = []
     if not isinstance(drv, list):
         drv = [drv]
+    if overwrite:  # pragma: no cover
+        shutil.copy(def_config_file, usr_config_file)
+        ygg_cfg_usr.reload()
     for idrv in drv:
         miss += idrv.configure(ygg_cfg_usr)
     ygg_cfg_usr.update_file()

@@ -98,8 +98,10 @@ def validate_yaml():
 
 def update_config():
     r"""Update the user config file for yggdrasil."""
+    overwrite = ('--overwrite' in sys.argv)
     drv = [import_component('model', l) for l in tools.get_supported_lang()]
-    config.update_language_config(drv)
+    config.update_language_config(drv, overwrite=overwrite,
+                                  verbose=True)
 
 
 def yggtime_comm():
