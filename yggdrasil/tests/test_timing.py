@@ -104,6 +104,7 @@ class TimedRunTestBase(YggTestClass):
     def check_filename(self):
         r"""Raise a unittest.SkipTest error if the filename dosn't exist."""
         if not os.path.isfile(self.filename):  # pragma: debug
+            print("no file", self.filename)
             raise unittest.SkipTest("Performance stats file dosn't exist: %s"
                                     % self.filename)
 

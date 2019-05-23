@@ -63,7 +63,8 @@ class CMakeConfigure(CompilerBase):
             else:
                 sourcedir = src
         if builddir is None:
-            builddir = os.path.join(sourcedir, cls.default_builddir)
+            builddir = os.path.normpath(os.path.join(sourcedir,
+                                                     cls.default_builddir))
         if dont_link:
             out = builddir
             if (not os.path.isabs(out)) and (working_dir is not None):
@@ -101,7 +102,8 @@ class CMakeConfigure(CompilerBase):
             if builddir is None:
                 outfile = kwargs.get('outfile', None)
                 if outfile is None:
-                    builddir = os.path.join(sourcedir, cls.default_builddir)
+                    builddir = os.path.normpath(os.path.join(sourcedir,
+                                                             cls.default_builddir))
                 else:
                     builddir = outfile
         # Pop target (used for build stage file name, but not for any other
@@ -138,7 +140,7 @@ class CMakeConfigure(CompilerBase):
         assert(len(args) == 1)
         if not kwargs.get('skip_flags', False):
             sourcedir = kwargs.get('sourcedir', args[0])
-            if sourcedir != args[0]:
+            if sourcedir != args[0]:  # pragma: debug
                 raise RuntimeError(("The argument list "
                                     "contents (='%s') and 'sourcedir' (='%s') "
                                     "keyword specify the same thing, but those "
@@ -183,13 +185,13 @@ class CMakeBuilder(LinkerBase):
             dict: Keyword arguments that should be passed to the linker.
 
         """
-        kws_link = []
+        # kws_link = []
         kws_both = ['builddir', 'target']
         kwargs_link = super(CMakeBuilder, cls).extract_kwargs(kwargs)
         # Move kwargs unique to linker
-        for k in kws_link:
-            if k in kwargs:
-                kwargs_link[k] = kwargs.pop(k)
+        # for k in kws_link:
+        #     if k in kwargs:
+        #         kwargs_link[k] = kwargs.pop(k)
         # Copy kwargs that should be passed to both compiler & linker
         for k in kws_both:
             if k in kwargs:
@@ -220,7 +222,6 @@ class CMakeBuilder(LinkerBase):
             RuntimeError: If target is None.
 
         """
-        print('get_output_file input', obj, target, builddir, kwargs)
         if builddir is None:
             if os.path.isdir(obj):
                 builddir = obj
@@ -233,7 +234,6 @@ class CMakeBuilder(LinkerBase):
                 target = os.path.splitext(os.path.basename(obj))[0]
         elif target == 'clean':
             return target
-        print('get_output_file input modified', obj, target, builddir, kwargs)
         out = super(CMakeBuilder, cls).get_output_file(
             os.path.join(builddir, target), **kwargs)
         return out
@@ -262,7 +262,7 @@ class CMakeBuilder(LinkerBase):
             if builddir is None:
                 builddir = os.path.dirname(outfile)
         if builddir is None:
-            builddir = cls.default_builddir
+            builddir = CMakeConfigure.default_builddir
         out = super(CMakeBuilder, cls).get_flags(target=target,
                                                  builddir=builddir, **kwargs)
         return out
@@ -286,7 +286,9 @@ class CMakeBuilder(LinkerBase):
         assert(len(args) == 1)
         if not kwargs.get('skip_flags', False):
             builddir = kwargs.get('builddir', args[0])
-            if builddir != args[0]:
+            if not os.path.isabs(builddir) and os.path.isabs(args[0]):
+                builddir = os.path.join(os.path.dirname(args[0]), builddir)
+            if builddir != args[0]:  # pragma: debug
                 raise RuntimeError(("The argument list "
                                     "contents (='%s') and 'builddir' (='%s') "
                                     "keyword specify the same thing, but those "
@@ -356,7 +358,6 @@ class CMakeModelDriver(CompiledModelDriver):
             args (list): List of arguments provided.
 
         """
-        print('before', self.sourcedir, self.builddir, self.target, args)
         if self.sourcedir is None:
             self.sourcedir = os.path.dirname(args[0])
         if not os.path.isabs(self.sourcedir):
@@ -373,7 +374,6 @@ class CMakeModelDriver(CompiledModelDriver):
                                                           self.builddir))
         self.source_files = [self.sourcedir]
         kwargs = dict(default_model_dir=self.builddir)
-        print('after', self.sourcedir, self.builddir, self.target, kwargs)
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
         self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
         self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
@@ -549,7 +549,7 @@ class CMakeModelDriver(CompiledModelDriver):
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
                 preamble_lines.append(new_dir)
-            if cls.add_libraries:
+            if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 if xe.lower() in ['.so', '.dll', '.dylib']:
                     lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
@@ -591,6 +591,9 @@ class CMakeModelDriver(CompiledModelDriver):
                 class's method.
 
         """
+        # Set keyword arguments based on cmake mappings/aliases
+        if dont_build is not None:
+            kwargs['dont_link'] = dont_build
         # Remove files created by cmake in overwrite so that directory should
         # be empty (and therefore removable by the parent method).
         if kwargs.get('overwrite', False):
@@ -616,9 +619,6 @@ class CMakeModelDriver(CompiledModelDriver):
                                                or xfile.endswith('Win32')
                                                or xfile.endswith('.dir')):
                     shutil.rmtree(xfile)
-        # Set keyword arguments based on cmake mappings/aliases
-        if dont_build is not None:
-            kwargs['dont_link'] = dont_build
         # Add conda prefix
         # import pprint
         # conda_prefix = cls.get_tool('compiler').get_conda_prefix()
@@ -665,13 +665,13 @@ class CMakeModelDriver(CompiledModelDriver):
         out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
     
-    def remove_products(self):
-        r"""Delete products produced during the compilation process."""
-        # Clean used to be called here, but for projects with multiple targets,
-        # this dosn't allow for building them as separate models
-        super(CMakeModelDriver, self).remove_products()
-        if os.path.isdir(self.builddir) and (not os.listdir(self.builddir)):
-            os.rmdir(self.builddir)
+    # def remove_products(self):
+    #     r"""Delete products produced during the compilation process."""
+    #     # Clean used to be called here, but for projects with multiple targets,
+    #     # this dosn't allow for building them as separate models
+    #     super(CMakeModelDriver, self).remove_products()
+    #     if os.path.isdir(self.builddir) and (not os.listdir(self.builddir)):
+    #         os.rmdir(self.builddir)
 
     def cleanup(self):
         r"""Remove compile executable."""
