@@ -14,10 +14,6 @@ class CPPCompilerBase(CCompilerBase):
     search_path_flags = ['-E', '-v', '-xc++', '/dev/null']
     default_linker = None
     default_executable = None
-    function_param = dict(CModelDriver.function_param,
-                          try_begin='try {{',
-                          try_error_type='const std::exception&',
-                          try_except='}} catch ({error_type} {error_var}) {{')
 
     @classmethod
     def get_flags(cls, **kwargs):
@@ -67,9 +63,9 @@ class CPPModelDriver(CModelDriver):
     default_compiler = None
     default_linker = None
     function_param = dict(CModelDriver.function_param,
-                          try_begin='try {',
+                          try_begin='try {{',
                           try_error_type='const std::exception&',
-                          try_except='} catch ({try_error} {error_var}) {')
+                          try_except='}} catch ({error_type} {error_var}) {{')
     
     @staticmethod
     def before_registration(cls):

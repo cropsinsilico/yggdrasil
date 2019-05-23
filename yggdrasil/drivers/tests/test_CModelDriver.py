@@ -43,6 +43,8 @@ class TestCModelDriverNoStart(TestCModelParam,
         if self.import_cls.language == 'c':
             self.assert_raises(NotImplementedError, self.import_cls.write_try_except,
                                None, None)
+        else:
+            super(TestCModelDriverNoStart, self).test_write_try_except()
         
 
 class TestCModelDriver(TestCModelParam, parent.TestCompiledModelDriver):
