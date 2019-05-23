@@ -580,6 +580,7 @@ class ModelDriver(Driver):
         # Check for installation based on config option
         if not skip_config:
             installed_comms = ygg_cfg.get(cls.language, 'commtypes', [])
+            print(commtype, installed_comms, type(installed_comms))
             if commtype is None:
                 return (len(installed_comms) > 0)
             else:
@@ -587,7 +588,9 @@ class ModelDriver(Driver):
         # Check for any comm
         if commtype is None:
             for c in tools.get_supported_comm():
-                if cls.is_comm_installed(commtype=c, **kwargs):
+                if cls.is_comm_installed(commtype=c, skip_config=skip_config,
+                                         **kwargs):
+                    print('%s is installed' % c)
                     return True
             return False
         # Check that comm is explicitly supported
@@ -605,6 +608,8 @@ class ModelDriver(Driver):
         # Check libraries
         if (libraries is not None):
             for lib in libraries:
+                print(cls.language, lib, cls.is_library_installed(lib, **kwargs),
+                      kwargs)
                 if not cls.is_library_installed(lib, **kwargs):
                     return False
         return True
