@@ -74,6 +74,7 @@ class MSVCCompiler(CCompilerBase):
     linker_switch = '/link'
     search_path_env = 'INCLUDE'
     search_path_flags = None
+    version_flags = []
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
                              default_executable_flags_env=None,

@@ -407,7 +407,7 @@ class ModelDriver(Driver):
         return self.run_executable(command, return_process=True, **kwargs)
         
     @classmethod
-    def language_version(cls, **kwargs):
+    def language_version(cls, version_flags=None, **kwargs):
         r"""Determine the version of this language.
 
         Args:
@@ -417,7 +417,9 @@ class ModelDriver(Driver):
             str: Version of compiler/interpreter for this language.
 
         """
-        return cls.run_executable(cls.version_flags, **kwargs)
+        if version_flags is None:
+            version_flags = cls.version_flags
+        return cls.run_executable(version_flags, **kwargs)
 
     @classmethod
     def is_installed(cls):

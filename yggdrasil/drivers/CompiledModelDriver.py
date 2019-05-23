@@ -220,6 +220,7 @@ class CompilationToolBase(object):
     search_regex_begin = None
     search_regex_end = None
     search_regex = ['([^\n]+)']
+    version_flags = ['--version']
 
     _language_ext = None  # only update once per class
     
@@ -2224,6 +2225,7 @@ class CompiledModelDriver(ModelDriver):
             str: Version of compiler/interpreter for this language.
 
         """
+        kwargs['version_flags'] = cls.get_tool('compiler').version_flags
         kwargs['skip_flags'] = True
         return super(CompiledModelDriver, cls).language_version(**kwargs)
         
