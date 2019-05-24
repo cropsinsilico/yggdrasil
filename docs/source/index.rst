@@ -29,6 +29,7 @@ Welcome to yggdrasil's documentation!
    new_languages
    release
    hackathon2018/index
+   publications
    
 Indices and tables
 ==================
