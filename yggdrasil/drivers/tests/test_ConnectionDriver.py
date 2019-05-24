@@ -88,7 +88,7 @@ class TestConnectionParam(parent.TestParam):
             flag, msg_recv = recv_inst.recv(self.timeout)
             if flag:
                 if break_on_empty and recv_inst.is_empty_recv(msg_recv):
-                    break
+                    break  # pragma: no cover
                 msg_list.append(msg_recv)
             else:
                 self.assert_equal(msg_recv, recv_inst.eof_msg)
