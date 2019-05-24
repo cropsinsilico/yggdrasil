@@ -8,6 +8,7 @@ class TestCPPModelParam(parent.TestCModelParam):
 
     def __init__(self, *args, **kwargs):
         super(TestCPPModelParam, self).__init__(*args, **kwargs)
+        self._inst_kwargs.setdefault('compiler_flags', [])
         self._inst_kwargs['compiler_flags'].append('-std=c++11')
     
     
