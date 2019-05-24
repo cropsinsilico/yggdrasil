@@ -740,10 +740,12 @@ class CompilationToolBase(object):
                                    % (' '.join(cmd), proc.returncode))
             try:
                 logger.debug(' '.join(cmd) + '\n' + output)
-            except UnicodeDecodeError:
-                cmd_out = backwards.as_unicode(' '.join(cmd))
-                out = backwards.as_unicode(output)
-                logger.debug(cmd_out + u'\n' + out)
+            except UnicodeDecodeError as e:
+                print(e)
+                tools.print_encoded(' '.join(cmd) + '\n' + output)
+                # cmd_out = backwards.as_bytes(' '.join(cmd))
+                # out = backwards.as_bytes(output)
+                # logger.debug(cmd_out + b'\n' + out)
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
                 raise RuntimeError("Could not call command '%s': %s"
