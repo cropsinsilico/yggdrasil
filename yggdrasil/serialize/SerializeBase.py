@@ -282,8 +282,6 @@ class SerializeBase(tools.YggClass):
         r"""dict: Get the input keyword arguments used to create this class."""
         out = {}
         for k in self._schema_properties.keys():
-            if k in self._schema_excluded_from_class:
-                continue
             v = getattr(self, k, None)
             if v is not None:
                 out[k] = copy.deepcopy(v)
