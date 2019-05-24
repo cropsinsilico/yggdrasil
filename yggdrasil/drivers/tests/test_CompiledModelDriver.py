@@ -41,7 +41,7 @@ class TestCompiledModelParam(parent.TestModelParam):
         self.attr_list += ['source_files']
         for k in ['compiler', 'linker', 'archiver']:
             self.attr_list += [k, '%s_flags' % k, '%s_tool' % k]
-        if self.src is not None:
+        if (self.src is not None) and self.import_cls.is_installed():
             self.args = [self.import_cls.get_tool('compiler').get_output_file(
                 self.src[0])]
             self._inst_kwargs['source_files'] = self.src
