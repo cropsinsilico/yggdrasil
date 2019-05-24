@@ -338,7 +338,7 @@ def get_YGG_MSG_MAX(comm_type=None):
     """
     if comm_type is None:
         comm_type = get_default_comm()
-    if comm_type == 'IPCComm':
+    if comm_type in ['ipc', 'IPCComm']:
         # OS X limit is 2kb
         out = 1024 * 2
     else:
