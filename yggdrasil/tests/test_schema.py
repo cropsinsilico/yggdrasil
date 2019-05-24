@@ -15,6 +15,7 @@ _normalize_objects = [
                   'working_dir': os.getcwd()}],
       'connections': [{'inputs': 'outputA',
                        'outputs': 'fileA.txt',
+                       'seritype': 'direct',
                        'working_dir': os.getcwd()}]},
      {'models': [{'name': 'modelA',
                   'language': 'c',
@@ -59,6 +60,7 @@ def test_default_schema():
         assert(isinstance(s[k].classes, list))
         for ksub in s[k].classes:
             s[k].get_subtype_properties(ksub)
+            s[k].default_subtype
 
 
 def test_create_schema():

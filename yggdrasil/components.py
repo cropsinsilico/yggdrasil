@@ -24,6 +24,16 @@ _comptype2mod = {'comm': 'communication',
                  'connection': 'drivers',
                  'datatype': ['metaschema', 'datatypes'],
                  'serializer': 'serialize'}
+
+
+def clear_registry():
+    r"""Reset registries."""
+    global _registry
+    global _registry_defaults
+    global _registry_class2subtype
+    _registry = {}
+    _registry_defaults = {}
+    _registry_class2subtype = {}
     
 
 def docs2args(docs):

@@ -69,6 +69,7 @@ class ConnectionDriver(Driver):
                                    'and one or more comms/files.')
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
+        'connection_type': {'type': 'string', 'default': 'default'},
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},

@@ -66,12 +66,23 @@ definitions:
             None.
           type: function
       required:
-      - commtype
       - datatype
+      - commtype
       - name
       title: comm_base
       type: object
     - anyOf:
+      - additionalProperties: true
+        description: Schema for comm component ['ipc'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: Interprocess communication (IPC) queue.
+            enum:
+            - ipc
+            type: string
+        title: IPCComm
+        type: object
       - additionalProperties: true
         description: Schema for comm component ['rmq'] subtype.
         properties:
@@ -95,15 +106,15 @@ definitions:
         title: RMQAsyncComm
         type: object
       - additionalProperties: true
-        description: Schema for comm component ['ipc'] subtype.
+        description: Schema for comm component ['zmq'] subtype.
         properties:
           commtype:
             default: default
-            description: Interprocess communication (IPC) queue.
+            description: ZeroMQ socket.
             enum:
-            - ipc
+            - zmq
             type: string
-        title: IPCComm
+        title: ZMQComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['default'] subtype.
@@ -115,17 +126,6 @@ definitions:
             - default
             type: string
         title: DefaultComm
-        type: object
-      - additionalProperties: true
-        description: Schema for comm component ['zmq'] subtype.
-        properties:
-          commtype:
-            default: default
-            description: ZeroMQ socket.
-            enum:
-            - zmq
-            type: string
-        title: ZMQComm
         type: object
     description: Schema for comm components.
     title: comm
@@ -141,6 +141,7 @@ definitions:
           description: '[DEPRECATED] Arguments that should be provided to the driver.'
           type: string
         connection_type:
+          default: default
           enum:
           - client
           - default
@@ -153,6 +154,7 @@ definitions:
           - rmq_client
           - rmq_server
           - server
+          type: string
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -199,106 +201,128 @@ definitions:
         description: Schema for connection component ['default'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between one or more comms/files and one or more
               comms/files.
             enum:
             - default
+            type: string
         title: ConnectionDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['client'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a model acting as a client and a server
               request comm.
             enum:
             - client
+            type: string
         title: ClientDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rmq_client'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a model acting as a client and a RabbitMQ
               server request comm.
             enum:
             - rmq_client
+            type: string
         title: RMQClientDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['output'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a model and one or more comms/files.
             enum:
             - output
+            type: string
         title: OutputDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['file_output'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a model and a file.
             enum:
             - file_output
+            type: string
         title: FileOutputDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['server'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a server request comm and a model acting
               as a server.
             enum:
             - server
+            type: string
         title: ServerDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rmq_async_server'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between an asynchronous RabbitMQ server request
               comm and a model acting as a server.
             enum:
             - rmq_async_server
+            type: string
         title: RMQAsyncServerDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['input'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between one or more comms/files and a model.
             enum:
             - input
+            type: string
         title: InputDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['file_input'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a file and a model.
             enum:
             - file_input
+            type: string
         title: FileInputDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rmq_server'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a RabbitMQ server request comm and a model
               acting as a server.
             enum:
             - rmq_server
+            type: string
         title: RMQServerDriver
         type: object
       - additionalProperties: true
         description: Schema for connection component ['rmq_async_client'] subtype.
         properties:
           connection_type:
+            default: default
             description: Connection between a model acting as a client and an asynchronous
               RabbitMQ server request comm.
             enum:
             - rmq_async_client
+            type: string
         title: RMQAsyncClientDriver
         type: object
     description: Schema for connection components.
@@ -313,7 +337,9 @@ definitions:
       properties:
         append:
           default: false
-          description: If True and writing, file is openned in append mode. Defaults
+          description: If True and writing, file is openned in append mode. If True
+            and reading, file is kept open even if the end of the file is reached
+            to allow for another process to write to the file in append mode. Defaults
             to False.
           type: boolean
         args:
@@ -472,8 +498,8 @@ definitions:
           type: string
       required:
       - filetype
-      - name
       - working_dir
+      - name
       title: file_base
       type: object
     - anyOf:
@@ -1051,10 +1077,10 @@ definitions:
             is used.
           type: string
       required:
-      - working_dir
-      - args
       - name
       - language
+      - working_dir
+      - args
       title: model_base
       type: object
     - anyOf:
@@ -1089,6 +1115,38 @@ definitions:
               via the command line. Defaults to False.
             type: boolean
         title: MatlabModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['python'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Python.
+            enum:
+            - python
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: PythonModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['c'] subtype.
@@ -1253,6 +1311,38 @@ definitions:
         title: MakeModelDriver
         type: object
       - additionalProperties: true
+        description: Schema for model component ['lpy'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is an LPy system.
+            enum:
+            - lpy
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: LPyModelDriver
+        type: object
+      - additionalProperties: true
         description: Schema for model component ['cmake'] subtype.
         properties:
           builddir:
@@ -1324,70 +1414,6 @@ definitions:
             - executable
             type: string
         title: ExecutableModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['python'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in Python.
-            enum:
-            - python
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: PythonModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['lpy'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is an LPy system.
-            enum:
-            - lpy
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: LPyModelDriver
         type: object
     description: Schema for model components.
     title: model
