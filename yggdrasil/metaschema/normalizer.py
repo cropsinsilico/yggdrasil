@@ -375,8 +375,10 @@ def create(*args, **kwargs):
     def iter_errors_js2(self, instance, _schema=None):
         r"""Wrapper that can be added to classes for jsonschema < 3.0 to allow
         for boolean schema."""
+        if _schema is None:
+            _schema = self.schema
         if _schema is True:
-            return
+            pass
         elif _schema is False:
             yield jsonschema.exceptions.ValidationError(
                 "False schema does not allow %r" % (instance,),
@@ -384,9 +386,9 @@ def create(*args, **kwargs):
                 validator_value=None,
                 instance=instance,
                 schema=_schema)
-            return
-        for e in super(Normalizer, self).iter_errors(instance, _schema=_schema):
-            yield e
+        else:
+            for e in super(Normalizer, self).iter_errors(instance, _schema=_schema):
+                yield e
 
     def is_type_js2(self, instance, types):
         r"""Jsonschema < 3.0 wrapper for method that determines if an object is
