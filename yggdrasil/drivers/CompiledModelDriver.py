@@ -738,7 +738,7 @@ class CompilationToolBase(object):
                 logger.error(output)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
-            logger.debug('%s\n%s' % (' '.join(cmd), output))
+            logger.debug(' '.join(cmd) + '\n' + output)
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
                 raise RuntimeError("Could not call command '%s': %s"
