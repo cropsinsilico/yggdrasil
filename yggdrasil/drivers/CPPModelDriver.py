@@ -65,7 +65,7 @@ class CPPModelDriver(CModelDriver):
     function_param = dict(CModelDriver.function_param,
                           exec_prefix=('#include <iostream>\n'
                                        '#include <exception>\n'),
-                          print='std::cout << "{message}" << std::endl;',
+                          # print='std::cout << "{message}" << std::endl;',
                           error='throw \"{error_msg}\";',
                           try_begin='try {',
                           try_error_type='const std::exception&',
@@ -77,6 +77,7 @@ class CPPModelDriver(CModelDriver):
         to registration."""
         if platform._is_mac and (cls.default_compiler is None):
             cls.default_compiler = 'clang++'
+        cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
         CModelDriver.before_registration(cls)
         internal_libs = copy.deepcopy(cls.internal_libraries)
         internal_libs[cls.interface_library] = internal_libs.pop(
