@@ -188,7 +188,6 @@ class ModelDriver(Driver):
         self.model_index = model_index
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = b'EXIT'
-        # print(os.environ.keys())
         for k in self.env_copy:
             if k in os.environ:
                 self.env[k] = os.environ[k]
@@ -598,7 +597,7 @@ class ModelDriver(Driver):
         libraries = kwargs.pop('libraries', [])
         # Check platforms
         if (platforms is not None) and (platform._platform not in platforms):
-            return False
+            return False  # pragma: windows
         # Check libraries
         if (libraries is not None):
             for lib in libraries:
@@ -934,13 +933,15 @@ class ModelDriver(Driver):
                                       "language '%s'" % cls.language)
         out = []
         # Add standard & user defined prefixes
-        if 'exec_prefix' in cls.function_param:
+        if ((('exec_prefix' in cls.function_param)
+             and (cls.function_param['exec_prefix'] not in lines))):
             out.append(cls.function_param['exec_prefix'])
+            out.append('')
         if prefix is not None:
             if not isinstance(prefix, (list, tuple)):
                 prefix = [prefix]
             out += prefix
-        out.append('')
+            out.append('')
         # Add code with begin/end book ends
         if ((('exec_begin' in cls.function_param)
              and (cls.function_param['exec_begin'] not in lines))):
@@ -953,15 +954,18 @@ class ModelDriver(Driver):
                                               cls.function_param['block_end']))
         else:
             out += lines
-        out.append('')
+        if out[-1]:
+            out.append('')
         # Add standard & user defined suffixes
         if suffix is not None:
             if not isinstance(suffix, (list, tuple)):
                 suffix = [suffix]
             out += suffix
-        if 'exec_suffix' in cls.function_param:
+            out.append('')
+        if ((('exec_suffix' in cls.function_param)
+             and (cls.function_param['exec_suffix'] not in lines))):
             out.append(cls.function_param['exec_suffix'])
-        out.append('')
+            out.append('')
         return out
                 
     @classmethod

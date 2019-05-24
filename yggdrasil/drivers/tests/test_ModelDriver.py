@@ -103,9 +103,11 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
                                self.import_cls.write_executable,
                                None)
         else:
-            self.import_cls.write_executable('dummy',
-                                             prefix='dummy',
-                                             suffix='dummy')
+            lines1 = self.import_cls.write_executable('dummy',
+                                                      prefix='dummy',
+                                                      suffix='dummy')
+            lines2 = self.import_cls.write_executable(lines1)
+            self.assert_equal(lines1, lines2)
             # Don't run this because it is invalid
 
     def test_error_code(self):
