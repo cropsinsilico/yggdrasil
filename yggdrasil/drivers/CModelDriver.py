@@ -203,6 +203,8 @@ class CModelDriver(CompiledModelDriver):
         linker = cls.get_tool('linker')
         for x in ['zmq', 'czmq']:
             if x in cls.external_libraries:
+                if platform._is_win:  # pragma: windows
+                    cls.external_libraries[x]['libtype'] = 'static'
                 libtype = cls.external_libraries[x]['libtype']
                 if libtype == 'static':  # pragma: debug
                     tool = archiver
