@@ -415,7 +415,7 @@ class ComponentBase(object):
             if (k == self._schema_subtype_key) and (subtype is not None):
                 default = subtype
             if default is not None:
-                kwargs.setdefault(k, default)
+                kwargs.setdefault(k, copy.deepcopy(default))
             if v.get('type', None) == 'array':
                 if isinstance(kwargs.get(k, None), backwards.string_types):
                     kwargs[k] = kwargs[k].split()

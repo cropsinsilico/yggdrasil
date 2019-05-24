@@ -434,6 +434,8 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'comment': '%',
         'true': 'true',
         'indent': 2 * ' ',
+        'print': 'disp(\'{message}\');',
+        'error': 'error(\'{error_msg}\');',
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',

@@ -14,8 +14,12 @@ class TestCPPModelParam(parent.TestCModelParam):
 class TestCPPModelDriverNoStart(TestCPPModelParam,
                                 parent.TestCModelDriverNoStart):
     r"""Test runner for CPPModelDriver without start."""
-    pass
-
+    
+    def test_write_try_except(self, **kwargs):
+        r"""Test writing a try/except block."""
+        kwargs.setdefault('error_type', '...')
+        super(TestCPPModelDriverNoStart, self).test_write_try_except(**kwargs)
+        
         
 class TestCPPModelDriver(TestCPPModelParam, parent.TestCModelDriver):
     r"""Test runner for CPPModelDriver."""

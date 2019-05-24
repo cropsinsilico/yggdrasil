@@ -28,6 +28,7 @@ class PythonModelDriver(InterpretedModelDriver):
         'comment': '#',
         'true': 'True',
         'indent': 4 * ' ',
+        'print': 'print(\"{message}\")',
         'error': 'raise Exception("{error_msg}")',
         'block_end': '',
         'if_begin': 'if ({cond}):',
@@ -36,7 +37,10 @@ class PythonModelDriver(InterpretedModelDriver):
         'try_begin': 'try:',
         'try_error_type': 'BaseException',
         'try_except': 'except {error_type} as {error_var}:',
-        'assign': '{name} = {value}'}
+        'assign': '{name} = {value}',
+        'exec_begin': 'def main():',
+        'exec_suffix': ('if __name__ == "__main__":\n'
+                        '    main()')}
 
     @classmethod
     def is_language_installed(self):

@@ -44,13 +44,20 @@ class TestModelParam(parent.TestParam):
             raise unittest.SkipTest("'%s' installed."
                                     % self.import_cls.language)
 
+    @classmethod
+    def setUpClass(cls, *args, **kwargs):
+        cls._flag_tests_on_not_installed = False
+        super(TestModelParam, cls).setUpClass(*args, **kwargs)
+
     def setup(self, *args, **kwargs):
         if self.import_cls.language is None:
             raise unittest.SkipTest("Driver dosn't have language.")
         if not self.import_cls.is_installed():
-            self.assert_raises(RuntimeError, super(TestModelParam, self).setup,
-                               *args, **kwargs)
-            self.tests_on_not_installed()
+            if not self.__class__._flag_tests_on_not_installed:
+                self.assert_raises(RuntimeError, super(TestModelParam, self).setup,
+                                   *args, **kwargs)
+                self.tests_on_not_installed()
+                self.__class__._flag_tests_on_not_installed = True
             raise unittest.SkipTest("'%s' not installed."
                                     % self.import_cls.language)
         super(TestModelParam, self).setup(*args, **kwargs)
@@ -61,9 +68,6 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
 
     def test_is_installed(self):
         r"""Assert that the tested model driver is installed."""
-        # if self.driver == 'ModelDriver':
-        #     assert(not self.import_cls.is_installed())
-        # else:
         assert(self.import_cls.is_installed())
 
     def test_language_version(self):
@@ -83,7 +87,20 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
         r"""Write and run generated code."""
         if not self.import_cls.is_installed():
             return
-        # TODO: Actually run it
+        # Write code to a file
+        self.import_cls.run_code(lines)
+            
+    def test_write_executable(self):
+        r"""Test writing an executable."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_executable,
+                               None)
+        else:
+            self.import_cls.write_executable('dummy',
+                                             prefix='dummy',
+                                             suffix='dummy')
+            # Don't run this because it is invalid
 
     def test_write_if_block(self):
         r"""Test writing an if block."""
@@ -130,16 +147,19 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
             lines += self.import_cls.write_while_loop(cond, loop_contents)
             self.run_generated_code(lines)
 
-    def test_write_try_except(self):
+    def test_write_try_except(self, **kwargs):
         r"""Test writing a try/except block."""
         if self.import_cls.function_param is None:
             self.assert_raises(NotImplementedError, self.import_cls.write_try_except,
                                None, None)
         else:
             lines = []
-            try_contents = 'dummy code'
-            except_contents = 'dummy code'
-            lines += self.import_cls.write_try_except(try_contents, except_contents)
+            try_contents = self.import_cls.function_param['error'].format(
+                error_msg='Dummy error')
+            except_contents = self.import_cls.function_param['print'].format(
+                message='Dummy message')
+            lines += self.import_cls.write_try_except(try_contents,
+                                                      except_contents, **kwargs)
             self.run_generated_code(lines)
 
 

@@ -5,6 +5,8 @@ import logging
 import warnings
 import subprocess
 import shutil
+import uuid
+import tempfile
 from pprint import pformat
 from yggdrasil import platform, tools, backwards
 from yggdrasil.config import ygg_cfg, locate_file, update_language_config
@@ -373,11 +375,14 @@ class ModelDriver(Driver):
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
         
-    def run_model(self, **kwargs):
+    def run_model(self, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
         run_executable.
 
         Args:
+            return_process (bool, optional): If True, the process running
+                the model is returned. If False, the process will block until
+                the model finishes running. Defaults to True.
             **kwargs: Keyword arguments are passed to run_executable.
 
         """
@@ -404,7 +409,7 @@ class ModelDriver(Driver):
                               shell=platform._is_win)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
-        return self.run_executable(command, return_process=True, **kwargs)
+        return self.run_executable(command, return_process=return_process, **kwargs)
         
     @classmethod
     def language_version(cls, version_flags=None, **kwargs):
@@ -881,6 +886,93 @@ class ModelDriver(Driver):
     #     super(ModelDriver, self).do_terminate()
                 
     # Methods for automated model wrapping
+    @classmethod
+    def run_code(cls, lines, **kwargs):
+        r"""Run code by first writing it as an executable and then calling
+        the driver.
+
+        Args:
+            lines (list): Lines of code to be wrapped as an executable.
+            **kwargs: Additional keyword arguments are passed to the
+                write_executable method.
+
+        """
+        name = 'test_code_%s' % str(uuid.uuid4())[:13].replace('-', '_')
+        working_dir = os.getcwd()
+        code_dir = tempfile.gettempdir()
+        # code_dir = working_dir
+        fname = os.path.join(code_dir, name + cls.language_ext[0])
+        lines = cls.write_executable(lines, **kwargs)
+        with open(fname, 'w') as fd:
+            fd.write('\n'.join(lines))
+        inst = None
+        try:
+            # TODO: Run the code
+            assert(os.path.isfile(fname))
+            inst = cls(name, [fname], working_dir=working_dir)
+            inst.run_model(return_process=False)
+        except BaseException:  # pragma: debug
+            logger.error('Failed generated code:\n%s' % '\n'.join(lines))
+            raise
+        finally:
+            if os.path.isfile(fname):
+                os.remove(fname)
+            if inst is not None:
+                inst.cleanup()
+                
+    @classmethod
+    def write_executable(cls, lines, prefix=None, suffix=None):
+        r"""Return the lines required to complete a program that will run
+        the provided lines.
+
+        Args:
+            lines (list): Lines of code to be wrapped as an executable.
+            prefix (list, optional): Lines of code that should proceed the
+                wrapped code. Defaults to None and is ignored. (e.g. C/C++
+                include statements).
+            suffix (list, optional): Lines of code that should follow the
+                wrapped code. Defaults to None and is ignored.
+
+        Returns:
+            lines: Lines of code wrapping the provided lines with the
+                necessary code to run it as an executable (e.g. C/C++'s main).
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        out = []
+        # Add standard & user defined prefixes
+        if 'exec_prefix' in cls.function_param:
+            out.append(cls.function_param['exec_prefix'])
+        if prefix is not None:
+            if not isinstance(prefix, (list, tuple)):
+                prefix = [prefix]
+            out += prefix
+        out.append('')
+        # Add code with begin/end book ends
+        if ((('exec_begin' in cls.function_param)
+             and (cls.function_param['exec_begin'] not in lines))):
+            out.append(cls.function_param['exec_begin'])
+            if not isinstance(lines, (list, tuple)):
+                lines = [lines]
+            for x in lines:
+                out.append(cls.function_param['indent'] + x)
+            out.append(cls.function_param.get('exec_end',
+                                              cls.function_param['block_end']))
+        else:
+            out += lines
+        out.append('')
+        # Add standard & user defined suffixes
+        if suffix is not None:
+            if not isinstance(suffix, (list, tuple)):
+                suffix = [suffix]
+            out += suffix
+        if 'exec_suffix' in cls.function_param:
+            out.append(cls.function_param['exec_suffix'])
+        out.append('')
+        return out
+                
     @classmethod
     def write_if_block(cls, cond, block_contents):
         r"""Return the lines required to complete a conditional block.

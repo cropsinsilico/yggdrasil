@@ -1609,7 +1609,7 @@ class CompiledModelDriver(ModelDriver):
             kwargs['out'] = None
         out = self.compile_model(**kwargs)
         if model_is_source:
-            self.info('Determined model file: %s', out)
+            self.debug('Determined model file: %s', out)
             self.model_file = out
         for x in kwargs['products']:
             if self.language_ext is not None:

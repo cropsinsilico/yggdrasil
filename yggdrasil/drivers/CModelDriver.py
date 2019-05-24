@@ -180,13 +180,17 @@ class CModelDriver(CompiledModelDriver):
         'comment': '//',
         'true': '1',
         'indent': 2 * ' ',
-        'block_end': '}}',
+        'print': 'printf(\"{message}\");',
+        'block_end': '}',
         'if_begin': 'if ({cond}) {{',
         'for_begin': ('for ({iter_var} = {iter_begin}; {iter_var} < {iter_end}; '
                       '{iter_var}++) {{'),
         'while_begin': 'while ({cond}) {{',
+        'break': 'break;',
         'declare': '{type} {name};',
-        'assign': '{name} = {value};'}
+        'assign': '{name} = {value};',
+        'exec_begin': 'int main() {',
+        'exec_end': '  return 0;\n}'}
 
     @staticmethod
     def before_registration(cls):
