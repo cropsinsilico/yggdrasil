@@ -181,6 +181,7 @@ class CModelDriver(CompiledModelDriver):
         'true': '1',
         'indent': 2 * ' ',
         'print': 'printf(\"{message}\");',
+        'error': 'return -1;',
         'block_end': '}',
         'if_begin': 'if ({cond}) {{',
         'for_begin': ('for ({iter_var} = {iter_begin}; {iter_var} < {iter_end}; '

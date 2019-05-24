@@ -645,7 +645,6 @@ class CMakeModelDriver(CompiledModelDriver):
                                     overwrite=True, working_dir=self.working_dir,
                                     allow_error=True, **kwargs)
         else:
-            self.info('model_file = %s', self.model_file)
             default_kwargs = dict(target=target,
                                   sourcedir=self.sourcedir,
                                   builddir=self.builddir,

@@ -11,6 +11,7 @@ def test_ModelDriver_implementation():
     r"""Test that NotImplementedError raised for base class."""
     assert_raises(NotImplementedError, ModelDriver.language_executable)
     assert_raises(NotImplementedError, ModelDriver.executable_command, None)
+    assert_raises(NotImplementedError, ModelDriver.is_library_installed, None)
     assert_raises(NotImplementedError, CompiledModelDriver.get_tool, 'compiler')
     assert_raises(NotImplementedError, InterpretedModelDriver.get_interpreter)
 
@@ -74,7 +75,6 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
         r"""Test language version."""
         assert(self.import_cls.language_version())
 
-    # Tests for code generation
     def tests_on_not_installed(self):
         r"""Tests for when the driver is not installed."""
         super(TestModelDriverNoStart, self).tests_on_not_installed()
@@ -82,7 +82,13 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
         self.test_write_for_loop()
         self.test_write_while_loop()
         self.test_write_try_except()
+
+    def test_comm_installed(self):
+        r"""Tests for getting installed comm while skipping config."""
+        self.assert_equal(self.import_cls.is_comm_installed(),
+                          self.import_cls.is_comm_installed(skip_config=True))
         
+    # Tests for code generation
     def run_generated_code(self, lines):
         r"""Write and run generated code."""
         if not self.import_cls.is_installed():
@@ -101,6 +107,15 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
                                              prefix='dummy',
                                              suffix='dummy')
             # Don't run this because it is invalid
+
+    def test_error_code(self):
+        r"""Test that error is raised when code generates one."""
+        if (((not self.import_cls.is_installed())
+             or (self.import_cls.function_param is None))):
+            return
+        error_msg = 'Test error'
+        lines = [self.import_cls.function_param['error'].format(error_msg=error_msg)]
+        assert_raises(RuntimeError, self.import_cls.run_code, lines)
 
     def test_write_if_block(self):
         r"""Test writing an if block."""

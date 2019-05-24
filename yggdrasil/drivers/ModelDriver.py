@@ -450,11 +450,11 @@ class ModelDriver(Driver):
         """
         out = (cls.language is not None)
         for x in cls.base_languages:
-            if not out:
+            if not out:  # pragma: no cover
                 break
             out = import_component('model', x).are_dependencies_installed()
         for x in cls.interface_dependencies:
-            if not out:
+            if not out:  # pragma: no cover
                 break
             out = cls.is_library_installed(x)
         return out
@@ -470,10 +470,7 @@ class ModelDriver(Driver):
         """
         out = False
         if cls.language is not None:
-            try:
-                out = (tools.which(cls.language_executable()) is not None)
-            except NotImplementedError:
-                out = False
+            out = (tools.which(cls.language_executable()) is not None)
         for x in cls.base_languages:
             if not out:
                 break
@@ -571,7 +568,7 @@ class ModelDriver(Driver):
         if len(cls.base_languages) > 0:
             out = True
             for x in cls.base_languages:
-                if not out:
+                if not out:  # pragma: no cover
                     break
                 out = import_component('model', x).is_comm_installed(
                     commtype=commtype, skip_config=skip_config, **kwargs)
