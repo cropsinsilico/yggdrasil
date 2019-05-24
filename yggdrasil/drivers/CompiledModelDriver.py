@@ -105,7 +105,7 @@ def get_compilation_tool(tooltype, name):
         return reg[name]
     name = os.path.splitext(name)[0]
     if name in reg:
-        return name
+        return reg[name]
     if name.lower() in reg:
         return reg[name.lower()]
     raise ValueError("Could not locate a %s tool with name '%s'"
@@ -133,13 +133,13 @@ class CompilationToolMeta(type):
                     reg['by_language'][l] = OrderedDict()
             for x in [cls.name] + cls.aliases:
                 # Register by name
-                if x in reg:
+                if x in reg:  # pragma: debug
                     raise ValueError("%s name '%s' already registered."
                                      % (cls.tooltype.title(), x))
                 reg[x] = cls
                 # Register by language
                 for l in cls.languages:
-                    if x in reg['by_language'][l]:
+                    if x in reg['by_language'][l]:  # pragma: debug
                         raise ValueError(("%s name '%s' already registered for "
                                           "%s language.")
                                          % (cls.tooltype.title(), x, l))
@@ -239,8 +239,8 @@ class CompilationToolBase(object):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        if cls.name is None:
-            return
+        if cls.name is None:  # pragma: debug
+            raise ValueError("Registering unnamed compilation tool.")
         attr_list = ['default_executable', 'default_flags']
         # Set attributes based on environment variables
         for k in attr_list:

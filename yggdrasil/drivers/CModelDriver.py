@@ -12,10 +12,10 @@ class CCompilerBase(CompilerBase):
     languages = ['c']
     default_executable_env = 'CC'
     # TODO: Additional flags environment variables?
-    default_executable_flags_env = 'CFLAGS'
+    default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
-    linker_attributes = {'default_executable_flags_env': 'LDFLAGS',
+    linker_attributes = {'default_flags_env': 'LDFLAGS',
                          'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
     search_path_env = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
@@ -77,7 +77,7 @@ class MSVCCompiler(CCompilerBase):
     version_flags = []
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
-                             default_executable_flags_env=None,
+                             default_flags_env=None,
                              output_key='/OUT:%s',
                              output_first=True,
                              output_first_library=False,

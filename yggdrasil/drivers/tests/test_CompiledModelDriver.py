@@ -1,4 +1,34 @@
+import os
+from yggdrasil.tests import assert_equal, assert_raises
+from yggdrasil.drivers import CompiledModelDriver
 import yggdrasil.drivers.tests.test_ModelDriver as parent
+
+
+def test_get_compilation_tool_registry():
+    r"""Test errors raised by get_compilation_tool_registry."""
+    assert_raises(ValueError, CompiledModelDriver.get_compilation_tool_registry,
+                  'invalid')
+
+    
+def test_find_compilation_tool():
+    r"""Test errors raised by find_compilation_tool."""
+    assert_raises(RuntimeError, CompiledModelDriver.find_compilation_tool,
+                  'archiver', 'cmake')
+    
+
+def test_get_compilation_tool():
+    r"""Test get_compilation_tool for different name variations."""
+    from yggdrasil.drivers.CModelDriver import CModelDriver
+    tooltype = 'compiler'
+    out = CModelDriver.get_tool('compiler').__class__
+    toolname = out.name.lower()
+    toolpath = os.path.join('somedir', toolname)
+    toolfile = toolpath + '.exe'
+    vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
+    for v in vals:
+        assert_equal(CompiledModelDriver.get_compilation_tool(tooltype, v), out)
+    assert_raises(ValueError, CompiledModelDriver.get_compilation_tool,
+                  'compiler', 'invalid')
 
 
 class TestCompiledModelParam(parent.TestModelParam):

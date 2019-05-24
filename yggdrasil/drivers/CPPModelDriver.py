@@ -9,7 +9,7 @@ class CPPCompilerBase(CCompilerBase):
     r"""Base class for C++ compilers."""
     languages = ['c++']
     default_executable_env = 'CXX'
-    default_executable_flags_env = 'CXXFLAGS'
+    default_flags_env = 'CXXFLAGS'
     cpp_std = 'c++11'
     search_path_flags = ['-E', '-v', '-xc++', '/dev/null']
     default_linker = None
