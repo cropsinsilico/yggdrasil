@@ -1,11 +1,16 @@
 import os
 import unittest
-from yggdrasil.tests import scripts, assert_raises
+from yggdrasil.tests import scripts, assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
-from yggdrasil.drivers.MakeModelDriver import MakeModelDriver
+from yggdrasil.drivers.MakeModelDriver import MakeModelDriver, MakeCompiler
 
 
 _driver_installed = MakeModelDriver.is_installed()
+
+
+def test_MakeCompiler():
+    r"""Test MakeCompiler class."""
+    assert_equal(MakeCompiler.get_output_file(None, target='clean'), 'clean')
 
 
 @unittest.skipIf(_driver_installed, "C Library installed")
@@ -53,6 +58,14 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
         # Version specifying makedir via working_dir
         self._inst_kwargs['yml']['working_dir'] = self.makedir
         del self._inst_kwargs['makefile']
+
+    def test_compile_model(self):
+        r"""Test compile model with alternate set of input arguments."""
+        src = [self.target + '.c']
+        self.instance.compile_model(target=self.target)
+        self.instance.compile_model(source_files=src)
+        self.assert_raises(RuntimeError, self.instance.compile_model,
+                           source_files=src, target=self.target + 'invalid')
         
 
 class TestMakeModelDriver(TestMakeModelParam, parent.TestCompiledModelDriver):
