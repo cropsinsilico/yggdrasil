@@ -643,7 +643,7 @@ class CMakeModelDriver(CompiledModelDriver):
         if target == 'clean':
             return self.call_linker(self.builddir, target=target, out=target,
                                     overwrite=True, working_dir=self.working_dir,
-                                    **kwargs)
+                                    allow_error=True, **kwargs)
         else:
             self.info('model_file = %s', self.model_file)
             default_kwargs = dict(target=target,
