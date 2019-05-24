@@ -89,9 +89,11 @@ class TestParam(YggTestClassInfo):
     def create_instance(self, *args, **kwargs):
         r"""Create a new instance object."""
         curpath = os.getcwd()
-        os.chdir(self.working_dir)
-        inst = super(TestParam, self).create_instance(*args, **kwargs)
-        os.chdir(curpath)
+        try:
+            os.chdir(self.working_dir)
+            inst = super(TestParam, self).create_instance(*args, **kwargs)
+        finally:
+            os.chdir(curpath)
         return inst
 
     def remove_instance(self, inst):
