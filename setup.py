@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
 import install_matlab_engine
+import install_R_interface
 import create_coveragerc
 ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
@@ -25,8 +26,17 @@ if install_matlab_engine.install_matlab(as_user=('--user' in sys.argv)):
     matlab_installed = True
 else:
     warnings.warn("Could not import matlab.engine. " +
-                  "Matlab features will be disabled.")
+                  "Matlab support will be disabled.")
     matlab_installed = False
+    
+
+# Install R interface
+if install_R_interface.install_R_interface():
+    R_installed = True
+else:
+    warnings.warn("Could not install R interface. " +
+                  "R support will be disabled.")
+    R_installed = False
 
 
 # Determine if rapidjson installed and parse user defined location
@@ -62,7 +72,8 @@ if rj_include_dir != rj_include_dir0:
     
 # Set coverage options in .coveragerc
 create_coveragerc.create_coveragerc(matlab_installed=matlab_installed,
-                                    lpy_installed=lpy_installed)
+                                    lpy_installed=lpy_installed,
+                                    R_installed=R_installed)
 
 
 # Create .rst README from .md and get long description

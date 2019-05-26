@@ -1,5 +1,6 @@
 import os
 import sys
+import install_R_interface
 PY_MAJOR_VERSION = sys.version_info[0]
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 # Import config parser
@@ -44,7 +45,8 @@ def rm_excl_rule(excl_list, new_rule):
     return excl_list
 
 
-def create_coveragerc(matlab_installed=False, lpy_installed=False):
+def create_coveragerc(matlab_installed=False, lpy_installed=False,
+                      R_installed=False):
     r"""Create the coveragerc to reflect the OS, Python version, and availability
     of matlab. Parameters from the setup.cfg file will be added. If the
     .coveragerc file already exists, it will be read first before adding setup.cfg
@@ -55,6 +57,8 @@ def create_coveragerc(matlab_installed=False, lpy_installed=False):
         matlab_installed (bool, optional): Truth of if matlab is installed or not.
             Defaults to False.
         lpy_installed (bool, optional): Truth of if lpy is installed or not.
+            Defaults to False.
+        R_installed (bool, optional): Truth of if R is installed or not.
             Defaults to False.
 
     Returns:
@@ -124,6 +128,13 @@ def create_coveragerc(matlab_installed=False, lpy_installed=False):
     else:
         excl_list = add_excl_rule(excl_list, 'pragma: lpy')
         excl_list = rm_excl_rule(excl_list, 'pragma: no lpy')
+    # R
+    if R_installed:
+        excl_list = add_excl_rule(excl_list, 'pragma: no R')
+        excl_list = rm_excl_rule(excl_list, 'pragma: R')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: R')
+        excl_list = rm_excl_rule(excl_list, 'pragma: no R')
     # Add new rules
     cp.set('report', 'exclude_lines', '\n' + '\n'.join(excl_list))
     # Write
@@ -143,7 +154,9 @@ if __name__ == "__main__":
         lpy_installed = True
     except ImportError:
         lpy_installed = False
+    R_installed = install_R_interface.install_R_interface()
     flag = create_coveragerc(matlab_installed=matlab_installed,
-                             lpy_installed=lpy_installed)
+                             lpy_installed=lpy_installed,
+                             R_installed=R_installed)
     if not flag:
         raise Exception("Failed to create/update converagerc file.")
