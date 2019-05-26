@@ -581,7 +581,7 @@ class ModelDriver(Driver):
                 return (commtype in installed_comms)
         # Check for any comm
         if commtype is None:
-            for c in tools.get_supported_comm():
+            for c in cls.supported_comms:
                 if cls.is_comm_installed(commtype=c, skip_config=skip_config,
                                          **kwargs):
                     return True
@@ -643,7 +643,7 @@ class ModelDriver(Driver):
             out += cls.configure_libraries(cfg)
             # Installed comms
             comms = []
-            for c in tools.get_supported_comm():
+            for c in cls.supported_comms:
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
             cfg.set(cls.language, 'commtypes', comms)
