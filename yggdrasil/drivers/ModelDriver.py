@@ -5,9 +5,11 @@ import logging
 import warnings
 import subprocess
 import shutil
+import uuid
+import tempfile
 from pprint import pformat
 from yggdrasil import platform, tools, backwards
-from yggdrasil.config import ygg_cfg, locate_file
+from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
 from threading import Event
@@ -15,6 +17,7 @@ try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
+logger = logging.getLogger(__name__)
 
 
 class ModelDriver(Driver):
@@ -151,6 +154,7 @@ class ModelDriver(Driver):
                            'items': {'type': 'string'}}}
     _schema_excluded_from_class = ['name', 'language', 'args',
                                    'inputs', 'outputs', 'working_dir']
+    _schema_excluded_from_class_validation = ['inputs', 'outputs']
     
     language = None
     language_ext = None
@@ -184,7 +188,6 @@ class ModelDriver(Driver):
         self.model_index = model_index
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = b'EXIT'
-        # print(os.environ.keys())
         for k in self.env_copy:
             if k in os.environ:
                 self.env[k] = os.environ[k]
@@ -218,6 +221,13 @@ class ModelDriver(Driver):
         if (((cls.language_ext is not None)
              and (not isinstance(cls.language_ext, (list, tuple))))):
             cls.language_ext = [cls.language_ext]
+            
+    @staticmethod
+    def after_registration(cls):
+        r"""Operations that should be preformed to modify class attributes after
+        registration."""
+        if (not cls.is_configured()):
+            update_language_config(cls)
         
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
@@ -345,30 +355,33 @@ class ModelDriver(Driver):
                 unused_kwargs.setdefault('cwd', unused_kwargs.pop('working_dir'))
             unused_kwargs.setdefault('shell', platform._is_win)
             # Call command
-            logging.info("Running '%s' from %s"
-                         % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
-            logging.debug("Process keyword arguments:\n%s\n",
-                          '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
+            logger.info("Running '%s' from %s"
+                        % (' '.join(cmd), unused_kwargs.get('cwd', os.getcwd())))
+            logger.debug("Process keyword arguments:\n%s\n",
+                         '    ' + pformat(unused_kwargs).replace('\n', '\n    '))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             if return_process:
                 return proc
             out, err = proc.communicate()
             if proc.returncode != 0:
-                logging.error(out)
+                logger.error(out)
                 raise RuntimeError("Command '%s' failed with code %d."
                                    % (' '.join(cmd), proc.returncode))
             out = backwards.as_str(out)
-            logging.debug('%s\n%s' % (' '.join(cmd), out))
+            logger.debug('%s\n%s' % (' '.join(cmd), out))
             return out
         except (subprocess.CalledProcessError, OSError) as e:
             raise RuntimeError("Could not call command '%s': %s"
                                % (' '.join(cmd), e))
         
-    def run_model(self, **kwargs):
+    def run_model(self, return_process=True, **kwargs):
         r"""Run the model. Unless overridden, the model will be run using
         run_executable.
 
         Args:
+            return_process (bool, optional): If True, the process running
+                the model is returned. If False, the process will block until
+                the model finishes running. Defaults to True.
             **kwargs: Keyword arguments are passed to run_executable.
 
         """
@@ -395,10 +408,10 @@ class ModelDriver(Driver):
                               shell=platform._is_win)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
-        return self.run_executable(command, return_process=True, **kwargs)
+        return self.run_executable(command, return_process=return_process, **kwargs)
         
     @classmethod
-    def language_version(cls, **kwargs):
+    def language_version(cls, version_flags=None, **kwargs):
         r"""Determine the version of this language.
 
         Args:
@@ -408,7 +421,9 @@ class ModelDriver(Driver):
             str: Version of compiler/interpreter for this language.
 
         """
-        return cls.run_executable(cls.version_flags, **kwargs)
+        if version_flags is None:
+            version_flags = cls.version_flags
+        return cls.run_executable(version_flags, **kwargs)
 
     @classmethod
     def is_installed(cls):
@@ -434,14 +449,13 @@ class ModelDriver(Driver):
         """
         out = (cls.language is not None)
         for x in cls.base_languages:
-            if not out:
+            if not out:  # pragma: no cover
                 break
             out = import_component('model', x).are_dependencies_installed()
-        if out:
-            for x in cls.interface_dependencies:
-                if not out:
-                    break
-                out = cls.is_library_installed(x)
+        for x in cls.interface_dependencies:
+            if not out:  # pragma: no cover
+                break
+            out = cls.is_library_installed(x)
         return out
 
     @classmethod
@@ -460,6 +474,24 @@ class ModelDriver(Driver):
             if not out:
                 break
             out = import_component('model', x).is_language_installed()
+        return out
+
+    @classmethod
+    def is_source_file(cls, fname):
+        r"""Determine if the provided file name points to a source files for
+        the associated programming language by checking the extension.
+
+        Args:
+            fname (str): Path to file.
+
+        Returns:
+            bool: True if the provided file is a source file, False otherwise.
+
+        """
+        out = False
+        model_ext = os.path.splitext(fname)[-1]
+        if (cls.language_ext is not None) and (len(model_ext) > 0):
+            out = (model_ext in cls.language_ext)
         return out
 
     @classmethod
@@ -535,7 +567,7 @@ class ModelDriver(Driver):
         if len(cls.base_languages) > 0:
             out = True
             for x in cls.base_languages:
-                if not out:
+                if not out:  # pragma: no cover
                     break
                 out = import_component('model', x).is_comm_installed(
                     commtype=commtype, skip_config=skip_config, **kwargs)
@@ -550,7 +582,8 @@ class ModelDriver(Driver):
         # Check for any comm
         if commtype is None:
             for c in tools.get_supported_comm():
-                if cls.is_comm_installed(commtype=c, **kwargs):
+                if cls.is_comm_installed(commtype=c, skip_config=skip_config,
+                                         **kwargs):
                     return True
             return False
         # Check that comm is explicitly supported
@@ -564,7 +597,7 @@ class ModelDriver(Driver):
         libraries = kwargs.pop('libraries', [])
         # Check platforms
         if (platforms is not None) and (platform._platform not in platforms):
-            return False
+            return False  # pragma: windows
         # Check libraries
         if (libraries is not None):
             for lib in libraries:
@@ -584,15 +617,25 @@ class ModelDriver(Driver):
                 be set.
 
         """
+        # Base languages
+        for x in cls.base_languages:
+            x_drv = import_component('model', x)
+            if not x_drv.is_configured():  # pragma: debug
+                # This shouldn't actually be called because configuration should
+                # occur on import
+                x_drv.configure(cfg)
         # Section and executable
         if (cls.language is not None) and (not cfg.has_section(cls.language)):
             cfg.add_section(cls.language)
         # Locate executable
         if (((not cls.is_language_installed())
              and (cls.executable_type is not None))):  # pragma: debug
-            fpath = locate_file(cls.language_executable())
-            if fpath:
-                cfg.set(cls.language, cls.executable_type, fpath)
+            try:
+                fpath = locate_file(cls.language_executable())
+                if fpath:
+                    cfg.set(cls.language, cls.executable_type, fpath)
+            except NotImplementedError:
+                pass
         # Only do additional configuration if no base languages
         out = []
         if not cls.base_languages:
@@ -603,7 +646,7 @@ class ModelDriver(Driver):
             for c in tools.get_supported_comm():
                 if cls.is_comm_installed(commtype=c, cfg=cfg, skip_config=True):
                     comms.append(c)
-            cfg.set(cls.language, 'commtypes', str(comms))
+            cfg.set(cls.language, 'commtypes', comms)
         return out
 
     @classmethod
@@ -835,6 +878,98 @@ class ModelDriver(Driver):
                 
     # Methods for automated model wrapping
     @classmethod
+    def run_code(cls, lines, **kwargs):
+        r"""Run code by first writing it as an executable and then calling
+        the driver.
+
+        Args:
+            lines (list): Lines of code to be wrapped as an executable.
+            **kwargs: Additional keyword arguments are passed to the
+                write_executable method.
+
+        """
+        name = 'test_code_%s' % str(uuid.uuid4())[:13].replace('-', '_')
+        working_dir = os.getcwd()
+        code_dir = tempfile.gettempdir()
+        # code_dir = working_dir
+        fname = os.path.join(code_dir, name + cls.language_ext[0])
+        lines = cls.write_executable(lines, **kwargs)
+        with open(fname, 'w') as fd:
+            fd.write('\n'.join(lines))
+        inst = None
+        try:
+            # TODO: Run the code
+            assert(os.path.isfile(fname))
+            inst = cls(name, [fname], working_dir=working_dir)
+            inst.run_model(return_process=False)
+        except BaseException:  # pragma: debug
+            logger.error('Failed generated code:\n%s' % '\n'.join(lines))
+            raise
+        finally:
+            if os.path.isfile(fname):
+                os.remove(fname)
+            if inst is not None:
+                inst.cleanup()
+                
+    @classmethod
+    def write_executable(cls, lines, prefix=None, suffix=None):
+        r"""Return the lines required to complete a program that will run
+        the provided lines.
+
+        Args:
+            lines (list): Lines of code to be wrapped as an executable.
+            prefix (list, optional): Lines of code that should proceed the
+                wrapped code. Defaults to None and is ignored. (e.g. C/C++
+                include statements).
+            suffix (list, optional): Lines of code that should follow the
+                wrapped code. Defaults to None and is ignored.
+
+        Returns:
+            lines: Lines of code wrapping the provided lines with the
+                necessary code to run it as an executable (e.g. C/C++'s main).
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        out = []
+        # Add standard & user defined prefixes
+        if ((('exec_prefix' in cls.function_param)
+             and (cls.function_param['exec_prefix'] not in lines))):
+            out.append(cls.function_param['exec_prefix'])
+            out.append('')
+        if prefix is not None:
+            if not isinstance(prefix, (list, tuple)):
+                prefix = [prefix]
+            out += prefix
+            out.append('')
+        # Add code with begin/end book ends
+        if ((('exec_begin' in cls.function_param)
+             and (cls.function_param['exec_begin'] not in lines))):
+            out.append(cls.function_param['exec_begin'])
+            if not isinstance(lines, (list, tuple)):
+                lines = [lines]
+            for x in lines:
+                out.append(cls.function_param['indent'] + x)
+            out.append(cls.function_param.get('exec_end',
+                                              cls.function_param['block_end']))
+        else:
+            out += lines
+        if out[-1]:
+            out.append('')
+        # Add standard & user defined suffixes
+        if suffix is not None:
+            if not isinstance(suffix, (list, tuple)):
+                suffix = [suffix]
+            out += suffix
+            out.append('')
+        if ((('exec_suffix' in cls.function_param)
+             and (cls.function_param['exec_suffix'] not in lines))):
+            out.append(cls.function_param['exec_suffix'])
+            out.append('')
+        return out
+                
+    @classmethod
     def write_if_block(cls, cond, block_contents):
         r"""Return the lines required to complete a conditional block.
 
@@ -944,7 +1079,7 @@ class ModelDriver(Driver):
             Lines of code perfoming a try/except block.
 
         """
-        if cls.function_param is None:
+        if (cls.function_param is None) or ('try_begin' not in cls.function_param):
             raise NotImplementedError("function_param attribute not set for"
                                       "language '%s'" % cls.language)
         if error_type is None:

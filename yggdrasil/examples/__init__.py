@@ -6,7 +6,7 @@ _all_lang = ('python', 'matlab', 'c', 'cpp', 'r')
 ex_dict = {'gs_lesson1': _all_lang,
            'gs_lesson2': _all_lang,
            'gs_lesson3': _all_lang,
-           'gs_lesson4': _all_lang,
+           'gs_lesson4': tuple(list(_all_lang) + ['cmake']),
            'gs_lesson4b': _all_lang,
            'formatted_io1': _all_lang,
            'formatted_io2': _all_lang,
@@ -34,7 +34,8 @@ ext_map = {'python': '.py',
            'r': '.R',
            'c': '.c',
            'cpp': '.cpp',
-           'executable': ''}
+           'executable': '',
+           'cmake': '.cpp'}
 _example_dir = os.path.dirname(__file__)
 
 

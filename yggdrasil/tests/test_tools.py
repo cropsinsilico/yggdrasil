@@ -4,13 +4,16 @@ from yggdrasil import tools, platform
 from yggdrasil.tests import YggTestClass, assert_equal
 
 
-def test_get_installed_lang():
-    r"""Test get_installed_lang."""
+def test_get_supported():
+    r"""Test get_supported_<platforms/lang/comm>."""
+    tools.get_supported_platforms()
+    tools.get_supported_lang()
+    tools.get_supported_comm()
+
+
+def test_get_installed():
+    r"""Test get_installed_<lang/comm>."""
     tools.get_installed_lang()
-
-
-def test_get_installed_comm():
-    r"""Test get_installed_comm."""
     tools.get_installed_comm()
 
 

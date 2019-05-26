@@ -9,6 +9,7 @@ import importlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
+logger = logging.getLogger(__name__)
 order = ['pytest', 'nose']
 # order = ['nose', 'pytest']
 try:
@@ -71,7 +72,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         elif x.endswith('yggtest'):
             # if _test_package_name == 'nose':
             #     argv.append(x)
-            print(x)  # pass
+            pass
         elif x == '--nocover':
             withcoverage = False
         elif x.startswith('-'):
@@ -116,9 +117,12 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
                         test_paths[i] = os.path.join(package_dir, test_paths[i])
     # os.chdir(package_dir)
     argv += test_paths
-    print("running", argv)
-    print(os.getcwd())
+    logger.info("Running %s from %s", argv, os.getcwd())
     try:
+        # Set env
+        old_skip_norm = os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', None)
+        if old_skip_norm is None:
+            os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
         error_code = subprocess.call(argv)
         # if _test_package_name == 'nose':
         #     result = _test_package.run(argv=argv)
@@ -129,10 +133,12 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         # else:
         #     raise RuntimeError("No test runner.")
     except BaseException:
-        logging.exception('Error in running test.')
+        logger.exception('Error in running test.')
         error_code = -1
     finally:
         os.chdir(initial_dir)
+        if old_skip_norm is None:
+            del os.environ['YGG_SKIP_COMPONENT_VALIDATION']
     return error_code
 
 

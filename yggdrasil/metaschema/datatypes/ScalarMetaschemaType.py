@@ -140,11 +140,11 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         arr = cls.to_array(obj)
-        if typedef is None:
-            subtype_prop = get_metaschema_property('subtype')
-            subtype = subtype_prop.encode(obj)
-        else:
+        if isinstance(typedef, dict):
             subtype = typedef.get('subtype', typedef.get('type', None))
+        else:
+            subtype_cls = get_metaschema_property('subtype')
+            subtype = subtype_cls.encode(obj)
         if (cls.name in ['1darray', 'ndarray']):
             return arr.tolist()
         assert(arr.ndim > 0)

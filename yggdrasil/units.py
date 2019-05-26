@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 from yggdrasil import backwards
 if backwards.PY2:  # pragma: Python 2
     import pint
@@ -7,7 +8,10 @@ if backwards.PY2:  # pragma: Python 2
     _ureg_unyt = None
     _ureg_pint = pint.UnitRegistry()
     # _ureg_pint.define('micro_mole = 1e-6 * mole = uMol = umol')
+    # Don't print warning about day redefinition
+    logging.getLogger("pint").propagate = False
     _ureg_pint.define('day = 24 * hour = d')
+    logging.getLogger("pint").propagate = True
 else:  # pragma: Python 3
     import unyt
     pint = None

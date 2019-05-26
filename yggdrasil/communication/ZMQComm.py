@@ -11,6 +11,7 @@ from yggdrasil.config import ygg_cfg
 from yggdrasil.communication import CommBase, AsyncComm
 
 
+logger = logging.getLogger(__name__)
 _socket_type_pairs = [('PUSH', 'PULL'),
                       ('PUB', 'SUB'),
                       ('REP', 'REQ'),
@@ -198,7 +199,7 @@ def bind_socket(socket, address, retry_timeout=-1, nretry=1):
             # print(e, e.errno)
             raise e
         else:
-            logging.debug("Retrying bind in %f s", retry_timeout)
+            logger.debug("Retrying bind in %f s", retry_timeout)
             tools.sleep(retry_timeout)
             address = bind_socket(socket, address, nretry=nretry - 1,
                                   retry_timeout=retry_timeout)
@@ -436,38 +437,26 @@ class ZMQComm(AsyncComm.AsyncComm):
                                    nretry=4, retry_timeout=2.0 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
-    def printStatus(self, nindent=0):
-        r"""Print status of the communicator."""
-        super(ZMQComm, self).printStatus(nindent=nindent)
-        prefix = '\t' + nindent * '\t'
-        print('%s%-15s: %s' % (prefix, 'nsent (zmq)', self._n_zmq_sent))
-        print('%s%-15s: %s' % (prefix, 'nsent reply (zmq)', self._n_reply_sent))
+    def get_status_message(self, nindent=0):
+        r"""Return lines composing a status message.
+        
+        Args:
+            nindent (int, optional): Number of tabs that should be used to
+                indent each line. Defaults to 0.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
+
+        """
+        lines, prefix = super(ZMQComm, self).get_status_message(nindent=nindent)
+        lines += ['%s%-15s: %s' % (prefix, 'nsent (zmq)', self._n_zmq_sent),
+                  '%s%-15s: %s' % (prefix, 'nsent reply (zmq)', self._n_reply_sent)]
         for k in self._n_zmq_recv.keys():
-            print('%s%-15s: %s' % (prefix, 'nrecv (%s)' % k, self._n_zmq_recv[k]))
-            print('%s%-15s: %s' % (prefix, 'nrecv reply (%s)' % k,
-                                   self._n_reply_recv[k]))
-
-    # @classmethod
-    # def is_installed(cls, language=None):
-    #     r"""Determine if the necessary libraries are installed for this
-    #     communication class.
-
-    #     Args:
-    #         language (str, optional): Specific language that should be checked
-    #             for compatibility. Defaults to None and all languages supported
-    #             on the current platform will be checked.
-
-    #     Returns:
-    #         bool: Is the comm installed.
-
-    #     """
-    #     if language == 'python':
-    #         out = True  # ZMQ is a requirement so it should always be installed
-    #     elif language == 'c':
-    #         out = _zmq_installed_c
-    #     else:
-    #         out = super(ZMQComm, cls).is_installed(language=language)
-    #     return out
+            lines += ['%s%-15s: %s' % (prefix, 'nrecv (%s)' % k, self._n_zmq_recv[k]),
+                      '%s%-15s: %s' % (prefix, 'nrecv reply (%s)' % k,
+                                       self._n_reply_recv[k])]
+        return lines, prefix
 
     @classmethod
     def underlying_comm_class(self):

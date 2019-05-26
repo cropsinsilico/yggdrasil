@@ -560,7 +560,22 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                 iline = '%s %s' % (_map_element2code[e], ivalue)
                 body.append(iline.strip())  # Ensure trailing spaces are removed
         return newline.join(header + body) + newline
+        
+    @classmethod
+    def encode_data_readable(cls, obj, typedef):
+        r"""Encode an object's data in a readable format.
 
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        return cls.encode_data(obj, typedef)
+    
     @classmethod
     def decode_data(cls, msg, typedef):
         r"""Decode an object.
@@ -623,7 +638,7 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                 pass
         return super(ObjMetaschemaType, cls).coerce_type(obj, typedef=typedef,
                                                          **kwargs)
-        
+
     @classmethod
     def updated_fixed_properties(cls, obj):
         r"""Get a version of the fixed properties schema that includes information

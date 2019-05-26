@@ -28,7 +28,6 @@ TODO
 * Update base test class for comm and connection drivers to use comm installation bool for generating unittest skip errors
 * Use return code to indicate specific errors when using a generated wrapper (e.g. missing comm class)
 * Consider passing input/output to/from Matlab function models directly through the matlab engine
-* Add link to paper & citation section once officially published
 * Update yaml.rst docs to reflect new schema
 * Add deprecation warnings to handling of old syntax
 * Add datatypes as components?
@@ -51,3 +50,6 @@ TODO
 * testing for R
 * installation for R
 * improve speed of validation
+* Split ld off as its own linker
+* Add comm for using files as temporary storage in passing information between models
+* Change cmake to be a C/C++ compiler rather than a separate language with its own driver

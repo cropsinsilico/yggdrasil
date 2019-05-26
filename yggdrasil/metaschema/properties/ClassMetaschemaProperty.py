@@ -9,7 +9,7 @@ class ClassMetaschemaProperty(MetaschemaProperty):
     name = 'class'
     schema = {'description': ('One or more classes that the object should be '
                               'an instance of.'),
-              'oneOf': [{'type': 'class'},
+              'anyOf': [{'type': 'class'},
                         {'type': 'array',
                          'items': {'type': 'class'},
                          'minItems': 1}]}

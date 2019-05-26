@@ -63,9 +63,9 @@ class TestExample(YggTestBase, tools.YggClass):
     @property
     def languages_tested(self):
         r"""list: Languages covered by the example."""
-        if self.name not in source:
+        if self.name not in source:  # pragma: debug
             return None
-        if self.language not in yamls[self.name]:
+        if self.language not in yamls[self.name]:  # pragma: debug
             return None
         if self.language in ['all', 'all_nomatlab']:
             out = [_ext2lang[os.path.splitext(x)[-1]] for x in

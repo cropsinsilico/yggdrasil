@@ -69,6 +69,7 @@ class ConnectionDriver(Driver):
                                    'and one or more comms/files.')
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
+        'connection_type': {'type': 'string', 'default': 'default'},
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
@@ -83,6 +84,7 @@ class ConnectionDriver(Driver):
                                     'connection should send messages to.')},
         'translator': {'type': 'array', 'items': {'type': 'function'}},
         'onexit': {'type': 'string'}}
+    _schema_excluded_from_class_validation = ['inputs', 'outputs']
 
     @property
     def _is_input(self):
@@ -476,7 +478,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_closed:
                 return False
             flag, msg = self.icomm.recv(**kwargs)
-        if isinstance(msg, backwards.bytes_type) and (msg == self.icomm.eof_msg):
+        if self.icomm.is_eof(msg):
             return self.on_eof()
         if flag:
             return msg

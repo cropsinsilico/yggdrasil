@@ -1,14 +1,57 @@
 import os
+import re
+import pprint
 import unittest
 import tempfile
+from yggdrasil import platform
 from yggdrasil.tests import scripts, assert_raises, assert_equal
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
-from yggdrasil.drivers.CMakeModelDriver import CMakeModelDriver
+from yggdrasil.drivers.CMakeModelDriver import (
+    CMakeModelDriver, CMakeConfigure, CMakeBuilder)
 
 
 _driver_installed = CMakeModelDriver.is_installed()
 
 
+def test_CMakeConfigure():
+    r"""Test CMakeConfigure."""
+    src = scripts['c'][0]
+    sourcedir = os.path.dirname(src)
+    builddir = sourcedir
+    # Test get_output_file
+    out = CMakeConfigure.get_output_file(src, dont_build=True)
+    assert_equal(out, builddir)
+    out = CMakeConfigure.get_output_file(src, dont_build=True,
+                                         builddir='.', working_dir=sourcedir)
+    assert_equal(out, builddir)
+    # Test get_flags
+    out_A = CMakeConfigure.get_flags(dont_link=True)
+    out_B = CMakeConfigure.get_flags(dont_link=True, outfile='.')
+    assert_equal(out_A, out_B)
+
+
+def test_CMakeBuilder():
+    r"""Test CMakeBuilder."""
+    src = scripts['c'][0]
+    target = os.path.splitext(os.path.basename(src))[0]
+    builddir = os.path.dirname(src)
+    obj = os.path.splitext(src)[0] + '.obj'
+    out = os.path.splitext(src)[0]
+    if platform._is_win:  # pragma: windows
+        out += '.exe'
+    # Test get_output_file
+    assert_equal(CMakeBuilder.get_output_file(obj), out)
+    assert_equal(CMakeBuilder.get_output_file(obj, target='clean'), 'clean')
+    assert_equal(CMakeBuilder.get_output_file(builddir, target=target), out)
+    assert_raises(RuntimeError, CMakeBuilder.get_output_file, builddir)
+    # Test get_flags
+    out_A = CMakeBuilder.get_flags(target=target, working_dir=builddir)
+    out_B = CMakeBuilder.get_flags(target=target,
+                                   outfile=os.path.join('.', os.path.basename(out)))
+    assert_equal(out_A, out_B)
+
+
+@unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_create_include():
     r"""Test create_include."""
     target = 'target'
@@ -26,14 +69,34 @@ def test_create_include():
                 ([], ['-lm'], ['TARGET_LINK_LIBRARIES(%s -lm)' % target]),
                 ([], ['-Llib_dir'], ['LINK_DIRECTORIES(lib_dir)']),
                 ([], ['/LIBPATH:"lib_dir"'], ['LINK_DIRECTORIES(lib_dir)']),
-                ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target]),
-                ([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
-                ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
+                ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target])]
+    if CMakeModelDriver.add_libraries:  # pragma: debug
+        testlist += [([], [fname_dll], ['ADD_LIBRARY(test SHARED IMPORTED)']),
+                     ([], [fname_lib], ['ADD_LIBRARY(test STATIC IMPORTED)'])]
+    else:
+        if platform._is_win:  # pragma: windows
+            tempdir_cp = tempdir.replace('\\', re.escape('\\'))
+        else:
+            tempdir_cp = tempdir
+        testlist += [([], [fname_dll], [('FIND_LIBRARY(TEST_LIBRARY NAMES %s '
+                                         'test HINTS %s)')
+                                        % (os.path.basename(fname_dll), tempdir_cp)]),
+                     ([], [fname_lib], [('FIND_LIBRARY(TEST_LIBRARY NAMES %s '
+                                         'test HINTS %s)')
+                                        % (os.path.basename(fname_lib), tempdir_cp)])]
+    from yggdrasil.drivers.CModelDriver import CModelDriver
+    CModelDriver.compile_dependencies()
+    CMakeModelDriver.compile_dependencies()
     for c, l, lines in testlist:
         out = CMakeModelDriver.create_include(None, target, compile_flags=c,
                                               linker_flags=l)
         for x in lines:
-            assert(x in out)
+            try:
+                assert(x in out)
+            except AssertionError:  # pragma: debug
+                print("Could not find '%s':" % x)
+                pprint.pprint(out)
+                raise
     for fname in [fname_dll, fname_lib]:
         os.remove(fname)
     assert_raises(ValueError, CMakeModelDriver.create_include,
@@ -108,4 +171,16 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
 
 class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for CMakeModelDriver."""
-    pass
+
+    def test_call_compiler(self):
+        r"""Test call_compiler without full path."""
+        # self.instance.cleanup()
+        self.import_cls.call_compiler(self.instance.source_files,
+                                      builddir='build',
+                                      working_dir=self.instance.working_dir,
+                                      dont_build=True)
+        self.import_cls.call_compiler(self.instance.source_files,
+                                      out=self.instance.model_file,
+                                      builddir='build',
+                                      working_dir=self.instance.working_dir,
+                                      overwrite=True)

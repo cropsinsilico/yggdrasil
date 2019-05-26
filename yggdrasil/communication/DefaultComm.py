@@ -10,8 +10,6 @@ class DefaultComm(CommBase):
                                    'based on the current platform.')
 
     def __new__(cls, *args, **kwargs):
-        if kwargs.get('commtype', None) == cls._commtype:
-            kwargs.pop('commtype')
         return cls._get_alias()(*args, **kwargs)
 
     @classmethod

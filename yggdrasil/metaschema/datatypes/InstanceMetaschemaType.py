@@ -34,16 +34,15 @@ class InstanceMetaschemaType(MetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if super(InstanceMetaschemaType, cls).validate(obj,
-                                                       raise_errors=raise_errors):
-            try:
-                ArgsMetaschemaProperty.instance2args(obj)
-                return True
-            except MetaschemaTypeError:
-                if raise_errors:
-                    raise ValueError("Class dosn't have an input_args attribute.")
-                return False
-        return False
+        # Base not called because every python object should pass validation
+        # against the object class
+        try:
+            ArgsMetaschemaProperty.instance2args(obj)
+            return True
+        except MetaschemaTypeError:
+            if raise_errors:
+                raise ValueError("Class dosn't have an input_args attribute.")
+            return False
         
     @classmethod
     def encode_data(cls, obj, typedef):
@@ -58,11 +57,12 @@ class InstanceMetaschemaType(MetaschemaType):
             string: Encoded object.
 
         """
-        vtypedef = None
-        if isinstance(typedef, dict):
-            vtypedef = {'properties': typedef.get('args', {})}
         args = ArgsMetaschemaProperty.instance2args(obj)
-        return JSONObjectMetaschemaType.encode_data(args, vtypedef)
+        if isinstance(typedef, dict) and ('args' in typedef):
+            typedef_args = {'properties': typedef['args']}
+        else:
+            typedef_args = None
+        return JSONObjectMetaschemaType.encode_data(args, typedef_args)
 
     @classmethod
     def decode_data(cls, obj, typedef):

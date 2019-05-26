@@ -1,5 +1,6 @@
 import os
 import copy
+import shutil
 from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
@@ -11,10 +12,12 @@ class CCompilerBase(CompilerBase):
     languages = ['c']
     default_executable_env = 'CC'
     # TODO: Additional flags environment variables?
-    default_executable_flags_env = 'CFLAGS'
+    default_flags_env = 'CFLAGS'
     default_flags = ['-g', '-Wall']
     # GCC & CLANG have similar call patterns
-    linker_attributes = {'default_executable_flags_env': 'LDFLAGS'}
+    linker_attributes = {'default_flags_env': 'LDFLAGS',
+                         'search_path_env': ['LIBRARY_PATH', 'LD_LIBRARY_PATH']}
+    search_path_env = ['C_INCLUDE_PATH']
     search_path_flags = ['-E', '-v', '-xc', '/dev/null']
     search_regex_begin = '#include "..." search starts here:'
     search_regex_end = 'End of search list.'
@@ -71,8 +74,10 @@ class MSVCCompiler(CCompilerBase):
     linker_switch = '/link'
     search_path_env = 'INCLUDE'
     search_path_flags = None
+    version_flags = []
     linker_attributes = dict(GCCCompiler.linker_attributes,
-                             default_executable_flags_env=None,
+                             default_executable=None,
+                             default_flags_env=None,
                              output_key='/OUT:%s',
                              output_first=True,
                              output_first_library=False,
@@ -138,10 +143,10 @@ class CModelDriver(CompiledModelDriver):
                       'libtype': 'header_only',
                       'language': 'c'},
         'zmq': {'include': 'zmq.h',
-                'libtype': 'static',
-                'language': 'c'},  # static added in before_registration
+                'libtype': 'shared',
+                'language': 'c'},
         'czmq': {'include': 'czmq.h',
-                 'libtype': 'static',
+                 'libtype': 'shared',
                  'language': 'c'}}
     internal_libraries = {
         'ygg': {'source': 'YggInterface.c',
@@ -149,7 +154,7 @@ class CModelDriver(CompiledModelDriver):
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
                 'external_dependencies': ['rapidjson'],
-                'include_dirs': [_top_dir, _incl_io, _incl_comm, _incl_seri],
+                'include_dirs': [_incl_io, _incl_comm, _incl_seri],
                 'compiler_flags': []},
         'regex_win32': {'source': 'regex_win32.cpp',
                         'directory': os.path.join(_top_dir, 'regex'),
@@ -173,12 +178,20 @@ class CModelDriver(CompiledModelDriver):
                       'include_dirs': []}}
     function_param = {
         'comment': '//',
+        'true': '1',
         'indent': 2 * ' ',
+        'print': 'printf(\"{message}\");',
+        'error': 'return -1;',
         'block_end': '}',
-        'if_begin': 'if ({cond}) {',
+        'if_begin': 'if ({cond}) {{',
         'for_begin': ('for ({iter_var} = {iter_begin}; {iter_var} < {iter_end}; '
-                      '{iter_var}++) {'),
-        'while_begin': 'while ({cond}) {'}
+                      '{iter_var}++) {{'),
+        'while_begin': 'while ({cond}) {{',
+        'break': 'break;',
+        'declare': '{type} {name};',
+        'assign': '{name} = {value};',
+        'exec_begin': 'int main() {',
+        'exec_end': '  return 0;\n}'}
 
     @staticmethod
     def before_registration(cls):
@@ -190,14 +203,18 @@ class CModelDriver(CompiledModelDriver):
         archiver = cls.get_tool('archiver')
         linker = cls.get_tool('linker')
         for x in ['zmq', 'czmq']:
-            if x not in cls.external_libraries:
-                continue
-            libtype = cls.external_libraries[x]['libtype']
-            if libtype == 'static':
-                tool = archiver
-            else:
-                tool = linker
-            cls.external_libraries[x][libtype] = tool.get_output_file(x)
+            if x in cls.external_libraries:
+                if platform._is_win:  # pragma: windows
+                    cls.external_libraries[x]['libtype'] = 'static'
+                libtype = cls.external_libraries[x]['libtype']
+                if libtype == 'static':  # pragma: debug
+                    tool = archiver
+                    kwargs = {}
+                else:
+                    tool = linker
+                    kwargs = {'build_library': True}
+                cls.external_libraries[x][libtype] = tool.get_output_file(
+                    x, **kwargs)
         # Platform specific regex internal library
         if platform._is_win:  # pragma: windows
             regex_lib = cls.internal_libraries['regex_win32']
@@ -206,8 +223,13 @@ class CModelDriver(CompiledModelDriver):
         cls.internal_libraries['regex'] = regex_lib
         # Platform specific internal library options
         if platform._is_win:  # pragma: windows
-            cls.internal_libraries['datatypes']['include_dirs'] += [_top_dir]
+            stdint_win = os.path.join(_top_dir, 'windows_stdint.h')
+            assert(os.path.isfile(stdint_win))
+            shutil.copy(stdint_win, os.path.join(_top_dir, 'stdint.h'))
+            for x in ['ygg', 'datatypes']:
+                cls.internal_libraries[x]['include_dirs'] += [_top_dir]
         if platform._is_linux:
+            cls.internal_libraries['ygg']['include_dirs'] += [_top_dir]
             for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
@@ -226,7 +248,9 @@ class CModelDriver(CompiledModelDriver):
                 be set.
 
         """
-        out = super(CModelDriver, cls).configure(cfg)
+        # Call __func__ to avoid direct invoking of class which dosn't exist
+        # in after_registration where this is called
+        out = CompiledModelDriver.configure.__func__(cls, cfg)
         # Change configuration to be directory containing include files
         rjlib = cfg.get(cls._language, 'rapidjson_include', None)
         if (rjlib is not None) and os.path.isfile(rjlib):
@@ -245,4 +269,40 @@ class CModelDriver(CompiledModelDriver):
             for x in copy.deepcopy(self.products):
                 base = os.path.splitext(x)[0]
                 self.products += [base + ext for ext in ['.ilk', '.pdb', '.obj']]
+        return out
+
+    @classmethod
+    def update_ld_library_path(cls, env):
+        r"""Update provided dictionary of environment variables so that
+        LD_LIBRARY_PATH includes the interface directory containing the interface
+        libraries.
+
+        Args:
+            env (dict): Dictionary of enviroment variables to be updated.
+
+        Returns:
+            dict: Updated dictionary of environment variables.
+
+        """
+        if platform._is_linux:
+            path_list = []
+            prev_path = env.pop('LD_LIBRARY_PATH', '')
+            if prev_path:
+                path_list.append(prev_path)
+            for x in [_incl_interface]:
+                if x not in prev_path:
+                    path_list.append(x)
+            if path_list:
+                env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
+        return env
+
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CModelDriver, self).set_env()
+        out = self.update_ld_library_path(out)
         return out

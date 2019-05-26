@@ -203,7 +203,7 @@ class MetaschemaType(object):
         return obj
 
     @classmethod
-    def encode_type(cls, obj, typedef=None, **kwargs):
+    def encode_type(cls, obj, typedef=None, is_validated=False, **kwargs):
         r"""Encode an object's type definition.
 
         Args:
@@ -224,9 +224,10 @@ class MetaschemaType(object):
         obj = cls.coerce_type(obj, typedef=typedef)
         if typedef is None:
             typedef = {}
-        if not cls.validate(obj):
-            raise MetaschemaTypeError("Object could not be encoded as '%s' type."
-                                      % cls.name)
+        if not is_validated:
+            if not cls.validate(obj):
+                raise MetaschemaTypeError(("Object could not be encoded as "
+                                           "'%s' type.") % cls.name)
         out = copy.deepcopy(kwargs)
         for x in cls.properties:
             itypedef = typedef.get(x, out.get(x, None))
@@ -497,7 +498,8 @@ class MetaschemaType(object):
         return True
 
     @classmethod
-    def encode(cls, obj, typedef=None, typedef_validated=False, **kwargs):
+    def encode(cls, obj, typedef=None, typedef_validated=False,
+               dont_check=False, **kwargs):
         r"""Encode an object.
 
         Args:
@@ -509,6 +511,8 @@ class MetaschemaType(object):
             typedef_validated (bool, optional): If True, the type definition
                 is taken as already having been validated and will not be
                 validated again during the encoding process. Defaults to False.
+            dont_check (bool, optional): If True, the object will not be
+                checked against the type definition. Defaults to False.
             **kwargs: Additional keyword arguments are added to the metadata.
 
         Returns:
@@ -525,8 +529,9 @@ class MetaschemaType(object):
         # Coerce, then check object, then transform
         obj = cls.coerce_type(obj, typedef=typedef,
                               typedef_validated=typedef_validated, **kwargs)
-        cls.check_decoded(obj, typedef, raise_errors=True,
-                          typedef_validated=typedef_validated)
+        if not dont_check:
+            cls.check_decoded(obj, typedef, raise_errors=True,
+                              typedef_validated=typedef_validated)
         obj_t = cls.transform_type(obj, typedef)
         # Encode
         metadata = cls.encode_type(obj_t, typedef=typedef)
@@ -543,7 +548,8 @@ class MetaschemaType(object):
         return metadata, data
 
     @classmethod
-    def decode(cls, metadata, data, typedef=None, typedef_validated=False):
+    def decode(cls, metadata, data, typedef=None, typedef_validated=False,
+               dont_check=False):
         r"""Decode an object.
 
         Args:
@@ -555,6 +561,8 @@ class MetaschemaType(object):
             typedef_validated (bool, optional): If True, the type definition
                 is taken as already having been validated and will not be
                 validated again during the encoding process. Defaults to False.
+            dont_check (bool, optional): If True, the metadata will not be
+                checked against the type definition. Defaults to False.
 
         Returns:
             object: Decoded object.
@@ -565,30 +573,30 @@ class MetaschemaType(object):
 
         """
         conv_func = None
-        if not cls.check_encoded(metadata, typedef,
-                                 typedef_validated=typedef_validated):
-            if ('type' in metadata) and (typedef == {'type': 'bytes'}):
-                new_cls = get_type_class(metadata['type'])
-                return new_cls.decode(metadata, data)
-            if ((isinstance(metadata, dict)
-                 and (len(metadata.get('items', [])) == 1)
-                 and cls.check_encoded(metadata['items'][0], typedef))):
-                conv_func = _get_single_array_element
-            else:
-                conv_func = conversions.get_conversion(metadata.get('type', None),
-                                                       cls.name)
-            if not conv_func:
-                cls.check_encoded(metadata, typedef, raise_errors=True,
-                                  typedef_validated=typedef_validated)
+        if isinstance(metadata, dict):
+            metatype = metadata.get('type', None)
+            if (metatype not in [None, 'bytes']) and (typedef == {'type': 'bytes'}):
+                new_cls = get_type_class(metatype)
+                return new_cls.decode(metadata, data, dont_check=dont_check)
+            if metatype != cls.name:
+                conv_func = conversions.get_conversion(metatype, cls.name)
+                if (((conv_func is None)
+                     and (len(metadata.get('items', [])) == 1)
+                     and cls.check_encoded(metadata['items'][0], typedef))):
+                    conv_func = _get_single_array_element
+        if (not conv_func) and (not dont_check):
+            cls.check_encoded(metadata, typedef, raise_errors=True,
+                              typedef_validated=typedef_validated)
         if conv_func:
             new_cls = get_type_class(metadata['type'])
-            out = conv_func(new_cls.decode(metadata, data))
+            out = conv_func(new_cls.decode(metadata, data, dont_check=dont_check))
         else:
             out = cls.decode_data(data, metadata)
         out = cls.transform_type(out, typedef)
         return out
 
-    def serialize(self, obj, no_metadata=False, dont_encode=False, **kwargs):
+    def serialize(self, obj, no_metadata=False, dont_encode=False,
+                  dont_check=False, **kwargs):
         r"""Serialize a message.
 
         Args:
@@ -597,6 +605,9 @@ class MetaschemaType(object):
                 the serialized message. Defaults to False.
             dont_encode (bool, optional): If True, the input message will not
                 be encoded using type specific or JSON encoding. Defaults to
+                False.
+            dont_check (bool, optional): If True, the object being serialized
+                will not be checked against the type definition. Defaults to
                 False.
             **kwargs: Additional keyword arguments are added to the metadata.
 
@@ -612,7 +623,8 @@ class MetaschemaType(object):
             is_raw = True
         else:
             metadata, data = self.encode(obj, typedef=self._typedef,
-                                         typedef_validated=True, **kwargs)
+                                         typedef_validated=True,
+                                         dont_check=dont_check, **kwargs)
             is_raw = False
         for k in ['size', 'data']:
             if k in metadata:
@@ -627,7 +639,8 @@ class MetaschemaType(object):
         msg = YGG_MSG_HEAD + metadata + YGG_MSG_HEAD + data
         return msg
     
-    def deserialize(self, msg, no_data=False, metadata=None, dont_decode=False):
+    def deserialize(self, msg, no_data=False, metadata=None, dont_decode=False,
+                    dont_check=False):
         r"""Deserialize a message.
 
         Args:
@@ -640,6 +653,8 @@ class MetaschemaType(object):
             dont_decode (bool, optional): If True, type specific and JSON
                 decoding will not be used to decode the message. Defaults to
                 False.
+            dont_check (bool, optional): If True, the metadata will not be
+                checked against the type definition. Defaults to False.
 
         Returns:
             tuple(obj, dict): Deserialized message and header information.
@@ -683,5 +698,5 @@ class MetaschemaType(object):
         else:
             data = encoder.decode_json(data)
             obj = self.decode(metadata, data, self._typedef,
-                              typedef_validated=True)
+                              typedef_validated=True, dont_check=dont_check)
         return obj, metadata

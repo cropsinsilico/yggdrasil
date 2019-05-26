@@ -1,11 +1,16 @@
 import os
 import re
+import copy
 import shutil
+import logging
 from collections import OrderedDict
-from yggdrasil import platform
+from yggdrasil import platform, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase)
-from yggdrasil.drivers import CModelDriver
+from yggdrasil.drivers import CModelDriver, CPPModelDriver
+
+
+logger = logging.getLogger(__name__)
 
 
 class CMakeConfigure(CompilerBase):
@@ -15,8 +20,8 @@ class CMakeConfigure(CompilerBase):
     is_linker = False
     default_flags = []  # '-H']
     flag_options = OrderedDict([('definitions', '-D%s'),
-                                ('sourcedir', '-S'),
-                                ('builddir', '-B')])
+                                ('sourcedir', ''),  # '-S'
+                                ('builddir', '-B%s')])
     output_key = None
     compile_only_flag = None
     default_builddir = '.'
@@ -58,7 +63,8 @@ class CMakeConfigure(CompilerBase):
             else:
                 sourcedir = src
         if builddir is None:
-            builddir = os.path.join(sourcedir, cls.default_builddir)
+            builddir = os.path.normpath(os.path.join(sourcedir,
+                                                     cls.default_builddir))
         if dont_link:
             out = builddir
             if (not os.path.isabs(out)) and (working_dir is not None):
@@ -96,12 +102,21 @@ class CMakeConfigure(CompilerBase):
             if builddir is None:
                 outfile = kwargs.get('outfile', None)
                 if outfile is None:
-                    builddir = os.path.join(sourcedir, cls.default_builddir)
+                    builddir = os.path.normpath(os.path.join(sourcedir,
+                                                             cls.default_builddir))
                 else:
                     builddir = outfile
         # Pop target (used for build stage file name, but not for any other
         # part of the build stage)
         kwargs.pop('target', None)
+        # Add conda prefix
+        # conda_prefix = cls.get_conda_prefix()
+        # if conda_prefix:
+        #     kwargs.setdefault('definitions', [])
+        #     kwargs['definitions'].append('CMAKE_PREFIX_PATH=%s'
+        #                                  % os.path.join(conda_prefix, 'lib'))
+        #     kwargs['definitions'].append('CMAKE_LIBRARY_PATH=%s'
+        #                                  % os.path.join(conda_prefix, 'lib'))
         out = super(CMakeConfigure, cls).get_flags(sourcedir=sourcedir,
                                                    builddir=builddir, **kwargs)
         return out
@@ -125,7 +140,7 @@ class CMakeConfigure(CompilerBase):
         assert(len(args) == 1)
         if not kwargs.get('skip_flags', False):
             sourcedir = kwargs.get('sourcedir', args[0])
-            if sourcedir != args[0]:
+            if sourcedir != args[0]:  # pragma: debug
                 raise RuntimeError(("The argument list "
                                     "contents (='%s') and 'sourcedir' (='%s') "
                                     "keyword specify the same thing, but those "
@@ -139,12 +154,23 @@ class CMakeBuilder(LinkerBase):
     r"""CMake build tool."""
     name = 'cmake'
     languages = ['cmake']
-    default_flags = ['--clean-first']
+    default_flags = []  # '--clean-first']
     output_key = None
     flag_options = OrderedDict([('builddir', {'key': '--build',
                                               'position': 0}),
                                 ('target', '--target')])
+    executable_ext = ''
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        LinkerBase.before_registration(cls)
+        if platform._is_win:  # pragma: windows
+            cls.executable_ext = '.exe'
+        
     @classmethod
     def extract_kwargs(cls, kwargs):
         r"""Extract linker kwargs, leaving behind just compiler kwargs.
@@ -159,13 +185,13 @@ class CMakeBuilder(LinkerBase):
             dict: Keyword arguments that should be passed to the linker.
 
         """
-        kws_link = []
+        # kws_link = []
         kws_both = ['builddir', 'target']
         kwargs_link = super(CMakeBuilder, cls).extract_kwargs(kwargs)
         # Move kwargs unique to linker
-        for k in kws_link:
-            if k in kwargs:
-                kwargs_link[k] = kwargs.pop(k)
+        # for k in kws_link:
+        #     if k in kwargs:
+        #         kwargs_link[k] = kwargs.pop(k)
         # Copy kwargs that should be passed to both compiler & linker
         for k in kws_both:
             if k in kwargs:
@@ -236,7 +262,7 @@ class CMakeBuilder(LinkerBase):
             if builddir is None:
                 builddir = os.path.dirname(outfile)
         if builddir is None:
-            builddir = cls.default_builddir
+            builddir = CMakeConfigure.default_builddir
         out = super(CMakeBuilder, cls).get_flags(target=target,
                                                  builddir=builddir, **kwargs)
         return out
@@ -260,7 +286,9 @@ class CMakeBuilder(LinkerBase):
         assert(len(args) == 1)
         if not kwargs.get('skip_flags', False):
             builddir = kwargs.get('builddir', args[0])
-            if builddir != args[0]:
+            if not os.path.isabs(builddir) and os.path.isabs(args[0]):
+                builddir = os.path.join(os.path.dirname(args[0]), builddir)
+            if builddir != args[0]:  # pragma: debug
                 raise RuntimeError(("The argument list "
                                     "contents (='%s') and 'builddir' (='%s') "
                                     "keyword specify the same thing, but those "
@@ -296,6 +324,9 @@ class CMakeModelDriver(CompiledModelDriver):
         sourcedir (str): Source directory to call cmake on.
         builddir (str): Directory where the build should be saved.
         target (str): Name of executable that should be created and called.
+        add_libraries (bool): If True, interface libraries and dependency
+            libraries are added using CMake's ADD_LIBRARY directive. If False,
+            interface libraries are found using FIND_LIBRARY.
 
     Raises:
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
@@ -310,7 +341,13 @@ class CMakeModelDriver(CompiledModelDriver):
     language = 'cmake'
     base_languages = ['c']
     cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',
-                      'CMakeFiles']
+                      'CMakeFiles',
+                      'ALL_BUILD.vcxproj', 'ALL_BUILD.vcxproj.filters', 'Debug',
+                      'Win32', 'ZERO_CHECK.vcxproj', 'ZERO_CHECK.vcxproj.filters']
+    # TODO: These are only on Windows using MSVC
+    cmake_products_ext = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
+                          '.vcxproj.filters']
+    add_libraries = False
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -322,21 +359,47 @@ class CMakeModelDriver(CompiledModelDriver):
 
         """
         if self.sourcedir is None:
-            self.sourcedir = self.working_dir
-        elif not os.path.isabs(self.sourcedir):
+            self.sourcedir = os.path.dirname(args[0])
+        if not os.path.isabs(self.sourcedir):
             self.sourcedir = os.path.realpath(os.path.join(self.working_dir,
                                                            self.sourcedir))
         if self.builddir is None:
-            # self.builddir = self.sourcedir
-            self.builddir = os.path.join(self.sourcedir, 'build')
-        elif not os.path.isabs(self.builddir):
+            if self.target is None:
+                build_base = 'build'
+            else:
+                build_base = 'build_%s' % self.target
+            self.builddir = os.path.join(self.sourcedir, build_base)
+        if not os.path.isabs(self.builddir):
             self.builddir = os.path.realpath(os.path.join(self.working_dir,
                                                           self.builddir))
         self.source_files = [self.sourcedir]
         kwargs = dict(default_model_dir=self.builddir)
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
+        self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
+        self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
         for x in self.cmake_products:
             self.products.append(os.path.join(self.builddir, x))
+        model_base, model_ext = os.path.splitext(self.model_file)
+        for x in self.cmake_products_ext:
+            self.products.append(model_base + x)
+        # Add executable extension
+        if not model_ext:
+            self.model_file += self.get_tool('linker').executable_ext
+        
+    @classmethod
+    def is_source_file(cls, fname):
+        r"""Determine if the provided file name points to a source files for
+        the associated programming language by checking the extension.
+
+        Args:
+            fname (str): Path to file.
+
+        Returns:
+            bool: True if the provided file is a source file, False otherwise.
+
+        """
+        return (CModelDriver.CModelDriver.is_source_file(fname)
+                or CPPModelDriver.CPPModelDriver.is_source_file(fname))
         
     def write_wrappers(self, **kwargs):
         r"""Write any wrappers needed to compile and/or run a model.
@@ -350,11 +413,45 @@ class CMakeModelDriver(CompiledModelDriver):
         """
         out = super(CMakeModelDriver, self).write_wrappers(**kwargs)
         # Create cmake files that can be included
-        include_file = os.path.join(self.sourcedir, 'ygg_cmake.txt')
+        if self.target is None:
+            include_base = 'ygg_cmake.txt'
+        else:
+            include_base = 'ygg_cmake_%s.txt' % self.target
+        include_file = os.path.join(self.sourcedir, include_base)
         self.create_include(include_file, self.target,
                             logging_level=self.logger.getEffectiveLevel())
         assert(os.path.isfile(include_file))
         out.append(include_file)
+        # Create copy of cmakelists and modify
+        if os.path.isfile(self.cmakelists):
+            if not os.path.isfile(self.cmakelists_copy):
+                shutil.copy2(self.cmakelists, self.cmakelists_copy)
+            with open(self.cmakelists, 'rb') as fd:
+                contents = fd.read()
+            with open(self.cmakelists, 'wb') as fd:
+                # Add conda prefix as first line
+                conda_prefix = self.get_tool('compiler').get_conda_prefix()
+                if conda_prefix:
+                    newline = backwards.as_bytes('LINK_DIRECTORIES(%s)\n'
+                                                 % os.path.join(conda_prefix, 'lib'))
+                    if newline not in contents:
+                        fd.write(newline)
+                # Explicitly set Release/Debug directories to builddir on windows
+                if platform._is_win:  # pragma: windows
+                    for artifact in ['runtime', 'library', 'archive']:
+                        for conf in ['release', 'debug']:
+                            newline = backwards.as_bytes(
+                                'SET( CMAKE_%s_OUTPUT_DIRECTORY_%s '
+                                % (artifact.upper(), conf.upper())
+                                + '"${OUTPUT_DIRECTORY}")\n')
+                            if newline not in contents:
+                                fd.write(newline)
+                fd.write(contents)
+                # Add include if not already in the file
+                newline = backwards.as_bytes('\nINCLUDE(%s)\n'
+                                             % os.path.basename(include_file))
+                if newline not in contents:
+                    fd.write(newline)
         return out
 
     @classmethod
@@ -384,26 +481,41 @@ class CMakeModelDriver(CompiledModelDriver):
             compile_flags = []
         if linker_flags is None:
             linker_flags = []
+        use_library_path = True  # platform._is_win
+        library_flags = []
         compile_flags = CModelDriver.CModelDriver.get_compiler_flags(
-            flags=compile_flags, use_library_path=True, dont_link=True,
-            for_model=True, skip_defaults=True, logging_level=logging_level)
+            flags=compile_flags, use_library_path=use_library_path,
+            dont_link=True, for_model=True, skip_defaults=True,
+            logging_level=logging_level)
         linker_flags = CModelDriver.CModelDriver.get_linker_flags(
-            flags=linker_flags, use_library_path=True, for_model=True,
-            skip_defaults=True)
+            flags=linker_flags, use_library_path=use_library_path,
+            for_model=True, skip_defaults=True, use_library_path_internal=True,
+            skip_library_libs=True, library_flags=library_flags)
         lines = []
-        var_count = 0
+        preamble_lines = []
+        # Suppress warnings on windows about the security of strcpy etc.
+        if platform._is_win:  # pragma: windows
+            new_flag = "-D_CRT_SECURE_NO_WARNINGS"
+            if new_flag not in compile_flags:
+                compile_flags.append(new_flag)
+        # Compilation flags
         for x in compile_flags:
             if x.startswith('-D'):
-                lines.append('ADD_DEFINITIONS(%s)' % x)
+                preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
             elif x.startswith('-I'):
                 xdir = x.split('-I', 1)[-1]
                 if platform._is_win:  # pragma: windows
                     xdir = xdir.replace('\\', re.escape('\\'))
-                lines.append('INCLUDE_DIRECTORIES(%s)' % xdir)
+                new_dir = 'INCLUDE_DIRECTORIES(%s)' % xdir
+                if new_dir not in preamble_lines:
+                    preamble_lines.append(new_dir)
             elif x.startswith('-') or x.startswith('/'):
-                lines.append('ADD_DEFINITIONS(%s)' % x)
+                new_def = 'ADD_DEFINITIONS(%s)' % x
+                if new_def not in preamble_lines:
+                    preamble_lines.append(new_def)
             else:
                 raise ValueError("Could not parse compiler flag '%s'." % x)
+        # Linker flags
         for x in linker_flags:
             if x.startswith('-l'):
                 lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
@@ -411,37 +523,52 @@ class CMakeModelDriver(CompiledModelDriver):
                 libdir = x.split('-L')[-1]
                 if platform._is_win:  # pragma: windows
                     libdir = libdir.replace('\\', re.escape('\\'))
-                lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif x.startswith('/LIBPATH:'):  # pragma: windows
                 libdir = x.split('/LIBPATH:')[-1]
                 if '"' in libdir:
                     libdir = libdir.split('"')[1]
                 if platform._is_win:
                     libdir = libdir.replace('\\', re.escape('\\'))
-                lines.append('LINK_DIRECTORIES(%s)' % libdir)
+                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
             elif os.path.isfile(x):
-                xd, xf = os.path.split(x)
-                xl, xe = os.path.splitext(xf)
-                if xe.lower() in ['.so', '.dll', '.dylib']:
-                    lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
-                else:
-                    lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
-                lines.append('SET_TARGET_PROPERTIES(')
-                lines.append('    %s PROPERTIES' % xl)
-                # lines.append('    PROPERTIES LINKER_LANGUAGE CXX')
-                if platform._is_win:  # pragma: windows
-                    lines.append('    IMPORTED_LOCATION %s)' %
-                                 x.replace('\\', re.escape('\\')))
-                else:
-                    lines.append('    IMPORTED_LOCATION %s)' % x)
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, xl))
-                # lines.append('FIND_LIBRARY(VAR%d %s HINTS %s)' % (var_count, xf, xd))
-                # lines.append('TARGET_LINK_LIBRARIES(%s ${VAR%s})' % (target, var_count))
-                var_count += 1
+                library_flags.append(x)
             elif x.startswith('-') or x.startswith('/'):
                 raise ValueError("Could not parse linker flag '%s'." % x)
             else:
                 lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+        # Libraries
+        for x in library_flags:
+            xd, xf = os.path.split(x)
+            xl, xe = os.path.splitext(xf)
+            xl = CModelDriver.CModelDriver.get_tool('linker').libpath2libname(xf)
+            if platform._is_win:  # pragma: windows
+                x = x.replace('\\', re.escape('\\'))
+                xd = xd.replace('\\', re.escape('\\'))
+            xn = os.path.splitext(xl)[0]
+            new_dir = 'LINK_DIRECTORIES(%s)' % xd
+            if new_dir not in preamble_lines:
+                preamble_lines.append(new_dir)
+            if cls.add_libraries:  # pragma: no cover
+                # Version adding library
+                if xe.lower() in ['.so', '.dll', '.dylib']:
+                    lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
+                else:
+                    lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
+                lines += ['SET_TARGET_PROPERTIES(',
+                          '    %s PROPERTIES' % xl,
+                          # '    LINKER_LANGUAGE CXX',
+                          # '    CXX_STANDARD 11',
+                          '    IMPORTED_LOCATION %s)' % x,
+                          'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
+            else:
+                # Version finding library
+                lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
+                             % (xn.upper(), xf, xn, xd))
+                lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
+                             % (target, xn.upper()))
+        lines = preamble_lines + lines
+        logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -464,15 +591,21 @@ class CMakeModelDriver(CompiledModelDriver):
                 class's method.
 
         """
+        # Set keyword arguments based on cmake mappings/aliases
+        if dont_build is not None:
+            kwargs['dont_link'] = dont_build
         # Remove files created by cmake in overwrite so that directory should
         # be empty (and therefore removable by the parent method).
         if kwargs.get('overwrite', False):
             builddir = kwargs.get('builddir', None)
             working_dir = kwargs.get('working_dir', None)
-            rm_files = cls.cmake_products
+            rm_files = copy.deepcopy(cls.cmake_products)
             out = kwargs.get('out', None)
             if out is not None:
                 rm_files.append(out)
+                out_base = os.path.splitext(out)[0]
+                for x in cls.cmake_products_ext:
+                    rm_files.append(out_base + x)
             for x in rm_files:
                 xfile = x
                 if (not os.path.isabs(xfile)) and (builddir is not None):
@@ -481,11 +614,18 @@ class CMakeModelDriver(CompiledModelDriver):
                     xfile = os.path.join(working_dir, xfile)
                 if os.path.isfile(xfile):
                     os.remove(xfile)
-                elif os.path.isdir(xfile) and xfile.endswith('CMakeFiles'):
+                elif os.path.isdir(xfile) and (xfile.endswith('CMakeFiles')
+                                               or xfile.endswith('Debug')
+                                               or xfile.endswith('Win32')
+                                               or xfile.endswith('.dir')):
                     shutil.rmtree(xfile)
-        # Set keyword arguments based on cmake mappings/aliases
-        if dont_build is not None:
-            kwargs['dont_link'] = dont_build
+        # Add conda prefix
+        # import pprint
+        # conda_prefix = cls.get_tool('compiler').get_conda_prefix()
+        # if conda_prefix:
+        #     os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
+        #     os.environ['CMAKE_LIBRARY_PATH'] = conda_prefix
+        # pprint.pprint(os.environ)
         return super(CMakeModelDriver, cls).call_compiler(src, **kwargs)
 
     def compile_model(self, target=None, **kwargs):
@@ -503,7 +643,7 @@ class CMakeModelDriver(CompiledModelDriver):
         if target == 'clean':
             return self.call_linker(self.builddir, target=target, out=target,
                                     overwrite=True, working_dir=self.working_dir,
-                                    **kwargs)
+                                    allow_error=True, **kwargs)
         else:
             default_kwargs = dict(target=target,
                                   sourcedir=self.sourcedir,
@@ -513,10 +653,30 @@ class CMakeModelDriver(CompiledModelDriver):
                 kwargs.setdefault(k, v)
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
-    def remove_products(self):
-        r"""Delete products produced during the compilation process."""
+    def set_env(self):
+        r"""Get environment variables that should be set for the model process.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CMakeModelDriver, self).set_env()
+        out = CModelDriver.CModelDriver.update_ld_library_path(out)
+        return out
+    
+    # def remove_products(self):
+    #     r"""Delete products produced during the compilation process."""
+    #     # Clean used to be called here, but for projects with multiple targets,
+    #     # this dosn't allow for building them as separate models
+    #     super(CMakeModelDriver, self).remove_products()
+    #     if os.path.isdir(self.builddir) and (not os.listdir(self.builddir)):
+    #         os.rmdir(self.builddir)
+
+    def cleanup(self):
+        r"""Remove compile executable."""
+        if os.path.isfile(self.cmakelists_copy):
+            os.remove(self.cmakelists)
+            shutil.move(self.cmakelists_copy, self.cmakelists)
         if (self.model_file is not None) and os.path.isfile(self.model_file):
             self.compile_model('clean')
-        super(CMakeModelDriver, self).remove_products()
-        if os.path.isdir(self.builddir) and (not os.listdir(self.builddir)):
-            os.rmdir(self.builddir)
+        super(CMakeModelDriver, self).cleanup()

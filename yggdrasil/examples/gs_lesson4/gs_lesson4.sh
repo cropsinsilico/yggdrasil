@@ -27,6 +27,9 @@ case $1 in
 	echo "Running R"
 	yaml='gs_lesson4_r.yml'
 	;;
+    --cmake )
+	echo "Running CMake"
+	yaml='gs_lesson4_cmake.yml'
 esac
 
 yggrun $yaml

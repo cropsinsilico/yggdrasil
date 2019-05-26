@@ -68,6 +68,11 @@ class TestSerializeBase(YggTestClassInfo):
                               self.testing_options.get('field_names', None))
             self.assert_equal(self.instance.get_field_units(),
                               self.testing_options.get('field_units', None))
+
+    def test_concatenation(self):
+        r"""Test message concatenation."""
+        for x, y in self.testing_options.get('concatenate', []):
+            self.assert_equal(self.instance.concatenate(x), y)
         
     def test_serialize(self):
         r"""Test serialize/deserialize."""

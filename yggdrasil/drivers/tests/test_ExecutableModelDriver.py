@@ -5,6 +5,12 @@ from yggdrasil.drivers.ExecutableModelDriver import ExecutableModelDriver
 import yggdrasil.drivers.tests.test_ModelDriver as parent
 
 
+def test_execution_error():
+    r"""Test errors raised during execution of invalid command."""
+    assert_raises(RuntimeError, ExecutableModelDriver.run_executable,
+                  ['invalid'])
+
+
 def test_error_valgrind_strace():
     r"""Test error if both valgrind and strace set."""
     assert_raises(RuntimeError, ExecutableModelDriver, 'test', 'test',

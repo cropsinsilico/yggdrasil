@@ -8,21 +8,22 @@ import warnings
 import weakref
 from yggdrasil import backwards, tools, platform, serialize
 from yggdrasil.config import ygg_cfg
+from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
+from yggdrasil.tools import TimeOut, sleep
+logger = logging.getLogger(__name__)
 try:  # pragma: matlab
     disable_engine = ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
     if platform._is_win or (disable_engine == 'true'):
         _matlab_engine_installed = False
         if not tools.is_subprocess():
-            logging.info("matlab.engine disabled")
+            logger.debug("matlab.engine disabled")
     else:
         import matlab.engine
         _matlab_engine_installed = True
 except ImportError:  # pragma: no matlab
-    logging.debug("Could not import matlab.engine. "
-                  + "Matlab support for using a sharedEngine will be disabled.")
+    logger.debug("Could not import matlab.engine. "
+                 + "Matlab support for using a sharedEngine will be disabled.")
     _matlab_engine_installed = False
-from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-from yggdrasil.tools import TimeOut, sleep
 
 
 _compat_map = {
@@ -127,7 +128,7 @@ def start_matlab_engine(skip_connect=False, timeout=None):  # pragma: matlab
         T = TimeOut(timeout)
         while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0)
                and not T.is_out):
-            logging.debug('Waiting for matlab engine to start')
+            logger.debug('Waiting for matlab engine to start')
             sleep(1)  # Usually 3 seconds
     except KeyboardInterrupt:  # pragma: debug
         args = ['screen', '-X', '-S', screen_session, 'quit']
@@ -224,13 +225,13 @@ def stop_matlab_engine(screen_session, matlab_engine, matlab_session,
         T = TimeOut(5)
         while ((matlab_session in matlab.engine.find_matlab())
                and not T.is_out):
-            logging.debug("Waiting for matlab engine to exit")
+            logger.debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
             if matlab_process is not None:
                 matlab_process.terminate()
-                logging.error("stop_matlab_engine timed out at %f s. " % T.elapsed
-                              + "Killed Matlab sharedEngine process.")
+                logger.error("stop_matlab_engine timed out at %f s. " % T.elapsed
+                             + "Killed Matlab sharedEngine process.")
 
 
 class MatlabProcess(tools.YggClass):  # pragma: matlab
@@ -433,13 +434,17 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     recv_converters = {'pandas': 'array'}
     function_param = {
         'comment': '%',
+        'true': 'true',
         'indent': 2 * ' ',
+        'print': 'disp(\'{message}\');',
+        'error': 'error(\'{error_msg}\');',
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
         'while_begin': 'while ({cond})',
         'try_begin': 'try',
-        'try_except': 'catch {error_var}'}
+        'try_except': 'catch {error_var}',
+        'assign': '{name} = {value};'}
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed
@@ -499,7 +504,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if matlab_engine is None:
             lines.append("exit(0);")
         # Write lines
-        logging.debug('Wrapper:\n\t%s', '\n\t'.join(lines))
+        logger.debug('Wrapper:\n\t%s', '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -507,7 +512,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 os.remove(fname)
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
-            logging.debug("Wrote wrapper to: %s" % fname)
+            logger.debug("Wrote wrapper to: %s" % fname)
 
     @classmethod
     def run_executable(cls, args, dont_wrap_error=False, fname_wrapper=None,

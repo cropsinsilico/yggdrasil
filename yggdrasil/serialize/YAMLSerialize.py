@@ -1,5 +1,5 @@
-import yaml
-from yggdrasil.metaschema.encoder import indent_char2int
+from yggdrasil import backwards
+from yggdrasil.metaschema.encoder import encode_yaml, decode_yaml
 from yggdrasil.serialize.JSONSerialize import JSONSerialize
 
 
@@ -38,15 +38,10 @@ class YAMLSerialize(JSONSerialize):
             bytes, str: Serialized message.
 
         """
-        # Convert objects to built-in python types where possible for
-        # readable encoding
-        args = self.datatype.encode_data_readable(args, None)
-        # args = backwards.as_str(args, recurse=True, allow_pass=True)
-        # Convert character indent to an integer (tabs are 4 spaces)
-        indent = indent_char2int(self.indent)
-        out = yaml.dump(args, indent=indent, encoding=self.encoding,
-                        default_flow_style=self.default_flow_style)
-        return out
+        # Convert bytes to str because JSON cannot serialize bytes by default
+        args = backwards.as_str(args, recurse=True, allow_pass=True)
+        return encode_yaml(args, indent=self.indent, encoding=self.encoding,
+                           default_flow_style=self.default_flow_style)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -58,8 +53,7 @@ class YAMLSerialize(JSONSerialize):
             obj: Deserialized Python object.
 
         """
-        out = yaml.safe_load(msg)
-        return out
+        return decode_yaml(msg)
 
     @classmethod
     def get_testing_options(cls, **kwargs):
@@ -69,11 +63,21 @@ class YAMLSerialize(JSONSerialize):
             dict: Dictionary of variables to use for testing.
 
         """
-        iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        # iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj1 = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj2 = {'d': 'new field'}
+        # iobj3 = int(2)
+        # iobj4 = [float(2.0)]
         out = {'kwargs': {},
                'empty': {}, 'dtype': None,
                'extra_kwargs': {},
-               'objects': [iobj],
+               'objects': [iobj1, iobj2],  # , iobj3, iobj4],
                'typedef': {'type': 'object'}}
-        out['contents'] = b'a:\n- b\n- 1\n- 1.0\nc:\n    z: hello\n'
+        out['contents'] = (b'a:\n- b\n- 1\n- 1.0\n'
+                           b'c:\n    z: hello\n'
+                           b'd: new field\n')
+        # out['contents'] = (b'-   a:\n    - b\n    - 1\n    - 1.0\n'
+        #                    b'    c:\n        z: hello\n'
+        #                    b'    d: new field\n'
+        #                    b'- 2\n- 2.0\n')
         return out

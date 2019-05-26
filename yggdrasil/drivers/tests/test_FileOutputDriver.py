@@ -32,8 +32,15 @@ class TestFileOutputParam(parent.TestConnectionParam):
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileOutputParam, self).teardown()
-        if os.path.isfile(self.filepath):
+        if os.path.isfile(self.filepath):  # pragma: debug
             os.remove(self.filepath)
+
+    def remove_instance(self, inst):
+        r"""Remove an instance include the input file."""
+        filename = inst.ocomm.address
+        super(TestFileOutputParam, self).remove_instance(inst)
+        if os.path.isfile(filename):
+            os.remove(filename)
 
 
 class TestFileOutputDriverNoStart(TestFileOutputParam,
@@ -48,10 +55,26 @@ class TestFileOutputDriverNoStart(TestFileOutputParam,
     def inst_kwargs(self):
         r"""dict: Keyword arguments for creating a class instance."""
         out = super(TestFileOutputDriverNoStart, self).inst_kwargs
-        out['in_temp'] = 'True'
+        out['in_temp'] = True
         return out
 
 
+class TestFileOutputDriverNoInit(TestFileOutputParam,
+                                 parent.TestConnectionDriverNoInit):
+    r"""Test runner for FileOutputDriver without init."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestFileOutputDriverNoInit, self).__init__(*args, **kwargs)
+        self.args = os.path.basename(self.filepath)
+        
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestFileOutputDriverNoInit, self).inst_kwargs
+        out['in_temp'] = True
+        return out
+
+    
 class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     r"""Test runner for FileOutputDriver."""
 
@@ -69,14 +92,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         # self.instance._comm_opened.wait(self.timeout)
         # print(self.instance._comm_opened.is_set())
         self.send_file_contents()
-
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        filename = self.instance.ocomm.address
-        super(TestFileOutputDriver, self).teardown()
-        if os.path.isfile(filename):  # pragma: debug
-            os.remove(filename)
-
+        
     # def run_before_stop(self):
     #     r"""Commands to run while the instance is running."""
     #     self.send_file_contents()
@@ -131,7 +147,8 @@ for k in file_types:
     globals()[cls_exp.__name__] = cls_exp
     if k == 'AsciiTableComm':
         cls_exp2 = type('Test%sArrayOutputDriver' % k,
-                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+                        (cls_exp, ),
+                        {'testing_option_kws': {'array_columns': True}})
         globals()[cls_exp2.__name__] = cls_exp2
         del cls_exp2
     del cls_exp

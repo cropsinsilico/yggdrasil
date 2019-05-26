@@ -114,4 +114,5 @@ class PlySerialize(SerializeBase):
                              + b'0.0000 1.0000 1.0000\n'
                              + b'3 0 1 2\n'
                              + b'3 3 4 5\n'))
+        out['concatenate'] = [([], [])]
         return out

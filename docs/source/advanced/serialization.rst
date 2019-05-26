@@ -35,8 +35,9 @@ array       list              cell               vector_t     std::vector<void*>
 object      dict              containers.Map     map_t        std::map<char*,void*>    Support for dynamic objects in C/C++
                                                                                        is still under development.
 bool        bool              logical            bool         bool                     
-null        None              NaN                NULL         NULL                     
-========    ==============    ===============    =========    =====================    ======================================
+null        None              NaN                NULL         NULL
+Datatypes Outside the JSON Standard
+-----------------------------------------------------------------------------------------------------------------------------
 uint        numpy.uintX       uintX              uintX_t      uintX_t                  Precision X is preserved.
 complex     numpy.complexX    complex            complex_X    complex_X                Precision X is preserved.
 bytes       bytes             char (utf-8)       char*        char*                    
@@ -51,7 +52,7 @@ schema      dict              containers.Map     map_t        MetaschemaType
 ========    ==============    ===============    =========    =====================    ======================================
 
 .. todo:
-   Automate the construction of this table from driver attributes
+   Automate the construction of this table from driver attributes and encase types in ````
 
 
 Message Structure
@@ -113,10 +114,12 @@ efficiently JSON encoded.
 Scalars
 -------
 
-In addition to being limited in its representation of numbers such that
-precision can be lost during encoding/decoding, JSON also dosn't support
-complex numbers or unsigned integers as primary types. To overcome this
-limitation, |yggdrasil| passes scalar numbers by pre-encoding their raw
+As described above, precision can be lost when using JSON encoding for
+floating point numbers. In addition, there are some number types that
+JSON encoding dosn't support. More specifically, JSON encoding does not
+support complex number, unsigned integers, or explicit precision numbers
+(e.g. float32_t vs. float64_t in C). To overcome this limitation,
+|yggdrasil| passes scalar numbers by pre-encoding their raw
 bytes into an ASCII string representation using the standard 
 `base64 <https://tools.ietf.org/html/rfc3548.html>`_ encoding. To allow
 decoding and validation on receipt of encoded scalars, |yggdrasil| includes
@@ -137,14 +140,12 @@ default), |yggdrasil| also supports types of ``unicode`` and ``bytes``.
 Data identified with the ``bytes`` type will be pre-encoded as ASCII strings
 using the base64 encoding. Data identified with the ``unicode`` type will
 be pre-encoded by encoding them as bytes using UTF-32 and then encoding those
-bytes as ASCII strings using the base64 encoding.
-
-
-and ``bytes``. Data specified as either type are pre-encoded like scalars by
-using base64 to encode the raw-bytes representing the data. However, on
-receipt, messages containing data specified as ``unicode`` be decoded and
-stored in a unicode data type if one is available in the receiving language. 
-If the receiving language dosn't have a built-in unicode type (e.g. C
+bytes as ASCII strings using the base64 encoding. On receipt, messages
+of either type are decoded from base64. Messages containing data specified
+as ``unicode`` will be decoded and stored in a unicode data type if one
+is available in the receiving language. 
+If the receiving language dosn't have a built-in unicode type (e.g. C),
+the message will be preserved in the encoded UTF-32 bytes format.
 
 
 Homogeneous Arrays
@@ -156,7 +157,7 @@ send/receive data. However, as most languages provide built-in support for
 arrays that are continuous in memory, it is much more efficient to pass the 
 arrays in a continuous format. Arrays elements are encoded in the same way 
 as scalars using base64 in row-major order. On receipt, languages which are 
-column-major order must re-order the data. As is dont for scalars, 
+column-major order must re-order the data. As is done for scalars, 
 |yggdrasil| passes the data subtype, precision, and units for arrays and 
 also sends the array size 
 (for one-dimensional arrays) or array shape (for multi-dimensional arrays).

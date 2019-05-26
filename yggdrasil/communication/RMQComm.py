@@ -1,17 +1,23 @@
 from yggdrasil.communication import CommBase, AsyncComm
 from yggdrasil.config import ygg_cfg
+from yggdrasil import backwards
 import logging
+logger = logging.getLogger(__name__)
 try:
     import pika
     _rmq_installed = True
 except ImportError:
-    logging.warning("Could not import pika. "
-                    + "RabbitMQ support will be disabled.")
+    logger.warning("Could not import pika. "
+                   + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
 
 
 _rmq_param_sep = '_RMQPARAM_'
+if backwards.PY2:  # pragma: Python 2
+    
+    class BlockingIOError:
+        pass
 
 
 def check_rmq_server(url=None, **kwargs):
@@ -311,6 +317,9 @@ class RMQComm(AsyncComm.AsyncComm):
                 res = self.channel.queue_declare(queue=self.queue,
                                                  auto_delete=True,
                                                  passive=True)
+            except BlockingIOError:  # pragma: debug
+                self.sleep()
+                res = self.get_queue_result()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
                     AttributeError):  # pragma: debug

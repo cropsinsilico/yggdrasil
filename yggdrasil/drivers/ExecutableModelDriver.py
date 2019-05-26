@@ -1,34 +1,36 @@
-from yggdrasil import platform, tools
+import platform as sys_platform
+from yggdrasil import platform  # , tools
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
-if platform._is_win:  # pragma: windows
-    _os_version_flags = ['winver']
-else:
-    _os_version_flags = ['uname', '-r']
-    # _os_version_flags = ['echo $0']
+# Version flags for windows appear to cause hang so just use
+# platform module for now
+# if platform._is_win:  # pragma: windows
+#     _os_version_flags = ['winver']
+# else:
+#     _os_version_flags = ['uname', '-r']
 
 
 class ExecutableModelDriver(ModelDriver):
     r"""Class for running executable based models."""
 
     language = 'executable'
-    version_flags = _os_version_flags
+    # version_flags = _os_version_flags
     _schema_subtype_description = ('Model is an executable.')
 
     @classmethod
-    def language_executable(cls):
-        r"""Command/arguments required to compile/run a model written in this
-        language from the command line.
+    def language_version(cls, version_flags=None, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.run_executable.
 
         Returns:
-            list: Name of (or path to) compiler/interpreter executable and any
-                flags required to run the compiler/interpreter from the command
-                line.
+            str: Version of compiler/interpreter for this language.
 
         """
-        return None
-
+        return sys_platform.platform()
+        
     @classmethod
     def executable_command(cls, args, unused_kwargs=None, **kwargs):
         r"""Compose a command for running a program using the exectuable for
@@ -52,20 +54,6 @@ class ExecutableModelDriver(ModelDriver):
         return args
         
     @classmethod
-    def configure(cls, cfg):
-        r"""Add configuration options for this language.
-
-        Args:
-            cfg (CisConfigParser): Config class that options should be set for.
-        
-        Returns:
-            list: Section, option, description tuples for options that could not
-                be set.
-
-        """
-        return []
-        
-    @classmethod
     def is_language_installed(cls):
         r"""Determine if the interpreter/compiler for the associated programming
         language is installed.
@@ -76,19 +64,6 @@ class ExecutableModelDriver(ModelDriver):
         """
         return True
 
-    @classmethod
-    def is_library_installed(cls, lib):
-        r"""Determine if a dependency is installed.
-
-        Args:
-            lib (str): Name of the library that should be checked.
-
-        Returns:
-            bool: True if the library is installed, False otherwise.
-
-        """
-        return (tools.which(lib) is not None)
-        
     @classmethod
     def is_configured(cls):
         r"""Determine if the appropriate configuration has been performed (e.g.

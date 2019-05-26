@@ -109,6 +109,7 @@ class NMakeCompiler(MakeCompiler):
     platforms = ['Windows']
     default_flags = ['/NOLOGO']
     flag_options = OrderedDict([('makefile', '/f')])
+    default_linker = None  # Force linker to be initialized with the same name
 
 
 class MakeModelDriver(CompiledModelDriver):
@@ -226,6 +227,8 @@ class MakeModelDriver(CompiledModelDriver):
                 for_model=True, skip_defaults=True)
             out['YGGCCFLAGS'] = ' '.join(compile_flags)
             out['YGGLDFLAGS'] = ' '.join(linker_flags)
+        else:
+            out = CModelDriver.update_ld_library_path(out)
         return out
         
     def remove_products(self):

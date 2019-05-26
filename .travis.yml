@@ -30,6 +30,7 @@ env:
     NUMPY=numpy
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
+    JSONSCHEMA=jsonschema
     INSTALLZMQ=1
     INSTALLRMQ=0
     INSTALLAPY=0
@@ -77,16 +78,17 @@ before_install:
     if [[ -n "$CONDA" || $INSTALLLPY == '1' ]]; then
       echo Installing Python using conda...;
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then MINICONDA_OS=Linux; else MINICONDA_OS=MacOSX; fi
-      wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      # wget https://repo.anaconda.com/miniconda/Miniconda${CONDA:0:1}-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
+      wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$MINICONDA_OS-x86_64.sh -O miniconda.sh
       bash miniconda.sh -b -p $HOME/miniconda
       export PATH="$HOME/miniconda/bin:$PATH"
       hash -r
       conda config --set always_yes yes --set changeps1 no
       conda config --add channels conda-forge
       conda update -q conda
-      conda install -q conda-build
       conda create -q -n test-environment python=$CONDA
       source activate test-environment
+      conda install -q conda-build
       conda info -a
     fi
     
@@ -150,6 +152,7 @@ install:
       # May need to uninstall conda version of numpy and matplotlib on LPy test
       pip install $NUMPY
       pip install $MATPLOTLIB
+      pip install $JSONSCHEMA
       pip install nose
       pip install pytest "pytest-cov<2.6"
       pip install coverage coveralls codecov flake8
@@ -166,6 +169,7 @@ install:
       pip uninstall -y matplotlib
       conda install $NUMPY
       conda install $MATPLOTLIB
+      conda install $JSONSCHEMA
       conda install nose
       conda install pytest "pytest-cov<2.6"
       conda install coverage coveralls codecov flake8
@@ -173,7 +177,10 @@ install:
         conda install sphinx breathe sphinx_rtd_theme
       fi
       conda build recipe/meta.yaml --python $CONDA
-      conda install --use-local yggdrasil
+      conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
+      # --use-local not working in conda 4.6.14
+      # conda install --use-local yggdrasil
+      conda list
     fi
 
 script:
@@ -199,7 +206,7 @@ jobs:
     - stage: test
       os: linux
       python: 2.7
-      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 JSONSCHEMA=jsonschema==2.6.0 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
       services:
         - rabbitmq
     - os: linux

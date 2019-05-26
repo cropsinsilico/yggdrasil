@@ -5,7 +5,6 @@ import logging
 import pprint
 import os
 import sys
-import pty
 import copy
 import shutil
 import inspect
@@ -19,6 +18,7 @@ from yggdrasil import backwards
 from yggdrasil.components import import_component, ComponentBase
 
 
+logger = logging.getLogger(__name__)
 YGG_MSG_EOF = b'EOF!!!'
 YGG_MSG_BUF = 1024 * 2
 
@@ -46,26 +46,26 @@ except AttributeError:
 def check_threads():  # pragma: debug
     r"""Check for threads that are still running."""
     global _thread_registry
-    # logging.info("Checking %d threads" % len(_thread_registry))
+    # logger.info("Checking %d threads" % len(_thread_registry))
     for k, v in _thread_registry.items():
         if v.is_alive():
-            logging.error("Thread is alive: %s" % k)
+            logger.error("Thread is alive: %s" % k)
     if threading.active_count() > 1:
-        logging.info("%d threads running" % threading.active_count())
+        logger.info("%d threads running" % threading.active_count())
         for t in threading.enumerate():
-            logging.info("%s thread running" % t.name)
+            logger.info("%s thread running" % t.name)
 
 
 def check_locks():  # pragma: debug
     r"""Check for locks in lock registry that are locked."""
     global _lock_registry
-    # logging.info("Checking %d locks" % len(_lock_registry))
+    # logger.info("Checking %d locks" % len(_lock_registry))
     for k, v in _lock_registry.items():
         res = v.acquire(False)
         if res:
             v.release()
         else:
-            logging.error("Lock could not be acquired: %s" % k)
+            logger.error("Lock could not be acquired: %s" % k)
 
 
 def check_sockets():  # pragma: debug
@@ -73,7 +73,25 @@ def check_sockets():  # pragma: debug
     from yggdrasil.communication import cleanup_comms
     count = cleanup_comms('ZMQComm')
     if count > 0:
-        logging.info("%d sockets closed." % count)
+        logger.info("%d sockets closed." % count)
+
+
+def check_environ_bool(name, valid_values=['true', '1', True, 1]):
+    r"""Check to see if a boolean environment variable is set to True.
+
+    Args:
+        name (str): Name of environment variable to check.
+        valid_values (list, optional): Values for the environment variable
+            that indicate it is True. These should all be lower case as
+            the lower case version of the variable contents will be compared
+            to the list. Defaults to ['true', '1'].
+
+    Returns:
+        bool: True if the environment variables is set and is one of the
+            list valid_values (after being transformed to lower case).
+
+    """
+    return (os.environ.get(name, '').lower() in valid_values)
 
 
 def get_subprocess_language():
@@ -104,7 +122,7 @@ def is_subprocess():
             otherwise.
 
     """
-    return (os.environ.get('YGG_SUBPROCESS', 'false').lower() == 'true')
+    return check_environ_bool('YGG_SUBPROCESS')
 
 
 def ygg_atexit():  # pragma: debug
@@ -322,8 +340,10 @@ def get_default_comm():
             _default_comm = max(tally)
             if tally[_default_comm] == 0:  # pragma: debug
                 raise Exception('Could not locate an installed comm.')
-    if _default_comm == 'RMQComm':  # pragma: debug
-        raise NotImplementedError('RMQComm cannot be the default comm because '
+    if _default_comm.endswith('Comm'):
+        _default_comm = import_component('comm', _default_comm)._commtype
+    if _default_comm == 'rmq':  # pragma: debug
+        raise NotImplementedError('RMQ cannot be the default comm because '
                                   + 'there is not an RMQ C interface.')
     return _default_comm
 
@@ -342,7 +362,7 @@ def get_YGG_MSG_MAX(comm_type=None):
     """
     if comm_type is None:
         comm_type = get_default_comm()
-    if comm_type == 'IPCComm':
+    if comm_type in ['ipc', 'IPCComm']:
         # OS X limit is 2kb
         out = 1024 * 2
     else:
@@ -481,7 +501,8 @@ class YggPopen(subprocess.Popen):
                 kwargs.setdefault('creationflags',
                                   subprocess.CREATE_NEW_PROCESS_GROUP)
             else:
-                if for_matlab:
+                if for_matlab:  # pragma: matlab
+                    import pty
                     # Matlab requires a tty so a pty is used here to allow
                     # the process to be lanched in a new process group.
                     # Related Materials:
@@ -543,8 +564,8 @@ def print_encoded(msg, *args, **kwargs):
     try:
         print(backwards.as_unicode(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
-        logging.debug("sys.stdout.encoding = %s, cannot print unicode",
-                      sys.stdout.encoding)
+        logger.debug("sys.stdout.encoding = %s, cannot print unicode",
+                     sys.stdout.encoding)
         kwargs.pop('end', None)
         try:
             print(msg, *args, **kwargs)
@@ -592,7 +613,7 @@ class TimeOut(object):
 #     r"""Decorator for marking functions that should only be called once."""
 #     def wrapper(*args, **kwargs):
 #         if getattr(func, '_single_use_method_called', False):
-#             logging.info("METHOD %s ALREADY CALLED" % func)
+#             logger.info("METHOD %s ALREADY CALLED" % func)
 #             return
 #         else:
 #             func._single_use_method_called = True
@@ -687,18 +708,16 @@ class YggClass(ComponentBase, logging.LoggerAdapter):
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
-        from yggdrasil.config import ygg_cfg, cfg_logging
-        self._old_loglevel = ygg_cfg.get('debug', 'ygg')
-        ygg_cfg.set('debug', 'ygg', 'DEBUG')
-        cfg_logging()
+        self.info("Setting debug_log")
+        from yggdrasil.config import get_ygg_loglevel, set_ygg_loglevel
+        self._old_loglevel = get_ygg_loglevel()
+        set_ygg_loglevel('DEBUG')
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
-        from yggdrasil.config import ygg_cfg, cfg_logging
+        from yggdrasil.config import set_ygg_loglevel
         if self._old_loglevel is not None:
-            ygg_cfg.set('debug', 'ygg', self._old_loglevel)
-            cfg_logging()
-            self._old_loglevel = None
+            set_ygg_loglevel(self._old_loglevel)
 
     def pprint(self, obj, block_indent=0, indent_str='    ', **kwargs):
         r"""Use pprint to represent an object as a string.
@@ -1011,6 +1030,9 @@ class YggThread(threading.Thread, YggClass):
         global _lock_registry
         if kwargs is None:
             kwargs = {}
+        if (target is not None) and ('target' in self._schema_properties):
+            ygg_kwargs['target'] = target
+            target = None
         thread_kwargs = dict(name=name, target=target, group=group,
                              args=args, kwargs=kwargs)
         super(YggThread, self).__init__(**thread_kwargs)
