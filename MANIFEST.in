@@ -27,3 +27,4 @@ include versioneer.py
 include yggdrasil/_version.py
 include install_matlab_engine.py
 include create_coveragerc.py
+include install_R_interface.py
