@@ -18,6 +18,7 @@ class PythonModelDriver(InterpretedModelDriver):
     language_ext = '.py'
     default_interpreter = sys.executable
     interface_library = 'yggdrasil.interface.YggInterface'
+    # supported_comms = ['ipc', 'zmq', 'rmq']
     supported_comms = tools.get_supported_comm()
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux'],

@@ -221,7 +221,10 @@ def encode_yaml(obj, fd=None, indent=None,
                 yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
                 data.items())
 
-        OrderedDumper.add_representer(sorted_dict_type, _dict_representer)
+        if not isinstance(sorted_dict_type, list):
+            sorted_dict_type = [sorted_dict_type]
+        for x in sorted_dict_type:
+            OrderedDumper.add_representer(x, _dict_representer)
         kwargs['Dumper'] = OrderedDumper
     return yaml.dump(encode_data_readable(obj), **kwargs)
 

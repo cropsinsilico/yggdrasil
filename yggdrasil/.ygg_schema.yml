@@ -67,22 +67,11 @@ definitions:
           type: function
       required:
       - datatype
-      - commtype
       - name
+      - commtype
       title: comm_base
       type: object
     - anyOf:
-      - additionalProperties: true
-        description: Schema for comm component ['ipc'] subtype.
-        properties:
-          commtype:
-            default: default
-            description: Interprocess communication (IPC) queue.
-            enum:
-            - ipc
-            type: string
-        title: IPCComm
-        type: object
       - additionalProperties: true
         description: Schema for comm component ['rmq'] subtype.
         properties:
@@ -106,15 +95,15 @@ definitions:
         title: RMQAsyncComm
         type: object
       - additionalProperties: true
-        description: Schema for comm component ['zmq'] subtype.
+        description: Schema for comm component ['ipc'] subtype.
         properties:
           commtype:
             default: default
-            description: ZeroMQ socket.
+            description: Interprocess communication (IPC) queue.
             enum:
-            - zmq
+            - ipc
             type: string
-        title: ZMQComm
+        title: IPCComm
         type: object
       - additionalProperties: true
         description: Schema for comm component ['default'] subtype.
@@ -126,6 +115,17 @@ definitions:
             - default
             type: string
         title: DefaultComm
+        type: object
+      - additionalProperties: true
+        description: Schema for comm component ['zmq'] subtype.
+        properties:
+          commtype:
+            default: default
+            description: ZeroMQ socket.
+            enum:
+            - zmq
+            type: string
+        title: ZMQComm
         type: object
     description: Schema for comm components.
     title: comm
@@ -498,8 +498,8 @@ definitions:
           type: string
       required:
       - filetype
-      - working_dir
       - name
+      - working_dir
       title: file_base
       type: object
     - anyOf:
@@ -1117,38 +1117,6 @@ definitions:
         title: MatlabModelDriver
         type: object
       - additionalProperties: true
-        description: Schema for model component ['python'] subtype.
-        properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
-            type: string
-          interpreter_flags:
-            default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in Python.
-            enum:
-            - python
-            type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: PythonModelDriver
-        type: object
-      - additionalProperties: true
         description: Schema for model component ['c'] subtype.
         properties:
           compiler:
@@ -1196,56 +1164,6 @@ definitions:
               type: string
             type: array
         title: CModelDriver
-        type: object
-      - additionalProperties: true
-        description: Schema for model component ['c++', 'cpp'] subtype.
-        properties:
-          compiler:
-            description: Command or path to executable that should be used to compile
-              the model. If not provided, the compiler will be determined based on
-              configuration options for the language (if present) and the registered
-              compilers that are available on the current operating system.
-            type: string
-          compiler_flags:
-            default: []
-            description: Flags that should be passed to the compiler during compilation.
-              If nto provided, the compiler flags will be determined based on configuration
-              options for the language (if present), the compiler defaults, and the
-              default_compiler_flags class attribute.
-            items:
-              type: string
-            type: array
-          language:
-            default: executable
-            description: Model is written in C++.
-            enum:
-            - c++
-            - cpp
-            type: string
-          linker:
-            description: Command or path to executable that should be used to link
-              the model. If not provided, the linker will be determined based on configuration
-              options for the language (if present) and the registered linkers that
-              are available on the current operating system
-            type: string
-          linker_flags:
-            default: []
-            description: Flags that should be passed to the linker during compilation.
-              If nto provided, the linker flags will be determined based on configuration
-              options for the language (if present), the linker defaults, and the
-              default_linker_flags class attribute.
-            items:
-              type: string
-            type: array
-          source_files:
-            default: []
-            description: Source files that should be compiled into an executable.
-              Defaults to an empty list and the driver will search for a source file
-              based on the model executable (the first model argument).
-            items:
-              type: string
-            type: array
-        title: CPPModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['make'] subtype.
@@ -1311,36 +1229,54 @@ definitions:
         title: MakeModelDriver
         type: object
       - additionalProperties: true
-        description: Schema for model component ['lpy'] subtype.
+        description: Schema for model component ['c++', 'cpp'] subtype.
         properties:
-          interpreter:
-            description: Name or path of interpreter executable that should be used
-              to run the model. If not provided, the interpreter will be determined
-              based on configuration options for the language (if present) and the
-              default_interpreter class attribute.
+          compiler:
+            description: Command or path to executable that should be used to compile
+              the model. If not provided, the compiler will be determined based on
+              configuration options for the language (if present) and the registered
+              compilers that are available on the current operating system.
             type: string
-          interpreter_flags:
+          compiler_flags:
             default: []
-            description: Flags that should be passed to the interpreter when running
-              the model. If not provided, the flags are determined based on configuration
-              options for the language (if present) and the default_interpreter_flags
-              class attribute.
+            description: Flags that should be passed to the compiler during compilation.
+              If nto provided, the compiler flags will be determined based on configuration
+              options for the language (if present), the compiler defaults, and the
+              default_compiler_flags class attribute.
             items:
               type: string
             type: array
           language:
             default: executable
-            description: Model is an LPy system.
+            description: Model is written in C++.
             enum:
-            - lpy
+            - c++
+            - cpp
             type: string
-          skip_interpreter:
-            default: false
-            description: If True, no interpreter will be added to the arguments. This
-              should only be used for subclasses that will not be invoking the model
-              via the command line. Defaults to False.
-            type: boolean
-        title: LPyModelDriver
+          linker:
+            description: Command or path to executable that should be used to link
+              the model. If not provided, the linker will be determined based on configuration
+              options for the language (if present) and the registered linkers that
+              are available on the current operating system
+            type: string
+          linker_flags:
+            default: []
+            description: Flags that should be passed to the linker during compilation.
+              If nto provided, the linker flags will be determined based on configuration
+              options for the language (if present), the linker defaults, and the
+              default_linker_flags class attribute.
+            items:
+              type: string
+            type: array
+          source_files:
+            default: []
+            description: Source files that should be compiled into an executable.
+              Defaults to an empty list and the driver will search for a source file
+              based on the model executable (the first model argument).
+            items:
+              type: string
+            type: array
+        title: CPPModelDriver
         type: object
       - additionalProperties: true
         description: Schema for model component ['cmake'] subtype.
@@ -1414,6 +1350,70 @@ definitions:
             - executable
             type: string
         title: ExecutableModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['python'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is written in Python.
+            enum:
+            - python
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: PythonModelDriver
+        type: object
+      - additionalProperties: true
+        description: Schema for model component ['lpy'] subtype.
+        properties:
+          interpreter:
+            description: Name or path of interpreter executable that should be used
+              to run the model. If not provided, the interpreter will be determined
+              based on configuration options for the language (if present) and the
+              default_interpreter class attribute.
+            type: string
+          interpreter_flags:
+            default: []
+            description: Flags that should be passed to the interpreter when running
+              the model. If not provided, the flags are determined based on configuration
+              options for the language (if present) and the default_interpreter_flags
+              class attribute.
+            items:
+              type: string
+            type: array
+          language:
+            default: executable
+            description: Model is an LPy system.
+            enum:
+            - lpy
+            type: string
+          skip_interpreter:
+            default: false
+            description: If True, no interpreter will be added to the arguments. This
+              should only be used for subclasses that will not be invoking the model
+              via the command line. Defaults to False.
+            type: boolean
+        title: LPyModelDriver
         type: object
     description: Schema for model components.
     title: model
@@ -1796,14 +1796,14 @@ definitions:
     title: serializer
 description: Schema for yggdrasil YAML input files.
 properties:
-  connections:
-    items:
-      $ref: '#/definitions/connection'
-    type: array
   models:
     items:
       $ref: '#/definitions/model'
     minItems: 1
+    type: array
+  connections:
+    items:
+      $ref: '#/definitions/connection'
     type: array
 required:
 - models

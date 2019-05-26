@@ -52,7 +52,7 @@ def ordered_dump(data, **kwargs):
         str: YAML document representating data.
 
     """
-    kwargs['sorted_dict_type'] = SchemaDict
+    kwargs['sorted_dict_type'] = [SchemaDict, OrderedDict]
     return metaschema.encoder.encode_yaml(data, **kwargs)
 
 

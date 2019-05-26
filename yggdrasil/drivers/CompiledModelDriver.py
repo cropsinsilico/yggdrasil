@@ -1782,8 +1782,9 @@ class CompiledModelDriver(ModelDriver):
         out = copy.deepcopy(cls.internal_libraries.get(cls.interface_library, {}).get(
             'external_dependencies', []))
         if (not no_comm_libs) and (cls.language is not None):
-            for x in tools.get_installed_comm(language=cls.language):
-                out += cls.supported_comm_options.get(x, {}).get('libraries', [])
+            for k, v in cls.supported_comm_options.items():
+                if ('libraries' in v) and cls.is_comm_installed(k):
+                    out += v['libraries']
         return out
 
     @classmethod
@@ -2324,10 +2325,11 @@ class CompiledModelDriver(ModelDriver):
 
         """
         out = super(CompiledModelDriver, cls).is_configured()
-        for k in cls.get_external_libraries():
-            if not out:
-                break
-            out = cls.is_library_installed(k)
+        if out:
+            for k in cls.get_external_libraries():
+                if not out:
+                    break
+                out = cls.is_library_installed(k)
         return out
 
     @classmethod
