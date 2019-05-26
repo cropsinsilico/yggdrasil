@@ -53,6 +53,11 @@ def create_metaschema(overwrite=False):
         raise RuntimeError("Metaschema file already exists.")
     out = copy.deepcopy(_base_validator.META_SCHEMA)
     out['title'] = "Ygg meta-schema for data type schemas"
+    # Lower versions have a differing draft4
+    if _jsonschema_ver_maj < 3:
+        for x in ['minItems', 'uniqueItems']:
+            if x in out['properties']['enum']:
+                del out['properties']['enum'][x]
     # TODO: Replace schema with a link to the metaschema in the documentation
     # del out['$schema']
     # Add properties
