@@ -10,7 +10,6 @@ from yggdrasil import metaschema, backwards
 _schema_fname = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '.ygg_schema.yml'))
 _schema = None
-_registry_complete = False
 
 
 class SchemaDict(OrderedDict):
@@ -56,21 +55,6 @@ def ordered_dump(data, **kwargs):
     return metaschema.encoder.encode_yaml(data, **kwargs)
 
 
-def init_registry():
-    r"""Initialize the registries and schema."""
-    global _registry_complete
-    if not _registry_complete:
-        # Connection & file component import will be needed if they are
-        # moved to other directories
-        from yggdrasil.components import import_all_components
-        import_all_components('serializer')
-        import_all_components('model')
-        # import_all_components('connection')
-        import_all_components('comm')
-        # import_all_components('file')
-        _registry_complete = True
-
-
 def clear_schema():
     r"""Clear global schema."""
     global _schema
@@ -86,9 +70,8 @@ def init_schema(fname=None):
 
 def create_schema():
     r"""Create a new schema from the registry."""
-    from yggdrasil.components import _registry
-    init_registry()
-    x = SchemaRegistry(_registry)
+    from yggdrasil.components import init_registry
+    x = SchemaRegistry(init_registry())
     return x
 
 
