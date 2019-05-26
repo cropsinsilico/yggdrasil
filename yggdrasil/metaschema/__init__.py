@@ -17,7 +17,7 @@ _metaschema_fname = os.path.abspath(os.path.join(
     os.path.dirname(yggdrasil.__file__), _metaschema_fbase))
 _metaschema = None
 _validator = None
-_base_schema = {"$schema": ""}
+_base_schema = {u'$schema': u'http://json-schema.org/draft-04/schema'}
 
 
 if os.path.isfile(_metaschema_fname):
@@ -53,6 +53,11 @@ def create_metaschema(overwrite=False):
         raise RuntimeError("Metaschema file already exists.")
     out = copy.deepcopy(_base_validator.META_SCHEMA)
     out['title'] = "Ygg meta-schema for data type schemas"
+    # Lower versions have a differing draft4
+    if _jsonschema_ver_maj < 3:
+        for x in ['minItems', 'uniqueItems']:
+            if x in out['properties']['enum']:
+                del out['properties']['enum'][x]
     # TODO: Replace schema with a link to the metaschema in the documentation
     # del out['$schema']
     # Add properties
