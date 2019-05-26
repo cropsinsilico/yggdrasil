@@ -12,6 +12,7 @@ from yggdrasil import backwards
 _registry = {}
 _registry_defaults = {}
 _registry_class2subtype = {}
+_registry_complete = False
 _comptype2key = {'comm': 'commtype',
                  'file': 'filetype',
                  'model': 'language',
@@ -26,14 +27,62 @@ _comptype2mod = {'comm': 'communication',
                  'serializer': 'serialize'}
 
 
-def clear_registry():
-    r"""Reset registries."""
+def init_registry():
+    r"""Initialize the registries and schema."""
+    global _registry
+    global _registry_complete
+    if not _registry_complete:
+        # Connection & file component import will be needed if they are
+        # moved to other directories
+        import_all_components('serializer')
+        import_all_components('model')
+        # import_all_components('connection')
+        import_all_components('comm')
+        # import_all_components('file')
+        _registry_complete = True
+    return _registry
+
+
+# This dosn't work as desried because classes that have already been imported
+# will not call registration on second import
+# def clear_registry():
+#     r"""Reset registries."""
+#     global _registry
+#     global _registry_defaults
+#     global _registry_class2subtype
+#     global _registry_complete
+#     _registry = {}
+#     _registry_defaults = {}
+#     _registry_class2subtype = {}
+#     _registry_complete = False
+
+    
+def suspend_registry():
+    r"""Suspend the registry by storing the global registries in a dictionary."""
     global _registry
     global _registry_defaults
     global _registry_class2subtype
+    global _registry_complete
+    out = {'_registry': _registry, '_registry_defaults': _registry_defaults,
+           '_registry_class2subtype': _registry_class2subtype,
+           '_registry_complete': _registry_complete}
     _registry = {}
     _registry_defaults = {}
     _registry_class2subtype = {}
+    _registry_complete = False
+    return out
+
+
+def restore_registry(reg_dict):
+    r"""Restore the registry to values in the provided dictionary."""
+    global _registry
+    global _registry_defaults
+    global _registry_class2subtype
+    global _registry_complete
+    _registry = reg_dict['_registry']
+    _registry_defaults = reg_dict['_registry_defaults']
+    _registry_class2subtype = reg_dict['_registry_class2subtype']
+    _registry_complete = reg_dict['_registry_complete']
     
 
 def docs2args(docs):
