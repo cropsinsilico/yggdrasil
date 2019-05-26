@@ -1,4 +1,5 @@
-|PyPI version| |Build Status| |Build status| |codecov| |PEP8| |platform| |license|
+|tag version| |PyPI version| |Travis Build Status| |Appveyor Build status| 
+|codecov| |PEP8| |license| |platform|
 
 The CiS framework, yggdrasil, provides support for combining scientific models
 written in different programming languages. To combine two models,
@@ -27,18 +28,19 @@ it.
    can be installed from PyPI `here <https://pypi.org/project/cis-interface/>`__,
    cis_interface will no longer be updated.
 
+.. |tag version| image:: https://img.shields.io/github/tag-date/cropsinsilico/yggdrasil.svg?style=flat-square
 .. |PyPI version| image:: https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat-square
    :target: https://pypi.org/project/yggdrasil-framework
-.. |Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil/master.svg?style=flat-square
+.. |Travis Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil/master.svg?style=flat-square
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
-.. |Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square
+.. |Appveyor Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square
    :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/master
 ..
    .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
       :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
 .. |codecov| image:: https://img.shields.io/codecov/c/github/cropsinsilico/yggdrasil/master.svg?style=flat-square
    :target: https://codecov.io/gh/cropsinsilico/yggdrasil
-.. |PEP8| image:: https://img.shields.io/badge/code%20style-pep8-orange.svg
+.. |PEP8| image:: https://img.shields.io/badge/code%20style-pep8-blue.svg?style=flat-square
    :target: https://www.python.org/dev/peps/pep-0008/
 .. |platform| image:: https://img.shields.io/conda/pn/conda-forge/yggdrasil.svg?color=magenta&label=conda%20platforms&style=flat-square
    :target: https://anaconda.org/conda-forge/yggdrasil

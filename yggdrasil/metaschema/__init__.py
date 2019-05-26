@@ -17,7 +17,7 @@ _metaschema_fname = os.path.abspath(os.path.join(
     os.path.dirname(yggdrasil.__file__), _metaschema_fbase))
 _metaschema = None
 _validator = None
-_base_schema = {"$schema": ""}
+_base_schema = {u'$schema': u'http://json-schema.org/draft-04/schema'}
 
 
 if os.path.isfile(_metaschema_fname):
