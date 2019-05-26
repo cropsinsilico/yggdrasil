@@ -1,4 +1,5 @@
 import os
+import pprint
 import numpy as np
 import shutil
 import tempfile
@@ -101,7 +102,12 @@ def test_get_metaschema():
                            "installation of jsonschema is up to date.") % (
                                new_id, old_id))
         else:
-            assert_equal(new_metaschema, old_metaschema)
+            try:
+                assert_equal(new_metaschema, old_metaschema)
+            except AssertionError:  # pragma: debug
+                print("Old:\n%s" % pprint.pformat(old_metaschema))
+                print("New:\n%s" % pprint.pformat(new_metaschema))
+                raise
     except BaseException:  # pragma: debug
         shutil.move(temp, metaschema._metaschema_fname)
         raise
