@@ -252,7 +252,11 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         r"""Test executable_command."""
         self.assert_raises(ValueError, self.instance.executable_command, ['test'],
                            exec_type='invalid')
-        self.instance.executable_command(['test'], exec_type='linker')
+        if self.import_cls.get_tool('compiler').no_separate_linking:
+            self.assert_raises(RuntimeError, self.instance.executable_command,
+                               ['test'], exec_type='linker')
+        else:
+            self.instance.executable_command(['test'], exec_type='linker')
 
     def test_compiler_call(self):
         r"""Test compiler call."""
