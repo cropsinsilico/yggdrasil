@@ -46,7 +46,8 @@ class TestMakeModelParam(parent.TestCompiledModelParam):
         self.makefile = os.path.join(self.makedir, 'Makefile')
         self.args = [self.target]
         self._inst_kwargs['makefile'] = self.makefile
-        del self._inst_kwargs['source_files']
+        if 'source_files' in self._inst_kwargs:
+            del self._inst_kwargs['source_files']
         
 
 class TestMakeModelDriverNoStart(TestMakeModelParam,
