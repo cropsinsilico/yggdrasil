@@ -196,7 +196,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         dep_list = (list(self.instance.external_libraries.keys())
                     + list(self.instance.internal_libraries.keys()))
         for dep in dep_list:
-            self.instance.get_dependency_source(dep)
+            self.instance.get_dependency_source(dep, default='default')
         self.assert_raises(ValueError, self.instance.get_dependency_source,
                            'invalid')
         self.assert_equal(self.instance.get_dependency_source(__file__), __file__)
