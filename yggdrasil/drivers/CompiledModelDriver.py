@@ -742,7 +742,7 @@ class CompilationToolBase(object):
                 logger.debug(' '.join(cmd) + '\n' + output)
             except UnicodeDecodeError as e:
                 print(e)
-                tools.print_encoded(' '.join(cmd) + '\n' + output)
+                tools.print_encoded(output)
                 # cmd_out = backwards.as_bytes(' '.join(cmd))
                 # out = backwards.as_bytes(output)
                 # logger.debug(cmd_out + b'\n' + out)
