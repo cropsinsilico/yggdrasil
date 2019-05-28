@@ -370,10 +370,8 @@ class ComponentMeta(type):
             global _registry_class2subtype
             yaml_typ = cls._schema_type
             default_subtype = cls._schema_properties.get(
-                cls._schema_subtype_key, {}).get('default', None)
+                cls._schema_subtype_key, {}).get('default', subtype)
             if yaml_typ not in _registry:
-                if default_subtype is None:
-                    default_subtype = subtype
                 _registry[yaml_typ] = OrderedDict()
                 _registry_defaults[yaml_typ] = default_subtype
                 _registry_class2subtype[yaml_typ] = {}

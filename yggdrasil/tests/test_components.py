@@ -4,7 +4,6 @@ from yggdrasil import components
 
 def test_import_component():
     r"""Test dynamic import of component."""
-    out = components.suspend_registry()
     # Test use of default
     components.import_component('serializer')
     components.import_component('serializer')
@@ -16,6 +15,10 @@ def test_import_component():
     # Test access to file through comm (including error)
     components.import_component('comm', 'pickle')
     assert_raises(ValueError, components.import_component, 'comm', 'invalid')
+    # Tests with registry suspended
+    out = components.suspend_registry()
+    components.import_component('serializer')
+    components.import_component('serializer', 'direct')
     components.restore_registry(out)
 
 
