@@ -118,6 +118,8 @@ class CompilationToolMeta(type):
         cls = type.__new__(meta, name, bases, class_dict)
         if not name.endswith('Base'):
             cls.before_registration(cls)
+            if cls._dont_register:
+                return cls
             assert(cls.name is not None)
             assert(len(cls.languages) > 0)
             reg = get_compilation_tool_registry(cls.tooltype)
@@ -202,6 +204,7 @@ class CompilationToolBase(object):
 
     """
 
+    _dont_register = False
     name = None
     aliases = []
     tooltype = None
@@ -247,10 +250,8 @@ class CompilationToolBase(object):
             env = getattr(cls, '%s_env' % k, None)
             if env is not None:
                 if k in ['default_flags']:
-                    old_val = getattr(cls, k)
-                    new_val = os.environ.get(env, '').split()
-                    for v in new_val:
-                        old_val.append(v)
+                    old_val = getattr(cls, k, [])
+                    old_val += os.environ.get(env, '').split()
                 else:
                     setattr(cls, k, os.environ.get(env, getattr(cls, k)))
         # Set default_executable to name
@@ -273,7 +274,7 @@ class CompilationToolBase(object):
         if cls._language_ext is None:
             cls._language_ext = []
             for x in cls.languages:
-                new_ext = import_component('model', x).language_ext
+                new_ext = import_component('model', x).get_language_ext()
                 if new_ext is not None:
                     cls._language_ext += new_ext
         return cls._language_ext
@@ -301,12 +302,6 @@ class CompilationToolBase(object):
                 additional details.
             value (object): Value that should be set in the flag. If a list,
                 multiple flags are added, one for each item in the list.
-            prefix_value (object, optional): Value/flag that should be added to
-                the list before the values. If a list, this must be the same
-                length as value (i.e. one prefix per value).
-            suffix_value (object, optional): Value/flag that should be added to
-                the list after the values. If a list, this must be the same
-                length as value (i.e. one suffix per value).
             prepend (bool, optional): If True, new flags are prepended to the
                 front of the list rather than the end. Defaults to False. This
                 keyword argument is ignoerd if position is provided.
@@ -335,22 +330,9 @@ class CompilationToolBase(object):
                 if k != 'key':
                     kwargs.setdefault(k, v)
             key = key['key']
-        # Get prefixes & suffixes
-        prefix_value = kwargs.pop('prefix_value', None)
-        suffix_value = kwargs.pop('suffix_value', None)
         # Loop over list
         if isinstance(value, list):
-            if prefix_value:
-                assert(isinstance(prefix_value, list))
-                assert(len(prefix_value) == len(value))
-            if suffix_value:
-                assert(isinstance(suffix_value, list))
-                assert(len(suffix_value) == len(value))
             for i, v in enumerate(value):
-                if prefix_value:
-                    kwargs['prefix_value'] = prefix_value[i]
-                if suffix_value:
-                    kwargs['suffix_value'] = suffix_value[i]
                 cls.append_flags(out, key, v, **kwargs)
             return
         # Unpack keyword arguments
@@ -361,16 +343,6 @@ class CompilationToolBase(object):
             raise ValueError("Unexpected keyword arguments: %s" % kwargs)
         # Create flags and check for duplicates
         new_flags = cls.create_flag(key, value)
-        if prefix_value:
-            if isinstance(prefix_value, list):
-                new_flags = prefix_value + new_flags
-            else:
-                new_flags.insert(0, prefix_value)
-        if suffix_value:
-            if isinstance(suffix_value, list):
-                new_flags += suffix_value
-            else:
-                new_flags.append(suffix_value)
         if no_duplicates:
             for o in out:
                 if scanf.scanf(key, o):
@@ -409,7 +381,7 @@ class CompilationToolBase(object):
             list: Items representing the flag.
 
         """
-        if key in cls.flag_options:
+        if (not isinstance(key, dict)) and (key in cls.flag_options):
             key = cls.flag_options[key]
         if isinstance(key, dict):
             key = key['key']
@@ -736,6 +708,7 @@ class CompilationToolBase(object):
         # Run command
         output = ''
         try:
+            logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = backwards.as_str(output)
@@ -844,8 +817,6 @@ class CompilerBase(CompilationToolBase):
         checking environment variables for default settings.
         """
         CompilationToolBase.before_registration(cls)
-        if cls.name is None:
-            return
         if platform._is_win:  # pragma: windows
             cls.object_ext = '.obj'
         if cls.no_separate_linking:
@@ -912,32 +883,21 @@ class CompilerBase(CompilationToolBase):
         return out
 
     @classmethod
-    def get_library_tool(cls, build_library=None, libtype=None, **kwargs):
+    def get_library_tool(cls, libtype=None, **kwargs):
         r"""Determine the tool that should be used based on the provided
         arguments.
 
         Args:
-            build_library (bool, optional): If True, the linker/archiver for
-                building the library type specified by libtype will be returned.
-                If False, the linker will be returned for creating an executable.
-                Defaults to None and is only set to True if libtype is 'static'
-                or 'shared'.
             libtype (str, optional): Library type that should be created by the
                 linker/archiver. If 'static', the archiver is returned. If
                 'shared' or any other value, the linker is returned. Defaults to
-                None and is set to _default_libtype if build_library is True.
+                None.
+            **kwargs: Additional keyword arguments are ignored.
 
         Returns:
             CompilationToolBase: Linker/archiver that should be used.
 
         """
-        if build_library is None:
-            if libtype in ['static', 'shared']:
-                build_library = True
-            else:
-                build_library = False
-        if (libtype is None) and build_library:
-            libtype = _default_libtype
         if libtype == 'static':
             tool = cls.archiver()
         else:
@@ -1046,12 +1006,6 @@ class CompilerBase(CompilationToolBase):
             str: Full path to file that will be produced.
 
         """
-        # Set dont_link based on libtype
-        if dont_link is None:
-            if libtype == 'object':
-                dont_link = True
-            else:
-                dont_link = False
         # Get intermediate file
         if cls.no_separate_linking:
             obj = src
@@ -1059,7 +1013,7 @@ class CompilerBase(CompilationToolBase):
             if isinstance(src, list):
                 obj = []
                 for isrc in src:
-                    obj.append(cls.get_output_file(dont_link=True,
+                    obj.append(cls.get_output_file(isrc, dont_link=True,
                                                    working_dir=working_dir,
                                                    no_src_ext=no_src_ext,
                                                    libtype=libtype, **kwargs))
@@ -1124,7 +1078,9 @@ class CompilerBase(CompilationToolBase):
             else:
                 dont_link = False
         # Get appropriate tool
-        tool = cls.get_library_tool(libtype=libtype, **kwargs)
+        tool = None
+        if not dont_link:
+            tool = cls.get_library_tool(libtype=libtype, **kwargs)
         # Handle list of sources
         if (not skip_flags) and isinstance(args, list) and (len(args) > 1):
             if dont_link:
@@ -1142,6 +1098,8 @@ class CompilerBase(CompilationToolBase):
             kwargs_link = {}
             if not dont_link:
                 kwargs_link = tool.extract_kwargs(kwargs)
+            else:
+                kwargs.pop('linker_language', None)
             obj_list = []
             for isrc, iout in zip(args, out_comp):
                 iobj = cls.call(isrc, out=iout, dont_link=True, **kwargs)
@@ -1155,6 +1113,7 @@ class CompilerBase(CompilationToolBase):
         if skip_flags or dont_link:
             if not skip_flags:
                 kwargs['dont_link'] = dont_link
+            kwargs.pop('linker_language', None)
             return super(CompilerBase, cls).call(args, skip_flags=skip_flags,
                                                  out=out, **kwargs)
         else:
@@ -1203,8 +1162,6 @@ class LinkerBase(CompilationToolBase):
         checking environment variables for default settings.
         """
         CompilationToolBase.before_registration(cls)
-        if cls.name is None:
-            return
         if platform._is_win:  # pragma: windows
             # TODO: Use 'cyg' prefix on cygwin?
             cls.library_prefix = ''
@@ -1416,8 +1373,6 @@ class ArchiverBase(LinkerBase):
         checking environment variables for default settings.
         """
         LinkerBase.before_registration(cls)
-        if cls.name is None:
-            return
         # Delete attributes that are linker specific
         for k in ['shared_library_flag']:
             setattr(cls, k, None)
@@ -1473,12 +1428,12 @@ class DummyLinkerBase(LinkerBase):
     name = 'dummy'
 
     @classmethod
-    def get_flags(cls, **kwargs):
+    def get_flags(cls, **kwargs):  # pragma: debug
         r"""Raises an error to ward off getting flags for the dummy linker."""
         raise RuntimeError("DummyLinker")
 
     @classmethod
-    def call(cls, *args, **kwargs):
+    def call(cls, *args, **kwargs):  # pragma: debug
         r"""Raises an error to ward off calling the dummy linker."""
         raise RuntimeError("DummyLinker")
         
@@ -1626,7 +1581,7 @@ class CompiledModelDriver(ModelDriver):
         for x in kwargs['products']:
             if self.language_ext is not None:
                 x_ext = os.path.splitext(x)[-1]
-                if x_ext in self.language_ext:
+                if x_ext in self.language_ext:  # pragma: debug
                     raise Exception("Product is source file: '%s'" % x)
             if x not in self.products:
                 self.products.append(x)
@@ -1651,10 +1606,9 @@ class CompiledModelDriver(ModelDriver):
                 for k0 in [k, '%s_flags' % k]:
                     ka = 'default_%s' % k0
                     if k0.endswith('_flags'):
-                        old_val = getattr(cls, ka)
-                        new_val = ygg_cfg.get(cls.language, k0, '').split()
-                        for v in new_val:
-                            old_val.append(v)
+                        old_val = getattr(cls, ka, [])
+                        if isinstance(old_val, list):
+                            old_val += ygg_cfg.get(cls.language, k0, '').split()
                     else:
                         setattr(cls, ka, ygg_cfg.get(cls.language, k0,
                                                      getattr(cls, ka)))
@@ -1666,7 +1620,7 @@ class CompiledModelDriver(ModelDriver):
                 # Check default tool to make sure it is installed
                 if default_tool_name:
                     default_tool = get_compilation_tool(k, default_tool_name)
-                    if not default_tool.is_installed():
+                    if not default_tool.is_installed():  # pragma: debug
                         warnings.warn(('Default %s for %s (%s) not installed. '
                                        'Attempting to locate an alternative .')
                                       % (k, cls.language, default_tool_name))
@@ -1809,6 +1763,7 @@ class CompiledModelDriver(ModelDriver):
                 this will be the header location.
 
         """
+        out = None
         if dep in cls.internal_libraries:
             dep_info = cls.internal_libraries[dep]
             out = dep_info.get('source', None)
@@ -1934,15 +1889,13 @@ class CompiledModelDriver(ModelDriver):
         if dep in cls.internal_libraries:
             out = cls.internal_libraries[dep].get('directory', None)
             if out is None:
+                out = []
                 src = cls.internal_libraries[dep].get('source', None)
                 if (src is not None) and os.path.isabs(src):
-                    out = os.path.dirname(src)
-            add_out = cls.internal_libraries[dep].get('include_dirs', None)
-            if add_out:
-                if out is None:
-                    out = add_out
-                else:
-                    out = [out] + add_out
+                    out.append(os.path.dirname(src))
+            else:
+                out = [out]
+            out += cls.internal_libraries[dep].get('include_dirs', [])
         elif dep in cls.external_libraries:
             dep_lang = cls.external_libraries[dep].get('language', cls.language)
             out = ygg_cfg.get(dep_lang, '%s_include' % dep, None)
@@ -1950,7 +1903,7 @@ class CompiledModelDriver(ModelDriver):
                 out = os.path.dirname(out)
         elif os.path.isfile(dep):
             out = os.path.dirname(dep)
-        if out is None:
+        if not out:
             if default is None:
                 raise ValueError("Could not determine include directory for "
                                  "dependency '%s'" % dep)
@@ -2023,9 +1976,13 @@ class CompiledModelDriver(ModelDriver):
 
         """
         if kwargs.get('libtype', None) == 'static':
-            tool = cls.get_tool('archiver')
+            tooltype = 'archiver'
         else:
-            tool = cls.get_tool('linker')
+            tooltype = 'linker'
+        tool = cls.get_tool(tooltype)
+        if tool is False:
+            raise RuntimeError("No %s tool for language %s."
+                               % (tooltype, cls.language))
         kwargs = cls.update_linker_kwargs(**kwargs)
         return tool.get_flags(**kwargs)
 
@@ -2332,7 +2289,7 @@ class CompiledModelDriver(ModelDriver):
         out = super(CompiledModelDriver, cls).is_configured()
         if out:
             for k in cls.get_external_libraries():
-                if not out:
+                if not out:  # pragma: no cover
                     break
                 out = cls.is_library_installed(k)
         return out
@@ -2363,7 +2320,7 @@ class CompiledModelDriver(ModelDriver):
                     desc_end = '%s headers' % k
                 elif t in ['static', 'shared']:
                     desc_end = '%s %s library' % (k, t)
-                else:
+                else:  # pragma: no cover
                     desc_end = '%s %s' % (k, t)
                 desc = 'The full path to the directory containing %s.' % desc_end
                 if cfg.has_option(k_lang, opt):
@@ -2393,7 +2350,7 @@ class CompiledModelDriver(ModelDriver):
                     cfg.set(k_lang, opt, fpath)
                 else:
                     logger.info('Could not locate %s (search_list = %s)'
-                                % (fname, search_list))
+                                % (fname, '\n\t'.join(search_list)))
                     out.append((k_lang, opt, desc))
         return out
 
@@ -2508,7 +2465,7 @@ class CompiledModelDriver(ModelDriver):
                     'out', cls.get_dependency_library(dep, libtype=kwargs['libtype']))
                 if (kwargs['libtype'] == 'static') and ('linker_language' in kwargs):
                     kwargs['archiver_language'] = kwargs.pop('linker_language')
-            return cls.call_compiler(src, **kwargs)  # out=out, flags=flags,
+            return cls.call_compiler(src, **kwargs)
         # Compile using the compiler after updating the flags
         kwargs = cls.update_compiler_kwargs(**kwargs)
         tool = cls.get_tool('compiler')

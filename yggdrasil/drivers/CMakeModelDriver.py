@@ -57,8 +57,10 @@ class CMakeConfigure(CompilerBase):
         """
         if dont_build is not None:
             dont_link = dont_build
+        if isinstance(src, list):
+            src = src[0]
         if sourcedir is None:
-            if os.path.isfile(src):
+            if os.path.isfile(src) or os.path.splitext(src)[-1]:
                 sourcedir = os.path.dirname(src)
             else:
                 sourcedir = src
@@ -222,16 +224,20 @@ class CMakeBuilder(LinkerBase):
             RuntimeError: If target is None.
 
         """
+        if isinstance(obj, list):
+            iobj = obj[0]
+        else:
+            iobj = obj
         if builddir is None:
-            if os.path.isdir(obj):
-                builddir = obj
+            if os.path.isfile(iobj) or os.path.splitext(iobj)[-1]:
+                builddir = os.path.dirname(iobj)
             else:
-                builddir = os.path.dirname(obj)
+                builddir = iobj
         if target is None:
-            if os.path.isdir(obj):
-                raise RuntimeError("Target is required.")
+            if os.path.isfile(iobj) or os.path.splitext(iobj)[-1]:
+                target = os.path.splitext(os.path.basename(iobj))[0]
             else:
-                target = os.path.splitext(os.path.basename(obj))[0]
+                raise RuntimeError("Target is required.")
         elif target == 'clean':
             return target
         out = super(CMakeBuilder, cls).get_output_file(

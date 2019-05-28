@@ -228,6 +228,16 @@ class ModelDriver(Driver):
         registration."""
         if (not cls.is_configured()):
             update_language_config(cls)
+
+    @classmethod
+    def get_language_ext(cls):
+        r"""Return the language extension, including from the base classes."""
+        out = cls.language_ext
+        if out is None:
+            out = []
+            for x in cls.base_languages:
+                out += import_component('model', x).get_language_ext()
+        return out
         
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
@@ -496,8 +506,8 @@ class ModelDriver(Driver):
         """
         out = False
         model_ext = os.path.splitext(fname)[-1]
-        if (cls.language_ext is not None) and (len(model_ext) > 0):
-            out = (model_ext in cls.language_ext)
+        if len(model_ext) > 0:
+            out = (model_ext in cls.get_language_ext())
         return out
 
     @classmethod
@@ -897,7 +907,7 @@ class ModelDriver(Driver):
         working_dir = os.getcwd()
         code_dir = tempfile.gettempdir()
         # code_dir = working_dir
-        fname = os.path.join(code_dir, name + cls.language_ext[0])
+        fname = os.path.join(code_dir, name + cls.get_language_ext()[0])
         lines = cls.write_executable(lines, **kwargs)
         with open(fname, 'w') as fd:
             fd.write('\n'.join(lines))
