@@ -19,8 +19,11 @@ def test_get_installed():
 
 def test_which():
     r"""Test location of executable."""
-    assert(tools.which('python') is not None)
     assert(tools.which(sys.executable) is not None)
+    if platform._is_win:  # pragma: windows
+        assert(tools.which('python.exe') is not None)
+    else:
+        assert(tools.which('python') is not None)
     assert(tools.which('invalid') is None)
 
 

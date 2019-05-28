@@ -411,11 +411,6 @@ class CompilationToolBase(object):
             bool: True if the tool is installed, False otherwise.
 
         """
-        if cls.name == 'nmake':
-            print("NMAKE IS_INSTALLED")
-            for x in [cls.get_executable(), cls.get_executable().upper(),
-                      cls.get_executable() + '.exe']:
-                print('    executable: %s %s' % (x, tools.which(x)))
         exec_path = tools.which(cls.get_executable())
         return (exec_path is not None)
 
