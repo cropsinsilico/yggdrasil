@@ -229,6 +229,8 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         else:
             self.import_cls.get_linker_flags(libtype='static', for_model=True,
                                              use_library_path_internal=True)
+            self.import_cls.get_linker_flags(libtype='static', for_model=True,
+                                             use_library_path=True)
 
     def test_executable_command(self):
         r"""Test executable_command."""

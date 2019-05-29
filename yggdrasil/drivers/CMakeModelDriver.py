@@ -224,18 +224,14 @@ class CMakeBuilder(LinkerBase):
             RuntimeError: If target is None.
 
         """
-        if isinstance(obj, list):
-            iobj = obj[0]
-        else:
-            iobj = obj
         if builddir is None:
-            if os.path.isfile(iobj) or os.path.splitext(iobj)[-1]:
-                builddir = os.path.dirname(iobj)
+            if os.path.isfile(obj) or os.path.splitext(obj)[-1]:
+                builddir = os.path.dirname(obj)
             else:
-                builddir = iobj
+                builddir = obj
         if target is None:
-            if os.path.isfile(iobj) or os.path.splitext(iobj)[-1]:
-                target = os.path.splitext(os.path.basename(iobj))[0]
+            if os.path.isfile(obj) or os.path.splitext(obj)[-1]:
+                target = os.path.splitext(os.path.basename(obj))[0]
             else:
                 raise RuntimeError("Target is required.")
         elif target == 'clean':
