@@ -718,12 +718,8 @@ class CompilationToolBase(object):
                                    % (' '.join(cmd), proc.returncode))
             try:
                 logger.debug(' '.join(cmd) + '\n' + output)
-            except UnicodeDecodeError as e:
-                print(e)
+            except UnicodeDecodeError:
                 tools.print_encoded(output)
-                # cmd_out = backwards.as_bytes(' '.join(cmd))
-                # out = backwards.as_bytes(output)
-                # logger.debug(cmd_out + b'\n' + out)
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
                 raise RuntimeError("Could not call command '%s': %s"
@@ -2202,7 +2198,10 @@ class CompiledModelDriver(ModelDriver):
             str: Version of compiler/interpreter for this language.
 
         """
-        kwargs['version_flags'] = cls.get_tool('compiler').version_flags
+        compiler = cls.get_tool('compiler').version_flags
+        if hasattr(compiler, 'language_version'):  # pragma: windows
+            return compiler.language_version(**kwargs)
+        kwargs['version_flags'] = compiler.version_flags
         kwargs['skip_flags'] = True
         return super(CompiledModelDriver, cls).language_version(**kwargs)
         

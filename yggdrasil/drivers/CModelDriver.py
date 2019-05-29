@@ -87,6 +87,23 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_env='LIB',
                              search_path_flags=None)
+    
+    @classmethod
+    def language_version(cls, **kwargs):  # pragma: windows
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        out = cls.call(cls.version_flags, skip_flags=True,
+                       allow_error=True, **kwargs)
+        if 'Copyright' not in out:  # pragma: debug
+            raise RuntimeError("Version call failed: %s" % out)
+        return out.split('Copyright')[0]
 
     
 # C Archivers
