@@ -8,7 +8,7 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
-from yggdrasil.drivers.ModelDriver import ModelDriver
+from yggdrasil.drivers.ModelDriver import ModelDriver, _all_language_ext
 from yggdrasil.components import import_component
 
 
@@ -261,6 +261,11 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             if not cls.default_executable.endswith('.exe'):
                 cls.default_executable += '.exe'
+
+    @classmethod
+    def get_all_language_ext(cls):
+        r"""Return the list of all language extensions."""
+        return _all_language_ext
 
     @classmethod
     def get_language_ext(cls):
@@ -672,7 +677,7 @@ class CompilationToolBase(object):
             # Check for file
             if overwrite and (not dry_run):
                 if os.path.isfile(out):
-                    if os.path.splitext(out)[-1] in cls.get_language_ext():
+                    if os.path.splitext(out)[-1] in cls.get_all_language_ext():
                         raise RuntimeError("Source file will not be overwritten: "
                                            + out)
                     os.remove(out)

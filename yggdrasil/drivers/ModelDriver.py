@@ -20,6 +20,9 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
+_all_language_ext = []
+
+
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -228,6 +231,15 @@ class ModelDriver(Driver):
         registration."""
         if (not cls.is_configured()):
             update_language_config(cls)
+        global _all_language_ext
+        for x in cls.get_language_ext():
+            if x not in _all_language_ext:
+                _all_language_ext.append(x)
+
+    @classmethod
+    def get_all_language_ext(cls):
+        r"""Return the list of all language extensions."""
+        return _all_language_ext
 
     @classmethod
     def get_language_ext(cls):
