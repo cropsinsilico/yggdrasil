@@ -66,10 +66,15 @@ class TestMatlabModelParam(parent.TestInterpretedModelParam):  # pragma: matlab
         self.attr_list += ['started_matlab', 'mlengine']
 
             
+class TestMatlabModelDriverNoInit(TestMatlabModelParam,  # pragma: matlab
+                                  parent.TestInterpretedModelDriverNoInit):
+    r"""Test runner for MatlabModelDriver without instance."""
+    pass
+
+
 class TestMatlabModelDriverNoStart(TestMatlabModelParam,  # pragma: matlab
                                    parent.TestInterpretedModelDriverNoStart):
-    r"""Test runner for MatlabModelDriver."""
-    
+    r"""Test runner for MatlabModelDriver without starting the driver."""
     pass
 
 

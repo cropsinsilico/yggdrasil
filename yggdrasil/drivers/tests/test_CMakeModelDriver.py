@@ -155,6 +155,15 @@ class TestCMakeModelParam(parent.TestCompiledModelParam):
         assert_equal(self.instance.builddir, self.builddir)
         
 
+class TestCMakeModelDriverNoInit(TestCMakeModelParam,
+                                 parent.TestCompiledModelDriverNoInit):
+    r"""Test runner for CMakeModelDriver without init."""
+    
+    def test_sbdir(self):
+        r"""Test that source/build directories set correctly."""
+        pass
+    
+    
 class TestCMakeModelDriverNoStart(TestCMakeModelParam,
                                   parent.TestCompiledModelDriverNoStart):
     r"""Test runner for CMakeModelDriver without start."""

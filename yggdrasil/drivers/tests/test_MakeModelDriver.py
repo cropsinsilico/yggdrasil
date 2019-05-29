@@ -50,6 +50,12 @@ class TestMakeModelParam(parent.TestCompiledModelParam):
             del self._inst_kwargs['source_files']
         
 
+class TestMakeModelDriverNoInit(TestMakeModelParam,
+                                parent.TestCompiledModelDriverNoInit):
+    r"""Test runner for MakeModelDriver without init."""
+    pass
+
+
 class TestMakeModelDriverNoStart(TestMakeModelParam,
                                  parent.TestCompiledModelDriverNoStart):
     r"""Test runner for MakeModelDriver without start."""
@@ -71,5 +77,4 @@ class TestMakeModelDriverNoStart(TestMakeModelParam,
 
 class TestMakeModelDriver(TestMakeModelParam, parent.TestCompiledModelDriver):
     r"""Test runner for MakeModelDriver."""
-
     pass

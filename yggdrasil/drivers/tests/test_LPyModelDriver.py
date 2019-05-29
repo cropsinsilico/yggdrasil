@@ -12,6 +12,12 @@ class TestLPyModelParam(parent.TestInterpretedModelParam):
         self.assert_raises(RuntimeError, self.import_cls.language_version)
 
         
+class TestLPyModelDriverNoInit(TestLPyModelParam,
+                               parent.TestInterpretedModelDriverNoInit):
+    r"""Test runner for LPyModelDriver class without initing the driver."""
+    pass
+
+
 class TestLPyModelDriverNoStart(TestLPyModelParam,
                                 parent.TestInterpretedModelDriverNoStart):
     r"""Test runner for LPyModelDriver class without starting the driver."""

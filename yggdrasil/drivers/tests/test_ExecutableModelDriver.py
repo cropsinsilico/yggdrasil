@@ -32,6 +32,12 @@ class TestExecutableModelParam(parent.TestModelParam):
     driver = 'ExecutableModelDriver'
 
             
+class TestExecutableModelDriverNoInit(TestExecutableModelParam,
+                                      parent.TestModelDriverNoInit):
+    r"""Test runner for ExecutableModelDriver class without init."""
+    pass
+
+
 class TestExecutableModelDriverNoStart(TestExecutableModelParam,
                                        parent.TestModelDriverNoStart):
     r"""Test runner for ExecutableModelDriver class without start."""
