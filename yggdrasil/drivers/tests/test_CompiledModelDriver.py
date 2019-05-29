@@ -132,7 +132,7 @@ class TestDummyCompiler(TestCompilationTool):
     def test_get_flags(self):
         r"""Test get_flags."""
         self.assert_equal(self.import_cls.get_flags(flags='hello',
-                                                    dont_link=True), ['hello'])
+                                                    libtype='object'), ['hello'])
         
     def test_get_executable_command(self):
         r"""Test get_executable_command."""
@@ -262,7 +262,7 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         r"""Test compiler call."""
         tool = self.import_cls.get_tool('compiler')
         fname = self.src[0]
-        self.assert_raises(RuntimeError, tool.call, 'args',
+        self.assert_raises(RuntimeError, self.instance.compile_model,
                            out=os.path.basename(fname),
                            working_dir=os.path.dirname(fname),
                            overwrite=True)

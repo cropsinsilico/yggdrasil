@@ -55,7 +55,7 @@ class CPPModelDriver(CModelDriver):
     _schema_subtype_description = ('Model is written in C++.')
     language = 'c++'
     language_ext = ['.cpp', '.CPP', '.cxx', '.C', '.c++', '.cc', '.cp', '.tcc',
-                    '.hpp', '.HPP', '.hxx', '.H', '.h++', '.hh', '.hp', '.h']
+                    '.hpp', '.HPP', '.hxx', '.H', '.h++', '.hh', '.hp', '.h', '.c']
     language_aliases = ['cpp']
     base_languages = ['c']
     interface_library = 'ygg++'

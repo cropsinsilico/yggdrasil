@@ -797,8 +797,7 @@ class CompilerBase(CompilationToolBase):
     combine_with_linker = None
     search_path_conda = 'include'
 
-    def __init__(self, linker=None, archiver=None, linker_flags=None,
-                 archiver_flags=None, **kwargs):
+    def __init__(self, **kwargs):
         for k in ['linker', 'archiver', 'linker_flags', 'archiver_flags']:
             v = kwargs.pop(k, None)
             if v is not None:
@@ -1209,7 +1208,8 @@ class LinkerBase(CompilationToolBase):
         kws_link = ['build_library', 'skip_library_libs', 'use_library_path',
                     '%s_flags' % cls.tooltype, '%s_language' % cls.tooltype,
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
-        kws_both = ['overwrite', 'products', 'allow_error', 'dry_run']
+        kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
+                    'working_dir']
         kwargs_link = {}
         # Move kwargs unique to linker
         for k in kws_link:
@@ -1504,7 +1504,7 @@ class CompiledModelDriver(ModelDriver):
     default_archiver = None
     default_archiver_flags = None
 
-    def __init__(self, name, args, **kwargs):
+    def __init__(self, name, args, skip_compile=False, **kwargs):
         kwargs.setdefault('overwrite', (not kwargs.pop('preserve_cache', False)))
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
         # Set defaults from attributes
@@ -1517,15 +1517,16 @@ class CompiledModelDriver(ModelDriver):
         for k in ['compiler', 'linker', 'archiver']:
             setattr(self, '%s_tool' % k, self.get_tool(k))
         # Compile
-        try:
-            self.compile_dependencies()
-            self.compile_model()
-            self.products.append(self.model_file)
-        except BaseException:
-            self.remove_products()
-            raise
-        assert(os.path.isfile(self.model_file))
-        self.debug("Compiled %s", self.model_file)
+        if not skip_compile:
+            try:
+                self.compile_dependencies()
+                self.compile_model()
+                self.products.append(self.model_file)
+            except BaseException:
+                self.remove_products()
+                raise
+            assert(os.path.isfile(self.model_file))
+            self.debug("Compiled %s", self.model_file)
 
     def parse_arguments(self, args, **kwargs):
         r"""Sort model arguments to determine which one is the executable
@@ -1546,25 +1547,27 @@ class CompiledModelDriver(ModelDriver):
         if model_is_source:
             if len(self.source_files) == 0:
                 self.source_files.append(self.model_file)
-        elif len(model_ext) > 0:
-            # Assert that model file is not source code in any of the
-            # registered languages
-            from yggdrasil.components import import_component
-            from yggdrasil.schema import get_schema
-            s = get_schema()['model']
-            for v_name in s.classes:
-                v = import_component('model', v_name)
-                if (((v.language_ext is not None)
-                     and (model_ext in v.language_ext))):  # pragma: debug
-                    raise RuntimeError(("Extension '%s' indicates that the "
-                                        "model language is '%s', not '%s' "
-                                        "as specified.")
-                                       % (model_ext, v.language,
-                                          self.language))
-        elif (len(self.source_files) == 0) and (self.language_ext is not None):
-            # Add source file based on the model file
-            self.source_files.append(os.path.splitext(self.model_file)[0]
-                                     + self.language_ext[0])
+        else:
+            if len(model_ext) > 0:
+                # Assert that model file is not source code in any of the
+                # registered languages
+                from yggdrasil.components import import_component
+                from yggdrasil.schema import get_schema
+                s = get_schema()['model']
+                for v_name in s.classes:
+                    v = import_component('model', v_name)
+                    if (((v.language_ext is not None)
+                         and (model_ext in v.language_ext))):  # pragma: debug
+                        raise RuntimeError(("Extension '%s' indicates that the "
+                                            "model language is '%s', not '%s' "
+                                            "as specified.")
+                                           % (model_ext, v.language,
+                                              self.language))
+            if (len(self.source_files) == 0) and (self.language_ext is not None):
+                # Add source file based on the model file
+                # model_is_source = True
+                self.source_files.append(os.path.splitext(self.model_file)[0]
+                                         + self.language_ext[0])
         # Add intermediate files and executable by doing a dry run
         kwargs = dict(products=[], dry_run=True)
         if model_is_source:
@@ -1601,9 +1604,13 @@ class CompiledModelDriver(ModelDriver):
                 for k0 in [k, '%s_flags' % k]:
                     ka = 'default_%s' % k0
                     if k0.endswith('_flags'):
-                        old_val = getattr(cls, ka, [])
-                        if isinstance(old_val, list):
-                            old_val += ygg_cfg.get(cls.language, k0, '').split()
+                        old_val = getattr(cls, ka, None)
+                        new_val = ygg_cfg.get(cls.language, k0, '').split()
+                        if new_val:  # pragma: no cover
+                            if old_val is None:
+                                setattr(cls, ka, new_val)
+                            else:
+                                old_val += new_val
                     else:
                         setattr(cls, ka, ygg_cfg.get(cls.language, k0,
                                                      getattr(cls, ka)))
@@ -1711,9 +1718,9 @@ class CompiledModelDriver(ModelDriver):
         # Return correct property given the tool
         if return_prop == 'tool':
             return out
-        elif return_prop == 'name':
+        elif return_prop == 'name':  # pragma: no cover
             return out.name
-        elif return_prop == 'flags':
+        elif return_prop == 'flags':  # pragma: no cover
             return out.flags
         else:
             raise ValueError("Invalid return_prop: '%s'" % return_prop)
@@ -2387,12 +2394,13 @@ class CompiledModelDriver(ModelDriver):
             kwargs['logging_level'] = self.logger.getEffectiveLevel()
         default_kwargs = dict(out=self.model_file,
                               compiler_flags=self.compiler_flags,
-                              linker_flags=self.linker_flags,
                               for_model=True,
                               skip_interface_flags=skip_interface_flags,
                               overwrite=self.overwrite,
                               working_dir=self.working_dir,
                               products=self.products)
+        if not kwargs.get('dont_link', False):
+            default_kwargs.update(linker_flags=self.linker_flags)
         for k, v in default_kwargs.items():
             kwargs.setdefault(k, v)
         return self.call_compiler(source_files, **kwargs)

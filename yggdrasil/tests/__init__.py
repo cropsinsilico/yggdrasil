@@ -274,7 +274,6 @@ else:  # pragma: Python 3
     ut = WrappedTestCase()
 
 
-print('enable_long_tests', enable_long_tests)
 long_running = unittest.skipIf(not enable_long_tests, "Long tests not enabled.")
 
 
