@@ -258,14 +258,17 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         else:
             self.instance.executable_command(['test'], exec_type='linker')
 
-    def test_compiler_call(self):
-        r"""Test compiler call."""
-        tool = self.import_cls.get_tool('compiler')
+    def test_compile_model(self):
+        r"""Test compile model with alternate set of input arguments."""
         fname = self.src[0]
         self.assert_raises(RuntimeError, self.instance.compile_model,
                            out=os.path.basename(fname),
                            working_dir=os.path.dirname(fname),
                            overwrite=True)
+        
+    def test_compiler_call(self):
+        r"""Test compiler call."""
+        tool = self.import_cls.get_tool('compiler')
         self.assert_equal(tool.call('args', out='test',
                                     dry_run=True, skip_flags=True), '')
         src = [x + tool.get_language_ext()[0] for x in ['args1', 'args2']]
