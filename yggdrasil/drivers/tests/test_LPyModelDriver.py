@@ -8,8 +8,8 @@ class TestLPyModelParam(parent.TestInterpretedModelParam):
     
     def tests_on_not_installed(self):
         r"""Tests for when the driver is not installed."""
-        self.assert_raises(RuntimeError, self.import_cls.language_version)
         super(TestLPyModelParam, self).tests_on_not_installed()
+        self.assert_raises(RuntimeError, self.import_cls.language_version)
 
         
 class TestLPyModelDriverNoStart(TestLPyModelParam,
