@@ -38,6 +38,22 @@ class TestCModelDriverNoStart(TestCModelParam,
         env = self.import_cls.update_ld_library_path(env)
         self.assert_equal(env['LD_LIBRARY_PATH'], total)
 
+    def test_call_linker(self):
+        r"""Test call_linker with static."""
+        out = self.instance.compile_model(dont_link=True,
+                                          out=None)
+        self.instance.call_linker(out, for_model=True,
+                                  working_dir=self.instance.working_dir,
+                                  linker_language='c++',
+                                  libtype='static')
+
+    def test_parse_arguments(self):
+        r"""Run test to initialize driver using the executable."""
+        x = os.path.splitext(self.instance.source_files[0])[0] + '.out'
+        new_inst = self.import_cls('test_name', [x], skip_compile=True)
+        self.assert_equal(new_inst.model_file, x)
+        self.assert_equal(new_inst.source_files, self.instance.source_files[:1])
+
     def test_write_try_except(self, **kwargs):
         r"""Test writing a try/except block."""
         if self.import_cls.language == 'c':

@@ -241,7 +241,7 @@ int split_head_body(const char *buf, const size_t buf_siz,
   // size_t bodysiz = 0;
   // Split buffer into head and body
   int ret;
-  size_t sind, eind, sind_head, eind_head, sind_body, eind_body;
+  size_t sind, eind, sind_head, eind_head;  //, sind_body, eind_body;
   sind = 0;
   eind = 0;
 #ifdef _WIN32
@@ -271,13 +271,13 @@ int split_head_body(const char *buf, const size_t buf_siz,
     ygglog_debug("split_head_body: No header in '%.1000s...'", buf);
     sind_head = 0;
     eind_head = 0;
-    sind_body = 0;
-    eind_body = buf_siz;
+    /* sind_body = 0; */
+    /* eind_body = buf_siz; */
   } else {
     sind_head = sind + strlen(MSG_HEAD_SEP);
     eind_head = eind - strlen(MSG_HEAD_SEP);
-    sind_body = eind;
-    eind_body = buf_siz;
+    /* sind_body = eind; */
+    /* eind_body = buf_siz; */
   }
   headsiz[0] = (eind_head - sind_head);
   // bodysiz = (eind_body - sind_body);

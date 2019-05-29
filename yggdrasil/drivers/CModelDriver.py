@@ -149,8 +149,8 @@ class CModelDriver(CompiledModelDriver):
                  'libtype': 'shared',
                  'language': 'c'}}
     internal_libraries = {
-        'ygg': {'source': 'YggInterface.c',
-                'directory': _incl_interface,
+        'ygg': {'source': os.path.join(_incl_interface, 'YggInterface.c'),
+                # 'directory': _incl_interface,
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
                 'external_dependencies': ['rapidjson'],
@@ -168,8 +168,7 @@ class CModelDriver(CompiledModelDriver):
                         'libtype': 'header_only',
                         'internal_dependencies': [],
                         'external_dependencies': []},
-        'datatypes': {'source': 'datatypes.cpp',
-                      'directory': os.path.join(_top_dir, 'metaschema',
+        'datatypes': {'directory': os.path.join(_top_dir, 'metaschema',
                                                 'datatypes'),
                       'language': 'c++',
                       'libtype': 'object',

@@ -637,7 +637,7 @@ class TimedRun(YggTestBase, tools.YggClass):
                           nrep=nrep, matlab_running=self.matlab_running,
                           max_errors=self.max_errors)
         copy_env = ['TMPDIR', 'YGG_SKIP_COMPONENT_VALIDATION',
-                    'YGG_VALIDATE_ALL_MESSAGES']
+                    'YGG_VALIDATE_ALL_MESSAGES', 'CONDA_PREFIX']
         if platform._is_win:  # pragma: windows
             copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
                          'INCLUDE', 'LIB', 'LIBPATH']

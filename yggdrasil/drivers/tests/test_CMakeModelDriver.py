@@ -168,10 +168,6 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
                                  builddir='build',
                                  compiler_flags=['-Wdev'])
 
-
-class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
-    r"""Test runner for CMakeModelDriver."""
-
     def test_call_compiler(self):
         r"""Test call_compiler without full path."""
         # self.instance.cleanup()
@@ -184,3 +180,8 @@ class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
                                       builddir='build',
                                       working_dir=self.instance.working_dir,
                                       overwrite=True)
+        
+
+class TestCMakeModelDriver(TestCMakeModelParam, parent.TestCompiledModelDriver):
+    r"""Test runner for CMakeModelDriver."""
+    pass

@@ -88,7 +88,11 @@ before_install:
       conda update -q conda
       conda create -q -n test-environment python=$CONDA
       source activate test-environment
-      conda install -q conda-build
+      if [[ "${CONDA:0:1}" == "2" ]]; then
+        conda install -q "conda-build<3.18.2"
+      else
+        conda install -q conda-build
+      fi
       conda info -a
     fi
     

@@ -109,6 +109,7 @@ class NMakeCompiler(MakeCompiler):
     platforms = ['Windows']
     default_flags = ['/NOLOGO']
     flag_options = OrderedDict([('makefile', '/f')])
+    default_executable = None
     default_linker = None  # Force linker to be initialized with the same name
 
 

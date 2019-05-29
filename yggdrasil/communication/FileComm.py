@@ -599,10 +599,10 @@ class FileComm(CommBase.CommBase):
                 the read messages as bytes.
 
         """
-        self.read_header()
-        prev_pos = self.fd.tell()
-        flag = True
         try:
+            self.read_header()
+            prev_pos = self.fd.tell()
+            flag = True
             if self.read_meth == 'read':
                 out = self.fd.read()
             elif self.read_meth == 'readline':
@@ -615,7 +615,7 @@ class FileComm(CommBase.CommBase):
             if self.advance_in_series():
                 self.debug("Advanced to %d", self._series_index)
                 flag, out = self._recv()
-            elif self.append:
+            elif self.append and self.is_open:
                 self.fd.seek(prev_pos)
                 out = self.empty_bytes_msg
             else:

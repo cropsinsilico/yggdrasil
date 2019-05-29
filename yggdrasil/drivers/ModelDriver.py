@@ -20,6 +20,9 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
+_all_language_ext = []
+
+
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -228,6 +231,25 @@ class ModelDriver(Driver):
         registration."""
         if (not cls.is_configured()):
             update_language_config(cls)
+        global _all_language_ext
+        for x in cls.get_language_ext():
+            if x not in _all_language_ext:
+                _all_language_ext.append(x)
+
+    @classmethod
+    def get_all_language_ext(cls):
+        r"""Return the list of all language extensions."""
+        return _all_language_ext
+
+    @classmethod
+    def get_language_ext(cls):
+        r"""Return the language extension, including from the base classes."""
+        out = cls.language_ext
+        if out is None:
+            out = []
+            for x in cls.base_languages:
+                out += import_component('model', x).get_language_ext()
+        return out
         
     def parse_arguments(self, args, default_model_dir=None):
         r"""Sort model arguments to determine which one is the executable
@@ -469,7 +491,13 @@ class ModelDriver(Driver):
         """
         out = False
         if cls.language is not None:
-            out = (tools.which(cls.language_executable()) is not None)
+            try:
+                out = (tools.which(cls.language_executable()) is not None)
+            except NotImplementedError:  # pragma: debug
+                # TODO: In production out should be False but raise error
+                # for testing
+                out = False
+                raise
         for x in cls.base_languages:
             if not out:
                 break
@@ -490,8 +518,8 @@ class ModelDriver(Driver):
         """
         out = False
         model_ext = os.path.splitext(fname)[-1]
-        if (cls.language_ext is not None) and (len(model_ext) > 0):
-            out = (model_ext in cls.language_ext)
+        if len(model_ext) > 0:
+            out = (model_ext in cls.get_language_ext())
         return out
 
     @classmethod
@@ -892,7 +920,7 @@ class ModelDriver(Driver):
         working_dir = os.getcwd()
         code_dir = tempfile.gettempdir()
         # code_dir = working_dir
-        fname = os.path.join(code_dir, name + cls.language_ext[0])
+        fname = os.path.join(code_dir, name + cls.get_language_ext()[0])
         lines = cls.write_executable(lines, **kwargs)
         with open(fname, 'w') as fd:
             fd.write('\n'.join(lines))
