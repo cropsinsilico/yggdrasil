@@ -8,5 +8,5 @@ Development
    :maxdepth: 2
    :caption: Contents:
 
-   new_languages
+   new_language
    release

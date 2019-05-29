@@ -1,6 +1,6 @@
 
 Release Steps
-=============
+#############
 
 #. [on branch/fork] Make code changes adding desired feature(s).
 #. [on branch/fork] Run tests locally.::
@@ -15,7 +15,7 @@ Release Steps
    $ git commit -m "Updated .ygg_schema.yml and .ygg_metaschema.json"
    $ git push origin [BRANCH]
 
-#. [on branch/fork] Make sure all CI tests pass (`travis <>`_, `appveyor <>`_).::
+#. [on branch/fork] Make sure all CI tests pass (`travis <https://travis-ci.org/cropsinsilico/yggdrasil>`_, `appveyor <https://ci.appveyor.com/project/langmm/yggdrasil>`_).::
 #. [on branch/fork] Update docs to reflect new features and make sure they build locally::
 
    $ cd docs

@@ -153,13 +153,16 @@ class CompilationToolMeta(type):
 class CompilationToolBase(object):
     r"""Base class for compilation command line tools.
 
-    Attributes:
+    Class Attributes:
         name (str): Tool name used for registration and as a default for the
-            executable.
+            executable. [REQUIRED]
         aliases (list): Alternative names that the tool might have.
         tooltype (str): Tool type. One of 'compiler', 'linker', or 'archiver'.
+            [AUTOMATED]
         languages (list): Programming languages that this tool can be used on.
-        platforms (list): Platforms that the tool is available on.
+            [REQUIRED]
+        platforms (list): Platforms that the tool is available on. Defaults to
+            ['Windows', 'MacOS', 'Linux'].
         default_executable (str): The default tool executable command if
             different than the tool name.
         default_executable_env (str): Environment variable where the executable
@@ -185,11 +188,13 @@ class CompilationToolBase(object):
             order of entries indicates the order the flags should be added to
             the list.
         search_path_env (str): Environment variables containing a list of paths
-            to search for library files.
+            to search for library files. Either search_path_env or
+            search_path_flags must be set. [REQUIRED]
         search_path_conda (str): Path relative to the conda prefix that should
             be searched if the CONDA_PREFIX environment variable is set.
         search_path_flags (list): Flags that should be passed to the tool
-            executable in order to locate the search path.
+            executable in order to locate the search path. Either search_path_env
+            or search_path_flags must be set. [REQUIRED]
         search_regex_begin (str): Search string indicating where the set of
             paths begins in the output from running the tool executable with the
             search_path_flags. If None, the search is performed from the very
@@ -750,14 +755,26 @@ class CompilerBase(CompilationToolBase):
         archiver (str, optional): Name of the archiver that should be used for
             combining compiled objects into a static library. Defaults to None
             if not provided and default_archiver will be used.
+        linker_flags (list, optional): Flags that should be used when linking
+            compiled objects. Defaults to default_linker_flags if not provided.
+        archiver_flags (list, optional): Flags that should be used for combining
+            compiled objects into a static library. Defaults to
+            default_archiver_flags if not provided.
 
-    Attributes:
+    Class Attributes:
         compile_only_flag (str): Flag that should prepended to compiler/linker
             combination tool arguments to indicate that only compilation should
             be performed.
         default_linker (str): Name of linker that should be used after compiling
             with this compiler. If not set, it is assumed that this compiler is
             also a linker.
+        default_archiver (str): Name of archiver that should be used to create
+            a static library after compiling with this compiler. If not set,
+            it is assumed that this compiler is also a linker.
+        default_linker_flags (list): Flags that should be used with the linker
+            if no other flags are provided.
+        default_archiver_flags (list): Flags that should be used with the
+            archiver if no other flags are provided.
         linker_switch (str): Flag to indicate beginning of flags that should be
             passed to the linker from a call to a compiler/linker combination
             tools (e.g. /link on Windows).

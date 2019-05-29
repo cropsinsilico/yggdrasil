@@ -28,27 +28,54 @@ passed (dynamic arrays/objects are not yet supported).
 Simple Datatypes
 ----------------
 
-.. todo::
-   Generated table of simple datatypes.
+.. literalinclude:: ../datatype_tables/datatype_table_simple.rst
 
 
 Collection Datatypes
 --------------------
 
-.. todo::
-   Generated table of collection datatypes.
+.. literalinclude:: ../datatype_tables/datatype_table_container.rst
 
 
 |yggdrasil| Datatypes
 ---------------------
 
-.. todo::
-   Generated table of |yggdrasil| datatypes.
+.. literalinclude:: ../datatype_tables/datatype_table_yggdrasil.rst
 
+
+Defining New Datatypes
+======================
+
+|yggdrasil| supports two methods for defining new datatypes, either by 
+creating an alias for a complex datatype expressed in terms of the existing
+datatypes above or through a Python class.
 
 YAML Defined Datatypes
-======================
+......................
 
 
 Class Defined Datatypes
-=======================
+.......................
+
+Class defined data types should subclass the
+:class:`yggdrasil.metaschema.datatypes.MetaschemaType.MetaschemaType` base
+class with the :func:`yggdrasil.metaschema.datatypes.register_type` decorator.
+The file containing the class definitions should reside in the
+'yggdrasil/metaschema/datatypes/' directory.
+
+At a minimum, classes for types defined in
+such a manner must override the following method:
+
+* ``encode_data``: Takes as input an object for encoding and a type definition
+  and returns the encoded object which is of a type that is encodable by the
+  standard JSON library.
+* ``decode_data``: The reverse of ``encode_data``. Takes as input an encoded
+  object and the associated type definitions and returns the decoded object.
+
+In addition, the behavior of types defined using classes are also
+controlled by the following class attributes:
+
+.. literalinclude:: ../class_tables/class_table_MetaschemaType_classattr.rst
+
+.. todo::
+   Testing

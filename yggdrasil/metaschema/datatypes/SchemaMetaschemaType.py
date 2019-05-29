@@ -89,6 +89,7 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
     definition_properties = ['type']
     metadata_properties = ['type']
     specificity = JSONObjectMetaschemaType.specificity + 1
+    _replaces_existing = False
 
     @classmethod
     def encode_data(cls, obj, typedef):

@@ -450,6 +450,7 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
 
     _empty_msg = {'vertices': [], 'faces': []}
     python_types = (dict, ObjDict)
+    _replaces_existing = False
 
     @classmethod
     def _encode_object_property(cls, obj, order, req_keys=False):

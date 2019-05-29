@@ -24,16 +24,23 @@ class MetaschemaType(object):
             properties which will be used to validate serialized/deserialized
             messages.
 
-    Attributes:
+    Class Attributes:
         name (str): Name of the type for use in YAML files & form options.
-        description (str): A short description of the type.
+            [REQUIRED]
+        description (str): A short description of the type. [REQUIRED]
         properties (list): List of JSON schema properties that this type uses.
+            Defaults to ['type', 'title'].
         definition_properties (list): Type properties that are required for YAML
             or form entries specifying the type. These will also be used to
-            validate type definitions.
+            validate type definitions. Defaults to ['type'].
         metadata_properties (list): Type properties that are required for
             deserializing instances of the type that have been serialized.
+            Defaults to ['type'].
+        extract_properties (list): Properties that will be extracted from the
+            metadata of a message to construct the type definition. Defaults
+            to ['type', 'title'].
         python_types (list): List of python types that this type encompasses.
+            [REQUIRED].
         specificity (int): Specificity of the type. Types with larger values are
             more specific while types with smaller values are more general. Base
             types have a specificity of 0. More specific types are checked first

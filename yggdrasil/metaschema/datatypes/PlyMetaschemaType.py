@@ -657,6 +657,7 @@ class PlyMetaschemaType(JSONObjectMetaschemaType):
 
     _empty_msg = {'vertices': [], 'faces': []}
     python_types = (dict, PlyDict)
+    _replaces_existing = False
 
     @classmethod
     def encode_data(cls, obj, typedef, element_order=None, property_order=None,
