@@ -22,8 +22,9 @@ Welcome to yggdrasil's documentation!
    examples/examples_toc
    advanced/index
    development/index
-   hackathon2018/index
    publications
+   hackathon2018/index
+   hackathon2019/index
    
 Indices and tables
 ==================
