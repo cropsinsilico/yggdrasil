@@ -1,21 +1,18 @@
 import numpy as np
 import pandas as pd
 from collections import OrderedDict
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
 
-@register_type
 class JSONObjectMetaschemaType(ContainerMetaschemaType):
     r"""Type associated with a map."""
 
     name = 'object'
     description = 'A container mapping between keys and values.'
-    properties = ContainerMetaschemaType.properties + ['properties']
-    definition_properties = ContainerMetaschemaType.definition_properties
-    metadata_properties = ContainerMetaschemaType.metadata_properties + ['properties']
-    extract_properties = ContainerMetaschemaType.extract_properties + ['properties']
+    properties = ['properties']
+    metadata_properties = ['properties']
+    extract_properties = ['properties']
     python_types = (dict, )
     _replaces_existing = True
     

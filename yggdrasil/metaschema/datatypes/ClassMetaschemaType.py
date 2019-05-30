@@ -1,10 +1,8 @@
 import importlib
 from yggdrasil import backwards
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
-@register_type
 class ClassMetaschemaType(MetaschemaType):
     r"""Type for evaluating classes."""
 

@@ -1,10 +1,8 @@
 import types
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.ClassMetaschemaType import (
     ClassMetaschemaType)
 
 
-@register_type
 class FunctionMetaschemaType(ClassMetaschemaType):
     r"""Type for evaluating functions."""
 

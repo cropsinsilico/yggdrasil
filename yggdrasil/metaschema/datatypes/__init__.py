@@ -13,6 +13,8 @@ _type_registry = OrderedDict()
 _schema_dir = os.path.join(os.path.dirname(__file__), 'schemas')
 _base_validator = jsonschema.validators.validator_for({"$schema": ""})
 YGG_MSG_HEAD = b'YGG_MSG_HEAD'
+_property_attributes = ['properties', 'definition_properties',
+                        'metadata_properties', 'extract_properties']
 
 
 class MetaschemaTypeError(TypeError):
@@ -50,7 +52,9 @@ def register_type(type_class):
         if prop_class.name != p:
             raise ValueError("Type '%s' has unregistered property '%s'."
                              % (type_name, p))
-        # Update property class with this type's info
+    # Update property class with this type's info
+    for p in type_class.properties:
+        prop_class = get_metaschema_property(p)
         # TODO: Make sure this actually modifies the class
         # Type strings
         old = copy.deepcopy(list(prop_class.types))
@@ -73,6 +77,51 @@ def register_type(type_class):
     # register_component(type_class)
     _type_registry[type_name] = type_class
     return type_class
+
+
+# TODO: Replace this with ComponentMeta
+class MetaschemaTypeMeta(type):
+    r"""Meta class for registering datatypes."""
+
+    def __new__(meta, name, bases, class_dict):
+        if class_dict.get('schema_file', None) is not None:
+            schema_file = class_dict.pop('schema_file')
+            cls = add_type_from_schema(schema_file, class_name=name,
+                                       target_globals=None, **class_dict)
+            return cls
+        else:
+            cls = type.__new__(meta, name, bases, class_dict)
+        # Handle inheritance
+        if ((cls.inherit_properties and ('fixed_properties' not in class_dict)
+             and (cls.name != 'base'))):
+            if isinstance(cls.inherit_properties, bool):
+                attr_list = _property_attributes
+            else:
+                attr_list = cls.inherit_properties
+            for k in attr_list:
+                if k not in class_dict:
+                    continue
+                inherit_from = None
+                for x in bases:
+                    if hasattr(x, k):
+                        inherit_from = x
+                        break
+                if inherit_from is None:  # pragma: debug
+                    raise RuntimeError(("Class %s dosn't have a MetaschemaType "
+                                        "parent class.") % cls)
+                old_attr = getattr(inherit_from, k)
+                new_attr = getattr(cls, k)
+                if new_attr != old_attr:
+                    old_attr = copy.deepcopy(old_attr)
+                    for p in new_attr:
+                        if p not in old_attr:
+                            old_attr.append(p)
+                    setattr(cls, k, old_attr)
+        # Register
+        if not (name.endswith('Base') or (cls.name in ['base', 'container'])
+                or cls._dont_register):
+            cls = register_type(cls)
+        return cls
 
 
 def add_type_from_schema(path_to_schema, **kwargs):
@@ -105,31 +154,31 @@ def add_type_from_schema(path_to_schema, **kwargs):
     description = out['description']
     base = get_type_class(out['type'])
     fixed_properties = out
-    return create_fixed_type_class(name, description, base,
-                                   fixed_properties, **kwargs)
+    return create_fixed_type_class(name, description, base, fixed_properties,
+                                   loaded_schema_file=path_to_schema, **kwargs)
 
 
-def register_type_from_file(path_to_schema):
-    r"""Decorator for registering a type by loading the schema describing it
-    from a file. The original base class is discarded and replaced by one
-    determined from the 'type' key in the schema. All attributes/methods
-    for the class are preserved.
+# def register_type_from_file(path_to_schema):
+#     r"""Decorator for registering a type by loading the schema describing it
+#     from a file. The original base class is discarded and replaced by one
+#     determined from the 'type' key in the schema. All attributes/methods
+#     for the class are preserved.
 
-    Args:
-        path_to_schema (str): Full path to the location of a schema file that
-            can be loaded.
+#     Args:
+#         path_to_schema (str): Full path to the location of a schema file that
+#             can be loaded.
 
-    Returns:
-        function: Decorator that will modify a class according to the information
-            provided in the schema.
+#     Returns:
+#         function: Decorator that will modify a class according to the information
+#             provided in the schema.
 
-    """
-    def _wrapped_decorator(type_class):
-        out = add_type_from_schema(path_to_schema, target_globals=None,
-                                   **type_class.__dict__)
-                                   
-        return out
-    return _wrapped_decorator
+#     """
+#     def _wrapped_decorator(type_class):
+#         out = add_type_from_schema(path_to_schema, target_globals=None,
+#                                    class_name=type_class.__name__,
+#                                    **type_class.__dict__)
+#         return out
+#     return _wrapped_decorator
 
 
 def get_registered_types():

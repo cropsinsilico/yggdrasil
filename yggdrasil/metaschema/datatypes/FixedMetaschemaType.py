@@ -1,11 +1,11 @@
 import jsonschema
 import copy
-from yggdrasil.metaschema.datatypes import register_type, compare_schema
+from yggdrasil.metaschema.datatypes import compare_schema
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
 def create_fixed_type_class(name, description, base, fixed_properties,
-                            target_globals=None, **kwargs):
+                            target_globals=None, class_name=None, **kwargs):
     r"""Create a fixed class.
 
     Args:
@@ -17,6 +17,8 @@ def create_fixed_type_class(name, description, base, fixed_properties,
         target_globals (dict, optional): Globals dictionary for module where the
             fixed class should be added. If None, the new class is returned.
             Defaults to None.
+        class_name (str, optional): Name that should be given to the class.
+            If not provided, defaults to '<name.title()>MetaschemaType'.
         **kwargs: Additional keyword arguments are treated as attributes that
             should be set on the fixed class.
 
@@ -25,6 +27,8 @@ def create_fixed_type_class(name, description, base, fixed_properties,
             the created class if target_globals is None.
 
     """
+    if class_name is None:
+        class_name = str('%sMetaschemaType' % name.title())
     iattr = {'name': name,
              'description': description,
              'fixed_properties': fixed_properties,
@@ -37,8 +41,7 @@ def create_fixed_type_class(name, description, base, fixed_properties,
                 continue
             if x in iattr[k]:
                 iattr[k].remove(x)
-    new_cls = register_type(type(str('%sMetaschemaType' % name.title()),
-                                 (FixedMetaschemaType, base, ), iattr))
+    new_cls = type(class_name, (FixedMetaschemaType, base, ), iattr)
     if target_globals is not None:
         target_globals[new_cls.__name__] = new_cls
         del new_cls

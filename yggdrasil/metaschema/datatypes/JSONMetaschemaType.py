@@ -1,10 +1,9 @@
 import numbers
 from jsonschema.compat import str_types, int_types
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
-class JSONMetaschemaType(MetaschemaType):
+class JSONMetaschemaTypeBase(MetaschemaType):
     r"""Base type for default JSON types."""
 
     name = 'json'
@@ -43,8 +42,7 @@ class JSONMetaschemaType(MetaschemaType):
         return obj
 
 
-@register_type
-class JSONBooleanMetaschemaType(JSONMetaschemaType):
+class JSONBooleanMetaschemaType(JSONMetaschemaTypeBase):
     r"""JSON base boolean type."""
 
     name = 'boolean'
@@ -70,8 +68,7 @@ class JSONBooleanMetaschemaType(JSONMetaschemaType):
         return obj
 
 
-@register_type
-class JSONIntegerMetaschemaType(JSONMetaschemaType):
+class JSONIntegerMetaschemaType(JSONMetaschemaTypeBase):
     r"""JSON base integer type."""
 
     name = 'integer'
@@ -96,8 +93,7 @@ class JSONIntegerMetaschemaType(JSONMetaschemaType):
         return obj
 
 
-@register_type
-class JSONNullMetaschemaType(JSONMetaschemaType):
+class JSONNullMetaschemaType(JSONMetaschemaTypeBase):
     r"""JSON base null type."""
 
     name = 'null'
@@ -105,8 +101,7 @@ class JSONNullMetaschemaType(JSONMetaschemaType):
     python_types = (type(None), )
     
 
-@register_type
-class JSONNumberMetaschemaType(JSONMetaschemaType):
+class JSONNumberMetaschemaType(JSONMetaschemaTypeBase):
     r"""JSON base number type."""
 
     name = 'number'
@@ -131,8 +126,7 @@ class JSONNumberMetaschemaType(JSONMetaschemaType):
         return obj
     
 
-@register_type
-class JSONStringMetaschemaType(JSONMetaschemaType):
+class JSONStringMetaschemaType(JSONMetaschemaTypeBase):
     r"""JSON base string type."""
 
     name = 'string'

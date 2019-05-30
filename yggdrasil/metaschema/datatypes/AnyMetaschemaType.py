@@ -1,17 +1,15 @@
 from yggdrasil.metaschema.datatypes import (
-    register_type, transform_type, encode_data, encode_data_readable,
-    decode_data)
+    transform_type, encode_data, encode_data_readable, decode_data)
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
-@register_type
 class AnyMetaschemaType(MetaschemaType):
     r"""Type associated with a scalar."""
 
     name = 'any'
     description = 'A type allowing any value that is expresible in some type.'
-    properties = MetaschemaType.properties + ['temptype']
-    metadata_properties = MetaschemaType.metadata_properties + ['temptype']
+    properties = ['temptype']
+    metadata_properties = ['temptype']
     python_types = (object, )
 
     @classmethod

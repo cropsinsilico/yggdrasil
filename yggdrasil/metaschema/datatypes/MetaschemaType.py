@@ -1,3 +1,4 @@
+import six
 import copy
 import uuid
 import pprint
@@ -6,8 +7,8 @@ from yggdrasil import backwards, tools
 from yggdrasil.metaschema import (get_metaschema, get_validator, encoder,
                                   validate_instance)
 from yggdrasil.metaschema.datatypes import (
-    MetaschemaTypeError, compare_schema, YGG_MSG_HEAD, get_type_class,
-    conversions)
+    MetaschemaTypeError, MetaschemaTypeMeta, compare_schema, YGG_MSG_HEAD,
+    get_type_class, conversions)
 from yggdrasil.metaschema.properties import get_metaschema_property
 
 
@@ -15,6 +16,7 @@ def _get_single_array_element(arr):
     return arr[0]
 
 
+@six.add_metaclass(MetaschemaTypeMeta)
 class MetaschemaType(object):
     r"""Base type that should be subclassed by user defined types. Attributes
     should be overwritten to match the type.
@@ -29,16 +31,21 @@ class MetaschemaType(object):
             [REQUIRED]
         description (str): A short description of the type. [REQUIRED]
         properties (list): List of JSON schema properties that this type uses.
-            Defaults to ['type', 'title'].
+            These properties will be added to those form the paretn type class
+            unless inherit_properties is False. Defaults to ['type', 'title'].
         definition_properties (list): Type properties that are required for YAML
             or form entries specifying the type. These will also be used to
-            validate type definitions. Defaults to ['type'].
+            validate type definitions. These properties will be added to those
+            from the parent type class unless inherit_properties is False.
+            Defaults to ['type'].
         metadata_properties (list): Type properties that are required for
             deserializing instances of the type that have been serialized.
-            Defaults to ['type'].
+            These properties will be added to those from the parent class
+            unless inherit_properties is False. Defaults to ['type'].
         extract_properties (list): Properties that will be extracted from the
-            metadata of a message to construct the type definition. Defaults
-            to ['type', 'title'].
+            metadata of a message to construct the type definition. These
+            properties will be added to those from the parent class unless
+            inherit_properties is False. Defaults to ['type', 'title'].
         python_types (list): List of python types that this type encompasses.
             [REQUIRED].
         specificity (int): Specificity of the type. Types with larger values are
@@ -47,6 +54,17 @@ class MetaschemaType(object):
             before more general ones.
         is_fixed (bool): True if the type is a fixed version of another type. See
             FixedMetaschemaType for details.
+        inherit_properties (bool, list): If True, a type class's properties will
+            be a combination of the parent class's properties and those
+            explicitly defined in the child class. If False, a type class's
+            properties will only be those explicitly defined in the child class.
+            If a list of property attributes, only properties specified by those
+            attributes will be inherited from the parent class.
+        schema_file (str, None): If set, the class's schema is loaded from the
+            specified file at registration and moved to the loaded_schema_file
+            class attribute. Defaults to None.
+        loaded_schema_file (str, None): The path to the file the schema for the
+            type was loaded from if it was loaded.
 
     """
 
@@ -59,6 +77,10 @@ class MetaschemaType(object):
     python_types = []
     specificity = 0
     is_fixed = False
+    inherit_properties = True
+    schema_file = None
+    loaded_schema_file = None
+    _dont_register = False
     _empty_msg = b''
     _replaces_existing = False
     _json_type = None
