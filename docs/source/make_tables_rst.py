@@ -21,9 +21,9 @@ for x in dir_list:
         os.mkdir(x)
 
         
-doctools.write_component_table(fname_dir=tables_dir)
+doctools.write_component_table(fname_dir=tables_dir, verbose=False)
 for c in class_list:
-    doctools.write_classdocs_table(c, fname_dir=tables_dir)
+    doctools.write_classdocs_table(c, fname_dir=tables_dir, verbose=False)
 doctools.write_datatype_table(fname_dir=tables_dir, verbose=False)
 doctools.write_datatype_mapping_table(fname_dir=tables_dir, verbose=False)
-doctools.write_comm_devnotes_table(fname_dir=tables_dir, verbose=True)
+doctools.write_comm_devnotes_table(fname_dir=tables_dir, verbose=False)

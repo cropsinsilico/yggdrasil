@@ -4,12 +4,14 @@ import jsonschema
 class MetaschemaProperty(object):
     r"""Base class for adding properties to the metaschema.
 
-    Attributes:
-        name (str): Name of the property.
+    Class Attributes:
+        name (str): Name of the property. [REQUIRED]
         schema (dict): JSON schema describing valid values for the property.
+            [REQUIRED]
         types (list): Types of instances that the property is valid for.
+            [AUTOMATED]
         python_types (list): Python types of instances that the property is
-            valid for.
+            valid for. [AUTOMATED]
 
     """
 
