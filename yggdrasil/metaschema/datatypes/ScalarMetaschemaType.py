@@ -10,7 +10,13 @@ from yggdrasil.metaschema.properties import (
 
 
 class ScalarMetaschemaType(MetaschemaType):
-    r"""Type associated with a scalar."""
+    r"""Type associated with a scalar.
+
+    Developer Notes:
+        |yggdrasil| defines scalars as an umbrella type encompassing int, uint,
+        float, bytes, and unicode.
+
+    """
 
     name = 'scalar'
     description = 'A scalar value with or without units.'
@@ -275,7 +281,12 @@ class ScalarMetaschemaType(MetaschemaType):
 
 # Dynamically create explicity scalar classes for shorthand
 for t in ScalarMetaschemaProperties._valid_types.keys():
-    create_fixed_type_class(t, 'A %s value with or without units.' % t,
-                            ScalarMetaschemaType, {'subtype': t},
-                            target_globals=globals(),
-                            python_types=ScalarMetaschemaProperties._python_scalars[t])
+    short_doc = 'A %s value with or without units.' % t
+    long_doc = ('%s\n\n'
+                '    Developer Notes:\n'
+                '        Precision X is preserved.\n\n') % short_doc
+    kwargs = {'target_globals': globals(),
+              '__doc__': long_doc,
+              'python_types': ScalarMetaschemaProperties._python_scalars[t]}
+    create_fixed_type_class(t, short_doc, ScalarMetaschemaType,
+                            {'subtype': t}, **kwargs)

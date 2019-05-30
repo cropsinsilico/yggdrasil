@@ -74,6 +74,8 @@ class JSONIntegerMetaschemaType(JSONMetaschemaTypeBase):
     name = 'integer'
     description = 'JSON integer type.'
     python_types = int_types
+    # TODO: Find a better way to signify this for creating the table
+    cross_language_support = False
     
     @classmethod
     def normalize(cls, obj):
@@ -102,7 +104,12 @@ class JSONNullMetaschemaType(JSONMetaschemaTypeBase):
     
 
 class JSONNumberMetaschemaType(JSONMetaschemaTypeBase):
-    r"""JSON base number type."""
+    r"""JSON base number type.
+
+    Developer Notes:
+        This covers the JSON default for floating point or integer values.
+
+    """
 
     name = 'number'
     description = 'JSON number type.'
@@ -127,7 +134,12 @@ class JSONNumberMetaschemaType(JSONMetaschemaTypeBase):
     
 
 class JSONStringMetaschemaType(JSONMetaschemaTypeBase):
-    r"""JSON base string type."""
+    r"""JSON base string type.
+
+    Developer Notes:
+        Encoding dependent on JSON library.
+
+    """
 
     name = 'string'
     description = 'JSON string type.'

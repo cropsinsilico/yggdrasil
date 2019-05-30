@@ -6,7 +6,12 @@ from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
 
 
 class JSONObjectMetaschemaType(ContainerMetaschemaType):
-    r"""Type associated with a map."""
+    r"""Type associated with a map.
+
+    Developer Notes:
+        Support for dynamic objects in C/C++ is still under development.
+
+    """
 
     name = 'object'
     description = 'A container mapping between keys and values.'

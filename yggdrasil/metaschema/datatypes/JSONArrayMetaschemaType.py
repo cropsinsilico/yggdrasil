@@ -5,7 +5,12 @@ from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
 
 
 class JSONArrayMetaschemaType(ContainerMetaschemaType):
-    r"""Type associated with a set of subtypes."""
+    r"""Type associated with a set of subtypes.
+
+    Developer Notes:
+        Support for dynamic arrays in C/C++ is still under development.
+
+    """
 
     name = 'array'
     description = 'A container of ordered values.'

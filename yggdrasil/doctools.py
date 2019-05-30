@@ -45,6 +45,39 @@ def write_table(lines, fname=None, fname_base=None, fname_dir=None,
     return fname
 
 
+def write_comm_devnotes_table(**kwargs):
+    r"""Write a table containing development notes for the registered comms.
+
+    Args:
+        **kwargs: Additional keyword arguments are passed to dict2table and
+            write_table.
+
+    Returns:
+        str, list: Name of file or files created.
+
+    """
+    from yggdrasil import tools, components
+    kwargs.setdefault('fname_base', 'comm_devnotes_table.rst')
+    args = {}
+    for comm in tools.get_supported_comm():
+        if comm in ['default', 'rmq_async']:
+            continue
+        cdrv = components.import_component('comm', comm)
+        args[comm] = {'developer notes': get_docs_section(cdrv.__doc__,
+                                                          keys=['Developer Notes:',
+                                                                'Development Notes:'],
+                                                          join_lines=True)}
+        if cdrv.address_description is not None:
+            args[comm]['address'] = cdrv.address_description
+    kwargs.setdefault('key_column_name', 'comm')
+    kwargs.setdefault('val_column_name', 'developer notes')
+    kwargs.setdefault('wrapped_columns', {'address': 40,
+                                          'developer notes': 80})
+    kwargs.setdefault('column_order', ['comm', 'address', 'developer notes'])
+    lines = dict2table(args, **kwargs)
+    return write_table(lines, **kwargs)
+
+
 def write_datatype_mapping_table(**kwargs):
     r"""Write a table containing mapping of datatypes between different
     languages.
@@ -63,16 +96,28 @@ def write_datatype_mapping_table(**kwargs):
     args = {}
     for k, v in _type_registry.items():
         if v.cross_language_support:
-            args[k] = {}
-    for l in tools.get_supported_lang():
-        if l in ['lpy', 'make', 'cmake', 'executable']:
+            args[k] = {'notes': get_docs_section(v.__doc__,
+                                                 keys=['Developer Notes:',
+                                                       'Development Notes:'],
+                                                 join_lines=True)}
+    for lang in tools.get_supported_lang():
+        if lang in ['lpy', 'make', 'cmake', 'executable']:
             continue
-        ldrv = components.import_component('model', l)
+        if lang == 'cpp':
+            lang = 'c++'
+        ldrv = components.import_component('model', lang)
         for k in args.keys():
-            args[k][l] = ldrv.type_map.get(k, '')
+            entry = ldrv.type_map.get(k, '')
+            if entry:
+                args[k][lang] = '``%s``' % entry
+            else:
+                args[k][lang] = ''
     kwargs.setdefault('key_column_name', 'schema')
+    kwargs.setdefault('val_column_name', 'notes')
     kwargs.setdefault('prune_empty_columns', False)
-    kwargs.setdefault('column_order', ['schema', 'notes'])
+    kwargs.setdefault('last_column', 'notes')
+    # kwargs.setdefault('column_order', ['schema', 'notes'])
+    kwargs.setdefault('wrapped_columns', {'notes': 40})
     lines = dict2table(args, **kwargs)
     return write_table(lines, **kwargs)
     
@@ -351,7 +396,7 @@ def component2table(comp, table_type, include_required=None,
 
 def dict2table(args, key_column_name='option', val_column_name='description',
                column_order=None, wrapped_columns=None, list_columns=None,
-               sort_on_key=True, prune_empty_columns=False,
+               sort_on_key=True, last_column=None, prune_empty_columns=False,
                style='simple', **kwargs):
     r"""Convert a dictionary to a table.
 
@@ -381,6 +426,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             as rows in the order determined by sorting on the keys. If False,
             the order will be determine by prop (which is not deterministic
             if a Python 2 dictionary). Defaults to True.
+        last_column (str, optional): Name of the field that should be placed
+            in the last column position. Defaults to None and is ignored.
         prune_empty_columns (bool, optional): If True, empty columns will be
             removed. If False, they will be included. Defaults to False.
         style (str, optional): Style of table that should be used. 'simple'
@@ -429,6 +476,9 @@ def dict2table(args, key_column_name='option', val_column_name='description',
     for k in sorted(columns.keys()):
         if k not in column_order:
             column_order.append(k)
+    if (last_column is not None) and (last_column in column_order):
+        column_order.remove(last_column)
+        column_order.append(last_column)
     # Prune empty columns
     column_widths = {}
     for k in list(columns.keys()):
@@ -503,20 +553,24 @@ def dict2table(args, key_column_name='option', val_column_name='description',
     return lines
 
 
-def docs2args(docs, keys=['Args:', 'Arguments:']):
-    r"""Get a dictionary of arguments and argument descriptions from a docstring.
+def get_docs_section(docs, keys=['Args:', 'Arguments:'], join_lines=False):
+    r"""Get contents of a particular sections in a docstring.
 
     Args:
         docs (str): Docstring that should be parsed.
         keys (list): Strings that should be used to identify the target section
             in the docstring. Defaults to ['Args:', 'Arguments:'].
+        join_lines (bool, optional): If True, the returned lines will be
+            stripped and joined into a single string. Defaults to False.
 
     Returns:
-        dict: Dictionary of arguments/description pairs.
+        list: Lines in the section(s) specified by keys.
 
     """
+    if not isinstance(keys, list):
+        keys = [keys]
     if docs is None:
-        return {}
+        return []
     docs_lines = docs.splitlines()
     # Isolate arguments section based on heading
     in_args = False
@@ -531,6 +585,25 @@ def docs2args(docs, keys=['Args:', 'Arguments:']):
                 args_lines.append(x)
         elif any([x.startswith('    %s' % k) for k in keys]):
             in_args = True
+    # Join lines
+    if join_lines:
+        return ' '.join([x.strip() for x in args_lines])
+    return args_lines
+    
+
+def docs2args(docs, keys=['Args:', 'Arguments:']):
+    r"""Get a dictionary of arguments and argument descriptions from a docstring.
+
+    Args:
+        docs (str): Docstring that should be parsed.
+        keys (list): Strings that should be used to identify the target section
+            in the docstring. Defaults to ['Args:', 'Arguments:'].
+
+    Returns:
+        dict: Dictionary of arguments/description pairs.
+
+    """
+    args_lines = get_docs_section(docs, keys=keys)
     # Parse argument lines
     out = {}
     curr_arg = None

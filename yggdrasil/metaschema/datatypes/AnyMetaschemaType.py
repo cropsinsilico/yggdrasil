@@ -11,6 +11,7 @@ class AnyMetaschemaType(MetaschemaType):
     properties = ['temptype']
     metadata_properties = ['temptype']
     python_types = (object, )
+    cross_language_support = False
 
     @classmethod
     def validate(cls, *args, **kwargs):

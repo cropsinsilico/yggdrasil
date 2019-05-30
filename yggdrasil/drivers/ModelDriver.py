@@ -91,7 +91,7 @@ class ModelDriver(Driver):
         internal_libraries (dict): Information on internal libraries required
             for running models in the target language using yggdrasil.
         type_map (dict): Mapping of |yggdrasil| extended JSON types to
-            datatypes in the target programming language.
+            datatypes in the target programming language. [REQUIRED]
         function_param (dict): Options specifying how different operations
             would be encoded in the target language (e.g. if statements, for
             loops, while loops). [REQUIRED]
