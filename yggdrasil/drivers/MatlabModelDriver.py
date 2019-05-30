@@ -430,6 +430,23 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     default_interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop',
                                  '-nojvm', '-batch']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
+    type_map = {
+        'int': 'intX',
+        'float': 'single, double',
+        'string': 'char',
+        'array': 'cell',
+        'object': 'containers.Map',
+        'boolean': 'logical',
+        'null': 'NaN',
+        'uint': 'uintX',
+        'complex': 'complex',
+        'bytes': 'char (utf-8)',
+        'unicode': 'char',
+        '1darray': 'mat',
+        'ndarray': 'mat',
+        'ply': 'containers.Map',
+        'obj': 'containers.Map',
+        'schema': 'containers.Map'}
     function_param = {
         'comment': '%',
         'true': 'true',

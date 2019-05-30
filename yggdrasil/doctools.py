@@ -45,6 +45,38 @@ def write_table(lines, fname=None, fname_base=None, fname_dir=None,
     return fname
 
 
+def write_datatype_mapping_table(**kwargs):
+    r"""Write a table containing mapping of datatypes between different
+    languages.
+
+    Args:
+        **kwargs: Additional keyword arguments are passed to dict2table and
+            write_table.
+
+    Returns:
+        str, list: Name of file or files created.
+
+    """
+    from yggdrasil import tools, components
+    from yggdrasil.metaschema.datatypes import _type_registry
+    kwargs.setdefault('fname_base', 'datatype_mapping_table.rst')
+    args = {}
+    for k, v in _type_registry.items():
+        if v.cross_language_support:
+            args[k] = {}
+    for l in tools.get_supported_lang():
+        if l in ['lpy', 'make', 'cmake', 'executable']:
+            continue
+        ldrv = components.import_component('model', l)
+        for k in args.keys():
+            args[k][l] = ldrv.type_map.get(k, '')
+    kwargs.setdefault('key_column_name', 'schema')
+    kwargs.setdefault('prune_empty_columns', False)
+    kwargs.setdefault('column_order', ['schema', 'notes'])
+    lines = dict2table(args, **kwargs)
+    return write_table(lines, **kwargs)
+    
+
 def write_datatype_table(table_type='all', **kwargs):
     r"""Write a table containing entries from the descriptions of datatypes.
 
@@ -81,20 +113,26 @@ def write_datatype_table(table_type='all', **kwargs):
         raise ValueError("Unsupported table_type: '%s'" % table_type)
     fname_format = 'datatype_table_%s.rst'
     kwargs.setdefault('fname_base', fname_format % (table_type))
+    target_types = []
     args = {}
     if table_type == 'simple':
         for k, v in _type_registry.items():
             if v._replaces_existing and (not hasattr(v, '_container_type')):
-                args[k] = v.description
+                target_types.append(k)
     elif table_type == 'container':
         for k, v in _type_registry.items():
             if v._replaces_existing and hasattr(v, '_container_type'):
-                args[k] = v.description
+                target_types.append(k)
     elif table_type == 'yggdrasil':
         for k, v in _type_registry.items():
             if not v._replaces_existing:
-                args[k] = v.description
+                target_types.append(k)
+    for k in target_types:
+        v = _type_registry[k]
+        args[k] = {'description': v.description,
+                   'required properties': v.definition_properties}
     kwargs.setdefault('key_column_name', 'type')
+    kwargs.setdefault('list_columns', 'required properties')
     lines = dict2table(args, **kwargs)
     return write_table(lines, **kwargs)
     
@@ -312,8 +350,9 @@ def component2table(comp, table_type, include_required=None,
 
 
 def dict2table(args, key_column_name='option', val_column_name='description',
-               column_order=None, wrapped_columns=None,
-               sort_on_key=True, prune_empty_columns=False, **kwargs):
+               column_order=None, wrapped_columns=None, list_columns=None,
+               sort_on_key=True, prune_empty_columns=False,
+               style='simple', **kwargs):
     r"""Convert a dictionary to a table.
 
     Args:
@@ -335,12 +374,18 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         wrapped_columns (dict, optional): Dictionary specifying fields that
             should be wrapped as columns and the widths that the corresponding
             column should be wrapped to. Defaults to {'Description': 80}.
+        list_columns (list, optional): List of fields with values that should
+            be formatted with one item per line if it is a list. Defaults to
+            None and is ignored.
         sort_on_key (bool, optional): If True, the entries in args are added
             as rows in the order determined by sorting on the keys. If False,
             the order will be determine by prop (which is not deterministic
             if a Python 2 dictionary). Defaults to True.
         prune_empty_columns (bool, optional): If True, empty columns will be
             removed. If False, they will be included. Defaults to False.
+        style (str, optional): Style of table that should be used. 'simple'
+            dosn't allow for multi-column or row cells, while 'complex'
+            does. Defaults to 'simple'.
         **kwargs: Additional keyword arguments are ignored.
             
     Returns:
@@ -349,6 +394,10 @@ def dict2table(args, key_column_name='option', val_column_name='description',
     """
     if wrapped_columns is None:
         wrapped_columns = {'description': 80}
+    if list_columns is None:
+        list_columns = []
+    else:
+        style = 'complex'
     # Determine column order
     if column_order is None:
         column_order = [key_column_name, val_column_name]
@@ -368,6 +417,11 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         for pk in columns.keys():
             if pk == key_column_name:
                 columns[key_column_name].append(k)
+            elif pk in list_columns:
+                x = v.get(pk, [])
+                if not isinstance(x, list):
+                    x = [x]
+                columns[pk].append(x)
             else:
                 columns[pk].append(str(v.get(pk, '')))
         pos += 1
@@ -390,15 +444,36 @@ def dict2table(args, key_column_name='option', val_column_name='description',
     for k in columns.keys():
         if k in wrapped_columns:
             w = wrapped_columns[k]
+        elif k in list_columns:
+            w = max([len(max(irow, key=len)) for irow in columns[k]])
         else:
             w = column_widths[k]
         column_widths[k] = max(w, len(k))
     # Create format string
-    column_sep = '   '
-    column_format = column_sep.join(['%-' + str(column_widths[k]) + 's'
-                                     for k in column_order])
-    divider = column_sep.join(['=' * column_widths[k]
-                               for k in column_order])
+    if style == 'simple':
+        column_beg = ''
+        column_end = ''
+        column_sep = '   '
+        hline_beg = ''
+        hline_end = ''
+        hline_char = '='
+        hline_sep = column_sep
+    else:
+        column_beg = '| '
+        column_end = ' |'
+        column_sep = ' | '
+        hline_beg = '+-'
+        hline_end = '-+'
+        hline_char = '-'
+        hline_sep = '-+-'
+    column_format = (column_beg
+                     + column_sep.join(['%-' + str(column_widths[k]) + 's'
+                                        for k in column_order])
+                     + column_end)
+    divider = (hline_beg
+               + hline_sep.join([hline_char * column_widths[k]
+                                 for k in column_order])
+               + hline_end)
     header = column_format % tuple([k.title() for k in column_order])
     # Table
     if len(columns) == 0:
@@ -412,6 +487,8 @@ def dict2table(args, key_column_name='option', val_column_name='description',
         for k in column_order:
             if k in wrapped_columns:
                 row.append(textwrap.wrap(columns[k][i], wrapped_columns[k]))
+            elif k in list_columns:
+                row.append(columns[k][i])
             else:
                 row.append([columns[k][i]])
             max_row_len = max(max_row_len, len(row[-1]))
@@ -419,7 +496,10 @@ def dict2table(args, key_column_name='option', val_column_name='description',
             row[j] += (max_row_len - len(row[j])) * ['']
         for k in range(max_row_len):
             lines.append(column_format % tuple([row[j][k] for j in range(len(row))]))
-    lines.append(divider)
+        if style != 'simple':
+            lines.append(divider)
+    if style == 'simple':
+        lines.append(divider)
     return lines
 
 

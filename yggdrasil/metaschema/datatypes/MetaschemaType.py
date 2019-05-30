@@ -65,6 +65,10 @@ class MetaschemaType(object):
             class attribute. Defaults to None.
         loaded_schema_file (str, None): The path to the file the schema for the
             type was loaded from if it was loaded.
+        cross_language_support (bool): If True, this indicates the types should
+            be serializable across most (if not all) of the supported languages.
+            If False, this type is not required to be serializable except
+            to/from Python. Defaults to True.
 
     """
 
@@ -80,6 +84,7 @@ class MetaschemaType(object):
     inherit_properties = True
     schema_file = None
     loaded_schema_file = None
+    cross_language_support = True
     _dont_register = False
     _empty_msg = b''
     _replaces_existing = False

@@ -2215,7 +2215,7 @@ class CompiledModelDriver(ModelDriver):
             str: Version of compiler/interpreter for this language.
 
         """
-        compiler = cls.get_tool('compiler').version_flags
+        compiler = cls.get_tool('compiler')
         if hasattr(compiler, 'language_version'):  # pragma: windows
             return compiler.language_version(**kwargs)
         kwargs['version_flags'] = compiler.version_flags

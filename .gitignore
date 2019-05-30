@@ -18,9 +18,7 @@ docs/source/yggdrasil.inc
 docs/source/yggdrasil*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
-docs/source/schema_tables
-docs/source/class_tables
-docs/source/datatype_tables
+docs/source/tables
 
 # Coverage
 .coveragerc

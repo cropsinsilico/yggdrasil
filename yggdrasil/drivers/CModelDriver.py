@@ -192,6 +192,23 @@ class CModelDriver(CompiledModelDriver):
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson'],
                       'include_dirs': []}}
+    type_map = {
+        'int': 'intX_t',
+        'float': 'floatX_t',
+        'string': 'char*',
+        'array': 'vector_t',
+        'object': 'map_t',
+        'boolean': 'bool',
+        'null': 'NULL',
+        'uint': 'uintX_t',
+        'complex': 'complex_X',
+        'bytes': 'char*',
+        'unicode': 'char*',
+        '1darray': '*',
+        'ndarray': '*',
+        'ply': 'ply_t',
+        'obj': 'obj_t',
+        'schema': 'map_t'}
     function_param = {
         'comment': '//',
         'true': '1',

@@ -10,6 +10,7 @@ class ClassMetaschemaType(MetaschemaType):
     description = 'Type for Python classes.'
     python_types = backwards.class_types
     encoded_type = 'string'
+    cross_language_support = False
 
     @classmethod
     def normalize(cls, obj):

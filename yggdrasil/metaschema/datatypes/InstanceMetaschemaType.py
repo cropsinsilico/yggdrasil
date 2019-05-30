@@ -16,6 +16,7 @@ class InstanceMetaschemaType(MetaschemaType):
     metadata_properties = ['class', 'args']
     extract_properties = ['class', 'args']
     python_types = (object, )
+    cross_language_support = False
 
     @classmethod
     def validate(cls, obj, raise_errors=False):

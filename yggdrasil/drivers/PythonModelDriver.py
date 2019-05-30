@@ -25,6 +25,23 @@ class PythonModelDriver(InterpretedModelDriver):
                 'libraries': ['sysv_ipc']},
         'zmq': {'libraries': ['zmq']},
         'rmq': {'libraries': ['pika']}}
+    type_map = {
+        'int': 'numpy.intX',
+        'float': 'numpy.floatX',
+        'string': 'str',
+        'array': 'list',
+        'object': 'dict',
+        'boolean': 'bool',
+        'null': 'None',
+        'uint': 'numpy.uintX',
+        'complex': 'numpy.complexX',
+        'bytes': 'bytes',
+        'unicode': 'str',
+        '1darray': 'numpy.ndarray',
+        'ndarray': 'numpy.ndarray',
+        'ply': 'PlyDict',
+        'obj': 'ObjDict',
+        'schema': 'dict'}
     function_param = {
         'comment': '#',
         'true': 'True',
