@@ -28,6 +28,7 @@ Welcome to yggdrasil's documentation!
    examples/examples_toc
    release
    hackathon2018/index
+   hackathon2019/index
    
 Indices and tables
 ==================

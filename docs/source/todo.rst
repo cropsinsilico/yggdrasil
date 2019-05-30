@@ -31,3 +31,4 @@ TODO
 * Clean up dependencies if possible
 * Test outside of conda on windows?
 * Silence warnings from pint/pika on model processes
+* Add forwarding of format string to forked output
