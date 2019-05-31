@@ -31,7 +31,7 @@ if platform._is_win:  # pragma: windows
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
 
 
-def expand_and_add(path, path_list, dir_list):
+def expand_and_add(path, path_list, dir_list):  # pragma: no cover
     r"""Expand the specified path and add it's expanded forms to the provided
     list.
 
