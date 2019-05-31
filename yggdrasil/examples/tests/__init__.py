@@ -149,6 +149,11 @@ class TestExample(YggTestBase, tools.YggClass):
             for fout in self.output_files:
                 if os.path.isfile(fout):
                     os.remove(fout)
+            if self.language == 'make':
+                # Remove copied makefile
+                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+                if os.path.isfile(makefile):
+                    os.remove(makefile)
 
     def test_all(self):
         r"""Test the version of the example that uses all languages."""
@@ -177,6 +182,12 @@ class TestExample(YggTestBase, tools.YggClass):
     def test_cpp(self):
         r"""Test the C++ version of the example."""
         self.language = 'cpp'
+        self.run_example()
+        self.language = None
+
+    def test_make(self):
+        r"""Test the Make version of the example."""
+        self.language = 'make'
         self.run_example()
         self.language = None
 

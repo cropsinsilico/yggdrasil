@@ -1,11 +1,13 @@
 """Tools for accessing examples from python."""
 import os
+import shutil
+from yggdrasil import platform
 
 
 ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson3': ('python', 'matlab', 'c', 'cpp'),
-           'gs_lesson4': ('python', 'matlab', 'c', 'cpp', 'cmake'),
+           'gs_lesson4': ('python', 'matlab', 'c', 'cpp', 'make', 'cmake'),
            'gs_lesson4b': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io1': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io2': ('python', 'matlab', 'c', 'cpp'),
@@ -33,6 +35,7 @@ ext_map = {'python': '.py',
            'c': '.c',
            'cpp': '.cpp',
            'executable': '',
+           'make': '.cpp',
            'cmake': '.cpp'}
 _example_dir = os.path.dirname(__file__)
 
@@ -45,6 +48,13 @@ for k, lang in ex_dict.items():
     idir = os.path.join(_example_dir, k)
     isrcdir = os.path.join(idir, 'src')
     for ilang in lang:
+        if lang == 'make':
+            imakefile = os.path.join(isrcdir, 'Makefile')
+            if platform._is_win:  # pragma: windows
+                src_ext = '_windows'
+            else:
+                src_ext = '_linux'
+            shutil.copy(imakefile + src_ext, imakefile)
         # Get list of yaml & source files
         if k == 'rpcFib':
             if ilang == 'all':

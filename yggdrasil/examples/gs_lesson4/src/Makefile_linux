@@ -1,0 +1,24 @@
+IDIR = .
+CC = gcc
+LINK = g++
+CFLAGS = -I$(IDIR) $(YGGCCFLAGS)
+
+ODIR = .
+
+LIBS = -lm $(YGGLDFLAGS)
+
+.PHONY: all
+all: gs_lesson4_modelA gs_lesson4_modelB
+
+$(ODIR)/%.o: %.c
+	$(CC) -c $(CFLAGS) $< -o $@
+
+gs_lesson4_modelA: $(ODIR)/gs_lesson4_modelA.o
+	$(LINK) -o $@ $^ $(CFLAGS) $(LIBS)
+
+gs_lesson4_modelB: $(ODIR)/gs_lesson4_modelB.o
+	$(LINK) -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+clean:
+	rm -f $(ODIR)/*.o *~ gs_lesson4_modelA gs_lesson4_modelB $(IDIR)/*~ 
