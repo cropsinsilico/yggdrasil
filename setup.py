@@ -11,69 +11,72 @@ ygg_ver = versioneer.get_version()
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
-# Attempt to install openalea
-try:
-    from openalea import lpy
-    lpy_installed = True
-except ImportError:
-    warnings.warn("Could not import openalea.lpy. " +
-                  "LPy support will be disabled.")
-    lpy_installed = False
-
-
-# Attempt to install matlab engine
-if install_matlab_engine.install_matlab(as_user=('--user' in sys.argv)):
-    matlab_installed = True
-else:
-    warnings.warn("Could not import matlab.engine. " +
-                  "Matlab support will be disabled.")
-    matlab_installed = False
-    
-
-# Install R interface
-if install_R_interface.install_R_interface():
-    R_installed = True
-else:
-    warnings.warn("Could not install R interface. " +
-                  "R support will be disabled.")
-    R_installed = False
-
-
-# Determine if rapidjson installed and parse user defined location
-rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
-for idx, arg in enumerate(sys.argv[:]):
-    if ((arg.startswith('--rj-include-dir=')
-         or arg.startswith('--rapidjson-include-dir='))):
-        sys.argv.pop(idx)
-        rj_include_dir = os.path.abspath(arg.split('=', 1)[1])
-        break
-else:
-    rj_include_dir = rj_include_dir0
-if not os.path.isdir(rj_include_dir):
-    raise RuntimeError("RapidJSON sources could not be located. If you "
-                       "cloned the git repository, initialize the rapidjson "
-                       "git submodule by calling "
-                       "'git submodule update --init --recursive' "
-                       "from inside the repository.")
-if rj_include_dir != rj_include_dir0:
-    def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
+# Don't do coverage or installation of packages for use with other languages
+# when building a source distribution
+if 'sdist' not in sys.argv:
+    # Attempt to install openalea
     try:
-        import ConfigParser as configparser
+        from openalea import lpy
+        lpy_installed = True
     except ImportError:
-        import configparser
-    cfg = configparser.ConfigParser()
-    cfg.read(def_config_file)
-    if not cfg.has_section('c'):
-        cfg.add_section('c')
-    cfg.set('c', 'rapidjson_include', rj_include_dir)
-    with open(def_config_file, 'w') as fd:
-        cfg.write(fd)
+        warnings.warn("Could not import openalea.lpy. " +
+                      "LPy support will be disabled.")
+        lpy_installed = False
 
-    
-# Set coverage options in .coveragerc
-create_coveragerc.create_coveragerc(matlab_installed=matlab_installed,
-                                    lpy_installed=lpy_installed,
-                                    R_installed=R_installed)
+
+    # Attempt to install matlab engine
+    if install_matlab_engine.install_matlab(as_user=('--user' in sys.argv)):
+        matlab_installed = True
+    else:
+        warnings.warn("Could not import matlab.engine. " +
+                      "Matlab support will be disabled.")
+        matlab_installed = False
+
+
+    # Install R interface
+    if install_R_interface.install_R_interface(with_sudo=('sudo' in sys.argv)):
+        R_installed = True
+    else:
+        warnings.warn("Could not install R interface. " +
+                      "R support will be disabled.")
+        R_installed = False
+
+
+    # Determine if rapidjson installed and parse user defined location
+    rj_include_dir0 = os.path.join(ROOT_PATH, 'yggdrasil', 'rapidjson', 'include')
+    for idx, arg in enumerate(sys.argv[:]):
+        if ((arg.startswith('--rj-include-dir=')
+             or arg.startswith('--rapidjson-include-dir='))):
+            sys.argv.pop(idx)
+            rj_include_dir = os.path.abspath(arg.split('=', 1)[1])
+            break
+    else:
+        rj_include_dir = rj_include_dir0
+    if not os.path.isdir(rj_include_dir):
+        raise RuntimeError("RapidJSON sources could not be located. If you "
+                           "cloned the git repository, initialize the rapidjson "
+                           "git submodule by calling "
+                           "'git submodule update --init --recursive' "
+                           "from inside the repository.")
+    if rj_include_dir != rj_include_dir0:
+        def_config_file = os.path.join(ROOT_PATH, 'yggdrasil', 'defaults.cfg')
+        try:
+            import ConfigParser as configparser
+        except ImportError:
+            import configparser
+        cfg = configparser.ConfigParser()
+        cfg.read(def_config_file)
+        if not cfg.has_section('c'):
+            cfg.add_section('c')
+        cfg.set('c', 'rapidjson_include', rj_include_dir)
+        with open(def_config_file, 'w') as fd:
+            cfg.write(fd)
+
+
+    # Set coverage options in .coveragerc
+    create_coveragerc.create_coveragerc(matlab_installed=matlab_installed,
+                                        lpy_installed=lpy_installed,
+                                        R_installed=R_installed)
 
 
 # Create .rst README from .md and get long description
