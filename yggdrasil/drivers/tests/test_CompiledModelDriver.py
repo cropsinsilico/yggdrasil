@@ -22,7 +22,7 @@ def test_get_compilation_tool():
     from yggdrasil.drivers.CModelDriver import CModelDriver
     tooltype = 'compiler'
     out = CModelDriver.get_tool('compiler').__class__
-    toolname = out.name.lower()
+    toolname = out.toolname.lower()
     toolpath = os.path.join('somedir', toolname)
     toolfile = toolpath + '.exe'
     vals = [toolname.upper(), toolpath, toolfile, toolfile.upper()]
@@ -41,7 +41,7 @@ def test_CompilationToolBase():
 class DummyCompiler(CompiledModelDriver.CompilerBase):
     r"""Dummy test class."""
     _dont_register = True
-    name = 'dummy'
+    toolname = 'dummy'
     languages = ['dummy']
     search_path_env = 'PATH'
     _language_ext = ['.c']
@@ -99,7 +99,7 @@ class TestCompilationTool(YggTestClass):
             
     def test_get_executable_command(self):
         r"""Test get_executable_command."""
-        if self.import_cls.name is None:
+        if self.import_cls.toolname is None:
             self.assert_raises(NotImplementedError,
                                self.import_cls.get_executable_command, [])
             

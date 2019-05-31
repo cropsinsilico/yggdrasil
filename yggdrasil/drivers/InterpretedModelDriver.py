@@ -60,14 +60,14 @@ class InterpretedModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, 'default_%s' % k))
 
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration. For compiled languages this includes selecting the
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
         """
-        ModelDriver.before_registration(cls)
+        ModelDriver.after_registration(cls)
         if cls.language is not None:
             for k in ['interpreter']:
                 # Set attribute defaults based on config options

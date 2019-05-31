@@ -231,9 +231,9 @@ class ModelDriver(Driver):
             cls.language_ext = [cls.language_ext]
             
     @staticmethod
-    def after_registration(cls):
-        r"""Operations that should be preformed to modify class attributes after
-        registration."""
+    def finalize_registration(cls):
+        r"""Operations that should be performed after a class has been fully
+        initialized and registered."""
         if (not cls.is_configured()):
             update_language_config(cls)
         global _all_language_ext

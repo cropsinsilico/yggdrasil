@@ -71,7 +71,15 @@ def init_schema(fname=None):
 def create_schema():
     r"""Create a new schema from the registry."""
     from yggdrasil.components import init_registry
-    x = SchemaRegistry(init_registry())
+    try:
+        old_env = os.environ.get('YGG_RUNNING_YGGSCHEMA', None)
+        os.environ['YGG_RUNNING_YGGSCHEMA'] = '1'
+        x = SchemaRegistry(init_registry())
+    finally:
+        if old_env is None:  # pragma: no cover
+            del os.environ['YGG_RUNNING_YGGSCHEMA']
+        else:
+            os.environ['YGG_RUNNING_YGGSCHEMA'] = old_env
     return x
 
 
@@ -338,7 +346,8 @@ class ComponentSchema(object):
     @property
     def default_subtype(self):
         r"""str: Default subtype."""
-        return self._base_schema['properties'][self.subtype_key]['default']
+        return self._base_schema['properties'][self.subtype_key].get(
+            'default', None)
 
     @property
     def subtypes(self):

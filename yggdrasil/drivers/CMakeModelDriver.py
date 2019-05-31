@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class CMakeConfigure(CompilerBase):
     r"""CMake configuration tool."""
-    name = 'cmake'
+    toolname = 'cmake'
     languages = ['cmake']
     is_linker = False
     default_flags = []  # '-H']
@@ -154,7 +154,7 @@ class CMakeConfigure(CompilerBase):
     
 class CMakeBuilder(LinkerBase):
     r"""CMake build tool."""
-    name = 'cmake'
+    toolname = 'cmake'
     languages = ['cmake']
     default_flags = []  # '--clean-first']
     output_key = None
@@ -655,14 +655,18 @@ class CMakeModelDriver(CompiledModelDriver):
                 kwargs.setdefault(k, v)
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
-    def set_env(self):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CMakeModelDriver, self).set_env()
+        out = super(CMakeModelDriver, self).set_env(**kwargs)
         out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
     

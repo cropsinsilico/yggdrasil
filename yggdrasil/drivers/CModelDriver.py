@@ -44,14 +44,14 @@ class CCompilerBase(CompilerBase):
 
 class GCCCompiler(CCompilerBase):
     r"""Interface class for gcc compiler/linker."""
-    name = 'gcc'
+    toolname = 'gcc'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
 
 
 class ClangCompiler(CCompilerBase):
     r"""clang compiler on Apple Mac OS."""
-    name = 'clang'
+    toolname = 'clang'
     platforms = ['MacOS']
     default_archiver = 'libtool'
 
@@ -60,7 +60,7 @@ class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
     # TODO: This class dosn't check the CXX and CXXFLAGS environment variables
     # for C++ currently because it is a C subclass.
-    name = 'cl'
+    toolname = 'cl'
     languages = ['c', 'c++']
     platforms = ['Windows']
     # TODO: Currently everything compiled as C++ on windows to allow use
@@ -110,7 +110,7 @@ class MSVCCompiler(CCompilerBase):
 # C Archivers
 class ARArchiver(ArchiverBase):
     r"""Archiver class for ar tool."""
-    name = 'ar'
+    toolname = 'ar'
     languages = ['c', 'c++']
     default_executable_env = 'AR'
     static_library_flag = 'rcs'
@@ -120,7 +120,7 @@ class ARArchiver(ArchiverBase):
 
 class LibtoolArchiver(ArchiverBase):
     r"""Archiver class for libtool tool."""
-    name = 'libtool'
+    toolname = 'libtool'
     languages = ['c', 'c++']
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
@@ -128,7 +128,7 @@ class LibtoolArchiver(ArchiverBase):
 
 class MSVCArchiver(ArchiverBase):
     r"""Microsoft Visual Studio C Archiver."""
-    name = 'LIB'
+    toolname = 'LIB'
     languages = ['c', 'c++']
     platforms = ['Windows']
     static_library_flag = None
@@ -228,12 +228,12 @@ class CModelDriver(CompiledModelDriver):
         'exec_end': '  return 0;\n}'}
 
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration."""
         if platform._is_mac and (cls.default_compiler is None):
             cls.default_compiler = 'clang'
-        CompiledModelDriver.before_registration(cls)
+        CompiledModelDriver.after_registration(cls)
         archiver = cls.get_tool('archiver')
         linker = cls.get_tool('linker')
         for x in ['zmq', 'czmq']:
@@ -330,13 +330,17 @@ class CModelDriver(CompiledModelDriver):
                 env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
         return env
 
-    def set_env(self):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CModelDriver, self).set_env()
+        out = super(CModelDriver, self).set_env(**kwargs)
         out = self.update_ld_library_path(out)
         return out

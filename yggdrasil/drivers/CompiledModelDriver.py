@@ -112,6 +112,8 @@ def get_compilation_tool(tooltype, name):
                      % (tooltype, name))
 
 
+# TODO: Cannot currently make compilation tools components because
+# of circular imports
 class CompilationToolMeta(type):
     r"""Meta class for registering compilers."""
     def __new__(meta, name, bases, class_dict):
@@ -120,29 +122,29 @@ class CompilationToolMeta(type):
             cls.before_registration(cls)
             if cls._dont_register:
                 return cls
-            assert(cls.name is not None)
+            assert(cls.toolname is not None)
             assert(len(cls.languages) > 0)
-            reg = get_compilation_tool_registry(cls.tooltype)
-            # Register by name & language
-            if cls.name in cls.aliases:  # pragma: debug
+            if cls.toolname in cls.aliases:  # pragma: debug
                 raise ValueError(("The name '%s' for class %s is also in "
                                   "its list of aliases: %s")
-                                 % (cls.name, name, cls.aliases))
+                                 % (cls.toolname, name, cls.aliases))
+            # Register by toolname & language
+            reg = get_compilation_tool_registry(cls.tooltype)
             if 'by_language' not in reg:
                 reg['by_language'] = OrderedDict()
             for l in cls.languages:
                 if l not in reg['by_language']:
                     reg['by_language'][l] = OrderedDict()
-            for x in [cls.name] + cls.aliases:
-                # Register by name
+            for x in [cls.toolname] + cls.aliases:
+                # Register by toolname
                 if x in reg:  # pragma: debug
-                    raise ValueError("%s name '%s' already registered."
-                                     % (cls.tooltype.title(), x))
+                    raise ValueError("%s toolname '%s' already registered (class = %s)."
+                                     % (cls.tooltype.title(), x, cls))
                 reg[x] = cls
                 # Register by language
                 for l in cls.languages:
                     if x in reg['by_language'][l]:  # pragma: debug
-                        raise ValueError(("%s name '%s' already registered for "
+                        raise ValueError(("%s toolname '%s' already registered for "
                                           "%s language.")
                                          % (cls.tooltype.title(), x, l))
                     reg['by_language'][l][x] = cls
@@ -154,7 +156,7 @@ class CompilationToolBase(object):
     r"""Base class for compilation command line tools.
 
     Class Attributes:
-        name (str): Tool name used for registration and as a default for the
+        toolname (str): Tool name used for registration and as a default for the
             executable. [REQUIRED]
         aliases (list): Alternative names that the tool might have.
         tooltype (str): Tool type. One of 'compiler', 'linker', or 'archiver'.
@@ -164,7 +166,7 @@ class CompilationToolBase(object):
         platforms (list): Platforms that the tool is available on. Defaults to
             ['Windows', 'MacOS', 'Linux'].
         default_executable (str): The default tool executable command if
-            different than the tool name.
+            different than the toolname.
         default_executable_env (str): Environment variable where the executable
             command might be stored.
         default_flags (list): Default flags that should be used when calling the
@@ -209,8 +211,14 @@ class CompilationToolBase(object):
 
     """
 
+    _schema_type = None
+    _schema_subtype_key = 'toolname'
+    _schema_required = []
+    _schema_properties = {'executable': {'type': 'string'},
+                          'flags': {'type': 'array',
+                                    'items': {'type': 'string'}}}
     _dont_register = False
-    name = None
+    toolname = None
     aliases = []
     tooltype = None
     languages = []
@@ -247,8 +255,9 @@ class CompilationToolBase(object):
         to registration including things like platform dependent properties and
         checking environment variables for default settings.
         """
-        if cls.name is None:  # pragma: debug
+        if cls.toolname is None:  # pragma: debug
             raise ValueError("Registering unnamed compilation tool.")
+        cls._schema_type = cls.tooltype
         attr_list = ['default_executable', 'default_flags']
         # Set attributes based on environment variables
         for k in attr_list:
@@ -261,7 +270,7 @@ class CompilationToolBase(object):
                     setattr(cls, k, os.environ.get(env, getattr(cls, k)))
         # Set default_executable to name
         if cls.default_executable is None:
-            cls.default_executable = cls.name
+            cls.default_executable = cls.toolname
         # Add executable extension
         if platform._is_win:  # pragma: windows
             if not cls.default_executable.endswith('.exe'):
@@ -289,6 +298,25 @@ class CompilationToolBase(object):
                     cls._language_ext += new_ext
         return cls._language_ext
 
+    @classmethod
+    def set_env(cls, existing=None, **kwargs):
+        r"""Set environment variables required for compilation.
+
+        Args:
+            existing (dict, optional): Existing dictionary of environment
+                variables that new variables should be added to. Defaults
+                to a copy of os.environ.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        if existing is None:
+            existing = {}
+            existing.update(os.environ)
+        return existing
+    
     @classmethod
     def file2base(cls, fname):
         r"""Determine basename from path.
@@ -491,7 +519,7 @@ class CompilationToolBase(object):
         out = getattr(cls, 'executable', cls.default_executable)
         if out is None:
             raise NotImplementedError("Executable not set for %s '%s'."
-                                      % (cls.tooltype, cls.name))
+                                      % (cls.tooltype, cls.toolname))
         return out
 
     @classmethod
@@ -518,7 +546,7 @@ class CompilationToolBase(object):
         """
         if (cls.search_path_flags is None) and (cls.search_path_env is None):
             raise NotImplementedError("get_search_path method not implemented for "
-                                      "%s tool '%s'" % (cls.tooltype, cls.name))
+                                      "%s tool '%s'" % (cls.tooltype, cls.toolname))
         paths = []
         # Get search paths from environment variable
         if cls.search_path_env is not None:
@@ -593,7 +621,7 @@ class CompilationToolBase(object):
                                   library_flags=library_flags, **kwargs)
         # Form command
         cmd = flags + args + library_flags
-        if (len(cmd) == 0) or (not os.path.splitext(cmd[0])[0].endswith(cls.name)):
+        if (len(cmd) == 0) or (not os.path.splitext(cmd[0])[0].endswith(cls.toolname)):
             cmd = [cls.get_executable()] + cmd
         # Pop library flags so it is not an unused_kwarg in cases of non-linking
         # compiler command
@@ -713,6 +741,7 @@ class CompilationToolBase(object):
         # Run command
         output = ''
         try:
+            unused_kwargs.setdefault('env', cls.set_env())
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
@@ -737,9 +766,9 @@ class CompilationToolBase(object):
                     logger.error('%s\n%s' % (' '.join(cmd), output))
                     raise RuntimeError(("%s tool, %s, failed to produce "
                                         "result '%s'")
-                                       % (cls.tooltype.title(), cls.name, out))
+                                       % (cls.tooltype.title(), cls.toolname, out))
                 logger.debug("%s %s produced %s"
-                             % (cls.tooltype.title(), cls.name, out))
+                             % (cls.tooltype.title(), cls.toolname, out))
                 products.append(out)
             return out
         return output
@@ -836,12 +865,12 @@ class CompilerBase(CompilationToolBase):
             cls.compile_only_flag = None
         if cls.is_linker:
             if cls.default_linker is None:
-                cls.default_linker = cls.name
-            copy_attr = ['name', 'aliases', 'languages', 'platforms',
+                cls.default_linker = cls.toolname
+            copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
                          'default_executable', 'default_executable_env']
             linker_name = '%sLinker' % cls.__name__.split('Compiler')[0]
             linker_attr = copy.deepcopy(cls.linker_attributes)
-            linker_attr.setdefault('name', cls.default_linker)
+            linker_attr.setdefault('toolname', cls.default_linker)
             for k in copy_attr:
                 linker_attr.setdefault(k, getattr(cls, k))
             linker_base_cls = cls.linker_base_classes
@@ -854,7 +883,7 @@ class CompilerBase(CompilationToolBase):
             globals()[linker_cls.__name__] = linker_cls
             del linker_cls
         if cls.combine_with_linker is None:
-            cls.combine_with_linker = (cls.name == cls.default_linker)
+            cls.combine_with_linker = (cls.toolname == cls.default_linker)
 
     @classmethod
     def linker(cls):
@@ -1438,7 +1467,7 @@ class DummyLinkerBase(LinkerBase):
     r"""Base class for a dummy linker in the case that the linking step cannot
     be split into a separate call."""
 
-    name = 'dummy'
+    toolname = 'dummy'
     is_dummy = True
 
     @classmethod
@@ -1609,14 +1638,14 @@ class CompiledModelDriver(ModelDriver):
         self.debug("model_file: %s", self.model_file)
         
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration. For compiled languages this includes selecting the
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
         """
-        ModelDriver.before_registration(cls)
+        ModelDriver.after_registration(cls)
         if cls.language is not None:
             compiler = None
             for k in ['compiler', 'linker', 'archiver']:
@@ -2379,6 +2408,24 @@ class CompiledModelDriver(ModelDriver):
                     out.append((k_lang, opt, desc))
         return out
 
+    def set_env(self, for_compile=False):
+        r"""Get environment variables that should be set for the model process.
+
+        Args:
+            for_compile (bool, optional): If True, environment variables are set
+                that are necessary for compiling. Defaults to False.
+
+        Returns:
+            dict: Environment variables for the model process.
+
+        """
+        out = super(CompiledModelDriver, self).set_env()
+        if for_compile:
+            compiler = self.get_tool('compiler')
+            out = compiler.set_env(existing=out,
+                                   logging_level=self.logger.getEffectiveLevel())
+        return out
+        
     @classmethod
     def compile_dependencies(cls, **kwargs):
         r"""Compile any required internal libraries, including the interface."""
@@ -2418,6 +2465,7 @@ class CompiledModelDriver(ModelDriver):
         default_kwargs = dict(out=self.model_file,
                               compiler_flags=self.compiler_flags,
                               for_model=True,
+                              env=self.set_env(for_compile=True),
                               skip_interface_flags=skip_interface_flags,
                               overwrite=self.overwrite,
                               working_dir=self.working_dir,
