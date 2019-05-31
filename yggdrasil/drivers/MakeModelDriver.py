@@ -240,7 +240,10 @@ class MakeModelDriver(CompiledModelDriver):
             #      and (linker.default_executable_env not in out))):
             #     out[linker.default_executable_env] = linker.get_executable()
         else:
+            print('ld update')
             out = CModelDriver.update_ld_library_path(out)
+        import pprint
+        pprint.pprint(out)
         return out
         
     def remove_products(self):
