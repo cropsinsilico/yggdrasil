@@ -1,5 +1,5 @@
 import platform as sys_platform
-from yggdrasil import platform  # , tools
+# from yggdrasil import platform  # , tools
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
 

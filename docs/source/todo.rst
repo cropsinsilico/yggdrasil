@@ -50,6 +50,8 @@ TODO
 * testing for R
 * installation for R
 * improve speed of validation
+* Add papers section for listing publication using yggdrasil
 * Split ld off as its own linker
 * Add comm for using files as temporary storage in passing information between models
 * Change cmake to be a C/C++ compiler rather than a separate language with its own driver
+* Add forwarding of format string to forked output

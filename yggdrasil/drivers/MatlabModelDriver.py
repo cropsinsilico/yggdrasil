@@ -432,6 +432,23 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     send_converters = {'pandas': serialize.consolidate_array,
                        'table': serialize.consolidate_array}
     recv_converters = {'pandas': 'array'}
+    type_map = {
+        'int': 'intX',
+        'float': 'single, double',
+        'string': 'char',
+        'array': 'cell',
+        'object': 'containers.Map',
+        'boolean': 'logical',
+        'null': 'NaN',
+        'uint': 'uintX',
+        'complex': 'complex',
+        'bytes': 'char (utf-8)',
+        'unicode': 'char',
+        '1darray': 'mat',
+        'ndarray': 'mat',
+        'ply': 'containers.Map',
+        'obj': 'containers.Map',
+        'schema': 'containers.Map'}
     function_param = {
         'comment': '%',
         'true': 'true',
@@ -468,7 +485,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         """
         super(MatlabModelDriver, self).parse_arguments(args)
         model_base, model_ext = os.path.splitext(os.path.basename(self.model_file))
-        wrap_base = 'warpped_%s_%s' % (model_base, self.uuid.replace('-', '_'))
+        wrap_base = 'wrapped_%s_%s' % (model_base, self.uuid.replace('-', '_'))
         # Matlab has a variable name limit of 62
         wrap_base = wrap_base[:min(len(wrap_base), 60)]
         self.model_wrapper = os.path.join(self.model_dir, wrap_base + model_ext)

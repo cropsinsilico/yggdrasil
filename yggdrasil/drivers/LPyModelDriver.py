@@ -31,5 +31,5 @@ class LPyModelDriver(PythonModelDriver):  # pragma: lpy
         try:
             import openalea.lpy
             return openalea.lpy.__version__.LPY_VERSION_STR
-        except ImportError:
+        except ImportError:  # pragma: debug
             raise RuntimeError("openalea.lpy not installed.")

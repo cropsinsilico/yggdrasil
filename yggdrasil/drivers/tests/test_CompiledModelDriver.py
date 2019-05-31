@@ -155,28 +155,10 @@ class TestCompiledModelParam(parent.TestModelParam):
             self._inst_kwargs['source_files'] = self.src
 
 
-class TestCompiledModelDriverNoStart(TestCompiledModelParam,
-                                     parent.TestModelDriverNoStart):
-    r"""Test runner for CompiledModelDriver without start."""
-
-    def test_compilers(self):
-        r"""Test available compilers."""
-        # Record old tools
-        old_tools = {}
-        for k in ['compiler', 'linker', 'achiver']:
-            old_tools[k] = getattr(self.instance, '%s_tool' % k, None)
-        # Compile with each compiler
-        for k, v in self.import_cls.get_available_tools('compiler').items():
-            if not v.is_installed():
-                continue
-            setattr(self.instance, 'compiler_tool', v)
-            setattr(self.instance, 'linker_tool', v.linker())
-            setattr(self.instance, 'archiver_tool', v.archiver())
-            self.instance.compile_model()
-        # Restore the old tools
-        for k, v in old_tools.items():
-            setattr(self.instance, '%s_tool' % k, v)
-
+class TestCompiledModelDriverNoInit(TestCompiledModelParam,
+                                    parent.TestModelDriverNoInit):
+    r"""Test runner for CompiledModelDriver without creating an instance."""
+    
     def test_build(self):
         r"""Test building libraries as a shared/static library or object files."""
         self.import_cls.compile_dependencies(libtype='shared', overwrite=True)
@@ -193,22 +175,22 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
 
     def test_get_dependency_source(self):
         r"""Test get_dependency_source."""
-        dep_list = (list(self.instance.external_libraries.keys())
-                    + list(self.instance.internal_libraries.keys()))
+        dep_list = (list(self.import_cls.external_libraries.keys())
+                    + list(self.import_cls.internal_libraries.keys()))
         for dep in dep_list:
-            self.instance.get_dependency_source(dep, default='default')
-        self.assert_raises(ValueError, self.instance.get_dependency_source,
+            self.import_cls.get_dependency_source(dep, default='default')
+        self.assert_raises(ValueError, self.import_cls.get_dependency_source,
                            'invalid')
-        self.assert_equal(self.instance.get_dependency_source(__file__), __file__)
-        self.assert_equal(self.instance.get_dependency_source('invalid',
-                                                              default='default'),
-                          'default')
+        self.assert_equal(self.import_cls.get_dependency_source(__file__),
+                          __file__)
+        self.assert_equal(self.import_cls.get_dependency_source(
+            'invalid', default='default'), 'default')
 
     def test_get_dependency_library(self):
         r"""Test get_dependency_library."""
-        self.assert_raises(ValueError, self.instance.get_dependency_library,
+        self.assert_raises(ValueError, self.import_cls.get_dependency_library,
                            'invalid', libtype='invalid')
-        for dep, info in self.instance.external_libraries.items():
+        for dep, info in self.import_cls.external_libraries.items():
             libtype_orig = info.get('libtype', None)
             if libtype_orig not in ['static', 'shared']:
                 continue
@@ -216,56 +198,50 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
                 libtype = 'shared'
             else:
                 libtype = 'static'
-            self.assert_raises(ValueError, self.instance.get_dependency_library,
+            self.assert_raises(ValueError, self.import_cls.get_dependency_library,
                                dep, libtype=libtype)
-        self.assert_raises(ValueError, self.instance.get_dependency_library,
+        self.assert_raises(ValueError, self.import_cls.get_dependency_library,
                            'invalid')
-        self.assert_equal(self.instance.get_dependency_library(__file__), __file__)
-        self.assert_equal(self.instance.get_dependency_library('invalid',
-                                                               default='default'),
-                          'default')
+        self.assert_equal(self.import_cls.get_dependency_library(__file__),
+                          __file__)
+        self.assert_equal(self.import_cls.get_dependency_library(
+            'invalid', default='default'), 'default')
 
     def test_get_dependency_include_dirs(self):
         r"""Test get_dependency_include_dirs."""
-        self.assert_raises(ValueError, self.instance.get_dependency_include_dirs,
+        self.assert_raises(ValueError, self.import_cls.get_dependency_include_dirs,
                            'invalid')
-        self.assert_equal(self.instance.get_dependency_include_dirs(__file__),
+        self.assert_equal(self.import_cls.get_dependency_include_dirs(__file__),
                           [os.path.dirname(__file__)])
-        self.assert_equal(self.instance.get_dependency_include_dirs(
+        self.assert_equal(self.import_cls.get_dependency_include_dirs(
             'invalid', default='default'), ['default'])
 
     def test_get_dependency_order(self):
         r"""Test get_dependency_order."""
-        deps = list(self.instance.internal_libraries.keys())
-        self.instance.get_dependency_order(deps)
+        deps = list(self.import_cls.internal_libraries.keys())
+        self.import_cls.get_dependency_order(deps)
 
     def test_get_linker_flags(self):
         r"""Test get_linker_flags."""
         if self.import_cls.get_tool('archiver') is False:
-            self.assert_raises(RuntimeError, self.instance.get_linker_flags,
+            self.assert_raises(RuntimeError, self.import_cls.get_linker_flags,
                                libtype='static')
         else:
-            self.instance.get_linker_flags(libtype='static', for_model=True,
-                                           use_library_path_internal=True)
+            self.import_cls.get_linker_flags(libtype='static', for_model=True,
+                                             use_library_path_internal=True)
+            self.import_cls.get_linker_flags(libtype='static', for_model=True,
+                                             use_library_path=True)
 
     def test_executable_command(self):
         r"""Test executable_command."""
-        self.assert_raises(ValueError, self.instance.executable_command, ['test'],
+        self.assert_raises(ValueError, self.import_cls.executable_command, ['test'],
                            exec_type='invalid')
         if self.import_cls.get_tool('compiler').no_separate_linking:
-            self.assert_raises(RuntimeError, self.instance.executable_command,
+            self.assert_raises(RuntimeError, self.import_cls.executable_command,
                                ['test'], exec_type='linker')
         else:
-            self.instance.executable_command(['test'], exec_type='linker')
+            self.import_cls.executable_command(['test'], exec_type='linker')
 
-    def test_compile_model(self):
-        r"""Test compile model with alternate set of input arguments."""
-        fname = self.src[0]
-        self.assert_raises(RuntimeError, self.instance.compile_model,
-                           out=os.path.basename(fname),
-                           working_dir=os.path.dirname(fname),
-                           overwrite=True)
-        
     def test_compiler_call(self):
         r"""Test compiler call."""
         tool = self.import_cls.get_tool('compiler')
@@ -291,6 +267,37 @@ class TestCompiledModelDriverNoStart(TestCompiledModelParam,
         fname = self.src[0]
         tool.get_output_file([fname])
 
+
+class TestCompiledModelDriverNoStart(TestCompiledModelParam,
+                                     parent.TestModelDriverNoStart):
+    r"""Test runner for CompiledModelDriver without start."""
+
+    def test_compilers(self):
+        r"""Test available compilers."""
+        # Record old tools
+        old_tools = {}
+        for k in ['compiler', 'linker', 'achiver']:
+            old_tools[k] = getattr(self.instance, '%s_tool' % k, None)
+        # Compile with each compiler
+        for k, v in self.import_cls.get_available_tools('compiler').items():
+            if not v.is_installed():
+                continue
+            setattr(self.instance, 'compiler_tool', v)
+            setattr(self.instance, 'linker_tool', v.linker())
+            setattr(self.instance, 'archiver_tool', v.archiver())
+            self.instance.compile_model()
+        # Restore the old tools
+        for k, v in old_tools.items():
+            setattr(self.instance, '%s_tool' % k, v)
+
+    def test_compile_model(self):
+        r"""Test compile model with alternate set of input arguments."""
+        fname = self.src[0]
+        self.assert_raises(RuntimeError, self.instance.compile_model,
+                           out=os.path.basename(fname),
+                           working_dir=os.path.dirname(fname),
+                           overwrite=True)
+        
     # Done in driver, but driver not started
     def teardown(self):
         r"""Remove the instance, stoppping it."""

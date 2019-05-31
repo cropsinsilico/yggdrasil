@@ -1,4 +1,3 @@
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -7,19 +6,17 @@ from yggdrasil.metaschema.properties.ArgsMetaschemaProperty import (
     ArgsMetaschemaProperty)
 
 
-@register_type
 class InstanceMetaschemaType(MetaschemaType):
     r"""Type for evaluating instances of Python classes."""
 
     name = 'instance'
     description = 'Type for Python class instances.'
-    properties = MetaschemaType.properties + ['class', 'args']
-    definition_properties = MetaschemaType.definition_properties + ['class']
-    metadata_properties = (MetaschemaType.metadata_properties
-                           + ['class', 'args'])
-    extract_properties = (MetaschemaType.extract_properties
-                          + ['class', 'args'])
+    properties = ['class', 'args']
+    definition_properties = ['class']
+    metadata_properties = ['class', 'args']
+    extract_properties = ['class', 'args']
     python_types = (object, )
+    cross_language_support = False
 
     @classmethod
     def validate(cls, obj, raise_errors=False):

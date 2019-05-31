@@ -1,10 +1,8 @@
 import copy
 from yggdrasil.metaschema.datatypes import encode_type, compare_schema
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
-@register_metaschema_property
 class ItemsMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'items' property."""
 

@@ -19,6 +19,7 @@ def test_import_component():
     out = components.suspend_registry()
     components.import_component('serializer')
     components.import_component('serializer', 'direct')
+    components.import_component('serializer', 'PandasSerialize')
     components.restore_registry(out)
 
 

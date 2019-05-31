@@ -62,14 +62,20 @@ class CPPModelDriver(CModelDriver):
     # To prevent inheritance
     default_compiler = None
     default_linker = None
-    function_param = dict(CModelDriver.function_param,
-                          exec_prefix=('#include <iostream>\n'
-                                       '#include <exception>\n'),
-                          # print='std::cout << "{message}" << std::endl;',
-                          error='throw \"{error_msg}\";',
-                          try_begin='try {',
-                          try_error_type='const std::exception&',
-                          try_except='}} catch ({error_type} {error_var}) {{')
+    type_map = dict(
+        CModelDriver.type_map,
+        array='std::vector<void*>',
+        object='std::map<char*,void*>',
+        schema='MetaschemaType')
+    function_param = dict(
+        CModelDriver.function_param,
+        exec_prefix=('#include <iostream>\n'
+                     '#include <exception>\n'),
+        # print='std::cout << "{message}" << std::endl;',
+        error='throw \"{error_msg}\";',
+        try_begin='try {',
+        try_error_type='const std::exception&',
+        try_except='}} catch ({error_type} {error_var}) {{')
     
     @staticmethod
     def before_registration(cls):

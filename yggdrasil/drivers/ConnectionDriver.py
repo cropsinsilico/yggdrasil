@@ -420,7 +420,7 @@ class ConnectionDriver(Driver):
         T = self.start_timeout(timeout)
         while not T.is_out:
             with self.lock:
-                if (not self.ocomm.is_open):
+                if (not self.ocomm.is_open):  # pragma: no cover
                     break
                 elif ((self.ocomm.n_msg_send_drain == 0)
                       and self.ocomm.is_confirmed_send):

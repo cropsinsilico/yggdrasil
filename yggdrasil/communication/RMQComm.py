@@ -87,6 +87,12 @@ class RMQComm(AsyncComm.AsyncComm):
     Raises:
         RuntimeError: If a connection cannot be established.
 
+    Developer Notes:
+        It is not advised that new language implement a RabbitMQ communication
+        interface. Rather RMQ communication is included explicitly for
+        connections between models that are not co-located on the same machine
+        and are used by the |yggdrasil| framework connections on the Python side.
+
     """
 
     _commtype = 'rmq'
@@ -94,6 +100,14 @@ class RMQComm(AsyncComm.AsyncComm):
     # Based on limit of 32bit int, this could be 2**30, but this is
     # too large for stack allocation in C so 2**20 will be used.
     _maxMsgSize = 2**20
+    address_description = ("AMPQ queue address of the form "
+                           "``<url>_RMQPARAM_<exchange>_RMQPARAM_<queue>`` "
+                           "where ``url`` is the broker address (see explanation "
+                           "`here <https://pika.readthedocs.io/en/stable/"
+                           "examples/using_urlparameters.html>`_), "
+                           "``exchange`` is the name of the exchange on the queue "
+                           "that should be used, and ``queue`` is the name of "
+                           "the queue.")
     
     def _init_before_open(self, **kwargs):
         r"""Set null connection and channel."""

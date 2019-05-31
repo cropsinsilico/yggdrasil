@@ -1,8 +1,6 @@
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
-@register_metaschema_property
 class ClassMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'class' property."""
 

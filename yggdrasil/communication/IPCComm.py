@@ -174,12 +174,19 @@ class IPCComm(AsyncComm.AsyncComm):
 
     Attributes:
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
+
+    Developer Notes:
+        The default size limit for IPC message queues is 2048 bytes on Mac
+        operating systems so it is important that implementation of this
+        communication mechanism properly split and send messages larger than
+        this limit as more than one message.
         
     """
 
     _commtype = 'ipc'
     _schema_subtype_description = ('Interprocess communication (IPC) queue.')
     _maxMsgSize = 2048  # Based on IPC limit on MacOS
+    address_description = ("An IPC message queue key.")
 
     def _init_before_open(self, **kwargs):
         r"""Initialize empty queue and server class."""

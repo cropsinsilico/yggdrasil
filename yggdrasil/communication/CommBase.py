@@ -273,6 +273,12 @@ class CommBase(tools.YggClass):
             as a check that the correct class is being created. Defaults to None.
         **kwargs: Additional keywords arguments are passed to parent class.
 
+    Class Attributes:
+        is_file (bool): True if the comm accesses a file.
+        _maxMsgSize (int): Maximum size of a single message that should be sent.
+        address_description (str): Description of the information constituting
+            an address for this communication mechanism.
+
     Attributes:
         name (str): The environment variable where communication address is
             stored.
@@ -300,10 +306,8 @@ class CommBase(tools.YggClass):
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
-        is_file (bool): True if the comm accesses a file.
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
-        maxMsgSize (int): Maximum size of a single message that should be sent.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -336,6 +340,7 @@ class CommBase(tools.YggClass):
     _schema_excluded_from_class_validation = ['datatype']
     is_file = False
     _maxMsgSize = 0
+    address_description = None
 
     def __init__(self, name, address=None, direction='send', dont_open=False,
                  is_interface=None, language=None, partner_language='python',

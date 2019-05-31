@@ -1,6 +1,5 @@
 from yggdrasil.metaschema.datatypes import (
     get_registered_types, get_type_class, MetaschemaTypeError)
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -8,7 +7,6 @@ def _specificity_sort_key(item):
     return -item[1].specificity
 
 
-@register_metaschema_property
 class TypeMetaschemaProperty(MetaschemaProperty):
     r"""Type property with validation of new properties."""
 

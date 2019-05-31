@@ -23,36 +23,7 @@ expansion type to the core set of JSON types.
 
 The mapping between datatypes in the different supported languages is shown below.
 
-.. _datatype_mapping_table:
-========    ==============    ===============    =========    =====================    ======================================
-Schema      Python            Matlab             C            C++                      Notes
-========    ==============    ===============    =========    =====================    ======================================
-int         numpy.intX        intX               intX_t       intX_t                   Precision X is preserved.
-float       numpy.floatX      single, double     floatX_t     floatX_t                 Precision X is preserved.
-string      str               char               char*        char*                    Encoding dependent on JSON library.
-array       list              cell               vector_t     std::vector<void*>       Support for dynamic arrays in C/C++
-                                                                                       is still under development.
-object      dict              containers.Map     map_t        std::map<char*,void*>    Support for dynamic objects in C/C++
-                                                                                       is still under development.
-bool        bool              logical            bool         bool                     
-null        None              NaN                NULL         NULL
-Datatypes Outside the JSON Standard
------------------------------------------------------------------------------------------------------------------------------
-uint        numpy.uintX       uintX              uintX_t      uintX_t                  Precision X is preserved.
-complex     numpy.complexX    complex            complex_X    complex_X                Precision X is preserved.
-bytes       bytes             char (utf-8)       char*        char*                    
-unicode     str               char               char*        char*                    
-1darray     numpy.ndarray     mat                *            *                        
-ndarray     numpy.ndarray     mat                *            *                        
-ply         PlyDict           containers.Map     ply_t        ply_t                    
-obj         ObjDict           containers.Map     obj_t        obj_t                    
-function    function          function_handle    n/a          n/a                      Function types are currently only
-                                                                                       available in interpreted languages.
-schema      dict              containers.Map     map_t        MetaschemaType           
-========    ==============    ===============    =========    =====================    ======================================
-
-.. todo:
-   Automate the construction of this table from driver attributes and encase types in ````
+.. include:: ../tables/datatype_mapping_table.rst
 
 
 Message Structure
@@ -71,6 +42,12 @@ Message headers are serialized JSON objects with properites that describe the me
 and can be used to deserialize and validate the message on receipt. Although each 
 header can contain any information, at a minimum the header must include the
 following properties:
+
+..
+  automate construction of this table
+  include:: ../tables/header_parameter_table.rst
+
+.. _header_parameter_table_rst:
 
 ========    ======    ===========================    ===========================
 Property    Type      Description                    Purpose

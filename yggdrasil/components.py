@@ -3,10 +3,10 @@ import glob
 import copy
 import six
 import importlib
-import re
 # import warnings
 from collections import OrderedDict
 from yggdrasil import backwards
+from yggdrasil.doctools import docs2args
 
 
 _registry = {}
@@ -83,51 +83,6 @@ def restore_registry(reg_dict):
     _registry_defaults = reg_dict['_registry_defaults']
     _registry_class2subtype = reg_dict['_registry_class2subtype']
     _registry_complete = reg_dict['_registry_complete']
-    
-
-def docs2args(docs):
-    r"""Get a dictionary of arguments and argument descriptions from a docstring.
-
-    Args:
-        docs (str): Docstring that should be parsed.
-
-    Returns:
-        dict: Dictionary of arguments/description pairs.
-
-    """
-    if docs is None:
-        return {}
-    docs_lines = docs.splitlines()
-    # Isolate arguments section based on heading
-    in_args = False
-    args_lines = []
-    for x in docs_lines:
-        if in_args:
-            if (len(x.strip()) == 0) or (not x.startswith(8 * ' ')):
-                # Blank line or no indent indicates new section
-                in_args = False
-                break
-            else:
-                args_lines.append(x)
-        elif x.startswith('    Args:') or x.startswith('    Arguments:'):
-            in_args = True
-    # Parse argument lines
-    out = {}
-    curr_arg = None
-    for x in args_lines:
-        if x.startswith(12 * ' '):
-            out[curr_arg] += ' ' + x.strip()
-        else:
-            re_arg = r'        ([\S]+)[\s]+\(([^\)]+)\):[\s]+([\S\s]+)'
-            x_match = re.match(re_arg, x)
-            if x_match is None:
-                break
-            # for i in range(4):
-            #     print(i, x_match.group(i))
-            curr_arg = x_match.group(1)
-            # arg_type = x_match.group(2)
-            out[curr_arg] = x_match.group(3)
-    return out
 
 
 def import_all_components(comptype):
@@ -363,7 +318,7 @@ class ComponentMeta(type):
                 args_dict = docs2args(x.__doc__)
                 for k, v in cls._schema_properties.items():
                     if k in args_dict:
-                        v.setdefault('description', args_dict[k])
+                        v.setdefault('description', args_dict[k]['description'])
             # Register
             global _registry
             global _registry_defaults

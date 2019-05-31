@@ -1,10 +1,8 @@
 import importlib
 from yggdrasil import backwards
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 
 
-@register_type
 class ClassMetaschemaType(MetaschemaType):
     r"""Type for evaluating classes."""
 
@@ -12,6 +10,7 @@ class ClassMetaschemaType(MetaschemaType):
     description = 'Type for Python classes.'
     python_types = backwards.class_types
     encoded_type = 'string'
+    cross_language_support = False
 
     @classmethod
     def normalize(cls, obj):

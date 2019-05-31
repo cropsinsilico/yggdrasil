@@ -23,9 +23,9 @@ class TestCModelParam(parent.TestCompiledModelParam):
                                      linker_flags=library_flag)
 
 
-class TestCModelDriverNoStart(TestCModelParam,
-                              parent.TestCompiledModelDriverNoStart):
-    r"""Test runner for CModelDriver without start."""
+class TestCModelDriverNoInit(TestCModelParam,
+                             parent.TestCompiledModelDriverNoInit):
+    r"""Test runner for CModelDriver without init."""
 
     @unittest.skipIf(not platform._is_linux, "OS is not Linux")
     def test_update_ld_library_path(self):
@@ -37,6 +37,19 @@ class TestCModelDriverNoStart(TestCModelParam,
         # Second time to ensure that path not added twice
         env = self.import_cls.update_ld_library_path(env)
         self.assert_equal(env['LD_LIBRARY_PATH'], total)
+
+    def test_write_try_except(self, **kwargs):
+        r"""Test writing a try/except block."""
+        if self.import_cls.language == 'c':
+            self.assert_raises(NotImplementedError, self.import_cls.write_try_except,
+                               None, None)
+        else:
+            super(TestCModelDriverNoInit, self).test_write_try_except(**kwargs)
+        
+    
+class TestCModelDriverNoStart(TestCModelParam,
+                              parent.TestCompiledModelDriverNoStart):
+    r"""Test runner for CModelDriver without start."""
 
     def test_call_linker(self):
         r"""Test call_linker with static."""
@@ -53,14 +66,6 @@ class TestCModelDriverNoStart(TestCModelParam,
         new_inst = self.import_cls('test_name', [x], skip_compile=True)
         self.assert_equal(new_inst.model_file, x)
         self.assert_equal(new_inst.source_files, self.instance.source_files[:1])
-
-    def test_write_try_except(self, **kwargs):
-        r"""Test writing a try/except block."""
-        if self.import_cls.language == 'c':
-            self.assert_raises(NotImplementedError, self.import_cls.write_try_except,
-                               None, None)
-        else:
-            super(TestCModelDriverNoStart, self).test_write_try_except(**kwargs)
         
 
 class TestCModelDriver(TestCModelParam, parent.TestCompiledModelDriver):

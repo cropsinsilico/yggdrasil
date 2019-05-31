@@ -63,18 +63,18 @@ class ModelDriver(Driver):
 
     Class Attributes:
         language (str): Primary name for the programming language that this
-            compiler should be used for.
+            compiler should be used for. [REQUIRED]
         language_aliases (list): Additional/alternative names that the language
             may be known by.
         language_ext (list): Extensions for programs written in the target
-            language.
+            language. [REQUIRED]
         base_languages (list): Other programming languages that this driver
             and the interpreter for the target language are dependent on (e.g.
             Matlab models require Python).
         executable_type (str): 'compiler' or 'interpreter' to indicate the type
-            of the executable for the language.
+            of the executable for the language. [AUTOMATED]
         interface_library (list): Name of the library containing the yggdrasil
-            interface for the target language.
+            interface for the target language. [REQUIRED]
         interface_directories (list): Directories containing code in the
             interface library for the target language.
         interface_dependencies (list): List of names of libraries that are
@@ -82,18 +82,22 @@ class ModelDriver(Driver):
             include libraries required by specific communication types which are
             described by supported_comm_options.
         supported_comms (list): Name of comms supported in the target language.
+            [REQUIRED]
         supported_comm_options (dict): Options for the supported comms like the
             platforms they are available on and the external libraries required
-            to use them.
+            to use them. [REQUIRED]
         external_libraries (dict): Information on external libraries required
             for running models in the target language using yggdrasil.
         internal_libraries (dict): Information on internal libraries required
             for running models in the target language using yggdrasil.
+        type_map (dict): Mapping of |yggdrasil| extended JSON types to
+            datatypes in the target programming language. [REQUIRED]
         function_param (dict): Options specifying how different operations
             would be encoded in the target language (e.g. if statements, for
-            loops, while loops).
+            loops, while loops). [REQUIRED]
         version_flags (list): Flags that should be called with the language
             executable to determine the version of the compiler/interpreter.
+            Defaults to ['--version'].
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
@@ -171,6 +175,7 @@ class ModelDriver(Driver):
     supported_comm_options = {}
     external_libraries = {}
     internal_libraries = {}
+    type_map = None
     function_param = None
     version_flags = ['--version']
 

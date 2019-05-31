@@ -33,7 +33,8 @@ class InterpretedModelDriver(ModelDriver):
 
     Class Attributes:
         default_interpreter (str): Name of interpreter that will be used if not
-            set explicitly by instance or config file.
+            set explicitly by instance or config file. Defaults to the language
+            name if not set.
         default_interpreter_flags (list): Flags that will be passed to the
             interpreter when running the model by default if not set explicitly
             by instance or config file.

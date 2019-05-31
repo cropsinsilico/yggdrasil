@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import encode_json, decode_json
-from yggdrasil.metaschema.datatypes import register_type_from_file, _schema_dir
+from yggdrasil.metaschema.datatypes import _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 
@@ -651,12 +651,13 @@ def get_key_order(all_keys, default_order):
 # The base class could be anything since it is discarded during registration,
 # but is set to JSONObjectMetaschemaType here for transparancy since this is
 # what the base class is determined to be on loading the schema
-@register_type_from_file(_schema_file)
 class PlyMetaschemaType(JSONObjectMetaschemaType):
     r"""Ply 3D structure map."""
 
     _empty_msg = {'vertices': [], 'faces': []}
     python_types = (dict, PlyDict)
+    schema_file = _schema_file
+    _replaces_existing = False
 
     @classmethod
     def encode_data(cls, obj, typedef, element_order=None, property_order=None,

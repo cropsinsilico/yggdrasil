@@ -75,6 +75,7 @@ class MSVCCompiler(CCompilerBase):
     search_path_env = 'INCLUDE'
     search_path_flags = None
     version_flags = []
+    combine_with_linker = True  # Must be explicit; linker is separate .exe
     linker_attributes = dict(GCCCompiler.linker_attributes,
                              default_executable=None,
                              default_flags_env=None,
@@ -87,6 +88,23 @@ class MSVCCompiler(CCompilerBase):
                              shared_library_flag='/DLL',
                              search_path_env='LIB',
                              search_path_flags=None)
+    
+    @classmethod
+    def language_version(cls, **kwargs):  # pragma: windows
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        out = cls.call(cls.version_flags, skip_flags=True,
+                       allow_error=True, **kwargs)
+        if 'Copyright' not in out:  # pragma: debug
+            raise RuntimeError("Version call failed: %s" % out)
+        return out.split('Copyright')[0]
 
     
 # C Archivers
@@ -175,6 +193,23 @@ class CModelDriver(CompiledModelDriver):
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson'],
                       'include_dirs': []}}
+    type_map = {
+        'int': 'intX_t',
+        'float': 'floatX_t',
+        'string': 'char*',
+        'array': 'vector_t',
+        'object': 'map_t',
+        'boolean': 'bool',
+        'null': 'NULL',
+        'uint': 'uintX_t',
+        'complex': 'complex_X',
+        'bytes': 'char*',
+        'unicode': 'char*',
+        '1darray': '*',
+        'ndarray': '*',
+        'ply': 'ply_t',
+        'obj': 'obj_t',
+        'schema': 'map_t'}
     function_param = {
         'comment': '//',
         'true': '1',

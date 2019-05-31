@@ -55,39 +55,42 @@ class TestModelParam(parent.TestParam):
             raise unittest.SkipTest("Driver dosn't have language.")
         if not self.import_cls.is_installed():
             if not self.__class__._flag_tests_on_not_installed:
-                self.assert_raises(RuntimeError, super(TestModelParam, self).setup,
-                                   *args, **kwargs)
+                if not self.skip_init:
+                    self.assert_raises(RuntimeError,
+                                       super(TestModelParam, self).setup,
+                                       *args, **kwargs)
                 self.tests_on_not_installed()
                 self.__class__._flag_tests_on_not_installed = True
             raise unittest.SkipTest("'%s' not installed."
                                     % self.import_cls.language)
         super(TestModelParam, self).setup(*args, **kwargs)
-        
 
-class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
-    r"""Test runner for basic ModelDriver class."""
 
-    def test_is_installed(self):
-        r"""Assert that the tested model driver is installed."""
-        assert(self.import_cls.is_installed())
-
-    def test_language_version(self):
-        r"""Test language version."""
-        assert(self.import_cls.language_version())
+class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
+    r"""Test runner for ModelDriver class without creating an instance."""
 
     def tests_on_not_installed(self):
         r"""Tests for when the driver is not installed."""
-        super(TestModelDriverNoStart, self).tests_on_not_installed()
+        super(TestModelDriverNoInit, self).tests_on_not_installed()
+        self.test_comm_installed()
         self.test_write_if_block()
         self.test_write_for_loop()
         self.test_write_while_loop()
         self.test_write_try_except()
+
+    def test_is_installed(self):
+        r"""Assert that the tested model driver is installed."""
+        assert(self.import_cls.is_installed())
 
     def test_comm_installed(self):
         r"""Tests for getting installed comm while skipping config."""
         self.assert_equal(self.import_cls.is_comm_installed(),
                           self.import_cls.is_comm_installed(skip_config=True))
         
+    def test_language_version(self):
+        r"""Test language version."""
+        assert(self.import_cls.language_version())
+
     # Tests for code generation
     def run_generated_code(self, lines):
         r"""Write and run generated code."""
@@ -178,6 +181,11 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
             lines += self.import_cls.write_try_except(try_contents,
                                                       except_contents, **kwargs)
             self.run_generated_code(lines)
+    
+
+class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
+    r"""Test runner for basic ModelDriver class."""
+    pass
 
 
 class TestModelDriver(TestModelParam, parent.TestDriver):

@@ -359,6 +359,24 @@ class ZMQComm(AsyncComm.AsyncComm):
         dealer_identity (str): Identity that should be used to route messages
             to a dealer socket.
 
+    Developer Notes:
+        |yggdrasil| uses the tcp transport by default with a PAIR socket type.
+        For every connection, |yggdrasil| establishes a second request/reply
+        connection that is used to confirm messages passed between the primary
+        PAIR of sockets. On the first send, the model should create a REP socket
+        on an open tcp address and send that address in the header of the first
+        message under the key 'zmq_reply'. Receiving models should check
+        message headers for this key and, on receipt, establish the partner
+        REQ socket with the specified address (receiving comms can receive from
+        more than one source so they can have more than one request addresses at
+        at time for this purpose). Following every message, the sending model
+        should wait for a message on the reply socket and, on receipt, return
+        the message. Following every message, the receiving model should send
+        the message 'YGG_REPLY' on the request socket and wait for a reply.
+        When creating worker comms for sending large messages, the sending
+        model should create the reply comm for the worker in advanced and send
+        it in the header with the worker address under the key 'zmq_reply_worker'.
+
     """
 
     _commtype = 'zmq'
@@ -366,6 +384,11 @@ class ZMQComm(AsyncComm.AsyncComm):
     # Based on limit of 32bit int, this could be 2**30, but this is
     # too large for stack allocation in C so 2**20 will be used.
     _maxMsgSize = 2**20
+    address_description = ("A ZeroMQ endpoint of the form "
+                           "<transport>://<address>, where the format of "
+                           "address depends on the transport. "
+                           "Additional information can be found "
+                           "`here <http://api.zeromq.org/3-2:zmq-bind>`_.")
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',

@@ -107,6 +107,26 @@ class TestParam(YggTestClassInfo):
         super(TestParam, self).remove_instance(inst)
 
 
+class TestDriverNoInit(TestParam):
+    r"""Test runner for driver without initializing the driver."""
+    pass
+
+        
+class TestDriverNoStart(TestParam):
+    r"""Test runner for basic Driver class without starting driver."""
+
+    def setup(self, *args, **kwargs):
+        r"""Create a driver instance without starting the driver."""
+        super(TestDriverNoStart, self).setup(*args, **kwargs)
+        assert(not self.instance.is_alive())
+
+    def test_attributes(self):
+        r"""Assert that the driver has all of the required attributes."""
+        for a in self.attr_list:
+            if not hasattr(self.instance, a):  # pragma: debug
+                raise AttributeError("Driver does not have attribute %s" % a)
+
+
 class TestDriver(TestParam):
     r"""Test runner for basic Driver class."""
 
@@ -153,18 +173,3 @@ class TestDriver(TestParam):
         if self.instance.is_alive():  # pragma: debug
             self.instance.join()
         self.assert_after_terminate()
-
-        
-class TestDriverNoStart(TestParam):
-    r"""Test runner for basic Driver class without starting driver."""
-
-    def setup(self, *args, **kwargs):
-        r"""Create a driver instance without starting the driver."""
-        super(TestDriverNoStart, self).setup(*args, **kwargs)
-        assert(not self.instance.is_alive())
-
-    def test_attributes(self):
-        r"""Assert that the driver has all of the required attributes."""
-        for a in self.attr_list:
-            if not hasattr(self.instance, a):  # pragma: debug
-                raise AttributeError("Driver does not have attribute %s" % a)

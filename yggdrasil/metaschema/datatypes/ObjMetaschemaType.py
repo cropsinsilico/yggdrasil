@@ -4,7 +4,7 @@ import numpy as np
 import warnings
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import encode_json, decode_json
-from yggdrasil.metaschema.datatypes import register_type_from_file, _schema_dir
+from yggdrasil.metaschema.datatypes import _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import (
@@ -444,12 +444,13 @@ class ObjDict(PlyDict):
 # The base class could be anything since it is discarded during registration,
 # but is set to JSONObjectMetaschemaType here for transparancy since this is
 # what the base class is determined to be on loading the schema
-@register_type_from_file(_schema_file)
 class ObjMetaschemaType(JSONObjectMetaschemaType):
     r"""Obj 3D structure map."""
 
     _empty_msg = {'vertices': [], 'faces': []}
     python_types = (dict, ObjDict)
+    schema_file = _schema_file
+    _replaces_existing = False
 
     @classmethod
     def _encode_object_property(cls, obj, order, req_keys=False):

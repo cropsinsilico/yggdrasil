@@ -10,10 +10,12 @@ properties, including type. The type assigned to an input/output determines
 how |yggdrasil| will :ref:`serialize <serialization_rst>` data that is
 passed to/from the input/output
 from/to other models and how data objects are mapped between native data types
-in the different programming languages (see :ref:`here <datatype_mapping_table>`
+in the different programming languages (see :ref:`here <datatype_mapping_table_rst>`
 for the mappings). Simple types (e.g. float, int) can be
 specified by strings, while more complex datatypes can be described directly 
-in the YAML file using a `JSON Schema <https://json-schema.org/>`_ (See below). 
+in the YAML file using a `JSON Schema <https://json-schema.org/>`_ (See below).
+When the YAML specification files are read in these datatypes are validated
+against the |yggdrasil| :ref:`metaschema <metaschema_rst>`.
 
 
 Primary Datatypes
@@ -28,27 +30,19 @@ passed (dynamic arrays/objects are not yet supported).
 Simple Datatypes
 ----------------
 
-.. todo::
-   Generated table of simple datatypes.
+.. include:: ../tables/datatype_table_simple.rst
 
 
 Collection Datatypes
 --------------------
 
-.. todo::
-   Generated table of collection datatypes.
+.. include:: ../tables/datatype_table_container.rst
 
 
 |yggdrasil| Datatypes
 ---------------------
 
-.. todo::
-   Generated table of |yggdrasil| datatypes.
+.. include:: ../tables/datatype_table_yggdrasil.rst
 
+Information on adding new datatypes can be found :ref:`here <new_datatype_rst>`	     
 
-YAML Defined Datatypes
-======================
-
-
-Class Defined Datatypes
-=======================
