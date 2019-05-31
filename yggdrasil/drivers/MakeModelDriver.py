@@ -1,7 +1,7 @@
 import os
 import copy
 from collections import OrderedDict
-from yggdrasil import components
+from yggdrasil import components, backwards
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase)
 from yggdrasil.drivers.CModelDriver import CModelDriver
@@ -152,8 +152,9 @@ class MakeCompiler(CompilerBase):
             for_model=True, skip_defaults=True)
         # TODO: Put these in the default_flags_env?
         # TODO: Change these to be more generic?
-        out['YGGCCFLAGS'] = ' '.join(compile_flags)
-        out['YGGLDFLAGS'] = ' '.join(linker_flags)
+        out['YGGCCFLAGS'] = backwards.as_str(' '.join(compile_flags))
+        out['YGGLDFLAGS'] = backwards.as_str(' '.join(linker_flags))
+        print(type(' '.join(compile_flags)), type(out['YGGCCFLAGS']))
         # Set default compiler executable
         compiler = drv.get_tool('compiler')
         linker = drv.get_tool('linker')
