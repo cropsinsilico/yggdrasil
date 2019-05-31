@@ -6,6 +6,7 @@ recursive-include yggdrasil *.cfg
 recursive-include yggdrasil *.yml
 recursive-include yggdrasil *.sh
 recursive-include yggdrasil *.m
+recursive-include yggdrasil *.R
 recursive-include yggdrasil *.c
 recursive-include yggdrasil *.h
 recursive-include yggdrasil *.cpp
