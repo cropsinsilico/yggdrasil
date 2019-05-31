@@ -742,7 +742,7 @@ class CompilationToolBase(object):
         output = ''
         try:
             unused_kwargs.setdefault('env', cls.set_env())
-            logger.debug('Command: "%s"' % ' '.join(cmd))
+            logger.info('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = backwards.as_str(output)
@@ -2097,6 +2097,8 @@ class CompiledModelDriver(ModelDriver):
                         external_dependencies.append(x)
             if commtype is None:
                 commtype = tools.get_default_comm()
+            print('commtype', commtype, tools.get_default_comm(),
+                  os.environ.get('YGG_DEFAULT_COMM', None))
             definitions.append('%sDEF' % commtype[:3].upper())
         # Add interface as internal_dependency for models and expand
         # dependencies to get entire chain including sub-dependencies and so on
