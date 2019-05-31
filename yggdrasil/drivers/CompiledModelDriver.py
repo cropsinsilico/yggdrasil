@@ -1439,6 +1439,7 @@ class DummyLinkerBase(LinkerBase):
     be split into a separate call."""
 
     name = 'dummy'
+    is_dummy = True
 
     @classmethod
     def get_flags(cls, **kwargs):  # pragma: debug
@@ -1569,18 +1570,19 @@ class CompiledModelDriver(ModelDriver):
             if len(model_ext) > 0:
                 # Assert that model file is not source code in any of the
                 # registered languages
-                from yggdrasil.components import import_component
-                from yggdrasil.schema import get_schema
-                s = get_schema()['model']
-                for v_name in s.classes:
-                    v = import_component('model', v_name)
-                    if (((v.language_ext is not None)
-                         and (model_ext in v.language_ext))):  # pragma: debug
-                        raise RuntimeError(("Extension '%s' indicates that the "
-                                            "model language is '%s', not '%s' "
-                                            "as specified.")
-                                           % (model_ext, v.language,
-                                              self.language))
+                if model_ext in self.get_all_language_ext():  # pragma: debug
+                    from yggdrasil.components import import_component
+                    from yggdrasil.schema import get_schema
+                    s = get_schema()['model']
+                    for v_name in s.classes:
+                        v = import_component('model', v_name)
+                        if (((v.language_ext is not None)
+                             and (model_ext in v.language_ext))):
+                            raise RuntimeError(
+                                ("Extension '%s' indicates that the "
+                                 "model language is '%s', not '%s' "
+                                 "as specified.")
+                                % (model_ext, v.language, self.language))
             if (len(self.source_files) == 0) and (self.language_ext is not None):
                 # Add source file based on the model file
                 # model_is_source = True

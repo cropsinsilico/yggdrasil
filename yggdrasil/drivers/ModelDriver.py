@@ -342,8 +342,6 @@ class ModelDriver(Driver):
                 from the command line using the executable for this language.
 
         """
-        if isinstance(unused_kwargs, dict):
-            unused_kwargs.update(kwargs)
         raise NotImplementedError("executable_command not implemented for '%s'"
                                   % cls.language)
 

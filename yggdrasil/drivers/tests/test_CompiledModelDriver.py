@@ -102,8 +102,6 @@ class TestCompilationTool(YggTestClass):
         if self.import_cls.name is None:
             self.assert_raises(NotImplementedError,
                                self.import_cls.get_executable_command, [])
-        else:
-            self.import_cls.get_executable_command([])
             
 
 class TestDummyCompiler(TestCompilationTool):
@@ -229,7 +227,11 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         else:
             self.import_cls.get_linker_flags(libtype='static', for_model=True,
                                              use_library_path_internal=True)
-            self.import_cls.get_linker_flags(libtype='static', for_model=True,
+        if getattr(self.import_cls.get_tool('linker'), 'is_dummy', False):
+            self.assert_raises(RuntimeError, self.import_cls.get_linker_flags,
+                               libtype='shared')
+        else:
+            self.import_cls.get_linker_flags(libtype='shared', for_model=True,
                                              use_library_path=True)
 
     def test_executable_command(self):
