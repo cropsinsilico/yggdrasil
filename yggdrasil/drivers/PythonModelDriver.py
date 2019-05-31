@@ -43,10 +43,22 @@ class PythonModelDriver(InterpretedModelDriver):
         'obj': 'ObjDict',
         'schema': 'dict'}
     function_param = {
-        'comment': '#',
+        'interface': 'from yggdrasil.interface import YggInterface',
+        'input': '{channel} = YggInterface.YggInput(\"{channel_name}\")',
+        'output': '{channel} = YggInterface.YggOutput(\"{channel_name}\")',
+        'table_input': ('{channel} = YggInterface.YggAsciiTableInput('
+                        '\"{channel_name}\")'),
+        'table_output': ('{channel} = YggInterface.YggAsciiTableOutput('
+                         '\"{channel_name}\", \"{format_str}\")'),
+        'recv': '{flag_var}, {recv_var} = {channel}.recv()',
+        'send': '{flag_var} = {channel}.send({send_var})',
         'true': 'True',
+        'not': 'not',
+        'comment': '#',
         'indent': 4 * ' ',
+        'quote': '\"',
         'print': 'print(\"{message}\")',
+        'fprintf': 'print(\"{message}\" % ({variables}))',
         'error': 'raise Exception("{error_msg}")',
         'block_end': '',
         'if_begin': 'if ({cond}):',

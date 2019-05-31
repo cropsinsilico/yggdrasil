@@ -153,6 +153,7 @@ class CModelDriver(CompiledModelDriver):
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux']},
         'zmq': {'libraries': ['zmq', 'czmq']}}
+    interface_dependencies = ['rapidjson']
     interface_directories = [_incl_interface]
     external_libraries = {
         'rapidjson': {'include': os.path.join(os.path.dirname(tools.__file__),
@@ -211,10 +212,22 @@ class CModelDriver(CompiledModelDriver):
         'obj': 'obj_t',
         'schema': 'map_t'}
     function_param = {
-        'comment': '//',
+        'interface': '#include "YggInterface.h"',
+        'input': 'yggInput_t {channel} = yggInput(\"{channel_name}\");',
+        'output': 'yggOutput_t {channel} = yggOutput(\"{channel_name}\");',
+        'table_input': ('yggInput_t {channel} = yggAsciiTableInput('
+                        '\"{channel_name}\");'),
+        'table_output': ('yggOutput_t {channel} = yggAsciiTableOutput('
+                         '\"{channel_name}\", \"{format_str}\");'),
+        'recv': '{flag_var} = yggRecv({channel}, {recv_var});',
+        'send': '{flag_var} = yggSend({channel}, {send_var});',
         'true': '1',
+        'not': '!',
+        'comment': '//',
         'indent': 2 * ' ',
+        'quote': '\"',
         'print': 'printf(\"{message}\");',
+        'fprintf': 'fprintf(\"{message}\", {variables});',
         'error': 'return -1;',
         'block_end': '}',
         'if_begin': 'if ({cond}) {{',

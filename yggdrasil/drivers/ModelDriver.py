@@ -463,7 +463,8 @@ class ModelDriver(Driver):
 
         """
         return (cls.is_language_installed() and cls.are_dependencies_installed()
-                and cls.is_comm_installed() and cls.is_configured())
+                and cls.is_interface_installed() and cls.is_comm_installed()
+                and cls.is_configured())
 
     @classmethod
     def are_dependencies_installed(cls):
@@ -485,6 +486,24 @@ class ModelDriver(Driver):
             out = cls.is_library_installed(x)
         return out
 
+    @classmethod
+    def is_interface_installed(cls):
+        r"""Determine if the interface library for the associated programming
+        language is installed.
+
+        Returns:
+            bool: True if the interface library is installed.
+
+        """
+        out = (cls.language is not None)
+        for x in cls.base_languages:
+            if not out:  # pragma: no cover
+                break
+            out = import_component('model', x).is_interface_installed()
+        if out and (cls.interface_library is not None):
+            out = cls.is_library_installed(cls.interface_library)
+        return out
+    
     @classmethod
     def is_language_installed(cls):
         r"""Determine if the interpreter/compiler for the associated programming

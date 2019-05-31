@@ -23,11 +23,29 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
     default_interpreter = 'Rscript'
     # Dynamically setting the interface library cause circular logic
     interface_library = 'yggdrasil'
+    interface_dependencies = ['reticulate', 'zeallot', 'float', 'bit64']
     # interface_library = PythonModelDriver.interface_library
     # The Batch version causes output to saved to a file rather than directed to
     # stdout
     # default_interpreter_flags = ['CMD', 'BATCH' '--vanilla', '--silent']
     send_converters = {'table': serialize.consolidate_array}
+    type_map = {
+        'int': 'integer, bit64::integer64',
+        'float': 'float::float32, double',
+        'string': 'character',
+        'array': 'list',
+        'object': 'list',
+        'boolean': 'logical',
+        'null': 'NULL',
+        'uint': 'integer',
+        'complex': 'complex',
+        'bytes': 'char (utf-8)',
+        'unicode': 'char',
+        '1darray': 'list',
+        'ndarray': 'list',
+        'ply': 'PlyDict',
+        'obj': 'ObjDict',
+        'schema': 'list'}
     function_param = {
         'interface': 'library(yggdrasil)',
         'input': '{channel} <- YggInterface(\"YggInput\", \"{channel_name}\")',
@@ -45,13 +63,15 @@ class RModelDriver(InterpretedModelDriver):  # pragma: R
         'quote': '\"',
         'print': 'print(\"{message}\")',
         'fprintf': 'print(sprintf(\"{message}\", {variables}))',
+        'error': 'stop(\"{error_msg}\")',
         'block_end': '}',
         'if_begin': 'if({cond}) {',
         'for_begin': 'for ({iter_var} in {iter_begin}:{iter_end}) {',
         'while_begin': 'while ({cond}) {',
         'try_begin': 'tryCatch({',
         'try_except': '}, error = function({error_var}) {',
-        'try_end': '})'}
+        'try_end': '})',
+        'assign': '{name} <- {value}'}
 
     @classmethod
     def is_library_installed(cls, lib, **kwargs):

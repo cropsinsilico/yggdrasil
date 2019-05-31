@@ -2290,6 +2290,9 @@ class CompiledModelDriver(ModelDriver):
         if cfg is None:
             cfg = ygg_cfg
         out = True
+        if lib in cls.internal_libraries:
+            src = cls.get_dependency_source(lib)
+            return os.path.isfile(src)
         dep_lang = cls.external_libraries[lib].get('language', cls.language)
         for lib_typ in cls.external_libraries[lib].keys():
             if lib_typ in ['libtype', 'language']:
