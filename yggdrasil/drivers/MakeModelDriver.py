@@ -226,8 +226,18 @@ class MakeModelDriver(CompiledModelDriver):
                 skip_defaults=True)
             linker_flags = CModelDriver.get_linker_flags(
                 for_model=True, skip_defaults=True)
+            # TODO: Put these in the default_flags_env?
             out['YGGCCFLAGS'] = ' '.join(compile_flags)
             out['YGGLDFLAGS'] = ' '.join(linker_flags)
+            # Set default compiler executable
+            compiler = CModelDriver.get_tool('compiler')
+            if (((compiler.default_flags_env is not None)
+                 and (compiler.default_flags_env not in out))):
+                out[compiler.default_flags_env] = compiler.get_executable()
+            linker = CModelDriver.get_tool('linker')
+            if (((linker.default_flags_env is not None)
+                 and (linker.default_flags_env not in out))):
+                out[linker.default_flags_env] = linker.get_executable()
         else:
             out = CModelDriver.update_ld_library_path(out)
         return out
