@@ -86,4 +86,4 @@ class ExecutableModelDriver(ModelDriver):
         """
         if commtype is None:
             return True  # executables presumed to include comms
-        return (commtype in tools.get_supported_lang())
+        return (commtype in tools.get_supported_comm())

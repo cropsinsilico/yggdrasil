@@ -17,6 +17,8 @@ recursive-include yggdrasil *.txt
 recursive-include yggdrasil *.json
 recursive-include yggdrasil/examples *.py
 recursive-include yggdrasil/tests/scripts *.py
+recursive-include yggdrasil Makefile_linux
+recursive-include yggdrasil Makefile_windows
 include yggdrasil/drivers/matlab_screenrc
 include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
