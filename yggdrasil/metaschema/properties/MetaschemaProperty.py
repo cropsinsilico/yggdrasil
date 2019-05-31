@@ -1,6 +1,9 @@
+import six
 import jsonschema
+from yggdrasil.metaschema.properties import MetaschemaPropertyMeta
 
 
+@six.add_metaclass(MetaschemaPropertyMeta)
 class MetaschemaProperty(object):
     r"""Base class for adding properties to the metaschema.
 
@@ -25,6 +28,7 @@ class MetaschemaProperty(object):
     _replaces_existing = False
     _skip_existing_validator = False
     _skip_formulaic_validator = False
+    _dont_register = False
 
     @classmethod
     def encode(cls, instance, typedef=None):
@@ -169,7 +173,8 @@ class MetaschemaProperty(object):
                 cls.post_validate(validator, value, instance, schema)
 
 
-def create_property(name, schema, encode, validate=None, compare=None):
+def create_property(name, schema, encode, validate=None, compare=None,
+                    dont_register=False):
     r"""Create a new property class.
 
     Args:
@@ -189,9 +194,12 @@ def create_property(name, schema, encode, validate=None, compare=None):
             property values and return a boolean: True if the first property
             is compatible with the second, False otherwise. See cls.compare
             for additional information and default behavior.
+        dont_register (bool, optional): If True, the created property will
+            not be registered. Defaults to False.
 
     """
-    attr_dict = {'name': name, 'schema': schema}
+    attr_dict = {'name': name, 'schema': schema,
+                 '_dont_register': dont_register}
     for k, x in zip(['_encode', '_validate', '_compare'],
                     [encode, validate, compare]):
         if x is not None:

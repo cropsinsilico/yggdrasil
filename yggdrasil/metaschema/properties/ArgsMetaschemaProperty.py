@@ -1,12 +1,10 @@
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import (
     MetaschemaProperty)
 from yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties import (
     PropertiesMetaschemaProperty)
 
 
-@register_metaschema_property
 class ArgsMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'args' property."""
 

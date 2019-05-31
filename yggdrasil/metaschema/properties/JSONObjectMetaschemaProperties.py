@@ -1,11 +1,9 @@
 from jsonschema.compat import iteritems
 from yggdrasil.metaschema import normalizer as normalizer_mod
 from yggdrasil.metaschema.datatypes import encode_type, compare_schema
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
-@register_metaschema_property
 class PropertiesMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'properties' property."""
 

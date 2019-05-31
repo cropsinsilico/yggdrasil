@@ -1,9 +1,7 @@
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import (
     MetaschemaProperty)
 
 
-@register_metaschema_property
 class LengthMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'length' property."""
     
@@ -18,7 +16,6 @@ class LengthMetaschemaProperty(MetaschemaProperty):
         return len(instance)
 
 
-@register_metaschema_property
 class ShapeMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'shape' property."""
     

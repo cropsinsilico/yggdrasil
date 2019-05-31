@@ -19,7 +19,8 @@ def test_dynamic():
             yield 'Test error'
         return
 
-    new_prop = create_property('invalid', None, encode, validate, compare)
+    new_prop = create_property('invalid', None, encode, validate, compare,
+                               dont_register=True)
     assert_equal(new_prop.encode('hello'), None)
     assert_equal(list(new_prop.validate(None, None, None, None)), [])
     assert_equal(list(new_prop.compare(True, True)), [])
