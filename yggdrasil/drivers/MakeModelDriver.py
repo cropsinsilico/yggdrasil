@@ -1,7 +1,7 @@
 import os
 import copy
 from collections import OrderedDict
-from yggdrasil import components, backwards
+from yggdrasil import components, backwards, platform
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase)
 from yggdrasil.drivers.CModelDriver import CModelDriver
@@ -42,6 +42,16 @@ class MakeCompiler(CompilerBase):
     default_archiver = False
     linker_attributes = {'executable_ext': ''}
     
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        CompilerBase.before_registration(cls)
+        if platform._is_win:  # pragma: windows
+            cls.linker_attributes['executable_ext'] = '.exe'
+        
     @classmethod
     def get_output_file(cls, src, target=None, **kwargs):
         r"""Determine the appropriate output file that will result when
@@ -154,19 +164,15 @@ class MakeCompiler(CompilerBase):
         # TODO: Change these to be more generic?
         out['YGGCCFLAGS'] = backwards.as_str(' '.join(compile_flags))
         out['YGGLDFLAGS'] = backwards.as_str(' '.join(linker_flags))
-        print(type(' '.join(compile_flags)), type(out['YGGCCFLAGS']))
         # Set default compiler executable
-        compiler = drv.get_tool('compiler')
-        linker = drv.get_tool('linker')
-        print(compiler.get_executable(), linker.get_executable())
+        # compiler = drv.get_tool('compiler')
+        # linker = drv.get_tool('linker')
         # if (((compiler.default_executable_env is not None)
         #      and (compiler.default_executable_env not in out))):
         #     out[compiler.default_executable_env] = compiler.get_executable()
         # if (((linker.default_executable_env is not None)
         #      and (linker.default_executable_env not in out))):
         #     out[linker.default_executable_env] = linker.get_executable()
-        import pprint
-        pprint.pprint(out)
         return out
     
 
