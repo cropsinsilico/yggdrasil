@@ -245,8 +245,10 @@ class MakeModelDriver(CompiledModelDriver):
                     src_dir = os.path.join(self.working_dir, src_dir)
                 for x in [self.working_dir, src_dir]:
                     y = os.path.normpath(os.path.join(x, self.makefile))
+                    print(x, y, os.path.isfile(y))
                     if os.path.isfile(y):
                         self.makefile = y
+                        # break
         if self.makedir is None:
             self.makedir = os.path.dirname(self.makefile)
         kwargs = dict(default_model_dir=self.makedir)
