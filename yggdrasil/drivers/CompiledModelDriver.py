@@ -2099,8 +2099,6 @@ class CompiledModelDriver(ModelDriver):
                         external_dependencies.append(x)
             if commtype is None:
                 commtype = tools.get_default_comm()
-            print('commtype', commtype, tools.get_default_comm(),
-                  os.environ.get('YGG_DEFAULT_COMM', None))
             definitions.append('%sDEF' % commtype[:3].upper())
         # Add interface as internal_dependency for models and expand
         # dependencies to get entire chain including sub-dependencies and so on
