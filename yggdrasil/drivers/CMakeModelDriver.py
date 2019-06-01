@@ -384,9 +384,6 @@ class CMakeModelDriver(CompiledModelDriver):
         model_base, model_ext = os.path.splitext(self.model_file)
         for x in self.cmake_products_ext:
             self.products.append(model_base + x)
-        # Add executable extension
-        if not model_ext:
-            self.model_file += self.get_tool('linker').executable_ext
         
     @classmethod
     def is_source_file(cls, fname):

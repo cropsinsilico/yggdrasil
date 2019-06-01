@@ -1596,7 +1596,9 @@ class CompiledModelDriver(ModelDriver):
             if len(self.source_files) == 0:
                 self.source_files.append(self.model_file)
         else:
-            if len(model_ext) > 0:
+            if len(model_ext) == 0:
+                self.model_file += self.get_tool('linker').executable_ext
+            else:
                 # Assert that model file is not source code in any of the
                 # registered languages
                 if model_ext in self.get_all_language_ext():  # pragma: debug
