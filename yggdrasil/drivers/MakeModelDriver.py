@@ -184,6 +184,23 @@ class NMakeCompiler(MakeCompiler):
     default_executable = None
     default_linker = None  # Force linker to be initialized with the same name
 
+    @classmethod
+    def language_version(cls, **kwargs):  # pragma: windows
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.call.
+
+        Returns:
+            str: Version of compiler/interpreter for this language.
+
+        """
+        out = cls.call(cls.version_flags, skip_flags=True,
+                       allow_error=True, **kwargs)
+        if 'Copyright' not in out:  # pragma: debug
+            raise RuntimeError("Version call failed: %s" % out)
+        return out.split('Copyright')[0]
+    
 
 class MakeModelDriver(CompiledModelDriver):
     r"""Class for running make file compiled drivers. Before running the
@@ -245,10 +262,9 @@ class MakeModelDriver(CompiledModelDriver):
                     src_dir = os.path.join(self.working_dir, src_dir)
                 for x in [self.working_dir, src_dir]:
                     y = os.path.normpath(os.path.join(x, self.makefile))
-                    print(x, y, os.path.isfile(y))
                     if os.path.isfile(y):
                         self.makefile = y
-                        # break
+                        break
         if self.makedir is None:
             self.makedir = os.path.dirname(self.makefile)
         kwargs = dict(default_model_dir=self.makedir)
