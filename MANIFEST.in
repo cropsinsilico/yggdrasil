@@ -18,7 +18,12 @@ recursive-include yggdrasil *.txt
 recursive-include yggdrasil *.json
 recursive-include yggdrasil/examples *.py
 recursive-include yggdrasil/tests/scripts *.py
-include yggdrasil/drivers/matlab_screenrc
+recursive-include yggdrasil/examples Makefile_linux
+recursive-include yggdrasil/examples Makefile_windows
+include yggdrasil/examples/gs_lesson4/src/Makefile_linux
+include yggdrasil/examples/gs_lesson4/src/Makefile_windows
+include yggdrasil/languages/MATLAB/matlab_screenrc
+include yggdrasil/languages/LPy/lpy_model.py
 include yggdrasil/regex/CMakeLists.txt
 include yggdrasil/tests/scripts/CMakeLists.txt
 include yggdrasil/tests/scripts/Makefile_linux

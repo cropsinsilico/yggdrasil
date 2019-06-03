@@ -3,8 +3,9 @@ import six
 import uuid
 import unittest
 import tempfile
+import shutil
 from yggdrasil.components import ComponentMeta
-from yggdrasil import runner, tools
+from yggdrasil import runner, tools, platform
 from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase
 
@@ -148,6 +149,14 @@ class TestExample(YggTestBase, tools.YggClass):
                 raise unittest.SkipTest("Could not locate example %s in language %s." %
                                         (self.name, self.language))
         else:
+            # Copy platform specific makefile
+            if self.language == 'make':
+                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+                if platform._is_win:  # pragma: windows
+                    make_ext = '_windows'
+                else:
+                    make_ext = '_linux'
+                shutil.copy(makefile + make_ext, makefile)
             # Check that language is installed
             for x in self.languages_tested:
                 if not tools.is_lang_installed(x):
@@ -162,6 +171,11 @@ class TestExample(YggTestBase, tools.YggClass):
                 assert(not self.runner.error_flag)
             self.check_results()
             self.cleanup()
+            # Remove copied makefile
+            if self.language == 'make':
+                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+                if os.path.isfile(makefile):
+                    os.remove(makefile)
 
     def cleanup(self):
         r"""Cleanup files created during the test."""

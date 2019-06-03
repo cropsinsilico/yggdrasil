@@ -57,7 +57,7 @@ YggInterfaceClass <- setRefClass("YggInterfaceClass",
 )
 
 YggInterface <- function(type, ...) {
-  ygg <- reticulate::import('yggdrasil.interface.YggInterface', convert=FALSE)
+  ygg <- reticulate::import('yggdrasil.languages.Python.YggInterface', convert=FALSE)
   varargin <- list(...)
   nargin <- length(varargin)
   pyobj <- ygg$YggInit(type, varargin)

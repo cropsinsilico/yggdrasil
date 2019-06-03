@@ -5,6 +5,12 @@ from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
+from yggdrasil.languages import get_language_dir
+
+
+_default_internal_libtype = 'object'
+# if platform._is_win:  # pragma: windows
+#     _default_internal_libtype = 'static'
 
 
 class CCompilerBase(CompilerBase):
@@ -44,14 +50,14 @@ class CCompilerBase(CompilerBase):
 
 class GCCCompiler(CCompilerBase):
     r"""Interface class for gcc compiler/linker."""
-    name = 'gcc'
+    toolname = 'gcc'
     platforms = ['MacOS', 'Linux', 'Windows']
     default_archiver = 'ar'
 
 
 class ClangCompiler(CCompilerBase):
     r"""clang compiler on Apple Mac OS."""
-    name = 'clang'
+    toolname = 'clang'
     platforms = ['MacOS']
     default_archiver = 'libtool'
 
@@ -60,7 +66,7 @@ class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
     # TODO: This class dosn't check the CXX and CXXFLAGS environment variables
     # for C++ currently because it is a C subclass.
-    name = 'cl'
+    toolname = 'cl'
     languages = ['c', 'c++']
     platforms = ['Windows']
     # TODO: Currently everything compiled as C++ on windows to allow use
@@ -110,7 +116,7 @@ class MSVCCompiler(CCompilerBase):
 # C Archivers
 class ARArchiver(ArchiverBase):
     r"""Archiver class for ar tool."""
-    name = 'ar'
+    toolname = 'ar'
     languages = ['c', 'c++']
     default_executable_env = 'AR'
     static_library_flag = 'rcs'
@@ -120,7 +126,7 @@ class ARArchiver(ArchiverBase):
 
 class LibtoolArchiver(ArchiverBase):
     r"""Archiver class for libtool tool."""
-    name = 'libtool'
+    toolname = 'libtool'
     languages = ['c', 'c++']
     default_executable_env = 'LIBTOOL'
     static_library_flag = '-static'  # This is the default
@@ -128,18 +134,19 @@ class LibtoolArchiver(ArchiverBase):
 
 class MSVCArchiver(ArchiverBase):
     r"""Microsoft Visual Studio C Archiver."""
-    name = 'LIB'
+    toolname = 'LIB'
     languages = ['c', 'c++']
     platforms = ['Windows']
     static_library_flag = None
     output_key = '/OUT:%s'
     
 
-_top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-_incl_interface = os.path.join(_top_dir, 'interface')
-_incl_io = os.path.join(_top_dir, 'io')
-_incl_seri = os.path.join(_top_dir, 'serialize')
-_incl_comm = os.path.join(_top_dir, 'communication')
+# _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
+# _incl_interface = os.path.join(_top_dir, 'interface')
+_top_lang_dir = get_language_dir('c')
+_incl_interface = _top_lang_dir
+_incl_seri = os.path.join(_top_lang_dir, 'serialize')
+_incl_comm = os.path.join(_top_lang_dir, 'communication')
 
 
 class CModelDriver(CompiledModelDriver):
@@ -173,24 +180,23 @@ class CModelDriver(CompiledModelDriver):
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
                 'external_dependencies': ['rapidjson'],
-                'include_dirs': [_incl_io, _incl_comm, _incl_seri],
+                'include_dirs': [_incl_comm, _incl_seri],
                 'compiler_flags': []},
         'regex_win32': {'source': 'regex_win32.cpp',
-                        'directory': os.path.join(_top_dir, 'regex'),
+                        'directory': os.path.join(_top_lang_dir, 'regex'),
                         'language': 'c++',
-                        'libtype': 'object',
+                        'libtype': _default_internal_libtype,
                         'internal_dependencies': [],
                         'external_dependencies': []},
         'regex_posix': {'source': 'regex_posix.h',
-                        'directory': os.path.join(_top_dir, 'regex'),
+                        'directory': os.path.join(_top_lang_dir, 'regex'),
                         'language': 'c',
                         'libtype': 'header_only',
                         'internal_dependencies': [],
                         'external_dependencies': []},
-        'datatypes': {'directory': os.path.join(_top_dir, 'metaschema',
-                                                'datatypes'),
+        'datatypes': {'directory': os.path.join(_top_lang_dir, 'datatypes'),
                       'language': 'c++',
-                      'libtype': 'object',
+                      'libtype': _default_internal_libtype,
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson'],
                       'include_dirs': []}}
@@ -241,12 +247,12 @@ class CModelDriver(CompiledModelDriver):
         'exec_end': '  return 0;\n}'}
 
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration."""
         if platform._is_mac and (cls.default_compiler is None):
             cls.default_compiler = 'clang'
-        CompiledModelDriver.before_registration(cls)
+        CompiledModelDriver.after_registration(cls)
         archiver = cls.get_tool('archiver')
         linker = cls.get_tool('linker')
         for x in ['zmq', 'czmq']:
@@ -269,14 +275,13 @@ class CModelDriver(CompiledModelDriver):
             regex_lib = cls.internal_libraries['regex_posix']
         cls.internal_libraries['regex'] = regex_lib
         # Platform specific internal library options
+        cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows
-            stdint_win = os.path.join(_top_dir, 'windows_stdint.h')
+            stdint_win = os.path.join(_top_lang_dir, 'windows_stdint.h')
             assert(os.path.isfile(stdint_win))
-            shutil.copy(stdint_win, os.path.join(_top_dir, 'stdint.h'))
-            for x in ['ygg', 'datatypes']:
-                cls.internal_libraries[x]['include_dirs'] += [_top_dir]
+            shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
+            cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
-            cls.internal_libraries['ygg']['include_dirs'] += [_top_dir]
             for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []
@@ -343,13 +348,17 @@ class CModelDriver(CompiledModelDriver):
                 env['LD_LIBRARY_PATH'] = os.pathsep.join(path_list)
         return env
 
-    def set_env(self):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CModelDriver, self).set_env()
+        out = super(CModelDriver, self).set_env(**kwargs)
         out = self.update_ld_library_path(out)
         return out

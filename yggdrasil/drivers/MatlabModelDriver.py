@@ -7,6 +7,7 @@ import psutil
 import warnings
 import weakref
 from yggdrasil import backwards, tools, platform, serialize
+from yggdrasil.languages import get_language_dir
 from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.tools import TimeOut, sleep
@@ -26,6 +27,7 @@ except ImportError:  # pragma: no matlab
     _matlab_engine_installed = False
 
 
+_top_lang_dir = get_language_dir('matlab')
 _compat_map = {
     'R2015b': ['2.7', '3.3', '3.4'],
     'R2017a': ['2.7', '3.3', '3.4', '3.5'],
@@ -121,7 +123,7 @@ def start_matlab_engine(skip_connect=False, timeout=None):  # pragma: matlab
                          + '_%d' % len(old_matlab))
     try:
         args = ['screen', '-dmS', screen_session, '-c',
-                os.path.join(os.path.dirname(__file__), 'matlab_screenrc'),
+                os.path.join(_top_lang_dir, 'matlab_screenrc'),
                 'matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
                 '-r', '"matlab.engine.shareEngine"']
         subprocess.call(' '.join(args), shell=True)

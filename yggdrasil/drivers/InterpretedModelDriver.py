@@ -5,7 +5,6 @@ from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-_incl_interface = os.path.join(_top_dir, 'interface')
 
 
 class InterpretedModelDriver(ModelDriver):
@@ -78,7 +77,7 @@ class InterpretedModelDriver(ModelDriver):
     default_interpreter = None
     default_interpreter_flags = []
     path_env_variable = None
-    paths_to_add = [_top_dir, _incl_interface]
+    paths_to_add = [_top_dir]
     comm_atexit = None
     comm_linger = False
     decode_format = None
@@ -97,14 +96,14 @@ class InterpretedModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, 'default_%s' % k))
 
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration. For compiled languages this includes selecting the
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
         """
-        ModelDriver.before_registration(cls)
+        ModelDriver.after_registration(cls)
         if cls.language is not None:
             for k in ['interpreter']:
                 # Set attribute defaults based on config options
@@ -119,7 +118,21 @@ class InterpretedModelDriver(ModelDriver):
             # Set default interpreter based on language
             if cls.default_interpreter is None:
                 cls.default_interpreter = cls.language
+            # Add directory containing the interface
+            cls.paths_to_add.append(cls.get_language_dir())
                     
+    def parse_arguments(self, *args, **kwargs):
+        r"""Sort model arguments to determine which one is the executable
+        and which ones are arguments.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments are passed to the parent class's method.
+
+        """
+        super(InterpretedModelDriver, self).parse_arguments(*args, **kwargs)
+        self.model_src = self.model_file
+        
     @classmethod
     def get_interpreter(cls):
         r"""Command required to run a model written in this language from

@@ -1,5 +1,5 @@
 import platform as sys_platform
-# from yggdrasil import platform  # , tools
+from yggdrasil import tools  # platform
 from yggdrasil.drivers.ModelDriver import ModelDriver
 
 
@@ -76,7 +76,7 @@ class ExecutableModelDriver(ModelDriver):
         return True
 
     @classmethod
-    def is_comm_installed(self, **kwargs):
+    def is_comm_installed(self, commtype=None, **kwargs):
         r"""Determine if a comm is installed for the associated programming
         language.
 
@@ -84,4 +84,6 @@ class ExecutableModelDriver(ModelDriver):
             bool: True if a comm is installed for this language.
 
         """
-        return True  # executables presumed include comms
+        if commtype is None:
+            return True  # executables presumed to include comms
+        return (commtype in tools.get_supported_comm())

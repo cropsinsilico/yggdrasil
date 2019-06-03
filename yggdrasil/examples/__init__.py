@@ -6,8 +6,9 @@ _all_lang = ('python', 'matlab', 'c', 'cpp', 'r')
 ex_dict = {'gs_lesson1': _all_lang,
            'gs_lesson2': _all_lang,
            'gs_lesson3': _all_lang,
-           'gs_lesson4': tuple(list(_all_lang) + ['cmake']),
+           'gs_lesson4': tuple(list(_all_lang) + ['make', 'cmake']),
            'gs_lesson4b': _all_lang,
+           'backwards': tuple(list(_all_lang) + ['make', 'cmake']),
            'formatted_io1': _all_lang,
            'formatted_io2': _all_lang,
            'formatted_io3': _all_lang,
@@ -35,6 +36,7 @@ ext_map = {'python': '.py',
            'c': '.c',
            'cpp': '.cpp',
            'executable': '',
+           'make': '.cpp',
            'cmake': '.cpp'}
 _example_dir = os.path.dirname(__file__)
 
@@ -81,7 +83,7 @@ for k, lang in ex_dict.items():
                          '%sSrv_%s.yml' % (k, srv_l)]
             src_names = ['%s%s' % (k, ext_map[cli_l]),
                          '%s%s' % (k, ext_map[srv_l])]
-        elif k in ['gs_lesson4', 'gs_lesson4b',
+        elif k in ['gs_lesson4', 'gs_lesson4b', 'backwards',
                    'formatted_io1', 'formatted_io2', 'formatted_io3',
                    'formatted_io4', 'formatted_io5', 'formatted_io6',
                    'formatted_io7', 'formatted_io8', 'formatted_io9']:

@@ -41,12 +41,12 @@ class CPPCompilerBase(CCompilerBase):
 
 class GPPCompiler(CPPCompilerBase, GCCCompiler):
     r"""Interface class for G++ compiler/linker."""
-    name = 'g++'
+    toolname = 'g++'
 
 
 class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
     r"""clang++ compiler on Apple Mac OS."""
-    name = 'clang++'
+    toolname = 'clang++'
 
 
 class CPPModelDriver(CModelDriver):
@@ -86,18 +86,23 @@ class CPPModelDriver(CModelDriver):
         try_except='}} catch ({error_type} {error_var}) {{')
     
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration."""
         if platform._is_mac and (cls.default_compiler is None):
             cls.default_compiler = 'clang++'
         cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
-        CModelDriver.before_registration(cls)
+        CModelDriver.after_registration(cls)
         internal_libs = copy.deepcopy(cls.internal_libraries)
         internal_libs[cls.interface_library] = internal_libs.pop(
             CModelDriver.interface_library)
-        internal_libs[cls.interface_library]['source'] = os.path.splitext(
-            internal_libs[cls.interface_library]['source'])[0] + cls.language_ext[0]
+        internal_libs[cls.interface_library]['source'] = os.path.join(
+            cls.get_language_dir(),
+            os.path.splitext(os.path.basename(
+                internal_libs[cls.interface_library]['source']))[0]
+            + cls.language_ext[0])
+        internal_libs[cls.interface_library]['include_dirs'].append(
+            cls.get_language_dir())
         cls.internal_libraries = internal_libs
 
     @classmethod

@@ -3,8 +3,9 @@ import re
 import copy
 import shutil
 import logging
+import glob
 from collections import OrderedDict
-from yggdrasil import platform, backwards
+from yggdrasil import platform, backwards, components
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, LinkerBase)
 from yggdrasil.drivers import CModelDriver, CPPModelDriver
@@ -15,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 class CMakeConfigure(CompilerBase):
     r"""CMake configuration tool."""
-    name = 'cmake'
-    languages = ['cmake']
+    toolname = 'cmake'
+    languages = ['cmake', 'c', 'c++']
     is_linker = False
     default_flags = []  # '-H']
     flag_options = OrderedDict([('definitions', '-D%s'),
@@ -154,8 +155,8 @@ class CMakeConfigure(CompilerBase):
     
 class CMakeBuilder(LinkerBase):
     r"""CMake build tool."""
-    name = 'cmake'
-    languages = ['cmake']
+    toolname = 'cmake'
+    languages = ['cmake', 'c', 'c++']
     default_flags = []  # '--clean-first']
     output_key = None
     flag_options = OrderedDict([('builddir', {'key': '--build',
@@ -320,6 +321,8 @@ class CMakeModelDriver(CompiledModelDriver):
             or absolute.
         target (str, optional): Make target that should be built to create the
             model executable. Defaults to None.
+        target_language (str, optional): Language that the target is written in.
+            Defaults to None and will be set based on the source files provided.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -329,6 +332,9 @@ class CMakeModelDriver(CompiledModelDriver):
         add_libraries (bool): If True, interface libraries and dependency
             libraries are added using CMake's ADD_LIBRARY directive. If False,
             interface libraries are found using FIND_LIBRARY.
+        target_language (str): Language that the target is written in.
+        target_language_driver (ModelDriver): Language driver for the target
+            language.
 
     Raises:
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
@@ -339,7 +345,8 @@ class CMakeModelDriver(CompiledModelDriver):
                                    'CMake build system.')
     _schema_properties = {'sourcedir': {'type': 'string'},
                           'builddir': {'type': 'string'},
-                          'target': {'type': 'string'}}
+                          'target': {'type': 'string'},
+                          'target_language': {'type': 'string'}}
     language = 'cmake'
     base_languages = ['c']
     cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',
@@ -384,9 +391,21 @@ class CMakeModelDriver(CompiledModelDriver):
         model_base, model_ext = os.path.splitext(self.model_file)
         for x in self.cmake_products_ext:
             self.products.append(model_base + x)
-        # Add executable extension
-        if not model_ext:
-            self.model_file += self.get_tool('linker').executable_ext
+        if self.target_language is None:
+            try_list = list(glob.glob(os.path.join(self.sourcedir, '*')))
+            early_exit = False
+            if self.model_src is not None:
+                try_list = [self.model_src, try_list]
+                early_exit = True
+            languages = copy.deepcopy(self.get_tool('compiler').languages)
+            languages.remove('cmake')
+            self.target_language = self.get_language_for_source(
+                try_list, early_exit=early_exit, languages=languages)
+            # Try to compile C as C++
+            if self.target_language == 'c':
+                self.target_language = 'c++'
+        self.target_language_driver = components.import_component(
+            'model', self.target_language)
         
     @classmethod
     def is_source_file(cls, fname):
@@ -421,6 +440,7 @@ class CMakeModelDriver(CompiledModelDriver):
             include_base = 'ygg_cmake_%s.txt' % self.target
         include_file = os.path.join(self.sourcedir, include_base)
         self.create_include(include_file, self.target,
+                            driver=self.target_language_driver,
                             logging_level=self.logger.getEffectiveLevel())
         assert(os.path.isfile(include_file))
         out.append(include_file)
@@ -458,7 +478,7 @@ class CMakeModelDriver(CompiledModelDriver):
 
     @classmethod
     def create_include(cls, fname, target, compile_flags=None, linker_flags=None,
-                       logging_level=None):
+                       driver=CModelDriver.CModelDriver, logging_level=None):
         r"""Create CMakeList include file with necessary includes,
         definitions, and linker flags.
 
@@ -469,6 +489,9 @@ class CMakeModelDriver(CompiledModelDriver):
                 should be set. Defaults to [].
             linker_flags (list, optional): Additional linker flags that
                 should be set. Defaults to [].
+            driver (CompiledModelDriver, optional): The CompiledModelDriver that
+                should be used to get compiler/linker flags. Defaults to
+                CModelDriver.
             logging_level (int, optional): Logging level that should be passed
                 as a definition to the C compiler. Defaults to None and will be
                 ignored.
@@ -485,21 +508,32 @@ class CMakeModelDriver(CompiledModelDriver):
             linker_flags = []
         use_library_path = True  # platform._is_win
         library_flags = []
-        compile_flags = CModelDriver.CModelDriver.get_compiler_flags(
+        external_library_flags = []
+        internal_library_flags = []
+        compile_flags = driver.get_compiler_flags(
             flags=compile_flags, use_library_path=use_library_path,
             dont_link=True, for_model=True, skip_defaults=True,
             logging_level=logging_level)
-        linker_flags = CModelDriver.CModelDriver.get_linker_flags(
-            flags=linker_flags, use_library_path=use_library_path,
-            for_model=True, skip_defaults=True, use_library_path_internal=True,
+        linker_flags = driver.get_linker_flags(
+            flags=linker_flags, for_model=True, skip_defaults=True,
+            use_library_path='external_library_flags',
+            external_library_flags=external_library_flags,
+            use_library_path_internal='internal_library_flags',
+            internal_library_flags=internal_library_flags,
             skip_library_libs=True, library_flags=library_flags)
         lines = []
         preamble_lines = []
+        library_flags += internal_library_flags + external_library_flags
         # Suppress warnings on windows about the security of strcpy etc.
+        # and target x64 if the current platform is 64bit
         if platform._is_win:  # pragma: windows
             new_flag = "-D_CRT_SECURE_NO_WARNINGS"
             if new_flag not in compile_flags:
                 compile_flags.append(new_flag)
+            if platform._is_64bit:
+                new_flag = "-DCMAKE_GENERATOR_PLATFORM=x64"
+                if new_flag not in compile_flags:
+                    compile_flags.append(new_flag)
         # Compilation flags
         for x in compile_flags:
             if x.startswith('-D'):
@@ -511,6 +545,10 @@ class CMakeModelDriver(CompiledModelDriver):
                 new_dir = 'INCLUDE_DIRECTORIES(%s)' % xdir
                 if new_dir not in preamble_lines:
                     preamble_lines.append(new_dir)
+            elif x.startswith('-std=c++') or x.startswith('/std=c++'):
+                new_def = 'SET(CMAKE_CXX_STANDARD %s)' % x.split('c++')[-1]
+                if new_def not in preamble_lines:
+                    preamble_lines.append(new_def)
             elif x.startswith('-') or x.startswith('/'):
                 new_def = 'ADD_DEFINITIONS(%s)' % x
                 if new_def not in preamble_lines:
@@ -543,7 +581,7 @@ class CMakeModelDriver(CompiledModelDriver):
         for x in library_flags:
             xd, xf = os.path.split(x)
             xl, xe = os.path.splitext(xf)
-            xl = CModelDriver.CModelDriver.get_tool('linker').libpath2libname(xf)
+            xl = driver.get_tool('linker').libpath2libname(xf)
             if platform._is_win:  # pragma: windows
                 x = x.replace('\\', re.escape('\\'))
                 xd = xd.replace('\\', re.escape('\\'))
@@ -551,17 +589,19 @@ class CMakeModelDriver(CompiledModelDriver):
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
                 preamble_lines.append(new_dir)
-            if cls.add_libraries:  # pragma: no cover
+            if cls.add_libraries or (x in internal_library_flags):
                 # Version adding library
+                lines.append('if (NOT TARGET %s)' % xl)
                 if xe.lower() in ['.so', '.dll', '.dylib']:
-                    lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
+                    lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
                 else:
-                    lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
-                lines += ['SET_TARGET_PROPERTIES(',
-                          '    %s PROPERTIES' % xl,
-                          # '    LINKER_LANGUAGE CXX',
-                          # '    CXX_STANDARD 11',
-                          '    IMPORTED_LOCATION %s)' % x,
+                    lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
+                lines += ['    SET_TARGET_PROPERTIES(',
+                          '        %s PROPERTIES' % xl,
+                          # '        LINKER_LANGUAGE CXX',
+                          # '        CXX_STANDARD 11',
+                          '        IMPORTED_LOCATION %s)' % x,
+                          'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
                 # Version finding library
@@ -570,7 +610,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
-        logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
+        logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -655,14 +695,18 @@ class CMakeModelDriver(CompiledModelDriver):
                 kwargs.setdefault(k, v)
             return super(CMakeModelDriver, self).compile_model(**kwargs)
 
-    def set_env(self):
+    def set_env(self, **kwargs):
         r"""Get environment variables that should be set for the model process.
+
+        Args:
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Environment variables for the model process.
 
         """
-        out = super(CMakeModelDriver, self).set_env()
+        out = super(CMakeModelDriver, self).set_env(**kwargs)
         out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
     

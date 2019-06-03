@@ -86,6 +86,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
         r"""Tests for getting installed comm while skipping config."""
         self.assert_equal(self.import_cls.is_comm_installed(),
                           self.import_cls.is_comm_installed(skip_config=True))
+        self.assert_equal(self.import_cls.is_comm_installed(commtype='invalid',
+                                                            skip_config=True),
+                          False)
         
     def test_language_version(self):
         r"""Test language version."""

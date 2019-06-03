@@ -19,12 +19,18 @@ _comptype2key = {'comm': 'commtype',
                  'connection': 'connection_type',
                  # 'datatype': None,
                  'serializer': 'seritype'}
+# 'compiler': 'toolname',
+# 'linker': 'toolname',
+# 'archiver': 'toolname'}
 _comptype2mod = {'comm': 'communication',
                  'file': 'communication',
                  'model': 'drivers',
                  'connection': 'drivers',
-                 'datatype': ['metaschema', 'datatypes'],
+                 # 'datatype': ['metaschema', 'datatypes'],
                  'serializer': 'serialize'}
+# 'compiler': 'drivers',
+# 'linker': 'drivers',
+# 'archiver': 'drivers'}
 
 
 def init_registry():
@@ -32,13 +38,14 @@ def init_registry():
     global _registry
     global _registry_complete
     if not _registry_complete:
-        # Connection & file component import will be needed if they are
-        # moved to other directories
-        import_all_components('serializer')
-        import_all_components('model')
-        # import_all_components('connection')
-        import_all_components('comm')
-        # import_all_components('file')
+        comp_list = []
+        mod_list = []
+        for k, v in _comptype2mod.items():
+            if v not in mod_list:
+                comp_list.append(k)
+                mod_list.append(v)
+        for k in comp_list:
+            import_all_components(k)
         _registry_complete = True
     return _registry
 
@@ -312,7 +319,7 @@ class ComponentMeta(type):
         if not (name.endswith('Base') or (subtype is None) or cls._dont_register):
             # Perform class specific actions in preparation for registration
             cls.before_registration(cls)
-            assert(cls.name is not None)
+            # assert(cls.name is not None)
             # Add parameter descriptions from docs
             for x in cls.__mro__[::-1]:
                 args_dict = docs2args(x.__doc__)
@@ -325,7 +332,8 @@ class ComponentMeta(type):
             global _registry_class2subtype
             yaml_typ = cls._schema_type
             default_subtype = cls._schema_properties.get(
-                cls._schema_subtype_key, {}).get('default', subtype)
+                cls._schema_subtype_key, {}).get('default',
+                                                 cls._schema_subtype_default)
             if yaml_typ not in _registry:
                 _registry[yaml_typ] = OrderedDict()
                 _registry_defaults[yaml_typ] = default_subtype
@@ -335,7 +343,10 @@ class ComponentMeta(type):
             if cls.__name__ not in _registry[yaml_typ]:
                 _registry[yaml_typ][cls.__name__] = cls
                 _registry_class2subtype[yaml_typ][subtype] = cls.__name__
-            cls.after_registration(cls)
+            if not (os.environ.get('YGG_RUNNING_YGGSCHEMA', 'None').lower()
+                    in ['true', '1']):
+                cls.after_registration(cls)
+                cls.finalize_registration(cls)
         return cls
     
     # def __getattribute__(cls, key):
@@ -397,6 +408,7 @@ class ComponentBase(object):
     _schema_type = None
     _schema_subtype_key = None
     _schema_subtype_description = None
+    _schema_subtype_default = None
     _schema_required = []
     _schema_properties = {}
     _schema_excluded_from_class = []
@@ -474,11 +486,20 @@ class ComponentBase(object):
     @staticmethod
     def before_registration(cls):
         r"""Operations that should be performed to modify class attributes prior
-        to registration."""
+        to registration. These actions will still be performed if the environment
+        variable YGG_RUNNING_YGGSCHEMA is set."""
         pass
 
     @staticmethod
     def after_registration(cls):
         r"""Operations that should be preformed to modify class attributes after
-        registration."""
+        registration. These actions will not be performed if the environment
+        variable YGG_RUNNING_YGGSCHEMA is set."""
+        pass
+
+    @staticmethod
+    def finalize_registration(cls):
+        r"""Final operations to perform after a class has been fully initialized.
+        These actions will not be performed if the environment variable
+        YGG_RUNNING_YGGSCHEMA is set."""
         pass
