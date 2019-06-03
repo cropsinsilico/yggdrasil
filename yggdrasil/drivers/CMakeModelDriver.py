@@ -356,7 +356,7 @@ class CMakeModelDriver(CompiledModelDriver):
     # TODO: These are only on Windows using MSVC
     cmake_products_ext = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
                           '.vcxproj.filters']
-    add_libraries = False
+    add_libraries = True
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -508,16 +508,22 @@ class CMakeModelDriver(CompiledModelDriver):
             linker_flags = []
         use_library_path = True  # platform._is_win
         library_flags = []
+        external_library_flags = []
+        internal_library_flags = []
         compile_flags = driver.get_compiler_flags(
             flags=compile_flags, use_library_path=use_library_path,
             dont_link=True, for_model=True, skip_defaults=True,
             logging_level=logging_level)
         linker_flags = driver.get_linker_flags(
-            flags=linker_flags, use_library_path=use_library_path,
-            for_model=True, skip_defaults=True, use_library_path_internal=True,
+            flags=linker_flags, for_model=True, skip_defaults=True,
+            use_library_path='external_library_flags',
+            external_library_flags=external_library_flags,
+            use_library_path_internal='internal_library_flags',
+            internal_library_flags=internal_library_flags,
             skip_library_libs=True, library_flags=library_flags)
         lines = []
         preamble_lines = []
+        library_flags += internal_library_flags + external_library_flags
         # Suppress warnings on windows about the security of strcpy etc.
         if platform._is_win:  # pragma: windows
             new_flag = "-D_CRT_SECURE_NO_WARNINGS"
@@ -578,17 +584,19 @@ class CMakeModelDriver(CompiledModelDriver):
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
                 preamble_lines.append(new_dir)
-            if cls.add_libraries:  # pragma: no cover
+            if cls.add_libraries and (x in internal_library_flags):
                 # Version adding library
+                lines.append('if (NOT TARGET %s)' % xl)
                 if xe.lower() in ['.so', '.dll', '.dylib']:
-                    lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
+                    lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
                 else:
-                    lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
-                lines += ['SET_TARGET_PROPERTIES(',
-                          '    %s PROPERTIES' % xl,
-                          # '    LINKER_LANGUAGE CXX',
-                          # '    CXX_STANDARD 11',
-                          '    IMPORTED_LOCATION %s)' % x,
+                    lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
+                lines += ['    SET_TARGET_PROPERTIES(',
+                          '        %s PROPERTIES' % xl,
+                          # '        LINKER_LANGUAGE CXX',
+                          # '        CXX_STANDARD 11',
+                          '        IMPORTED_LOCATION %s)' % x,
+                          'endif()',
                           'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
             else:
                 # Version finding library
@@ -597,7 +605,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
-        logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
+        logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
             return lines
         else:

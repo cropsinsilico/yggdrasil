@@ -742,9 +742,7 @@ class CompilationToolBase(object):
         output = ''
         try:
             unused_kwargs.setdefault('env', cls.set_env())
-            logger.info('Command: "%s"' % ' '.join(cmd))
-            import pprint
-            pprint.pprint(cmd)
+            logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = backwards.as_str(output)
@@ -1316,12 +1314,18 @@ class LinkerBase(CompilationToolBase):
         library_flags = kwargs.pop('library_flags', [])
         flags = copy.deepcopy(kwargs.pop('flags', []))
         # Get list of libraries
-        for x in libraries:
-            if use_library_path:
-                if skip_library_libs:
+        dest_flags = []
+        if use_library_path:
+            if skip_library_libs:
+                if ((isinstance(use_library_path, bool)
+                     or (use_library_path == 'library_flags'))):
                     dest_flags = library_flags
                 else:
-                    dest_flags = flags
+                    dest_flags = kwargs.pop(use_library_path)
+            else:
+                dest_flags = flags
+        for x in libraries:
+            if use_library_path:
                 if x not in dest_flags:
                     dest_flags.append(x)
             else:
@@ -2215,7 +2219,10 @@ class CompiledModelDriver(ModelDriver):
                     assert(os.path.isfile(dep_lib))
                 if use_library_path_internal and (dep in internal_dependencies):
                     if kwargs.get('skip_library_libs', False):
-                        libkey = 'library_flags'
+                        if isinstance(use_library_path_internal, bool):
+                            libkey = 'library_flags'
+                        else:
+                            libkey = use_library_path_internal
                     else:
                         libkey = 'flags'
                     kwargs.setdefault(libkey, [])
