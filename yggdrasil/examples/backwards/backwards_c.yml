@@ -1,0 +1,20 @@
+models:
+  - name: c_modelA
+    language: c
+    args: ./src/backwards_modelA.c
+    inputs: inputA
+    outputs: outputA
+
+  - name: c_modelB
+    language: c
+    args: ./src/backwards_modelB.c
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt

@@ -7,6 +7,7 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson3': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson4': ('python', 'matlab', 'c', 'cpp', 'make', 'cmake'),
            'gs_lesson4b': ('python', 'matlab', 'c', 'cpp'),
+           'backwards': ('python', 'matlab', 'c', 'cpp', 'make', 'cmake'),
            'formatted_io1': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io2': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io3': ('python', 'matlab', 'c', 'cpp'),
@@ -80,7 +81,7 @@ for k, lang in ex_dict.items():
                          '%sSrv_%s.yml' % (k, srv_l)]
             src_names = ['%s%s' % (k, ext_map[cli_l]),
                          '%s%s' % (k, ext_map[srv_l])]
-        elif k in ['gs_lesson4', 'gs_lesson4b',
+        elif k in ['gs_lesson4', 'gs_lesson4b', 'backwards',
                    'formatted_io1', 'formatted_io2', 'formatted_io3',
                    'formatted_io4', 'formatted_io5', 'formatted_io6',
                    'formatted_io7', 'formatted_io8', 'formatted_io9']:

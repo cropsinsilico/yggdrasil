@@ -1,0 +1,22 @@
+models:
+  - name: cmake_modelA
+    language: cmake
+    args: ./src/backwards_modelA.cpp
+    target: backwards_modelA
+    inputs: inputA
+    outputs: outputA
+
+  - name: cmake_modelB
+    language: cmake
+    args: ./src/backwards_modelB.cpp
+    target: backwards_modelB
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
