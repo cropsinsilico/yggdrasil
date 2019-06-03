@@ -7,6 +7,11 @@ from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
 
 
+_default_internal_libtype = 'object'
+# if platform._is_win:  # pragma: windows
+#     _default_internal_libtype = 'static'
+
+
 class CCompilerBase(CompilerBase):
     r"""Base class for C compilers."""
     languages = ['c']
@@ -177,7 +182,7 @@ class CModelDriver(CompiledModelDriver):
         'regex_win32': {'source': 'regex_win32.cpp',
                         'directory': os.path.join(_top_dir, 'regex'),
                         'language': 'c++',
-                        'libtype': 'object',
+                        'libtype': _default_internal_libtype,
                         'internal_dependencies': [],
                         'external_dependencies': []},
         'regex_posix': {'source': 'regex_posix.h',
@@ -189,7 +194,7 @@ class CModelDriver(CompiledModelDriver):
         'datatypes': {'directory': os.path.join(_top_dir, 'metaschema',
                                                 'datatypes'),
                       'language': 'c++',
-                      'libtype': 'object',
+                      'libtype': _default_internal_libtype,
                       'internal_dependencies': ['regex'],
                       'external_dependencies': ['rapidjson'],
                       'include_dirs': []}}

@@ -743,6 +743,8 @@ class CompilationToolBase(object):
         try:
             unused_kwargs.setdefault('env', cls.set_env())
             logger.info('Command: "%s"' % ' '.join(cmd))
+            import pprint
+            pprint.pprint(cmd)
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
             output = backwards.as_str(output)

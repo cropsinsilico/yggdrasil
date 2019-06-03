@@ -164,6 +164,10 @@ class MakeCompiler(CompilerBase):
         # TODO: Change these to be more generic?
         out['YGGCCFLAGS'] = backwards.as_str(' '.join(compile_flags))
         out['YGGLDFLAGS'] = backwards.as_str(' '.join(linker_flags))
+        print('flags')
+        import pprint
+        pprint.pprint(out['YGGCCFLAGS'])
+        pprint.pprint(out['YGGLDFLAGS'])
         # Set default compiler executable
         # compiler = drv.get_tool('compiler')
         # linker = drv.get_tool('linker')
