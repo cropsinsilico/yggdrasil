@@ -356,7 +356,7 @@ class CMakeModelDriver(CompiledModelDriver):
     # TODO: These are only on Windows using MSVC
     cmake_products_ext = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
                           '.vcxproj.filters']
-    add_libraries = True
+    add_libraries = False
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -525,10 +525,15 @@ class CMakeModelDriver(CompiledModelDriver):
         preamble_lines = []
         library_flags += internal_library_flags + external_library_flags
         # Suppress warnings on windows about the security of strcpy etc.
+        # and target x64 if the current platform is 64bit
         if platform._is_win:  # pragma: windows
             new_flag = "-D_CRT_SECURE_NO_WARNINGS"
             if new_flag not in compile_flags:
                 compile_flags.append(new_flag)
+            if platform._is_64bit:
+                new_flag = "-DCMAKE_GENERATOR_PLATFORM=x64"
+                if new_flag not in compile_flags:
+                    compile_flags.append(new_flag)
         # Compilation flags
         for x in compile_flags:
             if x.startswith('-D'):
@@ -584,7 +589,7 @@ class CMakeModelDriver(CompiledModelDriver):
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
                 preamble_lines.append(new_dir)
-            if cls.add_libraries and (x in internal_library_flags):
+            if cls.add_libraries or (x in internal_library_flags):
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
                 if xe.lower() in ['.so', '.dll', '.dylib']:
