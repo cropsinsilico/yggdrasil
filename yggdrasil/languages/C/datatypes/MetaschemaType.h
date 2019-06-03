@@ -1,7 +1,7 @@
 #ifndef METASCHEMA_TYPE_H_
 #define METASCHEMA_TYPE_H_
 
-#include "../../tools.h"
+#include "../tools.h"
 
 #include <stdexcept>
 #include <map>

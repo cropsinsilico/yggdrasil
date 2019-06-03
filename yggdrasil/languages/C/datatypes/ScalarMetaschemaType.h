@@ -6,8 +6,8 @@
 #include <vector>
 #include <cstring>
 
-#include "../../tools.h"
-#include "../../serialize/base64.h"
+#include "../tools.h"
+#include "../serialize/base64.h"
 #include "MetaschemaType.h"
 
 #include "rapidjson/document.h"

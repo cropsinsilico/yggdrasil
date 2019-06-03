@@ -1,7 +1,7 @@
 #ifndef PLY_DICT_H_
 #define PLY_DICT_H_
 
-#include "../../tools.h"
+#include "../tools.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {

@@ -1,3 +1,13 @@
+% =============================================================================
+%> @brief A wrapper for conversion from Python datatypes to Matlab datatypes.
+%>
+%> This function takes a Python object as input and converts it into an
+%> equivalent Matlab object.
+%>
+%> @param x_py Python object that should be converted.
+%>
+%> @return x_ml Matlab version of x_py.
+% =============================================================================
 function x_ml = python2matlab(x_py)
   [version, executable, isloaded] = pyversion;
   if isa(x_py, 'py.None')

@@ -13,7 +13,7 @@
 %> @return out python object returned by the called class/function.
 % =============================================================================
 function out = YggInterface(type, varargin)
-  YggInterface = py.importlib.import_module('yggdrasil.interface.YggInterface');
+  YggInterface = py.importlib.import_module('yggdrasil.languages.Python.YggInterface');
   pyobj = YggInterface.YggMatlab(type, py.list(varargin));
   if (nargin > 1);
     out = YggInterfaceClass(pyobj);

@@ -1,13 +1,7 @@
-import os
 import sys
 import importlib
 from yggdrasil import tools
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-
-
-_top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-_incl_interface = os.path.join(_top_dir, 'interface')
-_incl_io = os.path.join(_top_dir, 'io')
 
 
 class PythonModelDriver(InterpretedModelDriver):

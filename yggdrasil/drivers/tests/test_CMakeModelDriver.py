@@ -118,7 +118,8 @@ def test_CMakeModelDriver_error_cmake():
     r"""Test CMakeModelDriver error for invalid cmake args."""
     makedir, target = os.path.split(scripts['cmake'])
     assert_raises(RuntimeError, CMakeModelDriver, 'test', target,
-                  sourcedir=makedir, compiler_flags='-P')
+                  sourcedir=makedir, compiler_flags='-P',
+                  target_language='c')
 
 
 @unittest.skipIf(not _driver_installed, "C Library not installed")
@@ -126,13 +127,14 @@ def test_CMakeModelDriver_error_notarget():
     r"""Test CMakeModelDriver error for invalid target."""
     makedir, target = os.path.split(scripts['cmake'])
     assert_raises(RuntimeError, CMakeModelDriver, 'test', 'invalid',
-                  sourcedir=makedir)
+                  sourcedir=makedir, target_language='c')
 
 
 @unittest.skipIf(not _driver_installed, "C Library not installed")
 def test_CMakeModelDriver_error_nofile():
     r"""Test CMakeModelDriver error for missing CMakeLists.txt."""
-    assert_raises(RuntimeError, CMakeModelDriver, 'test', 'invalid')
+    assert_raises(RuntimeError, CMakeModelDriver, 'test', 'invalid',
+                  target_language='c')
 
 
 class TestCMakeModelParam(parent.TestCompiledModelParam):
@@ -146,7 +148,6 @@ class TestCMakeModelParam(parent.TestCompiledModelParam):
         self.sourcedir, self.target = os.path.split(scripts['cmake'])
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
-        # self._inst_kwargs['yml']['working_dir']
         self._inst_kwargs['yml']['working_dir'] = self.sourcedir
 
     def test_sbdir(self):

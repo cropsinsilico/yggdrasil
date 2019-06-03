@@ -1,3 +1,13 @@
+% =============================================================================
+%> @brief A wrapper for conversion from Matlab datatypes to Python datatypes.
+%>
+%> This function takes a Matlab object as input and converts it into an
+%> equivalent Python object.
+%>
+%> @param x_ml Matlab object that should be converted.
+%>
+%> @return x_py Python version of x_ml.
+% =============================================================================
 function x_py = matlab2python(x_ml)
   if isa(x_ml, 'py.object')
     x_py = x_ml;
@@ -101,7 +111,7 @@ function x_py = matlab2python(x_ml)
       transpose = x_ml';
       x_py = py.numpy.reshape(transpose(:)', data_size).tolist();
     end;
-  else;
+  else
     disp('Could not convert matlab type to python type');
     disp(x_ml);
     disp(class(x_ml));

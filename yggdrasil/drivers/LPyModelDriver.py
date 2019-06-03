@@ -1,8 +1,9 @@
 import os
+from yggdrasil.languages import get_language_dir
 from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 
 
-_model_script = os.path.join(os.path.dirname(__file__), 'lpy_model.py')
+_model_script = os.path.join(get_language_dir('lpy'), 'lpy_model.py')
 
 
 class LPyModelDriver(PythonModelDriver):  # pragma: lpy

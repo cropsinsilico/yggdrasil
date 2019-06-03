@@ -8,7 +8,7 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
-from yggdrasil.drivers.ModelDriver import ModelDriver, _all_language_ext
+from yggdrasil.drivers.ModelDriver import ModelDriver, _map_language_ext
 from yggdrasil.components import import_component
 
 
@@ -279,7 +279,7 @@ class CompilationToolBase(object):
     @classmethod
     def get_all_language_ext(cls):
         r"""Return the list of all language extensions."""
-        return _all_language_ext
+        return list(_map_language_ext.keys())
 
     @classmethod
     def get_language_ext(cls):
@@ -1595,6 +1595,7 @@ class CompiledModelDriver(ModelDriver):
         model_ext = os.path.splitext(self.model_file)[-1]
         model_is_source = self.is_source_file(self.model_file)
         if model_is_source:
+            self.model_src = self.model_file
             if len(self.source_files) == 0:
                 self.source_files.append(self.model_file)
         else:
@@ -1619,8 +1620,9 @@ class CompiledModelDriver(ModelDriver):
             if (len(self.source_files) == 0) and (self.language_ext is not None):
                 # Add source file based on the model file
                 # model_is_source = True
-                self.source_files.append(os.path.splitext(self.model_file)[0]
-                                         + self.language_ext[0])
+                self.model_src = (os.path.splitext(self.model_file)[0]
+                                  + self.language_ext[0])
+                self.source_files.append(self.model_src)
         # Add intermediate files and executable by doing a dry run
         kwargs = dict(products=[], dry_run=True)
         if model_is_source:
@@ -2521,7 +2523,7 @@ class CompiledModelDriver(ModelDriver):
         language = kwargs.pop('compiler_language', language)
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
-            drv = import_component('model', cls.language)
+            drv = import_component('model', language)
             return drv.call_compiler(src, **kwargs)
         # Handle internal library
         if isinstance(src, str) and (src in cls.internal_libraries):
@@ -2569,7 +2571,7 @@ class CompiledModelDriver(ModelDriver):
         language = kwargs.pop('linker_language', language)
         # Link using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
-            drv = import_component('model', cls.language)
+            drv = import_component('model', language)
             return drv.call_linker(obj, **kwargs)
         # Determine tool that should be used
         if kwargs.get('libtype', 'object') == 'static':

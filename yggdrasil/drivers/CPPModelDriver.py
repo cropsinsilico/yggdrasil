@@ -88,8 +88,13 @@ class CPPModelDriver(CModelDriver):
         internal_libs = copy.deepcopy(cls.internal_libraries)
         internal_libs[cls.interface_library] = internal_libs.pop(
             CModelDriver.interface_library)
-        internal_libs[cls.interface_library]['source'] = os.path.splitext(
-            internal_libs[cls.interface_library]['source'])[0] + cls.language_ext[0]
+        internal_libs[cls.interface_library]['source'] = os.path.join(
+            cls.get_language_dir(),
+            os.path.splitext(os.path.basename(
+                internal_libs[cls.interface_library]['source']))[0]
+            + cls.language_ext[0])
+        internal_libs[cls.interface_library]['include_dirs'].append(
+            cls.get_language_dir())
         cls.internal_libraries = internal_libs
 
     @classmethod

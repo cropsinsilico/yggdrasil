@@ -1,7 +1,7 @@
 #ifndef JSON_OBJECT_METASCHEMA_TYPE_H_
 #define JSON_OBJECT_METASCHEMA_TYPE_H_
 
-#include "../../tools.h"
+#include "../tools.h"
 #include "MetaschemaType.h"
 
 #ifndef __cplusplus /* If this is a C compiler, use C++ linkage */

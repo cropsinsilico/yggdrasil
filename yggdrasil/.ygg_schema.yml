@@ -1044,6 +1044,10 @@ definitions:
           description: Make target that should be built to create the model executable.
             Defaults to None.
           type: string
+        target_language:
+          description: Language that the target is written in. Defaults to None and
+            will be set based on the source files provided.
+          type: string
         valgrind_flags:
           default:
           - --leak-check=full
@@ -1325,6 +1329,10 @@ definitions:
           target:
             description: Make target that should be built to create the model executable.
               Defaults to None.
+            type: string
+          target_language:
+            description: Language that the target is written in. Defaults to None
+              and will be set based on the source files provided.
             type: string
         title: CMakeModelDriver
         type: object

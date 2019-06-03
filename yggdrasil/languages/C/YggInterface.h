@@ -3,7 +3,7 @@
 #define YGGINTERFACE_H_
 
 #include "../tools.h"
-#include "../metaschema/datatypes/datatypes.h"
+#include "../datatypes/datatypes.h"
 #include "../communication/communication.h"
 #include "../dataio/AsciiFile.h"
 #include "../dataio/AsciiTable.h"

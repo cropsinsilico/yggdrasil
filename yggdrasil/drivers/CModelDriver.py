@@ -5,6 +5,7 @@ from collections import OrderedDict
 from yggdrasil import platform, tools
 from yggdrasil.drivers.CompiledModelDriver import (
     CompiledModelDriver, CompilerBase, ArchiverBase)
+from yggdrasil.languages import get_language_dir
 
 
 _default_internal_libtype = 'object'
@@ -140,11 +141,12 @@ class MSVCArchiver(ArchiverBase):
     output_key = '/OUT:%s'
     
 
-_top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-_incl_interface = os.path.join(_top_dir, 'interface')
-_incl_io = os.path.join(_top_dir, 'io')
-_incl_seri = os.path.join(_top_dir, 'serialize')
-_incl_comm = os.path.join(_top_dir, 'communication')
+# _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
+# _incl_interface = os.path.join(_top_dir, 'interface')
+_top_lang_dir = get_language_dir('c')
+_incl_interface = _top_lang_dir
+_incl_seri = os.path.join(_top_lang_dir, 'serialize')
+_incl_comm = os.path.join(_top_lang_dir, 'communication')
 
 
 class CModelDriver(CompiledModelDriver):
@@ -177,22 +179,21 @@ class CModelDriver(CompiledModelDriver):
                 'linker_language': 'c++',  # Some dependencies are C++
                 'internal_dependencies': ['datatypes', 'regex'],
                 'external_dependencies': ['rapidjson'],
-                'include_dirs': [_incl_io, _incl_comm, _incl_seri],
+                'include_dirs': [_incl_comm, _incl_seri],
                 'compiler_flags': []},
         'regex_win32': {'source': 'regex_win32.cpp',
-                        'directory': os.path.join(_top_dir, 'regex'),
+                        'directory': os.path.join(_top_lang_dir, 'regex'),
                         'language': 'c++',
                         'libtype': _default_internal_libtype,
                         'internal_dependencies': [],
                         'external_dependencies': []},
         'regex_posix': {'source': 'regex_posix.h',
-                        'directory': os.path.join(_top_dir, 'regex'),
+                        'directory': os.path.join(_top_lang_dir, 'regex'),
                         'language': 'c',
                         'libtype': 'header_only',
                         'internal_dependencies': [],
                         'external_dependencies': []},
-        'datatypes': {'directory': os.path.join(_top_dir, 'metaschema',
-                                                'datatypes'),
+        'datatypes': {'directory': os.path.join(_top_lang_dir, 'datatypes'),
                       'language': 'c++',
                       'libtype': _default_internal_libtype,
                       'internal_dependencies': ['regex'],
@@ -261,14 +262,13 @@ class CModelDriver(CompiledModelDriver):
             regex_lib = cls.internal_libraries['regex_posix']
         cls.internal_libraries['regex'] = regex_lib
         # Platform specific internal library options
+        cls.internal_libraries['ygg']['include_dirs'] += [_top_lang_dir]
         if platform._is_win:  # pragma: windows
-            stdint_win = os.path.join(_top_dir, 'windows_stdint.h')
+            stdint_win = os.path.join(_top_lang_dir, 'windows_stdint.h')
             assert(os.path.isfile(stdint_win))
-            shutil.copy(stdint_win, os.path.join(_top_dir, 'stdint.h'))
-            for x in ['ygg', 'datatypes']:
-                cls.internal_libraries[x]['include_dirs'] += [_top_dir]
+            shutil.copy(stdint_win, os.path.join(_top_lang_dir, 'stdint.h'))
+            cls.internal_libraries['datatypes']['include_dirs'] += [_top_lang_dir]
         if platform._is_linux:
-            cls.internal_libraries['ygg']['include_dirs'] += [_top_dir]
             for x in ['ygg', 'datatypes']:
                 if 'compiler_flags' not in cls.internal_libraries[x]:
                     cls.internal_libraries[x]['compiler_flags'] = []

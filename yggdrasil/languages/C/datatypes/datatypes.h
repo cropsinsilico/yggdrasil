@@ -1,7 +1,7 @@
 #ifndef DATATYPES_H_
 #define DATATYPES_H_
 
-#include "../../tools.h"
+#include "../tools.h"
 #include "PlyDict.h"
 #include "ObjDict.h"
 

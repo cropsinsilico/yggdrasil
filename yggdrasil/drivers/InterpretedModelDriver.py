@@ -83,6 +83,18 @@ class InterpretedModelDriver(ModelDriver):
             if cls.default_interpreter is None:
                 cls.default_interpreter = cls.language
                     
+    def parse_arguments(self, *args, **kwargs):
+        r"""Sort model arguments to determine which one is the executable
+        and which ones are arguments.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments are passed to the parent class's method.
+
+        """
+        super(InterpretedModelDriver, self).parse_arguments(*args, **kwargs)
+        self.model_src = self.model_file
+        
     @classmethod
     def get_interpreter(cls):
         r"""Command required to run a model written in this language from

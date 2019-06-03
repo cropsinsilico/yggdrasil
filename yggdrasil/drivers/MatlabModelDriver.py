@@ -10,6 +10,7 @@ from yggdrasil import backwards, tools, platform
 from yggdrasil.config import ygg_cfg
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
 from yggdrasil.tools import TimeOut, sleep
+from yggdrasil.languages import get_language_dir
 logger = logging.getLogger(__name__)
 try:  # pragma: matlab
     disable_engine = ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
@@ -27,8 +28,7 @@ except ImportError:  # pragma: no matlab
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-_incl_interface = os.path.join(_top_dir, 'interface')
-_incl_io = os.path.join(_top_dir, 'io')
+_top_lang_dir = get_language_dir('matlab')
 _compat_map = {
     'R2015b': ['2.7', '3.3', '3.4'],
     'R2017a': ['2.7', '3.3', '3.4', '3.5'],
@@ -124,7 +124,7 @@ def start_matlab_engine(skip_connect=False, timeout=None):  # pragma: matlab
                          + '_%d' % len(old_matlab))
     try:
         args = ['screen', '-dmS', screen_session, '-c',
-                os.path.join(os.path.dirname(__file__), 'matlab_screenrc'),
+                os.path.join(_top_lang_dir, 'matlab_screenrc'),
                 'matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
                 '-r', '"matlab.engine.shareEngine"']
         subprocess.call(' '.join(args), shell=True)
@@ -170,7 +170,7 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
                            stderr=err)
     except BaseException:
         matlab_engine.addpath(_top_dir, nargout=0)
-        matlab_engine.addpath(_incl_interface, nargout=0)
+        matlab_engine.addpath(_top_lang_dir, nargout=0)
     matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
     if not first_connect:
         if backwards.PY2:
@@ -753,7 +753,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         prev_path = out.pop('MATLABPATH', '')
         if prev_path:
             path_list.append(prev_path)
-        for x in [_top_dir, _incl_interface, self.model_dir]:
+        for x in [_top_dir, _top_lang_dir, self.model_dir]:
             if x not in prev_path:
                 path_list.append(x)
         if path_list:

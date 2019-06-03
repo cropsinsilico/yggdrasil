@@ -1,9 +1,9 @@
 #ifndef ASCII_TABLE_METASCHEMA_TYPE_H_
 #define ASCII_TABLE_METASCHEMA_TYPE_H_
 
-#include "../../tools.h"
+#include "../tools.h"
 #include "MetaschemaType.h"
-#include "../../dataio/AsciiTable.h"
+#include "../dataio/AsciiTable.h"
 
 #ifndef __cplusplus /* If this is a C compiler, use C++ linkage */
 //extern "C++" {

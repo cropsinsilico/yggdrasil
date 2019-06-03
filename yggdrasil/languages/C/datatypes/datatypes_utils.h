@@ -1,4 +1,4 @@
-#include "../../tools.h"
+#include "../tools.h"
 #include "MetaschemaType.h"
 #include "DirectMetaschemaType.h"
 #include "ScalarMetaschemaType.h"

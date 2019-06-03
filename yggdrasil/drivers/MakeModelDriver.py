@@ -33,7 +33,7 @@ class MakeCompiler(CompilerBase):
         'makedir': {'type': 'string'},  # default will depend on makefile
         'target': {'type': 'string'}}
     toolname = 'make'
-    languages = ['c', 'c++', 'make']
+    languages = ['make', 'c', 'c++']
     platforms = ['MacOS', 'Linux']
     default_flags = ['--always-make']  # Always overwrite
     flag_options = OrderedDict([('makefile', {'key': '-f', 'position': 0})])
@@ -154,7 +154,7 @@ class MakeCompiler(CompilerBase):
         """
         out = super(MakeCompiler, cls).set_env(**kwargs)
         if language is None:
-            language = cls.languages[0]
+            language = 'c'
         drv = components.import_component('model', language)
         compile_flags = drv.get_compiler_flags(
             for_model=True, logging_level=logging_level, skip_defaults=True)

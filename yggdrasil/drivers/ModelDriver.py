@@ -7,8 +7,9 @@ import subprocess
 import shutil
 import uuid
 import tempfile
+from collections import OrderedDict
 from pprint import pformat
-from yggdrasil import platform, tools, backwards
+from yggdrasil import platform, tools, backwards, languages
 from yggdrasil.config import ygg_cfg, locate_file, update_language_config
 from yggdrasil.components import import_component
 from yggdrasil.drivers.Driver import Driver
@@ -20,7 +21,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-_all_language_ext = []
+_map_language_ext = OrderedDict()
 
 
 class ModelDriver(Driver):
@@ -101,9 +102,12 @@ class ModelDriver(Driver):
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
-        model_file (str): Full path to the compiled model executable.
-        model_args (list): Runtime arguments for running the model on the command
-            line.
+        model_file (str): Full path to the model executable or interpretable
+            script.
+        model_args (list): Runtime arguments for running the model on the
+            command line.
+        model_src (str): Full path to the model source code. For interpreted
+            languages, this will be the same as model_file.
         overwrite (bool): If True, any existing compilation products will be
             overwritten by compilation and cleaned up following the run.
             Otherwise, existing products will be used and will remain after
@@ -207,6 +211,7 @@ class ModelDriver(Driver):
         self.model_file = None
         self.model_args = []
         self.model_dir = None
+        self.model_src = None
         self.products = []
         self.args = args
         self.parse_arguments(args)
@@ -236,15 +241,66 @@ class ModelDriver(Driver):
         initialized and registered."""
         if (not cls.is_configured()):
             update_language_config(cls)
-        global _all_language_ext
+        global _map_language_ext
         for x in cls.get_language_ext():
-            if x not in _all_language_ext:
-                _all_language_ext.append(x)
+            if x not in _map_language_ext:
+                _map_language_ext[x] = []
+            _map_language_ext[x].append(cls.language)
+
+    @classmethod
+    def get_language_for_source(cls, fname, languages=None, early_exit=False):
+        r"""Determine the language that can be used with the provided source
+        file(s). If more than one language applies to a set of multiple files,
+        the language that applies to the most files is returned.
+
+        Args:
+            fname (str, list): The full path to one or more files. If more than
+                one
+            languages (list, optional): The list of languages that are acceptable.
+                Defaults to None and any language will be acceptable.
+            early_exit (bool, optional): If True, the first language identified
+                will be returned if fname is a list of files. Defaults to False.
+
+        Returns:
+            str: The language that can operate on the specified file.
+
+        """
+        if isinstance(fname, list):
+            lang_dict = {}
+            for f in fname:
+                try:
+                    ilang = cls.get_language_for_source(f, languages=languages)
+                    if early_exit:
+                        return ilang
+                except ValueError:
+                    continue
+                if ilang in lang_dict:
+                    lang_dict[ilang] += 1
+                else:
+                    lang_dict[ilang] = 1
+            if lang_dict:
+                return max(lang_dict, key=lang_dict.get)
+        else:
+            ext = os.path.splitext(fname)[-1]
+            for ilang in cls.get_map_language_ext().get(ext, []):
+                if (languages is None) or (ilang in languages):
+                    return ilang
+        raise ValueError("Cannot determine language for file(s): '%s'" % fname)
+                
+    @classmethod
+    def get_map_language_ext(cls):
+        r"""Return the mapping of all language extensions."""
+        return _map_language_ext
 
     @classmethod
     def get_all_language_ext(cls):
         r"""Return the list of all language extensions."""
-        return _all_language_ext
+        return list(_map_language_ext.keys())
+
+    @classmethod
+    def get_language_dir(cls):
+        r"""Return the langauge directory."""
+        return languages.get_language_dir(cls.language)
 
     @classmethod
     def get_language_ext(cls):

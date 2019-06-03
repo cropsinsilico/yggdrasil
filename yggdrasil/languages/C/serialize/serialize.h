@@ -9,7 +9,7 @@
 #include "PlySerialize.h"
 #include "ObjSerialize.h"
 */
-#include "../metaschema/datatypes/datatypes.h"
+#include "../datatypes/datatypes.h"
 
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */

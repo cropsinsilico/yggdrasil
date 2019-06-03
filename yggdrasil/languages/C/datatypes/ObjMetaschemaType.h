@@ -1,7 +1,7 @@
 #ifndef OBJ_METASCHEMA_TYPE_H_
 #define OBJ_METASCHEMA_TYPE_H_
 
-#include "../../tools.h"
+#include "../tools.h"
 #include "MetaschemaType.h"
 #include "ObjDict.h"
 

@@ -3,7 +3,7 @@
 #define YGGZMQCOMM_H_
 
 #include <CommBase.h>
-#include "../metaschema/datatypes/datatypes.h"
+#include "../datatypes/datatypes.h"
 
 #ifdef ZMQINSTALLED
 #include <czmq.h>
