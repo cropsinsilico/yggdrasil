@@ -2,15 +2,12 @@
 TODO
 ====
 
-* Move all C/C++ code into dedicated folders such that include/lib can be single directories
-* Add Cis aliases to C and Python interface for backwards compat in yggdrasil
 * Move all specialized strings to a file that is read in and passed as definitions during compilation for C/C++ (or loaded at import in python/matlab)
 * Change C client/server use of direction/serializer info to be more transparent
 * Go through docs to strip out deprecated info
 * Change "args" in drivers to more transparent wording (source_code, etc.)
 * Alias input/output keyword arguments for connections to from/to for clarity
 * Update docs to reflect changes to YAML spec
-* Write docs on units (with reference to us of pint on Python 2.7)
 * Docs on datatypes w/ example of user defined data type
 * Update/replace io_drivers section of docs
 * Remove IOInfo test class as no longer used
