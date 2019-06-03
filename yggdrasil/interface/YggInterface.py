@@ -1,1 +1,1 @@
-../languages/Python/YggInterface.py
+from yggdrasil.languages.Python.YggInterface import *

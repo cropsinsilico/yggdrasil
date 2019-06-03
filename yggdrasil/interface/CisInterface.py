@@ -1,1 +1,1 @@
-../languages/Python/CisInterface.py
+from yggdrasil.languages.Python.CisInterface import *
