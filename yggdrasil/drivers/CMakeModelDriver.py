@@ -362,7 +362,8 @@ class CMakeModelDriver(CompiledModelDriver):
     cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',
                       'CMakeFiles',
                       'ALL_BUILD.vcxproj', 'ALL_BUILD.vcxproj.filters', 'Debug',
-                      'Win32', 'ZERO_CHECK.vcxproj', 'ZERO_CHECK.vcxproj.filters']
+                      'Win32', 'Win64',
+                      'ZERO_CHECK.vcxproj', 'ZERO_CHECK.vcxproj.filters']
     # TODO: These are only on Windows using MSVC
     cmake_products_ext = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
                           '.vcxproj.filters']
@@ -666,6 +667,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 elif os.path.isdir(xfile) and (xfile.endswith('CMakeFiles')
                                                or xfile.endswith('Debug')
                                                or xfile.endswith('Win32')
+                                               or xfile.endswith('Win64')
                                                or xfile.endswith('.dir')):
                     shutil.rmtree(xfile)
         # Add conda prefix
