@@ -2,7 +2,8 @@ import os
 import uuid
 import unittest
 import tempfile
-from yggdrasil import runner, tools
+import shutil
+from yggdrasil import runner, tools, platform
 from yggdrasil.examples import yamls, source, ext_map
 from yggdrasil.tests import YggTestBase
 
@@ -43,9 +44,9 @@ class TestExample(YggTestBase, tools.YggClass):
     @property
     def languages_tested(self):
         r"""list: Languages covered by the example."""
-        if self.name not in source:
+        if self.name not in source:  # pragma: debug
             return None
-        if self.language not in yamls[self.name]:
+        if self.language not in yamls[self.name]:  # pragma: debug
             return None
         if self.language in ['all', 'all_nomatlab']:
             out = [_ext2lang[os.path.splitext(x)[-1]] for x in
@@ -128,6 +129,14 @@ class TestExample(YggTestBase, tools.YggClass):
                 raise unittest.SkipTest("Could not locate example %s in language %s." %
                                         (self.name, self.language))
         else:
+            # Copy platform specific makefile
+            if self.language == 'make':
+                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+                if platform._is_win:  # pragma: windows
+                    make_ext = '_windows'
+                else:
+                    make_ext = '_linux'
+                shutil.copy(makefile + make_ext, makefile)
             # Check that language is installed
             for x in self.languages_tested:
                 if not tools.is_lang_installed(x):
@@ -142,6 +151,11 @@ class TestExample(YggTestBase, tools.YggClass):
                 assert(not self.runner.error_flag)
             self.check_results()
             self.cleanup()
+            # Remove copied makefile
+            if self.language == 'make':
+                makefile = os.path.join(self.yamldir, 'src', 'Makefile')
+                if os.path.isfile(makefile):
+                    os.remove(makefile)
 
     def cleanup(self):
         r"""Cleanup files created during the test."""
@@ -177,6 +191,18 @@ class TestExample(YggTestBase, tools.YggClass):
     def test_cpp(self):
         r"""Test the C++ version of the example."""
         self.language = 'cpp'
+        self.run_example()
+        self.language = None
+
+    def test_make(self):
+        r"""Test the Make version of the example."""
+        self.language = 'make'
+        self.run_example()
+        self.language = None
+
+    def test_cmake(self):
+        r"""Test the CMake version of the example."""
+        self.language = 'cmake'
         self.run_example()
         self.language = None
 

@@ -88,14 +88,28 @@ class JSONSerialize(SerializeBase):
             dict: Dictionary of variables to use for testing.
 
         """
-        iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        # iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj1 = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj2 = {'d': 'new field'}
+        # iobj3 = int(2)
+        # iobj4 = [float(2.0)]
         out = {'kwargs': {},
                'empty': {}, 'dtype': None,
                'extra_kwargs': {},
-               'objects': [iobj],
+               'objects': [iobj1, iobj2],  # , iobj3, iobj4],
                'typedef': {'type': 'object'}}
         out['contents'] = (b'{\n\t"a": [\n\t\t"b",\n\t\t1,\n\t\t1.0\n\t],'
-                           b'\n\t"c": {\n\t\t"z": "hello"\n\t}\n}')
+                           b'\n\t"c": {\n\t\t"z": "hello"\n\t},'
+                           b'\n\t"d": "new field"\n}')
+        out['concatenate'] = [([{'a': 1}, {'b': 2}], [{'a': 1, 'b': 2}]),
+                              ([['a'], ['b']], [['a', 'b']]),
+                              ([['a'], {'b': 2}], [[['a'], {'b': 2}]])]
+        # Version that allows for list concatentation
+        # out['contents'] = (b'[\n\t'
+        #                    b'{\n\t\t"a": [\n\t\t\t"b",\n\t\t\t1,\n\t\t\t1.0\n\t\t],'
+        #                    b'\n\t\t"c": {\n\t\t\t"z": "hello"\n\t\t},'
+        #                    b'\n\t\t"d": "new field"\n\t},'
+        #                    b'\n\t2,\n\t2.0\n]')
         if backwards.PY2 or _use_rapidjson:  # pragma: Python 2
             tab_rep = indent_char2int('\t') * b' '
             out['contents'] = out['contents'].replace(b'\t', tab_rep)

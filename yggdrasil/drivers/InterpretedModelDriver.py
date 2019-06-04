@@ -28,7 +28,8 @@ class InterpretedModelDriver(ModelDriver):
 
     Class Attributes:
         default_interpreter (str): Name of interpreter that will be used if not
-            set explicitly by instance or config file.
+            set explicitly by instance or config file. Defaults to the language
+            name if not set.
         default_interpreter_flags (list): Flags that will be passed to the
             interpreter when running the model by default if not set explicitly
             by instance or config file.
@@ -59,14 +60,14 @@ class InterpretedModelDriver(ModelDriver):
                     setattr(self, k, getattr(self, 'default_%s' % k))
 
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration. For compiled languages this includes selecting the
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration. For compiled languages this includes selecting the
         default compiler. The order of precedence is the config file 'compiler'
         option for the language, followed by the environment variable set by
         _compiler_env, followed by the existing class attribute.
         """
-        ModelDriver.before_registration(cls)
+        ModelDriver.after_registration(cls)
         if cls.language is not None:
             for k in ['interpreter']:
                 # Set attribute defaults based on config options
@@ -74,9 +75,7 @@ class InterpretedModelDriver(ModelDriver):
                     ka = 'default_%s' % k0
                     if k0.endswith('_flags'):
                         old_val = getattr(cls, ka)
-                        new_val = ygg_cfg.get(cls.language, k0, '').split()
-                        for v in new_val:
-                            old_val.append(v)
+                        old_val += ygg_cfg.get(cls.language, k0, '').split()
                     else:
                         setattr(cls, ka, ygg_cfg.get(cls.language, k0,
                                                      getattr(cls, ka)))
@@ -84,6 +83,18 @@ class InterpretedModelDriver(ModelDriver):
             if cls.default_interpreter is None:
                 cls.default_interpreter = cls.language
                     
+    def parse_arguments(self, *args, **kwargs):
+        r"""Sort model arguments to determine which one is the executable
+        and which ones are arguments.
+
+        Args:
+            *args: Arguments are passed to the parent class's method.
+            **kwargs: Keyword arguments are passed to the parent class's method.
+
+        """
+        super(InterpretedModelDriver, self).parse_arguments(*args, **kwargs)
+        self.model_src = self.model_file
+        
     @classmethod
     def get_interpreter(cls):
         r"""Command required to run a model written in this language from
@@ -115,9 +126,6 @@ class InterpretedModelDriver(ModelDriver):
         """
         out = getattr(cls, 'interpreter_flags',
                       getattr(cls, 'default_interpreter_flags'))
-        if out is None:
-            raise NotImplementedError("Interpreter flags not set for language '%s'."
-                                      % cls.language)
         return out
 
     @classmethod
@@ -159,8 +167,7 @@ class InterpretedModelDriver(ModelDriver):
 
         """
         ext = cls.language_ext
-        if not isinstance(ext, list):
-            ext = [ext]
+        assert(isinstance(ext, (tuple, list)))
         if exec_type == 'interpreter':
             # if (((cls.language not in args[0])
             if (((tools.which(args[0]) is None)

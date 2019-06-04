@@ -23,8 +23,7 @@ ghpages: autodoc
 	cd $(REPODIR) ; git pull ; git add . ; git commit -m "rebuilt docs" ; git push origin gh-pages
 
 .PHONY: autodoc
-autodoc: doxy
-	python $(SOURCEDIR)/examples/make_example_rst.py
+autodoc: doxy scripts
 	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../yggdrasil # ../yggdrasil/tests/* ../yggdrasil/*/tests/*
 	mv $(SOURCEDIR)/yggdrasil.rst $(SOURCEDIR)/yggdrasil.inc
 	make html
@@ -32,6 +31,11 @@ autodoc: doxy
 .PHONY: doxy
 doxy:
 	cd $(DOXYDIR) ; doxygen doxy.cfg
+
+.PHONY: scripts
+scripts:
+	python $(SOURCEDIR)/examples/make_example_rst.py
+	python $(SOURCEDIR)/make_tables_rst.py
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

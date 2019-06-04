@@ -1,4 +1,3 @@
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
@@ -7,19 +6,17 @@ from yggdrasil.metaschema.properties.ArgsMetaschemaProperty import (
     ArgsMetaschemaProperty)
 
 
-@register_type
 class InstanceMetaschemaType(MetaschemaType):
     r"""Type for evaluating instances of Python classes."""
 
     name = 'instance'
     description = 'Type for Python class instances.'
-    properties = MetaschemaType.properties + ['class', 'args']
-    definition_properties = MetaschemaType.definition_properties + ['class']
-    metadata_properties = (MetaschemaType.metadata_properties
-                           + ['class', 'args'])
-    extract_properties = (MetaschemaType.extract_properties
-                          + ['class', 'args'])
+    properties = ['class', 'args']
+    definition_properties = ['class']
+    metadata_properties = ['class', 'args']
+    extract_properties = ['class', 'args']
     python_types = (object, )
+    cross_language_support = False
 
     @classmethod
     def validate(cls, obj, raise_errors=False):
@@ -34,16 +31,15 @@ class InstanceMetaschemaType(MetaschemaType):
             bool: True if the object could be of this type, False otherwise.
 
         """
-        if super(InstanceMetaschemaType, cls).validate(obj,
-                                                       raise_errors=raise_errors):
-            try:
-                ArgsMetaschemaProperty.instance2args(obj)
-                return True
-            except MetaschemaTypeError:
-                if raise_errors:
-                    raise ValueError("Class dosn't have an input_args attribute.")
-                return False
-        return False
+        # Base not called because every python object should pass validation
+        # against the object class
+        try:
+            ArgsMetaschemaProperty.instance2args(obj)
+            return True
+        except MetaschemaTypeError:
+            if raise_errors:
+                raise ValueError("Class dosn't have an input_args attribute.")
+            return False
         
     @classmethod
     def encode_data(cls, obj, typedef):
@@ -59,8 +55,11 @@ class InstanceMetaschemaType(MetaschemaType):
 
         """
         args = ArgsMetaschemaProperty.instance2args(obj)
-        return JSONObjectMetaschemaType.encode_data(
-            args, {'properties': typedef.get('args', {})})
+        if isinstance(typedef, dict) and ('args' in typedef):
+            typedef_args = {'properties': typedef['args']}
+        else:
+            typedef_args = None
+        return JSONObjectMetaschemaType.encode_data(args, typedef_args)
 
     @classmethod
     def decode_data(cls, obj, typedef):

@@ -140,6 +140,7 @@ setup(
     ],
     entry_points={
         'console_scripts': ['yggrun=yggdrasil.command_line:yggrun',
+                            'cisrun=yggdrasil.command_line:yggrun',
                             'yggcc=yggdrasil.command_line:yggcc',
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',

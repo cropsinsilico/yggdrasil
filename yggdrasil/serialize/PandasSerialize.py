@@ -28,8 +28,6 @@ class PandasSerialize(AsciiTableSerialize):
     # has_header = False
 
     def __init__(self, *args, **kwargs):
-        self.dont_read_header = False
-        self.read_header_once = False
         # self.dont_write_header = False  # Set by schema
         self.write_header_once = False
         return super(PandasSerialize, self).__init__(*args, **kwargs)
@@ -141,8 +139,6 @@ class PandasSerialize(AsciiTableSerialize):
         fd = backwards.BytesIO(msg)
         names = None
         dtype = None
-        if self.dont_read_header:
-            names = self.get_field_names()
         if self.initialized:
             dtype = self.numpy_dtype
         out = pandas.read_csv(fd,
@@ -150,13 +146,11 @@ class PandasSerialize(AsciiTableSerialize):
                               names=names,
                               dtype=dtype,
                               encoding='utf8')
-        if self.read_header_once:
-            self.dont_read_header = True
         fd.close()
         if not backwards.PY2:
             # For Python 3 and higher, make sure strings are bytes
             for c, d in zip(out.columns, out.dtypes):
-                if d == object:
+                if (d == object) and isinstance(out[c][0], backwards.unicode_type):
                     out[c] = out[c].apply(lambda s: s.encode('utf-8'))
         # On windows, long != longlong and longlong requires special cformat
         # For now, long will be used to preserve the use of %ld to match long
@@ -321,6 +315,7 @@ class PandasSerialize(AsciiTableSerialize):
                            + b'one\t1\t1.0\n'
                            + b'two\t2\t2.0\n'
                            + b'three\t3\t3.0\n')
+        out['concatenate'] = [([], [])]
         if not_as_frames:
             # Strip units since pandas data frames are not serialized with units
             out['objects'] = [[units.get_data(ix) for ix in x]
@@ -336,16 +331,12 @@ class PandasSerialize(AsciiTableSerialize):
         the serializations."""
         self.dont_write_header = False
         self.write_header_once = True
-        self.dont_read_header = False
-        self.read_header_once = False
 
     def disable_file_header(self):
         r"""Set serializer attributes to disable file headers from being
         included in the serializations."""
         self.dont_write_header = True
         self.write_header_once = True
-        self.dont_read_header = False
-        self.read_header_once = False
         
     def serialize_file_header(self):
         r"""Return the serialized header information that should be prepended

@@ -9,7 +9,7 @@ class CPPCompilerBase(CCompilerBase):
     r"""Base class for C++ compilers."""
     languages = ['c++']
     default_executable_env = 'CXX'
-    default_executable_flags_env = 'CXXFLAGS'
+    default_flags_env = 'CXXFLAGS'
     cpp_std = 'c++11'
     search_path_flags = ['-E', '-v', '-xc++', '/dev/null']
     default_linker = None
@@ -41,12 +41,12 @@ class CPPCompilerBase(CCompilerBase):
 
 class GPPCompiler(CPPCompilerBase, GCCCompiler):
     r"""Interface class for G++ compiler/linker."""
-    name = 'g++'
+    toolname = 'g++'
 
 
 class ClangPPCompiler(CPPCompilerBase, ClangCompiler):
     r"""clang++ compiler on Apple Mac OS."""
-    name = 'clang++'
+    toolname = 'clang++'
 
 
 class CPPModelDriver(CModelDriver):
@@ -62,28 +62,43 @@ class CPPModelDriver(CModelDriver):
     # To prevent inheritance
     default_compiler = None
     default_linker = None
-    function_param = dict(CModelDriver.function_param,
-                          input='YggInput {channel}(\"{channel_name}\");',
-                          output='YggOutput {channel}(\"{channel_name}\");',
-                          recv='{flag_var} = {channel}.recv({recv_num}, {recv_var});',
-                          send='{flag_var} = {channel}.send({send_num}, {send_var});',
-                          error='error(\"{message}\");',
-                          try_begin='try {',
-                          try_error_type='const std::exception&',
-                          try_except='} catch ({try_error} {error_var}) {')
+    type_map = dict(
+        CModelDriver.type_map,
+        array='std::vector<void*>',
+        object='std::map<char*,void*>',
+        schema='MetaschemaType')
+    function_param = dict(
+        CModelDriver.function_param,
+        input='YggInput {channel}(\"{channel_name}\");',
+        output='YggOutput {channel}(\"{channel_name}\");',
+        recv='{flag_var} = {channel}.recv({recv_num}, {recv_var});',
+        send='{flag_var} = {channel}.send({send_num}, {send_var});',
+        exec_prefix=('#include <iostream>\n'
+                     '#include <exception>\n'),
+        # print='std::cout << "{message}" << std::endl;',
+        error='throw \"{error_msg}\";',
+        try_begin='try {',
+        try_error_type='const std::exception&',
+        try_except='}} catch ({error_type} {error_var}) {{')
     
     @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration."""
+    def after_registration(cls):
+        r"""Operations that should be performed to modify class attributes after
+        registration."""
         if platform._is_mac and (cls.default_compiler is None):
             cls.default_compiler = 'clang++'
-        CModelDriver.before_registration(cls)
+        cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
+        CModelDriver.after_registration(cls)
         internal_libs = copy.deepcopy(cls.internal_libraries)
         internal_libs[cls.interface_library] = internal_libs.pop(
             CModelDriver.interface_library)
-        internal_libs[cls.interface_library]['source'] = os.path.splitext(
-            internal_libs[cls.interface_library]['source'])[0] + cls.language_ext[0]
+        internal_libs[cls.interface_library]['source'] = os.path.join(
+            cls.get_language_dir(),
+            os.path.splitext(os.path.basename(
+                internal_libs[cls.interface_library]['source']))[0]
+            + cls.language_ext[0])
+        internal_libs[cls.interface_library]['include_dirs'].append(
+            cls.get_language_dir())
         cls.internal_libraries = internal_libs
 
     @classmethod

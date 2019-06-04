@@ -22,29 +22,29 @@ else:  # pragma: debug
 def test_register_metaschema_property():
     r"""Test errors in register_metaschema_property."""
     # Error when property class already registered
-    x = type('ReplacementClassSchema', (MetaschemaProperty, ),
-             {'name': existing_class})
-    assert_raises(ValueError, properties.register_metaschema_property, x)
+    args = ('ReplacementClassSchema', (MetaschemaProperty, ),
+            {'name': existing_class})
+    assert_raises(ValueError, type, *args)
     # Error when replacement class has schema
-    x = type('ReplacementClassSchema', (MetaschemaProperty, ),
-             {'name': existing_validator, 'schema': {}})
-    assert_raises(ValueError, properties.register_metaschema_property, x)
+    args = ('ReplacementClassSchema', (MetaschemaProperty, ),
+            {'name': existing_validator, 'schema': {}})
+    assert_raises(ValueError, type, *args)
     # Error when validate set
 
     def fake_validate(*args, **kwargs):  # pragma: no cover
         return
 
-    x = type('ReplacementClassSchema', (MetaschemaProperty, ),
-             {'name': existing_validator, '_validate': fake_validate})
-    assert_raises(ValueError, properties.register_metaschema_property, x)
-    x = type('ReplacementClassSchema', (MetaschemaProperty, ),
-             {'name': existing_validator, 'schema': {}})
-    assert_raises(ValueError, properties.register_metaschema_property, x)
+    args = ('ReplacementClassSchema', (MetaschemaProperty, ),
+            {'name': existing_validator, '_validate': fake_validate})
+    assert_raises(ValueError, type, *args)
+    args = ('ReplacementClassSchema', (MetaschemaProperty, ),
+            {'name': existing_validator, 'schema': {}})
+    assert_raises(ValueError, type, *args)
     # Error when property not in existing metaschema
     get_metaschema()  # ensures it has been initialized
-    x = type('ReplacementClassSchema', (MetaschemaProperty, ),
-             {'name': non_existant})
-    assert_raises(ValueError, properties.register_metaschema_property, x)
+    args = ('ReplacementClassSchema', (MetaschemaProperty, ),
+            {'name': non_existant})
+    assert_raises(ValueError, type, *args)
 
 
 def test_get_registered_properties():

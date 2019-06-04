@@ -67,8 +67,10 @@ class ConnectionDriver(Driver):
     _schema_subtype_key = 'connection_type'
     _schema_subtype_description = ('Connection between one or more comms/files '
                                    'and one or more comms/files.')
+    _schema_subtype_default = 'default'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
+        'connection_type': {'type': 'string'},  # 'default': 'default'},
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
                                        {'$ref': '#/definitions/file'}]},
@@ -83,6 +85,7 @@ class ConnectionDriver(Driver):
                                     'connection should send messages to.')},
         'translator': {'type': 'array', 'items': {'type': 'function'}},
         'onexit': {'type': 'string'}}
+    _schema_excluded_from_class_validation = ['inputs', 'outputs']
 
     @property
     def _is_input(self):
@@ -418,7 +421,7 @@ class ConnectionDriver(Driver):
         T = self.start_timeout(timeout)
         while not T.is_out:
             with self.lock:
-                if (not self.ocomm.is_open):
+                if (not self.ocomm.is_open):  # pragma: no cover
                     break
                 elif ((self.ocomm.n_msg_send_drain == 0)
                       and self.ocomm.is_confirmed_send):
@@ -476,7 +479,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_closed:
                 return False
             flag, msg = self.icomm.recv(**kwargs)
-        if isinstance(msg, backwards.bytes_type) and (msg == self.icomm.eof_msg):
+        if self.icomm.is_eof(msg):
             return self.on_eof()
         if flag:
             return msg

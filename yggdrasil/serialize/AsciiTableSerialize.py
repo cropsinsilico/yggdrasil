@@ -167,6 +167,7 @@ class AsciiTableSerialize(DefaultSerialize):
         out = super(AsciiTableSerialize, cls).get_testing_options(
             table_example=True, include_oldkws=True, **kwargs)
         out['extra_kwargs'] = {}
+        out['concatenate'] = []
         return out
 
     @property

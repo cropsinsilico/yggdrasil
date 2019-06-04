@@ -6,6 +6,10 @@ rst_dir = os.path.dirname(os.path.abspath(__file__))
 toc_file = os.path.join(rst_dir, 'examples_toc.rst')
 lang2print = {'python': 'Python',
               'matlab': 'Matlab',
+              'cmake': 'CMake',
+              'make': 'Make',
+              'r': 'R',
+              'R': 'R',
               'c': 'C',
               'cpp': 'C++',
               'all': 'Mixed',

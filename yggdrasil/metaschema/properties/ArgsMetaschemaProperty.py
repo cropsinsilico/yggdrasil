@@ -1,12 +1,10 @@
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import (
     MetaschemaProperty)
 from yggdrasil.metaschema.properties.JSONObjectMetaschemaProperties import (
     PropertiesMetaschemaProperty)
 
 
-@register_metaschema_property
 class ArgsMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'args' property."""
 
@@ -39,8 +37,8 @@ class ArgsMetaschemaProperty(MetaschemaProperty):
     def encode(cls, instance, typedef=None):
         r"""Encoder for the 'args' property."""
         typedef_args = None
-        if isinstance(typedef, dict) and ('args' in typedef):
-            typedef_args = typedef['args']
+        # if isinstance(typedef, dict) and ('args' in typedef):
+        #     typedef_args = typedef['args']
         args = cls.instance2args(instance)
         return PropertiesMetaschemaProperty.encode(args, typedef_args)
 

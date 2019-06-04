@@ -6,27 +6,29 @@ import os
 import psutil
 import warnings
 import weakref
-from yggdrasil import backwards, tools, platform, config
+from yggdrasil import backwards, tools, platform
+from yggdrasil.config import ygg_cfg
+from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
+from yggdrasil.tools import TimeOut, sleep
+from yggdrasil.languages import get_language_dir
+logger = logging.getLogger(__name__)
 try:  # pragma: matlab
-    disable_engine = config.ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
+    disable_engine = ygg_cfg.get('matlab', 'disable_engine', 'False').lower()
     if platform._is_win or (disable_engine == 'true'):
         _matlab_engine_installed = False
         if not tools.is_subprocess():
-            logging.info("matlab.engine disabled")
+            logger.debug("matlab.engine disabled")
     else:
         import matlab.engine
         _matlab_engine_installed = True
 except ImportError:  # pragma: no matlab
-    logging.debug("Could not import matlab.engine. "
-                  + "Matlab support for using a sharedEngine will be disabled.")
+    logger.debug("Could not import matlab.engine. "
+                 + "Matlab support for using a sharedEngine will be disabled.")
     _matlab_engine_installed = False
-from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-from yggdrasil.tools import TimeOut, sleep
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-_incl_interface = os.path.join(_top_dir, 'interface')
-_incl_io = os.path.join(_top_dir, 'io')
+_top_lang_dir = get_language_dir('matlab')
 _compat_map = {
     'R2015b': ['2.7', '3.3', '3.4'],
     'R2017a': ['2.7', '3.3', '3.4', '3.5'],
@@ -115,21 +117,21 @@ def start_matlab_engine(skip_connect=False, timeout=None):  # pragma: matlab
     if not _matlab_engine_installed:  # pragma: no matlab
         raise RuntimeError("Matlab engine is not installed.")
     if timeout is None:
-        timeout = float(config.ygg_cfg.get('matlab', 'startup_waittime_s', 10))
+        timeout = float(ygg_cfg.get('matlab', 'startup_waittime_s', 10))
     old_process = set(locate_matlab_engine_processes())
     old_matlab = set(matlab.engine.find_matlab())
     screen_session = str('ygg_matlab' + datetime.today().strftime("%Y%j%H%M%S")
                          + '_%d' % len(old_matlab))
     try:
         args = ['screen', '-dmS', screen_session, '-c',
-                os.path.join(os.path.dirname(__file__), 'matlab_screenrc'),
+                os.path.join(_top_lang_dir, 'matlab_screenrc'),
                 'matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
                 '-r', '"matlab.engine.shareEngine"']
         subprocess.call(' '.join(args), shell=True)
         T = TimeOut(timeout)
         while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0)
                and not T.is_out):
-            logging.debug('Waiting for matlab engine to start')
+            logger.debug('Waiting for matlab engine to start')
             sleep(1)  # Usually 3 seconds
     except KeyboardInterrupt:  # pragma: debug
         args = ['screen', '-X', '-S', screen_session, 'quit']
@@ -168,7 +170,7 @@ def connect_matlab_engine(matlab_session, first_connect=False):  # pragma: matla
                            stderr=err)
     except BaseException:
         matlab_engine.addpath(_top_dir, nargout=0)
-        matlab_engine.addpath(_incl_interface, nargout=0)
+        matlab_engine.addpath(_top_lang_dir, nargout=0)
     matlab_engine.eval("os = py.importlib.import_module('os');", nargout=0)
     if not first_connect:
         if backwards.PY2:
@@ -226,13 +228,13 @@ def stop_matlab_engine(screen_session, matlab_engine, matlab_session,
         T = TimeOut(5)
         while ((matlab_session in matlab.engine.find_matlab())
                and not T.is_out):
-            logging.debug("Waiting for matlab engine to exit")
+            logger.debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
             if matlab_process is not None:
                 matlab_process.terminate()
-                logging.error("stop_matlab_engine timed out at %f s. " % T.elapsed
-                              + "Killed Matlab sharedEngine process.")
+                logger.error("stop_matlab_engine timed out at %f s. " % T.elapsed
+                             + "Killed Matlab sharedEngine process.")
 
 
 class MatlabProcess(tools.YggClass):  # pragma: matlab
@@ -428,6 +430,23 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
     default_interpreter_flags = ['-nodisplay', '-nosplash', '-nodesktop',
                                  '-nojvm', '-batch']
     version_flags = ["fprintf('R%s', version('-release')); exit();"]
+    type_map = {
+        'int': 'intX',
+        'float': 'single, double',
+        'string': 'char',
+        'array': 'cell',
+        'object': 'containers.Map',
+        'boolean': 'logical',
+        'null': 'NaN',
+        'uint': 'uintX',
+        'complex': 'complex',
+        'bytes': 'char (utf-8)',
+        'unicode': 'char',
+        '1darray': 'mat',
+        'ndarray': 'mat',
+        'ply': 'containers.Map',
+        'obj': 'containers.Map',
+        'schema': 'containers.Map'}
     function_param = {
         'input': '{channel} = YggInterface(\'YggInput\', \'{channel_name}\');',
         'output': '{channel} = YggInterface(\'YggOutput\', \'{channel_name}\');',
@@ -436,19 +455,20 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'function_call': '{output_var} = {function_name}({input_var});',
         'define': '{variable} = {value};',
         'comment': '%',
+        'true': 'true',
         'indent': 2 * ' ',
         'quote': '\'',
-        'true': 'true',
-        'break': 'break;',
-        'error': 'error(\'{message}\');',
         'print': 'disp(\'{message}\');',
         'fprintf': 'fprintf(\'{message}\', {variables});',
+        'error': 'error(\'{error_msg}\');',
         'block_end': 'end;',
         'if_begin': 'if ({cond})',
         'for_begin': 'for {iter_var} = {iter_begin}:{iter_end}',
         'while_begin': 'while ({cond})',
+        'break': 'break;',
         'try_begin': 'try',
-        'try_except': 'catch {error_var}'}
+        'try_except': 'catch {error_var}',
+        'assign': '{name} = {value};'}
 
     def __init__(self, name, args, **kwargs):
         self.using_matlab_engine = _matlab_engine_installed
@@ -472,7 +492,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         """
         super(MatlabModelDriver, self).parse_arguments(args)
         model_base, model_ext = os.path.splitext(os.path.basename(self.model_file))
-        wrap_base = 'warpped_%s_%s' % (model_base, self.uuid.replace('-', '_'))
+        wrap_base = 'wrapped_%s_%s' % (model_base, self.uuid.replace('-', '_'))
         # Matlab has a variable name limit of 62
         wrap_base = wrap_base[:min(len(wrap_base), 60)]
         self.model_wrapper = os.path.join(self.model_dir, wrap_base + model_ext)
@@ -508,7 +528,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         if matlab_engine is None:
             lines.append("exit(0);")
         # Write lines
-        logging.debug('Wrapper:\n\t%s', '\n\t'.join(lines))
+        logger.debug('Wrapper:\n\t%s', '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -516,7 +536,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
                 os.remove(fname)
             with open(fname, 'w') as fd:
                 fd.write('\n'.join(lines))
-            logging.debug("Wrote wrapper to: %s" % fname)
+            logger.debug("Wrote wrapper to: %s" % fname)
 
     @classmethod
     def run_executable(cls, args, dont_wrap_error=False, fname_wrapper=None,
@@ -742,7 +762,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         prev_path = out.pop('MATLABPATH', '')
         if prev_path:
             path_list.append(prev_path)
-        for x in [_top_dir, _incl_interface, self.model_dir]:
+        for x in [_top_dir, _top_lang_dir, self.model_dir]:
             if x not in prev_path:
                 path_list.append(x)
         if path_list:

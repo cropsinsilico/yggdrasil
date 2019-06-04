@@ -7,21 +7,117 @@ This module imports the configuration for yggdrasil.
 """
 import os
 import sys
+import json
 import shutil
 import logging
 import warnings
 import subprocess
 from yggdrasil.backwards import configparser
 from yggdrasil import platform, tools
-from yggdrasil.components import import_component
+conda_prefix = os.environ.get('CONDA_PREFIX', '')
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
-usr_config_file = os.path.expanduser(os.path.join('~', config_file))
+if conda_prefix:
+    usr_dir = conda_prefix
+else:
+    usr_dir = os.path.expanduser('~')
+usr_config_file = os.path.join(usr_dir, config_file)
 loc_config_file = os.path.join(os.getcwd(), config_file)
+if not os.path.isfile(usr_config_file):
+    shutil.copy(def_config_file, usr_config_file)
+logger = logging.getLogger(__name__)
 
 
-class YggConfigParser(configparser.ConfigParser):
+class YggConfigParser(configparser.ConfigParser, object):
     r"""Config parser that returns None if option not provided on get."""
+
+    def __init__(self, files=None):
+        self.files = files
+        super(YggConfigParser, self).__init__()
+
+    def reload(self):
+        r"""Reload parameters from the original files."""
+        self._sections = self._dict()
+        if self.files is not None:
+            self.read(self.files)
+
+    @property
+    def file_to_update(self):
+        r"""str: Full path to file that should be updated if update_file is
+        called without an explicit file path."""
+        out = None
+        if self.files is not None:
+            out = self.files[-1]
+        return out
+
+    def update_file(self, fname=None):
+        r"""Write out updated contents to a file.
+
+        Args:
+            fname (str, optional): Full path to file where contents should be
+               saved. If None, file_to_update is used. Defaults to None.
+
+        Raises:
+            RuntimeError: If fname is None and file_to_update is None.
+
+        """
+        if fname is None:
+            fname = self.file_to_update
+        if fname is None:
+            raise RuntimeError("No file provided or set at creation.")
+        with open(fname, 'w') as fd:
+            self.write(fd)
+
+    def read(self, *args, **kwargs):
+        out = super(YggConfigParser, self).read(*args, **kwargs)
+        alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
+                     (('debug', 'cis'), ('debug', 'ygg'))]
+        for old, new in alias_map:
+            v = self.get(*old)
+            if v:  # pragma: debug
+                self.set(new[0], new[1], v)
+        return out
+
+    @classmethod
+    def from_files(cls, files, **kwargs):
+        r"""Construct a config parser from a set of files.
+
+        Args:
+            files (list): One or more files that options should be read from in
+                the order they should be loaded.
+            **kwargs: Additional keyword arguments are passed to the class
+                constructor.
+
+        Returns:
+           YggConfigParser: Config parser with information loaded from the
+               provided files.
+
+        """
+        out = cls(files=files, **kwargs)
+        out.reload()
+        return out
+
+    def set(self, section, option, value=None):
+        """Set an option."""
+        if not isinstance(value, str):
+            value = json.dumps(value)
+        super(YggConfigParser, self).set(section, option, value=value)
+
+    def backwards_str2val(self, val):  # pragma: no cover
+        try:
+            out = json.loads(val)
+        except ValueError:
+            if val.startswith('[') and val.endswith(']'):
+                if val[1:-1]:
+                    out = [self.backwards_str2val(x.strip())
+                           for x in val[1:-1].split(',')]
+                else:
+                    out = []
+            elif val.startswith("'") and val.endswith("'"):
+                out = val.strip("'")
+            else:
+                out = val
+        return out
 
     def get(self, section, option, default=None, **kwargs):
         r"""Return None if the section/option does not exist.
@@ -48,10 +144,52 @@ class YggConfigParser(configparser.ConfigParser):
             if not out:
                 return default
             else:
-                return out
+                return self.backwards_str2val(out)
         else:
             return default
 
+
+# Initialize config
+ygg_cfg_usr = YggConfigParser.from_files([usr_config_file])
+ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
+                                      loc_config_file])
+
+
+def update_language_config(drv, skip_warnings=False, overwrite=False,
+                           verbose=False):
+    r"""Update configuration options for a language driver.
+
+    Args:
+        drv (list, class): One or more language drivers that should be
+            configured.
+        skip_warnings (bool, optional): If True, warnings about missing options
+            will not be raised. Defaults to False.
+        overwrite (bool, optional): If True, the existing file will be overwritten.
+            Defaults to False.
+        verbose (bool, optional): If True, information about the config file
+            will be displayed. Defaults to False.
+
+    """
+    if verbose:  # pragma: no cover
+        logger.info("Updating user configuration file for yggdrasil at:\n\t%s"
+                    % usr_config_file)
+    miss = []
+    if not isinstance(drv, list):
+        drv = [drv]
+    if overwrite:  # pragma: no cover
+        shutil.copy(def_config_file, usr_config_file)
+        ygg_cfg_usr.reload()
+    for idrv in drv:
+        miss += idrv.configure(ygg_cfg_usr)
+    ygg_cfg_usr.update_file()
+    ygg_cfg.reload()
+    if not skip_warnings:
+        for sect, opt, desc in miss:  # pragma: windows
+            warnings.warn(("Could not set option %s in section %s. "
+                           + "Please set this in %s to: %s")
+                          % (opt, sect, ygg_cfg_usr.file_to_update, desc),
+                          RuntimeWarning)
+    
 
 def find_all(name, path):
     r"""Find all instances of a file with a given name within the directory
@@ -79,7 +217,7 @@ def find_all(name, path):
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
         else:
-            args = ["find", path, "-type", "f", "-name", name]
+            args = ["find", "-L", path, "-type", "f", "-name", name]
             pfind = subprocess.Popen(args, env=os.environ,
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE)
@@ -144,67 +282,12 @@ def locate_file(fname, environment_variable='PATH', directory_list=None):
     return first
 
 
-def update_config(config_file, config_base=None, skip_warnings=False):
-    r"""Update config options for the current platform.
-
-    Args:
-        config_file (str): Full path to the config file that should be created
-            and/or updated.
-        config_base (str, optional): Full path to existing config file that should
-            be used as a base for building the new one if it dosn't already exist.
-            Defaults to 'defaults.cfg' if not provided.
-        skip_warnings (bool, optional): If True, warnings about missing options
-            will not be raised. Defaults to False.
-
-    """
-    if config_base is None:
-        config_base = def_config_file
-    assert(os.path.isfile(config_base))
-    if not os.path.isfile(config_file):
-        shutil.copy(config_base, config_file)
-    cp = YggConfigParser()
-    cp.read(config_file)
-    miss = []
-    # if platform._is_win:  # pragma: windows
-    #     miss += update_config_windows(cp)
-    for l in tools.get_supported_lang():
-        drv = import_component('model', l)
-        miss += drv.configure(cp)
-    # miss += update_config_c(cp)
-    # miss += update_config_matlab(cp)
-    with open(config_file, 'w') as fd:
-        cp.write(fd)
-    if not skip_warnings:
-        for sect, opt, desc in miss:  # pragma: windows
-            warnings.warn(("Could not set option %s in section %s. "
-                           + "Please set this in %s to: %s")
-                          % (opt, sect, config_file, desc), RuntimeWarning)
-        
-
-# In order read: defaults, user, local files
-if not os.path.isfile(usr_config_file):
-    logging.info('Creating user config file: "%s".' % usr_config_file)
-    update_config(usr_config_file)
-assert(os.path.isfile(usr_config_file))
-assert(os.path.isfile(def_config_file))
-files = [def_config_file, usr_config_file, loc_config_file]
-ygg_cfg = YggConfigParser()
-ygg_cfg.read(files)
-
-
-# Aliases for old versions of config options
-alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
-             (('debug', 'cis'), ('debug', 'ygg'))]
-for old, new in alias_map:
-    v = ygg_cfg.get(*old)
-    if v:  # pragma: debug
-        ygg_cfg.set(new[0], new[1], v)
-
-
 # Set associated environment variables
 env_map = [('debug', 'ygg', 'YGG_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
            ('debug', 'client', 'YGG_CLIENT_DEBUG'),
+           ('jsonschema', 'validate_components', 'YGG_SKIP_COMPONENT_VALIDATION'),
+           ('jsonschema', 'validate_all_messages', 'YGG_VALIDATE_ALL_MESSAGES'),
            ('rmq', 'namespace', 'YGG_NAMESPACE'),
            ('rmq', 'host', 'YGG_MSG_HOST'),
            ('rmq', 'vhost', 'YGG_MSG_VHOST'),
@@ -214,6 +297,53 @@ env_map = [('debug', 'ygg', 'YGG_DEBUG'),
            ]
 
 
+def get_ygg_loglevel(cfg=None, default='DEBUG'):
+    r"""Get the current log level.
+
+    Args:
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
+            Config parser with options that should be used to determine the
+            log level. Defaults to :data:`yggdrasil.config.ygg_cfg`.
+        default (str, optional): Log level that should be returned if the log
+            level option is not set in cfg. Defaults to 'DEBUG'.
+
+    Returns:
+        str: Log level string.
+
+    """
+    is_model = tools.is_subprocess()
+    if cfg is None:
+        cfg = ygg_cfg
+    if is_model:
+        opt = 'client'
+    else:
+        opt = 'ygg'
+    return cfg.get('debug', opt, default)
+
+
+def set_ygg_loglevel(level, cfg=None):
+    r"""Set the current log level.
+
+    Args:
+        level (str): Level that the log should be set to.
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
+            Config parser with options that should be used to update the
+            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
+    
+    """
+    is_model = tools.is_subprocess()
+    if cfg is None:
+        cfg = ygg_cfg
+    if is_model:
+        opt = 'client'
+    else:
+        opt = 'ygg'
+    cfg.set('debug', opt, level)
+    logLevelYGG = eval('logging.%s' % level)
+    ygg_logger = logging.getLogger("yggdrasil")
+    ygg_logger.setLevel(level=logLevelYGG)
+        
+    
 def cfg_logging(cfg=None):
     r"""Set logging levels from config options.
 
@@ -223,22 +353,26 @@ def cfg_logging(cfg=None):
             environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
 
     """
-    is_model = (os.environ.get('YGG_SUBPROCESS', "False") == "True")
+    is_model = tools.is_subprocess()
     if cfg is None:
         cfg = ygg_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
     logLevelYGG = eval('logging.%s' % cfg.get('debug', 'ygg', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
+    logLevelCLI = eval('logging.%s' % cfg.get('debug', 'client', 'INFO'))
     ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
-    ygg_logger.setLevel(level=logLevelYGG)
+    if is_model:
+        ygg_logger.setLevel(level=logLevelCLI)
+    else:
+        ygg_logger.setLevel(level=logLevelYGG)
     rmq_logger.setLevel(level=logLevelRMQ)
     # For models, route the loggs to stdout so that they are displayed by the
     # model driver.
     if is_model:
         handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logLevelYGG)
+        handler.setLevel(logLevelCLI)
         ygg_logger.addHandler(handler)
         rmq_logger.addHandler(handler)
 

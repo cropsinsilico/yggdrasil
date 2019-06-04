@@ -8,6 +8,7 @@ from yggdrasil.drivers import MatlabModelDriver
 from yggdrasil.examples import yamls as ex_yamls
 
 
+logger = logging.getLogger(__name__)
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 
 
@@ -65,10 +66,15 @@ class TestMatlabModelParam(parent.TestInterpretedModelParam):  # pragma: matlab
         self.attr_list += ['started_matlab', 'mlengine']
 
             
+class TestMatlabModelDriverNoInit(TestMatlabModelParam,  # pragma: matlab
+                                  parent.TestInterpretedModelDriverNoInit):
+    r"""Test runner for MatlabModelDriver without instance."""
+    pass
+
+
 class TestMatlabModelDriverNoStart(TestMatlabModelParam,  # pragma: matlab
                                    parent.TestInterpretedModelDriverNoStart):
-    r"""Test runner for MatlabModelDriver."""
-    
+    r"""Test runner for MatlabModelDriver without starting the driver."""
     pass
 
 
@@ -81,8 +87,8 @@ class TestMatlabModelDriver(TestMatlabModelParam,
     def test_a(self):
         r"""Dummy test to start matlab."""
         if self.instance.screen_session is None:  # pragma: debug
-            logging.info("Matlab was not started by this test. Close any "
-                         + "existing Matlab sessions to test creation/removal.")
+            logger.info("Matlab was not started by this test. Close any "
+                        + "existing Matlab sessions to test creation/removal.")
         else:
             with open(_session_fname, 'w') as f:
                 f.write(self.instance.screen_session)
@@ -100,5 +106,5 @@ class TestMatlabModelDriver(TestMatlabModelParam,
             self.instance.screen_session = session
             self.instance.started_matlab = True
         else:  # pragma: debug
-            logging.info("Skipping removal of Matlab session as the test did "
-                         + "not create it.")
+            logger.info("Skipping removal of Matlab session as the test did "
+                        + "not create it.")

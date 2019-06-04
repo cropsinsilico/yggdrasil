@@ -1,5 +1,5 @@
-|PyPI version| |Build Status| |Build status| |Coverage Status| |codecov|
-|PEP8|
+|tag version| |PyPI version| |Travis Build Status| |Appveyor Build status| 
+|codecov| |PEP8| |license| |platform|
 
 The CiS framework, yggdrasil, provides support for combining scientific models
 written in different programming languages. To combine two models,
@@ -28,15 +28,28 @@ it.
    can be installed from PyPI `here <https://pypi.org/project/cis-interface/>`__,
    cis_interface will no longer be updated.
 
-.. |PyPI version| image:: https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat
+If you use yggdrasil in your research, please cite the accompanying paper:
+
+
+    Meagan Lang, yggdrasil: a Python package for integrating computational models 
+    across languages and scales, in silico Plants, Volume 1, Issue 1, 2019, diz001, 
+    `https://doi.org/10.1093/insilicoplants/diz001 <https://doi.org/10.1093/insilicoplants/diz001>`__
+
+
+.. |tag version| image:: https://img.shields.io/github/tag-date/cropsinsilico/yggdrasil.svg?style=flat-square
+.. |PyPI version| image:: https://img.shields.io/pypi/v/yggdrasil-framework.svg?style=flat-square
    :target: https://pypi.org/project/yggdrasil-framework
-.. |Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil.svg?style=flat
+.. |Travis Build Status| image:: https://img.shields.io/travis/cropsinsilico/yggdrasil/master.svg?style=flat-square
    :target: https://travis-ci.org/cropsinsilico/yggdrasil
-.. |Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat
+.. |Appveyor Build status| image:: https://img.shields.io/appveyor/ci/langmm/yggdrasil.svg?style=flat-square
    :target: https://ci.appveyor.com/project/langmm/yggdrasil/branch/master
-.. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
-   :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
-.. |codecov| image:: https://codecov.io/gh/cropsinsilico/yggdrasil/branch/master/graph/badge.svg
+..
+   .. |Coverage Status| image:: https://coveralls.io/repos/github/cropsinsilico/yggdrasil/badge.svg?branch=master
+      :target: https://coveralls.io/github/cropsinsilico/yggdrasil?branch=master
+.. |codecov| image:: https://img.shields.io/codecov/c/github/cropsinsilico/yggdrasil/master.svg?style=flat-square
    :target: https://codecov.io/gh/cropsinsilico/yggdrasil
-.. |PEP8| image:: https://img.shields.io/badge/code%20style-pep8-orange.svg
+.. |PEP8| image:: https://img.shields.io/badge/code%20style-pep8-blue.svg?style=flat-square
    :target: https://www.python.org/dev/peps/pep-0008/
+.. |platform| image:: https://img.shields.io/conda/pn/conda-forge/yggdrasil.svg?color=magenta&label=conda%20platforms&style=flat-square
+   :target: https://anaconda.org/conda-forge/yggdrasil
+.. |license| image:: https://img.shields.io/pypi/l/yggdrasil-framework.svg?style=flat-square

@@ -4,7 +4,7 @@ import numpy as np
 import warnings
 from yggdrasil import backwards
 from yggdrasil.metaschema.encoder import encode_json, decode_json
-from yggdrasil.metaschema.datatypes import register_type_from_file, _schema_dir
+from yggdrasil.metaschema.datatypes import _schema_dir
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 from yggdrasil.metaschema.datatypes.PlyMetaschemaType import (
@@ -444,12 +444,13 @@ class ObjDict(PlyDict):
 # The base class could be anything since it is discarded during registration,
 # but is set to JSONObjectMetaschemaType here for transparancy since this is
 # what the base class is determined to be on loading the schema
-@register_type_from_file(_schema_file)
 class ObjMetaschemaType(JSONObjectMetaschemaType):
     r"""Obj 3D structure map."""
 
     _empty_msg = {'vertices': [], 'faces': []}
     python_types = (dict, ObjDict)
+    schema_file = _schema_file
+    _replaces_existing = False
 
     @classmethod
     def _encode_object_property(cls, obj, order, req_keys=False):
@@ -560,7 +561,22 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
                 iline = '%s %s' % (_map_element2code[e], ivalue)
                 body.append(iline.strip())  # Ensure trailing spaces are removed
         return newline.join(header + body) + newline
+        
+    @classmethod
+    def encode_data_readable(cls, obj, typedef):
+        r"""Encode an object's data in a readable format.
 
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        return cls.encode_data(obj, typedef)
+    
     @classmethod
     def decode_data(cls, msg, typedef):
         r"""Decode an object.
@@ -600,6 +616,29 @@ class ObjMetaschemaType(JSONObjectMetaschemaType):
         # Return
         # out.update(**metadata)
         return ObjDict(out)
+
+    @classmethod
+    def coerce_type(cls, obj, typedef=None, **kwargs):
+        r"""Coerce objects of specific types to match the data type.
+
+        Args:
+            obj (object): Object to be coerced.
+            typedef (dict, optional): Type defintion that object should be
+                coerced to. Defaults to None.
+            **kwargs: Additional keyword arguments are metadata entries that may
+                aid in coercing the type.
+
+        Returns:
+            object: Coerced object.
+
+        """
+        if not backwards.PY2:
+            try:
+                obj['material'] = backwards.as_str(obj['material'])
+            except BaseException:
+                pass
+        return super(ObjMetaschemaType, cls).coerce_type(obj, typedef=typedef,
+                                                         **kwargs)
 
     @classmethod
     def updated_fixed_properties(cls, obj):

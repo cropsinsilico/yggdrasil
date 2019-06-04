@@ -3,7 +3,7 @@ import copy
 import uuid
 import atexit
 import threading
-from logging import info
+import logging
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
 from yggdrasil.communication import new_comm, get_comm, determine_suffix
@@ -15,6 +15,7 @@ from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 
 
+logger = logging.getLogger(__name__)
 _registered_servers = dict()
 _registered_comms = dict()
 _server_lock = threading.RLock()
@@ -272,6 +273,12 @@ class CommBase(tools.YggClass):
             code. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
+    Class Attributes:
+        is_file (bool): True if the comm accesses a file.
+        _maxMsgSize (int): Maximum size of a single message that should be sent.
+        address_description (str): Description of the information constituting
+            an address for this communication mechanism.
+
     Attributes:
         name (str): The environment variable where communication address is
             stored.
@@ -298,11 +305,9 @@ class CommBase(tools.YggClass):
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
-        is_file (bool): True if the comm accesses a file.
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
         matlab (bool): True if the comm will be accessed by Matlab code.
-        maxMsgSize (int): Maximum size of a single message that should be sent.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -333,8 +338,10 @@ class CommBase(tools.YggClass):
     _schema_excluded_from_class = ['name']
     _default_serializer = 'default'
     _default_serializer_class = None
+    _schema_excluded_from_class_validation = ['datatype']
     is_file = False
     _maxMsgSize = 0
+    address_description = None
 
     def __init__(self, name, address=None, direction='send',
                  partner_language='python', dont_open=False, is_interface=False,
@@ -346,9 +353,6 @@ class CommBase(tools.YggClass):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
-        if kwargs.get('commtype', None) == 'default':
-            # TODO: Check that the class is the default?
-            kwargs.pop('commtype')
         if isinstance(kwargs.get('datatype', None), MetaschemaType):
             self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
@@ -517,16 +521,32 @@ class CommBase(tools.YggClass):
                 out[k] = copy.deepcopy(out_seri[k])
         return out
 
-    def printStatus(self, nindent=0):
-        r"""Print status of the communicator."""
+    def get_status_message(self, nindent=0):
+        r"""Return lines composing a status message.
+        
+        Args:
+            nindent (int, optional): Number of tabs that should be used to
+                indent each line. Defaults to 0.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
+
+        """
         prefix = nindent * '\t'
-        print('%s%s:' % (prefix, self.name))
+        lines = ['', '%s%s:' % (prefix, self.name)]
         prefix += '\t'
-        print('%s%-15s: %s' % (prefix, 'address', self.address))
-        print('%s%-15s: %s' % (prefix, 'direction', self.direction))
-        print('%s%-15s: %s' % (prefix, 'open', self.is_open))
-        print('%s%-15s: %s' % (prefix, 'nsent', self._n_sent))
-        print('%s%-15s: %s' % (prefix, 'nrecv', self._n_recv))
+        lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
+                  '%s%-15s: %s' % (prefix, 'direction', self.direction),
+                  '%s%-15s: %s' % (prefix, 'open', self.is_open),
+                  '%s%-15s: %s' % (prefix, 'nsent', self._n_sent),
+                  '%s%-15s: %s' % (prefix, 'nrecv', self._n_recv)]
+        return lines, prefix
+
+    def printStatus(self, *args, **kwargs):
+        r"""Print status of the communicator."""
+        lines, _ = self.get_status_message(*args, **kwargs)
+        self.info('\n'.join(lines))
 
     @classmethod
     def is_installed(cls, language=None):
@@ -587,8 +607,13 @@ class CommBase(tools.YggClass):
     @property
     def comm_class(self):
         r"""str: Name of communication class."""
+        # TODO: Change this to return self._commtype
         if self._comm_class is None:
-            self._comm_class = str(self.__class__).split("'")[1].split(".")[-1]
+            if getattr(self, '_is_error_class', False):
+                name_cls = self.__class__.__bases__[0]
+            else:
+                name_cls = self.__class__
+            self._comm_class = str(name_cls).split("'")[1].split(".")[-1]
         return self._comm_class
 
     @classmethod
@@ -613,11 +638,13 @@ class CommBase(tools.YggClass):
 
     def register_comm(self, key, value):
         r"""Register a comm."""
-        self.debug("Registering comm: %s", key)
+        self.debug("Registering %s comm: %s", self.comm_class, key)
         register_comm(self.comm_class, key, value)
 
     def unregister_comm(self, key, dont_close=False):
         r"""Unregister a comm."""
+        self.debug("Unregistering %s comm: %s (dont_close = %s)",
+                   self.comm_class, key, dont_close)
         unregister_comm(self.comm_class, key, dont_close=dont_close)
 
     @classmethod
@@ -625,9 +652,9 @@ class CommBase(tools.YggClass):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
         if out > 0:
-            info('There are %d %s comms: %s',
-                 len(cls.comm_registry()), cls.__name__,
-                 [k for k in cls.comm_registry().keys()])
+            logger.info('There are %d %s comms: %s',
+                        len(cls.comm_registry()), cls.__name__,
+                        [k for k in cls.comm_registry().keys()])
         return out
 
     @classmethod
@@ -680,12 +707,7 @@ class CommBase(tools.YggClass):
             kwargs['direction'] = 'recv'
         else:
             kwargs['direction'] = 'send'
-        for k in self.serializer._schema_properties.keys():
-            if k in self.serializer._schema_excluded_from_class:
-                continue
-            v = getattr(self.serializer, k)
-            if v is not None:
-                kwargs[k] = v
+        kwargs.update(self.serializer.input_kwargs)
         return kwargs
 
     def bind(self):
@@ -1683,8 +1705,6 @@ class CommBase(tools.YggClass):
              and (len(args_dict) <= 1))):
             metadata['key_order'] = [k for k in args_dict.keys()]
         if not self.serializer.initialized:
-            if (metadata['key_order'] is None) and isinstance(args_dict, dict):
-                metadata['key_order'] = sorted(list(args_dict.keys()))
             metadata['field_names'] = metadata['key_order']
         args = JSONArrayMetaschemaType.coerce_type(args_dict, **metadata)
         # Add field order to kwargs so it can be reconstructed

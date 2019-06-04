@@ -100,6 +100,15 @@ class DefaultSerialize(SerializeBase):
             return super(DefaultSerialize, cls).concatenate(objects, **kwargs)
         return out
 
+    @classmethod
+    def get_testing_options(cls, **kwargs):
+        r"""Method to return a dictionary of testing options for this class."""
+        out = super(DefaultSerialize, cls).get_testing_options(**kwargs)
+        if cls._seritype == 'default':
+            out['concatenate'] = [([], []),
+                                  ([b'a', b'b'], [b'ab'])]
+        return out
+        
     def update_serializer(self, *args, **kwargs):
         r"""Update serializer with provided information.
 

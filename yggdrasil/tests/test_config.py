@@ -1,7 +1,7 @@
 import os
 import tempfile
-from yggdrasil.tests import assert_equal, assert_warns
-from yggdrasil import config, backwards, tools
+from yggdrasil.tests import assert_equal, assert_warns, assert_raises
+from yggdrasil import config, backwards
 
 
 def make_temp(fname_base, count=1):
@@ -37,6 +37,8 @@ def test_YggConfigParser():
     x = config.YggConfigParser()
     x.add_section('test_section')
     x.set('test_section', 'test_option', 'test_value')
+    assert_raises(RuntimeError, x.update_file)
+    assert_equal(x.file_to_update, None)
     assert_equal(x.get('test_section', 'test_option'), 'test_value')
     assert_equal(x.get('test_section', 'fake_option'), None)
     assert_equal(x.get('test_section', 'fake_option', 5), 5)
@@ -77,19 +79,23 @@ def test_find_all():
     assert_equal(mout, mans)
 
 
-def test_update_config():
-    r"""Test update_config."""
-    test_cfg = os.path.join(tempfile.gettempdir(), 'test.cfg')
-    assert(not os.path.isfile(test_cfg))
-    if not tools.is_lang_installed('matlab'):  # pragma: no matlab
-        assert_warns(RuntimeWarning, config.update_config, test_cfg)
-    config.update_config(test_cfg)
-    assert(os.path.isfile(test_cfg))
-    os.remove(test_cfg)
+# def test_update_config():
+#     r"""Test update_config."""
+#     test_cfg = os.path.join(tempfile.gettempdir(), 'test.cfg')
+#     assert(not os.path.isfile(test_cfg))
+#     if not tools.is_lang_installed('matlab'):  # pragma: no matlab
+#         assert_warns(RuntimeWarning, config.update_config, test_cfg)
+#     config.update_config(test_cfg)
+#     assert(os.path.isfile(test_cfg))
+#     os.remove(test_cfg)
 
 
 def test_cfg_logging():
     r"""Test cfg_logging."""
+    lvl = config.get_ygg_loglevel()
+    config.set_ygg_loglevel(lvl)
     os.environ['YGG_SUBPROCESS'] = 'True'
+    lvl = config.get_ygg_loglevel()
+    config.set_ygg_loglevel(lvl)
     config.cfg_logging()
     del os.environ['YGG_SUBPROCESS']

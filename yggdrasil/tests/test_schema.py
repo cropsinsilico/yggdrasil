@@ -15,6 +15,7 @@ _normalize_objects = [
                   'working_dir': os.getcwd()}],
       'connections': [{'inputs': 'outputA',
                        'outputs': 'fileA.txt',
+                       'seritype': 'direct',
                        'working_dir': os.getcwd()}]},
      {'models': [{'name': 'modelA',
                   'language': 'c',
@@ -59,6 +60,7 @@ def test_default_schema():
         assert(isinstance(s[k].classes, list))
         for ksub in s[k].classes:
             s[k].get_subtype_properties(ksub)
+            s[k].default_subtype
 
 
 def test_create_schema():
@@ -106,7 +108,7 @@ def test_normalize():
     r"""Test normalization of legacy formats."""
     s = schema.get_schema()
     for x, y in _normalize_objects:
-        a = s.normalize(x, backwards_compat=True)
+        a = s.normalize(x, backwards_compat=True)  # , show_errors=True)
         try:
             assert_equal(a, y)
         except BaseException:  # pragma: debug

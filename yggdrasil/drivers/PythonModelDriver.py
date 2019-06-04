@@ -1,13 +1,7 @@
-import os
 import sys
 import importlib
 from yggdrasil import tools
 from yggdrasil.drivers.InterpretedModelDriver import InterpretedModelDriver
-
-
-_top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
-_incl_interface = os.path.join(_top_dir, 'interface')
-_incl_io = os.path.join(_top_dir, 'io')
 
 
 class PythonModelDriver(InterpretedModelDriver):
@@ -18,12 +12,30 @@ class PythonModelDriver(InterpretedModelDriver):
     language_ext = '.py'
     default_interpreter = sys.executable
     interface_library = 'yggdrasil.interface.YggInterface'
+    # supported_comms = ['ipc', 'zmq', 'rmq']
     supported_comms = tools.get_supported_comm()
     supported_comm_options = {
         'ipc': {'platforms': ['MacOS', 'Linux'],
                 'libraries': ['sysv_ipc']},
         'zmq': {'libraries': ['zmq']},
         'rmq': {'libraries': ['pika']}}
+    type_map = {
+        'int': 'numpy.intX',
+        'float': 'numpy.floatX',
+        'string': 'str',
+        'array': 'list',
+        'object': 'dict',
+        'boolean': 'bool',
+        'null': 'None',
+        'uint': 'numpy.uintX',
+        'complex': 'numpy.complexX',
+        'bytes': 'bytes',
+        'unicode': 'str',
+        '1darray': 'numpy.ndarray',
+        'ndarray': 'numpy.ndarray',
+        'ply': 'PlyDict',
+        'obj': 'ObjDict',
+        'schema': 'dict'}
     function_param = {
         'import': 'import {function}',
         'interface': 'import {interface_library} as ygg',
@@ -34,20 +46,24 @@ class PythonModelDriver(InterpretedModelDriver):
         'function_call': '{output_var} = {function_name}({input_var})',
         'define': '{variable} = {value}',
         'comment': '#',
+        'true': 'True',
         'indent': 4 * ' ',
         'quote': '\"',
-        'true': 'True',
-        'break': 'break',
-        'error': 'raise Exception(\"{message}\")',
         'print': 'print(\"{message}\")',
         'fprintf': 'print(\"{message}\" % ({variables}))',
+        'error': 'raise Exception("{error_msg}")',
         'block_end': '',
         'if_begin': 'if ({cond}):',
         'for_begin': 'for {iter_var} in range({iter_begin}, {iter_end}):',
         'while_begin': 'while ({cond}):',
+        'break': 'break',
         'try_begin': 'try:',
         'try_error_type': 'BaseException',
-        'try_except': 'except {try_error} as {error_var}:'}
+        'try_except': 'except {error_type} as {error_var}:',
+        'assign': '{name} = {value}',
+        'exec_begin': 'def main():',
+        'exec_suffix': ('if __name__ == "__main__":\n'
+                        '    main()')}
 
     @classmethod
     def is_language_installed(self):
@@ -93,7 +109,9 @@ class PythonModelDriver(InterpretedModelDriver):
             bool: True if a comm is installed for this language.
 
         """
-        out = super(PythonModelDriver, cls).is_comm_installed(**kwargs)
+        # Call __func__ to avoid direct invoking of class which dosn't exist
+        # in after_registration where this is called
+        out = InterpretedModelDriver.is_comm_installed.__func__(cls, **kwargs)
         if not kwargs.get('skip_config'):
             return out
         if out and (kwargs.get('commtype', None) in ['rmq', 'rmq_async']):

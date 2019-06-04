@@ -3,12 +3,14 @@ such that they can be run simultaneously, passing input back and forth."""
 from yggdrasil import platform
 import os
 import sys
+import glob
 import logging
 import subprocess
 import importlib
 from ._version import get_versions
 _test_package_name = None
 _test_package = None
+logger = logging.getLogger(__name__)
 order = ['pytest', 'nose']
 # order = ['nose', 'pytest']
 try:
@@ -27,6 +29,42 @@ if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
     # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
+
+
+def expand_and_add(path, path_list, dir_list):  # pragma: no cover
+    r"""Expand the specified path and add it's expanded forms to the provided
+    list.
+
+    Args:
+        path (str): Absolute/relative path with or without regex wildcard
+            expressions to expand.
+        path_list (list): Existing list that expansions should be added to.
+        dir_list (list): Directories that should be tried for relative paths.
+
+    Returns:
+        int: The number of expansions added to path_list.
+
+    """
+    if os.path.isabs(path):
+        matches = glob.glob(path)
+        path_list += matches
+        return len(matches)
+    # Try checking for function
+    for func_sep in ['::', ':']:
+        if (func_sep in path):
+            prepath, mod = path.rsplit(func_sep, 1)
+            nadded = expand_and_add(prepath, path_list, dir_list)
+            if nadded:
+                for i in range(-nadded, 0):
+                    path_list[i] += '%s%s' % (func_sep, mod)
+                return nadded
+    # Try directory prefixes
+    for path_prefix in dir_list:
+        nadded = expand_and_add(os.path.join(path_prefix, path),
+                                path_list, dir_list)
+        if nadded:
+            return nadded
+    return 0
 
 
 def run_tsts(verbose=True, nocapture=True, stop=True,
@@ -52,10 +90,8 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         raise RuntimeError("Could not locate test runner pytest or nose.")
     elif _test_package_name == 'pytest':
         test_cmd = 'pytest'
-        func_sep = '::'
     elif _test_package_name == 'nose':
         test_cmd = 'nosetests'
-        func_sep = ':'
     else:
         raise RuntimeError("Unsupported test package: '%s'" % _test_package_name)
     initial_dir = os.getcwd()
@@ -71,7 +107,7 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         elif x.endswith('yggtest'):
             # if _test_package_name == 'nose':
             #     argv.append(x)
-            print(x)  # pass
+            pass
         elif x == '--nocover':
             withcoverage = False
         elif x.startswith('-'):
@@ -98,27 +134,23 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
             argv.append('--cover-package=yggdrasil')
         elif _test_package_name == 'pytest':
             argv.append('--cov=%s' % package_dir)
+    # Get expanded tests
+    expanded_test_paths = []
     if not test_paths:
-        test_paths.append(package_dir)
+        expanded_test_paths.append(package_dir)
     else:
-        for i in range(len(test_paths)):
-            if not os.path.isabs(test_paths[i]):
-                for func_sep in ['::', ':']:
-                    if (func_sep in test_paths[i]):
-                        path, mod = test_paths[i].rsplit(func_sep, 1)
-                        if (((not os.path.isabs(path))
-                             and os.path.exists(os.path.join(package_dir, path)))):
-                            test_paths[i] = '%s%s%s' % (
-                                os.path.join(package_dir, path), func_sep, mod)
-                            break
-                else:
-                    if os.path.exists(os.path.join(package_dir, test_paths[i])):
-                        test_paths[i] = os.path.join(package_dir, test_paths[i])
+        for x in test_paths:
+            if not expand_and_add(x, expanded_test_paths,
+                                  [package_dir, os.getcwd()]):
+                expanded_test_paths.append(x)
     # os.chdir(package_dir)
-    argv += test_paths
-    print("running", argv)
-    print(os.getcwd())
+    argv += expanded_test_paths
+    logger.info("Running %s from %s", argv, os.getcwd())
     try:
+        # Set env
+        old_skip_norm = os.environ.get('YGG_SKIP_COMPONENT_VALIDATION', None)
+        if old_skip_norm is None:
+            os.environ['YGG_SKIP_COMPONENT_VALIDATION'] = 'True'
         error_code = subprocess.call(argv)
         # if _test_package_name == 'nose':
         #     result = _test_package.run(argv=argv)
@@ -129,10 +161,12 @@ def run_tsts(verbose=True, nocapture=True, stop=True,
         # else:
         #     raise RuntimeError("No test runner.")
     except BaseException:
-        logging.exception('Error in running test.')
+        logger.exception('Error in running test.')
         error_code = -1
     finally:
         os.chdir(initial_dir)
+        if old_skip_norm is None:
+            del os.environ['YGG_SKIP_COMPONENT_VALIDATION']
     return error_code
 
 

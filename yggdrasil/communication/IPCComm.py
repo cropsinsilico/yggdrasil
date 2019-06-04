@@ -3,12 +3,13 @@ import logging
 from subprocess import Popen, PIPE
 from yggdrasil import platform, tools
 from yggdrasil.communication import CommBase, AsyncComm
+logger = logging.getLogger(__name__)
 try:
     import sysv_ipc
     _ipc_installed = (platform._is_linux or platform._is_mac)
 except ImportError:  # pragma: windows
-    logging.warn("Could not import sysv_ipc. "
-                 + "IPC support will be disabled.")
+    logger.warn("Could not import sysv_ipc. "
+                + "IPC support will be disabled.")
     sysv_ipc = None
     _ipc_installed = False
 
@@ -33,7 +34,7 @@ def get_queue(qid=None):
         CommBase.register_comm('IPCComm', key, mq)
         return mq
     else:  # pragma: windows
-        logging.warning("IPC not installed. Queue cannot be returned.")
+        logger.warning("IPC not installed. Queue cannot be returned.")
         return None
 
 
@@ -75,7 +76,7 @@ def ipcs(options=[]):
             raise Exception("Error on spawned process. See output.")
         return output.decode('utf-8')
     else:  # pragma: windows
-        logging.warn("IPC not installed. ipcs cannot be run.")
+        logger.warn("IPC not installed. ipcs cannot be run.")
         return ''
 
 
@@ -138,7 +139,7 @@ def ipcrm(options=[]):
         if not output.isspace():
             print(output.decode('utf-8'))
     else:  # pragma: windows
-        logging.warn("IPC not installed. ipcrm cannot be run.")
+        logger.warn("IPC not installed. ipcrm cannot be run.")
 
 
 def ipcrm_queues(queue_keys=None):
@@ -157,7 +158,7 @@ def ipcrm_queues(queue_keys=None):
         for q in queue_keys:
             ipcrm(["-Q %s" % q])
     else:  # pragma: windows
-        logging.warn("IPC not installed. ipcrm cannot be run.")
+        logger.warn("IPC not installed. ipcrm cannot be run.")
 
 
 class IPCServer(CommBase.CommServer):
@@ -173,12 +174,19 @@ class IPCComm(AsyncComm.AsyncComm):
 
     Attributes:
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
+
+    Developer Notes:
+        The default size limit for IPC message queues is 2048 bytes on Mac
+        operating systems so it is important that implementation of this
+        communication mechanism properly split and send messages larger than
+        this limit as more than one message.
         
     """
 
     _commtype = 'ipc'
     _schema_subtype_description = ('Interprocess communication (IPC) queue.')
     _maxMsgSize = 2048  # Based on IPC limit on MacOS
+    address_description = ("An IPC message queue key.")
 
     def _init_before_open(self, **kwargs):
         r"""Initialize empty queue and server class."""
@@ -186,26 +194,6 @@ class IPCComm(AsyncComm.AsyncComm):
         self._server_class = IPCServer
         super(IPCComm, self)._init_before_open(**kwargs)
             
-    # @classmethod
-    # def is_installed(cls, language=None):
-    #     r"""Determine if the necessary libraries are installed for this
-    #     communication class.
-
-    #     Args:
-    #         language (str, optional): Specific language that should be checked
-    #             for compatibility. Defaults to None and all languages supported
-    #             on the current platform will be checked.
-
-    #     Returns:
-    #         bool: Is the comm installed.
-
-    #     """
-    #     if language in ['python', 'c']:
-    #         out = _ipc_installed
-    #     else:
-    #         out = super(IPCComm, cls).is_installed(language=language)
-    #     return out
-
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""

@@ -22,7 +22,7 @@ class AsciiMapSerialize(SerializeBase):
     _schema_properties = {
         'delimiter': {'type': 'string',
                       'default': backwards.as_str(_default_delimiter)}}
-    _attr_conv = SerializeBase._attr_conv + ['delimiter']
+    _attr_conv = SerializeBase._attr_conv  # + ['delimiter']
     default_datatype = {'type': 'object'}
     concats_as_str = False
 
@@ -46,7 +46,7 @@ class AsciiMapSerialize(SerializeBase):
             if isinstance(v, backwards.string_types):
                 v = backwards.as_str(v)
             out += json.dumps(v, cls=JSONReadableEncoder)
-            out += self.newline
+            out += backwards.as_str(self.newline)
         return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
@@ -60,7 +60,8 @@ class AsciiMapSerialize(SerializeBase):
 
         """
         out = dict()
-        lines = (backwards.as_str(msg)).split(self.newline)
+        lines = (backwards.as_str(msg)).split(
+            backwards.as_str(self.newline))
         for l in lines:
             kv = l.split(self.delimiter)
             if len(kv) <= 1:
@@ -74,7 +75,7 @@ class AsciiMapSerialize(SerializeBase):
                     except BaseException:
                         out[kv[0]] = kv[1]
             else:
-                raise ValueError("Line has more than one delimiter: " + l)
+                raise ValueError("Line has more than one delimiter: " + str(l))
         return out
 
     @classmethod
@@ -104,9 +105,8 @@ class AsciiMapSerialize(SerializeBase):
 
         """
         out = super(AsciiMapSerialize, cls).get_testing_options()
-        out['objects'] = [{'args1': int(1), 'args2': 'this',
-                           # Should these be separate messages, allowing append?
-                           'args3': float(1), 'args4': [int(1), int(2)]}]
+        out['objects'] = [{'args1': int(1), 'args2': 'this'},
+                          {'args3': float(1), 'args4': [int(1), int(2)]}]
         out['empty'] = dict()
         out['contents'] = (b'args1\t1\n'
                            + b'args2\t"this"\n'

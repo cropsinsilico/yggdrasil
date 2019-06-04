@@ -1,18 +1,16 @@
 from yggdrasil import units
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.ScalarMetaschemaType import (
     ScalarMetaschemaType)
 from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
 
 
-@register_type
 class OneDArrayMetaschemaType(ScalarMetaschemaType):
     r"""Type associated with a scalar."""
 
     name = '1darray'
     description = 'A 1D array with or without units.'
-    properties = ScalarMetaschemaType.properties + ['length']
-    metadata_properties = ScalarMetaschemaType.metadata_properties + ['length']
+    properties = ['length']
+    metadata_properties = ['length']
     python_types = ScalarMetaschemaProperties._all_python_arrays
 
     @classmethod
@@ -38,14 +36,13 @@ class OneDArrayMetaschemaType(ScalarMetaschemaType):
         return True
 
 
-@register_type
 class NDArrayMetaschemaType(ScalarMetaschemaType):
     r"""Type associated with a scalar."""
 
     name = 'ndarray'
     description = 'An ND array with or without units.'
-    properties = ScalarMetaschemaType.properties + ['shape']
-    metadata_properties = ScalarMetaschemaType.metadata_properties + ['shape']
+    properties = ['shape']
+    metadata_properties = ['shape']
     python_types = ScalarMetaschemaProperties._all_python_arrays
 
     @classmethod

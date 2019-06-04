@@ -23,6 +23,15 @@ case $1 in
 	echo "Running C++"
 	yaml='gs_lesson4_cpp.yml'
 	;;
+    --make )
+	echo "Running Make"
+	cp ./src/Makefile_linux ./src/Makefile
+	yaml='gs_lesson4_make.yml'
+	;;
+    --cmake )
+	echo "Running CMake"
+	yaml='gs_lesson4_cmake.yml'
+	;;
 esac
 
 yggrun $yaml

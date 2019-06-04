@@ -19,18 +19,20 @@ _this_platform = (platform._platform,
                   tools.get_default_comm())
 _base_environment = {'platform': 'Linux',
                      'python_ver': '2.7',
-                     'comm_type': 'ZMQComm'}
-_valid_platforms = [('Linux', '2.7', 'ZMQComm'),
-                    ('Linux', '2.7', 'IPCComm'),
-                    ('Linux', '3.5', 'ZMQComm'),
-                    ('MacOS', '2.7', 'ZMQComm'),
-                    ('Windows', '2.7', 'ZMQComm')]
+                     'comm_type': 'zmq'}
+_valid_platforms = [('Linux', '2.7', 'zmq'),
+                    ('Linux', '2.7', 'ipc'),
+                    ('Linux', '3.5', 'zmq'),
+                    ('MacOS', '2.7', 'zmq'),
+                    ('Windows', '2.7', 'zmq')]
 _testfile_json = 'test_run123.json'
 _testfile_dat = 'test_run123.dat'
 
 
 def test_get_source():
     r"""Test getting source file for test."""
+    from yggdrasil.tests import enable_long_tests
+    print("**88**YGG_ENABLE_LONG_TESTS", enable_long_tests)
     lang_list = timing.get_lang_list()
     dir_list = ['src', 'dst']
     for l in lang_list:
@@ -102,6 +104,7 @@ class TimedRunTestBase(YggTestClass):
     def check_filename(self):
         r"""Raise a unittest.SkipTest error if the filename dosn't exist."""
         if not os.path.isfile(self.filename):  # pragma: debug
+            print("no file", self.filename)
             raise unittest.SkipTest("Performance stats file dosn't exist: %s"
                                     % self.filename)
 
@@ -248,7 +251,7 @@ class TestTimedRun(TimedRunTestBase):
         # Errors
         assert_raises(ValueError, timing.plot_scalings, compare='invalid')
         assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
-                      comm_type='ZMQComm')
+                      comm_type='zmq')
 
     def test_production_runs(self):
         r"""Test production tests (those used in paper)."""

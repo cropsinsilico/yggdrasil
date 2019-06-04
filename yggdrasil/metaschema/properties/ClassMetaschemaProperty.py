@@ -1,15 +1,13 @@
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
-@register_metaschema_property
 class ClassMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'class' property."""
 
     name = 'class'
     schema = {'description': ('One or more classes that the object should be '
                               'an instance of.'),
-              'oneOf': [{'type': 'class'},
+              'anyOf': [{'type': 'class'},
                         {'type': 'array',
                          'items': {'type': 'class'},
                          'minItems': 1}]}

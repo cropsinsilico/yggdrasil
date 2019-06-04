@@ -80,11 +80,13 @@ class MatSerialize(SerializeBase):
             dict: Dictionary of variables to use for testing.
 
         """
-        msg = {'a': np.array([[int(1)]]), 'b': np.array([[float(1)]])}
+        # msg = {'a': np.array([[int(1)]]), 'b': np.array([[float(1)]])}
+        msg1 = {'a': np.array([[int(1)]]), 'b': np.array([[float(1)]])}
+        msg2 = {'c': np.array([[int(1)]]), 'd': np.array([[float(1)]])}
         out = super(MatSerialize, cls).get_testing_options()
-        out['objects'] = [msg, msg]
+        out['objects'] = [msg1, msg2]
         out['empty'] = dict()
-        out['contents'] = cls().func_serialize(msg)
+        out['contents'] = cls().func_serialize(cls.concatenate(out['objects'])[0])
         out['contents'] = out['contents'].replace(b'\n', platform._newline)
         out['exact_contents'] = False  # Contains a time stamp
         return out

@@ -4,13 +4,12 @@ import pprint
 import yaml
 from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
-from yggdrasil import metaschema
+from yggdrasil import metaschema, backwards
 
 
 _schema_fname = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '.ygg_schema.yml'))
 _schema = None
-_registry_complete = False
 
 
 class SchemaDict(OrderedDict):
@@ -20,46 +19,40 @@ class SchemaDict(OrderedDict):
         return pprint.pformat(dict(self))
 
 
-def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=SchemaDict):
-    class OrderedLoader(Loader):
-        pass
-    
-    def construct_mapping(loader, node):
-        loader.flatten_mapping(node)
-        return object_pairs_hook(loader.construct_pairs(node))
+def ordered_load(stream, object_pairs_hook=SchemaDict, **kwargs):
+    r"""Load YAML document from a file using a specified class to represent
+    mapping types that allows for ordering.
 
-    OrderedLoader.add_constructor(
-        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-        construct_mapping)
-    return yaml.load(stream, OrderedLoader)
+    Args:
+        stream (file): File stream to load the schema YAML from.
+        object_pairs_hook (type, optional): Class that should be used to
+            represent loaded maps. Defaults to SchemaDict.
+        **kwargs: Additional keyword arguments are passed to decode_yaml.
 
+    Returns:
+        object: Result of ordered load.
 
-def ordered_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
-    class OrderedDumper(Dumper):
-        pass
-    
-    def _dict_representer(dumper, data):
-        return dumper.represent_mapping(
-            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-            data.items())
-    
-    OrderedDumper.add_representer(SchemaDict, _dict_representer)
-    return yaml.dump(data, stream, OrderedDumper, **kwds)
+    """
+    kwargs['sorted_dict_type'] = object_pairs_hook
+    out = metaschema.encoder.decode_yaml(stream, **kwargs)
+    out = backwards.as_str(out, recurse=True, allow_pass=True)
+    return out
 
 
-def init_registry():
-    r"""Initialize the registries and schema."""
-    global _registry_complete
-    if not _registry_complete:
-        # Connection & file component import will be needed if they are
-        # moved to other directories
-        from yggdrasil.components import import_all_components
-        import_all_components('serializer')
-        import_all_components('model')
-        # import_all_components('connection')
-        import_all_components('comm')
-        # import_all_components('file')
-        _registry_complete = True
+def ordered_dump(data, **kwargs):
+    r"""Dump object as a YAML document, representing SchemaDict objects as
+    mapping type.
+
+    Args:
+        data (object): Python object that should be dumped.
+        **kwargs: Additional keyword arguments are passed to encode_yaml.
+
+    Returns:
+        str: YAML document representating data.
+
+    """
+    kwargs['sorted_dict_type'] = [SchemaDict, OrderedDict]
+    return metaschema.encoder.encode_yaml(data, **kwargs)
 
 
 def clear_schema():
@@ -77,9 +70,16 @@ def init_schema(fname=None):
 
 def create_schema():
     r"""Create a new schema from the registry."""
-    from yggdrasil.components import _registry
-    init_registry()
-    x = SchemaRegistry(_registry)
+    from yggdrasil.components import init_registry
+    try:
+        old_env = os.environ.get('YGG_RUNNING_YGGSCHEMA', None)
+        os.environ['YGG_RUNNING_YGGSCHEMA'] = '1'
+        x = SchemaRegistry(init_registry())
+    finally:
+        if old_env is None:  # pragma: no cover
+            del os.environ['YGG_RUNNING_YGGSCHEMA']
+        else:
+            os.environ['YGG_RUNNING_YGGSCHEMA'] = old_env
     return x
 
 
@@ -202,7 +202,7 @@ class ComponentSchema(object):
                 for k in self._base_schema['properties'].keys():
                     if (k != self.subtype_key) and (k in out['properties']):
                         del out['properties'][k]
-                if not out['properties']:
+                if not out['properties']:  # pragma: no cover
                     del out['properties']
         if relaxed:
             out['additionalProperties'] = True
@@ -223,7 +223,7 @@ class ComponentSchema(object):
         """
         r"""dict: Schema for this component."""
         out = {'description': 'Schema for %s components.' % self.schema_type,
-               'title': self.schema_type, '$id': '#%s' % self.schema_type,
+               'title': self.schema_type,
                'allOf': [self.get_subtype_schema('base', relaxed=relaxed),
                          {'anyOf': [self.get_subtype_schema(x, unique=True)
                                     for x in self._storage.keys()]}]}
@@ -242,7 +242,7 @@ class ComponentSchema(object):
         # to reconcile that with schema normalization which uses the
         # position in the schema
         out = {'description': 'Schema for %s components.' % self.schema_type,
-               'title': self.schema_type, '$id': '#%s' % self.schema_type,
+               'title': self.schema_type,
                'allOf': [self.get_subtype_schema('base', unique=True),
                          {'anyOf': [self.get_subtype_schema(x)
                                     for x in self._storage.keys()]}]}
@@ -346,7 +346,8 @@ class ComponentSchema(object):
     @property
     def default_subtype(self):
         r"""str: Default subtype."""
-        return self._base_schema['properties'][self.subtype_key]['default']
+        return self._base_schema['properties'][self.subtype_key].get(
+            'default', None)
 
     @property
     def subtypes(self):
@@ -371,8 +372,6 @@ class ComponentSchema(object):
         assert(comp_cls._schema_type == self.schema_type)
         assert(comp_cls._schema_subtype_key == self.subtype_key)
         name = comp_cls.__name__
-        if name in ['CommBase', 'AsyncComm']:
-            name = 'DefaultComm'
         # Append subtype
         subtype_list = getattr(comp_cls, '_%s' % self.subtype_key, None)
         if not isinstance(subtype_list, list):
@@ -427,7 +426,7 @@ class ComponentSchema(object):
                 self._base_schema['required'] = list(
                     set(self._base_schema['required'])
                     & set(new_schema['required']))
-                if not self._base_schema['required']:
+                if not self._base_schema['required']:  # pragma: no cover
                     del self._base_schema['required']
             prop_overlap = list(
                 set([self.subtype_key])  # Force subtype keys to be included
@@ -597,7 +596,7 @@ class SchemaRegistry(object):
         """
         with open(fname, 'r') as f:
             contents = f.read()
-            schema = ordered_load(contents, yaml.SafeLoader)
+            schema = ordered_load(contents, Loader=yaml.SafeLoader)
         if schema is None:
             raise Exception("Failed to load schema from %s" % fname)
         # Create components
@@ -615,7 +614,7 @@ class SchemaRegistry(object):
         """
         out = self.schema
         with open(fname, 'w') as f:
-            ordered_dump(out, f, Dumper=yaml.SafeDumper)
+            ordered_dump(out, stream=f, Dumper=yaml.SafeDumper)
 
     def validate(self, obj, **kwargs):
         r"""Validate an object against this schema.
@@ -709,7 +708,7 @@ class SchemaRegistry(object):
             dict: Schema for the specified component.
 
         """
-        if comp_name not in self._storage:
+        if comp_name not in self._storage:  # pragma: debug
             raise ValueError("Unrecognized component: %s" % comp_name)
         if subtype is None:
             out = self._storage[comp_name].get_schema(relaxed=relaxed)
@@ -1237,6 +1236,9 @@ def _normalize_datatype(normalizer, value, instance, schema):
     r"""Normalize the datatype if the type information is in the comm."""
     if isinstance(instance, dict) and ('datatype' not in instance):
         type_keys = list(metaschema.get_metaschema()['properties'].keys())
+        # Don't include args in type_keys if driver in the instance
+        if ('driver' in instance) and ('args' in type_keys):
+            type_keys.remove('args')
         datatype = {}
         migrate_keys(instance, [datatype], include_key_list=type_keys)
         if datatype:

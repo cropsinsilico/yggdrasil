@@ -229,10 +229,11 @@ class SerializeBase(tools.YggClass):
                    'field_names': ['name', 'count', 'size'],
                    'field_units': ['n/a', 'umol', 'cm']}
             if include_oldkws:
-                out['kwargs'].update({'format_str': b'%5s\t%d\t%f\n',
-                                      'field_names': [b'name', b'count', b'size'],
-                                      'field_units': [b'n/a', b'umol', b'cm']})
-                out['extra_kwargs'].update({'format_str': out['kwargs']['format_str']})
+                out['kwargs'].update({'format_str': '%5s\t%d\t%f\n',
+                                      'field_names': ['name', 'count', 'size'],
+                                      'field_units': ['n/a', 'umol', 'cm']})
+                out['extra_kwargs'].update(
+                    {'format_str': backwards.as_str(out['kwargs']['format_str'])})
             if array_columns:
                 out['kwargs']['as_array'] = True
                 dtype = np.dtype(
@@ -276,6 +277,19 @@ class SerializeBase(tools.YggClass):
         r"""dict: Type definition for encoded data objects."""
         return self.encoded_datatype._typedef
 
+    @property
+    def input_kwargs(self):
+        r"""dict: Get the input keyword arguments used to create this class."""
+        out = {}
+        for k in self._schema_properties.keys():
+            v = getattr(self, k, None)
+            if v is not None:
+                out[k] = copy.deepcopy(v)
+        for k in self._attr_conv:
+            if (k in out) and isinstance(out[k], backwards.string_types):
+                out[k] = backwards.as_str(out[k])
+        return out
+        
     @property
     def serializer_info(self):
         r"""dict: Serializer info."""
@@ -685,6 +699,9 @@ class SerializeBase(tools.YggClass):
                     if not no_metadata:
                         metadata['metadata'] = self.datatype.encode_type(
                             args, typedef=self.typedef)
+        if ((self.initialized
+             and (not tools.check_environ_bool('YGG_VALIDATE_ALL_MESSAGES')))):
+            metadata.setdefault('dont_check', True)
         out = self.encoded_datatype.serialize(data, **metadata)
         return out
 
@@ -706,6 +723,9 @@ class SerializeBase(tools.YggClass):
         if (((self.func_deserialize is not None)
              and (self.encoded_typedef['type'] == 'bytes'))):
             kwargs['dont_decode'] = True
+        if ((self.initialized
+             and (not tools.check_environ_bool('YGG_VALIDATE_ALL_MESSAGES')))):
+            kwargs.setdefault('dont_check', True)
         out, metadata = self.encoded_datatype.deserialize(msg, **kwargs)
         if (self.func_deserialize is not None):
             if metadata['size'] == 0:
@@ -730,7 +750,7 @@ class SerializeBase(tools.YggClass):
             self.initialize_serializer(typedef, extract=True)
         return out, metadata
 
-    def enable_file_header(self):
+    def enable_file_header(self):  # pragma: no cover
         r"""Set serializer attributes to enable file headers to be included in
         the serializations."""
         pass
@@ -740,7 +760,7 @@ class SerializeBase(tools.YggClass):
         included in the serializations."""
         pass
 
-    def serialize_file_header(self):
+    def serialize_file_header(self):  # pragma: no cover
         r"""Return the serialized header information that should be prepended
         to files serialized using this class.
 
@@ -750,7 +770,7 @@ class SerializeBase(tools.YggClass):
         """
         return b''
 
-    def deserialize_file_header(self, fd):
+    def deserialize_file_header(self, fd):  # pragma: no cover
         r"""Deserialize the header information from the file and update the
         serializer.
 

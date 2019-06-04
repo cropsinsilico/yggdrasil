@@ -1,4 +1,5 @@
 import os
+import pprint
 import numpy as np
 import shutil
 import tempfile
@@ -73,7 +74,8 @@ _normalize_objects = [
     ({'type': 'function'}, '%s:invalid_func' % __name__,
      '%s:invalid_func' % __name__),
     ({'type': 'schema'}, {'units': 'g'},
-     {'type': 'scalar', 'units': 'g', 'subtype': 'float', 'precision': int(64)})]
+     {'type': 'scalar', 'units': 'g', 'subtype': 'float', 'precision': int(64)}),
+    ({'type': 'any', 'temptype': {'type': 'float'}}, '1', float(1))]
 
 
 def test_create_metaschema():
@@ -100,7 +102,12 @@ def test_get_metaschema():
                            "installation of jsonschema is up to date.") % (
                                new_id, old_id))
         else:
-            assert_equal(new_metaschema, old_metaschema)
+            try:
+                assert_equal(new_metaschema, old_metaschema)
+            except AssertionError:  # pragma: debug
+                print("Old:\n%s" % pprint.pformat(old_metaschema))
+                print("New:\n%s" % pprint.pformat(new_metaschema))
+                raise
     except BaseException:  # pragma: debug
         shutil.move(temp, metaschema._metaschema_fname)
         raise
@@ -121,11 +128,10 @@ def test_validate_instance():
 def test_normalize_instance():
     r"""Test normalize_instance."""
     for schema, x, y in _normalize_objects:
-        z = metaschema.normalize_instance(x, schema, test_attr=1)
-        assert_equal(z, y)
-
-
-def test_create_normalizer():
-    r"""Test create normalizer with default types."""
-    cls = metaschema.normalizer.create(metaschema.get_metaschema())
-    assert_equal(cls({'type': 'int'}).normalize('1'), '1')
+        z = metaschema.normalize_instance(x, schema, test_attr=1,
+                                          show_errors=(x != y))
+        try:
+            assert_equal(z, y)
+        except BaseException:  # pragma: debug
+            print(schema, x, y, z)
+            raise
