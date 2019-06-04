@@ -328,7 +328,7 @@ class CModelDriver(CompiledModelDriver):
             prev_path = env.pop('LD_LIBRARY_PATH', '')
             if prev_path:
                 path_list.append(prev_path)
-            for x in [_incl_interface]:
+            for x in [cls.get_language_dir()]:
                 if x not in prev_path:
                     path_list.append(x)
             if path_list:
