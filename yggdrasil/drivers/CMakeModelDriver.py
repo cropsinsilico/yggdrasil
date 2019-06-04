@@ -589,7 +589,8 @@ class CMakeModelDriver(CompiledModelDriver):
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
                 preamble_lines.append(new_dir)
-            if cls.add_libraries or (x in internal_library_flags):
+            # if cls.add_libraries or (x in internal_library_flags):
+            if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
                 if xe.lower() in ['.so', '.dll', '.dylib']:
