@@ -348,7 +348,7 @@ class CMakeModelDriver(CompiledModelDriver):
                           'target': {'type': 'string'},
                           'target_language': {'type': 'string'}}
     language = 'cmake'
-    base_languages = ['c']
+    base_languages = ['c', 'c++']
     cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',
                       'CMakeFiles',
                       'ALL_BUILD.vcxproj', 'ALL_BUILD.vcxproj.filters', 'Debug',
@@ -512,10 +512,10 @@ class CMakeModelDriver(CompiledModelDriver):
         internal_library_flags = []
         compile_flags = driver.get_compiler_flags(
             flags=compile_flags, use_library_path=use_library_path,
-            dont_link=True, for_model=True, skip_defaults=True,
+            dont_link=True, for_model=True, skip_defaults=True, dry_run=True,
             logging_level=logging_level)
         linker_flags = driver.get_linker_flags(
-            flags=linker_flags, for_model=True, skip_defaults=True,
+            flags=linker_flags, for_model=True, skip_defaults=True, dry_run=True,
             use_library_path='external_library_flags',
             external_library_flags=external_library_flags,
             use_library_path_internal='internal_library_flags',
@@ -589,8 +589,8 @@ class CMakeModelDriver(CompiledModelDriver):
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
                 preamble_lines.append(new_dir)
-            # if cls.add_libraries or (x in internal_library_flags):
-            if cls.add_libraries:  # pragma: no cover
+            if cls.add_libraries or (x in internal_library_flags):
+                # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
                 if xe.lower() in ['.so', '.dll', '.dylib']:
