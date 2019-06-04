@@ -1,3 +1,4 @@
+import os
 import sys
 import importlib
 from yggdrasil import tools
@@ -37,7 +38,8 @@ class PythonModelDriver(InterpretedModelDriver):
         'obj': 'ObjDict',
         'schema': 'dict'}
     function_param = {
-        'import': 'import {function}',
+        'import_nofile': 'import {function}',
+        'import': 'from {filename} import {function}',
         'interface': 'import {interface_library} as ygg',
         'input': '{channel} = ygg.YggInput(\'{channel_name}\')',
         'output': '{channel} = ygg.YggOutput(\'{channel_name}\')',
@@ -119,3 +121,32 @@ class PythonModelDriver(InterpretedModelDriver):
             from yggdrasil.communication.RMQComm import check_rmq_server
             out = check_rmq_server()
         return out
+
+    @classmethod
+    def format_function_param(cls, key, default=None, **kwargs):
+        r"""Return the formatted version of the specified key.
+
+        Args:
+            key (str): Key in cls.function_param mapping that should be
+                formatted.
+            default (str, optional): Format that should be returned if key
+                is not in cls.function_param. Defaults to None.
+            **kwargs: Additional keyword arguments are used in formatting the
+                request function parameter.
+
+        Returns:
+            str: Formatted string.
+
+        Raises:
+            NotImplementedError: If key is not in cls.function_param and default
+                is not set.
+
+        """
+        if key == 'import':
+            fname = kwargs.get('filename', None)
+            if fname is None:
+                key = 'import_nofile'
+            else:
+                kwargs['filename'] = os.path.splitext(os.path.basename(fname))[0]
+        kwargs['default'] = default
+        return super(PythonModelDriver, cls).format_function_param(key, **kwargs)

@@ -71,7 +71,7 @@ class CPPModelDriver(CModelDriver):
         CModelDriver.function_param,
         input='YggInput {channel}(\"{channel_name}\");',
         output='YggOutput {channel}(\"{channel_name}\");',
-        recv='{flag_var} = {channel}.recv({recv_num}, {recv_var});',
+        recv='{flag_var} = {channel}.recvRealloc({recv_num}, {recv_var});',
         send='{flag_var} = {channel}.send({send_num}, {send_var});',
         exec_prefix=('#include <iostream>\n'
                      '#include <exception>\n'),

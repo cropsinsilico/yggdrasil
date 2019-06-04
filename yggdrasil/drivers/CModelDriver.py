@@ -220,7 +220,8 @@ class CModelDriver(CompiledModelDriver):
         'ndarray': '*',
         'ply': 'ply_t',
         'obj': 'obj_t',
-        'schema': 'map_t'}
+        'schema': 'map_t',
+        'flag': 'int'}
     function_param = {
         'import': '#include \"{filename}\"',
         'interface': '#include \"{interface_library}\"',
@@ -239,9 +240,9 @@ class CModelDriver(CompiledModelDriver):
         'not': '!',
         'indent': 2 * ' ',
         'quote': '\"',
-        'print': 'printf(\"{message}\");',
-        'fprintf': 'printf(\"{message}\", {variables});',
-        'error': 'printf(\"{error_msg}\"); return -1;',
+        'print': 'printf(\"{message}\\n\");',
+        'fprintf': 'printf(\"{message}\\n\", {variables});',
+        'error': 'printf(\"{error_msg}\\n\"); return -1;',
         'block_end': '}',
         'if_begin': 'if ({cond}) {{',
         'for_begin': ('for ({iter_var} = {iter_begin}; {iter_var} < {iter_end}; '
@@ -249,7 +250,9 @@ class CModelDriver(CompiledModelDriver):
         'while_begin': 'while ({cond}) {{',
         'break': 'break;',
         'exec_begin': 'int main() {',
-        'exec_end': '  return 0;\n}'}
+        'exec_end': '  return 0;\n}',
+        'exec_prefix': '#include <stdbool.h>',
+        'free': 'if ({variable} != NULL) free({variable});'}
 
     @staticmethod
     def after_registration(cls):
@@ -369,6 +372,114 @@ class CModelDriver(CompiledModelDriver):
         return out
     
     @classmethod
+    def get_native_type(cls, **kwargs):
+        r"""Get the native type.
+
+        Args:
+            type (str, optional): Name of |yggdrasil| extended JSON
+                type or JSONSchema dictionary defining a datatype.
+            **kwargs: Additional keyword arguments may be used in determining
+                the precise declaration that should be used.
+
+        Returns:
+            str: The native type.
+
+        """
+        out = super(CModelDriver, cls).get_native_type(**kwargs)
+        if not ((out == '*') or ('X' in out)):
+            return out
+        json_type = kwargs.get('type', 'bytes')
+        assert(isinstance(json_type, dict))
+        if out == '*':
+            json_subtype = copy.deepcopy(json_type)
+            json_subtype['type'] = json_subtype.pop('subtype')
+            out = cls.get_native_type(type=json_subtype) + '*'
+        elif 'X' in out:
+            precision = json_type['precision']
+            out = out.replace('X', str(precision))
+        return out
+        
+    @classmethod
+    def format_function_param(cls, key, default=None, **kwargs):
+        r"""Return the formatted version of the specified key.
+
+        Args:
+            key (str): Key in cls.function_param mapping that should be
+                formatted.
+            default (str, optional): Format that should be returned if key
+                is not in cls.function_param. Defaults to None.
+            **kwargs: Additional keyword arguments are used in formatting the
+                request function parameter.
+
+        Returns:
+            str: Formatted string.
+
+        Raises:
+            NotImplementedError: If key is not in cls.function_param and default
+                is not set.
+
+        """
+        if (key == 'import') and ('filename' in kwargs):
+            kwargs['filename'] = os.path.basename(kwargs['filename'])
+        elif (key == 'interface') and ('interface_library' in kwargs):
+            kwargs['interface_library'] = os.path.basename(
+                kwargs['interface_library']).replace('.c', '.h')
+        kwargs['default'] = default
+        return super(CModelDriver, cls).format_function_param(key, **kwargs)
+    
+    @classmethod
+    def write_declaration(cls, name, **kwargs):
+        r"""Return the line required to declare a variable with a certain
+        type.
+
+        Args:
+            name (str): Name of variable being declared.
+            **kwargs: Addition keyword arguments are passed to get_native_type.
+
+        Returns:
+            str: The line declaring the variable.
+
+        """
+        orig_name = name
+        type_name = cls.get_native_type(**kwargs)
+        if type_name.endswith('*'):
+            kwargs.get('requires_freeing', []).append(name)
+            name = '%s = NULL' % name
+            # TODO: Handle *
+        out = super(CModelDriver, cls).write_declaration(name, **kwargs)
+        if type_name == 'char*':
+            length_name = orig_name + '_length = 0'
+            length_type = {'type': 'uint', 'precision': 64}
+            out += ' ' + cls.write_declaration(length_name,
+                                               type=length_type)
+        return out
+        
+    @classmethod
+    def prepare_variables(cls, vars_list):
+        r"""Concatenate a set of input variables such that it can be passed as a
+        single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable dictionaries containing info
+                (e.g. names) that should be used to prepare a string representing
+                input/output to/from a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        if not isinstance(vars_list, list):
+            vars_list = [vars_list]
+        new_vars_list = []
+        for x in vars_list:
+            if not isinstance(x, dict):
+                x = {'name': x}
+            new_vars_list.append(x)
+            if cls.get_native_type(**x) == 'char*':
+                new_vars_list.append({'name': x['name'] + '_length'})
+        return super(CModelDriver, cls).prepare_variables(new_vars_list)
+            
+    @classmethod
     def prepare_output_variables(cls, vars_list):
         r"""Concatenate a set of output variables such that it can be passed as
         a single string to the function_call parameter.
@@ -381,5 +492,67 @@ class CModelDriver(CompiledModelDriver):
             str: Concatentated variables list.
 
         """
+        if not isinstance(vars_list, list):
+            vars_list = [vars_list]
+        new_vars_list = []
+        for x in vars_list:
+            if not isinstance(x, dict):
+                x = {'name': x}
+            new_vars_list.append(x)
         return super(CModelDriver, cls).prepare_output_variables(
-            ['&' + x for x in vars_list])
+            [dict(y, name='&' + y['name']) for y in new_vars_list])
+
+    # @classmethod
+    # def write_model_send(cls, channel, send_var, **kwargs):
+    #     r"""Write a model send call include checking the return flag.
+
+    #     Args:
+    #         channel (str): Name of variable that the channel being sent to
+    #             was stored in.
+    #         send_var (str): Name of variable(s) that is being sent.
+    #         **kwargs: Additional keyword arguments are passed to the parent
+    #             class's method.
+
+    #     Returns:
+    #         list: Lines required to carry out a send call in this language.
+
+    #     """
+    #     new_send_var = []
+    #     if not isinstance(send_var, list):
+    #         send_var = [send_var]
+    #     for x in send_var:
+    #         if not isinstance(x, dict):
+    #             x = {'name': x}
+    #         new_send_var.append(x)
+    #         if cls.get_native_type(**x) == 'char*':
+    #             new_send_var.append({'name': x['name'] + '_length'})
+    #     return super(CModelDriver, cls).write_model_send(channel, new_send_var,
+    #                                                      **kwargs)
+        
+    # @classmethod
+    # def write_model_recv(cls, channel, recv_var, **kwargs):
+    #     r"""Write a model receive call include checking the return flag.
+
+    #     Args:
+    #         channel (str): Name of variable that the channel being received from
+    #             was stored in.
+    #         recv_var (str): Name of variable(s) that the received variable(s)
+    #             should be stored in.
+    #         **kwargs: Additional keyword arguments are passed to the parent
+    #             class's method.
+
+    #     Returns:
+    #         list: Lines required to carry out a receive call in this language.
+
+    #     """
+    #     new_recv_var = []
+    #     if not isinstance(recv_var, list):
+    #         recv_var = [recv_var]
+    #     for x in recv_var:
+    #         if not isinstance(x, dict):
+    #             x = {'name': x}
+    #         new_recv_var.append(x)
+    #         if cls.get_native_type(**x) == 'char*':
+    #             new_recv_var.append({'name': x['name'] + '_length'})
+    #     return super(CModelDriver, cls).write_model_recv(channel, new_recv_var,
+    #                                                      **kwargs)

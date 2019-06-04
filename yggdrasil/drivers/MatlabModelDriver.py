@@ -456,7 +456,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
         'define': '{variable} = {value};',
         'comment': '%',
         'true': 'true',
-        'not': '!',
+        'not': 'not',
         'indent': 2 * ' ',
         'quote': '\'',
         'print': 'disp(\'{message}\');',
