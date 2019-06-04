@@ -64,11 +64,10 @@ class ClangCompiler(CCompilerBase):
 
 class MSVCCompiler(CCompilerBase):
     r"""Microsoft Visual Studio C Compiler."""
-    # TODO: This class dosn't check the CXX and CXXFLAGS environment variables
-    # for C++ currently because it is a C subclass.
     toolname = 'cl'
     languages = ['c', 'c++']
     platforms = ['Windows']
+    default_flags_env = ['CFLAGS', 'CXXFLAGS']
     # TODO: Currently everything compiled as C++ on windows to allow use
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors

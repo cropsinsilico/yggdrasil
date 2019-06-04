@@ -22,7 +22,8 @@ class CMakeConfigure(CompilerBase):
     default_flags = []  # '-H']
     flag_options = OrderedDict([('definitions', '-D%s'),
                                 ('sourcedir', ''),  # '-S'
-                                ('builddir', '-B%s')])
+                                ('builddir', '-B%s'),
+                                ('configuration', '-DCMAKE_BUILD_TYPE=%s')])
     output_key = None
     compile_only_flag = None
     default_builddir = '.'
@@ -333,6 +334,8 @@ class CMakeModelDriver(CompiledModelDriver):
             model executable. Defaults to None.
         target_language (str, optional): Language that the target is written in.
             Defaults to None and will be set based on the source files provided.
+        configuration (str, optional): Build type/configuration that should be
+            built. Defaults to 'Release'.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -345,6 +348,8 @@ class CMakeModelDriver(CompiledModelDriver):
         target_language (str): Language that the target is written in.
         target_language_driver (ModelDriver): Language driver for the target
             language.
+        configuration (str): Build type/configuration that should be built.
+            This is only used on Windows.
 
     Raises:
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
@@ -356,7 +361,9 @@ class CMakeModelDriver(CompiledModelDriver):
     _schema_properties = {'sourcedir': {'type': 'string'},
                           'builddir': {'type': 'string'},
                           'target': {'type': 'string'},
-                          'target_language': {'type': 'string'}}
+                          'target_language': {'type': 'string'},
+                          'configuration': {'type': 'string',
+                                            'default': 'Release'}}
     language = 'cmake'
     base_languages = ['c', 'c++']
     cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',
@@ -522,11 +529,13 @@ class CMakeModelDriver(CompiledModelDriver):
         external_library_flags = []
         internal_library_flags = []
         compile_flags = driver.get_compiler_flags(
+            skip_defaults=(not platform._is_win),
             flags=compile_flags, use_library_path=use_library_path,
-            dont_link=True, for_model=True, skip_defaults=True, dry_run=True,
+            dont_link=True, for_model=True, dry_run=True,
             logging_level=logging_level)
         linker_flags = driver.get_linker_flags(
-            flags=linker_flags, for_model=True, skip_defaults=True, dry_run=True,
+            skip_defaults=(not platform._is_win),
+            flags=linker_flags, for_model=True, dry_run=True,
             use_library_path='external_library_flags',
             external_library_flags=external_library_flags,
             use_library_path_internal='internal_library_flags',
@@ -586,6 +595,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
         # Libraries
         for x in library_flags:
+            xorig = x
             xd, xf = os.path.split(x)
             xl, xe = os.path.splitext(xf)
             xl = driver.get_tool('linker').libpath2libname(xf)
@@ -596,7 +606,7 @@ class CMakeModelDriver(CompiledModelDriver):
             new_dir = 'LINK_DIRECTORIES(%s)' % xd
             if new_dir not in preamble_lines:
                 preamble_lines.append(new_dir)
-            if cls.add_libraries or (x in internal_library_flags):
+            if cls.add_libraries or (xorig in internal_library_flags):
                 # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
@@ -702,6 +712,8 @@ class CMakeModelDriver(CompiledModelDriver):
                                   sourcedir=self.sourcedir,
                                   builddir=self.builddir,
                                   skip_interface_flags=True)
+            # if platform._is_win:  # pragma: windows
+            default_kwargs['configuration'] = self.configuration
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
             return super(CMakeModelDriver, self).compile_model(**kwargs)
