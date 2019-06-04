@@ -913,6 +913,11 @@ definitions:
           items:
             type: string
           type: array
+        configuration:
+          default: Release
+          description: Build type/configuration that should be built. Defaults to
+            'Release'.
+          type: string
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -1292,6 +1297,11 @@ definitions:
             items:
               type: string
             type: array
+          configuration:
+            default: Release
+            description: Build type/configuration that should be built. Defaults to
+              'Release'.
+            type: string
           language:
             default: executable
             description: Model is written in C/C++ and has a CMake build system.

@@ -264,8 +264,11 @@ class CompilationToolBase(object):
             env = getattr(cls, '%s_env' % k, None)
             if env is not None:
                 if k in ['default_flags']:
+                    if not isinstance(env, list):
+                        env = [env]
                     old_val = getattr(cls, k, [])
-                    old_val += os.environ.get(env, '').split()
+                    for ienv in env:
+                        old_val += os.environ.get(ienv, '').split()
                 else:
                     setattr(cls, k, os.environ.get(env, getattr(cls, k)))
         # Set default_executable to name
