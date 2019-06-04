@@ -2216,7 +2216,7 @@ class CompiledModelDriver(ModelDriver):
             dep_lib = cls.get_dependency_library(dep)
             if dep_lib and (dep_lib not in libraries):
                 if not kwargs.get('dry_run', False):
-                    if not os.path.isfile(dep_lib):
+                    if not os.path.isfile(dep_lib):  # pragma: debug
                         print('dep_lib', dep, dep_lib)
                     assert(os.path.isfile(dep_lib))
                 if use_library_path_internal and (dep in internal_dependencies):
