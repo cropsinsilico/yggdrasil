@@ -71,8 +71,14 @@ class MSVCCompiler(CCompilerBase):
     platforms = ['Windows']
     # TODO: Currently everything compiled as C++ on windows to allow use
     # of complex types. Use '/TC' instead of '/TP' for strictly C
-    default_flags = ['/W4', '/Zi', "/EHsc", '/TP',
-                     "/nologo", "-D_CRT_SECURE_NO_WARNINGS"]
+    default_flags = ['/W4',      # Display all errors
+                     # '/Zi',      # Symbolic debug in .pdb (implies debug)
+                     '/Z7',      # Symbolic debug in .obj (implies debug)
+                     "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
+                     '/TP',      # Treat all files as C++
+                     "/nologo",  # Suppress startup banner
+                     # Don't show errors from using scanf, strcpy, etc.
+                     "-D_CRT_SECURE_NO_WARNINGS"]
     output_key = '/Fo%s'
     output_first = True
     default_linker = 'LINK'

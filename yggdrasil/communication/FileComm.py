@@ -491,7 +491,7 @@ class FileComm(CommBase.CommBase):
             self.fd.seek(0, os.SEEK_END)
             endpos = self.fd.tell()
             out = endpos - curpos
-        except (ValueError, AttributeError):  # pragma: debug
+        except (ValueError, AttributeError, OSError):  # pragma: debug
             if self.is_open:
                 raise
             out = 0
