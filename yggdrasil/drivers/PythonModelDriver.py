@@ -47,6 +47,7 @@ class PythonModelDriver(InterpretedModelDriver):
         'define': '{variable} = {value}',
         'comment': '#',
         'true': 'True',
+        'not': 'not',
         'indent': 4 * ' ',
         'quote': '\"',
         'print': 'print(\"{message}\")',

@@ -962,198 +962,6 @@ class ModelDriver(Driver):
     #     self.kill_process()
     #     super(ModelDriver, self).do_terminate()
 
-    @classmethod
-    def get_mapped_type(cls, type_dict):
-        r"""Determine the native type that represents the type described by
-        the provided JSON schema.
-
-        Args:
-            type_dict (dict): JSON schema describing a type.
-
-        Returns:
-            str: The native type in the language of this class.
-
-        """
-        raise NotImplementedError("get_mapped_type undefined for language '%s'"
-                                  % cls.language)
-
-    @classmethod
-    def prepare_input_variables(cls, vars_list):
-        r"""Concatenate a set of input variables such that it can be passed as a
-        single string to the function_call parameter.
-
-        Args:
-            vars_list (list): List of variable names to concatenate as input to
-                a function call.
-
-        Returns:
-            str: Concatentated variables list.
-
-        """
-        return ', '.join(vars_list)
-
-    @classmethod
-    def prepare_output_variables(cls, vars_list):
-        r"""Concatenate a set of output variables such that it can be passed as
-        a single string to the function_call parameter.
-
-        Args:
-            vars_list (list): List of variable names to concatenate as output
-                from a function call.
-
-        Returns:
-            str: Concatentated variables list.
-
-        """
-        return ', '.join(vars_list)
-
-    @classmethod
-    def write_model_interface(cls, model_file, model_function,
-                              inputs=[], outputs=[],
-                              static_inputs=[], static_outputs=[]):
-        r"""Return the lines required to run a model looping over specified
-        variables.
-
-        Args:
-            model_file (str): Full path to the file containing the model
-                function.
-            model_function (str): Name of the model function.
-            inputs (list, optional): List of JSON documents defining inputs to
-                the model function. Defaults to [] and the model is assumed to
-                not take any input.
-            outputs (list, optional): List of JSON documents defining outputs
-                from the model function. Defaults to [] and the model is
-                assumed to not return any input.
-            static_inputs (list, optional): List of the names of input channels
-                that should only be recieved from once. Defaults to [] and is
-                ignored.
-            static_outputs (list, optional): List of the names of output channels
-                that should only be output to once. Defaults to [] and is
-                ignored.
-
-        Returns:
-            list: Lines of code wrapping a model function such that it is called
-                with input from one or more |yggdrasil| channels and sends output
-                to one or more channels.
-
-        """
-        out = []
-        if cls.function_param is None:
-            raise NotImplementedError("function_param attribute not set for"
-                                      "language '%s'" % cls.language)
-        # Check for required parametrizations
-        req_param = ['input', 'output', 'recv', 'send', 'print', 'error',
-                     'break', 'function_call']
-        miss = []
-        for k in req_param:
-            if k not in cls.function_param:
-                miss.append(k)
-        if miss:
-            raise NotImplementedError(("The following parameters are "
-                                       "required for writting a model wrapper, "
-                                       "but are missing from the function_param "
-                                       "dictionary for language '%s'.: %s")
-                                      % (cls.language, miss))
-        flag_cond = cls.function_param.get('flag_cond', '{flag_var}')
-        # Import interface and model
-        if 'interface' in cls.function_param:
-            out.append(cls.function_param['interface'].format(
-                interface_library=cls.interface_library))
-        if 'import' in cls.function_param:
-            out.append(cls.function_param['import'].format(
-                filename=model_file, function=model_function))
-        # Declare variables
-        # TODO: requires type mapping
-        if 'declare' in cls.function_param:
-            typ_list = {'flag': cls.get_mapped_type('boolean')}
-            for x in (inputs + outputs):
-                typ_list[x['name'] + '_variable'] = cls.get_mapped_type(x)
-            out += [cls.function_param['declare'].format(type_name=t, variable=v)
-                    for v, t in typ_list.items()]
-        # Create dictionaries of input & output channels and get list of
-        # inputs/outputs that will vary during the loop
-        # input_dict = {x['name']: x for x in inputs}
-        # output_dict = {x['name']: x for x in outputs}
-        varying_inputs = []
-        varying_outputs = []
-        for x in inputs:
-            if x['name'] not in static_inputs:
-                varying_inputs.append(x['name'])
-        for x in outputs:
-            if x['name'] not in static_outputs:
-                varying_outputs.append(x['name'])
-        # Create input & output channels
-        out += [cls.function_param['input'].format(
-            channel=(x['name'] + '_input_channel'),
-            channel_name=x['name']) for x in inputs]
-        out += [cls.function_param['output'].format(
-            channel=(x['name'] + '_output_channel'),
-            channel_name=x['name']) for x in outputs]
-        # Recieve from static inputs
-        for x in static_inputs:
-            out += [cls.function_param['recv'].format(
-                channel=(x + '_input_channel'), flag_var='flag',
-                recv_var=(x + '_variable'))]
-            iflag_cond = flag_cond.format(flag_var='flag')
-            iflag_block = [cls.function_param['error'].format(
-                message="Failed to receive from %s" % x)]
-            out += cls.write_if_block(iflag_cond, iflag_block)
-        # Loop
-        while_contents = []
-        # Loop inputs
-        first = True
-        for x in varying_inputs:
-            while_contents += [cls.function_param['recv'].format(
-                channel=(x + '_input_channel'), flag_var='flag',
-                recv_var=(x + '_variable'))]
-            iflag_cond = flag_cond.format(flag_var='flag')
-            # Only raise error if partial input
-            if first:
-                iflag_block = [cls.function_param['print'].format('No more input.'),
-                               cls.function_param['break']]
-            else:
-                iflag_block = [cls.function_param['error'].format(
-                    message="Failed to receive from %s" % x)]
-            while_contents += cls.write_if_block(iflag_cond, iflag_block)
-            first = False
-        # Function call
-        while_contents += [cls.function_param['function_call'].format(
-            function_name=model_function, flag_var='flag',
-            input_var=cls.prepare_input_variables([x['name'] + '_variable'
-                                                   for x in inputs]),
-            output_var=cls.prepare_output_variables([x['name'] + '_variable'
-                                                     for x in outputs]))]
-        if '{flag_var}' in cls.function_param['function_call']:
-            model_error = [cls.function_param['error'].format(
-                message="Model return flag indicates there was an error.")]
-            while_contents += cls.write_if_block('flag', model_error)
-        # Loop outputs
-        for x in varying_outputs:
-            while_contents += [cls.function_param['send'].format(
-                channel=(x + '_output_channel'),
-                flag_var=('flag_' + x),
-                send_var=(x + '_variable'))]
-            iflag_cond = flag_cond.format(flag_var=('flag_' + x))
-            iflag_block = [cls.function_param['error'].format(
-                message="Failed to send to %s" % x)]
-            while_contents += cls.write_if_block(iflag_cond, iflag_block)
-        # Add loop
-        out += cls.write_while_loop(cls.function_param.get('true', 1),
-                                    while_contents)
-        # Send to static outputs
-        for x in static_outputs:
-            out += [cls.function_param['send'].format(
-                channel=(x + '_output_channel'),
-                flag_var=('flag_' + x),
-                send_var=(x + '_variable'))]
-            error_cnd = flag_cond.format(flag_var=('flag_' + x))
-            error_msg = "Failed to send to %s" % x
-            out += cls.write_if_block(error_cnd, error_msg)
-        # Perform any necessary clean-up (e.g. deallocation)
-        # return out
-        print(out)
-        raise NotImplementedError()
-                
     # Methods for automated model wrapping
     @classmethod
     def run_code(cls, lines, **kwargs):
@@ -1176,7 +984,6 @@ class ModelDriver(Driver):
             fd.write('\n'.join(lines))
         inst = None
         try:
-            # TODO: Run the code
             assert(os.path.isfile(fname))
             inst = cls(name, [fname], working_dir=working_dir)
             inst.run_model(return_process=False)
@@ -1188,7 +995,172 @@ class ModelDriver(Driver):
                 os.remove(fname)
             if inst is not None:
                 inst.cleanup()
-                
+
+    @classmethod
+    def write_model_wrapper(cls, model_file, model_function,
+                            inputs=[], outputs=[]):
+        r"""Return the lines required to wrap a model function as an integrated
+        model.
+
+        Args:
+            model_file (str): Full path to the file containing the model
+                function's declaration.
+            model_function (str): Name of the model function.
+            inputs (list, optional): List of model inputs including types.
+                Defaults to [].
+            outputs (list, optional): List of model outputs including types.
+                Defaults to [].
+            TODO: Control flow to treat inputs/output differently
+
+        Returns:
+            list: Lines of code wrapping the provided model with the necessary
+                code to run it as part of an integration.
+
+        """
+        # TODO: Determine how to encode dependencies between variables in models
+        # TODO: Determine how to group variables
+        # TODO: Allow for input/output of tables with multiple columns at a time
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        lines = []
+        flag_var = 'flag'
+        # Declare variables and flag, then define flag
+        if 'declare' in cls.function_param:
+            lines.append(cls.write_declaration(name=flag_var, json_type='bool'))
+            for x in inputs + outputs:
+                lines.append(cls.write_declaration(**x))
+        lines.append(cls.function_param['define'].format(
+            variable=flag_var, value=cls.function_param['true']))
+        # Declare/define input and output channels
+        for x in inputs:
+            lines.append(cls.function_param['input'].format(
+                channel=(x['name'] + '_input_channel'), channel_name=x['name']))
+        for x in outputs:
+            lines.append(cls.function_param['output'].format(
+                channel=(x['name'] + '_output_channel'), channel_name=x['name']))
+        # Receive inputs before loop
+        for x in inputs:
+            if x.get('outside_loop', False):
+                lines += cls.write_model_recv(x['name'] + '_input_channel',
+                                              x['name'], flag_var=flag_var)
+        # Loop
+        loop_lines = []
+        # Receive inputs
+        for x in inputs:
+            if not x.get('outside_loop', False):
+                loop_lines += cls.write_model_recv(x['name'] + '_input_channel',
+                                                   x['name'], flag_var=flag_var,
+                                                   allow_failure=True)
+        # Call model
+        loop_lines.append(cls.function_param['function_call'].format(
+            flag_var=flag_var, function_name=model_function,
+            input_var=cls.prepare_input_variables([x['name'] for x in inputs]),
+            output_var=cls.prepare_output_variables([x['name'] for x in outputs])))
+        # Send outputs
+        for x in outputs:
+            if not x.get('outside_loop', False):
+                loop_lines += cls.write_model_send(x['name'] + '_output_channel',
+                                                   x['name'], flag_var=flag_var)
+        # Add loop in while block
+        flag_cond = cls.function_param.get('flag_cond', '{flag_var}').format(
+            flag_var=flag_var)
+        lines += cls.write_while_loop(flag_cond, loop_lines)
+        # Send outputs after loop
+        for x in outputs:
+            if x.get('outside_loop', False):
+                lines += cls.write_model_send(x['name'] + '_output_channel',
+                                              x['name'], flag_var=flag_var)
+        # Wrap as executable with interface & model import
+        prefix = []
+        if 'interface' in cls.function_param:
+            prefix.append(cls.function_param['interface'])
+        if 'import' in cls.function_param:
+            prefix.append(cls.function_param['import'].format(
+                filename=model_file, function=model_function))
+        return cls.write_executable(lines, prefix=prefix)
+
+    @classmethod
+    def write_model_recv(cls, channel, recv_var, flag_var='flag', recv_num=1,
+                         allow_failure=False):
+        r"""Write a model receive call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being received from
+                was stored in.
+            recv_var (str): Name of variable(s) that the received variable(s)
+                should be stored in.
+            flag_var (str, optional): Name of flag variable that the flag should
+                be stored in. Defaults to 'flag',
+            recv_num (int, optional): Number of variables being received.
+                Defaults to 1.
+            allow_failure (bool, optional): If True, the returned lines will
+                call a break if the flag is False. Otherwise, the returned
+                lines will issue an error. Defaults to False.
+
+        Returns:
+            list: Lines required to carry out a receive call in this language.
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        lines = [cls.function_param['recv'].format(
+            flag_var=flag_var, channel=channel,
+            recv_var=recv_var, recv_num=recv_num)]
+        flag_cond = '%s (%s)' % (
+            cls.function_param['not'],
+            cls.function_param.get('flag_cond', '{flag_var}').format(
+                flag_var=flag_var))
+        fail_message = "Could not receive '%s'." % recv_var
+        if allow_failure:
+            if_block = [cls.function_param['print'].format(message=fail_message),
+                        cls.function_param.get('break', 'break')]
+        else:
+            if_block = [cls.function_param['error'].format(error_msg=fail_message)]
+        lines += cls.write_if_block(flag_cond, if_block)
+        return lines
+        
+    @classmethod
+    def write_model_send(cls, channel, send_var, flag_var='flag', send_num=1,
+                         allow_failure=False):
+        r"""Write a model send call include checking the return flag.
+
+        Args:
+            channel (str): Name of variable that the channel being sent to
+                was stored in.
+            send_var (str): Name of variable(s) that is being sent.
+            flag_var (str, optional): Name of flag variable that the flag should
+                be stored in. Defaults to 'flag',
+            send_num (int, optional): Number of variables being sent. Defaults
+                to 1.
+            allow_failure (bool, optional): If True, the returned lines will
+                call a break if the flag is False. Otherwise, the returned
+                lines will issue an error. Defaults to False.
+
+        Returns:
+            list: Lines required to carry out a send call in this language.
+
+        """
+        if cls.function_param is None:
+            raise NotImplementedError("function_param attribute not set for"
+                                      "language '%s'" % cls.language)
+        lines = [cls.function_param['send'].format(
+            flag_var=flag_var, channel=channel,
+            send_var=send_var, send_num=send_num)]
+        flag_cond = '%s (%s)' % (
+            cls.function_param['not'],
+            cls.function_param.get('flag_cond', '{flag_var}').format(
+                flag_var=flag_var))
+        fail_message = "Could not send '%s'." % send_var
+        if allow_failure:  # pragma: no cover
+            if_block = [cls.function_param['print'].format(message=fail_message),
+                        cls.function_param.get('break', 'break')]
+        else:
+            if_block = [cls.function_param['error'].format(error_msg=fail_message)]
+        lines += cls.write_if_block(flag_cond, if_block)
+        return lines
+        
     @classmethod
     def write_executable(cls, lines, prefix=None, suffix=None):
         r"""Return the lines required to complete a program that will run
@@ -1247,6 +1219,61 @@ class ModelDriver(Driver):
             out.append('')
         return out
                 
+    @classmethod
+    def write_declaration(cls, name, json_type='bytes', **kwargs):
+        r"""Return the line required to declare a variable with a certain
+        type.
+
+        Args:
+            name (str): Name of variable being declared.
+            json_type (str, optional): Name of |yggdrasil| extended JSON
+                type or JSONSchema dictionary defining a datatype.
+            **kwargs: Additional keyword arguments may be used in determining
+                the precise declaration that should be used.
+
+        Returns:
+            str: The line delcaring the variable.
+
+        """
+        if 'type' in kwargs:
+            json_type = kwargs['type']
+        if isinstance(json_type, dict):
+            type_name = json_type['type']
+        else:
+            type_name = json_type
+        return cls.function_param['declare'].format(type_name=type_name,
+                                                    variable=name)
+
+    @classmethod
+    def prepare_input_variables(cls, vars_list):
+        r"""Concatenate a set of input variables such that it can be passed as a
+        single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable names to concatenate as input to
+                a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        return ', '.join(vars_list)
+
+    @classmethod
+    def prepare_output_variables(cls, vars_list):
+        r"""Concatenate a set of output variables such that it can be passed as
+        a single string to the function_call parameter.
+
+        Args:
+            vars_list (list): List of variable names to concatenate as output
+                from a function call.
+
+        Returns:
+            str: Concatentated variables list.
+
+        """
+        return ', '.join(vars_list)
+
     @classmethod
     def write_if_block(cls, cond, block_contents):
         r"""Return the lines required to complete a conditional block.

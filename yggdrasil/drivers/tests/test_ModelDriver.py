@@ -101,7 +101,22 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             return
         # Write code to a file
         self.import_cls.run_code(lines)
-            
+
+    def test_write_model_wrapper(self):
+        r"""Test writing a model based on yaml parameters."""
+        if self.import_cls.function_param is None:
+            self.assert_raises(NotImplementedError,
+                               self.import_cls.write_model_wrapper,
+                               None, None)
+        else:
+            inputs = [{'name': 'a', 'type': 'bytes', 'outside_loop': True},
+                      {'name': 'b', 'type': 'int'}]
+            outputs = [{'name': 'y', 'type': 'float'},
+                       {'name': 'z', 'type': 'bytes', 'outside_loop': True}]
+            self.import_cls.write_model_wrapper('test', 'test',
+                                                inputs=inputs,
+                                                outputs=outputs)
+        
     def test_write_executable(self):
         r"""Test writing an executable."""
         if self.import_cls.function_param is None:
@@ -134,7 +149,7 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             lines = []
             if 'declare' in self.import_cls.function_param:
                 lines.append(self.import_cls.function_param['declare'].format(
-                    type='int', name='x'))
+                    type_name='int', variable='x'))
             cond = self.import_cls.function_param['true']
             block_contents = self.import_cls.function_param['assign'].format(
                 name='x', value='1')
@@ -150,9 +165,9 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
             lines = []
             if 'declare' in self.import_cls.function_param:
                 lines.append(self.import_cls.function_param['declare'].format(
-                    type='int', name='i'))
+                    type_name='int', variable='i'))
                 lines.append(self.import_cls.function_param['declare'].format(
-                    type='int', name='x'))
+                    type_name='int', variable='x'))
             loop_contents = self.import_cls.function_param['assign'].format(
                 name='x', value='i')
             lines += self.import_cls.write_for_loop('i', 0, 1, loop_contents)

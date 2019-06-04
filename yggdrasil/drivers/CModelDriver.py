@@ -227,7 +227,7 @@ class CModelDriver(CompiledModelDriver):
         'interface': '#include \"{interface_library}\"',
         'input': 'yggInput_t {channel} = yggInput(\"{channel_name}\");',
         'output': 'yggOutput_t {channel} = yggOutput(\"{channel_name}\");',
-        'recv': '{flag_var} = yggRecv({channel}, {recv_var});',
+        'recv': '{flag_var} = yggRecvRealloc({channel}, {recv_var});',
         'send': '{flag_var} = yggSend({channel}, {send_var});',
         'flag_cond': '{flag_var} >= 0',
         # Model functions should return non-zero integer codes to indicate errors
@@ -237,6 +237,7 @@ class CModelDriver(CompiledModelDriver):
         'assign': '{name} = {value};',
         'comment': '//',
         'true': '1',
+        'not': '!',
         'indent': 2 * ' ',
         'quote': '\"',
         'print': 'printf(\"{message}\");',
