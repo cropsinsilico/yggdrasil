@@ -22,8 +22,8 @@ class CMakeConfigure(CompilerBase):
     default_flags = []  # '-H']
     flag_options = OrderedDict([('definitions', '-D%s'),
                                 ('sourcedir', ''),  # '-S'
-                                ('builddir', '-B%s'),
-                                ('configuration', '-DCMAKE_BUILD_TYPE=%s')])
+                                ('builddir', '-B%s')])
+    # ('configuration', '-DCMAKE_BUILD_TYPE=%s')])
     output_key = None
     compile_only_flag = None
     default_builddir = '.'
@@ -172,7 +172,8 @@ class CMakeBuilder(LinkerBase):
     output_key = None
     flag_options = OrderedDict([('builddir', {'key': '--build',
                                               'position': 0}),
-                                ('target', '--target')])
+                                ('target', '--target'),
+                                ('configuration', '--config')])
     executable_ext = ''
 
     @staticmethod
@@ -529,12 +530,12 @@ class CMakeModelDriver(CompiledModelDriver):
         external_library_flags = []
         internal_library_flags = []
         compile_flags = driver.get_compiler_flags(
-            skip_defaults=(not platform._is_win),
+            skip_defaults=True,
             flags=compile_flags, use_library_path=use_library_path,
             dont_link=True, for_model=True, dry_run=True,
             logging_level=logging_level)
         linker_flags = driver.get_linker_flags(
-            skip_defaults=(not platform._is_win),
+            skip_defaults=True,
             flags=linker_flags, for_model=True, dry_run=True,
             use_library_path='external_library_flags',
             external_library_flags=external_library_flags,
@@ -547,9 +548,11 @@ class CMakeModelDriver(CompiledModelDriver):
         # Suppress warnings on windows about the security of strcpy etc.
         # and target x64 if the current platform is 64bit
         if platform._is_win:  # pragma: windows
-            new_flag = "-D_CRT_SECURE_NO_WARNINGS"
-            if new_flag not in compile_flags:
-                compile_flags.append(new_flag)
+            new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
+                         "-D_CRT_SECURE_NO_WARNINGS"]
+            for x in new_flags:
+                if x not in compile_flags:
+                    compile_flags.append(x)
         # Compilation flags
         for x in compile_flags:
             if x.startswith('-D'):

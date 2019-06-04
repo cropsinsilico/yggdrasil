@@ -745,6 +745,8 @@ class CompilationToolBase(object):
         output = ''
         try:
             unused_kwargs.setdefault('env', cls.set_env())
+            if cls.toolname == 'cmake':
+                logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
