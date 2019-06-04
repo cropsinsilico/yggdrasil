@@ -28,6 +28,16 @@ class CMakeConfigure(CompilerBase):
     default_builddir = '.'
     default_archiver = False
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration including things like platform dependent properties and
+        checking environment variables for default settings.
+        """
+        CompilerBase.before_registration(cls)
+        if platform._is_win and platform._is_64bit:  # pragma: windows
+            cls.default_flags.append('-DCMAKE_GENERATOR_PLATFORM=x64')
+        
     @classmethod
     def get_output_file(cls, src, dont_link=False, dont_build=None,
                         sourcedir=None, builddir=None, working_dir=None,
@@ -530,10 +540,6 @@ class CMakeModelDriver(CompiledModelDriver):
             new_flag = "-D_CRT_SECURE_NO_WARNINGS"
             if new_flag not in compile_flags:
                 compile_flags.append(new_flag)
-            if platform._is_64bit:
-                new_flag = "-DCMAKE_GENERATOR_PLATFORM=x64"
-                if new_flag not in compile_flags:
-                    compile_flags.append(new_flag)
         # Compilation flags
         for x in compile_flags:
             if x.startswith('-D'):
