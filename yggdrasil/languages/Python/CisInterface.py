@@ -1,9 +1,8 @@
 import warnings
-import exceptions
 from yggdrasil.interface import YggInterface
 warnings.warn(("YggInterface replaces CisInterface in yggdrasil. "
                "Replace ygg with cis in interface calls."),
-              exceptions.DeprecationWarning, stacklevel=2)
+              DeprecationWarning, stacklevel=2)
 
 
 direct_replace = ['maxMsgSize', 'bufMsgSize', 'eof_msg']

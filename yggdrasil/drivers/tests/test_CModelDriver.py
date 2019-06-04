@@ -2,7 +2,7 @@ import os
 import unittest
 from yggdrasil import platform
 import yggdrasil.drivers.tests.test_CompiledModelDriver as parent
-from yggdrasil.drivers.CModelDriver import _incl_interface, CModelDriver
+from yggdrasil.drivers.CModelDriver import CModelDriver
 
 
 class TestCModelParam(parent.TestCompiledModelParam):
@@ -30,7 +30,8 @@ class TestCModelDriverNoInit(TestCModelParam,
     @unittest.skipIf(not platform._is_linux, "OS is not Linux")
     def test_update_ld_library_path(self):
         r"""Test update_ld_library_path method."""
-        total = os.pathsep.join(['test', _incl_interface])
+        lang_dir = self.import_cls.get_language_dir()
+        total = os.pathsep.join(['test', lang_dir])
         env = {'LD_LIBRARY_PATH': 'test'}
         env = self.import_cls.update_ld_library_path(env)
         self.assert_equal(env['LD_LIBRARY_PATH'], total)
