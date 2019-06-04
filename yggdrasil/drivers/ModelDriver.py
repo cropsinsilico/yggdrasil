@@ -35,11 +35,18 @@ class ModelDriver(Driver):
         products (list, optional): Paths to files created by the model that
             should be cleaned up when the model exits. Entries can be absolute
             paths or paths relative to the working directory. Defaults to [].
+        function (str, optional): If provided, an integrated model is
+            created by wrapping the function named here. The function must be
+            located within the file specified by the source file listed in the
+            first argument. If not provided, the model must contain it's own
+            calls to the |yggdrasil| interface.
         is_server (bool, optional): If True, the model is assumed to be a server
             and an instance of :class:`yggdrasil.drivers.ServerDriver`
-            is started. Defaults to False.
-        client_of (str, list, optional): The names of ne or more servers that
-            this model is a client of. Defaults to empty list.
+            is started. Defaults to False. Use of is_server with function is
+            not currently supported.
+        client_of (str, list, optional): The names of one or more servers that
+            this model is a client of. Defaults to empty list. Use of client_of
+            with function is not currently supported.
         overwrite (bool, optional): If True, any existing model products
             (compilation products, wrapper scripts, etc.) are removed prior to
             the run. If False, the products are not removed. Defaults to True.
@@ -117,6 +124,7 @@ class ModelDriver(Driver):
             files.
         process (:class:`yggdrasil.tools.YggPopen`): Process used to run
             the model.
+        function (str): The name of the model function that should be wrapped.
         is_server (bool): If True, the model is assumed to be a server and an
             instance of :class:`yggdrasil.drivers.ServerDriver` is
             started.
@@ -154,6 +162,7 @@ class ModelDriver(Driver):
         'working_dir': {'type': 'string'},
         'overwrite': {'type': 'boolean', 'default': True},
         'preserve_cache': {'type': 'boolean', 'default': False},
+        'function': {'type': 'string'},
         'is_server': {'type': 'boolean', 'default': False},
         'client_of': {'type': 'array', 'items': {'type': 'string'},
                       'default': []},
@@ -205,15 +214,41 @@ class ModelDriver(Driver):
                 self.env[k] = os.environ[k]
         if not self.is_installed():
             raise RuntimeError("%s is not installed" % self.language)
-        # Parse arguments
-        self.debug(str(args))
         self.raw_model_file = None
+        self.model_function_file = None
         self.model_file = None
         self.model_args = []
         self.model_dir = None
         self.model_src = None
         self.products = []
         self.args = args
+        # Update for function
+        if self.function:
+            self.model_function_file = args[0]
+            if not os.path.isabs(self.model_function_file):
+                self.model_function_file = os.path.join(self.working_dir,
+                                                        self.model_function_file)
+            if not os.path.isfile(self.model_function_file):
+                raise ValueError("Source file does not exist: '%s'"
+                                 % self.model_function_file)
+            if self.is_server or self.client_of:
+                raise NotImplementedError("Use of is_server or client_of "
+                                          "parameters not currently supported "
+                                          "when using automated wrapping of "
+                                          "model functions.")
+            model_dir, model_base = os.path.split(self.model_function_file)
+            model_base = os.path.splitext(model_base)[0]
+            # Write file
+            args[0] = os.path.join(model_dir, 'ygg_' + model_base
+                                   + self.language_ext[0])
+            lines = self.write_model_wrapper(self.model_function_file,
+                                             self.function,
+                                             inputs=self.inputs,
+                                             outputs=self.outputs)
+            with open(args[0], 'w') as fd:
+                fd.write('\n'.join(lines))
+        # Parse arguments
+        self.debug(str(args))
         self.parse_arguments(args)
         assert(self.model_file is not None)
         # Remove products
@@ -935,6 +970,9 @@ class ModelDriver(Driver):
         r"""Remove compile executable."""
         if self.overwrite:
             self.remove_products()
+        if self.function and os.path.isfile(self.model_src):
+            assert(os.path.basename(self.model_src).startswith('ygg_'))
+            os.remove(self.model_src)
         super(ModelDriver, self).cleanup()
         
     def remove_products(self):

@@ -893,8 +893,9 @@ definitions:
           type: string
         client_of:
           default: []
-          description: The names of ne or more servers that this model is a client
-            of. Defaults to empty list.
+          description: The names of one or more servers that this model is a client
+            of. Defaults to empty list. Use of client_of with function is not currently
+            supported.
           items:
             type: string
           type: array
@@ -921,6 +922,12 @@ definitions:
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
+        function:
+          description: If provided, an integrated model is created by wrapping the
+            function named here. The function must be located within the file specified
+            by the source file listed in the first argument. If not provided, the
+            model must contain it's own calls to the |yggdrasil| interface.
+          type: string
         inputs:
           default: []
           description: Model inputs described as comm objects.
@@ -946,6 +953,7 @@ definitions:
           default: false
           description: If True, the model is assumed to be a server and an instance
             of :class:`yggdrasil.drivers.ServerDriver` is started. Defaults to False.
+            Use of is_server with function is not currently supported.
           type: boolean
         language:
           default: executable
