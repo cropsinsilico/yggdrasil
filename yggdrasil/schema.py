@@ -76,9 +76,9 @@ def create_schema():
         os.environ['YGG_RUNNING_YGGSCHEMA'] = '1'
         x = SchemaRegistry(init_registry())
     finally:
-        if old_env is None:  # pragma: no cover
+        if old_env is None:
             del os.environ['YGG_RUNNING_YGGSCHEMA']
-        else:
+        else:  # pragma: no cover
             os.environ['YGG_RUNNING_YGGSCHEMA'] = old_env
     return x
 
