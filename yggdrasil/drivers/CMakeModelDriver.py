@@ -28,6 +28,10 @@ class CMakeConfigure(CompilerBase):
     compile_only_flag = None
     default_builddir = '.'
     default_archiver = False
+    add_libraries = False
+    product_files = ['Makefile', 'CMakeCache.txt',
+                     'cmake_install.cmake', 'CMakeFiles']
+    remove_product_exts = ['CMakeFiles']
 
     @staticmethod
     def before_registration(cls):
@@ -36,8 +40,32 @@ class CMakeConfigure(CompilerBase):
         checking environment variables for default settings.
         """
         CompilerBase.before_registration(cls)
-        if platform._is_win and platform._is_64bit:  # pragma: windows
-            cls.default_flags.append('-DCMAKE_GENERATOR_PLATFORM=x64')
+        if platform._is_win:  # pragma: windows
+            if platform._is_64bit:
+                cls.default_flags.append('-DCMAKE_GENERATOR_PLATFORM=x64')
+            cls.product_files += ['ALL_BUILD.vcxproj',
+                                  'ALL_BUILD.vcxproj.filters',
+                                  'Debug', 'Release', 'Win32', 'Win64', 'x64',
+                                  'ZERO_CHECK.vcxproj',
+                                  'ZERO_CHECK.vcxproj.filters']
+            cls.remove_product_exts += ['Debug', 'Release', 'Win32', 'Win64',
+                                        'x64', '.dir']
+        
+    @classmethod
+    def append_product(cls, products, new, **kwargs):
+        r"""Append a product to the specified list along with additional values
+        indicated by cls.product_exts.
+
+        Args:
+            products (list): List of of existing products that new product
+                should be appended to.
+            new (str): New product that should be appended to the list.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's method.
+
+        """
+        kwargs.setdefault('new_dir', new)
+        super(CMakeConfigure, cls).append_product(products, new, **kwargs)
         
     @classmethod
     def get_output_file(cls, src, dont_link=False, dont_build=None,
@@ -163,6 +191,159 @@ class CMakeConfigure(CompilerBase):
             kwargs['sourcedir'] = args[0]
         return super(CMakeConfigure, cls).get_executable_command([], **kwargs)
     
+    @classmethod
+    def create_include(cls, fname, target, compile_flags=None, linker_flags=None,
+                       driver=CModelDriver.CModelDriver, logging_level=None,
+                       configuration='Release'):
+        r"""Create CMakeList include file with necessary includes,
+        definitions, and linker flags.
+
+        Args:
+            fname (str): File where the include file should be saved.
+            target (str): Target that links should be added to.
+            compile_flags (list, optional): Additional compile flags that
+                should be set. Defaults to [].
+            linker_flags (list, optional): Additional linker flags that
+                should be set. Defaults to [].
+            driver (CompiledModelDriver, optional): The CompiledModelDriver that
+                should be used to get compiler/linker flags. Defaults to
+                CModelDriver.
+            logging_level (int, optional): Logging level that should be passed
+                as a definition to the C compiler. Defaults to None and will be
+                ignored.
+            configuration (str, optional): Build type/configuration that should
+                be built. Defaults to 'Release'. Only used on Windows to
+                determin the standard library.
+
+        Raises:
+            ValueError: If a linker or compiler flag cannot be interpreted.
+
+        """
+        if target is None:
+            target = '${PROJECT_NAME}'
+        if compile_flags is None:
+            compile_flags = []
+        if linker_flags is None:
+            linker_flags = []
+        use_library_path = True  # platform._is_win
+        library_flags = []
+        external_library_flags = []
+        internal_library_flags = []
+        compile_flags = driver.get_compiler_flags(
+            skip_defaults=True,
+            flags=compile_flags, use_library_path=use_library_path,
+            dont_link=True, for_model=True, dry_run=True,
+            logging_level=logging_level)
+        linker_flags = driver.get_linker_flags(
+            skip_defaults=True,
+            flags=linker_flags, for_model=True, dry_run=True,
+            use_library_path='external_library_flags',
+            external_library_flags=external_library_flags,
+            use_library_path_internal='internal_library_flags',
+            internal_library_flags=internal_library_flags,
+            skip_library_libs=True, library_flags=library_flags)
+        lines = []
+        preamble_lines = []
+        library_flags += internal_library_flags + external_library_flags
+        # Suppress warnings on windows about the security of strcpy etc.
+        # and target x64 if the current platform is 64bit
+        if platform._is_win:  # pragma: windows
+            new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
+                         "-D_CRT_SECURE_NO_WARNINGS"]
+            if configuration.lower() == 'debug':  # pragma: debug
+                new_flags.append("/MTd")
+            else:
+                new_flags.append("/MT")
+            for x in new_flags:
+                if x not in compile_flags:
+                    compile_flags.append(x)
+        # Compilation flags
+        for x in compile_flags:
+            if x.startswith('-D'):
+                preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
+            elif x.startswith('-I'):
+                xdir = x.split('-I', 1)[-1]
+                if platform._is_win:  # pragma: windows
+                    xdir = xdir.replace('\\', re.escape('\\'))
+                new_dir = 'INCLUDE_DIRECTORIES(%s)' % xdir
+                if new_dir not in preamble_lines:
+                    preamble_lines.append(new_dir)
+            elif x.startswith('-std=c++') or x.startswith('/std=c++'):
+                new_def = 'SET(CMAKE_CXX_STANDARD %s)' % x.split('c++')[-1]
+                if new_def not in preamble_lines:
+                    preamble_lines.append(new_def)
+            elif x.startswith('-') or x.startswith('/'):
+                new_def = 'ADD_DEFINITIONS(%s)' % x
+                if new_def not in preamble_lines:
+                    preamble_lines.append(new_def)
+            else:
+                raise ValueError("Could not parse compiler flag '%s'." % x)
+        # Linker flags
+        for x in linker_flags:
+            if x.startswith('-l'):
+                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+            elif x.startswith('-L'):
+                libdir = x.split('-L')[-1]
+                if platform._is_win:  # pragma: windows
+                    libdir = libdir.replace('\\', re.escape('\\'))
+                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+            elif x.startswith('/LIBPATH:'):  # pragma: windows
+                libdir = x.split('/LIBPATH:')[-1]
+                if '"' in libdir:
+                    libdir = libdir.split('"')[1]
+                if platform._is_win:
+                    libdir = libdir.replace('\\', re.escape('\\'))
+                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
+            elif os.path.isfile(x):
+                library_flags.append(x)
+            elif x.startswith('-') or x.startswith('/'):
+                raise ValueError("Could not parse linker flag '%s'." % x)
+            else:
+                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+        # Libraries
+        for x in library_flags:
+            xorig = x
+            xd, xf = os.path.split(x)
+            xl, xe = os.path.splitext(xf)
+            xl = driver.get_tool('linker').libpath2libname(xf)
+            if platform._is_win:  # pragma: windows
+                x = x.replace('\\', re.escape('\\'))
+                xd = xd.replace('\\', re.escape('\\'))
+            xn = os.path.splitext(xl)[0]
+            new_dir = 'LINK_DIRECTORIES(%s)' % xd
+            if new_dir not in preamble_lines:
+                preamble_lines.append(new_dir)
+            if cls.add_libraries or (xorig in internal_library_flags):
+                # if cls.add_libraries:  # pragma: no cover
+                # Version adding library
+                lines.append('if (NOT TARGET %s)' % xl)
+                if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
+                    lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
+                else:
+                    lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
+                lines += ['    SET_TARGET_PROPERTIES(',
+                          '        %s PROPERTIES' % xl,
+                          # '        LINKER_LANGUAGE CXX',
+                          # '        CXX_STANDARD 11',
+                          '        IMPORTED_LOCATION %s)' % x,
+                          'endif()',
+                          'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
+            else:
+                # Version finding library
+                lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
+                             % (xn.upper(), xf, xn, xd))
+                lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
+                             % (target, xn.upper()))
+        lines = preamble_lines + lines
+        logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
+        if fname is None:
+            return lines
+        else:
+            if os.path.isfile(fname):  # pragma: debug
+                os.remove(fname)
+            with open(fname, 'w') as fd:
+                fd.write('\n'.join(lines))
+
     
 class CMakeBuilder(LinkerBase):
     r"""CMake build tool."""
@@ -176,16 +357,6 @@ class CMakeBuilder(LinkerBase):
                                 ('configuration', '--config')])
     executable_ext = ''
 
-    @staticmethod
-    def before_registration(cls):
-        r"""Operations that should be performed to modify class attributes prior
-        to registration including things like platform dependent properties and
-        checking environment variables for default settings.
-        """
-        LinkerBase.before_registration(cls)
-        if platform._is_win:  # pragma: windows
-            cls.executable_ext = '.exe'
-        
     @classmethod
     def extract_kwargs(cls, kwargs, **kwargs_ex):
         r"""Extract linker kwargs, leaving behind just compiler kwargs.
@@ -360,15 +531,7 @@ class CMakeModelDriver(CompiledModelDriver):
                                             'default': 'Release'}}
     language = 'cmake'
     base_languages = ['c', 'c++']
-    cmake_products = ['Makefile', 'CMakeCache.txt', 'cmake_install.cmake',
-                      'CMakeFiles',
-                      'ALL_BUILD.vcxproj', 'ALL_BUILD.vcxproj.filters',
-                      'Debug', 'Release', 'Win32', 'Win64', 'x64',
-                      'ZERO_CHECK.vcxproj', 'ZERO_CHECK.vcxproj.filters']
-    # TODO: These are only on Windows using MSVC
-    cmake_products_ext = ['.dir', '.ilk', '.pdb', '.sln', '.vcxproj',
-                          '.vcxproj.filters']
-    add_libraries = False
+    add_libraries = CMakeConfigure.add_libraries
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax to determine if an argument
@@ -398,11 +561,8 @@ class CMakeModelDriver(CompiledModelDriver):
         super(CMakeModelDriver, self).parse_arguments(args, **kwargs)
         self.cmakelists = os.path.join(self.sourcedir, 'CMakeLists.txt')
         self.cmakelists_copy = os.path.join(self.sourcedir, 'CMakeLists_orig.txt')
-        for x in self.cmake_products:
-            self.products.append(os.path.join(self.builddir, x))
-        model_base, model_ext = os.path.splitext(self.model_file)
-        for x in self.cmake_products_ext:
-            self.products.append(model_base + x)
+        self.modified_files.append((self.cmakelists_copy, self.cmakelists))
+        # Determine the underlying language
         if self.target_language is None:
             try_list = list(glob.glob(os.path.join(self.sourcedir, '*')))
             early_exit = False
@@ -451,10 +611,11 @@ class CMakeModelDriver(CompiledModelDriver):
         else:
             include_base = 'ygg_cmake_%s.txt' % self.target
         include_file = os.path.join(self.sourcedir, include_base)
-        self.create_include(include_file, self.target,
-                            driver=self.target_language_driver,
-                            logging_level=self.logger.getEffectiveLevel(),
-                            configuration=self.configuration)
+        self.get_tool('compiler').create_include(
+            include_file, self.target,
+            driver=self.target_language_driver,
+            logging_level=self.logger.getEffectiveLevel(),
+            configuration=self.configuration)
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
@@ -490,212 +651,29 @@ class CMakeModelDriver(CompiledModelDriver):
         return out
 
     @classmethod
-    def create_include(cls, fname, target, compile_flags=None, linker_flags=None,
-                       driver=CModelDriver.CModelDriver, logging_level=None,
-                       configuration='Release'):
-        r"""Create CMakeList include file with necessary includes,
-        definitions, and linker flags.
+    def get_compiler_products(cls, src, **kwargs):
+        r"""Determine the products that will be created by calling call_compiler.
 
         Args:
-            fname (str): File where the include file should be saved.
-            target (str): Target that links should be added to.
-            compile_flags (list, optional): Additional compile flags that
-                should be set. Defaults to [].
-            linker_flags (list, optional): Additional linker flags that
-                should be set. Defaults to [].
-            driver (CompiledModelDriver, optional): The CompiledModelDriver that
-                should be used to get compiler/linker flags. Defaults to
-                CModelDriver.
-            logging_level (int, optional): Logging level that should be passed
-                as a definition to the C compiler. Defaults to None and will be
-                ignored.
-            configuration (str, optional): Build type/configuration that should
-                be built. Defaults to 'Release'. Only used on Windows to
-                determin the standard library.
-
-        Raises:
-            ValueError: If a linker or compiler flag cannot be interpreted.
-
-        """
-        if target is None:
-            target = '${PROJECT_NAME}'
-        if compile_flags is None:
-            compile_flags = []
-        if linker_flags is None:
-            linker_flags = []
-        use_library_path = True  # platform._is_win
-        library_flags = []
-        external_library_flags = []
-        internal_library_flags = []
-        compile_flags = driver.get_compiler_flags(
-            skip_defaults=True,
-            flags=compile_flags, use_library_path=use_library_path,
-            dont_link=True, for_model=True, dry_run=True,
-            logging_level=logging_level)
-        linker_flags = driver.get_linker_flags(
-            skip_defaults=True,
-            flags=linker_flags, for_model=True, dry_run=True,
-            use_library_path='external_library_flags',
-            external_library_flags=external_library_flags,
-            use_library_path_internal='internal_library_flags',
-            internal_library_flags=internal_library_flags,
-            skip_library_libs=True, library_flags=library_flags)
-        lines = []
-        preamble_lines = []
-        library_flags += internal_library_flags + external_library_flags
-        # Suppress warnings on windows about the security of strcpy etc.
-        # and target x64 if the current platform is 64bit
-        if platform._is_win:  # pragma: windows
-            new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
-                         "-D_CRT_SECURE_NO_WARNINGS"]
-            if configuration.lower() == 'debug':  # pragma: debug
-                new_flags.append("/MTd")
-            else:
-                new_flags.append("/MT")
-            for x in new_flags:
-                if x not in compile_flags:
-                    compile_flags.append(x)
-        # Compilation flags
-        for x in compile_flags:
-            if x.startswith('-D'):
-                preamble_lines.append('ADD_DEFINITIONS(%s)' % x)
-            elif x.startswith('-I'):
-                xdir = x.split('-I', 1)[-1]
-                if platform._is_win:  # pragma: windows
-                    xdir = xdir.replace('\\', re.escape('\\'))
-                new_dir = 'INCLUDE_DIRECTORIES(%s)' % xdir
-                if new_dir not in preamble_lines:
-                    preamble_lines.append(new_dir)
-            elif x.startswith('-std=c++') or x.startswith('/std=c++'):
-                new_def = 'SET(CMAKE_CXX_STANDARD %s)' % x.split('c++')[-1]
-                if new_def not in preamble_lines:
-                    preamble_lines.append(new_def)
-            elif x.startswith('-') or x.startswith('/'):
-                new_def = 'ADD_DEFINITIONS(%s)' % x
-                if new_def not in preamble_lines:
-                    preamble_lines.append(new_def)
-            else:
-                raise ValueError("Could not parse compiler flag '%s'." % x)
-        # Linker flags
-        for x in linker_flags:
-            if x.startswith('-l'):
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
-            elif x.startswith('-L'):
-                libdir = x.split('-L')[-1]
-                if platform._is_win:  # pragma: windows
-                    libdir = libdir.replace('\\', re.escape('\\'))
-                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
-            elif x.startswith('/LIBPATH:'):  # pragma: windows
-                libdir = x.split('/LIBPATH:')[-1]
-                if '"' in libdir:
-                    libdir = libdir.split('"')[1]
-                if platform._is_win:
-                    libdir = libdir.replace('\\', re.escape('\\'))
-                preamble_lines.append('LINK_DIRECTORIES(%s)' % libdir)
-            elif os.path.isfile(x):
-                library_flags.append(x)
-            elif x.startswith('-') or x.startswith('/'):
-                raise ValueError("Could not parse linker flag '%s'." % x)
-            else:
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
-        # Libraries
-        for x in library_flags:
-            xorig = x
-            xd, xf = os.path.split(x)
-            xl, xe = os.path.splitext(xf)
-            xl = driver.get_tool('linker').libpath2libname(xf)
-            if platform._is_win:  # pragma: windows
-                x = x.replace('\\', re.escape('\\'))
-                xd = xd.replace('\\', re.escape('\\'))
-            xn = os.path.splitext(xl)[0]
-            new_dir = 'LINK_DIRECTORIES(%s)' % xd
-            if new_dir not in preamble_lines:
-                preamble_lines.append(new_dir)
-            if cls.add_libraries or (xorig in internal_library_flags):
-                # if cls.add_libraries:  # pragma: no cover
-                # Version adding library
-                lines.append('if (NOT TARGET %s)' % xl)
-                if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
-                    lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
-                else:
-                    lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
-                lines += ['    SET_TARGET_PROPERTIES(',
-                          '        %s PROPERTIES' % xl,
-                          # '        LINKER_LANGUAGE CXX',
-                          # '        CXX_STANDARD 11',
-                          '        IMPORTED_LOCATION %s)' % x,
-                          'endif()',
-                          'TARGET_LINK_LIBRARIES(%s %s)' % (target, xl)]
-            else:
-                # Version finding library
-                lines.append('FIND_LIBRARY(%s_LIBRARY NAMES %s %s HINTS %s)'
-                             % (xn.upper(), xf, xn, xd))
-                lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
-                             % (target, xn.upper()))
-        lines = preamble_lines + lines
-        logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
-        if fname is None:
-            return lines
-        else:
-            if os.path.isfile(fname):  # pragma: debug
-                os.remove(fname)
-            with open(fname, 'w') as fd:
-                fd.write('\n'.join(lines))
-
-    @classmethod
-    def call_compiler(cls, src, dont_build=None, **kwargs):
-        r"""Compile a source file into an executable or linkable object file,
-        checking for errors.
-
-        Args:
-            src (str): Full path to the directory containing the source files.
-            dont_build (bool, optional): If True, cmake configuration/generation
-                will be run, but the project will not be built. Defaults to
-                False.
+            src (str): Full path to source file.
             **kwargs: Additional keyword arguments are passed to the parent
-                class's method.
+                class.
+
+        Returns:
+            tuple(list, list): The products and source products that will be
+                produced by the compilation.
 
         """
-        # Set keyword arguments based on cmake mappings/aliases
-        if dont_build is not None:
-            kwargs['dont_link'] = dont_build
-        # Remove files created by cmake in overwrite so that directory should
-        # be empty (and therefore removable by the parent method).
-        if kwargs.get('overwrite', False):
-            builddir = kwargs.get('builddir', None)
-            working_dir = kwargs.get('working_dir', None)
-            rm_files = copy.deepcopy(cls.cmake_products)
-            out = kwargs.get('out', None)
-            if out is not None:
-                rm_files.append(out)
-                out_base = os.path.splitext(out)[0]
-                for x in cls.cmake_products_ext:
-                    rm_files.append(out_base + x)
-            for x in rm_files:
-                xfile = x
-                if (not os.path.isabs(xfile)) and (builddir is not None):
-                    xfile = os.path.join(builddir, xfile)
-                if (not os.path.isabs(xfile)) and (working_dir is not None):
-                    xfile = os.path.join(working_dir, xfile)
-                if os.path.isfile(xfile):
-                    os.remove(xfile)
-                elif os.path.isdir(xfile) and (xfile.endswith('CMakeFiles')
-                                               or xfile.endswith('Release')
-                                               or xfile.endswith('Debug')
-                                               or xfile.endswith('Win32')
-                                               or xfile.endswith('Win64')
-                                               or xfile.endswith('x64')
-                                               or xfile.endswith('.dir')):
-                    shutil.rmtree(xfile)
-        # Add conda prefix
-        # import pprint
-        # conda_prefix = cls.get_tool('compiler').get_conda_prefix()
-        # if conda_prefix:
-        #     os.environ['CMAKE_PREFIX_PATH'] = conda_prefix
-        #     os.environ['CMAKE_LIBRARY_PATH'] = conda_prefix
-        # pprint.pprint(os.environ)
-        return super(CMakeModelDriver, cls).call_compiler(src, **kwargs)
-
+        out = super(CMakeModelDriver, cls).get_compiler_products(src, **kwargs)
+        (products, source_products) = out[:]
+        if os.path.isfile(src[0]):
+            sourcedir = os.path.dirname(src[0])
+        else:
+            sourcedir = src[0]
+        if sourcedir in products:
+            products.remove(sourcedir)
+        return products, source_products
+        
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s) and appends any products produced by
         the compilation that should be removed after the run is complete.
@@ -717,7 +695,6 @@ class CMakeModelDriver(CompiledModelDriver):
                                   sourcedir=self.sourcedir,
                                   builddir=self.builddir,
                                   skip_interface_flags=True)
-            # if platform._is_win:  # pragma: windows
             default_kwargs['configuration'] = self.configuration
             for k, v in default_kwargs.items():
                 kwargs.setdefault(k, v)
@@ -738,19 +715,8 @@ class CMakeModelDriver(CompiledModelDriver):
         out = CModelDriver.CModelDriver.update_ld_library_path(out)
         return out
     
-    # def remove_products(self):
-    #     r"""Delete products produced during the compilation process."""
-    #     # Clean used to be called here, but for projects with multiple targets,
-    #     # this dosn't allow for building them as separate models
-    #     super(CMakeModelDriver, self).remove_products()
-    #     if os.path.isdir(self.builddir) and (not os.listdir(self.builddir)):
-    #         os.rmdir(self.builddir)
-
     def cleanup(self):
-        r"""Remove compile executable."""
-        if os.path.isfile(self.cmakelists_copy):
-            os.remove(self.cmakelists)
-            shutil.move(self.cmakelists_copy, self.cmakelists)
+        r"""Remove compiled executable."""
         if (self.model_file is not None) and os.path.isfile(self.model_file):
             self.compile_model('clean')
         super(CMakeModelDriver, self).cleanup()

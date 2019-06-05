@@ -1034,6 +1034,15 @@ definitions:
           items:
             type: string
           type: array
+        source_products:
+          default: []
+          description: Files created by running the model that are source files. These
+            files will be removed without checking their extension so users should
+            avoid adding files to this list unless they are sure they should be deleted.
+            Defaults to [].
+          items:
+            type: string
+          type: array
         sourcedir:
           description: Source directory to call cmake on. If not provided it is set
             to working_dir. This should be the directory containing the CMakeLists.txt

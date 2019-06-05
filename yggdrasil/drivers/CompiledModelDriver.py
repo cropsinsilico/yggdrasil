@@ -208,6 +208,15 @@ class CompilationToolBase(object):
         search_regex (list): Regex strings that should be used to locate paths
             in the output from running the tool executable with the
             search_path_flags.
+        product_exts (list): List of extensions that will be added to the
+            output file's base to get a list of products that might be produced
+            by calling the compilation tool.
+        product_files (list): List of file basenames that will be joined with
+            the directory containing each output to get a list of products that
+            might be produced by calling the compilation tool.
+        remove_product_exts (list): List of extensions or directories matching
+            entries in product_exts and product_files that should be removed
+            during cleanup. Be careful when adding files to this list.
 
     """
 
@@ -237,6 +246,10 @@ class CompilationToolBase(object):
     search_regex_end = None
     search_regex = ['([^\n]+)']
     version_flags = ['--version']
+    product_exts = []
+    product_files = []
+    source_product_exts = []
+    remove_product_exts = []
 
     _language_ext = None  # only update once per class
     
@@ -633,6 +646,35 @@ class CompilationToolBase(object):
         return cmd
 
     @classmethod
+    def append_product(cls, products, new, new_dir=None):
+        r"""Append a product to the specified list along with additional values
+        indicated by cls.product_exts.
+
+        Args:
+            products (list): List of of existing products that new product
+                should be appended to.
+            new (str): New product that should be appended to the list.
+            new_dir (str, optional): Directory that should be used as base when
+                adding files listed in cls.product_files. Defaults to
+                os.path.dirname(new).
+
+        """
+        products.append(new)
+        # Add products based on extensions
+        new_base = os.path.splitext(new)[0]
+        for ext in cls.product_exts:
+            inew = new_base + ext
+            if inew not in products:
+                products.append(inew)
+        # Add products based on directory
+        if new_dir is None:
+            new_dir = os.path.dirname(new)
+        for base in cls.product_files:
+            inew = os.path.join(new_dir, base)
+            if inew not in products:
+                products.append(inew)
+
+    @classmethod
     def call(cls, args, language=None, skip_flags=False, dry_run=False,
              out=None, overwrite=False, products=None, allow_error=False,
              working_dir=None, additional_args=None, **kwargs):
@@ -725,7 +767,7 @@ class CompilationToolBase(object):
                         raise RuntimeError("Output directory %s is not empty: %s."
                                            % (out, os.listdir(out)))
             if (not dry_run) and (os.path.isfile(out) or os.path.isdir(out)):
-                products.append(out)
+                cls.append_product(products, out)
                 return out
             kwargs['outfile'] = out
         # Get command
@@ -739,7 +781,7 @@ class CompilationToolBase(object):
                 return ''
             else:
                 if out != 'clean':
-                    products.append(out)
+                    cls.append_product(products, out)
                 return out
         # Run command
         output = ''
@@ -774,7 +816,7 @@ class CompilationToolBase(object):
                                        % (cls.tooltype.title(), cls.toolname, out))
                 logger.debug("%s %s produced %s"
                              % (cls.tooltype.title(), cls.toolname, out))
-                products.append(out)
+                cls.append_product(products, out)
             return out
         return output
 
@@ -873,6 +915,7 @@ class CompilerBase(CompilationToolBase):
                 cls.default_linker = cls.toolname
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
                          'default_executable', 'default_executable_env']
+            # 'product_exts', 'product_files']
             linker_name = '%sLinker' % cls.__name__.split('Compiler')[0]
             linker_attr = copy.deepcopy(cls.linker_attributes)
             linker_attr.setdefault('toolname', cls.default_linker)
@@ -1164,6 +1207,9 @@ class CompilerBase(CompilationToolBase):
                                                  out=out, **kwargs)
         else:
             kwargs_link = tool.extract_kwargs(kwargs, compiler=cls)
+            if (tool.tooltype != 'linker') and ('linker_language' in kwargs):
+                kwargs_link[tool.tooltype + '_language'] = kwargs.pop(
+                    'linker_language')
             out_comp = super(CompilerBase, cls).call(args, dont_link=True,
                                                      out=None, **kwargs)
             return tool.call(out_comp, out=out, additional_args=additional_objs,
@@ -1495,6 +1541,32 @@ class ArchiverBase(LinkerBase):
         """
         kwargs['build_library'] = True
         return super(ArchiverBase, cls).get_output_file(obj, **kwargs)
+
+    
+class BuildToolBase(CompilerBase):  # pragma: in progress
+    r"""Base class for build tools which are used to coordinate compilation.
+
+    Args:
+        buildfile (str, optional): File containing information about the build.
+            Defaults to default_buildfile class attribute, if set.
+        builddir (str, optional): Directory where build files should be placed.
+            Defaults to directory where build is called.
+        sourcedir (str, optional): Directory where source files are stored.
+            Defaults to directory where build is called.
+        target (str, optional): Build target. If not provided, build will be
+            created without a target.
+
+    Class Attributes:
+
+    """
+    tooltype = 'buildtool'
+    flag_options = OrderedDict()
+    default_buildfile = None
+    _schema_properties = {
+        'buildfile': {'type': 'string'},
+        'builddir': {'type': 'string'},
+        'sourcedir': {'type': 'string'},
+        'target': {'type': 'string'}}
     
 
 class DummyLinkerBase(LinkerBase):
@@ -1656,25 +1728,19 @@ class CompiledModelDriver(ModelDriver):
                                   + self.language_ext[0])
                 self.source_files.append(self.model_src)
         # Add intermediate files and executable by doing a dry run
-        kwargs = dict(products=[], dry_run=True)
+        kwargs = dict(products=self.products, dry_run=True)
         if model_is_source:
             kwargs['out'] = None
         out = self.compile_model(**kwargs)
         if model_is_source:
             self.debug('Determined model file: %s', out)
             self.model_file = out
-        for x in kwargs['products']:
-            if self.language_ext is not None:
-                x_ext = os.path.splitext(x)[-1]
-                if x_ext in self.language_ext:  # pragma: debug
-                    raise Exception("Product is source file: '%s'" % x)
-            if x not in self.products:
-                self.products.append(x)
-        if self.language_ext is not None:
-            assert(os.path.splitext(self.model_file)[-1] not in self.language_ext)
+        # Adjust products
+        self.get_compiler_products(self.source_files, products=self.products,
+                                   source_products=self.source_products)
         self.debug("source_files: %s", str(self.source_files))
         self.debug("model_file: %s", self.model_file)
-        
+
     @staticmethod
     def after_registration(cls):
         r"""Operations that should be performed to modify class attributes after
@@ -2520,7 +2586,37 @@ class CompiledModelDriver(ModelDriver):
         return self.call_compiler(source_files, **kwargs)
     
     @classmethod
-    def call_compiler(cls, src, language=None, **kwargs):
+    def get_compiler_products(cls, src, products=None, source_products=[], **kwargs):
+        r"""Determine the products that will be created by calling call_compiler.
+
+        Args:
+            src (str): Full path to source file.
+            products (list, optional): Existing list of products that should be
+                used instead of running the compiler in dry_run mode. If not
+                provided, the list of products is generated by running the
+                compiler in dry_run mode.
+            source_products (list, optional): List of source products that
+                products matching compiler.remove_product_exts should be added to.
+            **kwargs: Additional keyword arguments are passed to call_compiler.
+
+        Returns:
+            tuple(list, list): The products and source products that will be
+                produced by the compilation.
+
+        """
+        if products is None:
+            products = []
+            kwargs.update(products=products, overwrite=False, dry_run=True)
+            cls.call_compiler(src, **kwargs)
+        # Move extensions that should be removed to source_products
+        remove_ext = tuple(cls.get_tool('compiler').remove_product_exts)
+        for x in products:
+            if x.endswith(remove_ext) and (x not in source_products):
+                source_products.append(x)
+        return products, source_products
+    
+    @classmethod
+    def call_compiler(cls, src, language=None, dont_build=None, **kwargs):
         r"""Compile a source file into an executable or linkable object file,
         checking for errors.
 
@@ -2536,6 +2632,9 @@ class CompiledModelDriver(ModelDriver):
             dont_link (bool, optional): If True, the command will result in a
                 linkable object file rather than an executable. Defaults to
                 False.
+            dont_build (bool, optional): If True, cmake configuration/generation
+                will be run, but the project will not be built. Defaults to
+                None. If provided, this overrides dont_link.
             overwrite (bool, optional): If True, the existing compile file will
                 be overwritten. Otherwise, it will be kept and this function
                 will return without recompiling the source file.
@@ -2557,7 +2656,15 @@ class CompiledModelDriver(ModelDriver):
                 output file.
 
         """
+        if dont_build is not None:
+            kwargs['dont_link'] = dont_build
         language = kwargs.pop('compiler_language', language)
+        # Prevent overwrite
+        if kwargs.get('overwrite', False):
+            ow_kwargs = copy.deepcopy(kwargs)
+            ow_kwargs.pop('products', None)
+            products, source_products = cls.get_compiler_products(src, **ow_kwargs)
+            cls._remove_products(products=products, source_products=source_products)
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
             drv = import_component('model', language)
