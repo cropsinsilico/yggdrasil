@@ -745,6 +745,8 @@ class CompilationToolBase(object):
         output = ''
         try:
             unused_kwargs.setdefault('env', cls.set_env())
+            if cls.toolname == 'cmake':
+                logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
@@ -1141,7 +1143,7 @@ class CompilerBase(CompilationToolBase):
             # Compile each source
             kwargs_link = {}
             if not dont_link:
-                kwargs_link = tool.extract_kwargs(kwargs)
+                kwargs_link = tool.extract_kwargs(kwargs, compiler=cls)
             else:
                 kwargs.pop('linker_language', None)
             obj_list = []
@@ -1161,7 +1163,7 @@ class CompilerBase(CompilationToolBase):
             return super(CompilerBase, cls).call(args, skip_flags=skip_flags,
                                                  out=out, **kwargs)
         else:
-            kwargs_link = tool.extract_kwargs(kwargs)
+            kwargs_link = tool.extract_kwargs(kwargs, compiler=cls)
             out_comp = super(CompilerBase, cls).call(args, dont_link=True,
                                                      out=None, **kwargs)
             return tool.call(out_comp, out=out, additional_args=additional_objs,
@@ -1242,7 +1244,8 @@ class LinkerBase(CompilationToolBase):
         return libname
 
     @classmethod
-    def extract_kwargs(cls, kwargs):
+    def extract_kwargs(cls, kwargs, compiler=None, add_kws_link=[],
+                       add_kws_both=[]):
         r"""Extract linker kwargs, leaving behind just compiler kwargs.
 
         Args:
@@ -1250,6 +1253,15 @@ class LinkerBase(CompilationToolBase):
                 be sorted into kwargs used by either the compiler or linker or
                 both. Keywords that are not used by the compiler will be removed
                 from this dictionary.
+            compiler (CompilerBase, optional): Compiler tool that linker kwargs
+                are being extracted in order to call. Defaults to None and is
+                ignored.
+            add_kws_link (list, optional): Addition keywords that should be
+                added to the list of those reserved for the linker. Defaults to
+                [].
+            add_kws_both (list, optional): Additional keywords that should be
+                added to the list of those that are valid for both the linker
+                and compiler. Defaults to [].
 
         Returns:
             dict: Keyword arguments that should be passed to the linker.
@@ -1260,7 +1272,20 @@ class LinkerBase(CompilationToolBase):
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
                     'working_dir']
+        kws_link += add_kws_link
+        kws_both += add_kws_both
         kwargs_link = {}
+        # Add kwargs from flag_options
+        flag_options_comp = []
+        if compiler is not None:
+            flag_options_comp = list(compiler.flag_options.keys())
+        for k in cls.flag_options.keys():
+            if (k in kws_link) or (k in kws_both):
+                continue
+            if k in flag_options_comp:
+                kws_both.append(k)
+            else:
+                kws_link.append(k)
         # Move kwargs unique to linker
         for k in kws_link:
             if k in kwargs:

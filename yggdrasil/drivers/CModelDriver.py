@@ -71,8 +71,9 @@ class MSVCCompiler(CCompilerBase):
     # TODO: Currently everything compiled as C++ on windows to allow use
     # of complex types. Use '/TC' instead of '/TP' for strictly C
     default_flags = ['/W4',      # Display all errors
-                     # '/Zi',      # Symbolic debug in .pdb (implies debug)
-                     '/Z7',      # Symbolic debug in .obj (implies debug)
+                     '/Zi',      # Symbolic debug in .pdb (implies debug)
+                     # '/MTd',     # Use LIBCMTD.lib to create multithreaded .exe
+                     # '/Z7',      # Symbolic debug in .obj (implies debug)
                      "/EHsc",    # Catch C++ exceptions only (C don't throw C++)
                      '/TP',      # Treat all files as C++
                      "/nologo",  # Suppress startup banner
