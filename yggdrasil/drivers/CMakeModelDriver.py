@@ -548,7 +548,7 @@ class CMakeModelDriver(CompiledModelDriver):
         if platform._is_win:  # pragma: windows
             new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
                          "-D_CRT_SECURE_NO_WARNINGS"]
-            if configuration.lower() == 'debug':
+            if configuration.lower() == 'debug':  # pragma: debug
                 new_flags.append("/MTd")
             else:
                 new_flags.append("/MT")
@@ -615,7 +615,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 # if cls.add_libraries:  # pragma: no cover
                 # Version adding library
                 lines.append('if (NOT TARGET %s)' % xl)
-                if xe.lower() in ['.so', '.dll', '.dylib']:
+                if xe.lower() in ['.so', '.dll', '.dylib']:  # pragma: no cover
                     lines.append('    ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
                 else:
                     lines.append('    ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
