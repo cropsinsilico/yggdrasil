@@ -22,8 +22,8 @@ class CMakeConfigure(CompilerBase):
     default_flags = []  # '-H']
     flag_options = OrderedDict([('definitions', '-D%s'),
                                 ('sourcedir', ''),  # '-S'
-                                ('builddir', '-B%s')])
-    # ('configuration', '-DCMAKE_BUILD_TYPE=%s')])
+                                ('builddir', '-B%s'),
+                                ('configuration', '-DCMAKE_BUILD_TYPE=%s')])
     output_key = None
     compile_only_flag = None
     default_builddir = '.'
@@ -187,7 +187,7 @@ class CMakeBuilder(LinkerBase):
             cls.executable_ext = '.exe'
         
     @classmethod
-    def extract_kwargs(cls, kwargs):
+    def extract_kwargs(cls, kwargs, **kwargs_ex):
         r"""Extract linker kwargs, leaving behind just compiler kwargs.
 
         Args:
@@ -195,23 +195,16 @@ class CMakeBuilder(LinkerBase):
                 be sorted into kwargs used by either the compiler or linker or
                 both. Keywords that are not used by the compiler will be removed
                 from this dictionary.
+            **kwargs_ex: Additional keyword arguments are passed to the parent
+                class's method.
 
         Returns:
             dict: Keyword arguments that should be passed to the linker.
 
         """
-        # kws_link = []
-        kws_both = ['builddir', 'target']
-        kwargs_link = super(CMakeBuilder, cls).extract_kwargs(kwargs)
-        # Move kwargs unique to linker
-        # for k in kws_link:
-        #     if k in kwargs:
-        #         kwargs_link[k] = kwargs.pop(k)
-        # Copy kwargs that should be passed to both compiler & linker
-        for k in kws_both:
-            if k in kwargs:
-                kwargs_link[k] = kwargs[k]
-        return kwargs_link
+        kwargs_ex['add_kws_both'] = (kwargs.get('add_kws_both', [])
+                                     + ['builddir', 'target'])
+        return super(CMakeBuilder, cls).extract_kwargs(kwargs, **kwargs_ex)
         
     @classmethod
     def get_output_file(cls, obj, target=None, builddir=None, **kwargs):
