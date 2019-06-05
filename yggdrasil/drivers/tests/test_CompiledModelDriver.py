@@ -233,6 +233,12 @@ class TestCompiledModelDriverNoInit(TestCompiledModelParam,
         else:
             self.import_cls.get_linker_flags(libtype='shared', for_model=True,
                                              use_library_path=True)
+            self.import_cls.get_linker_flags(libtype='shared', for_model=True,
+                                             skip_library_libs=True,
+                                             use_library_path=True)
+            self.import_cls.get_linker_flags(libtype='shared', for_model=True,
+                                             skip_library_libs=True,
+                                             use_library_path_internal=True)
 
     def test_executable_command(self):
         r"""Test executable_command."""
