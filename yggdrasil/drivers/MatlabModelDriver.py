@@ -872,5 +872,7 @@ class MatlabModelDriver(InterpretedModelDriver):  # pragma: matlab
             str: Concatentated variables list.
 
         """
-        return '[%s]' % super(MatlabModelDriver, cls).prepare_output_variables(
-            vars_list)
+        out = super(MatlabModelDriver, cls).prepare_output_variables(vars_list)
+        if isinstance(vars_list, list) and (len(vars_list) > 1):
+            out = '[%s]' % out
+        return out

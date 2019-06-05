@@ -20,6 +20,7 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'rpc_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'rpc_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'hello': ('python', 'matlab', 'c', 'cpp'),
+           'model_function': ('python', 'matlab', 'c', 'cpp'),
            'model_error': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
@@ -81,7 +82,7 @@ for k, lang in ex_dict.items():
                          '%sSrv_%s.yml' % (k, srv_l)]
             src_names = ['%s%s' % (k, ext_map[cli_l]),
                          '%s%s' % (k, ext_map[srv_l])]
-        elif k in ['gs_lesson4', 'gs_lesson4b', 'backwards',
+        elif k in ['gs_lesson4', 'gs_lesson4b', 'backwards', 'model_function',
                    'formatted_io1', 'formatted_io2', 'formatted_io3',
                    'formatted_io4', 'formatted_io5', 'formatted_io6',
                    'formatted_io7', 'formatted_io8', 'formatted_io9']:
