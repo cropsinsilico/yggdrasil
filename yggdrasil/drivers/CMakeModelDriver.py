@@ -453,7 +453,8 @@ class CMakeModelDriver(CompiledModelDriver):
         include_file = os.path.join(self.sourcedir, include_base)
         self.create_include(include_file, self.target,
                             driver=self.target_language_driver,
-                            logging_level=self.logger.getEffectiveLevel())
+                            logging_level=self.logger.getEffectiveLevel(),
+                            configuration=self.configuration)
         assert(os.path.isfile(include_file))
         out.append(include_file)
         # Create copy of cmakelists and modify
@@ -490,7 +491,8 @@ class CMakeModelDriver(CompiledModelDriver):
 
     @classmethod
     def create_include(cls, fname, target, compile_flags=None, linker_flags=None,
-                       driver=CModelDriver.CModelDriver, logging_level=None):
+                       driver=CModelDriver.CModelDriver, logging_level=None,
+                       configuration='Release'):
         r"""Create CMakeList include file with necessary includes,
         definitions, and linker flags.
 
@@ -507,6 +509,9 @@ class CMakeModelDriver(CompiledModelDriver):
             logging_level (int, optional): Logging level that should be passed
                 as a definition to the C compiler. Defaults to None and will be
                 ignored.
+            configuration (str, optional): Build type/configuration that should
+                be built. Defaults to 'Release'. Only used on Windows to
+                determin the standard library.
 
         Raises:
             ValueError: If a linker or compiler flag cannot be interpreted.
@@ -543,6 +548,10 @@ class CMakeModelDriver(CompiledModelDriver):
         if platform._is_win:  # pragma: windows
             new_flags = ["/W4", "/EHsc", '/TP', "/nologo",
                          "-D_CRT_SECURE_NO_WARNINGS"]
+            if configuration.lower() == 'debug':
+                new_flags.append("/MTd")
+            else:
+                new_flags.append("/MT")
             for x in new_flags:
                 if x not in compile_flags:
                     compile_flags.append(x)
