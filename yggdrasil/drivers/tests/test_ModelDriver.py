@@ -110,8 +110,8 @@ class TestModelDriverNoInit(TestModelParam, parent.TestDriverNoInit):
                                None, None)
         else:
             inputs = [{'name': 'a', 'type': 'bytes', 'outside_loop': True},
-                      {'name': 'b', 'type': 'int'}]
-            outputs = [{'name': 'y', 'type': 'float'},
+                      {'name': 'b', 'type': {'type': 'int', 'precision': 64}}]
+            outputs = [{'name': 'y', 'type': {'type': 'float', 'precision': 32}},
                        {'name': 'z', 'type': 'bytes', 'outside_loop': True}]
             self.import_cls.write_model_wrapper('test', 'test',
                                                 inputs=inputs,
