@@ -8,7 +8,8 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
-from yggdrasil.drivers.ModelDriver import ModelDriver, _map_language_ext
+from yggdrasil.drivers.ModelDriver import (
+    ModelDriver, _map_language_ext, remove_products)
 from yggdrasil.components import import_component
 
 
@@ -332,7 +333,21 @@ class CompilationToolBase(object):
             existing = {}
             existing.update(os.environ)
         return existing
-    
+
+    @classmethod
+    def write_wrappers(cls, **kwargs):
+        r"""Write any wrappers needed to compile and/or run a model.
+
+        Args:
+            **kwargs: Keyword arguments are ignored (only included to
+               allow cascade from child classes).
+
+        Returns:
+            list: Full paths to any created wrappers.
+
+        """
+        return []
+        
     @classmethod
     def file2base(cls, fname):
         r"""Determine basename from path.
@@ -646,17 +661,60 @@ class CompilationToolBase(object):
         return cmd
 
     @classmethod
-    def append_product(cls, products, new, new_dir=None):
+    def remove_products(cls, src, new):
+        r"""Remove products produced during compilation.
+
+        Args:
+            src (list): Input arguments to compilation call that was used to
+                generate the output file (usually one or more source files).
+            new (str): The full path to the primary product of the compilation
+                call (usually an object, executable, or library).
+
+        """
+        products = []
+        cls.append_product(products, src, new)
+        source_products = cls.get_source_products(products)
+        remove_products(products, source_products)
+
+    @classmethod
+    def get_source_products(cls, products, source_products=[]):
+        r"""Get the list of products that should be removed without checking
+        for source files based on cls.remove_product_exts.
+
+        Args:
+            products (list): List of products that should be checked against
+                cls.remove_product_exts.
+            source_products (list, optional): Existing list of products that
+                new source_products should be added to. Defaults to [].
+
+        Returns:
+            list: Products that should be removed without checking for source
+                files.
+
+        """
+        remove_ext = tuple(cls.remove_product_exts)
+        for x in products:
+            if x.endswith(remove_ext) and (x not in source_products):
+                source_products.append(x)
+        return source_products
+
+    @classmethod
+    def append_product(cls, products, src, new, new_dir=None,
+                       dont_append_src=False):
         r"""Append a product to the specified list along with additional values
         indicated by cls.product_exts.
 
         Args:
             products (list): List of of existing products that new product
                 should be appended to.
+            src (list): Input arguments to compilation call that was used to
+                generate the output file (usually one or more source files).
             new (str): New product that should be appended to the list.
             new_dir (str, optional): Directory that should be used as base when
                 adding files listed in cls.product_files. Defaults to
                 os.path.dirname(new).
+            dont_append_src (bool, optional): If True and src is in the list of
+                products, it will be removed. Defaults to False.
 
         """
         products.append(new)
@@ -673,6 +731,11 @@ class CompilationToolBase(object):
             inew = os.path.join(new_dir, base)
             if inew not in products:
                 products.append(inew)
+        # Make sure the source is not in the product list
+        if dont_append_src:
+            for isrc in src:
+                if isrc in products:  # pragma: debug
+                    products.remove(isrc)
 
     @classmethod
     def call(cls, args, language=None, skip_flags=False, dry_run=False,
@@ -754,20 +817,11 @@ class CompilationToolBase(object):
             assert(out not in args)  # Don't remove source files
             # Check for file
             if overwrite and (not dry_run):
-                if os.path.isfile(out):
-                    if os.path.splitext(out)[-1] in cls.get_all_language_ext():
-                        raise RuntimeError("Source file will not be overwritten: "
-                                           + out)
-                    os.remove(out)
-                    # raise RuntimeError("Output already exists: %s" % out)
-                elif os.path.isdir(out):
-                    if not os.listdir(out):
-                        os.rmdir(out)
-                    else:  # pragma: debug
-                        raise RuntimeError("Output directory %s is not empty: %s."
-                                           % (out, os.listdir(out)))
+                cls.remove_products(args, out)
+                if os.path.isfile(out) or os.path.isdir(out):  # pragma: debug
+                    raise RuntimeError("Product not removed: %s" % out)
             if (not dry_run) and (os.path.isfile(out) or os.path.isdir(out)):
-                cls.append_product(products, out)
+                cls.append_product(products, args, out)
                 return out
             kwargs['outfile'] = out
         # Get command
@@ -781,7 +835,7 @@ class CompilationToolBase(object):
                 return ''
             else:
                 if out != 'clean':
-                    cls.append_product(products, out)
+                    cls.append_product(products, args, out)
                 return out
         # Run command
         output = ''
@@ -816,7 +870,7 @@ class CompilationToolBase(object):
                                        % (cls.tooltype.title(), cls.toolname, out))
                 logger.debug("%s %s produced %s"
                              % (cls.tooltype.title(), cls.toolname, out))
-                cls.append_product(products, out)
+                cls.append_product(products, args, out)
             return out
         return output
 
@@ -1661,15 +1715,6 @@ class CompiledModelDriver(ModelDriver):
     def __init__(self, name, args, skip_compile=False, **kwargs):
         kwargs.setdefault('overwrite', (not kwargs.pop('preserve_cache', False)))
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
-        # Set defaults from attributes
-        for k0 in ['compiler', 'linker', 'archiver']:
-            for k in [k0, '%s_flags' % k0]:
-                v = getattr(self, k, None)
-                if v is None:
-                    setattr(self, k, getattr(self, 'default_%s' % k))
-        # Set tools so that they are cached
-        for k in ['compiler', 'linker', 'archiver']:
-            setattr(self, '%s_tool' % k, self.get_tool(k))
         # Compile
         if not skip_compile:
             try:
@@ -1692,6 +1737,16 @@ class CompiledModelDriver(ModelDriver):
                 class's method.
 
         """
+        # Set defaults from attributes
+        for k0 in ['compiler', 'linker', 'archiver']:
+            for k in [k0, '%s_flags' % k0]:
+                v = getattr(self, k, None)
+                if v is None:
+                    setattr(self, k, getattr(self, 'default_%s' % k))
+        # Set tools so that they are cached
+        for k in ['compiler', 'linker', 'archiver']:
+            setattr(self, '%s_tool' % k, self.get_tool_instance(k))
+            self.get_tool_instance(k)
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
@@ -1704,7 +1759,7 @@ class CompiledModelDriver(ModelDriver):
                 self.source_files.append(self.model_file)
         else:
             if len(model_ext) == 0:
-                self.model_file += self.get_tool('linker').executable_ext
+                self.model_file += self.get_tool_instance('linker').executable_ext
             else:
                 # Assert that model file is not source code in any of the
                 # registered languages
@@ -1736,8 +1791,8 @@ class CompiledModelDriver(ModelDriver):
             self.debug('Determined model file: %s', out)
             self.model_file = out
         # Adjust products
-        self.get_compiler_products(self.source_files, products=self.products,
-                                   source_products=self.source_products)
+        self.get_tool_instance('compiler').get_source_products(
+            self.products, source_products=self.source_products)
         self.debug("source_files: %s", str(self.source_files))
         self.debug("model_file: %s", self.model_file)
 
@@ -1789,6 +1844,23 @@ class CompiledModelDriver(ModelDriver):
                 if (default_tool_name is not None) and (k == 'compiler'):
                     compiler = get_compilation_tool(k, default_tool_name)
 
+    def write_wrappers(self, **kwargs):
+        r"""Write any wrappers needed to compile and/or run a model.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the parent class's method.
+
+        Returns:
+            list: Full paths to any created wrappers.
+
+        """
+        out = super(CompiledModelDriver, self).write_wrappers(**kwargs)
+        kwargs.setdefault('logging_level', self.logger.getEffectiveLevel())
+        for k in self._schema_properties.keys():
+            kwargs.setdefault(k, getattr(self, k, None))
+        out += self.get_tool_instance('compiler').write_wrappers(**kwargs)
+        return out
+        
     def model_command(self):
         r"""Return the command that should be used to run the model.
 
@@ -1818,8 +1890,8 @@ class CompiledModelDriver(ModelDriver):
         reg = get_compilation_tool_registry(tooltype).get('by_language', {})
         return copy.deepcopy(reg.get(cls.language, {}))
 
-    @classmethod
-    def get_tool(cls, tooltype, return_prop='tool'):
+    @staticmethod
+    def get_tool_static(cls, tooltype, return_prop='tool'):
         r"""Get the class associated with the specified compilation tool for
         this language.
 
@@ -1877,6 +1949,35 @@ class CompiledModelDriver(ModelDriver):
             return out.flags
         else:
             raise ValueError("Invalid return_prop: '%s'" % return_prop)
+
+    def get_tool_instance(self, *args, **kwargs):
+        r"""Get tool from a driver instance.
+
+        Args:
+            *args: Arguments are passed to the get_tool_static method.
+            **kwargs: Keyword arguments are passed to the get_tool_static method.
+
+        Returns:
+            CompilationToolBase: Class providing an interface to the specified
+                compilation tool.
+
+        """
+        return CompiledModelDriver.get_tool_static(self, *args, **kwargs)
+        
+    @classmethod
+    def get_tool(cls, *args, **kwargs):
+        r"""Get tool from a driver class.
+
+        Args:
+            *args: Arguments are passed to the get_tool_static method.
+            **kwargs: Keyword arguments are passed to the get_tool_static method.
+
+        Returns:
+            CompilationToolBase: Class providing an interface to the specified
+                compilation tool.
+
+        """
+        return CompiledModelDriver.get_tool_static(cls, *args, **kwargs)
 
     @classmethod
     def get_external_libraries(cls, no_comm_libs=False):
@@ -2530,7 +2631,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = super(CompiledModelDriver, self).set_env()
         if for_compile:
-            compiler = self.get_tool('compiler')
+            compiler = self.get_tool_instance('compiler')
             out = compiler.set_env(existing=out,
                                    logging_level=self.logger.getEffectiveLevel())
         return out
@@ -2586,36 +2687,6 @@ class CompiledModelDriver(ModelDriver):
         return self.call_compiler(source_files, **kwargs)
     
     @classmethod
-    def get_compiler_products(cls, src, products=None, source_products=[], **kwargs):
-        r"""Determine the products that will be created by calling call_compiler.
-
-        Args:
-            src (str): Full path to source file.
-            products (list, optional): Existing list of products that should be
-                used instead of running the compiler in dry_run mode. If not
-                provided, the list of products is generated by running the
-                compiler in dry_run mode.
-            source_products (list, optional): List of source products that
-                products matching compiler.remove_product_exts should be added to.
-            **kwargs: Additional keyword arguments are passed to call_compiler.
-
-        Returns:
-            tuple(list, list): The products and source products that will be
-                produced by the compilation.
-
-        """
-        if products is None:
-            products = []
-            kwargs.update(products=products, overwrite=False, dry_run=True)
-            cls.call_compiler(src, **kwargs)
-        # Move extensions that should be removed to source_products
-        remove_ext = tuple(cls.get_tool('compiler').remove_product_exts)
-        for x in products:
-            if x.endswith(remove_ext) and (x not in source_products):
-                source_products.append(x)
-        return products, source_products
-    
-    @classmethod
     def call_compiler(cls, src, language=None, dont_build=None, **kwargs):
         r"""Compile a source file into an executable or linkable object file,
         checking for errors.
@@ -2659,12 +2730,6 @@ class CompiledModelDriver(ModelDriver):
         if dont_build is not None:
             kwargs['dont_link'] = dont_build
         language = kwargs.pop('compiler_language', language)
-        # Prevent overwrite
-        if kwargs.get('overwrite', False):
-            ow_kwargs = copy.deepcopy(kwargs)
-            ow_kwargs.pop('products', None)
-            products, source_products = cls.get_compiler_products(src, **ow_kwargs)
-            cls._remove_products(products=products, source_products=source_products)
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):
             drv = import_component('model', language)

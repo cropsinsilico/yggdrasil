@@ -52,20 +52,24 @@ class CMakeConfigure(CompilerBase):
                                         'x64', '.dir']
         
     @classmethod
-    def append_product(cls, products, new, **kwargs):
+    def append_product(cls, products, src, new, **kwargs):
         r"""Append a product to the specified list along with additional values
         indicated by cls.product_exts.
 
         Args:
             products (list): List of of existing products that new product
                 should be appended to.
+            src (list): Input arguments to compilation call that was used to
+                generate the output file (usually one or more source files).
             new (str): New product that should be appended to the list.
             **kwargs: Additional keyword arguments are passed to the parent
                 class's method.
 
         """
         kwargs.setdefault('new_dir', new)
-        super(CMakeConfigure, cls).append_product(products, new, **kwargs)
+        kwargs.setdefault('dont_append_src', True)
+        return super(CMakeConfigure, cls).append_product(products, src,
+                                                         new, **kwargs)
         
     @classmethod
     def get_output_file(cls, src, dont_link=False, dont_build=None,
@@ -192,9 +196,42 @@ class CMakeConfigure(CompilerBase):
         return super(CMakeConfigure, cls).get_executable_command([], **kwargs)
     
     @classmethod
+    def write_wrappers(cls, target=None, sourcedir=None,
+                       target_language=None, **kwargs):
+        r"""Write any wrappers needed to compile and/or run a model.
+
+        Args:
+            **kwargs: Keyword arguments are ignored (only included to
+               allow cascade from child classes).
+
+        Returns:
+            list: Full paths to any created wrappers.
+
+        """
+        if sourcedir is None:
+            sourcedir = '.'
+        out = super(CMakeConfigure, cls).write_wrappers(**kwargs)
+        if target is None:
+            include_base = 'ygg_cmake.txt'
+        else:
+            include_base = 'ygg_cmake_%s.txt' % target
+        include_file = os.path.join(sourcedir, include_base)
+        # import pprint
+        # print('kwargs')
+        # pprint.pprint(kwargs)
+        kwargs['verbose'] = True
+        if (target_language is not None) and ('driver' not in kwargs):
+            kwargs['driver'] = components.import_component('model',
+                                                           target_language)
+        cls.create_include(include_file, target, **kwargs)
+        if os.path.isfile(include_file):
+            os.remove(include_file)
+        return out
+        
+    @classmethod
     def create_include(cls, fname, target, compile_flags=None, linker_flags=None,
-                       driver=CModelDriver.CModelDriver, logging_level=None,
-                       configuration='Release'):
+                       driver=None, logging_level=None, configuration='Release',
+                       verbose=False, **kwargs):
         r"""Create CMakeList include file with necessary includes,
         definitions, and linker flags.
 
@@ -214,6 +251,9 @@ class CMakeConfigure(CompilerBase):
             configuration (str, optional): Build type/configuration that should
                 be built. Defaults to 'Release'. Only used on Windows to
                 determin the standard library.
+            verbose (bool, optional): If True, the contents of the created file
+                are displayed. Defaults to False.
+            **kwargs: Additional keyword arguments are ignored.
 
         Raises:
             ValueError: If a linker or compiler flag cannot be interpreted.
@@ -225,6 +265,8 @@ class CMakeConfigure(CompilerBase):
             compile_flags = []
         if linker_flags is None:
             linker_flags = []
+        if driver is None:  # pragma: debug
+            driver = CModelDriver.CModelDriver
         use_library_path = True  # platform._is_win
         library_flags = []
         external_library_flags = []
@@ -335,7 +377,10 @@ class CMakeConfigure(CompilerBase):
                 lines.append('TARGET_LINK_LIBRARIES(%s ${%s_LIBRARY})'
                              % (target, xn.upper()))
         lines = preamble_lines + lines
-        logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
+        if verbose:  # pragma: debug
+            logger.info('CMake include file:\n\t' + '\n\t'.join(lines))
+        else:
+            logger.debug('CMake include file:\n\t' + '\n\t'.join(lines))
         if fname is None:
             return lines
         else:
@@ -569,7 +614,7 @@ class CMakeModelDriver(CompiledModelDriver):
             if self.model_src is not None:
                 try_list = [self.model_src, try_list]
                 early_exit = True
-            languages = copy.deepcopy(self.get_tool('compiler').languages)
+            languages = copy.deepcopy(self.get_tool_instance('compiler').languages)
             languages.remove('cmake')
             self.target_language = self.get_language_for_source(
                 try_list, early_exit=early_exit, languages=languages)
@@ -611,7 +656,7 @@ class CMakeModelDriver(CompiledModelDriver):
         else:
             include_base = 'ygg_cmake_%s.txt' % self.target
         include_file = os.path.join(self.sourcedir, include_base)
-        self.get_tool('compiler').create_include(
+        self.get_tool_instance('compiler').create_include(
             include_file, self.target,
             driver=self.target_language_driver,
             logging_level=self.logger.getEffectiveLevel(),
@@ -626,7 +671,7 @@ class CMakeModelDriver(CompiledModelDriver):
                 contents = fd.read()
             with open(self.cmakelists, 'wb') as fd:
                 # Add conda prefix as first line
-                conda_prefix = self.get_tool('compiler').get_conda_prefix()
+                conda_prefix = self.get_tool_instance('compiler').get_conda_prefix()
                 if conda_prefix:
                     newline = backwards.as_bytes('LINK_DIRECTORIES(%s)\n'
                                                  % os.path.join(conda_prefix, 'lib'))
@@ -650,30 +695,6 @@ class CMakeModelDriver(CompiledModelDriver):
                     fd.write(newline)
         return out
 
-    @classmethod
-    def get_compiler_products(cls, src, **kwargs):
-        r"""Determine the products that will be created by calling call_compiler.
-
-        Args:
-            src (str): Full path to source file.
-            **kwargs: Additional keyword arguments are passed to the parent
-                class.
-
-        Returns:
-            tuple(list, list): The products and source products that will be
-                produced by the compilation.
-
-        """
-        out = super(CMakeModelDriver, cls).get_compiler_products(src, **kwargs)
-        (products, source_products) = out[:]
-        if os.path.isfile(src[0]):
-            sourcedir = os.path.dirname(src[0])
-        else:
-            sourcedir = src[0]
-        if sourcedir in products:
-            products.remove(sourcedir)
-        return products, source_products
-        
     def compile_model(self, target=None, **kwargs):
         r"""Compile model executable(s) and appends any products produced by
         the compilation that should be removed after the run is complete.

@@ -24,6 +24,74 @@ logger = logging.getLogger(__name__)
 _map_language_ext = OrderedDict()
 
 
+def remove_product(product, check_for_source=False, timer_class=None):
+    r"""Delete a single product after checking that the product is not (or
+    does not contain, in the case of directories), source files.
+
+    Args:
+        product (str): Full path to a file or directory that should be
+            removed.
+        check_for_source (bool, optional): If True, the specified product
+            will be checked to ensure that no source files are present. If
+            a source file is present, a RuntimeError will be raised.
+            Defaults to False.
+
+    Raises:
+        RuntimeError: If the specified product is a source file and
+            check_for_source is False.
+        RuntimeError: If the specified product is a directory that contains
+            a source file and check_for_source is False.
+        RuntimeError: If the product cannot be removed.
+
+    """
+    if timer_class is None:
+        timer_class = tools.YggClass()
+    if os.path.isdir(product):
+        ext_tuple = tuple(_map_language_ext.keys())
+        if check_for_source:
+            for root, dirs, files in os.walk(product):
+                for f in files:
+                    if f.endswith(ext_tuple):
+                        raise RuntimeError(("%s contains a source file "
+                                            "(%s)") % (product, f))
+        shutil.rmtree(product)
+    elif os.path.isfile(product):
+        if check_for_source:
+            ext = os.path.splitext(product)[-1]
+            if ext in _map_language_ext:
+                raise RuntimeError("%s is a source file." % product)
+        T = timer_class.start_timeout()
+        while ((not T.is_out) and os.path.isfile(product)):
+            try:
+                os.remove(product)
+            except BaseException:  # pragma: debug
+                if os.path.isfile(product):
+                    timer_class.sleep()
+                if T.is_out:
+                    raise
+        timer_class.stop_timeout()
+        if os.path.isfile(product):  # pragma: debug
+            raise RuntimeError("Failed to remove product: %s" % product)
+        
+
+def remove_products(products, source_products, timer_class=None):
+    r"""Delete products produced during the process of running the model.
+
+    Args:
+        products (list): List of products that should be removed after
+            checking that they are not source files.
+        source_products (list): List of products that should be removed
+            without checking that they are not source files.
+
+    """
+    # print('products', products)
+    # print('source_products', source_products)
+    for p in source_products:
+        remove_product(p, timer_class=timer_class)
+    for p in products:
+        remove_product(p, timer_class=timer_class, check_for_source=True)
+        
+
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -958,80 +1026,11 @@ class ModelDriver(Driver):
                 os.remove(modified)
                 shutil.move(original, modified)
 
-    @classmethod
-    def remove_product(cls, product, check_for_source=False, timer_class=None):
-        r"""Delete a single product after checking that the product is not (or
-        does not contain, in the case of directories), source files.
-
-        Args:
-            product (str): Full path to a file or directory that should be
-                removed.
-            check_for_source (bool, optional): If True, the specified product
-                will be checked to ensure that no source files are present. If
-                a source file is present, a RuntimeError will be raised.
-                Defaults to False.
-
-        Raises:
-            RuntimeError: If the specified product is a source file and
-                check_for_source is False.
-            RuntimeError: If the specified product is a directory that contains
-                a source file and check_for_source is False.
-            RuntimeError: If the product cannot be removed.
-
-        """
-        if timer_class is None:
-            timer_class = tools.YggClass()
-        if os.path.isdir(product):
-            ext_tuple = tuple(cls.get_all_language_ext())
-            if check_for_source:
-                for root, dirs, files in os.walk(product):
-                    for f in files:
-                        if f.endswith(ext_tuple):
-                            raise RuntimeError(("%s contains a source file "
-                                                "(%s)") % (product, f))
-            shutil.rmtree(product)
-        elif os.path.isfile(product):
-            if check_for_source:
-                ext = os.path.splitext(product)[-1]
-                if ext in cls.get_all_language_ext():
-                    raise RuntimeError("%s is a source file." % product)
-            T = timer_class.start_timeout()
-            while ((not T.is_out) and os.path.isfile(product)):
-                try:
-                    os.remove(product)
-                except BaseException:  # pragma: debug
-                    if os.path.isfile(product):
-                        timer_class.sleep()
-                    if T.is_out:
-                        raise
-            timer_class.stop_timeout()
-            if os.path.isfile(product):  # pragma: debug
-                raise RuntimeError("Failed to remove product: %s" % product)
-
-    @classmethod
-    def _remove_products(cls, products, source_products, timer_class=None):
-        r"""Delete products produced during the process of running the model.
-
-        Args:
-            products (list): List of products that should be removed after
-                checking that they are not source files.
-            source_products (list): List of products that should be removed
-                without checking that they are not source files.
-
-        """
-        # print('products', products)
-        # print('source_products', source_products)
-        for p in source_products:
-            cls.remove_product(p, timer_class=timer_class)
-        for p in products:
-            cls.remove_product(p, timer_class=timer_class, check_for_source=True)
-
     def remove_products(self):
         r"""Delete products produced during the process of running the model."""
         products = self.products
         source_products = self.source_products + self.wrapper_products
-        self.__class__._remove_products(products, source_products,
-                                        timer_class=self)
+        remove_products(products, source_products, timer_class=self)
             
     # def do_terminate(self):
     #     r"""Terminate the process running the model."""
