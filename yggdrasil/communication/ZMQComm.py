@@ -4,10 +4,7 @@ import uuid
 import zmq
 import threading
 import logging
-import subprocess
-import warnings
-from yggdrasil import backwards, tools, platform
-from yggdrasil.config import ygg_cfg
+from yggdrasil import backwards, tools
 from yggdrasil.communication import CommBase, AsyncComm
 
 
@@ -27,47 +24,6 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = b'YGG_REPLY'
 _purge_msg = b'YGG_PURGE'
 _global_context = zmq.Context.instance()
-
-
-def check_czmq():
-    r"""Determine if the necessary C/C++ libraries are installed for ZeroMQ.
-
-    Returns:
-        bool: True if the libraries are installed, False otherwise.
-
-    """
-    # Check that the libraries are installed
-    if platform._is_win:  # pragma: windows
-        opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
-                'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
-        for o in opts:
-            if not ygg_cfg.get('windows', o, None):  # pragma: debug
-                warnings.warn("Config option %s not set." % o)
-                return False
-        return True
-    else:
-        if platform._is_mac:
-            cc = 'clang'
-        else:
-            cc = 'gcc'
-        cc = os.environ.get('CC', cc)
-        try:
-            process = subprocess.Popen([cc, '-lzmq', '-lczmq'],
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-            outs, errs = process.communicate()
-        except OSError:  # pragma: debug
-            return False
-        # Python 3
-        # try:
-        #     outs, errs = process.communicate(timeout=15)
-        # except subprocess.TimeoutExpired:
-        #     process.kill()
-        #     outs, errs = process.communicate()
-        return (b'zmq' not in errs)
-
-
-_zmq_installed_c = check_czmq()
 
 
 def get_ipc_host():

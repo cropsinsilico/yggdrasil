@@ -1,7 +1,9 @@
 import os
+from yggdrasil.tests import extra_example
 from yggdrasil.examples.tests import TestExample
 
 
+@extra_example
 class TestExampleGS4b(TestExample):
     r"""Test the Getting Started Lesson 4b example."""
 

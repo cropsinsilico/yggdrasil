@@ -917,6 +917,11 @@ definitions:
           items:
             type: string
           type: array
+        configuration:
+          default: Release
+          description: Build type/configuration that should be built. Defaults to
+            'Release'.
+          type: string
         driver:
           description: '[DEPRECATED] Name of driver class that should be used.'
           type: string
@@ -1032,6 +1037,15 @@ definitions:
           description: Source files that should be compiled into an executable. Defaults
             to an empty list and the driver will search for a source file based on
             the model executable (the first model argument).
+          items:
+            type: string
+          type: array
+        source_products:
+          default: []
+          description: Files created by running the model that are source files. These
+            files will be removed without checking their extension so users should
+            avoid adding files to this list unless they are sure they should be deleted.
+            Defaults to [].
           items:
             type: string
           type: array
@@ -1331,6 +1345,11 @@ definitions:
             items:
               type: string
             type: array
+          configuration:
+            default: Release
+            description: Build type/configuration that should be built. Defaults to
+              'Release'.
+            type: string
           language:
             default: executable
             description: Model is written in C/C++ and has a CMake build system.

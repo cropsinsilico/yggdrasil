@@ -8,7 +8,7 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
-from yggdrasil.drivers.ModelDriver import ModelDriver, _map_language_ext
+from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
 from yggdrasil.components import import_component
 
 
@@ -208,6 +208,15 @@ class CompilationToolBase(object):
         search_regex (list): Regex strings that should be used to locate paths
             in the output from running the tool executable with the
             search_path_flags.
+        product_exts (list): List of extensions that will be added to the
+            output file's base to get a list of products that might be produced
+            by calling the compilation tool.
+        product_files (list): List of file basenames that will be joined with
+            the directory containing each output to get a list of products that
+            might be produced by calling the compilation tool.
+        remove_product_exts (list): List of extensions or directories matching
+            entries in product_exts and product_files that should be removed
+            during cleanup. Be careful when adding files to this list.
 
     """
 
@@ -237,6 +246,10 @@ class CompilationToolBase(object):
     search_regex_end = None
     search_regex = ['([^\n]+)']
     version_flags = ['--version']
+    product_exts = []
+    product_files = []
+    source_product_exts = []
+    remove_product_exts = []
 
     _language_ext = None  # only update once per class
     
@@ -264,8 +277,11 @@ class CompilationToolBase(object):
             env = getattr(cls, '%s_env' % k, None)
             if env is not None:
                 if k in ['default_flags']:
+                    if not isinstance(env, list):
+                        env = [env]
                     old_val = getattr(cls, k, [])
-                    old_val += os.environ.get(env, '').split()
+                    for ienv in env:
+                        old_val += os.environ.get(ienv, '').split()
                 else:
                     setattr(cls, k, os.environ.get(env, getattr(cls, k)))
         # Set default_executable to name
@@ -275,11 +291,6 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             if not cls.default_executable.endswith('.exe'):
                 cls.default_executable += '.exe'
-
-    @classmethod
-    def get_all_language_ext(cls):
-        r"""Return the list of all language extensions."""
-        return list(_map_language_ext.keys())
 
     @classmethod
     def get_language_ext(cls):
@@ -316,7 +327,21 @@ class CompilationToolBase(object):
             existing = {}
             existing.update(os.environ)
         return existing
-    
+
+    @classmethod
+    def write_wrappers(cls, **kwargs):
+        r"""Write any wrappers needed to compile and/or run a model.
+
+        Args:
+            **kwargs: Keyword arguments are ignored (only included to
+               allow cascade from child classes).
+
+        Returns:
+            list: Full paths to any created wrappers.
+
+        """
+        return []
+        
     @classmethod
     def file2base(cls, fname):
         r"""Determine basename from path.
@@ -630,6 +655,83 @@ class CompilationToolBase(object):
         return cmd
 
     @classmethod
+    def remove_products(cls, src, new):
+        r"""Remove products produced during compilation.
+
+        Args:
+            src (list): Input arguments to compilation call that was used to
+                generate the output file (usually one or more source files).
+            new (str): The full path to the primary product of the compilation
+                call (usually an object, executable, or library).
+
+        """
+        products = []
+        cls.append_product(products, src, new)
+        source_products = cls.get_source_products(products)
+        remove_products(products, source_products)
+
+    @classmethod
+    def get_source_products(cls, products, source_products=[]):
+        r"""Get the list of products that should be removed without checking
+        for source files based on cls.remove_product_exts.
+
+        Args:
+            products (list): List of products that should be checked against
+                cls.remove_product_exts.
+            source_products (list, optional): Existing list of products that
+                new source_products should be added to. Defaults to [].
+
+        Returns:
+            list: Products that should be removed without checking for source
+                files.
+
+        """
+        remove_ext = tuple(cls.remove_product_exts)
+        for x in products:
+            if x.endswith(remove_ext) and (x not in source_products):
+                source_products.append(x)
+        return source_products
+
+    @classmethod
+    def append_product(cls, products, src, new, new_dir=None,
+                       dont_append_src=False):
+        r"""Append a product to the specified list along with additional values
+        indicated by cls.product_exts.
+
+        Args:
+            products (list): List of of existing products that new product
+                should be appended to.
+            src (list): Input arguments to compilation call that was used to
+                generate the output file (usually one or more source files).
+            new (str): New product that should be appended to the list.
+            new_dir (str, optional): Directory that should be used as base when
+                adding files listed in cls.product_files. Defaults to
+                os.path.dirname(new).
+            dont_append_src (bool, optional): If True and src is in the list of
+                products, it will be removed. Defaults to False.
+
+        """
+        products.append(new)
+        # Add products based on extensions
+        new_base = os.path.splitext(new)[0]
+        for ext in cls.product_exts:
+            inew = new_base + ext
+            if inew not in products:
+                products.append(inew)
+        # Add products based on directory
+        if new_dir is None:
+            new_dir = os.path.dirname(new)
+        for base in cls.product_files:
+            inew = os.path.join(new_dir, base)
+            if inew not in products:
+                products.append(inew)
+        # Make sure the source is not in the product list
+        if dont_append_src:
+            for isrc in src:
+                if isrc in products:  # pragma: debug
+                    products.remove(isrc)
+
+    @classmethod
     def call(cls, args, language=None, skip_flags=False, dry_run=False,
              out=None, overwrite=False, products=None, allow_error=False,
              working_dir=None, additional_args=None, **kwargs):
@@ -709,20 +811,11 @@ class CompilationToolBase(object):
             assert(out not in args)  # Don't remove source files
             # Check for file
             if overwrite and (not dry_run):
-                if os.path.isfile(out):
-                    if os.path.splitext(out)[-1] in cls.get_all_language_ext():
-                        raise RuntimeError("Source file will not be overwritten: "
-                                           + out)
-                    os.remove(out)
-                    # raise RuntimeError("Output already exists: %s" % out)
-                elif os.path.isdir(out):
-                    if not os.listdir(out):
-                        os.rmdir(out)
-                    else:  # pragma: debug
-                        raise RuntimeError("Output directory %s is not empty: %s."
-                                           % (out, os.listdir(out)))
+                cls.remove_products(args, out)
+                if os.path.isfile(out) or os.path.isdir(out):  # pragma: debug
+                    raise RuntimeError("Product not removed: %s" % out)
             if (not dry_run) and (os.path.isfile(out) or os.path.isdir(out)):
-                products.append(out)
+                cls.append_product(products, args, out)
                 return out
             kwargs['outfile'] = out
         # Get command
@@ -736,12 +829,14 @@ class CompilationToolBase(object):
                 return ''
             else:
                 if out != 'clean':
-                    products.append(out)
+                    cls.append_product(products, args, out)
                 return out
         # Run command
         output = ''
         try:
             unused_kwargs.setdefault('env', cls.set_env())
+            if cls.toolname == 'cmake':
+                logger.info('Command: "%s"' % ' '.join(cmd))
             logger.debug('Command: "%s"' % ' '.join(cmd))
             proc = tools.popen_nobuffer(cmd, **unused_kwargs)
             output, err = proc.communicate()
@@ -752,7 +847,7 @@ class CompilationToolBase(object):
                                    % (' '.join(cmd), proc.returncode))
             try:
                 logger.debug(' '.join(cmd) + '\n' + output)
-            except UnicodeDecodeError:
+            except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(output)
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
@@ -769,7 +864,7 @@ class CompilationToolBase(object):
                                        % (cls.tooltype.title(), cls.toolname, out))
                 logger.debug("%s %s produced %s"
                              % (cls.tooltype.title(), cls.toolname, out))
-                products.append(out)
+                cls.append_product(products, args, out)
             return out
         return output
 
@@ -868,6 +963,7 @@ class CompilerBase(CompilationToolBase):
                 cls.default_linker = cls.toolname
             copy_attr = ['toolname', 'aliases', 'languages', 'platforms',
                          'default_executable', 'default_executable_env']
+            # 'product_exts', 'product_files']
             linker_name = '%sLinker' % cls.__name__.split('Compiler')[0]
             linker_attr = copy.deepcopy(cls.linker_attributes)
             linker_attr.setdefault('toolname', cls.default_linker)
@@ -1138,7 +1234,7 @@ class CompilerBase(CompilationToolBase):
             # Compile each source
             kwargs_link = {}
             if not dont_link:
-                kwargs_link = tool.extract_kwargs(kwargs)
+                kwargs_link = tool.extract_kwargs(kwargs, compiler=cls)
             else:
                 kwargs.pop('linker_language', None)
             obj_list = []
@@ -1158,7 +1254,10 @@ class CompilerBase(CompilationToolBase):
             return super(CompilerBase, cls).call(args, skip_flags=skip_flags,
                                                  out=out, **kwargs)
         else:
-            kwargs_link = tool.extract_kwargs(kwargs)
+            kwargs_link = tool.extract_kwargs(kwargs, compiler=cls)
+            if (tool.tooltype != 'linker') and ('linker_language' in kwargs):
+                kwargs_link[tool.tooltype + '_language'] = kwargs.pop(
+                    'linker_language')
             out_comp = super(CompilerBase, cls).call(args, dont_link=True,
                                                      out=None, **kwargs)
             return tool.call(out_comp, out=out, additional_args=additional_objs,
@@ -1239,7 +1338,8 @@ class LinkerBase(CompilationToolBase):
         return libname
 
     @classmethod
-    def extract_kwargs(cls, kwargs):
+    def extract_kwargs(cls, kwargs, compiler=None, add_kws_link=[],
+                       add_kws_both=[]):
         r"""Extract linker kwargs, leaving behind just compiler kwargs.
 
         Args:
@@ -1247,6 +1347,15 @@ class LinkerBase(CompilationToolBase):
                 be sorted into kwargs used by either the compiler or linker or
                 both. Keywords that are not used by the compiler will be removed
                 from this dictionary.
+            compiler (CompilerBase, optional): Compiler tool that linker kwargs
+                are being extracted in order to call. Defaults to None and is
+                ignored.
+            add_kws_link (list, optional): Addition keywords that should be
+                added to the list of those reserved for the linker. Defaults to
+                [].
+            add_kws_both (list, optional): Additional keywords that should be
+                added to the list of those that are valid for both the linker
+                and compiler. Defaults to [].
 
         Returns:
             dict: Keyword arguments that should be passed to the linker.
@@ -1257,7 +1366,20 @@ class LinkerBase(CompilationToolBase):
                     'libraries', 'library_dirs', 'library_libs', 'library_flags']
         kws_both = ['overwrite', 'products', 'allow_error', 'dry_run',
                     'working_dir']
+        kws_link += add_kws_link
+        kws_both += add_kws_both
         kwargs_link = {}
+        # Add kwargs from flag_options
+        flag_options_comp = []
+        if compiler is not None:
+            flag_options_comp = list(compiler.flag_options.keys())
+        for k in cls.flag_options.keys():
+            if (k in kws_link) or (k in kws_both):
+                continue
+            if k in flag_options_comp:
+                kws_both.append(k)
+            else:
+                kws_link.append(k)
         # Move kwargs unique to linker
         for k in kws_link:
             if k in kwargs:
@@ -1467,6 +1589,32 @@ class ArchiverBase(LinkerBase):
         """
         kwargs['build_library'] = True
         return super(ArchiverBase, cls).get_output_file(obj, **kwargs)
+
+    
+class BuildToolBase(CompilerBase):  # pragma: in progress
+    r"""Base class for build tools which are used to coordinate compilation.
+
+    Args:
+        buildfile (str, optional): File containing information about the build.
+            Defaults to default_buildfile class attribute, if set.
+        builddir (str, optional): Directory where build files should be placed.
+            Defaults to directory where build is called.
+        sourcedir (str, optional): Directory where source files are stored.
+            Defaults to directory where build is called.
+        target (str, optional): Build target. If not provided, build will be
+            created without a target.
+
+    Class Attributes:
+
+    """
+    tooltype = 'buildtool'
+    flag_options = OrderedDict()
+    default_buildfile = None
+    _schema_properties = {
+        'buildfile': {'type': 'string'},
+        'builddir': {'type': 'string'},
+        'sourcedir': {'type': 'string'},
+        'target': {'type': 'string'}}
     
 
 class DummyLinkerBase(LinkerBase):
@@ -1561,15 +1709,6 @@ class CompiledModelDriver(ModelDriver):
     def __init__(self, name, args, skip_compile=False, **kwargs):
         kwargs.setdefault('overwrite', (not kwargs.pop('preserve_cache', False)))
         super(CompiledModelDriver, self).__init__(name, args, **kwargs)
-        # Set defaults from attributes
-        for k0 in ['compiler', 'linker', 'archiver']:
-            for k in [k0, '%s_flags' % k0]:
-                v = getattr(self, k, None)
-                if v is None:
-                    setattr(self, k, getattr(self, 'default_%s' % k))
-        # Set tools so that they are cached
-        for k in ['compiler', 'linker', 'archiver']:
-            setattr(self, '%s_tool' % k, self.get_tool(k))
         # Compile
         if not skip_compile:
             try:
@@ -1592,6 +1731,16 @@ class CompiledModelDriver(ModelDriver):
                 class's method.
 
         """
+        # Set defaults from attributes
+        for k0 in ['compiler', 'linker', 'archiver']:
+            for k in [k0, '%s_flags' % k0]:
+                v = getattr(self, k, None)
+                if v is None:
+                    setattr(self, k, getattr(self, 'default_%s' % k))
+        # Set tools so that they are cached
+        for k in ['compiler', 'linker', 'archiver']:
+            setattr(self, '%s_tool' % k, self.get_tool_instance(k))
+            self.get_tool_instance(k)
         super(CompiledModelDriver, self).parse_arguments(args, **kwargs)
         # Handle case where provided argument is source and not executable
         # and case where provided argument is executable, but source files are
@@ -1604,7 +1753,7 @@ class CompiledModelDriver(ModelDriver):
                 self.source_files.append(self.model_file)
         else:
             if len(model_ext) == 0:
-                self.model_file += self.get_tool('linker').executable_ext
+                self.model_file += self.get_tool_instance('linker').executable_ext
             else:
                 # Assert that model file is not source code in any of the
                 # registered languages
@@ -1628,25 +1777,19 @@ class CompiledModelDriver(ModelDriver):
                                   + self.language_ext[0])
                 self.source_files.append(self.model_src)
         # Add intermediate files and executable by doing a dry run
-        kwargs = dict(products=[], dry_run=True)
+        kwargs = dict(products=self.products, dry_run=True)
         if model_is_source:
             kwargs['out'] = None
         out = self.compile_model(**kwargs)
         if model_is_source:
             self.debug('Determined model file: %s', out)
             self.model_file = out
-        for x in kwargs['products']:
-            if self.language_ext is not None:
-                x_ext = os.path.splitext(x)[-1]
-                if x_ext in self.language_ext:  # pragma: debug
-                    raise Exception("Product is source file: '%s'" % x)
-            if x not in self.products:
-                self.products.append(x)
-        if self.language_ext is not None:
-            assert(os.path.splitext(self.model_file)[-1] not in self.language_ext)
+        # Adjust products
+        self.get_tool_instance('compiler').get_source_products(
+            self.products, source_products=self.source_products)
         self.debug("source_files: %s", str(self.source_files))
         self.debug("model_file: %s", self.model_file)
-        
+
     @staticmethod
     def after_registration(cls):
         r"""Operations that should be performed to modify class attributes after
@@ -1695,6 +1838,23 @@ class CompiledModelDriver(ModelDriver):
                 if (default_tool_name is not None) and (k == 'compiler'):
                     compiler = get_compilation_tool(k, default_tool_name)
 
+    def write_wrappers(self, **kwargs):
+        r"""Write any wrappers needed to compile and/or run a model.
+
+        Args:
+            **kwargs: Keyword arguments are passed to the parent class's method.
+
+        Returns:
+            list: Full paths to any created wrappers.
+
+        """
+        out = super(CompiledModelDriver, self).write_wrappers(**kwargs)
+        kwargs.setdefault('logging_level', self.logger.getEffectiveLevel())
+        for k in self._schema_properties.keys():
+            kwargs.setdefault(k, getattr(self, k, None))
+        out += self.get_tool_instance('compiler').write_wrappers(**kwargs)
+        return out
+        
     def model_command(self):
         r"""Return the command that should be used to run the model.
 
@@ -1724,8 +1884,8 @@ class CompiledModelDriver(ModelDriver):
         reg = get_compilation_tool_registry(tooltype).get('by_language', {})
         return copy.deepcopy(reg.get(cls.language, {}))
 
-    @classmethod
-    def get_tool(cls, tooltype, return_prop='tool'):
+    @staticmethod
+    def get_tool_static(cls, tooltype, return_prop='tool'):
         r"""Get the class associated with the specified compilation tool for
         this language.
 
@@ -1783,6 +1943,35 @@ class CompiledModelDriver(ModelDriver):
             return out.flags
         else:
             raise ValueError("Invalid return_prop: '%s'" % return_prop)
+
+    def get_tool_instance(self, *args, **kwargs):
+        r"""Get tool from a driver instance.
+
+        Args:
+            *args: Arguments are passed to the get_tool_static method.
+            **kwargs: Keyword arguments are passed to the get_tool_static method.
+
+        Returns:
+            CompilationToolBase: Class providing an interface to the specified
+                compilation tool.
+
+        """
+        return CompiledModelDriver.get_tool_static(self, *args, **kwargs)
+        
+    @classmethod
+    def get_tool(cls, *args, **kwargs):
+        r"""Get tool from a driver class.
+
+        Args:
+            *args: Arguments are passed to the get_tool_static method.
+            **kwargs: Keyword arguments are passed to the get_tool_static method.
+
+        Returns:
+            CompilationToolBase: Class providing an interface to the specified
+                compilation tool.
+
+        """
+        return CompiledModelDriver.get_tool_static(cls, *args, **kwargs)
 
     @classmethod
     def get_external_libraries(cls, no_comm_libs=False):
@@ -2439,7 +2628,7 @@ class CompiledModelDriver(ModelDriver):
         """
         out = super(CompiledModelDriver, self).set_env()
         if for_compile:
-            compiler = self.get_tool('compiler')
+            compiler = self.get_tool_instance('compiler')
             out = compiler.set_env(existing=out,
                                    logging_level=self.logger.getEffectiveLevel())
         return out
@@ -2495,7 +2684,7 @@ class CompiledModelDriver(ModelDriver):
         return self.call_compiler(source_files, **kwargs)
     
     @classmethod
-    def call_compiler(cls, src, language=None, **kwargs):
+    def call_compiler(cls, src, language=None, dont_build=None, **kwargs):
         r"""Compile a source file into an executable or linkable object file,
         checking for errors.
 
@@ -2511,6 +2700,9 @@ class CompiledModelDriver(ModelDriver):
             dont_link (bool, optional): If True, the command will result in a
                 linkable object file rather than an executable. Defaults to
                 False.
+            dont_build (bool, optional): If True, cmake configuration/generation
+                will be run, but the project will not be built. Defaults to
+                None. If provided, this overrides dont_link.
             overwrite (bool, optional): If True, the existing compile file will
                 be overwritten. Otherwise, it will be kept and this function
                 will return without recompiling the source file.
@@ -2532,6 +2724,8 @@ class CompiledModelDriver(ModelDriver):
                 output file.
 
         """
+        if dont_build is not None:
+            kwargs['dont_link'] = dont_build
         language = kwargs.pop('compiler_language', language)
         # Compile using another driver if the language dosn't match
         if (language is not None) and (language != cls.language):

@@ -1,7 +1,9 @@
 import os
+from yggdrasil.tests import extra_example
 from yggdrasil.examples.tests import TestExample
 
 
+@extra_example
 class TestExampleSaM(TestExample):
     r"""Test the SaM example."""
 

@@ -89,8 +89,13 @@ class CPPModelDriver(CModelDriver):
     def after_registration(cls):
         r"""Operations that should be performed to modify class attributes after
         registration."""
-        if platform._is_mac and (cls.default_compiler is None):
-            cls.default_compiler = 'clang++'
+        if cls.default_compiler is None:
+            if platform._is_linux:
+                cls.default_compiler = 'g++'
+            elif platform._is_mac:
+                cls.default_compiler = 'clang++'
+            elif platform._is_win:  # pragma: windows
+                cls.default_compiler = 'cl'
         cls.function_param['print'] = 'std::cout << "{message}" << std::endl;'
         CModelDriver.after_registration(cls)
         internal_libs = copy.deepcopy(cls.internal_libraries)
