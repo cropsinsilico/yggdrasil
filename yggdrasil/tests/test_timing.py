@@ -31,8 +31,6 @@ _testfile_dat = 'test_run123.dat'
 
 def test_get_source():
     r"""Test getting source file for test."""
-    from yggdrasil.tests import enable_long_tests
-    print("**88**YGG_ENABLE_LONG_TESTS", enable_long_tests)
     lang_list = timing.get_lang_list()
     dir_list = ['src', 'dst']
     for l in lang_list:
@@ -104,7 +102,6 @@ class TimedRunTestBase(YggTestClass):
     def check_filename(self):
         r"""Raise a unittest.SkipTest error if the filename dosn't exist."""
         if not os.path.isfile(self.filename):  # pragma: debug
-            print("no file", self.filename)
             raise unittest.SkipTest("Performance stats file dosn't exist: %s"
                                     % self.filename)
 
@@ -121,6 +118,8 @@ class TimedRunTestBase(YggTestClass):
         self.instance.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@unittest.skipIf(not tools.check_environ_bool("YGG_TEST_PRODUCTION_RUNS"),
+                 'YGG_TEST_PRODUCTION_RUNS not set')
 @long_running
 class TestTimedRun(TimedRunTestBase):
     r"""Test class for the TimedRun class using existing data."""
@@ -320,22 +319,22 @@ class TestTimedRunTemp(TimedRunTestBase):
         self.instance.remove_entry(self.entry_name)
         assert(not self.instance.has_entry(self.entry_name))
 
-    def test_languages(self):
-        r"""Test different combinations of source/destination languages."""
-        kwargs = copy.deepcopy(self.inst_kwargs)
-        for l1 in timing.get_lang_list():
-            args = (l1, l1)
-            x = timing.TimedRun(*args, **kwargs)
-            x.time_run(*self.time_run_args, **self.time_run_kwargs)
+    # def test_languages(self):
+    #     r"""Test different combinations of source/destination languages."""
+    #     kwargs = copy.deepcopy(self.inst_kwargs)
+    #     for l1 in timing.get_lang_list():
+    #         args = (l1, l1)
+    #         x = timing.TimedRun(*args, **kwargs)
+    #         x.time_run(*self.time_run_args, **self.time_run_kwargs)
 
-    def test_comm_types(self):
-        r"""Test different comm types."""
-        args = copy.deepcopy(self.inst_args)
-        kwargs = copy.deepcopy(self.inst_kwargs)
-        for c in timing.get_comm_list():
-            kwargs['comm_type'] = c
-            x = timing.TimedRun(*args, **kwargs)
-            x.time_run(*self.time_run_args, **self.time_run_kwargs)
+    # def test_comm_types(self):
+    #     r"""Test different comm types."""
+    #     args = copy.deepcopy(self.inst_args)
+    #     kwargs = copy.deepcopy(self.inst_kwargs)
+    #     for c in timing.get_comm_list():
+    #         kwargs['comm_type'] = c
+    #         x = timing.TimedRun(*args, **kwargs)
+    #         x.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
 @long_running
@@ -356,10 +355,10 @@ class TestTimedRunTempNoPerf(TestTimedRunTemp):
         r"""Disabled: Test perf_func."""
         pass
 
-    def test_languages(self):
-        r"""Disabled: Test different combinations of source/destination languages."""
-        pass
+    # def test_languages(self):
+    #     r"""Disabled: Test different combinations of source/destination languages."""
+    #     pass
 
-    def test_comm_types(self):
-        r"""Disabled: Test different comm types."""
-        pass
+    # def test_comm_types(self):
+    #     r"""Disabled: Test different comm types."""
+    #     pass
