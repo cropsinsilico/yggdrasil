@@ -208,7 +208,7 @@ class CMakeConfigure(CompilerBase):
             list: Full paths to any created wrappers.
 
         """
-        if sourcedir is None:
+        if sourcedir is None:  # pragma: debug
             sourcedir = '.'
         out = super(CMakeConfigure, cls).write_wrappers(**kwargs)
         if target is None:

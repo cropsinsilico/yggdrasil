@@ -8,8 +8,7 @@ import subprocess
 from collections import OrderedDict
 from yggdrasil import platform, backwards, tools, scanf
 from yggdrasil.config import ygg_cfg, locate_file
-from yggdrasil.drivers.ModelDriver import (
-    ModelDriver, _map_language_ext, remove_products)
+from yggdrasil.drivers.ModelDriver import ModelDriver, remove_products
 from yggdrasil.components import import_component
 
 
@@ -292,11 +291,6 @@ class CompilationToolBase(object):
         if platform._is_win:  # pragma: windows
             if not cls.default_executable.endswith('.exe'):
                 cls.default_executable += '.exe'
-
-    @classmethod
-    def get_all_language_ext(cls):
-        r"""Return the list of all language extensions."""
-        return list(_map_language_ext.keys())
 
     @classmethod
     def get_language_ext(cls):
@@ -853,7 +847,7 @@ class CompilationToolBase(object):
                                    % (' '.join(cmd), proc.returncode))
             try:
                 logger.debug(' '.join(cmd) + '\n' + output)
-            except UnicodeDecodeError:
+            except UnicodeDecodeError:  # pragma: debug
                 tools.print_encoded(output)
         except (subprocess.CalledProcessError, OSError) as e:
             if not allow_error:
