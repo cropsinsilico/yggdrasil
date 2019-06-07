@@ -319,23 +319,6 @@ class TestTimedRunTemp(TimedRunTestBase):
         self.instance.remove_entry(self.entry_name)
         assert(not self.instance.has_entry(self.entry_name))
 
-    # def test_languages(self):
-    #     r"""Test different combinations of source/destination languages."""
-    #     kwargs = copy.deepcopy(self.inst_kwargs)
-    #     for l1 in timing.get_lang_list():
-    #         args = (l1, l1)
-    #         x = timing.TimedRun(*args, **kwargs)
-    #         x.time_run(*self.time_run_args, **self.time_run_kwargs)
-
-    # def test_comm_types(self):
-    #     r"""Test different comm types."""
-    #     args = copy.deepcopy(self.inst_args)
-    #     kwargs = copy.deepcopy(self.inst_kwargs)
-    #     for c in timing.get_comm_list():
-    #         kwargs['comm_type'] = c
-    #         x = timing.TimedRun(*args, **kwargs)
-    #         x.time_run(*self.time_run_args, **self.time_run_kwargs)
-
 
 @long_running
 class TestTimedRunTempNoPerf(TestTimedRunTemp):
@@ -354,11 +337,3 @@ class TestTimedRunTempNoPerf(TestTimedRunTemp):
     def test_perf_func(self):
         r"""Disabled: Test perf_func."""
         pass
-
-    # def test_languages(self):
-    #     r"""Disabled: Test different combinations of source/destination languages."""
-    #     pass
-
-    # def test_comm_types(self):
-    #     r"""Disabled: Test different comm types."""
-    #     pass
