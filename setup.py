@@ -93,6 +93,7 @@ requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 "perf",
                 "pint; python_version == '2.7'",
                 "unyt; python_version >= '3.4'",
+                "six",
                 'sysv_ipc; platform_system != "Windows"']
 test_requirements = ['pytest']
 # optional_requirements = ["pika<1.0", "astropy"]
@@ -139,10 +140,12 @@ setup(
     ],
     entry_points={
         'console_scripts': ['yggrun=yggdrasil.command_line:yggrun',
+                            'cisrun=yggdrasil.command_line:yggrun',
                             'yggcc=yggdrasil.command_line:yggcc',
                             'yggccflags=yggdrasil.command_line:cc_flags',
                             'yggldflags=yggdrasil.command_line:ld_flags',
                             'yggtest=yggdrasil:run_tsts',
+                            'yggmetaschema=yggdrasil.command_line:regen_metaschema',
                             'yggschema=yggdrasil.command_line:regen_schema',
                             'yggbuildapi_c=yggdrasil.command_line:rebuild_c_api',
                             'yggconfig=yggdrasil.command_line:update_config',

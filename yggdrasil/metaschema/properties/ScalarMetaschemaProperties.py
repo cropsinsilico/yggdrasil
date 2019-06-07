@@ -1,7 +1,6 @@
 import numpy as np
 from yggdrasil import units, backwards, platform
 from yggdrasil.metaschema.datatypes import MetaschemaTypeError
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 from collections import OrderedDict
 
@@ -103,7 +102,6 @@ def definition2dtype(props):
     return out
 
 
-@register_metaschema_property
 class SubtypeMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'subtype' property."""
 
@@ -136,7 +134,6 @@ class SubtypeMetaschemaProperty(MetaschemaProperty):
         return schema
     
 
-@register_metaschema_property
 class PrecisionMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'precision' property."""
     
@@ -171,7 +168,6 @@ class PrecisionMetaschemaProperty(MetaschemaProperty):
         return schema
             
 
-@register_metaschema_property
 class UnitsMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'units' property."""
 

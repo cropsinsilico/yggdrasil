@@ -4,93 +4,55 @@ import pprint
 import yaml
 from collections import OrderedDict
 from jsonschema.exceptions import ValidationError
-from yggdrasil import metaschema
-from yggdrasil.drivers import import_all_drivers
-from yggdrasil.communication import import_all_comms
+from yggdrasil import metaschema, backwards
 
 
 _schema_fname = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '.ygg_schema.yml'))
 _schema = None
-_registry = {}
-_registry_complete = False
 
 
-def ordered_load(stream, Loader=yaml.Loader, object_pairs_hook=OrderedDict):
-    class OrderedLoader(Loader):
-        pass
-    
-    def construct_mapping(loader, node):
-        loader.flatten_mapping(node)
-        return object_pairs_hook(loader.construct_pairs(node))
-    
-    OrderedLoader.add_constructor(
-        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-        construct_mapping)
-    return yaml.load(stream, OrderedLoader)
+class SchemaDict(OrderedDict):
+    r"""OrderedDict subclass for ordering schemas on read in Python 2."""
+
+    def __repr__(self):
+        return pprint.pformat(dict(self))
 
 
-def ordered_dump(data, stream=None, Dumper=yaml.Dumper, **kwds):
-    class OrderedDumper(Dumper):
-        pass
-    
-    def _dict_representer(dumper, data):
-        return dumper.represent_mapping(
-            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-            data.items())
-    
-    OrderedDumper.add_representer(OrderedDict, _dict_representer)
-    return yaml.dump(data, stream, OrderedDumper, **kwds)
+def ordered_load(stream, object_pairs_hook=SchemaDict, **kwargs):
+    r"""Load YAML document from a file using a specified class to represent
+    mapping types that allows for ordering.
 
-
-def register_component(component_class):
-    r"""Decorator for registering a class as a yaml component."""
-    global _registry
-    yaml_typ = component_class._schema_type
-    if yaml_typ not in _registry:
-        _registry[yaml_typ] = []
-    if component_class not in _registry[yaml_typ]:
-        _registry[yaml_typ].insert(0, component_class)
-        # _registry[yaml_typ].append(component_class)
-    return component_class
-
-
-def inherit_schema(orig, new_values=None, remove_keys=None, **kwargs):
-    r"""Create an inherited schema, adding new value to accepted ones for
-    dependencies.
-    
     Args:
-        orig (dict): Schema that will be inherited.
-        new_values (dict, optional): Dictionary of new values to add. Defaults
-            to None and is ignored.
-        remove_keys (list, optional): Keys that should be removed form orig before
-            adding the new keys. Defaults to empty list.
-        **kwargs: Additional keyword arguments will be added to the schema
-            with dependency on the provided key/value pair.
+        stream (file): File stream to load the schema YAML from.
+        object_pairs_hook (type, optional): Class that should be used to
+            represent loaded maps. Defaults to SchemaDict.
+        **kwargs: Additional keyword arguments are passed to decode_yaml.
 
     Returns:
-        dict: New schema.
+        object: Result of ordered load.
 
     """
-    if remove_keys is None:
-        remove_keys = []
-    out = copy.deepcopy(orig)
-    for k in remove_keys:
-        if k in out:
-            out.pop(k)
-    if new_values is not None:
-        out.update(new_values)
-    out.update(**kwargs)
+    kwargs['sorted_dict_type'] = object_pairs_hook
+    out = metaschema.encoder.decode_yaml(stream, **kwargs)
+    out = backwards.as_str(out, recurse=True, allow_pass=True)
     return out
 
 
-def init_registry():
-    r"""Initialize the registries and schema."""
-    global _registry_complete
-    if not _registry_complete:
-        import_all_drivers()
-        import_all_comms()
-        _registry_complete = True
+def ordered_dump(data, **kwargs):
+    r"""Dump object as a YAML document, representing SchemaDict objects as
+    mapping type.
+
+    Args:
+        data (object): Python object that should be dumped.
+        **kwargs: Additional keyword arguments are passed to encode_yaml.
+
+    Returns:
+        str: YAML document representating data.
+
+    """
+    kwargs['sorted_dict_type'] = [SchemaDict, OrderedDict]
+    return metaschema.encoder.encode_yaml(data, **kwargs)
 
 
 def clear_schema():
@@ -108,9 +70,16 @@ def init_schema(fname=None):
 
 def create_schema():
     r"""Create a new schema from the registry."""
-    global _registry, _registry_complete
-    init_registry()
-    x = SchemaRegistry(_registry)
+    from yggdrasil.components import init_registry
+    try:
+        old_env = os.environ.get('YGG_RUNNING_YGGSCHEMA', None)
+        os.environ['YGG_RUNNING_YGGSCHEMA'] = '1'
+        x = SchemaRegistry(init_registry())
+    finally:
+        if old_env is None:
+            del os.environ['YGG_RUNNING_YGGSCHEMA']
+        else:  # pragma: no cover
+            os.environ['YGG_RUNNING_YGGSCHEMA'] = old_env
     return x
 
 
@@ -160,73 +129,123 @@ class ComponentSchema(object):
 
     Args:
         schema_type (str): The name of the component.
+        subtype_key (str): The name of the schema property/class attribute
+            that should be used to differentiate between subtypes of this
+            component.
         schema_registry (SchemaRegistry, optional): Registry of schemas
             that this schema is dependent on.
         **kwargs: Additional keyword arguments are entries in the component
             schema.
 
-    """
-    _subtype_keys = {'model': 'language', 'comm': 'commtype', 'file': 'filetype',
-                     'connection': 'connection_type'}
+    Args:
+        schema_type (str): The name of the component.
+        schema_registry (SchemaRegistry): Registry of schemas.
+        subtype_key (str): Schema property that is used to differentiate between
+            subtypes of this component.
+        schema_subtypes (dict): Mapping between component class names and the
+            associated values of the subtype_key property for this component.
 
-    def __init__(self, schema_type, schema_registry=None, schema_subtypes=None):
-        self._storage = OrderedDict()
+    """
+    # _subtype_keys = {'model': 'language', 'comm': 'commtype', 'file': 'filetype',
+    #                  'connection': 'connection_type'}
+
+    def __init__(self, schema_type, subtype_key,
+                 schema_registry=None, schema_subtypes=None):
+        self._storage = SchemaDict()
         self._base_schema = None
         self.schema_registry = schema_registry
         self.schema_type = schema_type
-        self.subtype_keys = self._subtype_keys[schema_type]
-        if not isinstance(self.subtype_keys, tuple):
-            self.subtype_keys = (self.subtype_keys, )
+        self.subtype_key = subtype_key
         if schema_subtypes is None:
             schema_subtypes = {}
         self.schema_subtypes = schema_subtypes
         super(ComponentSchema, self).__init__()
 
+    def get_subtype_schema(self, subtype, unique=False, relaxed=False):
+        r"""Get the schema for the specified subtype.
+
+        Args:
+            subtype (str): Component subtype to return schema for. If 'base',
+                the schema for evaluating the component base will be returned.
+            unique (bool, optional): If True, the returned schema will only
+                contain properties that are specific to the specified subtype.
+                If subtype is 'base', these will be properties that are valid
+                for all of the registerd subtypes. Defaults to False.
+
+        Returns:
+            dict: Schema for specified subtype.
+
+        """
+        if subtype == 'base':
+            out = copy.deepcopy(self._base_schema)
+            # Add additional properties that apply to specific subtypes
+            if not unique:
+                out['additionalProperties'] = False
+                for x in self._storage.values():
+                    for k, v in x['properties'].items():
+                        if (k != self.subtype_key) and (k not in out['properties']):
+                            out['properties'][k] = copy.deepcopy(v)
+        else:
+            if subtype not in self._storage:
+                s2c = self.subtype2class
+                if subtype in s2c:
+                    subtype = s2c[subtype]
+            out = copy.deepcopy(self._storage[subtype])
+            # Remove properties that apply to all subtypes
+            if unique:
+                out['additionalProperties'] = True
+                if 'required' in out:
+                    out['required'] = list(set(out['required'])
+                                           - set(self._base_schema['required']))
+                    if not out['required']:
+                        del out['required']
+                for k in self._base_schema['properties'].keys():
+                    if (k != self.subtype_key) and (k in out['properties']):
+                        del out['properties'][k]
+                if not out['properties']:  # pragma: no cover
+                    del out['properties']
+        if relaxed:
+            out['additionalProperties'] = True
+        return out
+
+    def get_schema(self, relaxed=False):
+        r"""Get the schema defining this component.
+
+        Args:
+            relaxed (bool, optional): If True, the returned schema (and any
+                definitions it includes) are relaxed to allow for objects with
+                objects with additional properties to pass validation. Defaults
+                to False.
+
+        Returns:
+            dict: Schema for this component.
+
+        """
+        r"""dict: Schema for this component."""
+        out = {'description': 'Schema for %s components.' % self.schema_type,
+               'title': self.schema_type,
+               'allOf': [self.get_subtype_schema('base', relaxed=relaxed),
+                         {'anyOf': [self.get_subtype_schema(x, unique=True)
+                                    for x in self._storage.keys()]}]}
+        return out
+
     @property
     def schema(self):
         r"""dict: Schema for this component."""
-        out = {'description': 'Schema for %s components.' % self.schema_type,
-               'title': self.schema_type, '$id': '#%s' % self.schema_type}
-        combo = {'allOf': [copy.deepcopy(self._base_schema),
-                           {'anyOf': []}]}
-        prop_default = combo['allOf'][0]['properties']
-        for subt in self.subtype_keys:
-            prop_default.setdefault(subt, {})
-            prop_default[subt]['enum'] = []
-        # Get list of properties for each subtype and move properties to
-        # base for brevity
-        for k in sorted(self._storage.keys()):
-            v0 = self._storage[k]
-            v = copy.deepcopy(v0)
-            combo['allOf'][1]['anyOf'].append(v)
-            for p in v['properties'].keys():
-                if p in self.subtype_keys:
-                    prop_default[p]['enum'] += v['properties'][p]['enum']
-                elif p not in prop_default:
-                    prop_default[p] = v['properties'][p]
-            # for subt in self.subtype_keys:
-            #     prop_default[subt]['enum'] += v['properties'][subt]['enum']
-        for subt in self.subtype_keys:
-            prop_default[subt]['enum'] = sorted(list(set(prop_default[subt]['enum'])))
-        out.update(**combo)
-        return out
+        return self.get_schema()
 
     @property
     def full_schema(self):
         r"""dict: Schema for evaluating YAML input file that fully specifies
         the properties for each component."""
-        out = self.schema
-        del out['allOf'][0]['additionalProperties']
-        prop_default = out['allOf'][0]['properties']
-        # Remove subtype specific properties from the default
-        for x in out['allOf'][1]['anyOf']:
-            for p in x['properties'].keys():
-                if (p in prop_default) and (p not in self.subtype_keys):
-                    del prop_default[p]
-        # Update subtype properties to include base properties
-        for x in out['allOf'][1]['anyOf']:
-            x['properties'].update(copy.deepcopy(prop_default))
-            x['additionalProperties'] = False
+        # TODO: Could be simplified to just 'anyOf' for subtypes, but need
+        # to reconcile that with schema normalization which uses the
+        # position in the schema
+        out = {'description': 'Schema for %s components.' % self.schema_type,
+               'title': self.schema_type,
+               'allOf': [self.get_subtype_schema('base', unique=True),
+                         {'anyOf': [self.get_subtype_schema(x)
+                                    for x in self._storage.keys()]}]}
         return out
 
     @classmethod
@@ -241,17 +260,35 @@ class ComponentSchema(object):
 
         """
         schema_type = schema['title']
-        out = cls(schema_type, schema_registry=schema_registry)
-        out._base_schema = schema['allOf'][0]
         subt_schema = schema['allOf'][1]['anyOf']
+        # Determine subtype key
+        subt_overlap = set(list(subt_schema[0]['properties'].keys()))
+        subt_props = copy.deepcopy(subt_overlap)
+        for v in subt_schema[1:]:
+            ikeys = set(list(v['properties'].keys()))
+            subt_props |= ikeys
+            subt_overlap &= ikeys
+        assert(len(subt_overlap) == 1)
+        subtype_key = list(subt_overlap)[0]
+        assert(subtype_key in schema['allOf'][0]['properties'])
+        # Initialize schema
+        out = cls(schema_type, subtype_key, schema_registry=schema_registry)
+        out._base_schema = schema['allOf'][0]
         for v in subt_schema:
             out._storage[v['title']] = v
-            # if schema_type == 'connection':
-            #     subtypes = [
-            #         tuple([v['properties'][k]['enum'][0] for k in out.subtype_keys])]
-            # else:
-            subtypes = v['properties'][out.subtype_keys[0]]['enum']
+            subtypes = v['properties'][out.subtype_key]['enum']
             out.schema_subtypes[v['title']] = subtypes
+        # Remove subtype specific properties
+        for k in subt_props:
+            if k != out.subtype_key:
+                del out._base_schema['properties'][k]
+        out._base_schema['additionalProperties'] = True
+        # Update subtype properties with general properties
+        for x in out._storage.values():
+            for k, v in out._base_schema['properties'].items():
+                if k != out.subtype_key:
+                    x['properties'][k] = copy.deepcopy(v)
+            x['additionalProperties'] = False
         return out
 
     @classmethod
@@ -268,20 +305,17 @@ class ComponentSchema(object):
             ComponentSchema: Schema with information from classes.
 
         """
-        out = cls(schema_type, **kwargs)
-        for x in schema_classes:
+        out = None
+        for x in schema_classes.values():
+            if out is None:
+                out = cls(schema_type, x._schema_subtype_key, **kwargs)
             out.append(x)
         return out
 
     @property
     def properties(self):
         r"""list: Valid properties for this component."""
-        out = []
-        if self._base_schema is not None:
-            out = list(self._base_schema['properties'].keys())
-        for v in self._storage.values():
-            out += list(v['properties'].keys())
-        return sorted(list(set(out)))
+        return sorted(list(self.get_subtype_schema('base')['properties'].keys()))
 
     def get_subtype_properties(self, subtype):
         r"""Get the valid properties for a specific subtype.
@@ -293,11 +327,7 @@ class ComponentSchema(object):
             list: Valid properties for the specified subtype.
 
         """
-        out = []
-        if self._base_schema is not None:
-            out = list(self._base_schema['properties'].keys())
-        out += list(self._storage[subtype]['properties'].keys())
-        return sorted(list(set(out)))
+        return sorted(list(self.get_subtype_schema(subtype)['properties'].keys()))
 
     @property
     def class2subtype(self):
@@ -314,6 +344,12 @@ class ComponentSchema(object):
         return out
 
     @property
+    def default_subtype(self):
+        r"""str: Default subtype."""
+        return self._base_schema['properties'][self.subtype_key].get(
+            'default', None)
+
+    @property
     def subtypes(self):
         r"""list: All subtypes for this schema type."""
         out = []
@@ -326,74 +362,98 @@ class ComponentSchema(object):
         r"""list: All available classes for this schema."""
         return sorted([k for k in self.schema_subtypes.keys()])
 
-    def append(self, comp_cls, subtype=None):
+    def append(self, comp_cls):
         r"""Append component class to the schema.
 
         Args:
             comp_cls (class): Component class that should be added.
-            subtype (str, tuple, optional): Key used to identify the subtype
-                of the component type. Defaults to subtype_attr if one was
-                provided, otherwise the subtype will not be logged.
 
         """
         assert(comp_cls._schema_type == self.schema_type)
+        assert(comp_cls._schema_subtype_key == self.subtype_key)
         name = comp_cls.__name__
-        if name == 'CommBase':
-            name = 'DefaultComm'
         # Append subtype
-        subtype = {k: getattr(comp_cls, '_%s' % k, None) for k in self.subtype_keys}
-        for k, v in subtype.items():
-            if not isinstance(v, list):
-                subtype[k] = [v]
-        # if self.schema_type == 'connection':
-        #     subtype['direction'] = [comp_cls.direction()]
-        #     subtype_list = [tuple([subtype[ik][0] for ik in self.subtype_keys])]
-        # else:
-        subtype_list = subtype[self.subtype_keys[0]]
+        subtype_list = getattr(comp_cls, '_%s' % self.subtype_key, None)
+        if not isinstance(subtype_list, list):
+            subtype_list = [subtype_list]
+        subtype_list += getattr(comp_cls, '_%s_aliases' % self.subtype_key, [])
         self.schema_subtypes[name] = subtype_list
-        # Create base schema
-        if self._base_schema is None:
-            self._base_schema = copy.deepcopy(
-                {'type': 'object',
-                 'required': comp_cls._schema_required,
-                 'properties': comp_cls._schema_properties,
-                 'additionalProperties': False,
-                 'dependencies': {'driver': ['args']}})
-            legacy_properties = {'driver': {'type': 'string'},
-                                 'args': {'type': 'string'}}
-            for k, v in legacy_properties.items():
-                if k not in self._base_schema['properties']:
-                    self._base_schema['properties'][k] = v
-        # Add sub schema
+        # Create new schema for subtype
         new_schema = {'title': name,
-                      'required': [],
-                      'properties': {}}
-        for k in comp_cls._schema_required:
-            assert(k in self._base_schema['required'])
-            # Uncomment the two lines below if the above assertion fails
-            # if k not in self._base_schema['required']:
-            #     new_schema['required'].append(k)
-        for k, v in comp_cls._schema_properties.items():
-            if k in self._base_schema['properties']:
-                if self._base_schema['properties'][k] != v:  # pragma: debug
-                    raise ValueError(("Schema for property '%s' of class '%s' "
-                                      "is %s, which differs from the base class "
-                                      "value (%s). Check that another class dosn't "
-                                      "have a conflicting definition of the same "
-                                      "property.") % (
-                                          k, comp_cls, v,
-                                          self._base_schema['properties'][k]))
-            else:
-                new_schema['properties'][k] = copy.deepcopy(v)
-                # This was used to prevent properties that are not part
-                # of the base schema from having defaults.
-                # if 'default' in new_schema['properties'][k]:
-                #     del new_schema['properties'][k]['default']
+                      'description': ('Schema for %s component %s subtype.'
+                                      % (self.schema_type, subtype_list)),
+                      'type': 'object',
+                      'required': copy.deepcopy(comp_cls._schema_required),
+                      'properties': copy.deepcopy(comp_cls._schema_properties),
+                      'additionalProperties': False}
         if not new_schema['required']:
             del new_schema['required']
-        for subt in self.subtype_keys:
-            new_schema['properties'].setdefault(subt, {})
-            new_schema['properties'][subt]['enum'] = subtype[subt]
+        new_schema['properties'].setdefault(self.subtype_key, {})
+        new_schema['properties'][self.subtype_key]['enum'] = subtype_list
+        # Add legacy properties
+        if self.schema_type in ['connection', 'comm', 'file', 'model']:
+            legacy_properties = {'driver': {'type': 'string',
+                                            'description': (
+                                                '[DEPRECATED] Name of driver '
+                                                'class that should be used.')},
+                                 'args': {'type': 'string',
+                                          'description': (
+                                              '[DEPRECATED] Arguments that should '
+                                              'be provided to the driver.')}}
+            for k, v in legacy_properties.items():
+                if k not in new_schema['properties']:
+                    new_schema['properties'][k] = v
+        # Create base schema
+        is_base = False
+        if self._base_schema is None:
+            is_base = True
+            self._base_schema = dict(
+                copy.deepcopy(new_schema),
+                title='%s_base' % self.schema_type,
+                description=('Base schema for all subtypes of %s components.'
+                             % self.schema_type),
+                dependencies={'driver': ['args']},
+                additionalProperties=True)
+        # Add description of subtype to subtype property after base to
+        # prevent overwriting description of the property rather than the
+        # property value.
+        if comp_cls._schema_subtype_description is not None:
+            new_schema['properties'][self.subtype_key]['description'] = (
+                comp_cls._schema_subtype_description)
+        # Update base schema, checking for compatiblity
+        if not is_base:
+            if 'required' in self._base_schema:
+                self._base_schema['required'] = list(
+                    set(self._base_schema['required'])
+                    & set(new_schema['required']))
+                if not self._base_schema['required']:  # pragma: no cover
+                    del self._base_schema['required']
+            prop_overlap = list(
+                set([self.subtype_key])  # Force subtype keys to be included
+                | (set(self._base_schema['properties'].keys())
+                   & set(new_schema['properties'].keys())))
+            new_base_prop = {}
+            for k in prop_overlap:
+                old = copy.deepcopy(self._base_schema['properties'][k])
+                new = copy.deepcopy(new_schema['properties'][k])
+                # Don't compare descriptions or properties defining subtype
+                if k != self.subtype_key:
+                    old.pop('description', None)
+                    new.pop('description', None)
+                    if old != new:  # pragma: debug
+                        raise ValueError(
+                            ("Schema for property '%s' of class '%s' "
+                             "is %s, which differs from the existing "
+                             "base class value (%s). Check that "
+                             "another class dosn't have a conflicting "
+                             "definition of the same property.")
+                            % (k, comp_cls, new, old))
+                # Assign original copy that includes description
+                new_base_prop[k] = self._base_schema['properties'][k]
+                if k == self.subtype_key:
+                    new_base_prop[k]['enum'] = sorted(list(
+                        set(new_base_prop[k]['enum']) | set(new['enum'])))
+            self._base_schema['properties'] = new_base_prop
         self._storage[name] = copy.deepcopy(new_schema)
         # Verify that the schema is valid
         metaschema.validate_schema(self.schema)
@@ -415,13 +475,16 @@ class SchemaRegistry(object):
     """
     
     _normalizers = {}
+    _default_required_components = ['comm', 'file', 'model', 'connection']
 
     def __init__(self, registry=None, required=None):
         super(SchemaRegistry, self).__init__()
-        self._storage = OrderedDict()
+        self._cache = {}
+        self._storage = SchemaDict()
+        if required is None:
+            required = self._default_required_components
+        self.required_components = required
         if registry is not None:
-            if required is None:
-                required = ['comm', 'file', 'model', 'connection']
             for k in required:
                 if k not in registry:
                     raise ValueError("Component %s required." % k)
@@ -432,43 +495,74 @@ class SchemaRegistry(object):
 
     def add(self, k, v):
         r"""Add a new component schema to the registry."""
+        self._cache = {}
         self._storage[k] = v
         metaschema.validate_schema(self.schema)
 
-    def get(self, k):
+    def get(self, k, *args, **kwargs):
         r"""Return a component schema from the registry."""
-        return self._storage[k]
+        return self._storage.get(k, *args, **kwargs)
+
+    def get_definitions(self, relaxed=False):
+        r"""Get schema definitions for the registered components.
+
+        Args:
+            relaxed (bool, optional): If True, the returned schema (and any
+                definitions it includes) are relaxed to allow for objects with
+                objects with additional properties to pass validation. Defaults
+                to False.
+
+        Returns:
+            dict: Schema defintiions for each of the registered components.
+
+        """
+        if relaxed:
+            cache_key = 'relaxed_definitions'
+        else:
+            cache_key = 'definitions'
+        if cache_key not in self._cache:
+            out = {k: v.get_schema(relaxed=relaxed)
+                   for k, v in self._storage.items()}
+            for k in self.required_components:
+                out.setdefault(k, {'type': 'string'})
+            self._cache[cache_key] = out
+        return copy.deepcopy(self._cache[cache_key])
+
+    @property
+    def definitions(self):
+        r"""dict: Schema definitions for different components."""
+        return self.get_definitions()
 
     @property
     def schema(self):
         r"""dict: Schema for evaluating YAML input file."""
-        required = ['comm', 'file', 'model', 'connection']
-        out = {'title': 'YAML Schema',
-               'description': 'Schema for yggdrasil YAML input files.',
-               'type': 'object',
-               'definitions': {},
-               'required': ['models'],
-               'additionalProperties': False,
-               'properties': OrderedDict(
-                   [('models', {'type': 'array',
-                                'items': {'$ref': '#/definitions/model'},
-                                'minItems': 1}),
-                    ('connections', {'type': 'array',
-                                     'items': {'$ref': '#/definitions/connection'}})])}
-        for k, v in self._storage.items():
-            out['definitions'][k] = v.schema
-        for k in required:
-            out['definitions'].setdefault(k, {'type': 'string'})
-        return out
+        if 'schema' not in self._cache:
+            out = {'title': 'YAML Schema',
+                   'description': 'Schema for yggdrasil YAML input files.',
+                   'type': 'object',
+                   'definitions': self.definitions,
+                   'required': ['models'],
+                   'additionalProperties': False,
+                   'properties': SchemaDict(
+                       [('models', {'type': 'array',
+                                    'items': {'$ref': '#/definitions/model'},
+                                    'minItems': 1}),
+                        ('connections',
+                         {'type': 'array',
+                          'items': {'$ref': '#/definitions/connection'}})])}
+            self._cache['schema'] = out
+        return copy.deepcopy(self._cache['schema'])
 
     @property
     def full_schema(self):
         r"""dict: Schema for evaluating YAML input file that fully specifies
         the properties for each component."""
-        out = self.schema
-        for k, v in self._storage.items():
-            out['definitions'][k] = v.full_schema
-        return out
+        if 'full_schema' not in self._cache:
+            out = self.schema
+            for k, v in self._storage.items():
+                out['definitions'][k] = v.full_schema
+            self._cache['full_schema'] = out
+        return copy.deepcopy(self._cache['full_schema'])
 
     def __getitem__(self, k):
         return self.get(k)
@@ -502,7 +596,7 @@ class SchemaRegistry(object):
         """
         with open(fname, 'r') as f:
             contents = f.read()
-            schema = ordered_load(contents, yaml.SafeLoader)
+            schema = ordered_load(contents, Loader=yaml.SafeLoader)
         if schema is None:
             raise Exception("Failed to load schema from %s" % fname)
         # Create components
@@ -519,9 +613,8 @@ class SchemaRegistry(object):
 
         """
         out = self.schema
-        # out['subtypes'] = {k: v._schema_subtypes for k, v in self.items()}
         with open(fname, 'w') as f:
-            ordered_dump(out, f, Dumper=yaml.SafeDumper)
+            ordered_dump(out, stream=f, Dumper=yaml.SafeDumper)
 
     def validate(self, obj, **kwargs):
         r"""Validate an object against this schema.
@@ -598,18 +691,31 @@ class SchemaRegistry(object):
             return False
         return True
 
-    def get_component_schema(self, comp_name):
+    def get_component_schema(self, comp_name, subtype=None, relaxed=False):
         r"""Get the schema for a certain component.
 
         Args:
             comp_name (str): Name of the component to get the schema for.
+            subtype (str, optional): Component subtype to get schema for.
+                Defaults to None and the schema for evaluating any subtype of
+                the specified component is returned.
+            relaxed (bool, optional): If True, the returned schema (and any
+                definitions it includes) are relaxed to allow for objects with
+                objects with additional properties to pass validation. Defaults
+                to False.
 
         Returns:
             dict: Schema for the specified component.
 
         """
-        out = self._storage[comp_name].schema
-        out['definitions'] = copy.deepcopy(self.schema['definitions'])
+        if comp_name not in self._storage:  # pragma: debug
+            raise ValueError("Unrecognized component: %s" % comp_name)
+        if subtype is None:
+            out = self._storage[comp_name].get_schema(relaxed=relaxed)
+        else:
+            out = self._storage[comp_name].get_subtype_schema(subtype,
+                                                              relaxed=relaxed)
+        out['definitions'] = self.get_definitions(relaxed=relaxed)
         return out
 
     def get_component_keys(self, comp_name):
@@ -735,26 +841,37 @@ def cdriver2filetype(driver):
     raise ValueError("%s is not a registered connection driver." % driver)
 
 
-def migrate_keys(from_dict, to_dict, key_list):
+def migrate_keys(from_dict, to_dict, exclude_key_list=None, include_key_list=None):
     r"""Migrate keys from one component to another that are not in a list
     of predefined keys.
 
     Args:
          from_dict (dict): Component dictionary to migrate keys from.
-         to_dict (dict): List of component dictionaries to migrate keys to.
-         key_list (list): List of allowable keys for the original component.
-             All keys in the original that are not in this list will be moved.
+         to_dict (list): List of component dictionaries to migrate keys to. If
+             this is an empty list, keys will not be migrated.
+         exclude_key_list (list, optional): List of keys in from_dict that
+             should not be migrated to to_dict. All keys in include_key_list
+             that are not in this list are moved. Defaults to None and no keys
+             are excluded.
+         include_key_list (list, optional): List of keys that should be migrated
+             from from_dict to to_dict dictionaries. If not provided, all keys
+             in from_dict that are not in exclude_key_list are moved. Defaults
+             to None and all keys in from_dict are included.
 
     """
     assert(isinstance(to_dict, list))
     if len(to_dict) == 0:
         return
-    klist = list(from_dict.keys())
-    for k in klist:
-        if k not in key_list:
-            v = from_dict.pop(k)
-            for d in to_dict:
-                d.setdefault(k, v)
+    if exclude_key_list is None:
+        exclude_key_list = []
+    if include_key_list is None:
+        include_key_list = list(from_dict.keys())
+    for k in include_key_list:
+        if (k not in from_dict) or (k in exclude_key_list):
+            continue
+        v = from_dict.pop(k)
+        for d in to_dict:
+            d.setdefault(k, v)
 
 
 def standardize(instance, keys, is_singular=False, suffixes=None, altkeys=None):
@@ -971,7 +1088,7 @@ def _normalize_connio_first(normalizer, value, instance, schema):
                         else:
                             instance.setdefault(k, val)
             # Move everything but comm keywords down to files, then move
-            # remainder down to input comms
+            # comm keywords down to connection inputs and outputs.
             migrate_keys(instance, target_files, conn_keys + comm_keys)
             instance.pop('working_dir', None)
             migrate_keys(instance, instance['inputs'] + instance['outputs'], conn_keys)
@@ -1047,6 +1164,18 @@ def _normalize_model_driver(normalizer, value, instance, schema):
         s = getattr(normalizer, 'schema_registry', None)
         if s is not None:
             if ('language' not in instance) and ('driver' in instance):
+                if instance['driver'] == 'GCCModelDriver':
+                    # TODO: Fix this properly, checking the extension to
+                    # distinguish between C and C++
+                    if isinstance(instance['args'], list):
+                        args_ext = os.path.splitext(instance['args'][0])[-1]
+                    else:
+                        args_ext = os.path.splitext(instance['args'])[-1]
+                    from yggdrasil.drivers.CPPModelDriver import CPPModelDriver
+                    if args_ext in CPPModelDriver.language_ext:
+                        instance['driver'] = 'CPPModelDriver'
+                    else:
+                        instance['driver'] = 'CModelDriver'
                 class2language = s['model'].class2subtype
                 instance['language'] = class2language[instance.pop('driver')][0]
     return instance
@@ -1081,6 +1210,24 @@ def _normalize_ascii_table(normalizer, value, instance, schema):
     return instance
 
 
+@SchemaRegistry.register_normalizer([('connections', 0, 'inputs', 1, 0),
+                                     ('connections', 0, 'outputs', 1, 0)])
+def _normalize_serializer(normalizer, value, instance, schema):
+    r"""Normalize the serializer if the information is in the file."""
+    if ((isinstance(instance, dict) and ('serializer' not in instance)
+         and (instance.get('filetype', None) in [None, 'binary']))):
+        s = getattr(normalizer, 'schema_registry', None)
+        if s is not None:
+            comm_keys = s.get_component_keys('comm')
+            seri_keys = s.get_component_keys('serializer')
+            serializer = {}
+            migrate_keys(instance, [serializer], include_key_list=seri_keys,
+                         exclude_key_list=comm_keys)
+            if serializer:
+                instance['serializer'] = serializer
+    return instance
+
+
 @SchemaRegistry.register_normalizer([('models', 0, 'inputs', 0),
                                      ('models', 0, 'outputs', 0),
                                      ('connections', 0, 'inputs', 0, 0),
@@ -1089,10 +1236,11 @@ def _normalize_datatype(normalizer, value, instance, schema):
     r"""Normalize the datatype if the type information is in the comm."""
     if isinstance(instance, dict) and ('datatype' not in instance):
         type_keys = list(metaschema.get_metaschema()['properties'].keys())
+        # Don't include args in type_keys if driver in the instance
+        if ('driver' in instance) and ('args' in type_keys):
+            type_keys.remove('args')
         datatype = {}
-        for k in type_keys:
-            if k in instance:
-                datatype[k] = instance.pop(k)
+        migrate_keys(instance, [datatype], include_key_list=type_keys)
         if datatype:
             instance['datatype'] = datatype
     return instance

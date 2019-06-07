@@ -29,6 +29,7 @@ env:
     NUMPY=numpy
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
+    JSONSCHEMA=jsonschema
     INSTALLZMQ=1
     INSTALLRMQ=0
     INSTALLAPY=0
@@ -84,9 +85,9 @@ before_install:
       conda create -q -n test-environment python=$CONDA
       source activate test-environment
       if [[ "${CONDA:0:1}" == "2" ]]; then
-         conda install -q "conda-build<3.18.2"
+        conda install -q "conda-build<3.18.2"
       else
-         conda install -q conda-build
+        conda install -q conda-build
       fi
       conda info -a
     fi
@@ -151,6 +152,7 @@ install:
       # May need to uninstall conda version of numpy and matplotlib on LPy test
       pip install $NUMPY
       pip install $MATPLOTLIB
+      pip install $JSONSCHEMA
       pip install nose
       pip install pytest "pytest-cov<2.6"
       pip install coverage coveralls codecov flake8
@@ -167,6 +169,7 @@ install:
       pip uninstall -y matplotlib
       conda install $NUMPY
       conda install $MATPLOTLIB
+      conda install $JSONSCHEMA
       conda install nose
       conda install pytest "pytest-cov<2.6"
       conda install coverage coveralls codecov flake8
@@ -177,6 +180,7 @@ install:
       conda install -c ${CONDA_PREFIX}/conda-bld/ yggdrasil
       # --use-local not working in conda 4.6.14
       # conda install --use-local yggdrasil
+      conda list
     fi
 
 script:
@@ -202,7 +206,7 @@ jobs:
     - stage: test
       os: linux
       python: 2.7
-      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 JSONSCHEMA=jsonschema==2.6.0 INSTALLZMQ=0 INSTALLRMQ=1 INSTALLLPY=1
       services:
         - rabbitmq
     - os: linux
@@ -211,11 +215,11 @@ jobs:
               yggtest tests/test_backwards.py
     - os: linux
       python: 3.6
-      env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0
+      env: INSTALLAPY=1 INSTALLZMQ=0 INSTALLRMQ=0 YGG_SKIP_COMPONENT_VALIDATION=0
     # Python 3.7 requires special dist
     - os: linux
       python: 3.7
-      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1
+      env: YGG_DEFAULT_COMM=ZMQComm INSTALLRMQ=0 YGG_ENABLE_LONG_TESTS=1 YGG_TEST_PRODUCTION_RUNS=1
       dist: xenial
       sudo: true
       

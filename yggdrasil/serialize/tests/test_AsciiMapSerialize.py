@@ -1,8 +1,8 @@
 from yggdrasil import backwards
-from yggdrasil.serialize.tests import test_DefaultSerialize as parent
+from yggdrasil.serialize.tests import test_SerializeBase as parent
 
 
-class TestAsciiMapSerialize(parent.TestDefaultSerialize):
+class TestAsciiMapSerialize(parent.TestSerializeBase):
     r"""Test class for TestAsciiMapSerialize class."""
 
     _cls = 'AsciiMapSerialize'

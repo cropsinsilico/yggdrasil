@@ -1,4 +1,5 @@
-from yggdrasil.communication import CommBase, get_comm, get_comm_class
+from yggdrasil.communication import CommBase, get_comm
+from yggdrasil.components import import_component
 
 
 _address_sep = ':YGG_ADD:'
@@ -33,6 +34,9 @@ class ForkComm(CommBase.CommBase):
         curr_comm_index (int): Index comm that next receive will be from.
 
     """
+
+    _dont_register = True
+    
     def __init__(self, name, comm=None, **kwargs):
         self.comm_list = []
         self.curr_comm_index = 0
@@ -104,7 +108,7 @@ class ForkComm(CommBase.CommBase):
                 if x is None:
                     x = {}
                 iname = x.pop('name', get_comm_name(name, i))
-                icls = get_comm_class(x.get('comm', None))
+                icls = import_component('comm', x.get('comm', None))
                 _, ickw = icls.new_comm_kwargs(iname, **x)
                 ickw['name'] = iname
                 comm[i] = ickw

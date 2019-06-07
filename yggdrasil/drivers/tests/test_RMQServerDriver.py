@@ -1,9 +1,12 @@
 import unittest
-from yggdrasil.communication.RMQComm import _rmq_server_running
+from yggdrasil.communication.RMQComm import RMQComm
 import yggdrasil.drivers.tests.test_ServerDriver as parent
 
 
-@unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
+_rmq_installed = RMQComm.is_installed(language='python')
+
+
+@unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 class TestRMQServerParam(parent.TestServerParam):
     r"""Test parameters for RMQServerDriver class."""
 
@@ -14,14 +17,14 @@ class TestRMQServerParam(parent.TestServerParam):
         self.icomm_name = self.client_comm
 
     
-@unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
+@unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 class TestRMQServerDriverNoStart(TestRMQServerParam,
                                  parent.TestServerDriverNoStart):
     r"""Test class for RMQServerDriver class without start."""
     pass
 
 
-@unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
+@unittest.skipIf(not _rmq_installed, "RMQ Server not running")
 class TestRMQServerDriver(TestRMQServerParam, parent.TestServerDriver):
     r"""Test class for RMQServerDriver class."""
     pass

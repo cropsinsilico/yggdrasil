@@ -1,52 +1,36 @@
-#
-# This should not be used directly by modelers
-#
 import os
-import sys
-from logging import debug
-from yggdrasil.drivers.ModelDriver import ModelDriver
-try:  # pragma: lpy
-    from openalea import lpy
-except ImportError:  # pragma: no lpy
-    debug("Could not import openalea.lpy. "
-          + "LPy support will be disabled.")
-    lpy = None
-from yggdrasil.schema import register_component
-_lpy_installed = (lpy is not None)
+from yggdrasil.languages import get_language_dir
+from yggdrasil.drivers.PythonModelDriver import PythonModelDriver
 
 
-_model_script = os.path.join(os.path.dirname(__file__), 'lpy_model.py')
+_model_script = os.path.join(get_language_dir('lpy'), 'lpy_model.py')
 
 
-@register_component
-class LPyModelDriver(ModelDriver):  # pragma: lpy
-    r"""Class for running LPy models.
+class LPyModelDriver(PythonModelDriver):  # pragma: lpy
+    r"""Class for running LPy models."""
 
-    Args:
-        name (str): Driver name.
-        args (str): The LPy l-system file.
-        **kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
-
-    """
-
-    _language = 'lpy'
-
-    def __init__(self, name, args, **kwargs):
-        if not _lpy_installed:  # pragma: no lpy
-            raise RuntimeError("LPy is not installed.")
-        super(LPyModelDriver, self).__init__(name, args, **kwargs)
-        self.debug(args)
-        self.args = [sys.executable, _model_script] + self.args
+    _schema_subtype_description = ('Model is an LPy system.')
+    
+    language = 'lpy'
+    language_ext = '.lpy'
+    # base_languages = ['python']  # Uncomment if PythonModelDriver not parent
+    default_interpreter_flags = [_model_script]
+    interface_dependencies = ['openalea.lpy']
+    function_param = None
 
     @classmethod
-    def is_installed(self):
-        r"""Determine if this model driver is installed on the current
-        machine.
+    def language_version(cls, **kwargs):
+        r"""Determine the version of this language.
+
+        Args:
+            **kwargs: Keyword arguments are passed to cls.run_executable.
 
         Returns:
-            bool: Truth of if this model driver can be run on the current
-                machine.
+            str: Version of compiler/interpreter for this language.
 
         """
-        return _lpy_installed
+        try:
+            import openalea.lpy
+            return openalea.lpy.__version__.LPY_VERSION_STR
+        except ImportError:  # pragma: debug
+            raise RuntimeError("openalea.lpy not installed.")

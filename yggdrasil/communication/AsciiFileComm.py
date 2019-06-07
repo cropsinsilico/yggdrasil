@@ -1,9 +1,6 @@
-from yggdrasil import serialize, backwards
 from yggdrasil.communication.FileComm import FileComm
-from yggdrasil.schema import register_component, inherit_schema
 
 
-@register_component
 class AsciiFileComm(FileComm):
     r"""Class for handling I/O from/to a file on disk.
 
@@ -15,22 +12,16 @@ class AsciiFileComm(FileComm):
             will be skipped.
         **kwargs: Additional keywords arguments are passed to parent class.
 
-    Attributes:
-        comment (str): String indicating a comment.
-
     """
 
     _filetype = 'ascii'
-    _schema_properties = inherit_schema(
-        FileComm._schema_properties,
-        {'comment': {'type': 'string',
-                     'default': backwards.as_str(serialize._default_comment)}})
-    _attr_conv = FileComm._attr_conv + ['comment']
+    _schema_subtype_description = ('This file is read/written as encoded text '
+                                   'one line at a time.')
 
     def _init_before_open(self, **kwargs):
         r"""Get absolute path and set attributes."""
-        kwargs.setdefault('read_meth', 'readline')
         super(AsciiFileComm, self)._init_before_open(**kwargs)
+        self.read_meth = 'readline'
 
     @classmethod
     def get_testing_options(cls, **kwargs):
@@ -47,42 +38,5 @@ class AsciiFileComm(FileComm):
                     the messages in 'send'.
 
         """
-        kwargs.setdefault('read_meth', 'readline')
-        out = super(AsciiFileComm, cls).get_testing_options(**kwargs)
-        comment = backwards.as_bytes(
-            cls._schema_properties['comment']['default'] + 'Comment\n')
-        out['send'].append(comment)
-        out['contents'] = b''.join(out['send'])
-        # out['contents'] = out['contents'].replace(b'\n', platform._newline)
-        out['dict'] = {'f0': out['msg']}
-        return out
-    
-    def opp_comm_kwargs(self):
-        r"""Get keyword arguments to initialize communication with opposite
-        comm object.
-
-        Returns:
-            dict: Keyword arguments for opposite comm object.
-
-        """
-        kwargs = super(AsciiFileComm, self).opp_comm_kwargs()
-        kwargs['comment'] = self.serializer.comment
-        return kwargs
-
-    def _recv(self, timeout=0):
-        r"""Reads message from a file.
-
-        Args:
-            timeout (float, optional): Time in seconds to wait for a message.
-                Defaults to self.recv_timeout. Unused.
-
-        Returns:
-            tuple (bool, str): Success or failure of reading from the file and
-                the read messages as bytes.
-
-        """
-        flag, msg = super(AsciiFileComm, self)._recv()
-        if self.read_meth == 'readline':
-            while flag and msg.startswith(backwards.as_bytes(self.comment)):
-                flag, msg = super(AsciiFileComm, self)._recv()
-        return flag, msg
+        kwargs['read_meth'] = 'readline'
+        return super(AsciiFileComm, cls).get_testing_options(**kwargs)

@@ -74,7 +74,8 @@ _normalize_objects = [
     ({'type': 'function'}, '%s:invalid_func' % __name__,
      '%s:invalid_func' % __name__),
     ({'type': 'schema'}, {'units': 'g'},
-     {'type': 'scalar', 'units': 'g', 'subtype': 'float', 'precision': int(64)})]
+     {'type': 'scalar', 'units': 'g', 'subtype': 'float', 'precision': int(64)}),
+    ({'type': 'any', 'temptype': {'type': 'float'}}, '1', float(1))]
 
 
 def test_create_metaschema():
@@ -127,11 +128,10 @@ def test_validate_instance():
 def test_normalize_instance():
     r"""Test normalize_instance."""
     for schema, x, y in _normalize_objects:
-        z = metaschema.normalize_instance(x, schema, test_attr=1)
-        assert_equal(z, y)
-
-
-def test_create_normalizer():
-    r"""Test create normalizer with default types."""
-    cls = metaschema.normalizer.create(metaschema.get_metaschema())
-    assert_equal(cls({'type': 'int'}).normalize('1'), '1')
+        z = metaschema.normalize_instance(x, schema, test_attr=1,
+                                          show_errors=(x != y))
+        try:
+            assert_equal(z, y)
+        except BaseException:  # pragma: debug
+            print(schema, x, y, z)
+            raise

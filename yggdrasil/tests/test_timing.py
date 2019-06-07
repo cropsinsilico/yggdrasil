@@ -10,7 +10,7 @@ _test_count = 1
 _test_nrep = 1
 _test_lang = 'c'
 # On windows, it's possible to not have a C/C++ communication library installed
-if 'c' not in timing._lang_list:  # pragma: windows
+if 'c' not in timing.get_lang_list():  # pragma: windows
     _test_lang = 'python'
 # _test_run = timing.TimedRun(_test_lang, _test_lang)
 # _test_run.time_run(_test_count, _test_size, nrep=_test_nrep)
@@ -19,19 +19,19 @@ _this_platform = (platform._platform,
                   tools.get_default_comm())
 _base_environment = {'platform': 'Linux',
                      'python_ver': '2.7',
-                     'comm_type': 'ZMQComm'}
-_valid_platforms = [('Linux', '2.7', 'ZMQComm'),
-                    ('Linux', '2.7', 'IPCComm'),
-                    ('Linux', '3.5', 'ZMQComm'),
-                    ('MacOS', '2.7', 'ZMQComm'),
-                    ('Windows', '2.7', 'ZMQComm')]
+                     'comm_type': 'zmq'}
+_valid_platforms = [('Linux', '2.7', 'zmq'),
+                    ('Linux', '2.7', 'ipc'),
+                    ('Linux', '3.5', 'zmq'),
+                    ('MacOS', '2.7', 'zmq'),
+                    ('Windows', '2.7', 'zmq')]
 _testfile_json = 'test_run123.json'
 _testfile_dat = 'test_run123.dat'
 
 
 def test_get_source():
     r"""Test getting source file for test."""
-    lang_list = timing._lang_list
+    lang_list = timing.get_lang_list()
     dir_list = ['src', 'dst']
     for l in lang_list:
         for d in dir_list:
@@ -118,6 +118,8 @@ class TimedRunTestBase(YggTestClass):
         self.instance.time_run(*self.time_run_args, **self.time_run_kwargs)
 
 
+@unittest.skipIf(not tools.check_environ_bool("YGG_TEST_PRODUCTION_RUNS"),
+                 'YGG_TEST_PRODUCTION_RUNS not set')
 @long_running
 class TestTimedRun(TimedRunTestBase):
     r"""Test class for the TimedRun class using existing data."""
@@ -248,7 +250,7 @@ class TestTimedRun(TimedRunTestBase):
         # Errors
         assert_raises(ValueError, timing.plot_scalings, compare='invalid')
         assert_raises(RuntimeError, timing.plot_scalings, compare='comm_type',
-                      comm_type='ZMQComm')
+                      comm_type='zmq')
 
     def test_production_runs(self):
         r"""Test production tests (those used in paper)."""
@@ -317,23 +319,6 @@ class TestTimedRunTemp(TimedRunTestBase):
         self.instance.remove_entry(self.entry_name)
         assert(not self.instance.has_entry(self.entry_name))
 
-    def test_languages(self):
-        r"""Test different combinations of source/destination languages."""
-        kwargs = copy.deepcopy(self.inst_kwargs)
-        for l1 in timing._lang_list:
-            args = (l1, l1)
-            x = timing.TimedRun(*args, **kwargs)
-            x.time_run(*self.time_run_args, **self.time_run_kwargs)
-
-    def test_comm_types(self):
-        r"""Test different comm types."""
-        args = copy.deepcopy(self.inst_args)
-        kwargs = copy.deepcopy(self.inst_kwargs)
-        for c in timing._comm_list:
-            kwargs['comm_type'] = c
-            x = timing.TimedRun(*args, **kwargs)
-            x.time_run(*self.time_run_args, **self.time_run_kwargs)
-
 
 @long_running
 class TestTimedRunTempNoPerf(TestTimedRunTemp):
@@ -351,12 +336,4 @@ class TestTimedRunTempNoPerf(TestTimedRunTemp):
 
     def test_perf_func(self):
         r"""Disabled: Test perf_func."""
-        pass
-
-    def test_languages(self):
-        r"""Disabled: Test different combinations of source/destination languages."""
-        pass
-
-    def test_comm_types(self):
-        r"""Disabled: Test different comm types."""
         pass

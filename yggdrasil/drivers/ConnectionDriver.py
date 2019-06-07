@@ -3,8 +3,9 @@ import os
 import numpy as np
 import threading
 from yggdrasil import backwards
-from yggdrasil.communication import new_comm, get_comm_class
+from yggdrasil.communication import new_comm
 from yggdrasil.drivers.Driver import Driver
+from yggdrasil.components import import_component
 from yggdrasil.schema import get_schema
 
 
@@ -32,9 +33,9 @@ class ConnectionDriver(Driver):
             waited before giving up on the first send. Defaults to self.timeout.
         single_use (bool, optional): If True, the driver will be stopped after
             one loop. Defaults to False.
-        onexit (str, optional): Class method that should be called when the
-            corresponding model exits, but before the driver is shut down.
-            Defaults to None.
+        onexit (str, optional): Class method that should be called when a
+            model that the connection interacts with exits, but before the
+            connection driver is shut down. Defaults to None.
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -63,16 +64,28 @@ class ConnectionDriver(Driver):
     _ocomm_type = 'DefaultComm'
     _direction = 'any'
     _schema_type = 'connection'
+    _schema_subtype_key = 'connection_type'
+    _schema_subtype_description = ('Connection between one or more comms/files '
+                                   'and one or more comms/files.')
+    _schema_subtype_default = 'default'
     _schema_required = ['inputs', 'outputs']
     _schema_properties = {
+        'connection_type': {'type': 'string'},  # 'default': 'default'},
         'inputs': {'type': 'array', 'minItems': 1,
                    'items': {'anyOf': [{'$ref': '#/definitions/comm'},
-                                       {'$ref': '#/definitions/file'}]}},
+                                       {'$ref': '#/definitions/file'}]},
+                   'description': ('One or more name(s) of model output(s) '
+                                   'and/or new comm/file objects that the '
+                                   'connection should receive messages from.')},
         'outputs': {'type': 'array', 'minItems': 1,
                     'items': {'anyOf': [{'$ref': '#/definitions/comm'},
-                                        {'$ref': '#/definitions/file'}]}},
+                                        {'$ref': '#/definitions/file'}]},
+                    'description': ('One or more name(s) of model input(s) '
+                                    'and/or new comm/file objects that the '
+                                    'connection should send messages to.')},
         'translator': {'type': 'array', 'items': {'type': 'function'}},
         'onexit': {'type': 'string'}}
+    _schema_excluded_from_class_validation = ['inputs', 'outputs']
 
     @property
     def _is_input(self):
@@ -162,12 +175,13 @@ class ConnectionDriver(Driver):
             comm_kws['no_suffix'] = True
             ikws = []
             for x in comm_kws['comm']:
-                if get_comm_class(x['comm']).is_file:
+                icomm_cls = import_component('comm', x['comm'])
+                if icomm_cls.is_file:
                     any_files = True
-                    ikws += s['file'].get_subtype_properties(x['comm'])
+                    ikws += s['file'].get_subtype_properties(icomm_cls._filetype)
                 else:
                     all_files = False
-                    ikws += s['comm'].get_subtype_properties(x['comm'])
+                    ikws += s['comm'].get_subtype_properties(icomm_cls._commtype)
             ikws = list(set(ikws))
             for k in ikws:
                 if (k not in comm_kws) and (k in kwargs):
@@ -407,7 +421,7 @@ class ConnectionDriver(Driver):
         T = self.start_timeout(timeout)
         while not T.is_out:
             with self.lock:
-                if (not self.ocomm.is_open):
+                if (not self.ocomm.is_open):  # pragma: no cover
                     break
                 elif ((self.ocomm.n_msg_send_drain == 0)
                       and self.ocomm.is_confirmed_send):
@@ -465,7 +479,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_closed:
                 return False
             flag, msg = self.icomm.recv(**kwargs)
-        if isinstance(msg, backwards.bytes_type) and (msg == self.icomm.eof_msg):
+        if self.icomm.is_eof(msg):
             return self.on_eof()
         if flag:
             return msg
@@ -497,7 +511,7 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
-        if (self.ocomm._send_serializer) and self.icomm.serializer._initialized:
+        if (self.ocomm._send_serializer) and self.icomm.serializer.initialized:
             self.update_serializer(msg)
         for t in self.translator:
             msg = t(msg)
@@ -542,7 +556,7 @@ class ConnectionDriver(Driver):
         #     sinfo.pop('seritype', None)
         #     self.ocomm.serializer = self.icomm.serializer
         #     inter_model = True
-        # if (not inter_model) and self.ocomm.serializer._initialized:  # pragma: debug
+        # if (not inter_model) and self.ocomm.serializer.initialized:  # pragma: debug
         #     self.ocomm.serializer.update_serializer(**sinfo)
         # else:
         #     self.ocomm.serializer.initialize_serializer(sinfo)

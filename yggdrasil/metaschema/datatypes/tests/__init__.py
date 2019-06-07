@@ -15,13 +15,10 @@ def test_get_type_class():
 def test_register_type_errors():
     r"""Test errors in register_type for duplicate."""
     assert_raises(ValueError, datatypes.register_type, ScalarMetaschemaType)
-    # fake_prop = type('FakeType', (ScalarMetaschemaType, ),
-    #                  {'name': 'number'})
-    # assert_raises(ValueError, datatypes.register_type, fake_prop)
-    fake_prop = type('FakeType', (ScalarMetaschemaType, ),
-                     {'name': 'new', 'properties': ['invalid']})
-    assert_raises(ValueError, datatypes.register_type, fake_prop)
-
+    type_args = ('FakeType', (ScalarMetaschemaType, ),
+                 {'name': 'new', 'properties': ['invalid']})
+    assert_raises(ValueError, type, *type_args)
+    
 
 def test_add_type_from_schema_errors():
     r"""Test errors in add_type_from_schema."""
@@ -45,11 +42,12 @@ def test_guess_type_from_msg():
 
 def test_guess_type_from_obj():
     r"""Test guess_type_from_obj."""
-    invalid_objects = [object, object()]
+    invalid_objects = [object()]  # , object()]
     for t, x in _valid_objects.items():
         assert_equal(datatypes.guess_type_from_obj(x).name, t)
     for x in invalid_objects:
-        assert_raises(datatypes.MetaschemaTypeError, datatypes.guess_type_from_obj, x)
+        assert_raises(datatypes.MetaschemaTypeError,
+                      datatypes.guess_type_from_obj, x)
 
 
 def test_encode_decode():
@@ -58,7 +56,11 @@ def test_encode_decode():
         y = datatypes.encode(x)
         z = datatypes.decode(y)
         assert_equal(z, x)
-        datatypes.encode_data(x)
+        t = datatypes.encode_type(x)
+        d = datatypes.encode_data(x)
+        w = datatypes.decode_data(d, t)
+        assert_equal(w, x)
+    assert_raises(ValueError, datatypes.decode_data, b'', None)
 
 
 def test_encode_decode_readable():

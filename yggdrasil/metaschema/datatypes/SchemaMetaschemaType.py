@@ -1,7 +1,6 @@
 import copy
 import jsonschema
-from yggdrasil.metaschema.datatypes import (
-    register_type, get_type_class, _type_registry)
+from yggdrasil.metaschema.datatypes import get_type_class, _type_registry
 from yggdrasil.metaschema.properties import get_metaschema_property
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
@@ -79,7 +78,6 @@ def _validate_schema(validator, ref, instance, schema):
         instance = validator._normalizing
 
         
-@register_type
 class SchemaMetaschemaType(JSONObjectMetaschemaType):
     r"""Schema type."""
 
@@ -89,6 +87,8 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
     definition_properties = ['type']
     metadata_properties = ['type']
     specificity = JSONObjectMetaschemaType.specificity + 1
+    inherit_properties = ['extract_properties']
+    _replaces_existing = False
 
     @classmethod
     def encode_data(cls, obj, typedef):
@@ -163,7 +163,7 @@ class SchemaMetaschemaType(JSONObjectMetaschemaType):
         """
         if isinstance(obj, str):
             obj = {'type': obj}
-        x = copy.deepcopy(cls.metaschema())
+        x = cls.metaschema()
         validators = {u'$ref': _validate_schema}
         normalizers = {tuple(): [_normalize_schema]}
         validator_class = copy.deepcopy(cls.validator())

@@ -23,22 +23,11 @@ if os.environ.get('DISPLAY', '') == '':  # pragma: debug
 elif ygg_platform._is_mac:
     mpl.use('TkAgg')
 import matplotlib.pyplot as plt  # noqa: E402
+logger = logging.getLogger(__name__)
 _linewidth = 2
 _legend_fontsize = 14
 mpl.rc('font', size=18)
 _perf_warmups = 0
-
-
-_lang_list = tools.get_installed_lang()
-for k in ['lpy', 'make', 'cmake']:
-    if k in _lang_list:
-        _lang_list.remove(k)
-_comm_list = tools.get_installed_comm(language=_lang_list)
-if ((len(_lang_list) == 0) or (len(_comm_list) == 0)):  # pragma: debug
-    raise Exception("Timings cannot be performed if there is not at least one valid "
-                    + "language and one valid communication mechanism. "
-                    + "len(valid_languages) = %d, " % len(_lang_list)
-                    + "len(valid_comms) = %d " % len(_comm_list))
 
 
 # TODO:
@@ -46,6 +35,39 @@ if ((len(_lang_list) == 0) or (len(_comm_list) == 0)):  # pragma: debug
 #  - Converting to using sparse benchmark data
 #  - Create separate classes for saving/loading benchmarks and running tests
 #  - Add functions for overwriting specific entries
+
+
+def get_lang_list():
+    r"""Get the list of testable languages on the current platform.
+
+    Returns:
+        list: Names of testable languages using timed_pipe.
+
+    """
+    _lang_list = tools.get_installed_lang()
+    for k in ['lpy', 'make', 'cmake', 'executable']:
+        if k in _lang_list:
+            _lang_list.remove(k)
+    if (len(_lang_list) == 0):  # pragma: debug
+        raise Exception(("Timings cannot be performed if there is not at least "
+                         "one valid language. len(valid_languages) = %d")
+                        % len(_lang_list))
+    return _lang_list
+
+
+def get_comm_list():
+    r"""Get the list of testable communication methods on the current platform.
+
+    Returns:
+        list: Names of testable communication methods using timed_pipe.
+
+    """
+    _comm_list = tools.get_installed_comm(language=get_lang_list())
+    if (len(_comm_list) == 0):  # pragma: debug
+        raise Exception(("Timings cannot be performed if there is not at least "
+                         "one valid communication mechanism. len(valid_comms) "
+                         "= %d") % len(_comm_list))
+    return _comm_list
 
 
 def write_perf_script(script_file, nmsg, msg_size,
@@ -234,6 +256,8 @@ class TimedRun(YggTestBase, tools.YggClass):
         self.python_ver = python_ver
         self.max_errors = max_errors
         self.program_name = test_name
+        self._lang_list = get_lang_list()
+        self._comm_list = get_comm_list()
         name = '%s_%s_%s' % (test_name, lang_src, lang_dst)
         tools.YggClass.__init__(self, name)
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
@@ -266,18 +290,23 @@ class TimedRun(YggTestBase, tools.YggClass):
         out = ((self.platform.lower() == ygg_platform._platform.lower())
                and (self.python_ver == backwards._python_version)
                and (self.matlab_running == MatlabModelDriver.is_matlab_running())
-               and (self.lang_src in _lang_list)
-               and (self.lang_dst in _lang_list)
-               and (self.comm_type in _comm_list))
+               and (self.lang_src in self._lang_list)
+               and (self.lang_dst in self._lang_list)
+               and (self.comm_type in self._comm_list))
         if (not out) and raise_error:
             msg = ['Cannot run test with parameters:',
                    '\tOperating System: %s' % self.platform,
                    '\tPython Version: %s' % self.python_ver,
                    '\tMatlab Running: %s' % self.matlab_running,
+                   '\tSource Language: %s' % self.lang_src,
+                   '\tDestination Language: %s' % self.lang_dst,
+                   '\tCommunication Method: %s' % self.comm_type,
                    'Because one or more platform properties are incompatible:',
                    '\tOperating System: %s' % ygg_platform._platform,
                    '\tPython Version: %s' % backwards._python_version,
-                   '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running()]
+                   '\tMatlab Running: %s' % MatlabModelDriver.is_matlab_running(),
+                   '\tSupported Languages: %s' % ', '.join(self._lang_list),
+                   '\tSupported Communication: %s' % ', '.join(self._comm_list)]
             raise RuntimeError('\n'.join(msg))
         return out
 
@@ -289,9 +318,12 @@ class TimedRun(YggTestBase, tools.YggClass):
             msg_size (int): Size of each message that should be sent.
 
         """
+        # TODO: The translation to using the form XXXComm should be abandoned
+        # if/when the timing statistics are recomputed (only used here to make
+        # use of the existing data).
         out = '%s(%s,%s,%s,%s,%s,%d,%d)' % (self.program_name,
                                             self.platform, self.python_ver,
-                                            self.comm_type,
+                                            self.comm_type.upper() + 'Comm',
                                             self.lang_src, self.lang_dst,
                                             nmsg, msg_size)
         if ((self.matlab_running
@@ -309,7 +341,7 @@ class TimedRun(YggTestBase, tools.YggClass):
         r"""list: Default message sizes for scaling tests. This will vary
         depending on the comm type so that the maximum size is not more than 10x
         larger than the maximum message size."""
-        if self.comm_type.startswith('IPC'):
+        if self.comm_type.lower().startswith('ipc'):
             msg_size = [1, 1e2, 1e3, 1e4, 5e4, 1e5]
         else:
             msg_size = [1, 1e2, 1e3, 1e4, 1e5, 1e6, 5e6, 1e7]
@@ -604,7 +636,8 @@ class TimedRun(YggTestBase, tools.YggClass):
                           self.lang_src, self.lang_dst, self.comm_type,
                           nrep=nrep, matlab_running=self.matlab_running,
                           max_errors=self.max_errors)
-        copy_env = ['TMPDIR']
+        copy_env = ['TMPDIR', 'YGG_SKIP_COMPONENT_VALIDATION',
+                    'YGG_VALIDATE_ALL_MESSAGES', 'CONDA_PREFIX']
         if platform._is_win:  # pragma: windows
             copy_env += ['HOMEPATH', 'NUMBER_OF_PROCESSORS',
                          'INCLUDE', 'LIB', 'LIBPATH']
@@ -1149,13 +1182,15 @@ def plot_scalings(compare='comm_type', compare_values=None,
         str: Path where the figure was saved.
 
     """
+    _lang_list = get_lang_list()
+    _comm_list = get_comm_list()
     if use_paper_values:
-        default_vars = {'comm_type': 'ZMQComm',
+        default_vars = {'comm_type': 'zmq',
                         'lang_src': 'python',
                         'lang_dst': 'python',
                         'platform': 'Linux',
                         'python_ver': '2.7'}
-        default_vals = {'comm_type': ['ZMQComm', 'IPCComm'],
+        default_vals = {'comm_type': ['zmq', 'ipc'],
                         'language': ['c', 'cpp', 'python'],
                         'platform': ['Linux', 'MacOS', 'Windows'],
                         'python_ver': ['2.7', '3.5']}
@@ -1178,9 +1213,9 @@ def plot_scalings(compare='comm_type', compare_values=None,
     per_message = kwargs.get('per_message', False)
     if compare == 'comm_type':
         color_var = 'comm_type'
-        color_map = {'ZMQComm': 'b', 'IPCComm': 'r', 'RMQComm': 'g'}
+        color_map = {'zmq': 'b', 'ipc': 'r', 'rmq': 'g'}
         style_var = 'comm_type'
-        style_map = {'ZMQComm': '-', 'IPCComm': '--', 'RMQComm': ':'}
+        style_map = {'zmq': '-', 'ipc': '--', 'rmq': ':'}
         var_list = compare_values
         var_kws = [{color_var: k} for k in var_list]
         kws2label = lambda x: x['comm_type'].split('Comm')[0]  # noqa: E731
@@ -1258,23 +1293,23 @@ def plot_scalings(compare='comm_type', compare_values=None,
             MatlabModelDriver.kill_all()
             assert(not MatlabModelDriver.is_matlab_running())
         if ((kws.get('matlab_running', False)
-             and MatlabModelDriver._matlab_installed)):  # pragma: matlab
+             and MatlabModelDriver._matlab_engine_installed)):  # pragma: matlab
             nml = 0
             for k in ['lang_src', 'lang_dst']:
                 if kws[k] == 'matlab':
                     nml += 1
             ml_sessions = []
             for i in range(nml):
-                ml_sessions.append(MatlabModelDriver.start_matlab())
+                ml_sessions.append(MatlabModelDriver.start_matlab_engine())
             label += ' (Existing)'
             plot_kws['color'] = 'orange'
         axs, fit = TimedRun.class_plot(test_name=test_name, axs=axs, label=label,
                                        yscale=yscale, plot_kws=plot_kws, **kws)
         fits[label] = fit
         if ((kws.get('matlab_running', False)
-             and MatlabModelDriver._matlab_installed)):  # pragma: matlab
+             and MatlabModelDriver._matlab_engine_installed)):  # pragma: matlab
             for v in ml_sessions:
-                MatlabModelDriver.stop_matlab(*v)
+                MatlabModelDriver.stop_matlab_engine(*v)
             assert(not MatlabModelDriver.is_matlab_running())
     # Print a table
     print('%-20s\t%-20s\t%-20s' % ('Label', 'Time per Message (s)', 'Overhead (s)'))
@@ -1285,7 +1320,7 @@ def plot_scalings(compare='comm_type', compare_values=None,
         print(fmt_row % (k, v[0], v[1]))
     # Save plot
     plt.savefig(plotfile, dpi=600)
-    logging.info('plotfile: %s', plotfile)
+    logger.info('plotfile: %s', plotfile)
     if cleanup_plot:
         os.remove(plotfile)
     return plotfile

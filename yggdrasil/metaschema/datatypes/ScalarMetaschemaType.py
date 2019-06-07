@@ -2,25 +2,28 @@ import numpy as np
 import copy
 import warnings
 from yggdrasil import units, backwards
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.FixedMetaschemaType import (
     create_fixed_type_class)
-from yggdrasil.metaschema.properties import ScalarMetaschemaProperties
+from yggdrasil.metaschema.properties import (
+    get_metaschema_property, ScalarMetaschemaProperties)
 
 
-@register_type
 class ScalarMetaschemaType(MetaschemaType):
-    r"""Type associated with a scalar."""
+    r"""Type associated with a scalar.
+
+    Developer Notes:
+        |yggdrasil| defines scalars as an umbrella type encompassing int, uint,
+        float, bytes, and unicode.
+
+    """
 
     name = 'scalar'
     description = 'A scalar value with or without units.'
-    properties = MetaschemaType.properties + ['subtype', 'precision', 'units']
-    definition_properties = MetaschemaType.definition_properties + ['subtype']
-    metadata_properties = (MetaschemaType.metadata_properties
-                           + ['subtype', 'precision', 'units'])
-    extract_properties = (MetaschemaType.extract_properties
-                          + ['subtype', 'precision', 'units'])
+    properties = ['subtype', 'precision', 'units']
+    definition_properties = ['subtype']
+    metadata_properties = ['subtype', 'precision', 'units']
+    extract_properties = ['subtype', 'precision', 'units']
     python_types = ScalarMetaschemaProperties._all_python_scalars
 
     @classmethod
@@ -119,7 +122,11 @@ class ScalarMetaschemaType(MetaschemaType):
 
         """
         arr = cls.to_array(obj)
-        subtype = typedef.get('subtype', typedef.get('type', None))
+        if isinstance(typedef, dict):
+            subtype = typedef.get('subtype', typedef.get('type', None))
+        else:
+            subtype_cls = get_metaschema_property('subtype')
+            subtype = subtype_cls.encode(obj)
         if (cls.name in ['1darray', 'ndarray']):
             return arr.tolist()
         assert(arr.ndim > 0)
@@ -130,7 +137,7 @@ class ScalarMetaschemaType(MetaschemaType):
         elif subtype in ['complex']:
             return str(complex(arr[0]))
         elif subtype in ['bytes', 'unicode']:
-            return backwards.as_str(arr[0])
+            return str(backwards.as_str(arr[0]))
         else:  # pragma: debug
             warnings.warn(("No method for handling readable serialization of "
                            + "subtype '%s', falling back to default.") % subtype)
@@ -274,6 +281,12 @@ class ScalarMetaschemaType(MetaschemaType):
 
 # Dynamically create explicity scalar classes for shorthand
 for t in ScalarMetaschemaProperties._valid_types.keys():
-    create_fixed_type_class(t, 'A %s value with or without units.' % t,
-                            ScalarMetaschemaType, {'subtype': t}, globals(),
-                            python_types=ScalarMetaschemaProperties._python_scalars[t])
+    short_doc = 'A %s value with or without units.' % t
+    long_doc = ('%s\n\n'
+                '    Developer Notes:\n'
+                '        Precision X is preserved.\n\n') % short_doc
+    kwargs = {'target_globals': globals(),
+              '__doc__': long_doc,
+              'python_types': ScalarMetaschemaProperties._python_scalars[t]}
+    create_fixed_type_class(t, short_doc, ScalarMetaschemaType,
+                            {'subtype': t}, **kwargs)

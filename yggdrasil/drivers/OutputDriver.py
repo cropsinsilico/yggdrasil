@@ -1,8 +1,6 @@
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
-from yggdrasil.schema import register_component
 
 
-@register_component
 class OutputDriver(ConnectionDriver):
     r"""Driver for sending output to another model's comm via a local comm.
 
@@ -17,6 +15,8 @@ class OutputDriver(ConnectionDriver):
 
     _connection_type = 'output'
     _direction = 'output'
+    _schema_subtype_description = ('Connection between a model '
+                                   'and one or more comms/files.')
 
     def __init__(self, name, args, **kwargs):
         kwargs.setdefault('ocomm_kws', {})

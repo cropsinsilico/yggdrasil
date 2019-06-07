@@ -4,14 +4,11 @@ import uuid
 import zmq
 import threading
 import logging
-import subprocess
-import warnings
-from yggdrasil import backwards, tools, platform
-from yggdrasil.config import ygg_cfg
-from yggdrasil.schema import register_component
+from yggdrasil import backwards, tools
 from yggdrasil.communication import CommBase, AsyncComm
 
 
+logger = logging.getLogger(__name__)
 _socket_type_pairs = [('PUSH', 'PULL'),
                       ('PUB', 'SUB'),
                       ('REP', 'REQ'),
@@ -27,47 +24,6 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = b'YGG_REPLY'
 _purge_msg = b'YGG_PURGE'
 _global_context = zmq.Context.instance()
-
-
-def check_czmq():
-    r"""Determine if the necessary C/C++ libraries are installed for ZeroMQ.
-
-    Returns:
-        bool: True if the libraries are installed, False otherwise.
-
-    """
-    # Check that the libraries are installed
-    if platform._is_win:  # pragma: windows
-        opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
-                'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
-        for o in opts:
-            if not ygg_cfg.get('windows', o, None):  # pragma: debug
-                warnings.warn("Config option %s not set." % o)
-                return False
-        return True
-    else:
-        if platform._is_mac:
-            cc = 'clang'
-        else:
-            cc = 'gcc'
-        cc = os.environ.get('CC', cc)
-        try:
-            process = subprocess.Popen([cc, '-lzmq', '-lczmq'],
-                                       stdout=subprocess.PIPE,
-                                       stderr=subprocess.PIPE)
-            outs, errs = process.communicate()
-        except OSError:  # pragma: debug
-            return False
-        # Python 3
-        # try:
-        #     outs, errs = process.communicate(timeout=15)
-        # except subprocess.TimeoutExpired:
-        #     process.kill()
-        #     outs, errs = process.communicate()
-        return (b'zmq' not in errs)
-
-
-_zmq_installed_c = check_czmq()
 
 
 def get_ipc_host():
@@ -149,7 +105,8 @@ def parse_address(address):
 
     """
     if '://' not in address:
-        raise ValueError("Address must contain '://'")
+        raise ValueError("Address must contain '://' (address provided = '%s')"
+                         % address)
     protocol, res = address.split('://')
     if protocol not in _socket_protocols:
         raise ValueError("Protocol '%s' not supported." % protocol)
@@ -198,7 +155,7 @@ def bind_socket(socket, address, retry_timeout=-1, nretry=1):
             # print(e, e.errno)
             raise e
         else:
-            logging.debug("Retrying bind in %f s", retry_timeout)
+            logger.debug("Retrying bind in %f s", retry_timeout)
             tools.sleep(retry_timeout)
             address = bind_socket(socket, address, nretry=nretry - 1,
                                   retry_timeout=retry_timeout)
@@ -328,7 +285,6 @@ class ZMQProxy(CommBase.CommServer):
         CommBase.unregister_comm('ZMQComm', 'DEALER_server_' + self.srv_address)
 
 
-@register_component
 class ZMQComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O using ZeroMQ sockets.
 
@@ -359,12 +315,36 @@ class ZMQComm(AsyncComm.AsyncComm):
         dealer_identity (str): Identity that should be used to route messages
             to a dealer socket.
 
+    Developer Notes:
+        |yggdrasil| uses the tcp transport by default with a PAIR socket type.
+        For every connection, |yggdrasil| establishes a second request/reply
+        connection that is used to confirm messages passed between the primary
+        PAIR of sockets. On the first send, the model should create a REP socket
+        on an open tcp address and send that address in the header of the first
+        message under the key 'zmq_reply'. Receiving models should check
+        message headers for this key and, on receipt, establish the partner
+        REQ socket with the specified address (receiving comms can receive from
+        more than one source so they can have more than one request addresses at
+        at time for this purpose). Following every message, the sending model
+        should wait for a message on the reply socket and, on receipt, return
+        the message. Following every message, the receiving model should send
+        the message 'YGG_REPLY' on the request socket and wait for a reply.
+        When creating worker comms for sending large messages, the sending
+        model should create the reply comm for the worker in advanced and send
+        it in the header with the worker address under the key 'zmq_reply_worker'.
+
     """
 
     _commtype = 'zmq'
+    _schema_subtype_description = ('ZeroMQ socket.')
     # Based on limit of 32bit int, this could be 2**30, but this is
     # too large for stack allocation in C so 2**20 will be used.
     _maxMsgSize = 2**20
+    address_description = ("A ZeroMQ endpoint of the form "
+                           "<transport>://<address>, where the format of "
+                           "address depends on the transport. "
+                           "Additional information can be found "
+                           "`here <http://api.zeromq.org/3-2:zmq-bind>`_.")
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
@@ -436,38 +416,26 @@ class ZMQComm(AsyncComm.AsyncComm):
                                    nretry=4, retry_timeout=2.0 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
-    def printStatus(self, nindent=0):
-        r"""Print status of the communicator."""
-        super(ZMQComm, self).printStatus(nindent=nindent)
-        prefix = '\t' + nindent * '\t'
-        print('%s%-15s: %s' % (prefix, 'nsent (zmq)', self._n_zmq_sent))
-        print('%s%-15s: %s' % (prefix, 'nsent reply (zmq)', self._n_reply_sent))
-        for k in self._n_zmq_recv.keys():
-            print('%s%-15s: %s' % (prefix, 'nrecv (%s)' % k, self._n_zmq_recv[k]))
-            print('%s%-15s: %s' % (prefix, 'nrecv reply (%s)' % k,
-                                   self._n_reply_recv[k]))
-
-    @classmethod
-    def is_installed(cls, language=None):
-        r"""Determine if the necessary libraries are installed for this
-        communication class.
-
+    def get_status_message(self, nindent=0):
+        r"""Return lines composing a status message.
+        
         Args:
-            language (str, optional): Specific language that should be checked
-                for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
-
+            nindent (int, optional): Number of tabs that should be used to
+                indent each line. Defaults to 0.
+                
         Returns:
-            bool: Is the comm installed.
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
 
         """
-        if language == 'python':
-            out = True  # ZMQ is a requirement so it should always be installed
-        elif language == 'c':
-            out = _zmq_installed_c
-        else:
-            out = super(ZMQComm, cls).is_installed(language=language)
-        return out
+        lines, prefix = super(ZMQComm, self).get_status_message(nindent=nindent)
+        lines += ['%s%-15s: %s' % (prefix, 'nsent (zmq)', self._n_zmq_sent),
+                  '%s%-15s: %s' % (prefix, 'nsent reply (zmq)', self._n_reply_sent)]
+        for k in self._n_zmq_recv.keys():
+            lines += ['%s%-15s: %s' % (prefix, 'nrecv (%s)' % k, self._n_zmq_recv[k]),
+                      '%s%-15s: %s' % (prefix, 'nrecv reply (%s)' % k,
+                                       self._n_reply_recv[k])]
+        return lines, prefix
 
     @classmethod
     def underlying_comm_class(self):

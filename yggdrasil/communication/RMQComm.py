@@ -1,18 +1,23 @@
 from yggdrasil.communication import CommBase, AsyncComm
 from yggdrasil.config import ygg_cfg
+from yggdrasil import backwards
 import logging
+logger = logging.getLogger(__name__)
 try:
     import pika
     _rmq_installed = True
 except ImportError:
-    logging.warning("Could not import pika. "
-                    + "RabbitMQ support will be disabled.")
+    logger.warning("Could not import pika. "
+                   + "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
-from yggdrasil.schema import register_component
 
 
 _rmq_param_sep = '_RMQPARAM_'
+if backwards.PY2:  # pragma: Python 2
+    
+    class BlockingIOError:
+        pass
 
 
 def check_rmq_server(url=None, **kwargs):
@@ -64,9 +69,6 @@ def check_rmq_server(url=None, **kwargs):
     return out
 
 
-_rmq_server_running = check_rmq_server()
-
-
 class RMQServer(CommBase.CommServer):
     r"""RMQ server object for cleaning up server connections."""
 
@@ -75,7 +77,6 @@ class RMQServer(CommBase.CommServer):
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
-@register_component
 class RMQComm(AsyncComm.AsyncComm):
     r"""Class for handling basic RabbitMQ communications.
 
@@ -86,12 +87,27 @@ class RMQComm(AsyncComm.AsyncComm):
     Raises:
         RuntimeError: If a connection cannot be established.
 
+    Developer Notes:
+        It is not advised that new language implement a RabbitMQ communication
+        interface. Rather RMQ communication is included explicitly for
+        connections between models that are not co-located on the same machine
+        and are used by the |yggdrasil| framework connections on the Python side.
+
     """
 
     _commtype = 'rmq'
+    _schema_subtype_description = ('RabbitMQ connection.')
     # Based on limit of 32bit int, this could be 2**30, but this is
     # too large for stack allocation in C so 2**20 will be used.
     _maxMsgSize = 2**20
+    address_description = ("AMPQ queue address of the form "
+                           "``<url>_RMQPARAM_<exchange>_RMQPARAM_<queue>`` "
+                           "where ``url`` is the broker address (see explanation "
+                           "`here <https://pika.readthedocs.io/en/stable/"
+                           "examples/using_urlparameters.html>`_), "
+                           "``exchange`` is the name of the exchange on the queue "
+                           "that should be used, and ``queue`` is the name of "
+                           "the queue.")
     
     def _init_before_open(self, **kwargs):
         r"""Set null connection and channel."""
@@ -99,9 +115,6 @@ class RMQComm(AsyncComm.AsyncComm):
         self.channel = None
         self._is_open = False
         self._bound = False
-        # Check that connection is possible
-        if not check_rmq_server(self.url):  # pragma: debug
-            raise RuntimeError("Could not connect to RabbitMQ server.")
         self._server_class = RMQServer
         super(RMQComm, self)._init_before_open(**kwargs)
 
@@ -179,26 +192,6 @@ class RMQComm(AsyncComm.AsyncComm):
                 user, password, host, port, virtual_host)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
-
-    @classmethod
-    def is_installed(cls, language=None):
-        r"""Determine if the necessary libraries are installed for this
-        communication class.
-
-        Args:
-            language (str, optional): Specific language that should be checked
-                for compatibility. Defaults to None and all languages supported
-                on the current platform will be checked.
-
-        Returns:
-            bool: Is the comm installed.
-
-        """
-        if language == 'python':
-            out = _rmq_server_running
-        else:
-            out = super(RMQComm, cls).is_installed(language=language)
-        return out
 
     @classmethod
     def underlying_comm_class(self):
@@ -338,6 +331,9 @@ class RMQComm(AsyncComm.AsyncComm):
                 res = self.channel.queue_declare(queue=self.queue,
                                                  auto_delete=True,
                                                  passive=True)
+            except BlockingIOError:  # pragma: debug
+                self.sleep()
+                res = self.get_queue_result()
             except (pika.exceptions.ChannelClosed,
                     pika.exceptions.ConnectionClosed,
                     AttributeError):  # pragma: debug

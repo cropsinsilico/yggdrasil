@@ -1,30 +1,30 @@
 import json
 from yggdrasil import backwards
-from yggdrasil.serialize import (
-    register_serializer, _default_delimiter, _default_newline)
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize import _default_delimiter
+from yggdrasil.serialize.SerializeBase import SerializeBase
 from yggdrasil.metaschema.encoder import JSONReadableEncoder
 
 
-@register_serializer
-class AsciiMapSerialize(DefaultSerialize):
+class AsciiMapSerialize(SerializeBase):
     r"""Class for serializing/deserializing name/value mapping.
 
     Args:
         delimiter (str, optional): Delimiter that should be used to
             separate name/value pairs in the map. Defaults to \t.
-        newline (str, optional): Delimiter that should be used to
-            separate lines. Defaults to \n.
 
     """
     
-    _seritype = 'ascii_map'
+    _seritype = 'map'
+    _schema_subtype_description = ('Serialzation of mapping between key/value '
+                                   'pairs with one pair per line and using a '
+                                   'character delimiter to separate keys and '
+                                   'values.')
     _schema_properties = {
         'delimiter': {'type': 'string',
-                      'default': backwards.as_str(_default_delimiter)},
-        'newline': {'type': 'string',
-                    'default': backwards.as_str(_default_newline)}}
-    _default_type = {'type': 'object'}
+                      'default': backwards.as_str(_default_delimiter)}}
+    _attr_conv = SerializeBase._attr_conv  # + ['delimiter']
+    default_datatype = {'type': 'object'}
+    concats_as_str = False
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -46,7 +46,7 @@ class AsciiMapSerialize(DefaultSerialize):
             if isinstance(v, backwards.string_types):
                 v = backwards.as_str(v)
             out += json.dumps(v, cls=JSONReadableEncoder)
-            out += self.newline
+            out += backwards.as_str(self.newline)
         return backwards.as_bytes(out)
 
     def func_deserialize(self, msg):
@@ -60,7 +60,8 @@ class AsciiMapSerialize(DefaultSerialize):
 
         """
         out = dict()
-        lines = (backwards.as_str(msg)).split(self.newline)
+        lines = (backwards.as_str(msg)).split(
+            backwards.as_str(self.newline))
         for l in lines:
             kv = l.split(self.delimiter)
             if len(kv) <= 1:
@@ -74,9 +75,27 @@ class AsciiMapSerialize(DefaultSerialize):
                     except BaseException:
                         out[kv[0]] = kv[1]
             else:
-                raise ValueError("Line has more than one delimiter: " + l)
+                raise ValueError("Line has more than one delimiter: " + str(l))
         return out
 
+    @classmethod
+    def concatenate(cls, objects, **kwargs):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        total = dict()
+        for x in objects:
+            total.update(x)
+        return [total]
+        
     @classmethod
     def get_testing_options(cls):
         r"""Method to return a dictionary of testing options for this class.
@@ -86,9 +105,8 @@ class AsciiMapSerialize(DefaultSerialize):
 
         """
         out = super(AsciiMapSerialize, cls).get_testing_options()
-        out['objects'] = [{'args1': int(1), 'args2': 'this',
-                           # Should these be separate messages, allowing append?
-                           'args3': float(1), 'args4': [int(1), int(2)]}]
+        out['objects'] = [{'args1': int(1), 'args2': 'this'},
+                          {'args3': float(1), 'args4': [int(1), int(2)]}]
         out['empty'] = dict()
         out['contents'] = (b'args1\t1\n'
                            + b'args2\t"this"\n'

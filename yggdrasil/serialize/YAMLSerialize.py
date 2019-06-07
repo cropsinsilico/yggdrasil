@@ -1,21 +1,32 @@
-import yaml
 from yggdrasil import backwards
-from yggdrasil.metaschema.encoder import indent_char2int
-from yggdrasil.serialize import register_serializer
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.metaschema.encoder import encode_yaml, decode_yaml
+from yggdrasil.serialize.JSONSerialize import JSONSerialize
 
 
-@register_serializer
-class YAMLSerialize(DefaultSerialize):
-    r"""Class for serializing a python object into a bytes message using YAML."""
+class YAMLSerialize(JSONSerialize):
+    r"""Class for serializing a python object into a bytes message using YAML.
+
+    Args:
+        indent (str, int, optional): String or number of spaces that should be
+            used to indent each level within the seiralized structure. Defaults
+            to '\t'.
+        encoding (str, optional): Encoding that should be used to serialize the
+            object. Defaults to 'utf-8'.
+        default_flow_style (bool, optional): If True, nested collections will
+            be serialized in the block style. If False, they will always be
+            serialized in the flow style. See
+            `PyYAML Documentation <https://pyyaml.org/wiki/PyYAMLDocumentation>`_.
+
+    """
 
     _seritype = 'yaml'
-    _schema_properties = dict(
-        DefaultSerialize._schema_properties,
-        indent={'type': ['string', 'int'], 'default': '\t'},
-        encoding={'type': 'string', 'default': 'utf-8'},
-        default_flow_style={'type': 'boolean', 'default': False})
-    _default_type = {'type': 'object'}
+    _schema_subtype_description = ('Serializes Python objects using the YAML '
+                                   'standard.')
+    _schema_properties = {
+        'indent': {'type': ['string', 'int'], 'default': '\t'},
+        'encoding': {'type': 'string', 'default': 'utf-8'},
+        'default_flow_style': {'type': 'boolean', 'default': False}}
+    _schema_excluded_from_inherit = ['sort_keys']
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -27,13 +38,10 @@ class YAMLSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
-        # Convert bytes to str because YAML can't process unicode by default
+        # Convert bytes to str because JSON cannot serialize bytes by default
         args = backwards.as_str(args, recurse=True, allow_pass=True)
-        # Convert character indent to an integer (tabs are 4 spaces)
-        indent = indent_char2int(self.indent)
-        out = yaml.dump(args, indent=indent, encoding=self.encoding,
-                        default_flow_style=self.default_flow_style)
-        return out
+        return encode_yaml(args, indent=self.indent, encoding=self.encoding,
+                           default_flow_style=self.default_flow_style)
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -45,8 +53,7 @@ class YAMLSerialize(DefaultSerialize):
             obj: Deserialized Python object.
 
         """
-        out = yaml.safe_load(msg)
-        return out
+        return decode_yaml(msg)
 
     @classmethod
     def get_testing_options(cls, **kwargs):
@@ -56,11 +63,21 @@ class YAMLSerialize(DefaultSerialize):
             dict: Dictionary of variables to use for testing.
 
         """
-        iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        # iobj = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj1 = {'a': ['b', int(1), float(1.0)], 'c': {'z': 'hello'}}
+        iobj2 = {'d': 'new field'}
+        # iobj3 = int(2)
+        # iobj4 = [float(2.0)]
         out = {'kwargs': {},
                'empty': {}, 'dtype': None,
                'extra_kwargs': {},
-               'objects': [iobj],
+               'objects': [iobj1, iobj2],  # , iobj3, iobj4],
                'typedef': {'type': 'object'}}
-        out['contents'] = b'a:\n- b\n- 1\n- 1.0\nc:\n    z: hello\n'
+        out['contents'] = (b'a:\n- b\n- 1\n- 1.0\n'
+                           b'c:\n    z: hello\n'
+                           b'd: new field\n')
+        # out['contents'] = (b'-   a:\n    - b\n    - 1\n    - 1.0\n'
+        #                    b'    c:\n        z: hello\n'
+        #                    b'    d: new field\n'
+        #                    b'- 2\n- 2.0\n')
         return out

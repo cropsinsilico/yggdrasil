@@ -80,6 +80,12 @@ class TestClientDriverNoStart(TestClientParam,
         err_attr = ['request_id', 'model_response_address']
         for k in err_attr:
             assert_raises(AttributeError, getattr, self.instance, k)
+
+
+class TestClientDriverNoInit(TestClientParam,
+                             parent.TestConnectionDriverNoInit):
+    r"""Test class for ClientDriver class without init."""
+    pass
             
 
 class TestClientDriver(TestClientParam, parent.TestConnectionDriver):

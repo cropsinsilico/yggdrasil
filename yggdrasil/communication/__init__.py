@@ -1,7 +1,4 @@
-import os
-import glob
-import importlib
-from yggdrasil import tools
+from yggdrasil.components import import_component
 
 
 def determine_suffix(no_suffix=False, reverse_names=False,
@@ -39,24 +36,6 @@ def determine_suffix(no_suffix=False, reverse_names=False,
     return suffix
 
 
-def get_comm_class(comm=None):
-    r"""Return a communication class given it's name.
-
-    Args:
-        comm (str, optional): Name of communicator class. Defaults to
-            tools.get_default_comm() if not provided.
-
-    Returns:
-        class: Communicator class.
-
-    """
-    if (comm is None) or (comm == 'DefaultComm'):
-        comm = tools.get_default_comm()
-    mod = importlib.import_module('yggdrasil.communication.%s' % comm)
-    comm_cls = getattr(mod, comm)
-    return comm_cls
-
-
 def new_comm(name, comm=None, **kwargs):
     r"""Return a new communicator, creating necessary components for
     communication (queues, sockets, channels, etc.).
@@ -73,13 +52,16 @@ def new_comm(name, comm=None, **kwargs):
     """
     if isinstance(comm, list):
         if len(comm) == 1:
-            name = comm[0].pop('name', name)
             kwargs.update(comm[0])
-            return new_comm(name, **kwargs)
+            kwargs.setdefault('name', name)
+            return new_comm(**kwargs)
         else:
             kwargs['comm'] = comm
             comm = 'ForkComm'
-    comm_cls = get_comm_class(comm)
+    comm_cls = import_component('comm', comm)
+    if comm in ['DefaultComm', 'default']:
+        commtype = kwargs.pop('commtype', 'default')
+        assert(commtype == 'default')
     return comm_cls.new_comm(name, **kwargs)
 
 
@@ -98,11 +80,6 @@ def get_comm(name, **kwargs):
     return new_comm(name, **kwargs)
     
 
-def DefaultComm(*args, **kwargs):
-    r"""Construct a comm object of the default type."""
-    return get_comm_class()(*args, **kwargs)
-
-
 def cleanup_comms(comm=None):
     r"""Call cleanup_comms for the appropriate communicator class.
 
@@ -114,15 +91,7 @@ def cleanup_comms(comm=None):
         int: Number of comms closed.
 
     """
-    return get_comm_class(comm).cleanup_comms()
+    return import_component('comm', comm).cleanup_comms()
 
 
-def import_all_comms():
-    r"""Import all comms to ensure they are registered."""
-    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
-        if not x.startswith('__'):
-            get_comm_class(os.path.basename(x)[:-3])
-
-
-__all__ = ['new_comm', 'get_comm', 'get_comm_class', 'cleanup_comms',
-           'DefaultComm']
+__all__ = ['new_comm', 'get_comm', 'cleanup_comms']

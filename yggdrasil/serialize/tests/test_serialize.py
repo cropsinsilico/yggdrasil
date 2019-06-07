@@ -1,7 +1,6 @@
 import numpy as np
 from yggdrasil import serialize, backwards, platform
 from yggdrasil.tests import assert_raises, assert_equal
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
 unsupported_nptype = ['bool_']
@@ -59,22 +58,6 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
 map_cformat2nptype.append(
     (['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
      'complex128'))
-
-
-def test_get_registered_serializers():
-    r"""Test get_registered_serializers."""
-    registry = serialize.get_registered_serializers()
-    assert_equal(registry[DefaultSerialize._seritype], DefaultSerialize)
-
-
-def test_register_serializer_errors():
-    r"""Test errors in register_serializer for duplicate."""
-    assert_raises(ValueError, serialize.register_serializer, DefaultSerialize)
-
-
-def test_get_serializer_class_errors():
-    r"""Test errors in get_serializer_class for invalid serializer."""
-    assert_raises(ValueError, serialize.get_serializer_class, 'invalid')
 
 
 def test_extract_formats():

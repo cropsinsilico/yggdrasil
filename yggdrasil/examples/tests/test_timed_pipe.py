@@ -18,12 +18,12 @@ class ExampleTimedPipeTestBase(TestExample):
         super(ExampleTimedPipeTestBase, self).__init__(*args, **kwargs)
         self._new_default_comm = getattr(self.__class__, '__new_default_comm',
                                          _default_comm)
-        # if self._new_default_comm == 'IPCComm':
+        # if self._new_default_comm in ['ipc', 'IPCComm']:
         #     self.debug_flag = True
         
     def run_example(self):
         r"""This runs an example in the correct language."""
-        if self._new_default_comm == 'IPCComm':
+        if self._new_default_comm in ['ipc', 'IPCComm']:
             from yggdrasil.communication.IPCComm import ipcrm_queues, ipc_queues
             qlist = ipc_queues()
             if qlist:  # pragma: debug
@@ -57,7 +57,7 @@ for c in tools.get_installed_comm():
         continue
     new_cls = unittest.skipIf(not tools.is_comm_installed(c),
                               "%s library not installed." % c)(
-                                  type('TestExampleTimedPipe%s' % c,
+                                  type('TestExampleTimedPipe_%s' % c,
                                        (ExampleTimedPipeTestBase, ),
                                        {'__new_default_comm': c}))
     globals()[new_cls.__name__] = new_cls

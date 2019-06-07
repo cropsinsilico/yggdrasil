@@ -11,7 +11,6 @@ from yggdrasil.metaschema.datatypes import (
     get_registered_types, import_all_types, _jsonschema_ver_maj)
 
 
-# TODO: this should be included in release as YAML/JSON and then loaded
 _metaschema_fbase = '.ygg_metaschema.json'
 _metaschema_fname = os.path.abspath(os.path.join(
     os.path.dirname(yggdrasil.__file__), _metaschema_fbase))
@@ -169,6 +168,20 @@ def validate_schema(obj):
     """
     cls = get_validator()
     cls.check_schema(obj)
+
+
+# def normalize_schema(obj):
+#     r"""Normalize a schema against the metaschema.
+
+#     Args:
+#         obj (dict): Schema to be normalized.
+
+#     Returns:
+#         dict: Normalized schema.
+
+#     """
+#     cls = get_validator()
+#     return cls.normalize_schema(obj)
 
 
 def validate_instance(obj, schema, **kwargs):

@@ -45,8 +45,14 @@ class TestFileInputParam(parent.TestConnectionParam):
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
-        filename = self.instance.icomm.address
         super(TestFileInputParam, self).teardown()
+        if os.path.isfile(self.filepath):  # pragma: debug
+            os.remove(self.filepath)
+
+    def remove_instance(self, inst):
+        r"""Remove an instance include the input file."""
+        filename = inst.icomm.address
+        super(TestFileInputParam, self).remove_instance(inst)
         if os.path.isfile(filename):
             os.remove(filename)
 
@@ -57,6 +63,12 @@ class TestFileInputDriverNoStart(TestFileInputParam,
     pass
 
 
+class TestFileInputDriverNoInit(TestFileInputParam,
+                                parent.TestConnectionDriverNoInit):
+    r"""Test runner for FileInputDriver without init."""
+    pass
+
+
 class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
     r"""Test runner for FileInputDriver."""
 
@@ -64,19 +76,7 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
         r"""Assertions to make before stopping the driver instance."""
         super(TestFileInputDriver, self).assert_before_stop(check_open=False)
         self.instance.sleep()
-        # File contents
-        flag = True
-        msg_list = []
-        while flag:
-            flag, msg_recv = self.recv_comm.recv(self.timeout)
-            if flag:
-                msg_list.append(msg_recv)
-            else:
-                self.assert_equal(msg_recv, self.recv_comm.eof_msg)
-        recv_objects = self.testing_options['recv']
-        self.assert_equal(len(msg_list), len(recv_objects))
-        for x, y in zip(msg_list, recv_objects):
-            self.assert_msg_equal(x, y)
+        self.recv_message_list(self.recv_comm, self.testing_options['recv'])
 
     def assert_after_terminate(self):
         r"""Assertions to make after stopping the driver instance."""
@@ -104,12 +104,16 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
 s = get_schema()
 file_types = list(s['file'].schema_subtypes.keys())
 for k in file_types:
+    attr_dict = {'icomm_name': k}
+    if k == 'PandasFileComm':
+        attr_dict['testing_option_kws'] = {'not_as_frames': True}
     cls_exp = type('Test%sInputDriver' % k,
-                   (TestFileInputDriver, ), {'icomm_name': k})
+                   (TestFileInputDriver, ), attr_dict)
     globals()[cls_exp.__name__] = cls_exp
     if k == 'AsciiTableComm':
+        attr_dict = dict(attr_dict, testing_option_kws={'array_columns': True})
         cls_exp2 = type('Test%sArrayInputDriver' % k,
-                        (cls_exp, ), {'testing_option_kws': {'as_array': True}})
+                        (cls_exp, ), attr_dict)
         globals()[cls_exp2.__name__] = cls_exp2
         del cls_exp2
     del cls_exp

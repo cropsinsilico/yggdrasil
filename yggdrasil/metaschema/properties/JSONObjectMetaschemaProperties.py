@@ -1,11 +1,9 @@
 from jsonschema.compat import iteritems
 from yggdrasil.metaschema import normalizer as normalizer_mod
 from yggdrasil.metaschema.datatypes import encode_type, compare_schema
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
-@register_metaschema_property
 class PropertiesMetaschemaProperty(MetaschemaProperty):
     r"""Property class for 'properties' property."""
 
@@ -17,8 +15,9 @@ class PropertiesMetaschemaProperty(MetaschemaProperty):
     def encode(cls, instance, typedef=None):
         r"""Encoder for the 'properties' container property."""
         if typedef is None:
-            typedef = {k: None for k in instance.keys()}
-        return {k: encode_type(v, typedef=typedef[k]) for k, v in instance.items()}
+            typedef = {}
+        return {k: encode_type(v, typedef=typedef.get(k, None))
+                for k, v in instance.items()}
 
     @classmethod
     def compare(cls, prop1, prop2, root1=None, root2=None):

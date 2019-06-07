@@ -3,19 +3,19 @@ import copy
 import uuid
 import atexit
 import threading
-from logging import info
+import logging
 from yggdrasil import backwards, tools, serialize
 from yggdrasil.tools import YGG_MSG_EOF
-from yggdrasil.communication import (
-    new_comm, get_comm, get_comm_class, determine_suffix)
-from yggdrasil.schema import register_component
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.communication import new_comm, get_comm, determine_suffix
+from yggdrasil.components import import_component
+from yggdrasil.metaschema.datatypes.MetaschemaType import MetaschemaType
 from yggdrasil.metaschema.datatypes.JSONArrayMetaschemaType import (
     JSONArrayMetaschemaType)
 from yggdrasil.metaschema.datatypes.JSONObjectMetaschemaType import (
     JSONObjectMetaschemaType)
 
 
+logger = logging.getLogger(__name__)
 _registered_servers = dict()
 _registered_comms = dict()
 _server_lock = threading.RLock()
@@ -94,7 +94,7 @@ def unregister_comm(comm_class, key, dont_close=False):
         value = _registered_comms[comm_class].pop(key)
         if dont_close:
             return False
-        out = get_comm_class(comm_class).close_registry_entry(value)
+        out = import_component('comm', comm_class).close_registry_entry(value)
         del value
     return out
 
@@ -148,8 +148,6 @@ class CommThreadLoop(tools.YggThreadLoop):
 
     def on_main_terminated(self):  # pragma: debug
         r"""Actions taken on the backlog thread when the main thread stops."""
-        # for i in threading.enumerate():
-        #     print(i.name)
         self.debug('is_interface = %s, direction = %s',
                    self.comm.is_interface, self.comm.direction)
         if self.comm.is_interface:
@@ -198,7 +196,6 @@ class CommServer(tools.YggThreadLoop):
             _registered_servers.pop(self.srv_address)
 
 
-@register_component
 class CommBase(tools.YggClass):
     r"""Class for handling I/O.
 
@@ -211,6 +208,24 @@ class CommBase(tools.YggClass):
             through the connection. 'send' if the connection will send
             messages, 'recv' if the connecton will receive messages. Defaults
             to 'send'.
+        partner_language (str, optional): Programming language of this comm's
+            partner comm. Defaults to 'python'.
+        datatype (schema, optional): JSON schema (with expanded core types
+            defined by |yggdrasil|) that constrains the type of data that
+            should be sent/received by this object. Defaults to {'type': 'bytes'}.
+            Additional information on specifying datatypes can be found
+            :ref:`here <datatypes_rst>`.
+        field_names (list, optional): [DEPRECATED] Field names that should be
+            used to label fields in sent/received tables. This keyword is only
+            valid for table-like datatypes. If not provided, field names are
+            created based on the field order.
+        field_units (list, optional): [DEPRECATED] Field units that should be
+            used to convert fields in sent/received tables. This keyword is only
+            valid for table-like datatypes. If not provided, all fields are
+            assumed to be unitless.
+        as_array (bool, optional): [DEPRECATED] If True and the datatype is
+            table-like, tables are sent/recieved with either columns rather
+            than row by row. Defaults to False.
         serializer (:class:.DefaultSerialize, optional): Class with serialize and
             deserialize methods that should be used to process sent and received
             messages. Defaults to None and is constructed using provided
@@ -258,12 +273,19 @@ class CommBase(tools.YggClass):
             code. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
+    Class Attributes:
+        is_file (bool): True if the comm accesses a file.
+        _maxMsgSize (int): Maximum size of a single message that should be sent.
+        address_description (str): Description of the information constituting
+            an address for this communication mechanism.
+
     Attributes:
         name (str): The environment variable where communication address is
             stored.
         address (str): Communication info.
         direction (str): The direction that messages should flow through the
             connection.
+        partner_language (str): Programming language of this comm's partner comm.
         serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
         is_interface (bool): True if this comm is a Python interface binding.
@@ -283,11 +305,9 @@ class CommBase(tools.YggClass):
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
-        is_file (bool): True if the comm accesses a file.
         recv_converter (func): Converter that should be used on received objects.
         send_converter (func): Converter that should be used on sent objects.
         matlab (bool): True if the comm will be accessed by Matlab code.
-        maxMsgSize (int): Maximum size of a single message that should be sent.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -298,25 +318,34 @@ class CommBase(tools.YggClass):
     """
 
     # TODO: Add serializer to comm schema
-    _commtype = 'default'
+    _commtype = None
     _schema_type = 'comm'
+    _schema_subtype_key = 'commtype'
     _schema_required = ['name', 'commtype', 'datatype']
     _schema_properties = {'name': {'type': 'string'},
-                          'commtype': {'type': 'string', 'default': _commtype},
+                          'commtype': {'type': 'string', 'default': 'default',
+                                       'description': ('Communication mechanism '
+                                                       'that should be used.')},
                           'datatype': {'type': 'schema',
                                        'default': {'type': 'bytes'}},
-                          'recv_converter': {'type': 'function'},
+                          'recv_converter': {'type': ['function', 'string']},
                           'send_converter': {'type': 'function'},
-                          'field_names': {'type': 'array', 'items': {'type': 'string'}},
-                          'field_units': {'type': 'array', 'items': {'type': 'string'}},
+                          'field_names': {'type': 'array',
+                                          'items': {'type': 'string'}},
+                          'field_units': {'type': 'array',
+                                          'items': {'type': 'string'}},
                           'as_array': {'type': 'boolean', 'default': False}}
-    _default_serializer = DefaultSerialize
+    _schema_excluded_from_class = ['name']
+    _default_serializer = 'default'
+    _default_serializer_class = None
+    _schema_excluded_from_class_validation = ['datatype']
     is_file = False
     _maxMsgSize = 0
+    address_description = None
 
     def __init__(self, name, address=None, direction='send',
-                 dont_open=False, is_interface=False, recv_timeout=0.0,
-                 close_on_eof_recv=True, close_on_eof_send=False,
+                 partner_language='python', dont_open=False, is_interface=False,
+                 recv_timeout=0.0, close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
@@ -324,6 +353,8 @@ class CommBase(tools.YggClass):
         self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
+        if isinstance(kwargs.get('datatype', None), MetaschemaType):
+            self.datatype = kwargs.pop('datatype')
         super(CommBase, self).__init__(name, **kwargs)
         if not self.__class__.is_installed(language='python'):
             raise RuntimeError("Comm class %s not installed" % self.__class__)
@@ -340,6 +371,7 @@ class CommBase(tools.YggClass):
         else:
             self.address = address
         self.direction = direction
+        self.partner_language = partner_language
         self.is_client = is_client
         self.is_server = is_server
         self.is_response_client = is_response_client
@@ -393,34 +425,62 @@ class CommBase(tools.YggClass):
         else:
             self.open()
 
-    def _init_before_open(self, serializer=None, **kwargs):
+    def _init_before_open(self, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
-        datatype = kwargs.get('datatype', None)
-        if datatype is None:
-            datatype = {}
-        datatype.update(kwargs.pop('serializer_kwargs', {}))
-        if serializer is not None:
-            self.serializer = serializer
-        else:
-            cls = kwargs.pop('serializer_class', self._default_serializer)
-            for k in cls.seri_kws():
+        seri_cls = kwargs.pop('serializer_class', None)
+        seri_kws = kwargs.pop('serializer_kwargs', {})
+        if ('datatype' in self._schema_properties) and (self.datatype is not None):
+            seri_kws.setdefault('datatype', self.datatype)
+        if ((('serializer' not in self._schema_properties)
+             and (not hasattr(self, 'serializer')))):
+            self.serializer = self._default_serializer
+        if isinstance(self.serializer, str):
+            seri_kws.setdefault('seritype', self.serializer)
+            self.serializer = None
+        elif isinstance(self.serializer, dict):
+            seri_kws.update(self.serializer)
+            self.serializer = None
+        # Only update serializer if not already set
+        if self.serializer is None:
+            # Get serializer class
+            if seri_cls is None:
+                if (((seri_kws['seritype'] == self._default_serializer)
+                     and (self._default_serializer_class is not None))):
+                    seri_cls = self._default_serializer_class
+                else:
+                    seri_cls = import_component('serializer',
+                                                subtype=seri_kws['seritype'])
+            # Recover keyword arguments for serializer passed to comm class
+            for k in seri_cls.seri_kws():
                 if k in kwargs:
-                    # TODO: Change to pop once old seri keywords not in comm
-                    # schema directly
-                    datatype[k] = kwargs[k]
-            self.debug('datatype = %s', str(datatype))
-            self.serializer = cls(**datatype)
-        # Transfer keywords form the schema
-        for k, v in self._schema_properties.items():
-            if k in ['name']:
-                continue
-            default = v.get('default', None)
-            setattr(self, k, kwargs.get(k, default))
+                    seri_kws.setdefault(k, kwargs[k])
+            # Create serializer instance
+            self.debug('seri_kws = %s', str(seri_kws))
+            self.serializer = seri_cls(**seri_kws)
+        # Set send/recv converter based on the serializer
+        for k in ['recv_converter', 'send_converter']:
+            if getattr(self, k, None) is None:
+                v = getattr(self.serializer, k, None)
+                if v is not None:
+                    setattr(self, k, v)
 
+    @staticmethod
+    def before_registration(cls):
+        r"""Operations that should be performed to modify class attributes prior
+        to registration."""
+        tools.YggClass.before_registration(cls)
+        cls._default_serializer_class = import_component('serializer',
+                                                         cls._default_serializer)
+        
     @classmethod
-    def get_testing_options(cls, **kwargs):
+    def get_testing_options(cls, serializer=None, **kwargs):
         r"""Method to return a dictionary of testing options for this class.
+
+        Args:
+            serializer (str, optional): The name of the serializer that should
+                be used. If not provided, the _default_serializer class
+                attribute will be used.
 
         Returns:
             dict: Dictionary of variables to use for testing. Key/value pairs:
@@ -433,29 +493,60 @@ class CommBase(tools.YggClass):
                     the messages in 'send'.
 
         """
-        out = cls._default_serializer.get_testing_options(**kwargs)
-        out = {'kwargs': out['kwargs'],
-               'send': copy.deepcopy(out['objects']),
-               'msg': out['objects'][0],
-               'contents': out['contents']}
+        if serializer is None:
+            serializer = cls._default_serializer
+        if (((serializer == cls._default_serializer)
+             and (cls._default_serializer_class is not None))):
+            seri_cls = cls._default_serializer_class
+        else:
+            seri_cls = import_component('serializer', serializer)
+        out_seri = seri_cls.get_testing_options(**kwargs)
+        out = {'kwargs': out_seri['kwargs'],
+               'send': copy.deepcopy(out_seri['objects']),
+               'msg': out_seri['objects'][0],
+               'contents': out_seri['contents']}
         out['recv'] = copy.deepcopy(out['send'])
-        out['dict'] = {'f0': out['msg']}
+        out['dict'] = seri_cls.object2dict(out['msg'], **out['kwargs'])
+        if not out_seri.get('exact_contents', True):
+            out['exact_contents'] = False
+        msg_array = seri_cls.object2array(out['msg'], **out['kwargs'])
+        if msg_array is not None:
+            out['msg_array'] = msg_array
         if isinstance(out['msg'], backwards.bytes_type):
             out['msg_long'] = out['msg'] + (cls._maxMsgSize * b'0')
         else:
             out['msg_long'] = out['msg']
+        for k in ['field_names', 'field_units']:
+            if k in out_seri:
+                out[k] = copy.deepcopy(out_seri[k])
         return out
 
-    def printStatus(self, nindent=0):
-        r"""Print status of the communicator."""
+    def get_status_message(self, nindent=0):
+        r"""Return lines composing a status message.
+        
+        Args:
+            nindent (int, optional): Number of tabs that should be used to
+                indent each line. Defaults to 0.
+                
+        Returns:
+            tuple(list, prefix): Lines composing the status message and the
+                prefix string used for the last message.
+
+        """
         prefix = nindent * '\t'
-        print('%s%s:' % (prefix, self.name))
+        lines = ['', '%s%s:' % (prefix, self.name)]
         prefix += '\t'
-        print('%s%-15s: %s' % (prefix, 'address', self.address))
-        print('%s%-15s: %s' % (prefix, 'direction', self.direction))
-        print('%s%-15s: %s' % (prefix, 'open', self.is_open))
-        print('%s%-15s: %s' % (prefix, 'nsent', self._n_sent))
-        print('%s%-15s: %s' % (prefix, 'nrecv', self._n_recv))
+        lines += ['%s%-15s: %s' % (prefix, 'address', self.address),
+                  '%s%-15s: %s' % (prefix, 'direction', self.direction),
+                  '%s%-15s: %s' % (prefix, 'open', self.is_open),
+                  '%s%-15s: %s' % (prefix, 'nsent', self._n_sent),
+                  '%s%-15s: %s' % (prefix, 'nrecv', self._n_recv)]
+        return lines, prefix
+
+    def printStatus(self, *args, **kwargs):
+        r"""Print status of the communicator."""
+        lines, _ = self.get_status_message(*args, **kwargs)
+        self.info('\n'.join(lines))
 
     @classmethod
     def is_installed(cls, language=None):
@@ -491,18 +582,16 @@ class CommBase(tools.YggClass):
                 elif use_any:
                     out = True
                     break
-        elif language in ['cpp', 'c++', 'make', 'cmake']:
-            out = cls.is_installed(language='c')
-        elif language in ['lpy', 'matlab']:
-            out = cls.is_installed(language='python')
-        elif language in ['executable']:
-            out = True
         else:
             if comm_class in ['CommBase', 'AsyncComm', 'ForkComm', 'ErrorClass']:
                 out = (language in lang_list)
             else:
-                # Default to False for languages so subclasses must be explicit
-                out = False
+                # Check driver
+                try:
+                    drv = import_component('model', language)
+                    out = drv.is_comm_installed(commtype=cls._commtype)
+                except ValueError:
+                    out = False
         return out
 
     @property
@@ -518,8 +607,13 @@ class CommBase(tools.YggClass):
     @property
     def comm_class(self):
         r"""str: Name of communication class."""
+        # TODO: Change this to return self._commtype
         if self._comm_class is None:
-            self._comm_class = str(self.__class__).split("'")[1].split(".")[-1]
+            if getattr(self, '_is_error_class', False):
+                name_cls = self.__class__.__bases__[0]
+            else:
+                name_cls = self.__class__
+            self._comm_class = str(name_cls).split("'")[1].split(".")[-1]
         return self._comm_class
 
     @classmethod
@@ -544,11 +638,13 @@ class CommBase(tools.YggClass):
 
     def register_comm(self, key, value):
         r"""Register a comm."""
-        self.debug("Registering comm: %s", key)
+        self.debug("Registering %s comm: %s", self.comm_class, key)
         register_comm(self.comm_class, key, value)
 
     def unregister_comm(self, key, dont_close=False):
         r"""Unregister a comm."""
+        self.debug("Unregistering %s comm: %s (dont_close = %s)",
+                   self.comm_class, key, dont_close)
         unregister_comm(self.comm_class, key, dont_close=dont_close)
 
     @classmethod
@@ -556,9 +652,9 @@ class CommBase(tools.YggClass):
         r"""int: Number of communication connections."""
         out = len(cls.comm_registry())
         if out > 0:
-            info('There are %d %s comms: %s',
-                 len(cls.comm_registry()), cls.__name__,
-                 [k for k in cls.comm_registry().keys()])
+            logger.info('There are %d %s comms: %s',
+                        len(cls.comm_registry()), cls.__name__,
+                        [k for k in cls.comm_registry().keys()])
         return out
 
     @classmethod
@@ -582,7 +678,7 @@ class CommBase(tools.YggClass):
         else:
             args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
         if new_comm_class is not None:
-            new_cls = get_comm_class(new_comm_class)
+            new_cls = import_component('comm', new_comm_class)
             return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
@@ -611,8 +707,7 @@ class CommBase(tools.YggClass):
             kwargs['direction'] = 'recv'
         else:
             kwargs['direction'] = 'send'
-        for k in self.serializer._schema_properties.keys():
-            kwargs[k] = getattr(self.serializer, k)
+        kwargs.update(self.serializer.input_kwargs)
         return kwargs
 
     def bind(self):
@@ -1291,7 +1386,7 @@ class CommBase(tools.YggClass):
             ret = self.send_multipart(args, **kwargs)
             if ret:
                 self._used = True
-                if self.serializer._initialized:
+                if self.serializer.initialized:
                     self._send_serializer = False
         except BaseException:
             # Handle error caused by calling repr on unyt array that isn't float64
@@ -1609,9 +1704,7 @@ class CommBase(tools.YggClass):
              and isinstance(args_dict, dict)
              and (len(args_dict) <= 1))):
             metadata['key_order'] = [k for k in args_dict.keys()]
-        if not self.serializer._initialized:
-            if (metadata['key_order'] is None) and isinstance(args_dict, dict):
-                metadata['key_order'] = sorted(list(args_dict.keys()))
+        if not self.serializer.initialized:
             metadata['field_names'] = metadata['key_order']
         args = JSONArrayMetaschemaType.coerce_type(args_dict, **metadata)
         # Add field order to kwargs so it can be reconstructed

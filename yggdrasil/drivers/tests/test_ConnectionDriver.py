@@ -1,21 +1,22 @@
-import uuid
 import unittest
-from yggdrasil import tools, backwards
+from yggdrasil import tools, backwards, platform
 from yggdrasil.tests import MagicTestError, assert_raises
 from yggdrasil.schema import get_schema
-from yggdrasil.drivers import import_driver
+from yggdrasil.components import import_component
 from yggdrasil.drivers.tests import test_Driver as parent
 from yggdrasil.drivers.ConnectionDriver import ConnectionDriver
 from yggdrasil.communication import (
-    new_comm, ZMQComm, IPCComm, RMQComm, get_comm_class)
+    new_comm, ZMQComm, IPCComm, RMQComm)
 
 
 _default_comm = tools.get_default_comm()
 _zmq_installed = ZMQComm.ZMQComm.is_installed(language='python')
 _ipc_installed = IPCComm.IPCComm.is_installed(language='python')
-_rmq_server_running = RMQComm._rmq_server_running
+_rmq_installed = RMQComm.RMQComm.is_installed(language='python')
 
-            
+
+@unittest.skipIf(platform._is_win, ("Temp skip connection tests on windows for "
+                                    "time's sake."))
 class TestConnectionParam(parent.TestParam):
     r"""Test parameters for the ConnectionDriver class."""
 
@@ -30,7 +31,6 @@ class TestConnectionParam(parent.TestParam):
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',
                            'nrecv', 'nproc', 'nsent', 'state', 'translator']
         # self.timeout = 1.0
-        self._extra_instances = []
 
     @property
     def description_prefix(self):
@@ -57,6 +57,46 @@ class TestConnectionParam(parent.TestParam):
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
         self.assert_equal(x, y)
+
+    def assert_msg_lists_equal(self, x, y):
+        r"""Assert that two lists of messages are equivalent."""
+        self.assert_equal(len(x), len(y))
+        for ix, iy in zip(x, y):
+            self.assert_msg_equal(ix, iy)
+
+    def recv_message_list(self, recv_inst, expected_result=None,
+                          break_on_empty=False):
+        r"""Continue receiving from a receive instance until flag is False (or
+        an empty messages is received and break_on_empty is True). On receipt of
+        a False flag, the recieved message is checked against the EOF message.
+
+        Args:
+            recv_inst (yggdrasil.communication.CommBase.CommBase): Communication
+                instance that should be received from.
+            expected_result (list, optional): A list of messages that the
+                recieved messages should be compared against. Defaults to None
+                and is ignored.
+            break_on_empty (bool, optional): If True, messages will stop being
+                received from the communication instance when an empty message
+                is received. Defaults to False.
+
+        Returns:
+            list: Received messages.
+
+        """
+        flag = True
+        msg_list = []
+        while flag:
+            flag, msg_recv = recv_inst.recv(self.timeout)
+            if flag:
+                if break_on_empty and recv_inst.is_empty_recv(msg_recv):
+                    break  # pragma: no cover
+                msg_list.append(msg_recv)
+            else:
+                self.assert_equal(msg_recv, recv_inst.eof_msg)
+        if expected_result is not None:
+            self.assert_msg_lists_equal(msg_list, expected_result)
+        return msg_list
 
     def get_options(self):
         r"""Get testing options."""
@@ -93,12 +133,12 @@ class TestConnectionParam(parent.TestParam):
     @property
     def icomm_import_cls(self):
         r"""class: Class used for connection input comm."""
-        return get_comm_class(self.icomm_name)
+        return import_component('comm', self.icomm_name)
 
     @property
     def ocomm_import_cls(self):
         r"""class: Class used for connection output comm."""
-        return get_comm_class(self.ocomm_name)
+        return import_component('comm', self.ocomm_name)
 
     @property
     def send_comm_kwargs(self):
@@ -137,24 +177,57 @@ class TestConnectionParam(parent.TestParam):
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         super(TestConnectionParam, self).setup(*args, **kwargs)
-        send_kws = self.send_comm_kwargs
-        recv_kws = self.recv_comm_kwargs
-        if self.skip_start:
-            send_kws['dont_open'] = True
-            recv_kws['dont_open'] = True
-        self.send_comm = new_comm(self.name, **send_kws)
-        self.recv_comm = new_comm(self.name, **recv_kws)
+        if not self.skip_init:
+            send_kws = self.send_comm_kwargs
+            recv_kws = self.recv_comm_kwargs
+            if self.skip_start:
+                send_kws['dont_open'] = True
+                recv_kws['dont_open'] = True
+            self.send_comm = new_comm(self.name, **send_kws)
+            self.recv_comm = new_comm(self.name, **recv_kws)
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""
-        self.send_comm.close()
-        self.recv_comm.close()
-        assert(self.send_comm.is_closed)
-        assert(self.recv_comm.is_closed)
+        if not self.skip_init:
+            self.send_comm.close()
+            self.recv_comm.close()
+            assert(self.send_comm.is_closed)
+            assert(self.recv_comm.is_closed)
         super(TestConnectionParam, self).teardown(*args, **kwargs)
-        for inst in self._extra_instances:
-            inst.terminate()
-    
+
+    def create_error_instance(self, comm=None, inst_class=None, args=None,
+                              kwargs=None, error_class=None, error_on_init=False):
+        r"""Create a new instance of the class where one or both comms is
+        wrapped in ErrorClass."""
+        if inst_class is None:
+            inst_class = self.import_cls
+        if args is None:
+            args = [self.get_fresh_name()]
+            if self.args is not None:
+                args.append(self.args)
+        if kwargs is None:
+            kwargs = self.inst_kwargs
+        # Adjust kwargs
+        if 'comm_address' in kwargs:
+            del kwargs['comm_address']
+        if comm in ['ocomm', 'both']:
+            kwargs['ocomm_kws'].update(
+                base_comm=self.ocomm_name, new_comm_class='ErrorComm',
+                error_on_init=error_on_init)
+        if comm in ['icomm', 'both']:
+            kwargs['icomm_kws'].update(
+                base_comm=self.icomm_name, new_comm_class='ErrorComm',
+                error_on_init=error_on_init)
+        # Get error class
+        if (error_class is None) and (comm in ['ocomm', 'icomm', 'both']):
+            error_class = inst_class
+        out = super(TestConnectionParam, self).create_error_instance(
+            inst_class=inst_class, args=args, kwargs=kwargs,
+            error_class=error_class, error_on_init=error_on_init)
+        if (not error_on_init) and (comm is not None):
+            out.icomm._first_send_done = True
+        return out
+            
 
 class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart):
     r"""Test class for the ConnectionDriver class without start."""
@@ -184,43 +257,17 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         assert(not flag)
         self.assert_equal(ret, None)
 
-    def get_fresh_name(self):
-        r"""Get a fresh name for a new instance that won't overlap with the base."""
-        return 'Test%s_%s' % (self.cls, str(uuid.uuid4()))
-
-    def get_fresh_error_instance(self, comm, error_on_init=False):
-        r"""Get a driver instance with ErrorComm class for one or both comms."""
-        args = [self.get_fresh_name()]
-        if self.args is not None:
-            args.append(self.args)
-        # args = self.inst_args
-        kwargs = self.inst_kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
-        if comm in ['ocomm', 'both']:
-            kwargs['ocomm_kws'].update(
-                base_comm=self.ocomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init)
-        if comm in ['icomm', 'both']:
-            kwargs['icomm_kws'].update(
-                base_comm=self.icomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init)
-        driver_class = import_driver(self.driver)
-        if error_on_init:
-            self.assert_raises(MagicTestError, driver_class, *args, **kwargs)
-        else:
-            inst = driver_class(*args, **kwargs)
-            inst.icomm._first_send_done = True
-            self._extra_instances.append(inst)
-            return inst
-
+        
+class TestConnectionDriverNoInit(TestConnectionParam):
+    r"""Test class for the ConnectionDriver class without init."""
+    
     def test_error_init_ocomm(self):
         r"""Test forwarding of error from init of ocomm."""
-        self.get_fresh_error_instance('ocomm', error_on_init=True)
+        self.create_error_instance(comm='ocomm', error_on_init=True)
 
     def test_error_open_icomm(self):
         r"""Test fowarding of error from open of icomm."""
-        inst = self.get_fresh_error_instance('icomm')
+        inst = self.create_error_instance(comm='icomm')
         inst.icomm.error_replace('open')
         self.assert_raises(MagicTestError, inst.open_comm)
         assert(inst.icomm.is_closed)
@@ -228,7 +275,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
 
     def test_error_close_icomm(self):
         r"""Test forwarding of error from close of icomm."""
-        inst = self.get_fresh_error_instance('icomm')
+        inst = self.create_error_instance(comm='icomm')
         inst.open_comm()
         inst.icomm.error_replace('close')
         self.assert_raises(MagicTestError, inst.close_comm)
@@ -239,7 +286,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         
     def test_error_close_ocomm(self):
         r"""Test forwarding of error from close of ocomm."""
-        inst = self.get_fresh_error_instance('ocomm')
+        inst = self.create_error_instance(comm='ocomm')
         inst.open_comm()
         inst.ocomm.error_replace('close')
         self.assert_raises(MagicTestError, inst.close_comm)
@@ -250,7 +297,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
 
     def test_error_open_fails(self):
         r"""Test error raised when comms fail to open."""
-        inst = self.get_fresh_error_instance('both')
+        inst = self.create_error_instance(comm='both')
         old_timeout = inst.timeout
         inst.icomm.empty_replace('open')
         inst.ocomm.empty_replace('open')
@@ -383,7 +430,7 @@ def test_ConnectionDriverTranslate_errors():
 s = get_schema()
 comm_types = list(s['comm'].schema_subtypes.keys())
 for k in comm_types:
-    if k == _default_comm:
+    if k == _default_comm:  # pragma: debug
         continue
     # Output
     ocls = type('Test%sOutputDriver' % k,
@@ -398,7 +445,7 @@ for k in comm_types:
     # Flags
     flag_func = None
     if k in ['RMQComm', 'RMQAsyncComm']:
-        flag_func = unittest.skipIf(not _rmq_server_running,
+        flag_func = unittest.skipIf(not _rmq_installed,
                                     "RMQ Server not running")
     elif k in ['ZMQComm']:
         flag_func = unittest.skipIf(not _zmq_installed,

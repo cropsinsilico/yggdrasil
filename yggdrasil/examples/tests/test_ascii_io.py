@@ -1,9 +1,11 @@
 import os
 import numpy as np
 from yggdrasil import serialize
+from yggdrasil.tests import extra_example
 from yggdrasil.examples.tests import TestExample
 
 
+@extra_example
 class TestExampleAsciiIO(TestExample):
     r"""Test the AsciiIO example."""
 

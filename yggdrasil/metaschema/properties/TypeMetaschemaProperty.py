@@ -1,6 +1,5 @@
 from yggdrasil.metaschema.datatypes import (
     get_registered_types, get_type_class, MetaschemaTypeError)
-from yggdrasil.metaschema.properties import register_metaschema_property
 from yggdrasil.metaschema.properties.MetaschemaProperty import MetaschemaProperty
 
 
@@ -8,7 +7,6 @@ def _specificity_sort_key(item):
     return -item[1].specificity
 
 
-@register_metaschema_property
 class TypeMetaschemaProperty(MetaschemaProperty):
     r"""Type property with validation of new properties."""
 
@@ -32,7 +30,7 @@ class TypeMetaschemaProperty(MetaschemaProperty):
         """
         type_registry = get_registered_types()
         for t, cls in sorted(type_registry.items(), key=_specificity_sort_key):
-            if cls.validate(instance):
+            if (t != 'any') and cls.validate(instance):
                 return t
         raise MetaschemaTypeError(
             "Could not encode 'type' property for Python type: %s"
@@ -75,6 +73,7 @@ class TypeMetaschemaProperty(MetaschemaProperty):
             v0 = value[0]
             for v in value:
                 t = get_type_class(v)
+                # if normalizer.is_type(instance, v):
                 if t.validate(v):
                     v0 = v
                     break

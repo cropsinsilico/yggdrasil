@@ -2,7 +2,6 @@ import os
 import glob
 import importlib
 from collections import OrderedDict
-from yggdrasil.metaschema.properties import MetaschemaProperty
 
 
 _metaschema_properties = OrderedDict()
@@ -50,6 +49,17 @@ def register_metaschema_property(prop_class):
     return prop_class
 
 
+class MetaschemaPropertyMeta(type):
+    r"""Meta class for registering properties."""
+
+    def __new__(meta, name, bases, class_dict):
+        cls = type.__new__(meta, name, bases, class_dict)
+        if not (name.endswith('Base') or (cls.name in ['base'])
+                or cls._dont_register):
+            cls = register_metaschema_property(cls)
+        return cls
+        
+
 def get_registered_properties():
     r"""Return a dictionary of registered properties.
 
@@ -72,6 +82,7 @@ def get_metaschema_property(property_name, skip_generic=False):
         MetaschemaProperty: Associated property class.
 
     """
+    from yggdrasil.metaschema.properties import MetaschemaProperty
     if property_name in _metaschema_properties:
         return _metaschema_properties[property_name]
     else:

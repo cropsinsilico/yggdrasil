@@ -1,23 +1,25 @@
-from yggdrasil.tests import scripts
-import yggdrasil.drivers.tests.test_ModelDriver as parent
+import yggdrasil.drivers.tests.test_InterpretedModelDriver as parent
 
 
-class TestPythonModelParam(parent.TestModelParam):
+class TestPythonModelParam(parent.TestInterpretedModelParam):
     r"""Test parameters for PythonModelDriver."""
 
     driver = "PythonModelDriver"
-    
-    def __init__(self, *args, **kwargs):
-        super(TestPythonModelParam, self).__init__(*args, **kwargs)
-        self.args = scripts["python"]
 
 
-class TestPythonModelDriver(TestPythonModelParam, parent.TestModelDriver):
-    r"""Test runner for PythonModelDriver."""
+class TestPythonModelDriverNoInit(TestPythonModelParam,
+                                  parent.TestInterpretedModelDriverNoInit):
+    r"""Test runner for PythonModelDriver without init."""
     pass
 
 
 class TestPythonModelDriverNoStart(TestPythonModelParam,
-                                   parent.TestModelDriverNoStart):
+                                   parent.TestInterpretedModelDriverNoStart):
     r"""Test runner for PythonModelDriver without start."""
+    pass
+
+
+class TestPythonModelDriver(TestPythonModelParam,
+                            parent.TestInterpretedModelDriver):
+    r"""Test runner for PythonModelDriver."""
     pass

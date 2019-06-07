@@ -145,17 +145,21 @@ class TestCommBase(YggTestClassInfo):
 
     def get_fresh_error_instance(self, recv=False):
         r"""Get comm instance with ErrorClass parent class."""
-        send_kwargs = self.send_inst_kwargs
-        err_kwargs = dict(base_comm=send_kwargs['comm'], new_comm_class='ErrorComm')
-        err_name = self.name + '_' + self.uuid
-        if not recv:
-            send_kwargs.update(**err_kwargs)
-        send_inst = new_comm(err_name, **send_kwargs)
-        recv_kwargs = send_inst.opp_comm_kwargs()
-        recv_kwargs['comm'] = send_kwargs['comm']
-        if recv:
-            recv_kwargs.update(**err_kwargs)
-        recv_inst = new_comm(err_name, **recv_kwargs)
+        try:
+            send_kwargs = self.send_inst_kwargs
+            err_kwargs = dict(base_comm=send_kwargs['comm'], new_comm_class='ErrorComm')
+            err_name = self.name + '_' + self.uuid
+            if not recv:
+                send_kwargs.update(**err_kwargs)
+            send_inst = new_comm(err_name, **send_kwargs)
+            recv_kwargs = send_inst.opp_comm_kwargs()
+            recv_kwargs['comm'] = send_kwargs['comm']
+            if recv:
+                recv_kwargs.update(**err_kwargs)
+            recv_inst = new_comm(err_name, **recv_kwargs)
+        except BaseException as e:  # pragma: debug
+            print(e)
+            raise
         return send_inst, recv_inst
 
     def test_empty_obj_recv(self):
@@ -283,11 +287,51 @@ class TestCommBase(YggTestClassInfo):
             y = self.map_sent2recv(y)
         self.assert_equal(x, y)
 
+    def assert_msg_lists_equal(self, x, y):
+        r"""Assert that two lists of messages are equivalent."""
+        self.assert_equal(len(x), len(y))
+        for ix, iy in zip(x, y):
+            self.assert_msg_equal(ix, iy)
+
+    def recv_message_list(self, recv_inst, expected_result=None,
+                          break_on_empty=False):
+        r"""Continue receiving from a receive instance until flag is False (or
+        an empty messages is received and break_on_empty is True). On receipt of
+        a False flag, the recieved message is checked against the EOF message.
+
+        Args:
+            recv_inst (yggdrasil.communication.CommBase.CommBase): Communication
+                instance that should be received from.
+            expected_result (list, optional): A list of messages that the
+                recieved messages should be compared against. Defaults to None
+                and is ignored.
+            break_on_empty (bool, optional): If True, messages will stop being
+                received from the communication instance when an empty message
+                is received. Defaults to False.
+
+        Returns:
+            list: Received messages.
+
+        """
+        flag = True
+        msg_list = []
+        while flag:
+            flag, msg_recv = recv_inst.recv()
+            if flag:
+                if break_on_empty and recv_inst.is_empty_recv(msg_recv):
+                    break
+                msg_list.append(msg_recv)
+            else:
+                self.assert_equal(msg_recv, recv_inst.eof_msg)
+        if expected_result is not None:
+            self.assert_msg_lists_equal(msg_list, expected_result)
+        return msg_list
+
     def do_send_recv(self, send_meth='send', recv_meth='recv',
                      msg_send=None, msg_recv=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
-                     n_send=1, n_recv=1,
+                     n_send=1, n_recv=1, print_status=False,
                      close_on_send_eof=None, close_on_recv_eof=None):
         r"""Generic send/recv of a message."""
         tkey = 'do_send_recv'
@@ -299,6 +343,8 @@ class TestCommBase(YggTestClassInfo):
                 msg_send = self.test_msg
         if msg_recv is None:
             msg_recv = msg_send
+        # print('send', msg_send)
+        # print('recv', msg_recv)
         if send_kwargs is None:
             send_kwargs = dict()
         if recv_kwargs is None:
@@ -374,8 +420,12 @@ class TestCommBase(YggTestClassInfo):
             send_instance.sleep()
         send_instance.stop_timeout(key_suffix=tkey)
         # Print status of comms
-        send_instance.printStatus()
-        recv_instance.printStatus()
+        if print_status:
+            send_instance.printStatus()
+            recv_instance.printStatus()
+        # else:
+        #     send_instance.get_status_message()
+        #     recv_instance.get_status_message()
         # Confirm recept of messages
         if not (is_eof or reverse_comms):
             send_instance.wait_for_confirm(timeout=self.timeout)
@@ -410,12 +460,13 @@ class TestCommBase(YggTestClassInfo):
 
     def test_send_recv(self):
         r"""Test send/recv of a small message."""
-        self.do_send_recv()
+        self.do_send_recv(print_status=True)
 
     def test_send_recv_nolimit(self):
         r"""Test send/recv of a large message."""
         assert(len(self.msg_long) > self.maxMsgSize)
-        self.do_send_recv('send_nolimit', 'recv_nolimit', self.msg_long)
+        self.do_send_recv('send_nolimit', 'recv_nolimit', self.msg_long,
+                          print_status=True)
 
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""
@@ -457,6 +508,10 @@ class TestCommBase(YggTestClassInfo):
         msg_send = self.testing_options['dict']
         self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
                           msg_send=msg_send)
+        
+    def test_send_recv_dict_names(self):
+        r"""Test send/recv message as dict with names."""
+        msg_send = self.testing_options['dict']
         field_order = self.testing_options.get('field_names', None)
         if field_order is not None:
             self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',

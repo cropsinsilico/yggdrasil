@@ -1,6 +1,7 @@
 import os
 import copy
 import unittest
+import jsonschema
 from yggdrasil.tests import assert_equal
 from yggdrasil.communication import new_comm
 from yggdrasil.communication.tests import test_CommBase as parent
@@ -14,7 +15,7 @@ def test_wait_for_creation():
     # kwargs = {'wait_for_creation': 5, 'in_temp': True, comm='FileComm'}
     send_instance = new_comm(name, direction='send', **kwargs)
     recv_instance = new_comm(name, direction='recv',
-                             wait_for_creation=5, **kwargs)
+                             wait_for_creation=5.0, **kwargs)
     if os.path.isfile(send_instance.address):
         os.remove(send_instance.address)
     
@@ -45,7 +46,7 @@ class TestFileComm(parent.TestCommBase):
     comm = 'FileComm'
     attr_list = (copy.deepcopy(parent.TestCommBase.attr_list)
                  + ['fd', 'read_meth', 'append', 'in_temp',
-                    'open_as_binary', 'newline', 'is_series',
+                    'is_series', 'wait_for_creation', 'serializer',
                     'platform_newline'])
     
     def teardown(self):
@@ -72,37 +73,40 @@ class TestFileComm(parent.TestCommBase):
 
     def test_invalid_read_meth(self):
         r"""Test raise of error on invalid read_meth."""
-        kwargs = self.send_inst_kwargs
-        kwargs['read_meth'] = 'invalid'
-        self.assert_raises(ValueError, new_comm, self.name, **kwargs)
+        if self.comm == 'FileComm':
+            kwargs = self.send_inst_kwargs
+            kwargs['read_meth'] = 'invalid'
+            kwargs['skip_component_schema_normalization'] = False
+            self.assert_raises(jsonschema.ValidationError, new_comm, self.name,
+                               **kwargs)
 
     def test_append(self):
         r"""Test open of file comm with append."""
         send_objects = self.testing_options['send']
         recv_objects = self.testing_options['recv']
+        recv_objects_partial = self.testing_options['recv_partial']
         # Write to file
         flag = self.send_instance.send(send_objects[0])
         assert(flag)
+        # Create temp file for receving
+        recv_kwargs = copy.deepcopy(self.inst_kwargs)
+        recv_kwargs['append'] = True
+        new_inst_recv = new_comm('partial%s' % self.uuid, **recv_kwargs)
+        self.recv_message_list(new_inst_recv, recv_objects_partial[0],
+                               break_on_empty=True)
         # Open file in append
-        kwargs = self.send_inst_kwargs
-        kwargs['append'] = True
-        new_inst = new_comm('append%s' % self.uuid, **kwargs)
-        for x in send_objects[1:]:
-            flag = new_inst.send(x)
+        send_kwargs = copy.deepcopy(self.send_inst_kwargs)
+        send_kwargs['append'] = True
+        new_inst_send = new_comm('append%s' % self.uuid, **send_kwargs)
+        for i in range(1, len(send_objects)):
+            flag = new_inst_send.send(send_objects[i])
             assert(flag)
-        self.remove_instance(new_inst)
+            self.recv_message_list(new_inst_recv, recv_objects_partial[i],
+                                   break_on_empty=True)
+        self.remove_instance(new_inst_send)
+        self.remove_instance(new_inst_recv)
         # Read entire contents
-        flag = True
-        msg_list = []
-        while flag:
-            flag, msg_recv = self.recv_instance.recv()
-            if flag:
-                msg_list.append(msg_recv)
-            else:
-                self.assert_equal(msg_recv, self.recv_instance.eof_msg)
-        self.assert_equal(len(msg_list), len(recv_objects))
-        for x, y in zip(msg_list, recv_objects):
-            self.assert_msg_equal(x, y)
+        self.recv_message_list(self.recv_instance, recv_objects)
         # Check file contents
         if self.testing_options.get('exact_contents', True):
             with open(self.send_instance.address, 'rb') as fd:
@@ -156,9 +160,3 @@ class TestFileComm_readline(TestFileComm):
         out = super(TestFileComm_readline, self).testing_options
         out['recv'] = out['send']
         return out
-
-    
-class TestFileComm_ascii(TestFileComm):
-    r"""Test for FileComm communication class with open_as_binary = False."""
-
-    testing_option_kws = {'open_as_binary': False}

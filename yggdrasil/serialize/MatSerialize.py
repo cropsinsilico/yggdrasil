@@ -1,18 +1,18 @@
 import numpy as np
 from scipy.io import savemat, loadmat
 from yggdrasil import backwards, platform
-from yggdrasil.serialize import register_serializer
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
-@register_serializer
-class MatSerialize(DefaultSerialize):
+class MatSerialize(SerializeBase):
     r"""Class for serializing a python object into a bytes message using the
     Matlab .mat format."""
     
     _seritype = 'mat'
-    _schema_properties = {}
-    _default_type = {'type': 'object'}
+    _schema_subtype_description = ('Serializes objects using the Matlab .mat '
+                                   'format.')
+    default_datatype = {'type': 'object'}
+    concats_as_str = False
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -55,6 +55,24 @@ class MatSerialize(DefaultSerialize):
         return out
 
     @classmethod
+    def concatenate(cls, objects, **kwargs):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        total = {}
+        for x in objects:
+            total.update(x)
+        return [total]
+        
+    @classmethod
     def get_testing_options(cls):
         r"""Method to return a dictionary of testing options for this class.
 
@@ -62,10 +80,13 @@ class MatSerialize(DefaultSerialize):
             dict: Dictionary of variables to use for testing.
 
         """
-        msg = {'a': np.array([[int(1)]]), 'b': np.array([[float(1)]])}
+        # msg = {'a': np.array([[int(1)]]), 'b': np.array([[float(1)]])}
+        msg1 = {'a': np.array([[int(1)]]), 'b': np.array([[float(1)]])}
+        msg2 = {'c': np.array([[int(1)]]), 'd': np.array([[float(1)]])}
         out = super(MatSerialize, cls).get_testing_options()
-        out['objects'] = [msg, msg]
+        out['objects'] = [msg1, msg2]
         out['empty'] = dict()
-        out['contents'] = cls().func_serialize(msg)
+        out['contents'] = cls().func_serialize(cls.concatenate(out['objects'])[0])
         out['contents'] = out['contents'].replace(b'\n', platform._newline)
+        out['exact_contents'] = False  # Contains a time stamp
         return out

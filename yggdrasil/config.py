@@ -7,20 +7,117 @@ This module imports the configuration for yggdrasil.
 """
 import os
 import sys
+import json
 import shutil
 import logging
 import warnings
 import subprocess
 from yggdrasil.backwards import configparser
-from yggdrasil import platform, backwards
+from yggdrasil import platform, tools
+conda_prefix = os.environ.get('CONDA_PREFIX', '')
 config_file = '.yggdrasil.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
-usr_config_file = os.path.expanduser(os.path.join('~', config_file))
+if conda_prefix:
+    usr_dir = conda_prefix
+else:
+    usr_dir = os.path.expanduser('~')
+usr_config_file = os.path.join(usr_dir, config_file)
 loc_config_file = os.path.join(os.getcwd(), config_file)
+if not os.path.isfile(usr_config_file):
+    shutil.copy(def_config_file, usr_config_file)
+logger = logging.getLogger(__name__)
 
 
-class YggConfigParser(configparser.ConfigParser):
+class YggConfigParser(configparser.ConfigParser, object):
     r"""Config parser that returns None if option not provided on get."""
+
+    def __init__(self, files=None):
+        self.files = files
+        super(YggConfigParser, self).__init__()
+
+    def reload(self):
+        r"""Reload parameters from the original files."""
+        self._sections = self._dict()
+        if self.files is not None:
+            self.read(self.files)
+
+    @property
+    def file_to_update(self):
+        r"""str: Full path to file that should be updated if update_file is
+        called without an explicit file path."""
+        out = None
+        if self.files is not None:
+            out = self.files[-1]
+        return out
+
+    def update_file(self, fname=None):
+        r"""Write out updated contents to a file.
+
+        Args:
+            fname (str, optional): Full path to file where contents should be
+               saved. If None, file_to_update is used. Defaults to None.
+
+        Raises:
+            RuntimeError: If fname is None and file_to_update is None.
+
+        """
+        if fname is None:
+            fname = self.file_to_update
+        if fname is None:
+            raise RuntimeError("No file provided or set at creation.")
+        with open(fname, 'w') as fd:
+            self.write(fd)
+
+    def read(self, *args, **kwargs):
+        out = super(YggConfigParser, self).read(*args, **kwargs)
+        alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
+                     (('debug', 'cis'), ('debug', 'ygg'))]
+        for old, new in alias_map:
+            v = self.get(*old)
+            if v:  # pragma: debug
+                self.set(new[0], new[1], v)
+        return out
+
+    @classmethod
+    def from_files(cls, files, **kwargs):
+        r"""Construct a config parser from a set of files.
+
+        Args:
+            files (list): One or more files that options should be read from in
+                the order they should be loaded.
+            **kwargs: Additional keyword arguments are passed to the class
+                constructor.
+
+        Returns:
+           YggConfigParser: Config parser with information loaded from the
+               provided files.
+
+        """
+        out = cls(files=files, **kwargs)
+        out.reload()
+        return out
+
+    def set(self, section, option, value=None):
+        """Set an option."""
+        if not isinstance(value, str):
+            value = json.dumps(value)
+        super(YggConfigParser, self).set(section, option, value=value)
+
+    def backwards_str2val(self, val):  # pragma: no cover
+        try:
+            out = json.loads(val)
+        except ValueError:
+            if val.startswith('[') and val.endswith(']'):
+                if val[1:-1]:
+                    out = [self.backwards_str2val(x.strip())
+                           for x in val[1:-1].split(',')]
+                else:
+                    out = []
+            elif val.startswith("'") and val.endswith("'"):
+                out = val.strip("'")
+            else:
+                out = val
+        return out
 
     def get(self, section, option, default=None, **kwargs):
         r"""Return None if the section/option does not exist.
@@ -47,10 +144,52 @@ class YggConfigParser(configparser.ConfigParser):
             if not out:
                 return default
             else:
-                return out
+                return self.backwards_str2val(out)
         else:
             return default
 
+
+# Initialize config
+ygg_cfg_usr = YggConfigParser.from_files([usr_config_file])
+ygg_cfg = YggConfigParser.from_files([def_config_file, usr_config_file,
+                                      loc_config_file])
+
+
+def update_language_config(drv, skip_warnings=False, overwrite=False,
+                           verbose=False):
+    r"""Update configuration options for a language driver.
+
+    Args:
+        drv (list, class): One or more language drivers that should be
+            configured.
+        skip_warnings (bool, optional): If True, warnings about missing options
+            will not be raised. Defaults to False.
+        overwrite (bool, optional): If True, the existing file will be overwritten.
+            Defaults to False.
+        verbose (bool, optional): If True, information about the config file
+            will be displayed. Defaults to False.
+
+    """
+    if verbose:  # pragma: no cover
+        logger.info("Updating user configuration file for yggdrasil at:\n\t%s"
+                    % usr_config_file)
+    miss = []
+    if not isinstance(drv, list):
+        drv = [drv]
+    if overwrite:  # pragma: no cover
+        shutil.copy(def_config_file, usr_config_file)
+        ygg_cfg_usr.reload()
+    for idrv in drv:
+        miss += idrv.configure(ygg_cfg_usr)
+    ygg_cfg_usr.update_file()
+    ygg_cfg.reload()
+    if not skip_warnings:
+        for sect, opt, desc in miss:  # pragma: windows
+            warnings.warn(("Could not set option %s in section %s. "
+                           + "Please set this in %s to: %s")
+                          % (opt, sect, ygg_cfg_usr.file_to_update, desc),
+                          RuntimeWarning)
+    
 
 def find_all(name, path):
     r"""Find all instances of a file with a given name within the directory
@@ -78,7 +217,7 @@ def find_all(name, path):
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
         else:
-            args = ["find", path, "-type", "f", "-name", name]
+            args = ["find", "-L", path, "-type", "f", "-name", name]
             pfind = subprocess.Popen(args, env=os.environ,
                                      stderr=subprocess.PIPE,
                                      stdout=subprocess.PIPE)
@@ -97,11 +236,21 @@ def find_all(name, path):
     return result
 
 
-def locate_file(fname):
-    r"""Locate a file on PATH.
+def locate_file(fname, environment_variable='PATH', directory_list=None):
+    r"""Locate a file within a set of paths defined by a list or environment
+    variable.
 
     Args:
         fname (str): Name of the file that should be located.
+        environment_variable (str): Environment variable containing the set of
+            paths that should be searched. Defaults to 'PATH'. If None, this
+            keyword argument will be ignored. If a list is provided, it is
+            assumed to be a list of environment variables that should be
+            searched in the specified order.
+        directory_list (list): List of paths that should be searched in addition
+            to those specified by environment_variable. Defaults to None and is
+            ignored. These directories will be searched be for those in the
+            specified environment variables.
 
     Returns:
         bool, str: Full path to the located file if it was located, False
@@ -109,10 +258,18 @@ def locate_file(fname):
 
     """
     out = []
-    if platform._is_win:  # pragma: windows
+    if ((platform._is_win and (environment_variable == 'PATH')
+         and (directory_list is None))):  # pragma: windows
         out += find_all(fname, None)
     else:
-        for path in os.environ.get('PATH').split(os.pathsep):
+        if directory_list is None:
+            directory_list = []
+        if environment_variable is not None:
+            if not isinstance(environment_variable, list):
+                environment_variable = [environment_variable]
+            for x in environment_variable:
+                directory_list += os.environ.get(x, '').split(os.pathsep)
+        for path in directory_list:
             if path:
                 out += find_all(fname, path)
     if not out:
@@ -125,176 +282,12 @@ def locate_file(fname):
     return first
 
 
-def update_config_matlab(config):
-    r"""Update config options specific to matlab.
-
-    Args:
-        config (YggConfigParser): Config class that options should be set for.
-
-    Returns:
-        list: Section, option, description tuples for options that could not be
-            set.
-
-    """
-    out = []
-    # This should be uncommented if the matlab section is removed from the
-    # default config file
-    if not config.has_section('matlab'):  # pragma: debug
-        config.add_section('matlab')
-    opts = {
-        'startup_waittime_s': [('The time allowed for a Matlab engine to start'
-                               + 'before timing out and reporting an error.'),
-                               '10'],
-        'release': ['The version (release number) of matlab that is installed.',
-                    ''],
-        'matlabroot': ['The path to the default installation of matlab.', '']}
-    if config.get('matlab', 'disable', 'False').lower() != 'true':
-        mtl_id = '=MATLABROOT='
-        cmd = ("fprintf('" + mtl_id + "%s" + mtl_id + "R%s" + mtl_id + "'"
-               + ",matlabroot,version('-release')); exit();")
-        mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
-                   '-r', '%s' % cmd]
-        try:  # pragma: matlab
-            mtl_proc = subprocess.check_output(mtl_cmd)
-            mtl_id = backwards.match_stype(mtl_proc, mtl_id)
-            if mtl_id not in mtl_proc:  # pragma: debug
-                raise RuntimeError(("Could not locate matlab root id (%s) in "
-                                    "output (%s).") % (mtl_id, mtl_proc))
-            opts['matlabroot'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-3])
-            opts['release'][1] = backwards.as_str(mtl_proc.split(mtl_id)[-2])
-        except (subprocess.CalledProcessError, OSError):  # pragma: no matlab
-            pass
-    for k in opts.keys():
-        if not config.has_option('matlab', k):
-            if opts[k][1]:  # pragma: matlab
-                config.set('matlab', k, opts[k][1])
-            else:
-                out.append(('matlab', k, opts[k][0]))
-    return out
-
-
-def update_config_windows(config):  # pragma: windows
-    r"""Update config options specific to windows.
-
-    Args:
-        config (YggConfigParser): Config class that options should be set for.
-
-    Returns:
-        list: Section, option, description tuples for options that could not be
-            set.
-
-    """
-    out = []
-    if not config.has_section('windows'):
-        config.add_section('windows')
-    # Find paths
-    clibs = [('libzmq_include', 'zmq.h',
-              'The full path to the zmq.h header file.'),
-             ('libzmq_static', 'zmq.lib',
-              'The full path to the zmq.lib static library.'),
-             ('czmq_include', 'czmq.h',
-              'The full path to the czmq.h header file.'),
-             ('czmq_static', 'czmq.lib',
-              'The full path to the czmq.lib static library.')]
-    for opt, fname, desc in clibs:
-        if not config.has_option('windows', opt):
-            fpath = locate_file(fname)
-            if fpath:
-                logging.info('Located %s: %s' % (fname, fpath))
-                config.set('windows', opt, fpath)
-            else:
-                out.append(('windows', opt, desc))
-    return out
-
-
-def update_config_c(config):
-    r"""Update config options specific to C/C++.
-
-    Args:
-        config (CisConfigParser): Config class that options should be set for.
-
-    Returns:
-        list: Section, option, description tuples for options that could not be
-            set.
-
-    """
-    out = []
-    if not config.has_section('c'):
-        config.add_section('c')
-    # Find paths
-    clibs = [('rapidjson_include', 'rapidjson.h',
-              'The full path to the directory containing rapidjson headers.')]
-    for opt, fname, desc in clibs:
-        if not config.has_option('c', opt):
-            fpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rapidjson',
-                                 'include', 'rapidjson', fname)
-            if not os.path.isfile(fpath):  # pragma: debug
-                fpath = locate_file(fname)
-            if fpath:
-                if opt == 'rapidjson_include':
-                    fpath = os.path.dirname(os.path.dirname(fpath))
-                logging.info('Located %s: %s' % (fname, fpath))
-                config.set('c', opt, fpath)
-            else:  # pragma: debug
-                out.append(('c', opt, desc))
-    return out
-
-
-def update_config(config_file, config_base=None):
-    r"""Update config options for the current platform.
-
-    Args:
-        config_file (str): Full path to the config file that should be created
-            and/or updated.
-        config_base (str, optional): Full path to existing config file that should
-            be used as a base for building the new one if it dosn't already exist.
-            Defaults to 'defaults.cfg' if not provided.
-
-    """
-    if config_base is None:
-        config_base = def_config_file
-    assert(os.path.isfile(config_base))
-    if not os.path.isfile(config_file):
-        shutil.copy(config_base, config_file)
-    cp = YggConfigParser()
-    cp.read(config_file)
-    miss = []
-    if platform._is_win:  # pragma: windows
-        miss += update_config_windows(cp)
-    miss += update_config_c(cp)
-    miss += update_config_matlab(cp)
-    with open(config_file, 'w') as fd:
-        cp.write(fd)
-    for sect, opt, desc in miss:  # pragma: windows
-        warnings.warn(("Could not set option %s in section %s. "
-                       + "Please set this in %s to: %s")
-                      % (opt, sect, config_file, desc), RuntimeWarning)
-        
-
-# In order read: defaults, user, local files
-if not os.path.isfile(usr_config_file):
-    logging.info('Creating user config file: "%s".' % usr_config_file)
-    update_config(usr_config_file)
-assert(os.path.isfile(usr_config_file))
-assert(os.path.isfile(def_config_file))
-files = [def_config_file, usr_config_file, loc_config_file]
-ygg_cfg = YggConfigParser()
-ygg_cfg.read(files)
-
-
-# Aliases for old versions of config options
-alias_map = [(('debug', 'psi'), ('debug', 'ygg')),
-             (('debug', 'cis'), ('debug', 'ygg'))]
-for old, new in alias_map:
-    v = ygg_cfg.get(*old)
-    if v:  # pragma: debug
-        ygg_cfg.set(new[0], new[1], v)
-
-
 # Set associated environment variables
 env_map = [('debug', 'ygg', 'YGG_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
            ('debug', 'client', 'YGG_CLIENT_DEBUG'),
+           ('jsonschema', 'validate_components', 'YGG_SKIP_COMPONENT_VALIDATION'),
+           ('jsonschema', 'validate_all_messages', 'YGG_VALIDATE_ALL_MESSAGES'),
            ('rmq', 'namespace', 'YGG_NAMESPACE'),
            ('rmq', 'host', 'YGG_MSG_HOST'),
            ('rmq', 'vhost', 'YGG_MSG_VHOST'),
@@ -304,6 +297,53 @@ env_map = [('debug', 'ygg', 'YGG_DEBUG'),
            ]
 
 
+def get_ygg_loglevel(cfg=None, default='DEBUG'):
+    r"""Get the current log level.
+
+    Args:
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
+            Config parser with options that should be used to determine the
+            log level. Defaults to :data:`yggdrasil.config.ygg_cfg`.
+        default (str, optional): Log level that should be returned if the log
+            level option is not set in cfg. Defaults to 'DEBUG'.
+
+    Returns:
+        str: Log level string.
+
+    """
+    is_model = tools.is_subprocess()
+    if cfg is None:
+        cfg = ygg_cfg
+    if is_model:
+        opt = 'client'
+    else:
+        opt = 'ygg'
+    return cfg.get('debug', opt, default)
+
+
+def set_ygg_loglevel(level, cfg=None):
+    r"""Set the current log level.
+
+    Args:
+        level (str): Level that the log should be set to.
+        cfg (:class:`yggdrasil.config.YggConfigParser`, optional):
+            Config parser with options that should be used to update the
+            environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
+    
+    """
+    is_model = tools.is_subprocess()
+    if cfg is None:
+        cfg = ygg_cfg
+    if is_model:
+        opt = 'client'
+    else:
+        opt = 'ygg'
+    cfg.set('debug', opt, level)
+    logLevelYGG = eval('logging.%s' % level)
+    ygg_logger = logging.getLogger("yggdrasil")
+    ygg_logger.setLevel(level=logLevelYGG)
+        
+    
 def cfg_logging(cfg=None):
     r"""Set logging levels from config options.
 
@@ -313,22 +353,26 @@ def cfg_logging(cfg=None):
             environment. Defaults to :data:`yggdrasil.config.ygg_cfg`.
 
     """
-    is_model = (os.environ.get('YGG_SUBPROCESS', "False") == "True")
+    is_model = tools.is_subprocess()
     if cfg is None:
         cfg = ygg_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
     logLevelYGG = eval('logging.%s' % cfg.get('debug', 'ygg', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
+    logLevelCLI = eval('logging.%s' % cfg.get('debug', 'client', 'INFO'))
     ygg_logger = logging.getLogger("yggdrasil")
     rmq_logger = logging.getLogger("pika")
-    ygg_logger.setLevel(level=logLevelYGG)
+    if is_model:
+        ygg_logger.setLevel(level=logLevelCLI)
+    else:
+        ygg_logger.setLevel(level=logLevelYGG)
     rmq_logger.setLevel(level=logLevelRMQ)
     # For models, route the loggs to stdout so that they are displayed by the
     # model driver.
     if is_model:
         handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logLevelYGG)
+        handler.setLevel(logLevelCLI)
         ygg_logger.addHandler(handler)
         rmq_logger.addHandler(handler)
 

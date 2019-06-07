@@ -4,12 +4,14 @@ import sys
 import copy
 import logging
 import traceback
-from yggdrasil import runner, schema, config, timing, yamlfile
-from yggdrasil.drivers import GCCModelDriver
+
+
+logger = logging.getLogger(__name__)
 
 
 def yggrun():
     r"""Start a run."""
+    from yggdrasil import runner
     prog = sys.argv[0].split(os.path.sep)[-1]
     # Print help
     if '-h' in sys.argv:
@@ -28,9 +30,10 @@ def yggrun():
 
 def yggcc():
     r"""Compile C/C++ program."""
+    from yggdrasil.drivers import CModelDriver
     # prog = sys.argv[0].split(os.path.sep)[-1]
     src = sys.argv[1:]
-    out = GCCModelDriver.do_compile(src)
+    out = CModelDriver.CModelDriver.call_compile(src)
     print("executable: %s" % out)
 
 
@@ -42,7 +45,8 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
-    print(' '.join(GCCModelDriver.get_flags()[0]))
+    from yggdrasil.drivers import CModelDriver
+    print(' '.join(CModelDriver.CModelDriver.get_compiler_flags()))
 
 
 def ld_flags():
@@ -53,21 +57,35 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
-    print(' '.join(GCCModelDriver.get_flags()[1]))
+    from yggdrasil.drivers import CModelDriver
+    print(' '.join(CModelDriver.CModelDriver.get_linker_flags()))
 
 
 def rebuild_c_api():
     r"""Rebuild the C/C++ API."""
-    if GCCModelDriver._c_installed:
-        GCCModelDriver.build_api(cpp=False, overwrite=True)
-        GCCModelDriver.build_api(cpp=True, overwrite=True)
+    from yggdrasil.drivers import CModelDriver, CPPModelDriver
+    if CModelDriver.CModelDriver.is_installed():
+        CModelDriver.CModelDriver.compile_dependencies(overwrite=True)
+        # TODO: Check that this compiles library correctly
+        CPPModelDriver.CPPModelDriver.compile_dependencies(overwrite=True)
     else:
         raise Exception("The libraries necessary for running models written in "
                         "C/C++ could not be located.")
 
+    
+def regen_metaschema():
+    r"""Regenerate the yggdrasil metaschema."""
+    from yggdrasil import metaschema
+    if os.path.isfile(metaschema._metaschema_fname):
+        os.remove(metaschema._metaschema_fname)
+    metaschema._metaschema = None
+    metaschema._validator = None
+    metaschema.get_metaschema()
+    
 
 def regen_schema():
     r"""Regenerate the yggdrasil schema."""
+    from yggdrasil import schema
     if os.path.isfile(schema._schema_fname):
         os.remove(schema._schema_fname)
     schema.clear_schema()
@@ -76,38 +94,49 @@ def regen_schema():
 
 def validate_yaml():
     r"""Validate a set of or or more YAMLs defining an integration."""
+    from yggdrasil import yamlfile
     files = sys.argv[1:]
     yamlfile.parse_yaml(files)
-    logging.info("Validation succesful.")
+    logger.info("Validation succesful.")
 
 
 def update_config():
     r"""Update the user config file for yggdrasil."""
-    config.update_config(config.usr_config_file, config.def_config_file)
+    from yggdrasil import config, tools
+    from yggdrasil.components import import_component
+    overwrite = ('--overwrite' in sys.argv)
+    drv = [import_component('model', l) for l in tools.get_supported_lang()]
+    config.update_language_config(drv, overwrite=overwrite,
+                                  verbose=True)
 
 
 def yggtime_comm():
     r"""Plot timing statistics comparing the different communication mechanisms."""
+    from yggdrasil import timing
     timing.plot_scalings(compare='commtype')
 
 
 def yggtime_lang():
     r"""Plot timing statistics comparing the different languages."""
+    from yggdrasil import timing
     timing.plot_scalings(compare='language')
 
 
 def yggtime_os():
     r"""Plot timing statistics comparing the different operating systems."""
+    from yggdrasil import timing
     timing.plot_scalings(compare='platform')
 
 
 def yggtime_py():
     r"""Plot timing statistics comparing the different versions of Python."""
+    from yggdrasil import timing
     timing.plot_scalings(compare='python')
 
 
 def yggtime_paper():
     r"""Create plots for timing."""
+    from yggdrasil import timing
     _lang_list = timing._lang_list
     _lang_list_nomatlab = copy.deepcopy(_lang_list)
     _lang_list_nomatlab.remove('matlab')

@@ -28,7 +28,8 @@ class ServerRequestDriver(ConnectionDriver):
 
     """
 
-    _is_input = True
+    _connection_type = None
+    _direction = 'input'
 
     def __init__(self, model_request_name, request_name=None,
                  comm=None, comm_address=None, **kwargs):

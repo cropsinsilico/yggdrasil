@@ -21,6 +21,7 @@ import glob
 import sys
 import sphinx_rtd_theme
 import yggdrasil
+from yggdrasil import tools, languages, components
 # sys.path.insert(0, os.path.abspath('.'))
 doxydir = os.path.join(os.path.abspath('../'), "doxy", "xml")
 rootdir = os.path.abspath('../../')
@@ -51,23 +52,25 @@ extensions = [
     'breathe',
 ]
 
-finterface = ['YggInterface.h', 'YggInterface.hpp', 'YggInterface.m']
-fasciiio = ['AsciiTable.h', # 'AsciiTable.hpp', 'AsciiTable.m',
-            'AsciiFile.h', # 'AsciiFile.hpp', 'AsciiFile.m',
-]
-fserialize = [os.path.basename(f) for f in glob.glob(
-    os.path.join(srcdir, 'serialize', '*.h'))]
-fdatatypes = [os.path.basename(f) for f in glob.glob(
-    os.path.join(srcdir, 'metaschema', 'datatypes', '*.h'))]
+
+relative_files = []
+for lang in tools.get_supported_lang():
+    if lang == 'python':
+        continue
+    try:
+        lang_dir = languages.get_language_dir(lang)
+        lang_ext = components.import_component('model', lang).get_language_ext()
+    except ValueError:
+        continue
+    for iext in lang_ext:
+        relative_files += [os.path.relpath(f, start=srcdir) for f in
+                           glob.glob(os.path.join(lang_dir, '*' + iext))]
+        relative_files += [os.path.relpath(f, start=srcdir) for f in
+                           glob.glob(os.path.join(lang_dir, '*', '*' + iext))]
 
 breathe_projects = {"yggdrasil": doxydir}
 breathe_default_project = "yggdrasil"
-breathe_projects_source = {"yggdrasil": (
-    srcdir,
-    ([os.path.join('interface', f) for f in finterface] +
-     [os.path.join('serialize', f) for f in fserialize] +
-     [os.path.join('metaschema', 'datatypes', f) for f in fdatatypes]))
-    }
+breathe_projects_source = {"yggdrasil": (srcdir, relative_files)}
 
 # Napoleon settings
 napoleon_google_docstring = True

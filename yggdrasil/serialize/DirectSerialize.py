@@ -1,20 +1,14 @@
 from yggdrasil import backwards
-from yggdrasil.serialize import (
-    register_serializer, _default_newline, _default_comment, format_message)
-from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
+from yggdrasil.serialize import format_message
+from yggdrasil.serialize.SerializeBase import SerializeBase
 
 
-@register_serializer
-class DirectSerialize(DefaultSerialize):
+class DirectSerialize(SerializeBase):
     r"""Class for directly serializing bytes."""
 
     _seritype = 'direct'
-    _schema_properties = {
-        'newline': {'type': 'string',
-                    'default': backwards.as_str(_default_newline)},
-        'comment': {'type': 'string',
-                    'default': backwards.as_str(_default_comment)}}
-    _default_type = {'type': 'bytes'}
+    _schema_subtype_description = ('Direct serialization of bytes.')
+    default_datatype = {'type': 'bytes'}
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -45,6 +39,21 @@ class DirectSerialize(DefaultSerialize):
         return msg
 
     @classmethod
+    def concatenate(cls, objects, **kwargs):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        return [b''.join(objects)]
+    
+    @classmethod
     def get_testing_options(cls):
         r"""Method to return a dictionary of testing options for this class.
 
@@ -63,5 +72,9 @@ class DirectSerialize(DefaultSerialize):
                     determined type definition.
 
         """
-        # Ensure that bytes returned
-        return super(DirectSerialize, cls).get_testing_options()
+        out = {'kwargs': {}, 'empty': b'', 'dtype': None,
+               'typedef': cls.default_datatype,
+               'extra_kwargs': {}}
+        out['objects'] = [b'Test message\n', b'Test message 2\n']
+        out['contents'] = b''.join(out['objects'])
+        return out

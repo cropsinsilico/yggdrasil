@@ -252,10 +252,12 @@ class YggRunner(YggClass):
             yml.setdefault('comm_address', self.serverdrivers[yml['args']])
         if 'working_dir' in yml:
             os.chdir(yml['working_dir'])
-        instance = create_driver(yml=yml, namespace=self.namespace,
-                                 rank=self.rank, **yml)
-        yml['instance'] = instance
-        os.chdir(curpath)
+        try:
+            instance = create_driver(yml=yml, namespace=self.namespace,
+                                     rank=self.rank, **yml)
+            yml['instance'] = instance
+        finally:
+            os.chdir(curpath)
         if 'ServerDriver' in yml['driver']:
             self.serverdrivers[yml['args']] = instance.comm_address
         return instance

@@ -1,8 +1,10 @@
 import tempfile
 import os
+import yaml
 from jsonschema.exceptions import ValidationError
 from yggdrasil import yamlfile
-from yggdrasil.tests import YggTestClass, assert_raises
+from yggdrasil.backwards import StringIO
+from yggdrasil.tests import YggTestClass, assert_raises, assert_equal
 _yaml_env = 'TEST_YAML_FILE'
 
 
@@ -10,6 +12,36 @@ def direct_translate(msg):  # pragma: no cover
     r"""Test translator that just returns passed message."""
     return msg
 
+
+def test_load_yaml():
+    r"""Test loading yaml."""
+    cwd = os.getcwd()
+    fname = os.path.join(cwd, 'test_load_yaml.yml')
+    dict_write = {'test': 'hello'}
+    dict_read = {'test': 'hello',
+                 'working_dir': cwd}
+    contents = yaml.dump(dict_write)
+    with open(fname, 'w') as fd:
+        yaml.dump(dict_write, fd)
+    try:
+        # Dictionary
+        out = yamlfile.load_yaml(dict_write)
+        assert_equal(out, dict_read)
+        # File name
+        out = yamlfile.load_yaml(fname)
+        assert_equal(out, dict_read)
+        # Open file object
+        with open(fname, 'r') as fd:
+            out = yamlfile.load_yaml(fd)
+            assert_equal(out, dict_read)
+        # Open stream
+        out = yamlfile.load_yaml(StringIO(contents))
+        assert_equal(out, dict_read)
+    finally:
+        # Remove file
+        if os.path.isfile(fname):
+            os.remove(fname)
+            
 
 def test_load_yaml_error():
     r"""Test error on loading invalid file."""
@@ -610,7 +642,6 @@ class TestYamlMissingModelArgsError(YamlTestBaseError):
     _error = ValidationError
     _contents = (['models:',
                   '  - name: modelA',
-                  '    args: ./src/modelA.c',
                   '    inputs:',
                   '      name: inputA',
                   '      driver: FileInputDriver',

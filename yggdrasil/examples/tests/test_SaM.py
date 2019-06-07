@@ -1,8 +1,9 @@
 import os
+from yggdrasil.tests import extra_example
 from yggdrasil.examples.tests import TestExample
-from yggdrasil.drivers.MatlabModelDriver import _matlab_installed
 
 
+@extra_example
 class TestExampleSaM(TestExample):
     r"""Test the SaM example."""
 
@@ -12,11 +13,10 @@ class TestExampleSaM(TestExample):
     def results(self):
         r"""list: Results that should be found in the output files."""
         # 1 + 2*n_languages
-        if self.language == 'all':
-            if _matlab_installed:  # pragma: matlab
-                s = 9
-            else:
-                s = 7  # pragma: no matlab
+        if self.language == 'all':  # pragma: matlab
+            s = 9
+        elif self.language == 'all_nomatlab':  # pragma: no matlab
+            s = 7
         else:
             s = 3
         return ['%d' % s]

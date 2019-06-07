@@ -33,10 +33,13 @@
                 "object",
                 "string",
                 "1darray",
+                "any",
                 "bytes",
+                "class",
                 "complex",
                 "float",
                 "function",
+                "instance",
                 "int",
                 "ndarray",
                 "obj",
@@ -98,6 +101,25 @@
         },
         "anyOf": {
             "$ref": "#/definitions/schemaArray"
+        },
+        "args": {
+            "description": "Arguments required to recreate a class instance.",
+            "type": "object"
+        },
+        "class": {
+            "anyOf": [
+                {
+                    "type": "class"
+                },
+                {
+                    "items": {
+                        "type": "class"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                }
+            ],
+            "description": "One or more classes that the object should be an instance of."
         },
         "default": {},
         "definitions": {
@@ -237,6 +259,10 @@
                 "unicode"
             ],
             "type": "string"
+        },
+        "temptype": {
+            "description": "The type of the data for a single message.",
+            "type": "schema"
         },
         "title": {
             "type": "string"

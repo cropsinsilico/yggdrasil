@@ -21,6 +21,7 @@ if PY2:  # pragma: Python 2
     string_type = str
     np_dtype_str = 'S'
     string_types = (str, unicode, bytearray)
+    class_types = (type, types.ClassType)
     base64_encode = base64.encodestring
     base64_decode = base64.decodestring
 else:  # pragma: Python 3
@@ -36,6 +37,7 @@ else:  # pragma: Python 3
     unicode = None
     np_dtype_str = 'S'
     string_types = (bytes, str, bytearray)
+    class_types = (type, )
     base64_encode = base64.encodebytes
     base64_decode = base64.decodebytes
 if sys.version_info >= (3, 3):

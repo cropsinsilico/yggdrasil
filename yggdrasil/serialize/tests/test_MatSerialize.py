@@ -1,7 +1,7 @@
-from yggdrasil.serialize.tests import test_DefaultSerialize as parent
+from yggdrasil.serialize.tests import test_SerializeBase as parent
 
 
-class TestMatSerialize(parent.TestDefaultSerialize):
+class TestMatSerialize(parent.TestSerializeBase):
     r"""Test class for TestMatSerialize class."""
 
     _cls = 'MatSerialize'

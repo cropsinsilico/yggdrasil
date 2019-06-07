@@ -1,20 +1,22 @@
 import numpy as np
 import pandas as pd
-from yggdrasil.metaschema.datatypes import register_type
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
 
-@register_type
 class JSONArrayMetaschemaType(ContainerMetaschemaType):
-    r"""Type associated with a set of subtypes."""
+    r"""Type associated with a set of subtypes.
+
+    Developer Notes:
+        Support for dynamic arrays in C/C++ is still under development.
+
+    """
 
     name = 'array'
     description = 'A container of ordered values.'
-    properties = ContainerMetaschemaType.properties + ['items']
-    definition_properties = ContainerMetaschemaType.definition_properties
-    metadata_properties = ContainerMetaschemaType.metadata_properties + ['items']
-    extract_properties = ContainerMetaschemaType.extract_properties + ['items']
+    properties = ['items']
+    metadata_properties = ['items']
+    extract_properties = ['items']
     python_types = (list, tuple, np.ndarray, pd.DataFrame)
     _replaces_existing = True
 
@@ -57,6 +59,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         """
         if isinstance(obj, str):
             obj = [v.strip() for v in obj.split(',')]
+        elif isinstance(obj, tuple):
+            obj = list(obj)
         return obj
 
     @classmethod
@@ -87,6 +91,8 @@ class JSONArrayMetaschemaType(ContainerMetaschemaType):
         elif isinstance(obj, dict):
             if (key_order is not None) or (len(obj) == 1):
                 obj = dict2list(obj, order=key_order)
+            else:
+                obj = [obj]
         elif isinstance(typedef, dict) and (len(typedef.get('items', [])) == 1):
             typedef_validated = kwargs.get('typedef_validated', False)
             if cls.check_decoded([obj], typedef,

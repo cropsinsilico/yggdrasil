@@ -1,35 +1,30 @@
-import unittest
-from yggdrasil.tests import scripts, assert_raises
-from yggdrasil.drivers import LPyModelDriver
-import yggdrasil.drivers.tests.test_ModelDriver as parent
+import yggdrasil.drivers.tests.test_InterpretedModelDriver as parent
 
 
-@unittest.skipIf(LPyModelDriver._lpy_installed, "LPy is installed")
-def test_LPyModelDriver_nolpy():  # pragma: no lpy
-    r"""Test LPyModelDriver error when LPy not installed."""
-    assert_raises(RuntimeError, LPyModelDriver.LPyModelDriver,
-                  'test', scripts['lpy'])
-
-
-class TestLPyModelParam(parent.TestModelParam):
+class TestLPyModelParam(parent.TestInterpretedModelParam):
     r"""Test parameters for LPyModelDriver class."""
 
     driver = 'LPyModelDriver'
     
-    def __init__(self, *args, **kwargs):
-        super(TestLPyModelParam, self).__init__(*args, **kwargs)
-        self.args = [scripts['lpy']]
+    def tests_on_not_installed(self):
+        r"""Tests for when the driver is not installed."""
+        super(TestLPyModelParam, self).tests_on_not_installed()
+        self.assert_raises(RuntimeError, self.import_cls.language_version)
 
         
-@unittest.skipIf(not LPyModelDriver._lpy_installed, "LPy is not installed")
+class TestLPyModelDriverNoInit(TestLPyModelParam,
+                               parent.TestInterpretedModelDriverNoInit):
+    r"""Test runner for LPyModelDriver class without initing the driver."""
+    pass
+
+
 class TestLPyModelDriverNoStart(TestLPyModelParam,
-                                parent.TestModelDriverNoStart):  # pragma: lpy
+                                parent.TestInterpretedModelDriverNoStart):
     r"""Test runner for LPyModelDriver class without starting the driver."""
     pass
 
 
-@unittest.skipIf(not LPyModelDriver._lpy_installed, "LPy is not installed")
 class TestLPyModelDriver(TestLPyModelParam,
-                         parent.TestModelDriver):  # pragma: lpy
+                         parent.TestInterpretedModelDriver):
     r"""Test runner for LPyModelDriver class."""
     pass

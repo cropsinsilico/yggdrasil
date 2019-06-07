@@ -52,7 +52,8 @@ class ClientRequestDriver(ConnectionDriver):
 
     """
 
-    _is_output = True
+    _connection_type = None
+    _direction = 'output'
 
     def __init__(self, model_request_name, request_name=None,
                  comm=None, comm_address=None, **kwargs):

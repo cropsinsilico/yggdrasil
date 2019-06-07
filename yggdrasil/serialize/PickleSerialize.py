@@ -1,16 +1,16 @@
 from yggdrasil import backwards
-from yggdrasil.serialize import register_serializer
 from yggdrasil.serialize.DefaultSerialize import DefaultSerialize
 
 
-@register_serializer
 class PickleSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message by pickling.
     """
 
     _seritype = 'pickle'
-    _schema_properties = dict()
+    _schema_subtype_description = ('Serialize any Python object using a Python '
+                                   'pickle.')
     _default_type = {'type': 'bytes'}
+    is_framed = True
 
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -38,6 +38,43 @@ class PickleSerialize(DefaultSerialize):
         out = backwards.pickle.loads(msg)
         return out
 
+    @classmethod
+    def get_first_frame(cls, msg):
+        r"""Extract one frame from the provided message that may contain one
+        or more frames.
+
+        Args:
+            msg (bytes): Message containing one or more frames.
+
+        Returns:
+            bytes: Portion of message containing the first frame. If no frames
+                are found, an empty string will be returned.
+
+        """
+        fd = backwards.BytesIO(msg)
+        try:
+            backwards.pickle.load(fd)
+            used = fd.tell()
+        except BaseException:
+            used = 0
+        fd.close()
+        return msg[:used]
+
+    @classmethod
+    def concatenate(cls, objects, **kwargs):
+        r"""Concatenate objects to get object that would be recieved if
+        the concatenated serialization were deserialized.
+
+        Args:
+            objects (list): Objects to be concatenated.
+            **kwargs: Additional keyword arguments are ignored.
+
+        Returns:
+            list: Set of objects that results from concatenating those provided.
+
+        """
+        return objects
+    
     @classmethod
     def get_testing_options(cls, **kwargs):
         r"""Method to return a dictionary of testing options for this class.

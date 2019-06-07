@@ -23,6 +23,8 @@ class ServerResponseDriver(ConnectionDriver):
 
     """
 
+    _connection_type = None
+
     def __init__(self, response_address, comm=None, msg_id=None,
                  request_name=None, **kwargs):
         if msg_id is None:

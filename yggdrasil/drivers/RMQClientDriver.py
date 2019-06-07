@@ -9,6 +9,11 @@ class RMQClientDriver(ClientDriver):
         **kwargs: Keyword arguments are passed to parent class.
 
     """
+
+    _connection_type = 'rmq_client'
+    _schema_subtype_description = ('Connection between a model acting as a '
+                                   'client and a RabbitMQ server request comm.')
+    
     def __init__(self, *args, **kwargs):
         kwargs['comm'] = 'RMQComm'
         super(RMQClientDriver, self).__init__(*args, **kwargs)

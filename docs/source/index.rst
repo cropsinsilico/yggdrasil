@@ -19,14 +19,10 @@ Welcome to yggdrasil's documentation!
    config
    units
    c_format_strings
-   io_drivers
-   model_drivers
-   model_interface
-   metaschema
-   schema
-   code
    examples/examples_toc
-   release
+   advanced/index
+   development/index
+   publications
    hackathon2018/index
    hackathon2019/index
    

@@ -1,20 +1,23 @@
 import numpy as np
 import pandas as pd
-from yggdrasil.metaschema.datatypes import register_type
+from collections import OrderedDict
 from yggdrasil.metaschema.datatypes.ContainerMetaschemaType import (
     ContainerMetaschemaType)
 
 
-@register_type
 class JSONObjectMetaschemaType(ContainerMetaschemaType):
-    r"""Type associated with a map."""
+    r"""Type associated with a map.
+
+    Developer Notes:
+        Support for dynamic objects in C/C++ is still under development.
+
+    """
 
     name = 'object'
     description = 'A container mapping between keys and values.'
-    properties = ContainerMetaschemaType.properties + ['properties']
-    definition_properties = ContainerMetaschemaType.definition_properties
-    metadata_properties = ContainerMetaschemaType.metadata_properties + ['properties']
-    extract_properties = ContainerMetaschemaType.extract_properties + ['properties']
+    properties = ['properties']
+    metadata_properties = ['properties']
+    extract_properties = ['properties']
     python_types = (dict, )
     _replaces_existing = True
     
@@ -94,3 +97,25 @@ class JSONObjectMetaschemaType(ContainerMetaschemaType):
 
         """
         return (index in container)
+
+    @classmethod
+    def _encode_data_alias(cls, obj, typedef, func_encode, container_type=None):
+        r"""Encode an object's data using a sepcified function.
+
+        Args:
+            obj (object): Object to encode.
+            typedef (dict): Type definition that should be used to encode the
+                object.
+            func_encode (callable): Function that should be used to encode
+                elements in the container. Defaults to encode_data.
+            container_type (type, optional): Type that should be used for the
+                output container. Defaults to cls._container_type.
+
+        Returns:
+            string: Encoded object.
+
+        """
+        if (container_type is None) and isinstance(obj, OrderedDict):
+            container_type = OrderedDict
+        return super(JSONObjectMetaschemaType, cls)._encode_data_alias(
+            obj, typedef, func_encode, container_type=container_type)

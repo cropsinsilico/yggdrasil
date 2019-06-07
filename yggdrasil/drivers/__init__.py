@@ -1,22 +1,9 @@
 r"""IO and Model drivers."""
-import os
-import glob
-import importlib
+from yggdrasil.components import import_component
 
 
-def import_driver(driver=None):
-    r"""Dynamically import a driver based on a string.
+_non_component_modules = ['lpy_model.py']
 
-    Args:
-        driver (str): Name of the driver that should be imported.
-
-    """
-    if driver is None:
-        driver = 'Driver'
-    drv = importlib.import_module('yggdrasil.drivers.%s' % driver)
-    class_ = getattr(drv, driver)
-    return class_
-                    
 
 def create_driver(driver=None, name=None, args=None, **kwargs):
     r"""Dynamically create a driver based on a string and other driver
@@ -35,7 +22,7 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
         object: Instance of the requested driver.
 
     """
-    class_ = import_driver(driver)
+    class_ = import_component('model', driver, without_schema=True)
     if args is None:
         instance = class_(name, **kwargs)
     else:
@@ -43,16 +30,9 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
     return instance
 
 
-def import_all_drivers():
-    r"""Import all drivers to ensure they are registered."""
-    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
-        xbase = os.path.basename(x)
-        if (not xbase.startswith('__')) and (xbase != 'lpy_model.py'):
-            import_driver(xbase[:-3])
-
-
-__all__ = ['import_driver', 'create_driver', 'Driver',
-           'ModelDriver', 'PythonModelDriver', 'GCCModelDriver',
+__all__ = ['create_driver', 'Driver',
+           'ModelDriver', 'PythonModelDriver',
+           'CModelDriver', 'CPPModelDriver',
            'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',
            'ConnectionDriver', 'InputDriver', 'OutputDriver',
            'FileInputDriver', 'FileOutputDriver',

@@ -5,6 +5,8 @@ import logging
 import pprint
 import os
 import sys
+import copy
+import shutil
 import inspect
 import time
 import signal
@@ -13,9 +15,10 @@ import uuid as uuid_gen
 import subprocess
 from yggdrasil import platform
 from yggdrasil import backwards
-from yggdrasil.config import ygg_cfg, cfg_logging
+from yggdrasil.components import import_component, ComponentBase
 
 
+logger = logging.getLogger(__name__)
 YGG_MSG_EOF = b'EOF!!!'
 YGG_MSG_BUF = 1024 * 2
 
@@ -43,26 +46,26 @@ except AttributeError:
 def check_threads():  # pragma: debug
     r"""Check for threads that are still running."""
     global _thread_registry
-    # logging.info("Checking %d threads" % len(_thread_registry))
+    # logger.info("Checking %d threads" % len(_thread_registry))
     for k, v in _thread_registry.items():
         if v.is_alive():
-            logging.error("Thread is alive: %s" % k)
+            logger.error("Thread is alive: %s" % k)
     if threading.active_count() > 1:
-        logging.info("%d threads running" % threading.active_count())
+        logger.info("%d threads running" % threading.active_count())
         for t in threading.enumerate():
-            logging.info("%s thread running" % t.name)
+            logger.info("%s thread running" % t.name)
 
 
 def check_locks():  # pragma: debug
     r"""Check for locks in lock registry that are locked."""
     global _lock_registry
-    # logging.info("Checking %d locks" % len(_lock_registry))
+    # logger.info("Checking %d locks" % len(_lock_registry))
     for k, v in _lock_registry.items():
         res = v.acquire(False)
         if res:
             v.release()
         else:
-            logging.error("Lock could not be acquired: %s" % k)
+            logger.error("Lock could not be acquired: %s" % k)
 
 
 def check_sockets():  # pragma: debug
@@ -70,14 +73,43 @@ def check_sockets():  # pragma: debug
     from yggdrasil.communication import cleanup_comms
     count = cleanup_comms('ZMQComm')
     if count > 0:
-        logging.info("%d sockets closed." % count)
+        logger.info("%d sockets closed." % count)
+
+
+def check_environ_bool(name, valid_values=['true', '1', True, 1]):
+    r"""Check to see if a boolean environment variable is set to True.
+
+    Args:
+        name (str): Name of environment variable to check.
+        valid_values (list, optional): Values for the environment variable
+            that indicate it is True. These should all be lower case as
+            the lower case version of the variable contents will be compared
+            to the list. Defaults to ['true', '1'].
+
+    Returns:
+        bool: True if the environment variables is set and is one of the
+            list valid_values (after being transformed to lower case).
+
+    """
+    return (os.environ.get(name, '').lower() in valid_values)
+
+
+def is_subprocess():
+    r"""Determine if the current process is a subprocess.
+
+    Returns:
+        bool: True if YGG_SUBPROCESS environment variable is True, False
+            otherwise.
+
+    """
+    return check_environ_bool('YGG_SUBPROCESS')
 
 
 def ygg_atexit():  # pragma: debug
     r"""Things to do at exit."""
     check_locks()
     check_threads()
-    if not os.environ.get('YGG_SUBPROCESS', False):
+    if not is_subprocess():
         check_sockets()
     if backwards.PY34:
         # Print empty line to ensure close
@@ -86,6 +118,34 @@ def ygg_atexit():  # pragma: debug
 
 
 atexit.register(ygg_atexit)
+
+
+def which(program):
+    r"""Determine the path to an executable if it exists.
+
+    Args:
+        program (str): Name of program to locate or full path to program.
+
+    Returns:
+        str: Path to executable if it can be located. Otherwise, None.
+
+    """
+    if backwards.PY2:  # pragma: Python 2
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+        fpath, fname = os.path.split(program)
+        if fpath:
+            if is_exe(program):
+                return program
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                exe_file = os.path.join(path, program)
+                if is_exe(exe_file):
+                    return exe_file
+        return None
+    else:  # pragma: Python 3
+        return shutil.which(program)
 
 
 def locate_path(fname, basedir=os.path.abspath(os.sep)):
@@ -107,6 +167,16 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
         return False
     out = out.decode('utf-8').splitlines()
     return out
+
+
+def get_supported_platforms():
+    r"""Get a list of the platforms supported by yggdrasil.
+
+    Returns:
+        list: The name of platforms supported by yggdrasil.
+
+    """
+    return copy.deepcopy(platform._supported_platforms)
 
 
 def get_supported_lang():
@@ -134,8 +204,8 @@ def get_supported_comm():
     """
     from yggdrasil import schema
     s = schema.get_schema()
-    out = s['comm'].classes
-    for k in ['CommBase', 'DefaultComm']:
+    out = s['comm'].subtypes
+    for k in ['CommBase', 'DefaultComm', 'default']:
         if k in out:
             out.remove(k)
     return list(set(out))
@@ -153,9 +223,7 @@ def is_lang_installed(lang):
             machine, False otherwise.
 
     """
-    from yggdrasil import schema, drivers
-    s = schema.get_schema()
-    drv = drivers.import_driver(s['model'].subtype2class[lang])
+    drv = import_component('model', lang)
     return drv.is_installed()
 
 
@@ -174,8 +242,7 @@ def is_comm_installed(comm, language=None):
             machine, False otherwise.
 
     """
-    from yggdrasil import communication
-    cmm = communication.get_comm_class(comm)
+    cmm = import_component('comm', comm)
     return cmm.is_installed(language=language)
 
 
@@ -219,7 +286,7 @@ def get_installed_comm(language=None):
             out.append(k)
     # Fix order to denote preference
     out_sorted = []
-    for k in ['ZMQComm', 'IPCComm', 'RMQComm']:
+    for k in ['zmq', 'ipc', 'rmq']:
         if k in out:
             out.remove(k)
             out_sorted.append(k)
@@ -249,8 +316,10 @@ def get_default_comm():
             _default_comm = max(tally)
             if tally[_default_comm] == 0:  # pragma: debug
                 raise Exception('Could not locate an installed comm.')
-    if _default_comm == 'RMQComm':  # pragma: debug
-        raise NotImplementedError('RMQComm cannot be the default comm because '
+    if _default_comm.endswith('Comm'):
+        _default_comm = import_component('comm', _default_comm)._commtype
+    if _default_comm == 'rmq':  # pragma: debug
+        raise NotImplementedError('RMQ cannot be the default comm because '
                                   + 'there is not an RMQ C interface.')
     return _default_comm
 
@@ -269,7 +338,7 @@ def get_YGG_MSG_MAX(comm_type=None):
     """
     if comm_type is None:
         comm_type = get_default_comm()
-    if comm_type == 'IPCComm':
+    if comm_type in ['ipc', 'IPCComm']:
         # OS X limit is 2kb
         out = 1024 * 2
     else:
@@ -388,7 +457,7 @@ class YggPopen(subprocess.Popen):
         **kwargs: Additional keywords arguments are passed to Popen.
 
     """
-    def __init__(self, cmd_args, forward_signals=True, **kwargs):
+    def __init__(self, cmd_args, forward_signals=True, for_matlab=False, **kwargs):
         # stdbuf only for linux
         if platform._is_linux:
             stdbuf_args = ['stdbuf', '-o0', '-e0']
@@ -399,11 +468,29 @@ class YggPopen(subprocess.Popen):
         kwargs.setdefault('bufsize', 0)
         kwargs.setdefault('stdout', subprocess.PIPE)
         kwargs.setdefault('stderr', subprocess.STDOUT)
+        # To prevent forward of signals, process will have a new process group
         if not forward_signals:
             if platform._is_win:  # pragma: windows
+                # TODO: Make sure that Matlab handled correctly since pty not
+                # guaranteed on windows
                 kwargs.setdefault('preexec_fn', None)
-                kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
+                kwargs.setdefault('creationflags',
+                                  subprocess.CREATE_NEW_PROCESS_GROUP)
             else:
+                if for_matlab:  # pragma: matlab
+                    import pty
+                    # Matlab requires a tty so a pty is used here to allow
+                    # the process to be lanched in a new process group.
+                    # Related Materials:
+                    # - https://www.mathworks.com/matlabcentral/answers/
+                    #       359992-system-call-bizarre-behavior
+                    # - https://gist.github.com/thepaul/1206753
+                    # - https://stackoverflow.com/questions/30139401/
+                    #       filter-out-command-that-needs-a-terminal-in-python-
+                    #       subprocess-module
+                    master_fd, slave_fd = pty.openpty()
+                    kwargs.setdefault('stdin', slave_fd)
+
                 kwargs.setdefault('preexec_fn', os.setpgrp)
         # if platform._is_win:  # pragma: windows
         #     kwargs.setdefault('universal_newlines', True)
@@ -453,8 +540,8 @@ def print_encoded(msg, *args, **kwargs):
     try:
         print(backwards.as_unicode(msg), *args, **kwargs)
     except (UnicodeEncodeError, UnicodeDecodeError):  # pragma: debug
-        logging.debug("sys.stdout.encoding = %s, cannot print unicode",
-                      sys.stdout.encoding)
+        logger.debug("sys.stdout.encoding = %s, cannot print unicode",
+                     sys.stdout.encoding)
         kwargs.pop('end', None)
         try:
             print(msg, *args, **kwargs)
@@ -502,7 +589,7 @@ class TimeOut(object):
 #     r"""Decorator for marking functions that should only be called once."""
 #     def wrapper(*args, **kwargs):
 #         if getattr(func, '_single_use_method_called', False):
-#             logging.info("METHOD %s ALREADY CALLED" % func)
+#             logger.info("METHOD %s ALREADY CALLED" % func)
 #             return
 #         else:
 #             func._single_use_method_called = True
@@ -510,11 +597,11 @@ class TimeOut(object):
 #     return wrapper
 
 
-class YggClass(logging.LoggerAdapter):
+class YggClass(ComponentBase, logging.LoggerAdapter):
     r"""Base class for Ygg classes.
 
     Args:
-        name (str): Class name.
+        name (str): Name used for component in log messages.
         uuid (str, optional): Unique ID for this instance. Defaults to None
             and is assigned.
         working_dir (str, optional): Working directory. If not provided, the
@@ -523,8 +610,8 @@ class YggClass(logging.LoggerAdapter):
             spent waiting on a process. Defaults to 60.
         sleeptime (float, optional): Time that class should sleep for when
             sleep is called. Defaults to 0.01.
-        **kwargs: Additional keyword arguments are assigned to the extra_kwargs
-            dictionary.
+        **kwargs: Additional keyword arguments are passed to the ComponentBase
+            initializer.
 
     Attributes:
         name (str): Class name.
@@ -535,7 +622,6 @@ class YggClass(logging.LoggerAdapter):
         timeout (float): Maximum time that should be spent waiting on a process.
         working_dir (str): Working directory.
         errors (list): List of errors.
-        extra_kwargs (dict): Keyword arguments that were not parsed.
         sched_out (obj): Output from the last scheduled task with output.
         logger (logging.Logger): Logger object for this object.
         suppress_special_debug (bool): If True, special_debug log messages
@@ -543,25 +629,26 @@ class YggClass(logging.LoggerAdapter):
 
     """
 
+    _base_defaults = ['name', 'uuid', 'working_dir', 'timeout', 'sleeptime']
+
     def __init__(self, name=None, uuid=None, working_dir=None,
                  timeout=60.0, sleeptime=0.01, **kwargs):
+        # Defaults
         if name is None:
             name = ''
-        self._name = name
         if uuid is None:
             uuid = str(uuid_gen.uuid4())
+        if working_dir is None:
+            working_dir = os.getcwd()
+        # Assign attributes
+        self._name = name
         self.uuid = uuid
         self.sleeptime = sleeptime
         self.longsleep = self.sleeptime * 10
         self.timeout = timeout
         self._timeouts = {}
-        # Set defaults
-        if working_dir is None:
-            working_dir = os.getcwd()
-        # Assign things
         self.working_dir = working_dir
         self.errors = []
-        self.extra_kwargs = kwargs
         self.sched_out = None
         self.suppress_special_debug = False
         self._periodic_logs = {}
@@ -574,7 +661,16 @@ class YggClass(logging.LoggerAdapter):
         self._old_encoding = None
         self.debug_flag = False
         self._ygg_class = str(self.__class__).split("'")[1].split('.')[-1]
-        super(YggClass, self).__init__(logging.getLogger(self.__module__), {})
+        # Call super class, adding in schema properties
+        for k in self._base_defaults:
+            if k in self._schema_properties:
+                kwargs[k] = getattr(self, k)
+        super(YggClass, self).__init__(**kwargs)
+        logging.LoggerAdapter.__init__(self, logging.getLogger(self.__module__), {})
+
+    def __deepcopy__(self, memo):
+        r"""Don't deep copy since threads cannot be copied."""
+        return self
 
     @property
     def name(self):
@@ -588,16 +684,16 @@ class YggClass(logging.LoggerAdapter):
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
-        self._old_loglevel = ygg_cfg.get('debug', 'ygg')
-        ygg_cfg.set('debug', 'ygg', 'DEBUG')
-        cfg_logging()
+        self.info("Setting debug_log")
+        from yggdrasil.config import get_ygg_loglevel, set_ygg_loglevel
+        self._old_loglevel = get_ygg_loglevel()
+        set_ygg_loglevel('DEBUG')
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
+        from yggdrasil.config import set_ygg_loglevel
         if self._old_loglevel is not None:
-            ygg_cfg.set('debug', 'ygg', self._old_loglevel)
-            cfg_logging()
-            self._old_loglevel = None
+            set_ygg_loglevel(self._old_loglevel)
 
     def pprint(self, obj, block_indent=0, indent_str='    ', **kwargs):
         r"""Use pprint to represent an object as a string.
@@ -891,7 +987,7 @@ class YggClass(logging.LoggerAdapter):
                 self.error("Timeout for %s at %5.2f/%5.2f s" % (
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
-
+        
 
 class YggThread(threading.Thread, YggClass):
     r"""Thread for Ygg that tracks when the thread is started and joined.
@@ -910,6 +1006,9 @@ class YggThread(threading.Thread, YggClass):
         global _lock_registry
         if kwargs is None:
             kwargs = {}
+        if (target is not None) and ('target' in self._schema_properties):
+            ygg_kwargs['target'] = target
+            target = None
         thread_kwargs = dict(name=name, target=target, group=group,
                              args=args, kwargs=kwargs)
         super(YggThread, self).__init__(**thread_kwargs)

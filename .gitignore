@@ -18,11 +18,16 @@ docs/source/yggdrasil.inc
 docs/source/yggdrasil*.rst
 docs/source/modules.rst
 docs/source/examples/*.rst
+docs/source/tables
 
 # Coverage
 .coveragerc
 .coverage
 htmlcov
+.coverage.*
+
+# Profiling
+prof
 
 # temp for storing notes, whatever, etc.   not managed
 tmp/
@@ -50,7 +55,10 @@ tmp/
 
 
 # Packaging things
+cis_interface
+cis_interface.egg-info
 yggdrasil.egg-info
+yggdrasil_framework.egg-info
 dist/
 build/
 
