@@ -36,6 +36,7 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
     BUILDDOCS=0
+    YGG_USE_SUDO_FOR_R=1  # sudo required for installing R libraries
   matrix:
     - YGG_ENABLE_LONG_TESTS=1
     - CONDA=yes
@@ -165,10 +166,9 @@ install:
       fi
       # Install from source dist
       python setup.py sdist
-      # sudo required for installing R libraries
-      pip install --verbose dist/*.tar.gz --install-option="--sudoR"
+      pip install --verbose dist/*.tar.gz
       # Install from source
-      # pip install --verbose -e . --install-option="--sudoR"
+      # pip install --verbose -e .
     elif [[ -n "$CONDA" ]]; then
       pip uninstall -y numpy
       pip uninstall -y matplotlib

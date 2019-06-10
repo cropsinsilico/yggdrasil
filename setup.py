@@ -37,7 +37,8 @@ if 'sdist' not in sys.argv:
 
     # Install R interface
     print('sys.argv', sys.argv)
-    with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv))
+    with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv)
+                 or (os.environ.get('YGG_USE_SUDO_FOR_R', '0') == '1'))
     if install_R_interface.install_R_interface(with_sudo=with_sudo):
         R_installed = True
     else:
@@ -135,7 +136,6 @@ develop_cmdclass = cmdclass.get('develop', develop)
 
 class CommandMixin(object):
     user_options = [('sudoR', None, None),
-                    ('noR', None, None),
                     ('rj-include-dir=', None, None),
                     ('rapidjson-include-dir=', None, None)]
 
