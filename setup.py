@@ -34,7 +34,8 @@ if 'sdist' not in sys.argv:
 
 
     # Install R interface
-    if install_R_interface.install_R_interface(with_sudo=('sudo' in sys.argv)):
+    with_sudo = (('sudo' in sys.argv) or ('--sudoR' in sys.argv))
+    if install_R_interface.install_R_interface(with_sudo=with_sudo):
         R_installed = True
     else:
         warnings.warn("Could not install R interface. " +
